@@ -3932,6 +3932,15 @@ div.m ul#civicrm-menu,
   position: relative;
   top: 3px;
 }
+.crm-container .crm-action-menu.action-icon-plus .select2-default span.select2-chosen:before {
+  background-position: -16px -128px;
+}
+.crm-container .crm-action-menu.action-icon-play .select2-default span.select2-chosen:before {
+  background-position: 0 -160px;
+}
+.crm-container .crm-action-menu.action-icon-clipboard .select2-default span.select2-chosen:before {
+  background-position: -160px -128px;
+}
 
 /* Special styling for specific form buttons */
 #crm-container span.crm-button_qf_Main_upload input,

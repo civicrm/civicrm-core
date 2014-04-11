@@ -276,17 +276,17 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       $activityLinks[$url] = $label;
     }
 
-    $this->add('select', 'add_activity_type_id', '', $activityLinks, FALSE, array('class' => 'crm-select2 crm-action-menu twenty'));
+    $this->add('select', 'add_activity_type_id', '', $activityLinks, FALSE, array('class' => 'crm-select2 crm-action-menu action-icon-plus twenty'));
     if ($this->_hasAccessToAllCases) {
       $this->add('select', 'report_id', '',
         array('' => ts('Run QA Audit / Redact')) + $reports,
         FALSE,
-        array('class' => 'crm-select2 crm-action-menu')
+        array('class' => 'crm-select2 crm-action-menu action-icon-clipboard')
       );
       $this->add('select', 'timeline_id', '',
         array('' => ts('Add Timeline')) + $reports,
         FALSE,
-        array('class' => 'crm-select2 crm-action-menu')
+        array('class' => 'crm-select2 crm-action-menu action-icon-play')
       );
     }
     $this->addElement('submit', $this->getButtonName('next'), ' ', array('class' => 'hiddenElement'));
