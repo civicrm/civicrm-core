@@ -239,6 +239,9 @@
       var that = this;
       var url = this._formatUrl(this.options.url);
       this.options.crmForm && $('form', this.element).ajaxFormUnbind();
+      if (this._originalContent === null) {
+        this._originalContent = this.element.contents().detach();
+      }
       this.options.block && $('.blockOverlay', this.element).length < 1 && this.element.block();
       $.getJSON(url, function(data) {
         if (typeof(data) != 'object' || typeof(data.content) != 'string') {
@@ -246,11 +249,7 @@
           return;
         }
         data.url = url;
-        that.element.trigger('crmBeforeLoad', data);
-        if (that._originalContent === null) {
-          that._originalContent = that.element.contents().detach();
-        }
-        that.element.html(data.content);
+        that.element.trigger('crmBeforeLoad', data).html(data.content);
         that._handleOrderLinks();
         that.element.trigger('crmLoad', data);
         that.options.crmForm && that.element.trigger('crmFormLoad', data);

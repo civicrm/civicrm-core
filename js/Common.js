@@ -406,17 +406,18 @@ CRM.validate = CRM.validate || {
     .on('crmLoad', function(e) {
       $('table.row-highlight', e.target)
         .off('.rowHighlight')
-        .on('change.rowHighlight', 'input.select-row, input.select-rows', function () {
-          var target, table = $(this).closest('table');
+        .on('change.rowHighlight', 'input.select-row, input.select-rows', function (e, data) {
+          var filter, $table = $(this).closest('table');
           if ($(this).hasClass('select-rows')) {
-            target = $('tbody tr', table);
-            $('input.select-row', table).prop('checked', $(this).prop('checked'));
+            filter = $(this).prop('checked') ? ':not(:checked)' : ':checked';
+            $('input.select-row' + filter, $table).prop('checked', $(this).prop('checked')).trigger('change', 'master-selected');
           }
           else {
-            target = $(this).closest('tr');
-            $('input.select-rows', table).prop('checked', $(".select-row:not(':checked')", table).length < 1);
+            $(this).closest('tr').toggleClass('crm-row-selected', $(this).prop('checked'));
+            if (data !== 'master-selected') {
+              $('input.select-rows', $table).prop('checked', $(".select-row:not(':checked')", $table).length < 1);
+            }
           }
-          target.toggleClass('crm-row-selected', $(this).is(':checked'));
         })
         .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
