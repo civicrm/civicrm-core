@@ -66,6 +66,13 @@ CRM.$(function($) {
   CRM.tabHeader = CRM.tabHeader || {};
 
   /**
+   * Return active tab
+   */
+  CRM.tabHeader.getActiveTab = function() {
+    return $('.ui-tabs-active', '#mainTabContainer');
+  }
+
+  /**
    * Make a given tab the active one
    * @param tab jQuery selector
    */
@@ -80,6 +87,10 @@ CRM.$(function($) {
   CRM.tabHeader.getTabPanel = function(tab) {
     return $('#' + $(tab).attr('aria-controls'));
   };
+
+  CRM.tabHeader.getCount = function(tab) {
+    return parseInt($(tab).find('a em').text(), 10);
+  }
 
   /**
    * Update the counter in a tab
