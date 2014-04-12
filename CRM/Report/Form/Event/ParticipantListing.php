@@ -470,8 +470,7 @@ GROUP BY  cv.label
         FROM civicrm_participant {$this->_aliases['civicrm_participant']}
              LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']}
                     ON ({$this->_aliases['civicrm_event']}.id = {$this->_aliases['civicrm_participant']}.event_id ) AND
-                       ({$this->_aliases['civicrm_event']}.is_template IS NULL OR
-                        {$this->_aliases['civicrm_event']}.is_template = 0)
+                        {$this->_aliases['civicrm_event']}.is_template = 0
              LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                     ON ({$this->_aliases['civicrm_participant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  )
              {$this->_aclFrom}
@@ -496,7 +495,8 @@ GROUP BY  cv.label
     if ($this->_lineitemField){
       $this->_from .= "
             LEFT JOIN civicrm_line_item line_item_civireport
-                  ON line_item_civireport.entity_id = {$this->_aliases['civicrm_participant']}.id
+                  ON line_item_civireport.entity_table = 'civicrm_participant' AND
+                     line_item_civireport.entity_id = {$this->_aliases['civicrm_participant']}.id
       ";
     }
   }

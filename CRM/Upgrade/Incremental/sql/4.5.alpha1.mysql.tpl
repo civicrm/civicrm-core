@@ -249,3 +249,8 @@ UPDATE civicrm_custom_field cf
   WHERE cg.is_multiple = 1 AND cf.html_type != 'TextArea';
 ALTER TABLE `civicrm_custom_group`
  CHANGE COLUMN `style` `style` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Visual relationship between this form and its parent.';
+
+-- CRM-14300
+UPDATE `civicrm_event` SET is_template = 0 WHERE is_template IS NULL;
+ALTER TABLE `civicrm_event`
+  CHANGE is_template is_template tinyint(4) DEFAULT '0' COMMENT 'whether the event has template';
