@@ -163,7 +163,11 @@ class CRM_Case_Form_Activity_OpenCase {
       $element->freeze();
     }
 
-    $csElement = $form->addSelect('status_id', array(), TRUE);
+    $csElement = $form->add('select', 'status_id', ts('Case Status'),
+      CRM_Case_PseudoConstant::caseStatus(),
+      FALSE
+    );
+
     if ($form->_caseStatusId) {
       $csElement->freeze();
     }
