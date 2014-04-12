@@ -37,10 +37,12 @@
     {if $smarty.get.snippet eq 2}
       {include file="CRM/common/print.tpl"}
     {else}
-      <div class="crm-container-snippet">
+      {crmRegion name='page-body'}
 
-        {* Display Status messages unless we are outputting json. *}
+        {* Add status messages and container-snippet div unless we are outputting json. *}
         {if $smarty.get.snippet neq 'json'}
+          {* this div is deprecated but included for older-style snippets for legacy support *}
+          <div class="crm-container-snippet">
           {include file="CRM/common/status.tpl"}
         {/if}
 
@@ -51,7 +53,11 @@
           {include file=$tplFile}
         {/if}
 
-      </div> {* end crm-container-snippet div *}
+        {if $smarty.get.snippet neq 'json'}
+          </div>
+        {/if}
+
+      {/crmRegion}
     {/if}
   {/if}
 {/strip}
