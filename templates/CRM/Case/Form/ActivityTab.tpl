@@ -43,17 +43,20 @@
               {$form.status_id.html}
             </td>
             <td style="vertical-align: bottom;">
-              <span class="crm-button"><input class="form-submit default" name="_qf_Basic_refresh" value="Search" type="button" onclick="buildCaseActivities( true )"; /></span>
+              {assign var=caseid value=$caseID}
+              <span class="crm-button"><input class="form-submit default" name="_qf_Basic_refresh" value="Search" type="button" onclick="buildCaseActivities( true,{$caseid} )"; /></span>
             </td>
           </tr>
           <tr>
             <td class="crm-case-caseview-form-block-activity_date_low">
-              {$form.activity_date_low.label}<br />
-            {include file="CRM/common/jcalendar.tpl" elementName=activity_date_low}
+	      {assign var=activitylow  value=activity_date_low_$caseID}
+              {$form.$activitylow.label}<br />
+            {include file="CRM/common/jcalendar.tpl" elementName=$activitylow}
             </td>
             <td class="crm-case-caseview-form-block-activity_date_high">
-              {$form.activity_date_high.label}<br />
-            {include file="CRM/common/jcalendar.tpl" elementName=activity_date_high}
+	      {assign var=activityhigh  value=activity_date_high_$caseID}
+              {$form.$activityhigh.label}<br />
+            {include file="CRM/common/jcalendar.tpl" elementName=$activityhigh}
             </td>
             <td class="crm-case-caseview-form-block-activity_type_filter_id">
               {$form.activity_type_filter_id.label}<br />
@@ -71,7 +74,7 @@
       </div><!-- /.crm-accordion-body -->
     </div><!-- /.crm-accordion-wrapper -->
 
-    <table id="activities-selector"  class="nestedActivitySelector">
+    <table id=case_id_{$caseid}  class="nestedActivitySelector">
       <thead><tr>
         <th class='crm-case-activities-date'>{ts}Date{/ts}</th>
         <th class='crm-case-activities-subject'>{ts}Subject{/ts}</th>
@@ -90,20 +93,20 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
-  buildCaseActivities(false);
+  buildCaseActivities(false,{/literal}{$caseID}{literal});
 });
 
-function buildCaseActivities(filterSearch) {
+function buildCaseActivities(filterSearch , CaseId) {
   if (filterSearch) {
     oTable.fnDestroy();
   }
   var count   = 0;
   var columns = '';
-  var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/activity' h=0 q='snippet=4&caseID='}{$caseID}"{literal};
+  var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/activity' h=0 q='snippet=4&caseID='}"{literal}+CaseId;
   sourceUrl = sourceUrl + '&cid={/literal}{$contactID}{literal}';
   sourceUrl = sourceUrl + '&userID={/literal}{$userID}{literal}';
 
-  cj('#activities-selector th').each(function( ) {
+  cj('#case_id_'+CaseId+' th').each(function( ) {
     if (cj(this).attr('id') != 'nosort') {
       columns += '{"sClass": "' + cj(this).attr('class') +'"},';
     }
@@ -116,7 +119,7 @@ function buildCaseActivities(filterSearch) {
   columns    = columns.substring(0, columns.length - 1 );
   eval('columns =[' + columns + ']');
 
-  oTable = cj('#activities-selector').dataTable({
+  oTable = cj('#case_id_'+CaseId).dataTable({
     "bFilter"    : false,
     "bAutoWidth" : false,
     "aaSorting"  : [],
@@ -129,19 +132,21 @@ function buildCaseActivities(filterSearch) {
     "bServerSide": true,
     "sAjaxSource": sourceUrl,
     "iDisplayLength": 10,
-    "fnDrawCallback": function() { setSelectorClass(); },
+    "bDestroy": true,
+    "fnDrawCallback": function() { setSelectorClass(CaseId); },
     "fnServerData": function ( sSource, aoData, fnCallback ) {
 
       if ( filterSearch ) {
         var activity_deleted = 0;
-        if ( cj("#activity_deleted:checked").val() == 1 ) {
+        if ( cj("#activity_deleted_"+CaseId+":checked").val() == 1 ) {
           activity_deleted = 1;
         }
         aoData.push(
-          {name:'status_id', value: cj("select#status_id").val()},
-          {name:'activity_type_id', value: cj("select#activity_type_filter_id").val()},
-          {name:'activity_date_low', value: cj("#activity_date_low").val()},
-          {name:'activity_date_high', value: cj("#activity_date_high").val() },
+          {name:'status_id', value: cj("select#status_id_"+CaseId).val()},
+          {name:'reporter_id', value: cj("select#reporter_id_"+CaseId).val()},
+          {name:'activity_type_id', value: cj("select#activity_type_filter_id_"+CaseId).val()},
+          {name:'activity_date_low', value: cj("#activity_date_low_"+CaseId).val()},
+          {name:'activity_date_high', value: cj("#activity_date_high_"+CaseId).val() },
           {name:'activity_deleted', value: activity_deleted }
         );
       }
@@ -156,8 +161,8 @@ function buildCaseActivities(filterSearch) {
   });
 }
 
-function setSelectorClass( ) {
-  cj("#activities-selector td:last-child").each( function( ) {
+function setSelectorClass(CaseId) {
+  cj("#case_id_"+CaseId+" td:last-child").each( function( ) {
     cj(this).parent().addClass(cj(this).text() );
   });
 }
