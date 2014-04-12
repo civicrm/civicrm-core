@@ -195,7 +195,7 @@
 
               <div class="description">{ts}Email a complete copy of this activity record to other people involved with the case. Click the top left box to select all.{/ts}</div>
               {strip}
-                <table>
+                <table class="row-highlight">
                   <tr class="columnheader">
                     <th>{$form.toggleSelect.html}&nbsp;</th>
                     <th>{ts}Case Role{/ts}</th>
