@@ -72,7 +72,7 @@
         <td colspan="2">
           <div id="activity-details" class="crm-accordion-wrapper collapsed">
             <div class="crm-accordion-header">
-              {ts} Activity Details{/ts}
+              {ts}Activity Details{/ts}
             </div><!-- /.crm-accordion-header -->
             <div class="crm-accordion-body">
     {/if}
@@ -296,7 +296,7 @@
     {/literal}
   {/if}
 
-  {if $action neq 8 and $action neq 32768}
+  {if $action neq 8 and $action neq 32768 and empty($activityTypeFile)}
   <script type="text/javascript">
     {if $searchRows}
       cj('#sendcopy').crmAccordionToggle();
