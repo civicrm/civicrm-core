@@ -438,7 +438,7 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
               else {
                 $matchingContactIds = explode(',', $checkDedupe['error_message']['params'][0]);
                 if (count($matchingContactIds) > 1) {
-                  return civicrm_api3_create_error("Invalid email address(duplicate)$email for Soft Credit. Row was skipped");
+                  return civicrm_api3_create_error("Invalid email address(duplicate) $email for Soft Credit. Row was skipped");
                 }
                 elseif (count($matchingContactIds) == 1) {
                   $contactId =  $matchingContactIds[0];
