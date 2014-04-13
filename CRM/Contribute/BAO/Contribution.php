@@ -869,18 +869,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    */
   static function getSpecialContributionFields() {
     $extraFields = array(
-      'honor_contact_name' => array(
-        'name' => 'honor_contact_name',
-        'title' => 'Honor Contact Name',
-        'headerPattern' => '/^honor_contact_name$/i',
-        'where' => 'civicrm_contact_c.display_name',
-      ),
-      'honor_contact_email' => array(
-        'name' => 'honor_contact_email',
-        'title' => 'Honor Contact Email',
-        'headerPattern' => '/^honor_contact_email$/i',
-        'where' => 'honor_email.email',
-      ),
       'contribution_soft_credit_name' => array(
         'name' => 'contribution_soft_credit_name',
         'title' => 'Soft Credit Name',
