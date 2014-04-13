@@ -102,6 +102,8 @@ class CRM_Core_BAO_CustomQuery {
    */
   protected $_contactSearch;
 
+  protected $_locationSpecifiCustomFields;
+
   /**
    * This stores custom data group types and tables that it extends
    *
@@ -135,8 +137,10 @@ class CRM_Core_BAO_CustomQuery {
    * @param  array  $ids     the set of custom field ids
    *
    * @access public
-   */ function __construct($ids, $contactSearch = FALSE) {
+   */
+  function __construct($ids, $contactSearch = FALSE, $locationSpecificFields = array()) {
     $this->_ids = &$ids;
+    $this->_locationSpecifiCustomFields = $locationSpecificFields;
 
     $this->_select      = array();
     $this->_element     = array();
@@ -300,12 +304,20 @@ SELECT label, value
       }
 
       if ($joinTable) {
-        $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = $joinTable.id";
+        $joinClause = 1;
+        $joinTableAlias = $joinTable;
+        // Set location-specific query
+        if (isset($this->_locationSpecifiCustomFields[$id])) {
+          list($locationType, $locationTypeId) = $this->_locationSpecifiCustomFields[$id];
+          $joinTableAlias = "$locationType-address";
+          $joinClause = "\nLEFT JOIN $joinTable `$locationType-address` ON (`$locationType-address`.contact_id = contact_a.id AND `$locationType-address`.location_type_id = $locationTypeId)";
+        }
+        $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = `$joinTableAlias`.id";
         if ($this->_ids[$id]) {
           $this->_whereTables[$name] = $this->_tables[$name];
         }
         if ($joinTable != 'contact_a') {
-          $this->_whereTables[$joinTable] = $this->_tables[$joinTable] = 1;
+          $this->_whereTables[$joinTableAlias] = $this->_tables[$joinTableAlias] = $joinClause;
         }
         elseif ($this->_contactSearch) {
           CRM_Contact_BAO_Query::$_openedPanes[ts('Custom Fields')] = TRUE;
@@ -325,9 +337,6 @@ SELECT label, value
    * @access public
    */
   function where() {
-    //CRM_Core_Error::debug( 'fld', $this->_fields );
-    //CRM_Core_Error::debug( 'ids', $this->_ids );
-
     foreach ($this->_ids as $id => $values) {
 
       // Fixed for Isuue CRM 607
