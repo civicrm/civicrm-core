@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   CONST ROW_COUNT_LIMIT = 10;
 

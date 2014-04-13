@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 
 /**
  * Page to disply contact name on top of the summary

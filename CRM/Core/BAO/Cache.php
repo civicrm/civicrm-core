@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 
 /**
  * BAO object for civicrm_cache table. This is a database cache and is persisted across sessions. Typically we use

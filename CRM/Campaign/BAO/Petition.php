@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
   function __construct() {
     parent::__construct();

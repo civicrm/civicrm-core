@@ -25,13 +25,6 @@
   +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 
 /**
  * Class that uses Yahoo! PlaceFinder API to retrieve the lat/long of an address

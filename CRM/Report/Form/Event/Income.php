@@ -26,13 +26,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
   CONST ROW_COUNT_LIMIT = 2;
 

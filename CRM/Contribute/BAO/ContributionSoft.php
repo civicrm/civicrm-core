@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_ContributionSoft {
 
   /**

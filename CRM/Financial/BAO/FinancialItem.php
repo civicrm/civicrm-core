@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 
 class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
 

@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 
 // ** REGSITE settings **
 define('REGSITE_PROFILE_ID', 15);

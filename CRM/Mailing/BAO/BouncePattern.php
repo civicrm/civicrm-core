@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Mailing_BAO_BouncePattern extends CRM_Mailing_DAO_BouncePattern {
 
   /**

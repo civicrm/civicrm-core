@@ -26,13 +26,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
   function __construct() {
     $this->_columns = array(

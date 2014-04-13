@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CiviContributeProcessor {
   static $_paypalParamsMapper = array(
     //category    => array(paypal_param    => civicrm_field);

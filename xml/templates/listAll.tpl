@@ -26,13 +26,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 
 class CRM_Core_DAO_AllCoreTables {ldelim}
 

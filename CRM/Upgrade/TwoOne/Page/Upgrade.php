@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Upgrade_TwoOne_Page_Upgrade extends CRM_Core_Page {
   function run() {
     $upgrade = new CRM_Upgrade_Form();

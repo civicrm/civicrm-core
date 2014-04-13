@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Upgrade_TwoOne_Form_Step1 extends CRM_Upgrade_Form {
   function verifyPreDBState(&$errorMessage) {
     $config = CRM_Core_Config::singleton();

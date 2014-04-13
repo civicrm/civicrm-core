@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
 
   public $useLivePageJS = TRUE;

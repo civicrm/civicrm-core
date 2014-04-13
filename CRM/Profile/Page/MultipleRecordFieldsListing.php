@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
 
   /**

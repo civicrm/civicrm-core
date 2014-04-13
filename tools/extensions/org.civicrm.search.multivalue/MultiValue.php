@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 
 require_once 'CRM/Contact/Form/Search/Custom/Base.php';
 class org_civicrm_search_multivalue extends CRM_Contact_Form_Search_Custom_BaseimplementsCRM_Contact_Form_Search_Interface {

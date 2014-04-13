@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Upgrade_TwoTwo_Controller extends CRM_Upgrade_Controller {
   function &getPages() {
     $pages = array(

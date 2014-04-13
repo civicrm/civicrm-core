@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 
 require_once 'CRM/Core/Payment.php';
 require_once ('packages/Google/library/googlecart.php');

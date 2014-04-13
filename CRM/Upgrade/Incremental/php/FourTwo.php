@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Upgrade_Incremental_php_FourTwo {
   const BATCH_SIZE = 5000;
   const SETTINGS_SNIPPET_PATTERN = '/CRM_Core_ClassLoader::singleton\(\)-\>register/';

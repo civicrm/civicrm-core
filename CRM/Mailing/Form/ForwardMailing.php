@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
   function preProcess() {
     $job_id = CRM_Utils_Request::retrieve('jid', 'Positive',

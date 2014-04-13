@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Custom.php';

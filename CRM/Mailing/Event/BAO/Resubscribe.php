@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 
 require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Resubscribe {

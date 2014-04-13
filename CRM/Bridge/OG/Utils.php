@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Bridge_OG_Utils {
   CONST aclEnabled = 1, syncFromCiviCRM = 1;
 

@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Batch_Form_Search extends CRM_Core_Form {
   function setDefaultValues() {
     $defaults = array();

@@ -24,13 +24,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Upgrade_Incremental_php_FourFour {
   const BATCH_SIZE = 5000;
 

@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 function civicrm_smarty_resource_string_get_template($tpl_name, &$tpl_source, &$smarty_obj) {
   $tpl_source = $tpl_name;
   return TRUE;
