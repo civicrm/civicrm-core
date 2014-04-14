@@ -2854,7 +2854,8 @@ WHERE  contribution_id = %1 ";
           }
           else {
             $diff = 1;
-            if ($context == 'changeFinancialType' || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)) {
+            if ($context == 'changeFinancialType' || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)
+              || $params['contribution']->contribution_status_id == array_search('Refunded', $contributionStatus)) {
              $diff = -1;
             }
             $amount = $diff * $fieldValues['line_total'];
@@ -3081,17 +3082,18 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       $getLine['entity_id'] = $contributionDAO->id;
       $getLine['entity_table'] = 'civicrm_contribution';
       $lineItemId = CRM_Price_BAO_LineItem::retrieve($getLine, CRM_Core_DAO::$_nullArray);
-      $addFinancialEntry = array(
-        'transaction_date' => $financialTrxn->trxn_date,
-        'contact_id' => $contributionDAO->contact_id,
-        'amount' => $financialTrxn->total_amount,
-        'status_id' => array_search('Paid', $financialItemStatus),
-        'entity_id' => $lineItemId->id,
-        'entity_table' => 'civicrm_line_item'
-      );
-      $trxnIds['id'] =  $financialTrxn->id;
-      CRM_Financial_BAO_FinancialItem::create($addFinancialEntry, NULL, $trxnIds);
-
+      if (!empty($lineItemId->id)) {
+        $addFinancialEntry = array(
+          'transaction_date' => $financialTrxn->trxn_date,
+          'contact_id' => $contributionDAO->contact_id,
+          'amount' => $financialTrxn->total_amount,
+          'status_id' => array_search('Paid', $financialItemStatus),
+          'entity_id' => $lineItemId->id,
+          'entity_table' => 'civicrm_line_item'
+        );
+        $trxnIds['id'] =  $financialTrxn->id;
+        CRM_Financial_BAO_FinancialItem::create($addFinancialEntry, NULL, $trxnIds);
+      }
       if ($participantId) {
         // update participant status
         $participantUpdate['id'] = $participantId;
