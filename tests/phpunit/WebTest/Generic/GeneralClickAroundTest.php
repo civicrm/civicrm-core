@@ -67,6 +67,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->login();
 
     // Create New → Individual
+    $this->waitForElementPresent("xpath=//*[@id='crm-create-new-link']");
     $this->click("crm-create-new-link");
     $this->click("link=Individual");
     $this->waitForPageToLoad($this->getTimeoutMsec());
