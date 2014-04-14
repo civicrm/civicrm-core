@@ -315,13 +315,13 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
           //when update mode check contribution id or trxn id or
           //invoice id
           $contactId = new CRM_Contribute_DAO_Contribution();
-          if ($params['contribution_id']) {
+          if (!empty($params['contribution_id'])) {
             $contactId->id = $params['contribution_id'];
           }
-          elseif ($params['trxn_id']) {
+          elseif (!empty($params['trxn_id'])) {
             $contactId->trxn_id = $params['trxn_id'];
           }
-          elseif ($params['invoice_id']) {
+          elseif (!empty($params['invoice_id'])) {
             $contactId->invoice_id = $params['invoice_id'];
           }
           if ($contactId->find(TRUE)) {
