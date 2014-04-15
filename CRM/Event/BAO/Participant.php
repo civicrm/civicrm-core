@@ -1787,6 +1787,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
       $submittedFieldId[] = CRM_Utils_Array::retrieveValueRecursive($submittedLineItems, 'price_field_id');
     }
     $insertLines = $submittedLineItems;
+
     $submittedFieldValueIds = array_keys($submittedLineItems);
     $updateLines = array();
     foreach ($previousLineItems as $id => $previousLineItem) {
@@ -1796,7 +1797,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
         // if submitted line items are existing don't fire INSERT query
         unset($insertLines[$previousLineItem['price_field_value_id']]);
         // for updating the line items i.e. use-case - once deselect-option selecting again
-        if ($previousLineItem['qty'] == 0) {
+        if ($previousLineItem['line_total'] != $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total']) {
           $updateLines[$previousLineItem['price_field_value_id']]['qty'] = $submittedLineItems[$previousLineItem['price_field_value_id']]['qty'];
           $updateLines[$previousLineItem['price_field_value_id']]['line_total'] = $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total'];
         }
@@ -1805,6 +1806,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
 
     $submittedFields = implode(', ', $submittedFieldId);
     $submittedFieldValues = implode(', ', $submittedFieldValueIds);
+
     if (!empty($submittedFields) && !empty($submittedFieldValues)) {
       $updateLineItem = "UPDATE civicrm_line_item li
 INNER JOIN civicrm_financial_item fi
@@ -1927,6 +1929,12 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
           'currency' => $updatedContribution->currency
         );
         $adjustedTrxn = CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
+      }
+      else {
+        // update the financial trxn amount as well, as the fee selections has been updated
+        if ($balanceAmt != $ftDetail['total_amount']) {
+          CRM_Core_DAO::setFieldValue('CRM_Core_BAO_FinancialTrxn', $ftDetail['trxn_id'], 'total_amount', $balanceAmt);
+        }
       }
     }
   }
