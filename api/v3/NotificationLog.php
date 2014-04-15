@@ -13,7 +13,7 @@ function civicrm_api3_notification_log_retry($params) {
       $anet = new CRM_Core_Payment_AuthorizeNetIPN2(json_decode($raw->message_raw, TRUE));
       $anet->main();
     }
-    if($raw->message_type == 'cmcic') {
+    elseif($raw->message_type == 'cmcic') {
       $anet = new CRM_Core_Payment_CmcicIPN(json_decode($raw->message_raw, TRUE));
       $anet->main();
     }
