@@ -370,7 +370,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $paramValues = array(
       'id' => $this->_batchId,
       // close status
-      'status_id' => 2,
+      'status_id' => CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name'),
       'total' => $params['actualBatchTotal'],
     );
 
