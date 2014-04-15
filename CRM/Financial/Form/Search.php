@@ -55,16 +55,17 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Batch_DAO_Batch');
     $attributes['total']['class'] = $attributes['item_count']['class'] = 'number';
     $this->add('text', 'title', ts('Batch Name'), $attributes['title']);
-
+    
+    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
     $this->add(
       'select',
       'status_id',
       ts('Batch Status'),
       array(
         '' => ts('- any -' ),
-        1 => ts('Open'),
-        2 => ts('Closed'),
-        5 => ts('Exported'),
+        array_search('Open', $batchStatus) => ts('Open'),
+        array_search('Closed', $batchStatus) => ts('Closed'),
+        array_search('Exported', $batchStatus) => ts('Exported'),
       ),
       false
     );
