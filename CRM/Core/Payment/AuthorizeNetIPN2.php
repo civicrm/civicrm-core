@@ -306,14 +306,14 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    * @param boolean $abort abort if empty
    * @return Ambigous <mixed, NULL, value, unknown, array, number>
    */
-  function retrieve($name, $type, $abort = TRUE, $default = NULL, $location = 'POST') {
+  function retrieve($name, $type, $abort = TRUE, $default = NULL) {
     $value = CRM_Utils_Type::validate(
-      empty($this->_inputParameter['name']) ? $default : $this->_inputParameter['name'],
+      empty($this->_inputParameters[$name]) ? $default : $this->_inputParameters[$name],
       $type,
       FALSE
     );
     if ($abort && $value === NULL) {
-      throw new CRM_Core_Exception("Could not find an entry for $name in $location");
+      throw new CRM_Core_Exception("Could not find an entry for $name");
     }
     return $value;
   }
