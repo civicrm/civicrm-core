@@ -109,7 +109,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext(CRM_Utils_System::url('civicrm/financial/financialbatches',
-      "reset=1&batchStatus=5"));
+      "reset=1&batchStatus={$this->_exportStatusId}"));
   }
 
   /**
