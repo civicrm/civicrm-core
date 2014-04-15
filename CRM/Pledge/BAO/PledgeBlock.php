@@ -243,7 +243,8 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       $payments = array();
       if (!empty($overduePayments)) {
         foreach ($overduePayments as $id => $payment) {
-          $key = ts("$%1 - due on %2 (overdue)", array(1 => CRM_Utils_Array::value('scheduled_amount', $payment),
+          $key = ts("%1 - due on %2 (overdue)", array(
+              1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $payment)),
               2 => CRM_Utils_Array::value('scheduled_date', $payment),
             ));
           $payments[$key] = CRM_Utils_Array::value('id', $payment);
@@ -251,7 +252,8 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       }
 
       if (!empty($nextPayment)) {
-        $key = ts("$%1 - due on %2", array(1 => CRM_Utils_Array::value('scheduled_amount', $nextPayment),
+        $key = ts("%1 - due on %2", array(
+            1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $nextPayment)),
             2 => CRM_Utils_Array::value('scheduled_date', $nextPayment),
           ));
         $payments[$key] = CRM_Utils_Array::value('id', $nextPayment);
