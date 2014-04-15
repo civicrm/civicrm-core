@@ -159,7 +159,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     elseif ($usedFor == 'Membership') {
       $this->click('extends[3]');
       $this->waitForElementPresent( 'financial_type_id' );
-      $this->select("css=select.form-select", "label={$contributionType}");
+      $this->select("css=select.crm-form-select", "label={$contributionType}");
     }
 
     $this->type('help_pre', $setHelp);
@@ -184,17 +184,17 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     elseif (!$defaultPriceSet) {
       $memTypeParams1 = $this->webtestAddMembershipType();
       $memTypeTitle1  = $memTypeParams1['membership_type'];
-      $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
+      $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[1]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
       $memTypeId1     = $memTypeId1[1];
 
       $memTypeParams2 = $this->webtestAddMembershipType();
       $memTypeTitle2  = $memTypeParams2['membership_type'];
-      $memTypeId2     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
+      $memTypeId2     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[1]/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
       $memTypeId2     = $memTypeId2[1];
 
       $memTypeParams3 = $this->webtestAddMembershipType();
       $memTypeTitle3  = $memTypeParams3['membership_type'];
-      $memTypeId3     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle3}']/../td[12]/span/a[3]@href"));
+      $memTypeId3     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[1]/table/tbody//tr/td[text()='{$memTypeTitle3}']/../td[12]/span/a[3]@href"));
       $memTypeId3     = $memTypeId3[1];
     }
 
