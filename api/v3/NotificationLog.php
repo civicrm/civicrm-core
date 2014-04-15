@@ -13,7 +13,7 @@ function civicrm_api3_notification_log_retry($params) {
       $anet = new CRM_Core_Payment_AuthorizeNetIPN2(json_decode($raw->message_raw, TRUE));
       $anet->main();
     }
-    if($raw->message_type == 'cmcic') {
+    elseif($raw->message_type == 'cmcic') {
       $anet = new CRM_Core_Payment_CmcicIPN(json_decode($raw->message_raw, TRUE));
       $anet->main();
     }
@@ -22,6 +22,7 @@ function civicrm_api3_notification_log_retry($params) {
       $payPal->main();
     }
   }
+  return civicrm_api3_create_success(array(), $params);
 }
 
 function _civicrm_api3_notification_log_retry_spec(&$params) {
@@ -47,10 +48,12 @@ function civicrm_api3_notification_log_retrysearch($params) {
       $resut['success'][] = $id;
     }
     catch (Exception $e) {
-      throw new Exception( $e->getMessage() . $id);
       $errors[]= $e->getMessage() . "  on  id " . $id;
       $resut['errors'][] = $id;
     }
+  }
+  if(!empty($errors)) {
+    throw new Exception(implode("\n ", $errors));
   }
   return civicrm_api3_create_success($result, $params);
 }
