@@ -641,6 +641,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
     $this->open($this->sboxPath . 'civicrm/admin/paymentProcessor?action=add&reset=1&pp=' . $pid);
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('name');
     $this->type('name', $processorName);
     $this->select('financial_account_id', "label={$financialAccount}");
 
