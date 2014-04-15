@@ -576,11 +576,11 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
     // Select an event fee
     $this->waitForElementPresent('priceset');
-    $this->type("//div[@id='priceset']//div[@class='crm-section Full_Conference-section']/div[2]/input", '5');
-    $this->fireEvent("//div[@id='priceset']//div[@class='crm-section Full_Conference-section']/div[2]/input", 'blur');
-    $this->click("xpath=//div[@id='priceset']//div[@class='crm-section Pre_conference_Meetup_-section']/div[2]/div[1]/span/input");
-    $this->click("xpath=//div[@id='priceset']//div[@class='crm-section Evening_Sessions-section']/div[2]/div[1]/span/input");
-    $this->click("xpath=//div[@id='priceset']//div[@class='crm-section Evening_Sessions-section']/div[2]/div[2]/span/input");
+    $this->type("//div[@id='priceset']/div[2]/div[2]/input", '5');
+    $this->fireEvent("//div[@id='priceset']/div[2]/div[2]/input", 'blur');
+    $this->click("xpath=//div[@id='priceset']/div[3]/div[2]/div[1]/span/input");
+    $this->click("xpath=//div[@id='priceset']/div[4]/div[2]/div[1]/span/input");
+    $this->click("xpath=//div[@id='priceset']/div[4]/div[2]/div[2]/span/input");
 
     // Select payment method = Check and enter chk number
     $this->select('payment_instrument_id', 'value=4');
@@ -681,7 +681,6 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Wait for event type to be filled in (since page reloads)
     $this->waitForElementPresent("template_id");
     // Enter Event Title, Summary and Description
-    $this->type('template_title', "Test Template");
     $this->select("event_type_id", "value=4");
     $this->select("default_role_id", "value=1");
     $this->type("title", "Test Event");

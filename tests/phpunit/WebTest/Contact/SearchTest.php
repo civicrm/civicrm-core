@@ -50,10 +50,10 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->typeKeys("css=input#sort_name_navigation", $sortName);
 
     // wait for result list
-    $this->waitForElementPresent("css=div.ac_results-inner li");
+    $this->waitForElementPresent("xpath=//*[@id='ui-id-1']/li");
 
     // visit contact summary page
-    $this->click("css=div.ac_results-inner li");
+    $this->click("xpath=//*[@id='ui-id-1']/li");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is contact present?
