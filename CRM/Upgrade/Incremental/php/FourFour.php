@@ -519,7 +519,10 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
         $params["domain_id"] = $value["id"];
         $params["options"] = array('wp-rebuild' => $rebuildEach);
         // unserialize word match string
-        $localeCustomArray = unserialize($value["locale_custom_strings"]);
+        $localeCustomArray = array();
+        if (!empty($value["locale_custom_strings"])) {
+          $localeCustomArray = unserialize($value["locale_custom_strings"]);
+        }
         if (!empty($localeCustomArray)) {
           $wordMatchArray = array();
           // Traverse Language array
