@@ -128,7 +128,10 @@ class CRM_Contact_Form_Task_EmailCommon {
     //here we are getting logged in user id as array but we need target contact id. CRM-5988
     $cid = $form->get('cid');
     if ($cid) {
-      $form->_contactIds = array($cid);
+      $form->_contactIds = explode(',',$cid);
+    }
+    if (count($form->_contactIds) > 1) {
+      $form->_single = FALSE;
     }
 
     $to  = $form->add('text', 'to', ts('To'), '', TRUE);
@@ -469,13 +472,18 @@ class CRM_Contact_Form_Task_EmailCommon {
       CRM_Core_Session::setStatus($status, ts('One Message Not Sent', array('count' => count($emailsNotSent), 'plural' => '%count Messages Not Sent')), 'info');
     }
 
-    if (isset($form->_caseId) && is_numeric($form->_caseId)) {
+    if (isset($form->_caseId)) {
       // if case-id is found in the url, create case activity record
-      $caseParams = array(
-        'activity_id' => $activityId,
-        'case_id' => $form->_caseId,
-      );
-      CRM_Case_BAO_Case::processCaseActivity($caseParams);
+      $cases = explode(',', $form->_caseId);
+      foreach($cases as $key => $val) {
+        if (is_numeric($val)) {
+          $caseParams = array(
+            'activity_id' => $activityId,
+            'case_id' => $val,
+          );
+          CRM_Case_BAO_Case::processCaseActivity($caseParams);
+        }
+      }
     }
   }
   //end of function
