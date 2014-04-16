@@ -1261,7 +1261,7 @@ function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
     if (strtotime($params[$fieldInfo['name']]) === FALSE) {
       throw new Exception($fieldInfo['name'] . " is not a valid date: " . $params[$fieldInfo['name']]);
     }
-    $format = ($fieldInfo['type'] == 4) ? 'Ymd000000' : 'YmdHis';
+    $format = ($fieldInfo['type'] == CRM_Utils_Type::T_DATE) ? 'Ymd000000' : 'YmdHis';
     $params[$fieldInfo['name']] = CRM_Utils_Date::processDate($params[$fieldInfo['name']], NULL, FALSE, $format);
   }
   if ((CRM_Utils_Array::value('name', $fieldInfo) != $fieldName) && CRM_Utils_Array::value($fieldName, $params)) {
