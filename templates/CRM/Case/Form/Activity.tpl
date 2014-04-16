@@ -256,12 +256,14 @@
     {if $activityTypeFile NEQ 'ChangeCaseStatus'
     && $activityTypeFile NEQ 'ChangeCaseType'
     && $activityTypeFile NEQ 'ChangeCaseStartDate'}
-    <tr class="crm-case-activity-form-block-status_id">
-      <td class="label">{$form.status_id.label}</td><td class="view-value">{$form.status_id.html}</td>
-    </tr>
-    <tr class="crm-case-activity-form-block-priority_id">
-      <td class="label">{$form.priority_id.label}</td><td class="view-value">{$form.priority_id.html}</td>
-    </tr>
+    <table class="form-layout-compressed">
+      <tr class="crm-case-activity-form-block-status_id">
+        <td class="label">{$form.status_id.label}</td><td class="view-value">{$form.status_id.html}</td>
+      </tr>
+      <tr class="crm-case-activity-form-block-priority_id">
+        <td class="label">{$form.priority_id.label}</td><td class="view-value">{$form.priority_id.html}</td>
+      </tr>
+    </table>
     {/if}
     {if $form.tag.html}
     <tr class="crm-case-activity-form-block-tag">
