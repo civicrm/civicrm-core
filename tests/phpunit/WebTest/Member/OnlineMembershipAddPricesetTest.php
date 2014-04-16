@@ -99,7 +99,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $setHelp = 'Select your membership options.';
     $memTypeParams1 = $this->webtestAddMembershipType();
     $memTypeTitle1 = $memTypeParams1['membership_type'];
-    $memTypeId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
+    $memTypeId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[1]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
     $memTypeId1 = $memTypeId1[1];
     $this->_testAddSet($setTitle, $usedFor, $contributionType, $setHelp);
 
@@ -197,7 +197,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     elseif ($usedFor == 'Membership') {
       $this->click('extends[3]');
           $this->waitForElementPresent( 'financial_type_id' );
-      $this->select("css=select.form-select", "label={$contributionType}");
+      $this->select("css=select.crm-form-select", "label={$contributionType}");
     }
 
     $this->type('help_pre', $setHelp);
@@ -210,12 +210,12 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
   function _testAddPriceFields(&$fields, &$validateString, $dateSpecificFields = FALSE, $title, $sid, $contributionType) {
     $memTypeParams1 = $this->webtestAddMembershipType();
     $memTypeTitle1 = $memTypeParams1['membership_type'];
-    $memTypeId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
+    $memTypeId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[1]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
     $memTypeId1 = $memTypeId1[1];
 
     $memTypeParams2 = $this->webtestAddMembershipType();
     $memTypeTitle2 = $memTypeParams2['membership_type'];
-    $memTypeId2 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
+    $memTypeId2 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[1]/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
     $memTypeId2 = $memTypeId2[1];
 
     $this->openCiviPage('admin/price/field', "reset=1&action=add&sid={$sid}");
@@ -273,7 +273,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->openCiviPage('admin/price', 'reset=1');
 
     // Use the price set id ($sid) to pick the correct row
-    $this->clickLink("css=tr#row_{$sid} a[title='Preview Price Set']", '_qf_Preview_cancel-bottom');
+    $this->clickLink("css=tr#price_set-{$sid} a[title='Preview Price Set']", '_qf_Preview_cancel-bottom');
 
     // Check for expected price set field strings
     $this->assertStringsPresent($validateStrings);
@@ -363,7 +363,7 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
       );
     }
 
-    $this->clickLink('_qf_MembershipView_cancel-bottom', "xpath=//div[@id='memberSearch']/table/tbody/tr[2]");
+    $this->clickLink('_qf_MembershipView_cancel-bottom', "xpath=//div[@id='memberSearch']/table/tbody/tr[2]", FALSE);
     $this->click("xpath=//div[@id='memberSearch']/table/tbody//tr/td[4][text()='{$memTypeTitle2}']/../td[11]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
