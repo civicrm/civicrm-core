@@ -299,6 +299,24 @@ class CRM_Extension_Mapper {
     return $moduleExtensions;
   }
 
+  /**
+   * Get a list of base URLs for all active modules
+   *
+   * @return array (string $extKey => string $baseUrl)
+   */
+  public function getActiveModuleUrls() {
+    // TODO optimization/caching
+    $urls = array();
+    $urls['civicrm'] = $this->keyToUrl('civicrm');
+    foreach ($this->getModules() as $module) {
+      /** @var $module CRM_Core_Module */
+      if ($module->is_active) {
+        $urls[$module->name] = $this->keyToUrl($module->name);
+      }
+    }
+    return $urls;
+  }
+
   public function isActiveModule($name) {
     $activeModules = $this->getActiveModuleFiles();
     foreach ($activeModules as $activeModule) {
