@@ -305,6 +305,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     );
     $compContext = CRM_Utils_Request::retrieve('compContext', 'String', $this);
 
+    $searchContext = CRM_Utils_Request::retrieve('searchContext', 'String', $this);
+
     //swap the context.
     if ($context == 'search' && $compContext) {
       $context = $compContext;
@@ -354,6 +356,9 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         $this->assign('searchKey', $qfKey);
         if ($context == 'advanced') {
           $url = CRM_Utils_System::url('civicrm/contact/search/advanced', $extraParams);
+        }
+        else if ($searchContext) {
+          $url = CRM_Utils_System::url("civicrm/$searchContext/search", $extraParams);
         }
         else {
           $url = CRM_Utils_System::url('civicrm/contribute/search', $extraParams);
