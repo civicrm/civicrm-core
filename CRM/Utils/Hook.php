@@ -1600,4 +1600,25 @@ abstract class CRM_Utils_Hook {
       self::$_nullObject, 'civicrm_contact_get_displayname'
     );
   }
+
+  /**
+   * EXPERIMENTAL: This hook allows one to register additional Angular modules
+   *
+   * @param array $angularModules list of modules
+   * @return null the return value is ignored
+   * @access public
+   *
+   * @code
+   * function mymod_civicrm_angularModules(&$angularModules) {
+   *   $angularModules['myAngularModule'] = array('ext' => 'org.example.mymod', 'file' => 'js/myAngularModule.js');
+   * }
+   * @endcode
+   */
+  static function angularModules(&$angularModules) {
+    return self::singleton()->invoke(1, $angularModules,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_angularModules'
+    );
+  }
+
 }
