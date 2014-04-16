@@ -413,21 +413,21 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     // NOTE: we consider only those columns for modifications where there is a spec change, and that the column definition
     // wasn't deliberately modified by fixTimeStampAndNotNullSQL() method.
     foreach ($civiTableSpecs as $col => $colSpecs) {
-      if ( !is_array($logTableSpecs[$col]) ) {
+      if (!isset($logTableSpecs[$col]) || !is_array($logTableSpecs[$col]) ) {
         $logTableSpecs[$col] = array();
       }
 
       $specDiff = array_diff($civiTableSpecs[$col], $logTableSpecs[$col]);
       if (!empty($specDiff) && $col != 'id' && !array_key_exists($col, $diff['ADD'])) {
         // ignore 'id' column for any spec changes, to avoid any auto-increment mysql errors
-        if ($civiTableSpecs[$col]['DATA_TYPE'] != $logTableSpecs[$col]['DATA_TYPE']) {
+        if ($civiTableSpecs[$col]['DATA_TYPE'] != CRM_Utils_Array::value('DATA_TYPE', $logTableSpecs[$col])) {
           // if data-type is different, surely consider the column
           $diff['MODIFY'][] = $col;
-        } else if ($civiTableSpecs[$col]['IS_NULLABLE'] != $logTableSpecs[$col]['IS_NULLABLE'] &&
+        } else if ($civiTableSpecs[$col]['IS_NULLABLE'] != CRM_Utils_Array::value('IS_NULLABLE', $logTableSpecs[$col]) &&
           $logTableSpecs[$col]['IS_NULLABLE'] == 'NO') {
           // if is-null property is different, and log table's column is NOT-NULL, surely consider the column
           $diff['MODIFY'][] = $col;
-        } else if ($civiTableSpecs[$col]['COLUMN_DEFAULT'] != $logTableSpecs[$col]['COLUMN_DEFAULT'] &&
+        } else if ($civiTableSpecs[$col]['COLUMN_DEFAULT'] != CRM_Utils_Array::value('COLUMN_DEFAULT', $logTableSpecs[$col]) &&
           !strstr($civiTableSpecs[$col]['COLUMN_DEFAULT'], 'TIMESTAMP')) {
           // if default property is different, and its not about a timestamp column, consider it
           $diff['MODIFY'][] = $col;
