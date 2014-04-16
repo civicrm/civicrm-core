@@ -100,15 +100,17 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
    */
   function preProcess() {
     // store case id if present
-    $this->_caseId = CRM_Utils_Request::retrieve('caseid', 'Positive', $this, FALSE);
+    $this->_caseId = CRM_Utils_Request::retrieve('caseid', 'String', $this, FALSE);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
-    $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE);
-    if ($cid) {
-      $displayName = CRM_Contact_BAO_Contact::displayName($cid);
-      CRM_Utils_System::setTitle($displayName . ' - ' . ts('Email'));
+    $cid = CRM_Utils_Request::retrieve('cid', 'String', $this, FALSE);
+    $cid = explode(',',$cid);
+
+    foreach ($cid as $key => $val) {
+      $displayName[] = CRM_Contact_BAO_Contact::displayName($val);
     }
 
+    CRM_Utils_System::setTitle(implode(',',$displayName) . ' - ' . ts('Email'));
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
 
     if (!$cid && $this->_context != 'standalone') {
