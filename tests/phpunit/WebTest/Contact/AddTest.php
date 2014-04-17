@@ -157,7 +157,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("tagGroup");
 
     // select group
-    $this->select("crmasmSelect0", "label=$groupName");
+    $this->select("group", "label=$groupName");
     $this->click("tag[{$this->webtestGetValidEntityID('Tag')}]");
 
     // Clicking save.
