@@ -108,8 +108,10 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
                                      $key                 = NULL,
                                      $compContext         = NULL) {
     static $activityActTypes = NULL;
+    //CRM-14277 added addtitional param to handle activity search
+    $extraParams = "&searchContext=activity";
 
-    $extraParams = ($key) ? "&key={$key}" : NULL;
+    $extraParams .= ($key) ? "&key={$key}" : NULL;
     if ($compContext) {
       $extraParams .= "&compContext={$compContext}";
     }
