@@ -163,9 +163,11 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     // verify text
     $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']");
 
-    $this->clickLink("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']/following-sibling::td[7]/span/a[text()= 'Edit']");
+    $tagid = explode('&id=', $this->getAttribute("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']/following-sibling::td[7]/span/a[text()= 'Edit']@href"));
+    $tagid = explode('&', $tagid[1]);
+    $tagid = $tagid[0];
 
-    return $this->urlArg('id');
+    return $tagid;
   }
 }
 
