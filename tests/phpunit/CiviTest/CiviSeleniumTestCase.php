@@ -506,7 +506,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     // 4 - Individual profile
     // 5 - Organization profile
     // 6 - Household profile
-    $profile = array('4' => 'New Individual', '5' => 'New Organisation', '6' => 'New Household');
+    $profile = array('4' => 'New Individual', '5' => 'New Organization', '6' => 'New Household');
     $this->clickAt("xpath=//div[@id='$selectId']/a");
     $this->click("xpath=//li[@class='select2-no-results']//a[contains(text(),' $profile[$type]')]");
 
