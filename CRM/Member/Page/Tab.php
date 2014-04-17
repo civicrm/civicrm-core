@@ -349,6 +349,9 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $context = CRM_Utils_Request::retrieve('context', 'String', $form, FALSE, 'search' );
 
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
+
+    $searchContext = CRM_Utils_Request::retrieve('searchContext', 'String', $this);
+
     //validate the qfKey
     if (!CRM_Utils_Rule::qfKey($qfKey)) {
       $qfKey = NULL;
@@ -373,8 +376,13 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
           $urlParams .= "&qfKey=$qfKey";
         }
         $form->assign('searchKey', $qfKey);
-
-        $url = CRM_Utils_System::url('civicrm/member/search', $urlParams);
+        
+        if ($searchContext) {
+          $url = CRM_Utils_System::url("civicrm/$searchContext/search", $urlParams);
+        }
+        else {
+          $url = CRM_Utils_System::url('civicrm/member/search', $urlParams);
+        }
         break;
 
       case 'home':
