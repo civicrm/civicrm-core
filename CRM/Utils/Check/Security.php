@@ -99,9 +99,9 @@ class CRM_Utils_Check_Security {
       if ($log_path = explode($filePathMarker, $log_filename)) {
         $url[] = $log_path[1];
         $log_url = implode($filePathMarker, $url);
-        $docs_url = $this->createDocUrl('checkLogFileIsNotAccessible');
         $headers = @get_headers($log_url);
         if (stripos($headers[0], '200')) {
+          $docs_url = $this->createDocUrl('checkLogFileIsNotAccessible');
           $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
             . '<br />' .
             '<a href="%2">Read more about this warning</a>';
@@ -136,28 +136,26 @@ class CRM_Utils_Check_Security {
     $messages = array();
 
     $config = CRM_Core_Config::singleton();
-    $filePathMarker = $this->getFilePathMarker();
+    $privateDirs = array(
+      $config->uploadDir,
+      $config->customFileUploadDir,
+    );
 
-    if ($upload_url = explode($filePathMarker, $config->imageUploadURL)) {
-      if ($files = glob($config->uploadDir . '/*')) {
-        for ($i = 0; $i < 3; $i++) {
-          $f = array_rand($files);
-          if ($file_path = explode($filePathMarker, $files[$f])) {
-            $url = implode($filePathMarker, array($upload_url[0], $file_path[1]));
-            $headers = @get_headers($url);
-            if (stripos($headers[0], '200')) {
-              $msg = 'Files in the upload directory should not be downloadable.'
-                . '<br />' .
-                '<a href="%1">Read more about this warning</a>';
-              $docs_url = $this->createDocUrl('checkUploadsAreNotAccessible');
-              $messages[] = new CRM_Utils_Check_Message(
-                'checkUploadsAreNotAccessible',
-                ts($msg, array(1 => $docs_url)),
-                ts('Security Warning')
-              );
-            }
-          }
-        }
+    foreach ($privateDirs as $privateDir) {
+      $heuristicUrl = $this->guessUrl($privateDir);
+      if ($this->isDirAccessible($privateDir, $heuristicUrl)) {
+        $messages[] = new CRM_Utils_Check_Message(
+          'checkUploadsAreNotAccessible',
+          ts('Files in the data directory (<a href="%3">%2</a>) should not be downloadable.'
+              . '<br />'
+              . '<a href="%1">Read more about this warning</a>',
+            array(
+              1 => $this->createDocUrl('checkUploadsAreNotAccessible'),
+              2 => $privateDir,
+              3 => $heuristicUrl,
+            )),
+          ts('Security Warning')
+        );
       }
     }
 
@@ -235,7 +233,56 @@ class CRM_Utils_Check_Security {
     return $result;
   }
 
+  /**
+   * Determine whether $url is a public version of $dir in which files
+   * are remotely accessible.
+   *
+   * @param string $dir local dir path
+   * @param string $url public URL
+   * @return bool
+   */
+  public function isDirAccessible($dir, $url) {
+    $dir = rtrim($dir, '/');
+    $url = rtrim($url, '/');
+    if (empty($dir) || empty($url) || !is_dir($dir)) {
+      return FALSE;
+    }
+
+    $result = FALSE;
+    $file = 'delete-this-' . CRM_Utils_String::createRandom(10, CRM_Utils_String::ALPHANUMERIC);
+
+    // this could be a new system with no uploads (yet) -- so we'll make a file
+    file_put_contents("$dir/$file", "delete me");
+
+    $headers = @get_headers("$url/$file");
+    if (stripos($headers[0], '200')) {
+      $content = @file_get_contents("$url/$file");
+      if (preg_match('/delete me/', $content)) {
+        $result = TRUE;
+      }
+    }
+
+    unlink("$dir/$file");
+
+    return $result;
+  }
+
   public function createDocUrl($topic) {
     return CRM_Utils_System::getWikiBaseURL() . $topic;
+  }
+
+  /**
+   * Make a guess about the URL that corresponds to $targetDir.
+   *
+   * @param string $targetDir local path to a directory
+   * @return string a guessed URL for $realDir
+   */
+  public function guessUrl($targetDir) {
+    $filePathMarker = $this->getFilePathMarker();
+    $config = CRM_Core_Config::singleton();
+
+    list ($heuristicBaseUrl, $ignore) = explode($filePathMarker, $config->imageUploadURL);
+    list ($ignore, $heuristicSuffix) = explode($filePathMarker, $targetDir);
+    return $heuristicBaseUrl . $filePathMarker . $heuristicSuffix;
   }
 }
