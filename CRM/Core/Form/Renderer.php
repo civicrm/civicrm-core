@@ -122,7 +122,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       if ($element->getAttribute('data-api-entity') && $element->getAttribute('data-entity-value')) {
         $this->renderFrozenEntityRef($el, $element);
       }
-      $el['html'] = '<div class="crm-frozen-field">' . $el['html'] . '</div>';
+      $el['html'] = '<span class="crm-frozen-field">' . $el['html'] . '</span>';
     }
     // Active form elements
     else {
