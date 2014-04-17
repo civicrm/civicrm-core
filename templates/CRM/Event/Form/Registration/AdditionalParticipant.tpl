@@ -41,6 +41,8 @@
     </div>
 {/if}
 
+{include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre}
+
 {if $priceSet && $allowGroupOnWaitlist}
     {include file="CRM/Price/Form/ParticipantCount.tpl"}
     <div id="waiting-status" style="display:none;" class="messages status no-popup"></div>
@@ -71,7 +73,6 @@
     </tr>
 </table>
 
-{include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre}
 {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPost}
 
 <div id="crm-submit-buttons">
