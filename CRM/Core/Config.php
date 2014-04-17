@@ -630,7 +630,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
     // Whether we delete/create or simply preserve directories, we should
     // certainly make sure the restrictions are enforced.
-    foreach (array($this->templateCompileDir, $this->uploadDir, $this->configAndLogDir) as $dir) {
+    foreach (array($this->templateCompileDir, $this->uploadDir, $this->configAndLogDir, $this->customFileUploadDir) as $dir) {
       if ($dir && is_dir($dir)) {
         CRM_Utils_File::restrictAccess($dir);
       }

@@ -203,6 +203,7 @@ class CRM_Core_Config_Defaults {
       $customDir = $path . "custom/";
 
       CRM_Utils_File::createDir($customDir);
+      CRM_Utils_File::restrictAccess($customDir);
       $defaults['customFileUploadDir'] = $customDir;
     }
 
