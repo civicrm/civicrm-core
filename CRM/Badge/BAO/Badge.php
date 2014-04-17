@@ -63,7 +63,6 @@ class CRM_Badge_BAO_Badge {
     if ($this->debug) {
       $this->border = "LTRB";
     }
-
     foreach ($participants as $participant) {
       $formattedRow = self::formatLabel($participant, $layoutInfo);
       $this->pdf->AddPdfLabel($formattedRow);
@@ -86,23 +85,25 @@ class CRM_Badge_BAO_Badge {
 
     if (CRM_Utils_Array::value('rowElements', $layout['data'])) {
       foreach ($layout['data']['rowElements'] as $key => $element) {
-        $value = '';
-        if ($element) {
-          $value = $row[$element];
-          // hack to fix date field display format
-          if (strpos($element, '_date')) {
-            $value = CRM_Utils_Date::customFormat($value, "%B %E%f");
+        if ($element != 'image_URL'){
+          $value = '';
+          if ($element) {
+            $value = $row[$element];
+            // hack to fix date field display format
+            if (strpos($element, '_date')) {
+              $value = CRM_Utils_Date::customFormat($value, "%B %E%f");
+            }
           }
-        }
 
-        $formattedRow['token'][$key] = array(
-          'value' => $value,
-          'font_name' => $layout['data']['font_name'][$key],
-          'font_size' => $layout['data']['font_size'][$key],
-          'font_style' => $layout['data']['font_style'][$key],
-          'text_alignment' => $layout['data']['text_alignment'][$key],
-          'token' => $layout['data']['token'][$key],
-        );
+          $formattedRow['token'][$key] = array(
+            'value' => $value,
+            'font_name' => $layout['data']['font_name'][$key],
+            'font_size' => $layout['data']['font_size'][$key],
+            'font_style' => $layout['data']['font_style'][$key],
+            'text_alignment' => $layout['data']['text_alignment'][$key],
+            'token' => $layout['data']['token'][$key],
+          );
+        }
       }
     }
 
@@ -125,7 +126,18 @@ class CRM_Badge_BAO_Badge {
     if (CRM_Utils_Array::value('height_image_2', $layout['data'])) {
       $formattedRow['height_image_2'] = $layout['data']['height_image_2'];
     }
-
+    if (CRM_Utils_Array::value('participant_image_URL', $row)) {
+      $formattedRow['participant_image'] = $row['participant_image_URL'];
+    }
+    if (CRM_Utils_Array::value('width_participant_image', $layout['data'])) {
+      $formattedRow['width_participant_image'] = $layout['data']['width_participant_image'];
+    }
+    if (CRM_Utils_Array::value('height_participant_image', $layout['data'])) {
+      $formattedRow['height_participant_image'] = $layout['data']['height_participant_image'];
+    }
+    if (CRM_Utils_Array::value('alignment_participant_image', $layout['data'])) {
+      $formattedRow['alignment_participant_image'] = $layout['data']['alignment_participant_image'];
+    }    
     if (CRM_Utils_Array::value('add_barcode', $layout['data'])) {
       $formattedRow['barcode'] = array(
         'alignment' => $layout['data']['barcode_alignment'],
@@ -160,6 +172,7 @@ class CRM_Badge_BAO_Badge {
     $y = $this->pdf->getY();
 
     $startOffset = 0;
+
     if (CRM_Utils_Array::value('image_1', $formattedRow)) {
       $this->printImage($formattedRow['image_1'], NULL, NULL, CRM_Utils_Array::value('width_image_1', $formattedRow),
         CRM_Utils_Array::value('height_image_1', $formattedRow));
@@ -178,6 +191,26 @@ class CRM_Badge_BAO_Badge {
     elseif (CRM_Utils_Array::value('height_image_2', $formattedRow)) {
       $startOffset = CRM_Utils_Array::value('height_image_2', $formattedRow);
     }
+    if (CRM_Utils_Array::value('participant_image', $formattedRow)){
+      $xAlign = 10;
+      switch (CRM_Utils_Array::value('alignment_participant_image', $formattedRow)){
+        case 'R':
+          $xAlign = 65;
+          break;
+        case 'L':
+          $xAlign = 10;
+          break;
+        case 'C':
+          $xAlign = 35;
+          break;
+        default:
+          break;
+      }
+      $this->pdf->Image($formattedRow['participant_image'], $x+$xAlign, $y + 18, CRM_Utils_Array::value('width_participant_image', $formattedRow), CRM_Utils_Array::value('height_participant_image', $formattedRow));
+      if ($startOffset == NULL && CRM_Utils_Array::value('height_participant_image', $formattedRow)){
+        $startOffset = CRM_Utils_Array::value('height_participant_image', $formattedRow);        
+      }
+    }
 
     $this->pdf->SetLineStyle(array(
       'width' => 0.1,
@@ -186,7 +219,6 @@ class CRM_Badge_BAO_Badge {
       'dash' => '2,2',
       'color' => array(0, 0, 200)
     ));
-
     $rowCount = CRM_Badge_Form_Layout::FIELD_ROWCOUNT;
     for ($i = 1; $i <= $rowCount; $i++) {
       if (!empty($formattedRow['token'][$i]['token'])) {
@@ -194,7 +226,6 @@ class CRM_Badge_BAO_Badge {
         if ($formattedRow['token'][$i]['token'] != 'spacer') {
           $value = $formattedRow['token'][$i]['value'];
         }
-
         $offset = $this->pdf->getY() + $startOffset + $cellspacing;
 
         $this->pdf->SetFont($formattedRow['token'][$i]['font_name'], $formattedRow['token'][$i]['font_style'],
@@ -345,6 +376,15 @@ class CRM_Badge_BAO_Badge {
 
     // spit / get actual field names from token
     $returnProperties = array();
+    $participant_image_URLs = array();
+   if (CRM_Utils_Array::value('participant_image', $layoutInfo['data'])){
+    $layoutInfo['data']['participant_image_URL'] = '';
+    $queryString = "SELECT civicrm_participant.id as participant_id, civicrm_contact.image_URL FROM civicrm_contact LEFT JOIN civicrm_participant ON civicrm_contact.id = civicrm_participant.contact_id WHERE {$form->_componentClause};";
+    $dao = CRM_Core_DAO::executeQuery($queryString);
+    while ($dao->fetch()){ 
+      $participant_image_URLs[$dao->participant_id] = $dao->image_URL;
+    }
+   }
     if (!empty($layoutInfo['data']['token'])) {
       foreach ($layoutInfo['data']['token'] as $index => $value) {
         $element = '';
@@ -414,6 +454,9 @@ class CRM_Badge_BAO_Badge {
       foreach ($returnProperties as $key => $dontCare) {
         $rows[$dao->participant_id][$key] = isset($dao->$key) ? $dao->$key : NULL;
       }
+    }
+     foreach ($participant_image_URLs as $participantId => $participant_image_URL) {
+      $rows[$participantId]['participant_image_URL'] = $participant_image_URL;
     }
 
     $eventBadgeClass = new CRM_Badge_BAO_Badge();
