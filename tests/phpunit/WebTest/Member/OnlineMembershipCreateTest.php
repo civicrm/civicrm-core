@@ -90,12 +90,12 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     // create two new membership types
     $memTypeParams1 = $this->webtestAddMembershipType();
     $memTypeTitle1 = $memTypeParams1['membership_type'];
-    $memTypeId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
+    $memTypeId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[1]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
     $memTypeId1 = $memTypeId1[1];
 
     $memTypeParams2 = $this->webtestAddMembershipType();
     $memTypeTitle2 = $memTypeParams2['membership_type'];
-    $memTypeId2 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
+    $memTypeId2 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[1]/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
     $memTypeId2 = $memTypeId2[1];
 
     // edit contribution page memberships tab to add two new membership types
@@ -142,8 +142,8 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($verifyData);
 
     // Click View action link on associated contribution record
-    $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
-    $this->click("xpath=//form[@id='MembershipView']/div[2]/div/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//form[@id='MembershipView']/div[2]/div/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
     //View Contribution Record
     $verifyData = array(
@@ -304,7 +304,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
 
     $this->type("sort_name", "$firstName $lastName");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
     //View Contribution Record and verify data
     $expected = array(

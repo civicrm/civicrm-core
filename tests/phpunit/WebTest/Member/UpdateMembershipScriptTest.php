@@ -60,7 +60,6 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click('_qf_Membership_upload');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
     $this->waitForText('crm-notification-container', "{$memTypeParams['membership_type']} membership for $firstName Anderson has been added.");
@@ -101,10 +100,7 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
 
     // New membership type
     $this->type('name', $memTypeParams['membership_type']);
-    $this->type('member_of_contact', $membershipTitle);
-    $this->click('member_of_contact');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('member_of_contact_id', $membershipTitle);
 
     // Membership fees
     $this->type('minimum_fee', '100');
@@ -115,7 +111,7 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
     $this->select('duration_unit', "label=year");
 
     // Membership period type
-    $this->select('period_type', "label=rolling");
+    $this->select('period_type', "value=rolling");
     $this->click('relationship_type_id', "value={$memTypeParams['relationship_type']}");
 
     // Clicking save

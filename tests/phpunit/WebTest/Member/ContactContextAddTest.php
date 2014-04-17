@@ -87,7 +87,6 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click("_qf_Membership_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -107,10 +106,10 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($verifyData);
 
     $this->click("_qf_MembershipView_cancel-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     // page was loaded
     $this->waitForTextPresent($sourceText);
 
+    $this->waitForElementPresent("css=li#tab_activity a");
     // click through to the activities screen
     $this->click("css=li#tab_activity a");
     // page was loaded
@@ -126,7 +125,7 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
       'Source' => $sourceText,
     );
     $this->webtestVerifyTabularData($verifyData);
-    $this->clickLink("_qf_MembershipView_cancel-bottom", "xpath=//div[@id='memberships']/div/table/tbody//tr/td[1][text()='{$memTypeParams['membership_type']}']/../td[7]");
+    $this->clickLink("_qf_MembershipView_cancel-bottom", "xpath=//div[@id='memberships']/div/table/tbody//tr/td[1][text()='{$memTypeParams['membership_type']}']/../td[7]", FALSE);
     $this->click("xpath=//div[@id='memberships']/div/table/tbody//tr/td[1][text()='{$memTypeParams['membership_type']}']/../td[9]/span/a[2][text()='Edit']");
     $this->waitForElementPresent("_qf_Membership_cancel-bottom");
 
@@ -140,8 +139,8 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->click("xpath=//form[@id='Membership']/div[2]/div[2]//table/tbody//tr[@class='crm-membership-form-block-end_date']/td[2]/a[@title='Clear']");
 
     $this->click("_qf_Membership_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
     // page was loaded
     $this->waitForTextPresent($sourceText);
     $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
@@ -211,7 +210,6 @@ class WebTest_Member_ContactContextAddTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click("_qf_Membership_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
