@@ -1529,6 +1529,7 @@ abstract class CRM_Utils_Hook {
    * @code
    * function mymod_civicrm_angularModules(&$angularModules) {
    *   $angularModules['myAngularModule'] = array('ext' => 'org.example.mymod', 'file' => 'js/myAngularModule.js');
+   *   $angularModules['myBigAngularModule'] = array('ext' => 'org.example.mymod', 'files' => array('js/part1.js', 'js/part2.js'));
    * }
    * @endcode
    */
