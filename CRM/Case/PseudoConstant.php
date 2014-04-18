@@ -141,11 +141,14 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @return array - array reference of all case type
    * @static
    */
-  public static function caseType($column = 'label', $onlyActive = TRUE) {
+  public static function caseType($column = 'label', $onlyActive = TRUE, $condition = NULL) {
     $cacheKey = "{$column}_" . (int)$onlyActive;
+    if (!$condition) {
+      $condition = 'AND filter = 0';
+    }
     if (!isset(self::$caseType[$cacheKey])) {
       self::$caseType[$cacheKey] = CRM_Core_OptionGroup::values('case_type',
-        FALSE, FALSE, FALSE, NULL,
+        FALSE, FALSE, FALSE, $condition,
         $column, $onlyActive
       );
     }
