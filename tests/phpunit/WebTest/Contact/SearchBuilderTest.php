@@ -159,8 +159,8 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->_searchBuilder('Email', NULL, NULL, 'IS NULL');
-    $this->click("xpath=//div[@class='crm-search-results']/div[4]/a[2]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->type("xpath=//*[@id='Builder-rows-per-page-select']", '100');
+    $this->waitForElementPresent("xpath=//*[@id='Builder-rows-per-page-select']");
     $names = array(
       1 => $firstName1,
       2 => $firstName2,
@@ -176,8 +176,8 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
     //searching contacts whose phone field is not empty
     $this->_searchBuilder('Phone', NULL, $firstName, 'IS NOT EMPTY');
-    $this->click("xpath=//div[@class='crm-search-results']/div[4]/a[2]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->type("xpath=//*[@id='Builder-rows-per-page-select']", '100');
+    $this->waitForElementPresent("xpath=//*[@id='Builder-rows-per-page-select']");
     $this->assertTrue($this->isTextPresent($firstName));
 
     $firstName4 = "AB" . substr(sha1(rand()), 0, 7);

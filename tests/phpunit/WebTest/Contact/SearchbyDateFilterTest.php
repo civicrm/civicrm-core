@@ -329,7 +329,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
         'event' =>
         array(
           'headerLocator' => 'div#CiviEvent',
-          'bodyLocator' => 'input#event_name',
+          'bodyLocator' => 'input#event_id',
           'title' => 'Events',
           'fields' =>
           array(

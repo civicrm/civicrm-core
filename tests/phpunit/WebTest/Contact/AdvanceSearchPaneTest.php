@@ -351,7 +351,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
         'event' =>
         array(
           'headerLocator' => 'div#CiviEvent',
-          'bodyLocator' => 'input#event_name',
+          'bodyLocator' => 'input#event_id',
           'title' => 'Events',
           'fields' =>
           array(
