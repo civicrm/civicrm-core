@@ -57,7 +57,7 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
 
     // Select the group and check deceased contacts
-    $this->select('crmasmSelect1', "label={$groupName}");
+    $this->select('group', "label={$groupName}");
     $this->click('demographics');
     $this->waitForElementPresent('CIVICRM_QFID_1_is_deceased');
     $this->click('CIVICRM_QFID_1_is_deceased');
@@ -67,7 +67,7 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     $this->waitForTextPresent('2 Selected records only');
 
     $this->select('task', 'label=Remove Contacts from Group');
-    $this->click("xpath=//div[@id='search-status']/table/tbody/tr[3]/td/ul/input[2]");
+    $this->click("Go");
     $this->waitForElementPresent('_qf_RemoveFromGroup_back-bottom');
     $this->assertElementContainsText('crm-container', 'Number of selected contacts: 2');
     $this->select('group_id', "label={$groupName}");
@@ -77,7 +77,7 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
 
     // Search for the contacts who are not deceased
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
-    $this->select('crmasmSelect1', "label={$groupName}");
+    $this->select('group', "label={$groupName}");
     $this->click('_qf_Advanced_refresh');
 
     // Check if non-deceased contacts are still present
@@ -106,7 +106,6 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     $this->waitForElementPresent('_qf_GroupContact_next');
     $this->select('group_id', "{$groupName}");
     $this->click('_qf_GroupContact_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 }
 

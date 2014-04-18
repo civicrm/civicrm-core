@@ -113,11 +113,11 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->click("_qf_Basic_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->click("xpath=//div[@class='form-item float-right']/a[text()='25']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->type("xpath=//*[@id='Basic-rows-per-page-select']", '25');
+    $this->waitForElementPresent("xpath=//*[@id='Basic-rows-per-page-select']");
     $this->click("toggleSelect");
     $this->click("xpath=//div[@class='crm-content-block']/div/div[2]/div/span[2]/a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("Go");
     $this->click("toggleSelect");
     $this->select("task", "label=Add Contacts to Group");
     $this->click("Go");

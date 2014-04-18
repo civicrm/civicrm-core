@@ -47,7 +47,7 @@ class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumT
 
     // Select event. Based on label for now.
     $this->waitForElementPresent('event_id');
-    $this->select('event_id', "label=regexp:Rain-forest Cup Youth Soccer Tournament.");
+    $this->select2('event_id', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select role
     $this->click('role_id[2]');
