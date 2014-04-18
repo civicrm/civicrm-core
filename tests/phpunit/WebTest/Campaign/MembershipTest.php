@@ -51,7 +51,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "John", "$firstName2.john@example.org");
@@ -64,7 +64,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     // Enable CiviCampaign module if necessary
     $this->enableComponents(array('CiviCampaign'));
@@ -146,7 +146,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click("_qf_Membership_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=View');
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
