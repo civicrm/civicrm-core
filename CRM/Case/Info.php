@@ -85,6 +85,8 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
             'label' => (string) $xml->name,
             'description' => (string) $xml->description, // CRM_Utils_Array::value('description', $caseType, ''),
             'option_group_id' => $caseTypesGroupId,
+            'filter' => empty($xml->filter) ? 0 : 1,
+            'grouping' => $xml->grouping,
             'is_reserved' => 1,
           ),
         );
