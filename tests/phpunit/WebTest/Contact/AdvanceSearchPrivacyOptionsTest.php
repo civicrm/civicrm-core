@@ -128,17 +128,17 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
     foreach ($privacyOptions as $privacyOption) {
       $privacyOptionVal = $this->getOptionVal($privacyOption);
 
-      if (!$this->isElementPresent("xpath=//ul[@id='crmasmList4']//li//span[text()='{$privacyOptionVal}']")) {
-        $this->select('crmasmSelect4', "value={$privacyOption}");
-        $this->waitForElementPresent("xpath=//ul[@id='crmasmList4']//li//span[text()='{$privacyOptionVal}']");
+      if (!$this->isElementPresent("xpath=//div[@id='s2id_privacy_options']//ul//li//div[text()='{$privacyOptionVal}']")) {
+        $this->select('privacy_options', "value={$privacyOption}");
+        $this->waitForElementPresent("xpath=//div[@id='s2id_privacy_options']//ul//li//div[text()='{$privacyOptionVal}']");
       }
     }
 
     foreach ($allPrivacyOptions as $allPrivacyOption) {
       if (!in_array($allPrivacyOption, $privacyOptions)) {
         $privacyOptionVal = $this->getOptionVal($allPrivacyOption);
-        if ($this->isElementPresent("xpath=//ul[@id='crmasmList4']//li//span[text()='{$privacyOptionVal}']")) {
-          $this->click("xpath=//ul[@id='crmasmList4']//li//span[text()='{$privacyOptionVal}']/../a[@class='crmasmListItemRemove']");
+        if ($this->isElementPresent("xpath=//div[@id='s2id_privacy_options']//ul//li//div[text()='{$privacyOptionVal}']")) {
+          $this->click("xpath=//div[@id='s2id_privacy_options']//ul//li//div[text()='{$privacyOptionVal}']/../a[@class='select2-search-choice-close']");
         }
       }
     }

@@ -62,7 +62,6 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_GroupContact_next');
     $this->select('group_id', "label={$groupName}");
     $this->click('_qf_GroupContact_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Added to Group");
 
     // Individual 1
@@ -110,7 +109,7 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->waitForText('crm-notification-container', "Your custom field '$contactRefFieldLabel1' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$contactRefFieldLabel1' has been saved.");
 
     //add custom field - alphanumeric checkbox
     $contactRefFieldLabel2 = 'contact_ref_' . substr(sha1(rand()), 0, 4);
@@ -129,21 +128,21 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->waitForText('crm-notification-container', "Your custom field '$contactRefFieldLabel2' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$contactRefFieldLabel2' has been saved.");
 
     $this->openCiviPage('admin/custom/group/field', "reset=1&action=browse&gid={$customGroupId}");
 
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[8]/span[1]/a[text()='Edit Field']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $fieldid1 = explode("&id=", $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[8]/span[1]/a[text()='Edit Field']@href"));
+    $fieldid1 = $fieldid1[1];
 
-    $contactRefFieldID1 = $this->urlArg('id');
+    $contactRefFieldID1 = $fieldid1;
 
     $this->openCiviPage('admin/custom/group/field', "reset=1&action=browse&gid={$customGroupId}");
 
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[8]/span[1]/a[text()='Edit Field']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $fieldid2 = explode("&id=", $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[8]/span[1]/a[text()='Edit Field']@href"));
+    $fieldid2 = $fieldid2[1];
 
-    $contactRefFieldID2 = $this->urlArg('id');
+    $contactRefFieldID2 = $fieldid2;
 
     // Visit custom group preview page
     $this->openCiviPage('admin/custom/group', "action=preview&reset=1&id={$customGroupId}");
