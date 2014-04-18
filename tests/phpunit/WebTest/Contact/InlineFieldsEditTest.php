@@ -67,10 +67,10 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
     // Justification for this instance: opening an accordion is predictable
     sleep(1);
     $this->openInlineForm('custom-set-content-1');
-    $dateFieldId = $this->getAttribute("xpath=//div[@id='constituent_information']/table/tbody/tr[3]/td[@class='html-adjust']/input@id");
+    $dateFieldId = $this->getAttribute("xpath=//div[@class='crm-accordion-body']/table/tbody/tr[3]/td[@class='html-adjust']/input@id");
     $this->inlineEdit('custom-set-content-1', array(
       'CIVICRM_QFID_Edu_2' => 1,
-      "//div[@id='constituent_information']/table/tbody/tr[2]/td[@class='html-adjust']/select" => array('Single'),
+      "//div[@class='crm-accordion-body']/table/tbody/tr[2]/td[@class='html-adjust']/select" => array('Single'),
       $dateFieldId => 'date: now - 10 years',
     ));
 
