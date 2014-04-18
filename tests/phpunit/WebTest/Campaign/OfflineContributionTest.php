@@ -51,7 +51,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "John", "$firstName2.john@example.org");
@@ -64,7 +64,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     // Enable CiviCampaign module if necessary
     $this->enableComponents(array('CiviCampaign'));
@@ -168,7 +168,10 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // soft credit
-    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 'soft_credit_contact_1');
+    $this->click("xpath=id('Contribution')/div[2]/div[@id='softCredit']/div[1]");
+    $this->type("soft_credit_amount_1", "50");
+    $this->waitForElementPresent("soft_credit_contact_id_1");
+    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 'soft_credit_contact_id_1');
 
     //Additional Detail section
     $this->click("AdditionalDetail");
@@ -181,15 +184,6 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->type("invoice_id", time());
     $this->webtestFillDate('thankyou_date');
 
-    //Honoree section
-    $this->click("Honoree");
-    $this->waitForElementPresent("honor_email");
-
-    $this->click("CIVICRM_QFID_1_2");
-    $this->select("honor_prefix_id", "label=Ms.");
-    $this->type("honor_first_name", "Foo");
-    $this->type("honor_last_name", "Bar");
-    $this->type("honor_email", "foo@bar.com");
 
     //Premium section
     $this->click("Premium");
@@ -200,15 +194,14 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click("_qf_Contribution_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->waitForText('crm-notification-container', "The contribution record has been saved");
+    $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
-    $this->waitForElementPresent("xpath=//div[@id='Contributions']//table/tbody/tr/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//*[@id='Search']//div[2]//table[2]/tbody/tr/td[8]/span/a[text()='View']");
 
     // click through to the Contribution view screen
-    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr/td[8]/span/a[text()='View']");
+    $this->click("xpath=//*[@id='Search']//div[2]//table[2]/tbody/tr/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
 
     // verify Contribution created
@@ -228,7 +221,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
       $this->type('sort_name', $firstName);
       $this->click("_qf_Search_refresh");
-      $this->waitForElementPresent("_qf_Search_next_print");
+      $this->waitForElementPresent("xpath=//div[@id='contributionSearch']/table/tbody/tr/td[11]/span/a[text()='Edit']");
       $this->click("xpath=//div[@id='contributionSearch']/table/tbody/tr/td[11]/span/a[text()='Edit']");
       $this->waitForElementPresent("_qf_Contribution_cancel-bottom");
       $this->assertTrue($this->isTextPresent("$campaignTitle"));
@@ -264,15 +257,11 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
     // click save
     $this->click("_qf_Campaign_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->assertTrue($this->isTextPresent("Campaign $pastCampaignTitle has been saved."),
-      "Status message didn't show up after saving campaign!"
-    );
+    $this->waitForElementPresent("//*[@id='crm-notification-container']");
+    $this->waitForText('crm-notification-container', "Campaign $pastCampaignTitle has been saved.");
 
     $this->waitForElementPresent("link=Add Campaign");
-
-    $this->waitForElementPresent("Campaigns");
+    $this->waitForElementPresent("link=Campaigns");
     $this->click("search_form_campaign");
     $this->type("campaign_title", $pastCampaignTitle);
     $this->click("xpath=//div[@class='crm-accordion-body']/table/tbody/tr[4]/td/a[text()='Search']");
