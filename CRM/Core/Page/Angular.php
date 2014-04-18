@@ -13,7 +13,11 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
   const DEFAULT_MODULE_WEIGHT = 200;
 
   function run() {
-    $res = CRM_Core_Resources::singleton();
+    $this->registerResources(CRM_Core_Resources::singleton());
+    return parent::run();
+  }
+
+  public function registerResources(CRM_Core_Resources $res) {
     $modules = self::getAngularModules();
 
     $res->addSettingsFactory(function () use (&$modules) {
@@ -32,9 +36,12 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
       if (!empty($module['file'])) {
         $res->addScriptFile($module['ext'], $module['file'], self::DEFAULT_MODULE_WEIGHT, 'html-header', TRUE);
       }
+      if (!empty($module['files'])) {
+        foreach ($module['files'] as $file) {
+          $res->addScriptFile($module['ext'], $file, self::DEFAULT_MODULE_WEIGHT, 'html-header', TRUE);
+        }
+      }
     }
-
-    return parent::run();
   }
 
   /**
