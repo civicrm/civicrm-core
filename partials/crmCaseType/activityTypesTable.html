@@ -1,0 +1,28 @@
+<!--
+Controller: CaseTypeCtrl
+Required vars: caseType
+-->
+<table>
+  <thead>
+  <tr>
+    <th>Activity Type</th>
+    <th>Max Instances</th>
+    <th></th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr ng-repeat="activityType in caseType.definition.activityTypes">
+    <td>
+      {{ activityType.name }}
+    </td>
+    <td>
+      {{ activityType.max_instances }}
+    </td>
+    <td>
+      <a class="ui-icon ui-icon-trash" title="Remove"
+         ng-click="removeItem(caseType.definition.activityTypes, activityType)"></a>
+    </td>
+  </tr>
+  </tbody>
+</table>

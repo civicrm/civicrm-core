@@ -1,0 +1,25 @@
+<!--
+Controller: CaseTypeCtrl
+Required vars: caseType
+-->
+<table>
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Assign to Creator</th>
+    <th>Is Manager</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr ng-repeat="relType in caseType.definition.caseRoles | orderBy:'name'">
+    <td>{{relType.name}}</td>
+    <td><input type="checkbox" ng-model="relType.creator" ng-true-value="1" ng-false-value="0"/></td>
+    <td><input type="radio" ng-model="relType.manager" value="1" ng-change="onManagerChange(relType)"/></td>
+    <td>
+      <a class="ui-icon ui-icon-trash" title="Remove"
+         ng-click="removeItem(caseType.definition.caseRoles, relType)"></a>
+    </td>
+  </tr>
+  </tbody>
+</table>
