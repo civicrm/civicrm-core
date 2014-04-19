@@ -6,28 +6,31 @@ Required vars: caseType
   <div ng-include="partialsUrl + '/caseTypeDetails.html'"></div>
 
   <h2>Roles</h2>
+
   <div ng-include="partialsUrl + '/rolesTable.html'"></div>
 
   <h2>Activities</h2>
 
-  <div class="vertical-tabset">
-    <fieldset class="vertical-tab">
-      <legend>Activity Types</legend>
+  <div ui-jq="tabs">
+    <ul>
+      <li><a href="#acttab-actType">Activity Types</a></li>
+      <li ng-repeat="activitySet in caseType.definition.activitySets">
+        <a href="#acttab-{{$index}}">{{ activitySet.label }}</a>
+      </li>
+    </ul>
 
+    <div id="acttab-actType">
       <div ng-include="partialsUrl + '/activityTypesTable.html'"></div>
-    </fieldset>
+    </div>
 
-    <fieldset class="vertical-tab" ng-repeat="activitySet in caseType.definition.activitySets">
-      <legend>{{ activitySet.label }}</legend>
-
+    <div ng-repeat="activitySet in caseType.definition.activitySets" id="acttab-{{$index}}">
       <div ng-include="activityTableTemplate(activitySet)"></div>
 
-      <fieldset class="collapsible">
-        <legend>Advanced</legend>
-        <div ng-include="partialsUrl + '/activitySetDetails.html'"></div>
-      </fieldset>
-
-    </fieldset>
+      <div ui-jq="accordion" ui-options="{collapsible: true, active: false}">
+        <h3>Advanced</h3>
+        <div ng-include="partialsUrl + '/activitySetDetails.html'" style="display:none;"></div>
+      </div>
+    </div>
   </div>
 
   <button ng-click="dump()">Log</button>

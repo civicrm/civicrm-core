@@ -1,7 +1,7 @@
 (function(angular, $, _) {
 
   var partialsUrl = CRM.resourceUrls['civicrm'] + '/partials/crmCaseType';
-  var crmCaseType = angular.module('crmCaseType', ['ngRoute']);
+  var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils']);
 
   crmCaseType.config(['$routeProvider',
     function($routeProvider) {
