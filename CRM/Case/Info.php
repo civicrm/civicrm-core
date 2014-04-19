@@ -52,6 +52,15 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     );
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public function getAngularModules() {
+    $result = array();
+    $result['crmCaseType'] = array('ext' => 'civicrm', 'files' => array('js/angular-crmCaseType.js'));
+    return $result;
+  }
+
   // docs inherited from interface
   public function getManagedEntities() {
     // Use hook_civicrm_caseTypes to build a list of OptionValues
