@@ -51,6 +51,7 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
    */
   public static function getAngularModules() {
     $angularModules = array();
+    $angularModules['ui.utils'] = array('ext' => 'civicrm', 'file' => 'packages/bower_components/angular-ui-utils/ui-utils.js');
     foreach (CRM_Core_Component::getEnabledComponents() as $component) {
       $angularModules = array_merge($angularModules, $component->getAngularModules());
     }
