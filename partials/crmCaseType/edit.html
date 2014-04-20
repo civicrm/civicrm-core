@@ -2,7 +2,7 @@
 Controller: CaseTypeCtrl
 Required vars: caseType
 -->
-<div class="crm-block crm-form-block">
+<div class="crm-block crm-form-block crmCaseType">
   <div ng-include="partialsUrl + '/caseTypeDetails.html'"></div>
 
   <h2>Roles</h2>
@@ -11,12 +11,19 @@ Required vars: caseType
 
   <h2>Activities</h2>
 
-  <div ui-jq="tabs">
+  <div class="crmCaseType-acttab" ui-jq="tabs" ui-options="{show: true, hide: true}">
     <ul>
       <li><a href="#acttab-actType">Activity Types</a></li>
       <li ng-repeat="activitySet in caseType.definition.activitySets">
         <a href="#acttab-{{$index}}">{{ activitySet.label }}</a>
+        <span class="ui-icon ui-icon-trash" title="Remove"
+           ng-click="removeItem(caseType.definition.activitySets, activitySet)">Remove</span>
       </li>
+      <select ng-model="newActivitySetWorkflow" ng-change="addActivitySet(newActivitySetWorkflow); newActivitySetWorkflow='';">
+        <option value="">(Add)</option>
+        <option value="timeline">Timeline</option>
+        <option value="pipeline">Sequence</option>
+      </select>
     </ul>
 
     <div id="acttab-actType">
@@ -26,7 +33,7 @@ Required vars: caseType
     <div ng-repeat="activitySet in caseType.definition.activitySets" id="acttab-{{$index}}">
       <div ng-include="activityTableTemplate(activitySet)"></div>
 
-      <div ui-jq="accordion" ui-options="{collapsible: true, active: false}">
+      <div ui-jq="accordion" ui-options="{collapsible: true, active: false, heightStyle: 'fill'}">
         <h3>Advanced</h3>
         <div ng-include="partialsUrl + '/activitySetDetails.html'" style="display:none;"></div>
       </div>
