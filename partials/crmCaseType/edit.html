@@ -3,11 +3,11 @@ Controller: CaseTypeCtrl
 Required vars: caseType
 -->
 <div class="crm-block crm-form-block crmCaseType">
-  <div ng-include="partialsUrl + '/caseTypeDetails.html'"></div>
+  <div ng-include="partialUrl('caseTypeDetails.html')"></div>
 
   <h2>Roles</h2>
 
-  <div ng-include="partialsUrl + '/rolesTable.html'"></div>
+  <div ng-include="partialUrl('rolesTable.html')"></div>
 
   <h2>Activities</h2>
 
@@ -27,7 +27,7 @@ Required vars: caseType
     </ul>
 
     <div id="acttab-actType">
-      <div ng-include="partialsUrl + '/activityTypesTable.html'"></div>
+      <div ng-include="partialUrl('activityTypesTable.html')"></div>
     </div>
 
     <div ng-repeat="activitySet in caseType.definition.activitySets" id="acttab-{{$index}}">
@@ -35,7 +35,7 @@ Required vars: caseType
 
       <div ui-jq="accordion" ui-options="{collapsible: true, active: false, heightStyle: 'fill'}">
         <h3>Advanced</h3>
-        <div ng-include="partialsUrl + '/activitySetDetails.html'" style="display:none;"></div>
+        <div ng-include="partialUrl('activitySetDetails.html')" style="display:none;"></div>
       </div>
     </div>
   </div>

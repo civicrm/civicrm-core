@@ -1,19 +1,22 @@
 (function(angular, $, _) {
 
-  var partialsUrl = CRM.resourceUrls['civicrm'] + '/partials/crmCaseType';
+  var partialUrl = function(relPath) {
+    return CRM.resourceUrls['civicrm'] + '/partials/crmCaseType/' + relPath;
+  } ;
+
   var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils']);
 
   crmCaseType.config(['$routeProvider',
     function($routeProvider) {
       $routeProvider.when('/caseType/:id', {
-        templateUrl: partialsUrl + '/edit.html',
+        templateUrl: partialUrl('edit.html'),
         controller: 'CaseTypeCtrl'
       });
     }
   ]);
 
   crmCaseType.controller('CaseTypeCtrl', function($scope) {
-    $scope.partialsUrl = partialsUrl;
+    $scope.partialUrl = partialUrl;
 
     $scope.workflows = {
       'timeline': 'Timeline',
@@ -108,9 +111,9 @@
      */
     $scope.activityTableTemplate = function(activitySet) {
       if (activitySet.timeline) {
-        return partialsUrl + '/timelineTable.html';
+        return partialUrl('timelineTable.html');
       } else if (activitySet.pipeline) {
-        return partialsUrl + '/pipelineTable.html';
+        return partialUrl('pipelineTable.html');
       } else {
         return '';
       }
