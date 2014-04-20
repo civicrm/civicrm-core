@@ -57,7 +57,11 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    */
   public function getAngularModules() {
     $result = array();
-    $result['crmCaseType'] = array('ext' => 'civicrm', 'files' => array('js/angular-crmCaseType.js'));
+    $result['crmCaseType'] = array(
+      'ext' => 'civicrm',
+      'js' => array('js/angular-crmCaseType.js'),
+      'css' => array('css/angular-crmCaseType.css'),
+    );
     return $result;
   }
 

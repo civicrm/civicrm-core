@@ -33,11 +33,13 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
     $res->addScriptFile('civicrm', 'packages/bower_components/angular/angular.js', 100, 'html-header', FALSE);
     $res->addScriptFile('civicrm', 'packages/bower_components/angular-route/angular-route.js', 110, 'html-header', FALSE);
     foreach ($modules as $module) {
-      if (!empty($module['file'])) {
-        $res->addScriptFile($module['ext'], $module['file'], self::DEFAULT_MODULE_WEIGHT, 'html-header', TRUE);
+      if (!empty($module['css'])) {
+        foreach ($module['css'] as $file) {
+          $res->addStyleFile($module['ext'], $file, self::DEFAULT_MODULE_WEIGHT, 'html-header', TRUE);
+        }
       }
-      if (!empty($module['files'])) {
-        foreach ($module['files'] as $file) {
+      if (!empty($module['js'])) {
+        foreach ($module['js'] as $file) {
           $res->addScriptFile($module['ext'], $file, self::DEFAULT_MODULE_WEIGHT, 'html-header', TRUE);
         }
       }
@@ -47,11 +49,11 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
   /**
    * Get a list of AngularJS modules which should be autoloaded
    *
-   * @return array (string $name => array('ext' => string $key, 'file' => string $path))
+   * @return array (string $name => array('ext' => string $key, 'js' => array $paths, 'css' => array $paths))
    */
   public static function getAngularModules() {
     $angularModules = array();
-    $angularModules['ui.utils'] = array('ext' => 'civicrm', 'file' => 'packages/bower_components/angular-ui-utils/ui-utils.js');
+    $angularModules['ui.utils'] = array('ext' => 'civicrm', 'js' => array('packages/bower_components/angular-ui-utils/ui-utils.js'));
     foreach (CRM_Core_Component::getEnabledComponents() as $component) {
       $angularModules = array_merge($angularModules, $component->getAngularModules());
     }
