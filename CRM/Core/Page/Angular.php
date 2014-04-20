@@ -30,8 +30,8 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
       );
     });
 
-    $res->addScriptFile('civicrm', 'packages/bower_components/angular/angular.js', 100, 'html-header', FALSE);
-    $res->addScriptFile('civicrm', 'packages/bower_components/angular-route/angular-route.js', 110, 'html-header', FALSE);
+    $res->addScriptFile('civicrm', 'packages/bower_components/angular/angular.min.js', 100, 'html-header', FALSE);
+    $res->addScriptFile('civicrm', 'packages/bower_components/angular-route/angular-route.min.js', 110, 'html-header', FALSE);
     foreach ($modules as $module) {
       if (!empty($module['css'])) {
         foreach ($module['css'] as $file) {
@@ -53,7 +53,7 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
    */
   public static function getAngularModules() {
     $angularModules = array();
-    $angularModules['ui.utils'] = array('ext' => 'civicrm', 'js' => array('packages/bower_components/angular-ui-utils/ui-utils.js'));
+    $angularModules['ui.utils'] = array('ext' => 'civicrm', 'js' => array('packages/bower_components/angular-ui-utils/ui-utils.min.js'));
     foreach (CRM_Core_Component::getEnabledComponents() as $component) {
       $angularModules = array_merge($angularModules, $component->getAngularModules());
     }
