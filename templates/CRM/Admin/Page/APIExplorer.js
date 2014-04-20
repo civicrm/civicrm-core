@@ -35,7 +35,7 @@ CRM.$(function($) {
 
   function generateQuery () {
     var params = {};
-    $('#explorer input:checkbox:checked, #explorer select, #extra input').each(function() {
+    $('#api-explorer input:checkbox:checked, #api-explorer select, #extra input').each(function() {
       var val = $(this).val();
       if (val) {
         params[$(this).data('id')] = val;
@@ -53,7 +53,7 @@ CRM.$(function($) {
     }
   }
 
-  function runQuery(query) {
+  function runQuery() {
     var vars = [],
       hash,
       smarty = '',
@@ -96,7 +96,7 @@ CRM.$(function($) {
     }
 
     if (!entity) {
-      $('#query').val(ts('Choose an entity.{/ts}'));
+      $('#query').val(ts('Choose an entity.'));
       $('#entity').val('');
       window.location.hash = 'explorer';
       return;
@@ -132,15 +132,24 @@ CRM.$(function($) {
   }
 
   var query = window.location.hash;
-  var t = "#/civicrm/ajax/rest";
-  if (query.substring(0, t.length) === t) {
+  if (query.substring(1, restURL.length + 1) === restURL) {
     $('#query').val (query.substring(1)).focus();
+    runQuery();
   } else {
     window.location.hash="explorer"; //to be sure to display the result under the generated code in the viewport
   }
-  $('#entity, #action').change (function() { $("#selector, #extra").empty(); generateQuery(); runQuery(); });
-  $('#explorer input:checkbox').change(function() {generateQuery(); runQuery(); });
-  $('#explorer').submit(function() {runQuery(); return false;});
+  $('#entity, #action').change (function() {
+    $("#selector, #extra").empty();
+    generateQuery();
+    runQuery();
+  });
+  $('#api-explorer input:checkbox').change(function() {
+    generateQuery(); runQuery();
+  });
+  $('#api-explorer').submit(function(e) {
+    e.preventDefault();
+    runQuery();
+  });
   $('#extra').on('keyup', 'input', generateQuery);
   $('#extra').on('click', 'a.remove-extra', function() {
     $(this).parent().remove();
