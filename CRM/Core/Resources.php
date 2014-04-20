@@ -128,6 +128,8 @@ class CRM_Core_Resources {
    * Construct a resource manager
    *
    * @param CRM_Extension_Mapper $extMapper Map extension names to their base path or URLs.
+   * @param CRM_Utils_Cache_Interface $cache JS-localization cache
+   * @param string|null $cacheCodeKey Random code to append to resource URLs; changing the code forces clients to reload resources
    */
   public function __construct($extMapper, $cache, $cacheCodeKey = NULL) {
     $this->extMapper = $extMapper;
@@ -239,7 +241,7 @@ class CRM_Core_Resources {
   /**
    * Add JavaScript variables to the global CRM object via a callback function.
    *
-   * @param $callable function
+   * @param callable $callable
    * @return CRM_Core_Resources
    */
   public function addSettingsFactory($callable) {
@@ -384,7 +386,7 @@ class CRM_Core_Resources {
    * @param $ext string, extension name; use 'civicrm' for core
    * @param $file string, file path -- relative to the extension base dir
    *
-   * @return (string|bool), full file path or FALSE if not found
+   * @return string|bool full file path or FALSE if not found
    */
   public function getPath($ext, $file) {
     // TODO consider caching results
@@ -400,7 +402,8 @@ class CRM_Core_Resources {
    *
    * @param $ext string, extension name; use 'civicrm' for core
    * @param $file string, file path -- relative to the extension base dir
-   * @return string, URL
+   * @param bool $addCacheCode
+   * @return string URL
    */
   public function getUrl($ext, $file = NULL, $addCacheCode = FALSE) {
     if ($file === NULL) {
@@ -435,6 +438,7 @@ class CRM_Core_Resources {
    * TODO: Separate the functional code (like addStyle/addScript) from the policy code
    * (like addCoreResources/addCoreStyles).
    *
+   * @param string $region
    * @return CRM_Core_Resources
    * @access public
    */

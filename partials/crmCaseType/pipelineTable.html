@@ -1,0 +1,22 @@
+<!--
+Controller: CaseTypeCtrl
+Required vars: activitySet
+-->
+<table>
+  <thead>
+  <tr>
+    <th>Activity Type</th>
+    <th></th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr ng-repeat="activity in activitySet.activityTypes">
+    <td>{{ activity.name }}</td>
+    <td>
+      <a class="ui-icon ui-icon-trash" title="Remove"
+         ng-click="removeItem(activitySet.activityTypes, activity)"></a>
+    </td>
+  </tr>
+  </tbody>
+</table>
