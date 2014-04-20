@@ -40,18 +40,34 @@ function display(totalfee) {
 
   // populate the balance amount div
   // change the status selections according to updated selections
-  populatebalanceFee(totalfee);
+  populatebalanceFee(totalfee, false);
 }
 
-function populatebalanceFee(updatedAmt) {
+function populatebalanceFee(updatedAmt, onlyStatusUpdate) {
+  // updatedAmt is: selected line total
+
   // assign statuses
   var partiallyPaid = {/literal}{$partiallyPaid}{literal};
   var pendingRefund = {/literal}{$pendingRefund}{literal};
   var participantStatus = {/literal}{$participantStatus}{literal};
+
+  // fee actually paid
   var feePaid = {/literal}{$feePaid}{literal};
 
+  var updatedTotalLineTotal = updatedAmt;
+
+  {/literal}{if $totalLineTotal}{literal}
+    // line total of current participant stored in DB
+    var linetotal = {/literal}{$lineItemTotal}{literal};
+
+    // line total of all the participants
+    var totalLineTotal = {/literal}{$totalLineTotal}{literal};
+    updatedTotalLineTotal = totalLineTotal + (updatedAmt - linetotal);
+  {/literal}{/if}{literal}
+
   // calculate the balance amount using total paid and updated amount
-  var balanceAmt = updatedAmt - feePaid;
+  var balanceAmt = updatedTotalLineTotal - feePaid;
+
   // change the status selections according to updated selections
   if (balanceAmt > 0) {
     cj('#status_id').val(partiallyPaid);
@@ -63,28 +79,17 @@ function populatebalanceFee(updatedAmt) {
     cj('#status_id').val(participantStatus);
   }
 
-  balanceAmt = formatMoney(balanceAmt, 2, seperator, thousandMarker);
-  cj('#balance-fee').text(symbol+" "+balanceAmt);
+  if (!onlyStatusUpdate) {
+    balanceAmt = formatMoney(balanceAmt, 2, seperator, thousandMarker);
+    cj('#balance-fee').text(symbol+" "+balanceAmt);
+  }
 }
 
 CRM.$(function($) {
-  // assign statuses
-  var partiallyPaid = {/literal}{$partiallyPaid}{literal};
-  var pendingRefund = {/literal}{$pendingRefund}{literal};
-  var participantStatus = {/literal}{$participantStatus}{literal};
-  var feePaid = {/literal}{$feePaid}{literal};
-
   var updatedFeeUnFormatted = cj('#pricevalue').text();
   var updatedAmt = parseFloat(updatedFeeUnFormatted.replace(/[^0-9-.]/g, ''));
-  var balanceAmt = updatedAmt - feePaid;
 
-  // change the status selections according to updated selections
-  if (balanceAmt > 0) {
-    cj('#status_id').val(partiallyPaid);
-  } 
-  else if(balanceAmt < 0) {
-    cj('#status_id').val(pendingRefund);
-  } 
+  populatebalanceFee(updatedAmt, true);
 });
 
 {/literal}
