@@ -14,6 +14,12 @@
 
   crmCaseType.controller('CaseTypeCtrl', function($scope) {
     $scope.partialsUrl = partialsUrl;
+
+    $scope.workflows = {
+      'timeline': 'Timeline',
+      'pipeline': 'Sequence'
+    };
+
     $scope.caseType = {
       id: 123,
       label: 'Adult Day Care Referral',
@@ -37,7 +43,7 @@
           },
           {
             name: 'my_sequence',
-            label: 'Sequence',
+            label: 'My Sequence',
             pipeline: '1', // Angular won't bind checkbox correctly with numeric 1
             activityTypes: [
               {name: 'Medical evaluation'},
@@ -53,6 +59,23 @@
           { name: 'Benefits Specialist' }
         ]
       }
+    };
+
+    $scope.addActivitySet = function(workflow) {
+      var activitySet = {};
+      activitySet[workflow] = '1';
+      activitySet.activityTypes = [];
+
+      var offset = 1;
+      var names = _.pluck($scope.caseType.definition.activitySets, 'name');
+      while (_.contains(names, workflow + '_' + offset)) offset++;
+      activitySet.name = workflow + '_' + offset;
+      activitySet.label = (offset == 1  ) ? $scope.workflows[workflow] : ($scope.workflows[workflow] + ' #' + offset);
+
+      $scope.caseType.definition.activitySets.push(activitySet);
+      _.defer(function() {
+        $('.crmCaseType-acttab').tabs('refresh').tabs({active: -1});
+      });
     };
 
     $scope.onManagerChange = function(managerRole) {
@@ -71,9 +94,11 @@
     };
 
     $scope.getWorkflowName = function(activitySet) {
-      if (activitySet.timeline) return "Timeline";
-      if (activitySet.pipeline) return "Sequence";
-      return "Unknown";
+      var result = 'Unknown';
+      _.each($scope.workflows, function(value, key) {
+        if (activitySet[key]) result = value;
+      });
+      return result;
     };
 
     /**
@@ -93,7 +118,13 @@
 
     $scope.dump = function() {
       console.log($scope.caseType);
-    }
+    };
+
+    $scope.$watchCollection('caseType.definition.activitySets', function() {
+      _.defer(function() {
+          $('.crmCaseType-acttab').tabs('refresh');
+      });
+    });
   });
 
 })(angular, CRM.$, CRM._);
