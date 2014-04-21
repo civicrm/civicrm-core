@@ -8,6 +8,12 @@
     fieldTpl = _.template($('#api-param-tpl').html()),
     chainTpl = _.template($('#api-chain-tpl').html());
 
+  function prettyPrint() {
+    if (window.prettyPrint) {
+      window.prettyPrint();
+    }
+  }
+
   function addField(name) {
     $('#api-params').append($(fieldTpl({name: name || ''})));
     var $row = $('tr:last-child', '#api-params');
@@ -241,8 +247,9 @@
       q.smarty = '{* Smarty API only works with get actions *}';
     }
     $.each(q, function(type, val) {
-      $('#api-' + type).text(val);
+      $('#api-' + type).removeClass('prettyprinted').text(val);
     });
+    prettyPrint();
   }
 
   function submit(e) {
@@ -272,7 +279,8 @@
       type: action.indexOf('get') < 0 ? 'POST' : 'GET',
       dataType: 'text'
     }).done(function(text) {
-      $('#api-result').text(text);
+      $('#api-result').addClass('prettyprint linenums').removeClass('prettyprinted').text(text);
+      prettyPrint();
     });
   }
 

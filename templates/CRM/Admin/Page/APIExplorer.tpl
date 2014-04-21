@@ -26,7 +26,6 @@
 <style>
   {literal}
   #api-result {
-    background: #d9d9d9;
     padding:1em;
     max-height: 50em;
   }
@@ -66,6 +65,8 @@
   }
   {/literal}
 </style>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css" />
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
 
 <form id="api-explorer">
   <label for="api-entity">{ts}Entity{/ts}:</label>
@@ -111,14 +112,14 @@
   <div id="api-generated-wraper">
     <table id="api-generated" border=1>
       <caption>{ts}Code{/ts}</caption>
-      <tr><td>Rest</td><td><pre id="api-rest"></pre></td></tr>
-      <tr><td>Smarty</td><td><pre id="api-smarty" title='smarty syntax (for get actions)'></pre></td></tr>
-      <tr><td>Php</td><td><pre id="api-php" title='php syntax'></pre></td></tr>
-      <tr><td>Javascript</td><td><pre id="api-json" title='javascript syntax'></pre></td></tr>
+      <tr><td>Rest</td><td><pre class="prettyprint linenums" id="api-rest"></pre></td></tr>
+      <tr><td>Smarty</td><td><pre class="prettyprint linenums" id="api-smarty" title='smarty syntax (for get actions)'></pre></td></tr>
+      <tr><td>Php</td><td><pre class="prettyprint linenums" id="api-php" title='php syntax'></pre></td></tr>
+      <tr><td>Javascript</td><td><pre class="prettyprint linenums" id="api-json" title='javascript syntax'></pre></td></tr>
     </table>
   </div>
   <input type="submit" value="{ts}Execute{/ts}" class="form-submit"/>
-<pre id="api-result">
+<pre class="prettyprint" id="api-result">
 {ts}The result of api calls are displayed in this area.{/ts}
 </pre>
 </form>
