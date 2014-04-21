@@ -55,7 +55,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Add to group.
     $this->select("group_id", "label=$parentGroupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("//*[@id='GroupContact']");
 
     $secondContactName = 'TestExport2' . substr(sha1(rand()), 0, 7);
     list($emailContactSecond,$prefixLabelContactScnd,$suffixLabelContactScnd,$genderLabelContactScnd) = WebTest_Export_ContactTest::webtestAddContactWithGenderPrefixSuffix($secondContactName, "John", "$secondContactName.john@example.org", Null);
@@ -71,7 +71,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Add to group.
     $this->select("group_id", "label=$parentGroupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("//*[@id='GroupContact']");
 
     $this->openCiviPage("contact/search", "reset=1");
 
@@ -173,7 +173,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Add to group.
     $this->select("group_id", "label=$parentGroupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("//*[@id='GroupContact']");
 
     // Adding child group contact
     // We're using Quick Add block on the main page for this.
@@ -191,7 +191,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Add to child group.
     $this->select("group_id", "label=regexp:$childGroupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("//*[@id='GroupContact']");
 
     // Visit contact search page.
     $this->openCiviPage("contact/search", "reset=1");
@@ -296,7 +296,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Add to group.
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("//*[@id='GroupContact']");
 
     $firstName1 = 'aa' . substr(sha1(rand()), 0, 5);
     $this->webtestAddContact($firstName1, "Smith", "{$firstName1}.smith@example.org");
@@ -312,7 +312,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Add to group.
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("//*[@id='GroupContact']");
 
     $firstName2 = 'bb' . substr(sha1(rand()), 0, 5);
 
@@ -328,8 +328,8 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->click("//div[@id='addressBlockId']/div[1]");
 
     $this->click("address[1][use_shared_address]");
-    $this->waitForElementPresent("contact_1");
-    $this->webtestFillAutocomplete($houseHold);
+    $this->waitForElementPresent("address_1_master_contact_id");
+    $this->select2('address_1_master_contact_id', $houseHold);
     $this->waitForTextPresent("121A Sherman");
 
     $this->click('_qf_Contact_upload_view-bottom');
@@ -346,7 +346,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Add to group.
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("//*[@id='GroupContact']");
 
     $this->openCiviPage("contact/search", "reset=1", NULL);
 
@@ -411,7 +411,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->reviewCSV($csvFile, $checkHeaders, $checkRows, 2);
   }
 
-  function addContactGroup($groupName = 'New Group', $parentGroupName = "- select -") {
+  function addContactGroup($groupName = 'New Group', $parentGroupName = "- select group -") {
     $this->openCiviPage("group/add", "reset=1", "_qf_Edit_upload");
 
     // Fill group name.

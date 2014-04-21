@@ -65,10 +65,9 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->click('link=Add Grant');
 
     // wait for grant form to load completely
-    $this->waitForElementPresent('note');
+    $this->waitForText('css=span.ui-dialog-title', "$firstName $lastName");
 
     // check contact name on Grant form
-    $this->assertElementContainsText('page-title', "$firstName $lastName");
 
     // select grant Status
     $this->select('status_id', 'value=1');
@@ -107,10 +106,10 @@ class WebTest_Grant_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->type('note', "Grant Note for $firstName");
 
     // Clicking save.
-    $this->clickLink('_qf_Grant_upload', "xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->clickLink('_qf_Grant_upload', "xpath=//div[@class='view-content']//table/tbody/tr[1]/td[8]/span/a[text()='View']", FALSE);
 
     // click through to the Grant view screen
-    $this->clickLink("xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_GrantView_cancel-bottom');
+    $this->clickLink("xpath=//div[@class='view-content']//table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_GrantView_cancel-bottom', FALSE);
 
     $gDate = date('F jS, Y', strtotime('now'));
 
