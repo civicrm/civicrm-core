@@ -1453,6 +1453,7 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
   foreach ($customfields as $key => $value) {
     // Regular fields have a 'name' property
     $value['name'] = 'custom_' . $key;
+    $value['title'] = $value['label'];
     $value['type'] = _getStandardTypeFromCustomDataType($value['data_type']);
     $ret['custom_' . $key] = $value;
   }
