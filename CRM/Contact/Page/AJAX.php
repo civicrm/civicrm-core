@@ -733,7 +733,7 @@ LIMIT {$offset}, {$rowCount}
     //check for mobile type
     $phoneTypes = CRM_Core_OptionGroup::values('phone_type', TRUE, FALSE, FALSE, NULL, 'name');
     $mobileType = CRM_Utils_Array::value('Mobile', $phoneTypes);
-    
+
     $name = CRM_Utils_Array::value('name', $_GET);
     if ($name) {
       $name = CRM_Utils_Type::escape($name, 'String');
@@ -935,6 +935,8 @@ LIMIT {$offset}, {$rowCount}
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
     $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
     $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
+    $sort      = 'sort_name';
+    $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
 
     $gid         = isset($_REQUEST['gid']) ? CRM_Utils_Type::escape($_REQUEST['gid'], 'Integer') : 0;
     $rgid        = isset($_REQUEST['rgid']) ? CRM_Utils_Type::escape($_REQUEST['rgid'], 'Integer') : 0;

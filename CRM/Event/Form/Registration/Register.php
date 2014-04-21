@@ -548,7 +548,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     //if payment done, no need to build the fee block.
     if (!empty($form->_paymentId)) {
-      //fix to diaplay line item in update mode.
+      //fix to display line item in update mode.
       $form->assign('priceSet', isset($form->_priceSet) ? $form->_priceSet : NULL);
       return;
     }
@@ -1462,4 +1462,3 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
   }
 }
-

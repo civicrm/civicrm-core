@@ -261,18 +261,18 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $config    = CRM_Core_Config::singleton();
     $script    = '';
     $separator = $htmlize ? '&amp;' : '&';
-    $pageID    = '';
+    $wpPageParam    = '';
+    $fragment = isset($fragment) ? ('#' . $fragment) : '';
 
     $path = CRM_Utils_String::stripPathChars($path);
 
     //this means wp function we are trying to use is not available,
     //so load bootStrap
     if (!function_exists('get_option')) {
-      $this->loadBootStrap();
+      $this->loadBootStrap(); // FIXME: Why bootstrap in url()? Generally want to define 1-2 strategic places to put bootstrap
     }
-    $permlinkStructure = get_option('permalink_structure');
     if ($config->userFrameworkFrontend) {
-      if ($permlinkStructure != '') {
+      if (get_option('permalink_structure') != '') {
         global $post;
         $script = get_permalink($post->ID);
       }
@@ -282,18 +282,47 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       global $wp_query;
       if ( method_exists( $wp_query, 'get' ) ) {
         if (get_query_var('page_id')) {
-          $pageID = "{$separator}page_id=" . get_query_var('page_id');
+          $wpPageParam = "page_id=" . get_query_var('page_id');
         }
         elseif (get_query_var('p')) {
           // when shortcode is inserted in post
-          $pageID = "{$separator}p=" . get_query_var('p');
+          $wpPageParam = "p=" . get_query_var('p');
         }
       }
     }
 
-    if (isset($fragment)) {
-      $fragment = '#' . $fragment;
+    $base = $this->getBaseUrl($absolute, $frontend, $forceBackend);
+
+    if (!isset($path) && !isset($query)) {
+      // FIXME: This short-circuited codepath is the same as the general one below, except
+      // in that it ignores "permlink_structure" /  $wpPageParam / $script . I don't know
+      // why it's different (and I can only find two obvious use-cases for this codepath,
+      // of which at least one looks gratuitous). A more ambitious person would simply remove
+      // this code.
+      return $base . $fragment;
     }
+
+    if (!$forceBackend && get_option('permalink_structure') != '' && ($wpPageParam || $script != '')) {
+      $base = $script;
+    }
+
+    $queryParts = array();
+    if (isset($path)) {
+      $queryParts[] = 'page=CiviCRM';
+      $queryParts[] = "q={$path}";
+    }
+    if ($wpPageParam) {
+      $queryParts[] = $wpPageParam;
+    }
+    if (isset($query)) {
+      $queryParts[] = $query;
+    }
+
+    return $base . '?' . implode($separator, $queryParts) . $fragment;
+  }
+
+  private function getBaseUrl($absolute, $frontend, $forceBackend) {
+    $config    = CRM_Core_Config::singleton();
 
     if (!isset($config->useFrameworkRelativeBase)) {
       $base = parse_url($config->userFrameworkBaseURL);
@@ -304,45 +333,17 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     if ((is_admin() && !$frontend) || $forceBackend) {
       $base .= 'wp-admin/admin.php';
+      return $base;
     }
     elseif (defined('CIVICRM_UF_WP_BASEPAGE')) {
       $base .= CIVICRM_UF_WP_BASEPAGE;
+      return $base;
     }
     elseif (isset($config->wpBasePage)) {
       $base .= $config->wpBasePage;
+      return $base;
     }
-
-    if (isset($path)) {
-      if (isset($query)) {
-        if ($permlinkStructure != '' && ($pageID || $script != '')) {
-          return $script . '?page=CiviCRM'. $separator . 'q=' . $path . $pageID . $separator . $query . $fragment;
-        }
-        else {
-          return $base . '?page=CiviCRM' . $separator . 'q=' . $path . $pageID . $separator . $query . $fragment;
-        }
-      }
-      else {
-        if ($permlinkStructure != '' && ($pageID || $script != '')) {
-          return $script . '?page=CiviCRM' . $separator . 'q=' . $path . $pageID . $fragment;
-        }
-        else {
-          return $base . '?page=CiviCRM' . $separator . 'q=' . $path . $pageID . $fragment;
-        }
-      }
-    }
-    else {
-      if (isset($query)) {
-        if ($permlinkStructure != '' && ($pageID || $script != '')) {
-          return $script . '?' . $query . $pageID . $fragment;
-        }
-        else {
-          return $base . $script . '?' . $query . $pageID . $fragment;
-        }
-      }
-      else {
-        return $base . $fragment;
-      }
-    }
+    return $base;
   }
 
   /**
@@ -415,7 +416,18 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @return string  with the locale or null for none
    */
   function getUFLocale() {
-    return NULL;
+    // WPML plugin
+    if (defined('ICL_LANGUAGE_CODE')) {
+      $language = ICL_LANGUAGE_CODE;
+    }
+
+    // TODO: set language variable for others WordPress plugin
+
+    if (isset($language)) {
+      return CRM_Core_I18n_PseudoConstant::longForShort(substr($language, 0, 2));
+    } else {
+      return NULL;
+    }
   }
 
   /**

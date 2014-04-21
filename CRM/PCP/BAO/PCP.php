@@ -887,9 +887,9 @@ WHERE pcp.id = %1";
    *
    * @return int
    * @access public
-   *
+   * @static
    */
-  public function getSupporterProfileId($component_id, $component = 'contribute') {
+  public static function getSupporterProfileId($component_id, $component = 'contribute') {
     $entity_table = self::getPcpEntityTable($component);
 
     $query = "
