@@ -197,12 +197,13 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       'isDefault' => TRUE,
     );
 
-    $buttons[] = array(
-      'type' => 'upload',
-      'name' => ts('Save and Record Payment'),
-      'subName' => 'new'
-    );
-
+    if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->_participantId)) {
+      $buttons[] = array(
+        'type' => 'upload',
+        'name' => ts('Save and Record Payment'),
+        'subName' => 'new'
+      );
+    }
     $buttons[] = array(
       'type' => 'cancel',
       'name' => ts('Cancel'),
