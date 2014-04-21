@@ -311,17 +311,17 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
             }
           }
         }
-        elseif ($params['contribution_id'] || $params['trxn_id'] || $params['invoice_id']) {
+        elseif (!empty($params['contribution_id']) || !empty($params['trxn_id']) || !empty($params['invoice_id'])) {
           //when update mode check contribution id or trxn id or
           //invoice id
           $contactId = new CRM_Contribute_DAO_Contribution();
-          if ($params['contribution_id']) {
+          if (!empty($params['contribution_id'])) {
             $contactId->id = $params['contribution_id'];
           }
-          elseif ($params['trxn_id']) {
+          elseif (!empty($params['trxn_id'])) {
             $contactId->trxn_id = $params['trxn_id'];
           }
-          elseif ($params['invoice_id']) {
+          elseif (!empty($params['invoice_id'])) {
             $contactId->invoice_id = $params['invoice_id'];
           }
           if ($contactId->find(TRUE)) {
@@ -331,6 +331,14 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
                 return civicrm_api3_create_error("Contact Type is wrong: $contactType->contact_type");
               }
             }
+          }
+        }
+        else {
+          if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
+            return civicrm_api3_create_error("Empty Contribution and Invoice and Transaction ID. Row was skipped.");
+          }
+          else {
+            return civicrm_api3_create_error("Empty Contact and External ID. Row was skipped.");
           }
         }
         break;
@@ -392,14 +400,6 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
         //import contribution record according to select contact type
         // validate contact id and external identifier.
         $value[$key] = $mismatchContactType = $softCreditContactIds = '';
-        if (!isset($params['contribution_id']) && empty($params['contribution_id']) && $onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
-          $errorMsg = ts("Empty Contribution Id. Row was skipped.");
-          return civicrm_api3_create_error($errorMsg, $value[$key]);
-        }
-        elseif (!isset($params['contribution_contact_id']) && empty($params['contribution_contact_id']) && $onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE) {
-          $errorMsg = ts("Empty Contact Id. Row was skipped.");
-          return civicrm_api3_create_error($errorMsg, $value[$key]);
-        }
         if (isset($params[$key]) && is_array($params[$key])) {
           foreach ($params[$key] as $softKey => $softParam) {
             $contactId = CRM_Utils_Array::value('contact_id', $softParam);
