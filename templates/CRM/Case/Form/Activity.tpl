@@ -278,7 +278,7 @@
 
   {/if}
 
-{crmRegion name='activity-form'}{/crmRegion}
+{crmRegion name='case-activity-form'}{/crmRegion}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 
