@@ -194,7 +194,9 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
 
     $honor = CRM_PCP_BAO_PCP::honorRoll($this->_id);
 
-    if ($fileInfo = reset(CRM_Core_BAO_File::getEntityFile('civicrm_pcp', $this->_id))) {
+    $entityFile = CRM_Core_BAO_File::getEntityFile('civicrm_pcp', $this->_id);
+    if (!empty($entityFile)) {
+      $fileInfo = reset($entityFile);
       $fileId = $fileInfo['fileID'];
       $image = '<img src="' . CRM_Utils_System::url('civicrm/file',
         "reset=1&id=$fileId&eid={$this->_id}"

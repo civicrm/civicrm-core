@@ -88,7 +88,7 @@ class CRM_Batch_Page_AJAX {
 
     if ($context != 'financialBatch') {
       // data entry status batches
-      $params['status_id'] = 3;
+      $params['status_id'] = CRM_Core_OptionGroup::getValue('batch_status','Data Entry', 'name');
     }
 
     $params['context'] = $context;

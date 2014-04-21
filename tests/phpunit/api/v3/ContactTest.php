@@ -1202,6 +1202,55 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   *  Test birthdate params incl value, array & birth_date_high, birthdate_low
+   *  && deceased
+   */
+  public function testContactGetBirthdate() {
+    $date = date('d M', strtotime('+ 2 days'));
+    $contact1 = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array('birth_date' => 'first day of next month - 2 years')));
+    $contact2 = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array('birth_date' => 'first day of  next month - 5 years')));
+    $contact3 = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array('birth_date' => 'first day of next month -20 years')));
+
+    $result = $this->callAPISuccess('contact', 'get', array());
+    $this->assertEquals(date('Y-m-d', strtotime('first day of next month -2 years')), $result['values'][$contact1['id']]['birth_date']);
+    $result = $this->callAPISuccess('contact', 'get', array('birth_date' => 'first day of next month -5 years'));
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(date('Y-m-d', strtotime('first day of next month -5 years')), $result['values'][$contact2['id']]['birth_date']);
+    $result = $this->callAPISuccess('contact', 'get', array('birth_date_high' => date('Y-m-d', strtotime('-6 years'))));
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(date('Y-m-d', strtotime('first day of next month -20 years')), $result['values'][$contact3['id']]['birth_date']);
+    $result = $this->callAPISuccess('contact', 'get', array('birth_date_low' => date('Y-m-d', strtotime('-6 years')), 'birth_date_high' => date('Y-m-d', strtotime('- 3 years'))));
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(date('Y-m-d', strtotime('first day of next month -5 years')), $result['values'][$contact2['id']]['birth_date']);
+    $result = $this->callAPISuccess('contact', 'get', array('birth_date_low' => '-6 years', 'birth_date_high' => '- 3 years'));
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(date('Y-m-d', strtotime('first day of next month -5 years')), $result['values'][$contact2['id']]['birth_date']);
+  }
+
+  /**
+   *  Test Deceaseddate params incl value, array & Deceased_date_high, Deceaseddate_low
+   *  && deceased
+   */
+  public function testContactGetDeceaseddate() {
+    $date = date('d M', strtotime('+ 2 days'));
+    $contact1 = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array('deceased_date' => 'first day of next month - 2 years')));
+    $contact2 = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array('deceased_date' => 'first day of  next month - 5 years')));
+    $contact3 = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array('deceased_date' => 'first day of next month -20 years')));
+
+    $result = $this->callAPISuccess('contact', 'get', array());
+    $this->assertEquals(date('Y-m-d', strtotime('first day of next month -2 years')), $result['values'][$contact1['id']]['deceased_date']);
+    $result = $this->callAPISuccess('contact', 'get', array('deceased_date' => 'first day of next month -5 years'));
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(date('Y-m-d', strtotime('first day of next month -5 years')), $result['values'][$contact2['id']]['deceased_date']);
+    $result = $this->callAPISuccess('contact', 'get', array('deceased_date_high' => date('Y-m-d', strtotime('-6 years'))));
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(date('Y-m-d', strtotime('first day of next month -20 years')), $result['values'][$contact3['id']]['deceased_date']);
+    $result = $this->callAPISuccess('contact', 'get', array('deceased_date_low' => '-6 years', 'deceased_date_high' => date('Y-m-d', strtotime('- 3 years'))));
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(date('Y-m-d', strtotime('first day of next month -5 years')), $result['values'][$contact2['id']]['deceased_date']);
+  }
+
+  /**
    * Test for Contact.get id=@user:username
    */
   function testContactGetByUsername() {

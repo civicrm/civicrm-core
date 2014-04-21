@@ -1953,6 +1953,22 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         $extends = CRM_Utils_Array::value('extends', $customFields[$customFieldID]);
         $htmlType = CRM_Utils_Array::value( 'html_type', $customFields[$customFieldID] );
         switch ( $htmlType ) {
+        case 'Select':
+        case 'Radio':
+        case 'Autocomplete-Select':
+          if ($customFields[$customFieldID]['data_type'] == 'String') {
+            $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
+            foreach ($customOption as $customFldID => $customValue) {
+              $val = CRM_Utils_Array::value('value', $customValue);
+              $label = CRM_Utils_Array::value('label', $customValue);
+              $label = strtolower($label);
+              $value = strtolower(trim($formatted[$key]));
+              if (($value == $label) || ($value == strtolower($val))) {
+                $params[$key] = $formatted[$key] = $val;
+              }
+            }
+          }
+          break;
         case 'CheckBox':
         case 'AdvMulti-Select':
         case 'Multi-Select':

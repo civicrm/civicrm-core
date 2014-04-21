@@ -267,7 +267,7 @@ function _civicrm_api3_get_DAO($name) {
     // len ('civicrm_api3_') == 13
     $name = substr($name, 13, $last - 13);
   }
-  
+
   $name = _civicrm_api_get_camel_name($name, 3);
 
   if ($name == 'Individual' || $name == 'Household' || $name == 'Organization') {
@@ -476,6 +476,7 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     }
 
   }
+
   $skipPermissions = !empty($params['check_permissions']) ? 0 :1;
 
   list($entities, $options) = CRM_Contact_BAO_Query::apiQuery(
@@ -1238,7 +1239,8 @@ function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
     if (strtotime($params[$fieldInfo['name']]) === FALSE) {
       throw new Exception($fieldInfo['name'] . " is not a valid date: " . $params[$fieldInfo['name']]);
     }
-    $params[$fieldInfo['name']] = CRM_Utils_Date::processDate($params[$fieldInfo['name']]);
+    $format = ($fieldInfo['type'] == CRM_Utils_Type::T_DATE) ? 'Ymd000000' : 'YmdHis';
+    $params[$fieldInfo['name']] = CRM_Utils_Date::processDate($params[$fieldInfo['name']], NULL, FALSE, $format);
   }
   if ((CRM_Utils_Array::value('name', $fieldInfo) != $fieldName) && !empty($params[$fieldName])) {
     //If the unique field name differs from the db name & is set handle it here

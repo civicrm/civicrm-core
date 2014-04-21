@@ -521,11 +521,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     if ($rowCount) {
       $cacheKey = $this->buildPrevNextCache($sort);
       $result = $this->_query->getCachedContacts($cacheKey, $offset, $rowCount, $includeContactIds);
-
-      // CRM-13996: result is empty when selector columns are sorted. hence we need to run the query again
-      if ( $result->N == 0) {
-        $result = $this->_query->searchQuery($offset, $rowCount, $sort, FALSE, $includeContactIds);
-      }
     }
     else {
       $result = $this->_query->searchQuery($offset, $rowCount, $sort, FALSE, $includeContactIds);
@@ -655,9 +650,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           'addressee', 'email_greeting', 'postal_greeting'))) {
           $greeting = $property . '_display';
           $row[$property] = $result->$greeting;
-        }
-        elseif ($property == 'state_province') {
-          $row[$property] = $result->state_province_name;
         }
         elseif (isset($pseudoconstants[$property])) {
           $row[$property] = CRM_Utils_Array::value(
@@ -953,19 +945,17 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param int $end
    */
   function fillupPrevNextCache($sort, $cacheKey, $start = 0, $end = 500) {
-
+    $coreSearch = TRUE;
     // For custom searches, use the contactIDs method
     if (is_a($this, 'CRM_Contact_Selector_Custom')) {
       $sql = $this->_search->contactIDs($start, $end, $sort, TRUE);
       $replaceSQL = "SELECT contact_a.id as contact_id";
+      $coreSearch = FALSE;
     }
     // For core searches use the searchQuery method
     else {
-      $sql = $this->_query->searchQuery(
-        $start, $end, $sort,
-        FALSE, FALSE,
-        FALSE, TRUE, TRUE, NULL
-      );
+      $sql = $this->_query->searchQuery($start, $end, $sort, FALSE, $this->_query->_includeContactIds,
+        FALSE, TRUE, TRUE);
       $replaceSQL = "SELECT contact_a.id as id";
     }
 
@@ -990,14 +980,52 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
     unset($errorScope);
 
     if (is_a($result, 'DB_Error')) {
-      // oops the above query failed, so lets just ignore it
-      // and return
-      // we print a sorry cant figure it out on view page
-      return;
+      // check if we get error during core search
+      if ($coreSearch) {
+        // in the case of error, try rebuilding cache using full sql which is used for search selector display
+        // this fixes the bugs reported in CRM-13996 & CRM-14438
+        $this->rebuildPreNextCache($start, $end, $sort, $cacheKey);
+      }
+      else {
+        // return if above query fails
+        return;
+      }
     }
 
     // also record an entry in the cache key table, so we can delete it periodically
     CRM_Core_BAO_Cache::setItem($cacheKey, 'CiviCRM Search PrevNextCache', $cacheKey);
+  }
+
+  /**
+   * This function is called to rebuild prev next cache using full sql in case of core search ( excluding custom search)
+   *
+   * @param int $start start for limit clause
+   * @param int $end end for limit clause
+   * @param $object $sort sort object
+   * @param string $cacheKey cache key
+   *
+   * @return void
+   */
+  function rebuildPreNextCache($start, $end, $sort, $cacheKey) {
+    // generate full SQL
+    $sql = $this->_query->searchQuery($start, $end, $sort, FALSE, $this->_query->_includeContactIds,
+      FALSE, FALSE, TRUE);
+
+    $dao = CRM_Core_DAO::executeQuery($sql);
+
+    // build insert query, note that currently we build cache for 500 contact records at a time, hence below approach
+    $insertValues = array();
+    while($dao->fetch()) {
+      $insertValues[] = "('civicrm_contact', {$dao->contact_id}, {$dao->contact_id}, '{$cacheKey}', '{$dao->sort_name}')";
+    }
+
+    //update pre/next cache using single insert query
+    if (!empty($insertValues)) {
+      $sql = 'INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cacheKey, data ) VALUES
+'.implode(',', $insertValues);
+
+      $result = CRM_Core_DAO::executeQuery($sql);
+    }
   }
 
   /**

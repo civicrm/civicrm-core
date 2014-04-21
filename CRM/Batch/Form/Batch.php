@@ -124,7 +124,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
     }
 
     // always create with data entry status
-    $params['status_id'] = 3;
+    $params['status_id'] = CRM_Core_OptionGroup::getValue('batch_status','Data Entry', 'name');
     $batch = CRM_Batch_BAO_Batch::create($params);
 
     // redirect to batch entry page.

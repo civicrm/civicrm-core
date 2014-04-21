@@ -460,7 +460,12 @@ class CRM_Core_Menu {
         $crumbs[] = array(
           'title' => $menu[$currentPath]['title'],
           'url' => CRM_Utils_System::url($currentPath,
-            'reset=1' . $urlVar, FALSE
+            'reset=1' . $urlVar,
+            FALSE, // absolute
+            NULL, // fragment
+            TRUE, // htmlize
+            FALSE, // frontend
+            TRUE // forceBackend; CRM-14439 work-around; acceptable for now because we don't display breadcrumbs on frontend
           ),
         );
       }
