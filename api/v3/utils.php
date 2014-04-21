@@ -1447,23 +1447,16 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
     FALSE,
     FALSE
   );
-  // find out if we have any requests to resolve options
-  $getoptions = CRM_Utils_Array::value('get_options', CRM_Utils_Array::value('options',$params));
-  if(!is_array($getoptions)){
-      $getoptions = array($getoptions);
-  }
+
+  $ret = array();
 
   foreach ($customfields as $key => $value) {
     // Regular fields have a 'name' property
     $value['name'] = 'custom_' . $key;
     $value['type'] = _getStandardTypeFromCustomDataType($value['data_type']);
-    $customfields['custom_' . $key] = $value;
-    if (in_array('custom_' . $key, $getoptions)) {
-      $customfields['custom_' . $key]['options'] = CRM_Core_BAO_CustomOption::valuesByID($key);
-    }
-    unset($customfields[$key]);
+    $ret['custom_' . $key] = $value;
   }
-  return $customfields;
+  return $ret;
 }
 /**
  * Translate the custom field data_type attribute into a std 'type'
