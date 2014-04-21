@@ -80,7 +80,9 @@ function civicrm_api3_generic_getfields($apiRequest) {
 
     case 'delete':
       $metadata = array(
-        'id' => array('title' => 'Unique Identifier',
+        'id' => array(
+          'title' => $entity . ' ID',
+          'name' => 'id',
           'api.required' => 1,
           'api.aliases' => array($lcase_entity . '_id'),
           'type' => CRM_Utils_Type::T_INT,
@@ -90,11 +92,13 @@ function civicrm_api3_generic_getfields($apiRequest) {
     case 'getoptions':
       $metadata = array(
         'field' => array(
-          'title' => 'Field to retrieve options for',
+          'name' => 'field',
+          'title' => 'Field name',
           'api.required' => 1,
         ),
         'context' => array(
-          'title' => 'Context string',
+          'name' => 'context',
+          'title' => 'Context',
         ),
       );
         break;
@@ -258,7 +262,7 @@ function civicrm_api3_generic_getoptions($apiRequest) {
  * @param array $fieldsToResolve anny field resolutions specifically requested
  */
 function _civicrm_api3_generic_get_metadata_options(&$metadata, $apiRequest, $fieldname, $fieldSpec, $fieldsToResolve){
-  if (empty($fieldSpec['pseudoconstant'])) {
+  if (empty($fieldSpec['pseudoconstant']) && empty($fieldSpec['option_group_id'])) {
     return;
   }
 
