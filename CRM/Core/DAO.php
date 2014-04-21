@@ -1898,9 +1898,8 @@ EOS;
   public static function createSQLFilter($fieldName, $filter, $type, $alias = NULL, $returnSanitisedArray = FALSE) {
     // http://issues.civicrm.org/jira/browse/CRM-9150 - stick with 'simple' operators for now
     // support for other syntaxes is discussed in ticket but being put off for now
-    $acceptedSQLOperators = array('=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=", "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN');
     foreach ($filter as $operator => $criteria) {
-      if (in_array($operator, $acceptedSQLOperators)) {
+      if (in_array($operator, self::acceptedSQLOperators())) {
         switch ($operator) {
           // unary operators
           case 'IS NULL':
@@ -1955,6 +1954,15 @@ EOS;
         }
       }
     }
+  }
+
+  /**
+   * @see http://issues.civicrm.org/jira/browse/CRM-9150
+   * support for other syntaxes is discussed in ticket but being put off for now
+   * @return array
+   */
+  public static function acceptedSQLOperators() {
+    return array('=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=", "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN');
   }
 
   /**
