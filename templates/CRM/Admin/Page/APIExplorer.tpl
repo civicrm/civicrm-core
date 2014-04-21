@@ -60,6 +60,10 @@
   #api-result {
     overflow: auto;
   }
+  .select2-choice .icon {
+    margin-top: .2em;
+    background-image: url("{/literal}{$config->resourceBase}{literal}/i/icons/jquery-ui-2786C2.png");
+  }
   {/literal}
 </style>
 
@@ -75,16 +79,9 @@
   &nbsp;&nbsp;
   <label for="api-action">{ts}Action{/ts}:</label>
   <select class="crm-form-select crm-select2" id="api-action" name="action">
-    <option value="get" selected="selected">get</option>
-    <option value="create" title="used to update as well, if id is set">create</option>
-    <option value="delete">delete</option>
-    <option value="getfields">getfields</option>
-    <option value="getactions">getactions</option>
-    <option value="getcount">getcount</option>
-    <option value="getsingle">getsingle</option>
-    <option value="getvalue">getvalue</option>
-    <option value="getoptions">getoptions</option>
-    <option value="getlist">getlist</option>
+    {foreach from=$actions item='act'}
+      <option value="{$act}">{$act}</option>
+    {/foreach}
   </select>
   &nbsp;&nbsp;
 
@@ -107,8 +104,9 @@
     </thead>
     <tbody id="api-params"></tbody>
   </table>
-  <div>
-    <a href="#" class="crm-hover-button" id="api-params-add" style="display: none;"><span class="icon ui-icon-plus"></span>{ts}Add Parameter{/ts}</a>
+  <div id="api-param-buttons" style="display: none;">
+    <a href="#" class="crm-hover-button" id="api-params-add"><span class="icon ui-icon-plus"></span>{ts}Add Parameter{/ts}</a>
+    <a href="#" class="crm-hover-button" id="api-chain-add"><span class="icon ui-icon-link"></span>{ts}Chain API Call{/ts}</a>
   </div>
   <div id="api-generated-wraper">
     <table id="api-generated" border=1>
@@ -137,6 +135,30 @@
     </td>
     <td>
       <input style="width: 85%;" class="crm-form-text api-param-value" placeholder="{ts}Value{/ts}"/>
+      <a class="crm-hover-button api-param-remove" href="#"><span class="icon ui-icon-close"></span></a>
+    </td>
+  </tr>
+</script>
+
+<script type="text/template" id="api-chain-tpl">
+  <tr class="api-chain-row">
+    <td>
+      <select style="width: 100%;" class="crm-form-select api-chain-entity" placeholder="{ts}Entity{/ts}">
+        <option value=""></option>
+        {foreach from=$entities.values item=entity}
+          <option value="{$entity}">{$entity}</option>
+        {/foreach}
+      </select>
+    </td>
+    <td>
+      <select class="crm-form-select api-chain-action">
+        {foreach from=$actions item='act'}
+          <option value="{$act}">{$act}</option>
+        {/foreach}
+    </select>
+    </td>
+    <td>
+      <input style="width: 85%;" class="crm-form-text api-param-value" value="{ldelim}{rdelim}" placeholder="{ts}Api Params{/ts}"/>
       <a class="crm-hover-button api-param-remove" href="#"><span class="icon ui-icon-close"></span></a>
     </td>
   </tr>
