@@ -197,7 +197,7 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
       $allFields = array_keys($apiFields['values']);
     }
     $paramFields = array_keys($params);
-    $undefined = array_diff($paramFields, $allFields, array_keys($_COOKIE), array('action', 'entity', 'debug', 'version', 'check_permissions', 'IDS_request_uri', 'IDS_user_agent', 'return', 'sequential', 'rowCount', 'option_offset', 'option_limit', 'custom', 'option_sort', 'options'));
+    $undefined = array_diff($paramFields, $allFields, array_keys($_COOKIE), array('action', 'entity', 'debug', 'version', 'check_permissions', 'IDS_request_uri', 'IDS_user_agent', 'return', 'sequential', 'rowCount', 'option_offset', 'option_limit', 'custom', 'option_sort', 'options', 'prettyprint'));
     if ($undefined) {
       $result['undefined_fields'] = array_merge($undefined);
     }
@@ -569,9 +569,6 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
       }
     }
   }
-  // http://issues.civicrm.org/jira/browse/CRM-9150 - stick with 'simple' operators for now
-  // support for other syntaxes is discussed in ticket but being put off for now
-  $acceptedSQLOperators = array('=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=", "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN');
   if (!$fields) {
     $fields = array();
   }
