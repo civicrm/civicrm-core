@@ -69,7 +69,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->click("css=li#tab_group a");
     $this->waitForElementPresent("_qf_GroupContact_next");
     $this->select("group_id", "$groupName");
-    $this->clickLink("_qf_GroupContact_next", "_qf_GroupContact_next");
+    $this->clickLink("_qf_GroupContact_next", "_qf_GroupContact_next", FALSE);
 
     // configure default mail-box
     $this->setupDefaultMailbox();
@@ -87,7 +87,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->click("add");
 
     // click next
-    $this->clickLink("_qf_Group_next", "_qf_Settings_cancel");
+    $this->clickLink("_qf_Group_next", "_qf_Settings_cancel", FALSE);
 
     //--------track and respond----------
 
@@ -168,7 +168,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
     $this->assertElementContainsText('page-title', "Find Mailings");
-    $this->assertElementContainsText("xpath=//table[@class='selector']/tbody//tr//td", "Mailing $mailingName Webtest");
+    $this->assertElementContainsText("xpath=//table[@class='selector row-highlight']/tbody//tr//td", "Mailing $mailingName Webtest");
 
     //--------- mail delivery verification---------
     // test undelivered report
@@ -321,7 +321,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->click("css=li#tab_group a");
     $this->waitForElementPresent("_qf_GroupContact_next");
     $this->select("group_id", "$groupName");
-    $this->clickLink("_qf_GroupContact_next", "_qf_GroupContact_next");
+    $this->clickLink("_qf_GroupContact_next", "_qf_GroupContact_next", FALSE);
 
     // configure default mail-box
     $this->openCiviPage("admin/mailSettings", "action=update&id=1&reset=1", '_qf_MailSettings_cancel-bottom');
@@ -403,8 +403,8 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     //----------end New Mailing-------------
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
-    $this->assertElementContainsText('page-title', "Scheduled and Sent Mailings");
-    $this->assertElementContainsText("xpath=//table[@class='selector']/tbody//tr//td", "Mailing $mailingName Webtest");
+    $this->assertElementContainsText('page-title', "Find Mailings");
+    $this->assertElementContainsText("xpath=//table[@class='selector row-highlight']/tbody//tr//td", "Mailing $mailingName Webtest");
 
     // directly send schedule mailing -- not working right now
     $this->openCiviPage("mailing/queue", "reset=1");
