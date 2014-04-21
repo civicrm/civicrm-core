@@ -278,6 +278,8 @@
 
   {/if}
 
+{crmRegion name='case-activity-form'}{/crmRegion}
+
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 
   {if $action eq 1 or $action eq 2}
