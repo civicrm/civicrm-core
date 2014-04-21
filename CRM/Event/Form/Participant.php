@@ -1415,6 +1415,14 @@ SELECT civicrm_custom_group.name as name,
             $amountOwed = $params['fee_amount'];
           }
 
+          // if multiple participants are link, consider contribution total amount as the amount Owed
+          if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->_id)) {
+            $amountOwed = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
+              $ids['contribution'],
+              'total_amount'
+            );
+          }
+
           // CRM-13964 partial_payment_total
           if ($amountOwed > $params['total_amount']) {
             // the owed amount

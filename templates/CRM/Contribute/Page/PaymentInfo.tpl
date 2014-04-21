@@ -63,7 +63,7 @@ CRM.$(function($) {
     <td class='right'>{$paymentInfo.balance|crmMoney}</td>
   </tr>
 </table>
-{if $paymentInfo.balance}
+{if $paymentInfo.balance and !$paymentInfo.payLater}
   {if $paymentInfo.balance > 0}
      {assign var=paymentButtonName value='Record Payment'}
   {elseif $paymentInfo.balance < 0}
