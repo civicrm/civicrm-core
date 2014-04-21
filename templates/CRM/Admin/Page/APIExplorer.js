@@ -5,12 +5,23 @@
     fields = [],
     options = {},
     params = {},
-    fieldTpl = _.template($('#api-param-tpl').html());
+    fieldTpl = _.template($('#api-param-tpl').html()),
+    chainTpl = _.template($('#api-chain-tpl').html());
 
   function addField(name) {
     $('#api-params').append($(fieldTpl({name: name || ''})));
     var $row = $('tr:last-child', '#api-params');
-    $('.api-param-name', $row).select2({data: fields}).change();
+    $('.api-param-name', $row).crmSelect2({data: fields}).change();
+  }
+
+  function addChainField() {
+    $('#api-params').append($(chainTpl({})));
+    var $row = $('tr:last-child', '#api-params');
+    $('.api-chain-entity', $row).crmSelect2({
+      formatSelection: function(item) {
+        return '<span class="icon ui-icon-link"></span> API ' + item.text;
+      }
+    });
   }
 
   function getFields() {
@@ -58,7 +69,7 @@
       text: ts('Other') + '...'
     });
     $('#api-params').empty();
-    $('#api-params-add').show();
+    $('#api-param-buttons').show();
     if (required.length) {
       _.each(required, addField);
     } else {
@@ -162,7 +173,11 @@
       var $row = $(this).closest('tr'),
         val = evaluate($(this).val(), $(this).is('.select2-offscreen')),
         name = $('input.api-param-name', $row).val(),
-        op = $('select.api-param-op', $row).val();
+        op = $('select.api-param-op', $row).val() || '=';
+      // Special syntax for api chaining
+      if (!name && $('select.api-chain-entity', $row).val()) {
+        name = 'api.' + $('select.api-chain-entity', $row).val() + '.' + $('select.api-chain-action', $row).val();
+      }
       if (name && val !== undefined) {
         params[name] = op === '=' ? val : {};
         if (op !== '=') {
@@ -273,10 +288,10 @@
           buildParams();
         } else {
           $('#api-params, #api-generated pre').empty();
-          $('#api-params-add, #api-params-table thead').hide();
+          $('#api-param-buttons, #api-params-table thead').hide();
         }
       })
-      .on('change keyup', 'input.api-param-checkbox, input.api-param-value, input.api-param-name, select.api-param-op', buildParams)
+      .on('change keyup', 'input.api-param-checkbox, input.api-param-value, input.api-param-name, #api-params select', buildParams)
       .on('submit', submit);
     $('#api-params')
       .on('change', '.api-param-name', toggleOptions)
@@ -286,8 +301,12 @@
         buildParams();
       });
     $('#api-params-add').on('click', function(e) {
-      addField();
       e.preventDefault();
+      addField();
+    });
+    $('#api-chain-add').on('click', function(e) {
+      e.preventDefault();
+      addChainField();
     });
     $('#api-entity').change();
   });
