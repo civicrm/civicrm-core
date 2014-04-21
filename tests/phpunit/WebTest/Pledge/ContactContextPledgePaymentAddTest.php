@@ -75,18 +75,6 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
 
     $this->select("contribution_page_id", "value=3");
 
-    //Honoree section
-    $this->click("Honoree");
-    $this->waitForElementPresent("honor_email");
-
-    $this->click("CIVICRM_QFID_1_2");
-    $this->select("honor_prefix_id", "value=3");
-
-    $honreeFirstName = 'First' . substr(sha1(rand()), 0, 4);
-    $honreeLastName = 'last' . substr(sha1(rand()), 0, 7);
-    $this->type("honor_first_name", $honreeFirstName);
-    $this->type("honor_last_name", $honreeLastName);
-    $this->type("honor_email", $honreeFirstName . "@example.com");
 
     //PaymentReminders
     $this->click("PaymentReminders");
@@ -96,13 +84,13 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->type("additional_reminder_day", "4");
 
     $this->click("_qf_Pledge_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Add Pledge');
 
     $this->waitForText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     //click through to the Pledge view screen
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_PledgeView_next-bottom");
     $pledgeDate = date('F jS, Y', strtotime('now'));
 
@@ -114,28 +102,27 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
         'Pledge Made' => $pledgeDate,
         'Financial Type' => 'Donation',
         'Pledge Status' => 'Pending',
-        'In Honor of' => 'Mr. ' . $honreeFirstName . ' ' . $honreeLastName,
         'Initial Reminder Day' => '4 days prior to schedule date',
         'Maximum Reminders Send' => 2,
         'Send additional reminders' => '4 days after the last one sent',
       )
     );
 
-    $this->clickLink("_qf_PledgeView_next-bottom", "xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->clickLink("_qf_PledgeView_next-bottom", "xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']", FALSE);
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
     $this->waitForElementPresent("xpath=//form[@id='Contribution']//table//tbody/tr[3]/td[2]/a[text()='adjust payment amount']");
     $this->click("xpath=//form[@id='Contribution']//table//tbody/tr[3]/td[2]/a[text()='adjust payment amount']");
     $this->waitForElementPresent("adjust-option-type");
     $this->type("total_amount", "5");
     $this->click("_qf_Contribution_upload");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[1]/span/a");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[3]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[3]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
     $this->waitForElementPresent("xpath=//form[@id='Contribution']//table//tbody/tr[3]/td[2]/a[text()='adjust payment amount']");
     $this->click("xpath=//form[@id='Contribution']//table//tbody/tr[3]/td[2]/a[text()='adjust payment amount']");
     $this->waitForElementPresent("adjust-option-type");
@@ -143,9 +130,9 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
 
     $this->click("_qf_Contribution_upload");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     //click through to the Pledge view screen
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_PledgeView_next-bottom");
     $pledgeDate = date('F jS, Y', strtotime('now'));
 
@@ -157,17 +144,16 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
         'Pledge Made' => $pledgeDate,
         'Financial Type' => 'Donation',
         'Pledge Status' => 'In Progress',
-        'In Honor of' => 'Mr. ' . $honreeFirstName . ' ' . $honreeLastName,
         'Initial Reminder Day' => '4 days prior to schedule date',
         'Maximum Reminders Send' => 2,
         'Send additional reminders' => '4 days after the last one sent',
       )
     );
 
-    $this->clickLink("_qf_PledgeView_next-bottom", "xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[4]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[4]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->clickLink("_qf_PledgeView_next-bottom", "xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']", FALSE);
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[4]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[4]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
     $this->waitForElementPresent("xpath=//form[@id='Contribution']//table//tbody/tr[3]/td[2]/a[text()='adjust payment amount']");
 
     $this->waitForElementPresent("xpath=//form[@id='Contribution']//table//tbody/tr[3]/td[2]/a[text()='adjust payment amount']");
@@ -178,17 +164,17 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->waitForElementPresent("_qf_Contribution_upload");
     $this->click("_qf_Contribution_upload");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[5]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[5]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[5]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[5]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
 
     $this->waitForElementPresent("_qf_Contribution_upload");
     $this->click("_qf_Contribution_upload");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
 
     $this->waitForElementPresent("_qf_PledgeView_next-bottom");
     $this->webtestVerifyTabularData(array(
@@ -199,7 +185,6 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
         'Pledge Made' => $pledgeDate,
         'Financial Type' => 'Donation',
         'Pledge Status' => 'Completed',
-        'In Honor of' => 'Mr. ' . $honreeFirstName . ' ' . $honreeLastName,
         'Initial Reminder Day' => '4 days prior to schedule date',
         'Maximum Reminders Send' => 2,
         'Send additional reminders' => '4 days after the last one sent',
@@ -249,18 +234,7 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
 
     $this->select("contribution_page_id", "value=3");
 
-    //Honoree section
-    $this->click("Honoree");
-    $this->waitForElementPresent("honor_email");
 
-    $this->click("CIVICRM_QFID_1_2");
-    $this->select("honor_prefix_id", "value=3");
-
-    $honreeFirstName = 'First' . substr(sha1(rand()), 0, 4);
-    $honreeLastName = 'last' . substr(sha1(rand()), 0, 7);
-    $this->type("honor_first_name", $honreeFirstName);
-    $this->type("honor_last_name", $honreeLastName);
-    $this->type("honor_email", $honreeFirstName . "@example.com");
 
     //PaymentReminders
     $this->click("PaymentReminders");
@@ -270,13 +244,12 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->type("additional_reminder_day", "4");
 
     $this->click("_qf_Pledge_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->waitForText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     //click through to the Pledge view screen
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_PledgeView_next-bottom");
     $pledgeDate = date('F jS, Y', strtotime('now'));
 
@@ -288,17 +261,16 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
         'Pledge Made' => $pledgeDate,
         'Financial Type' => 'Donation',
         'Pledge Status' => 'Pending',
-        'In Honor of' => 'Mr. ' . $honreeFirstName . ' ' . $honreeLastName,
         'Initial Reminder Day' => '4 days prior to schedule date',
         'Maximum Reminders Send' => 2,
         'Send additional reminders' => '4 days after the last one sent',
       )
     );
 
-    $this->clickLink("_qf_PledgeView_next-bottom", "xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->clickLink("_qf_PledgeView_next-bottom", "xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']", FALSE);
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
     $this->waitForElementPresent("xpath=//form[@id='Contribution']//table//tbody/tr[3]/td[2]/a[text()='adjust payment amount']");
     $this->click("xpath=//form[@id='Contribution']//table//tbody/tr[3]/td[2]/a[text()='adjust payment amount']");
     $this->waitForElementPresent("adjust-option-type");
@@ -307,11 +279,11 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->type("total_amount", "15");
     $this->click("_qf_Contribution_upload");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[3]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[3]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
     $this->waitForElementPresent("xpath=//form[@id='Contribution']//table//tbody/tr[3]/td[2]/a[text()='adjust payment amount']");
     $this->click("xpath=//form[@id='Contribution']//table//tbody/tr[3]/td[2]/a[text()='adjust payment amount']");
     $this->waitForElementPresent("adjust-option-type");
@@ -321,9 +293,9 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
 
     $this->click("_qf_Contribution_upload");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     //click through to the Pledge view screen
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_PledgeView_next-bottom");
     $pledgeDate = date('F jS, Y', strtotime('now'));
 
@@ -335,23 +307,22 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
         'Pledge Made' => $pledgeDate,
         'Financial Type' => 'Donation',
         'Pledge Status' => 'In Progress',
-        'In Honor of' => 'Mr. ' . $honreeFirstName . ' ' . $honreeLastName,
         'Initial Reminder Day' => '4 days prior to schedule date',
         'Maximum Reminders Send' => 2,
         'Send additional reminders' => '4 days after the last one sent',
       )
     );
 
-    $this->clickLink("_qf_PledgeView_next-bottom", "xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[4]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[4]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->clickLink("_qf_PledgeView_next-bottom", "xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']", FALSE);
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[4]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[4]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
 
     $this->waitForElementPresent("_qf_Contribution_upload");
     $this->click("_qf_Contribution_upload");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
 
     $this->waitForElementPresent("_qf_PledgeView_next-bottom");
     $this->webtestVerifyTabularData(array(
@@ -362,7 +333,6 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
         'Pledge Made' => $pledgeDate,
         'Financial Type' => 'Donation',
         'Pledge Status' => 'Completed',
-        'In Honor of' => 'Mr. ' . $honreeFirstName . ' ' . $honreeLastName,
         'Initial Reminder Day' => '4 days prior to schedule date',
         'Maximum Reminders Send' => 2,
         'Send additional reminders' => '4 days after the last one sent',
@@ -407,18 +377,6 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
 
     $this->select("contribution_page_id", "value=3");
 
-    //Honoree section
-    $this->click("Honoree");
-    $this->waitForElementPresent("honor_email");
-
-    $this->click("CIVICRM_QFID_1_2");
-    $this->select("honor_prefix_id", "value=3");
-
-    $honreeFirstName = 'First' . substr(sha1(rand()), 0, 4);
-    $honreeLastName = 'last' . substr(sha1(rand()), 0, 7);
-    $this->type("honor_first_name", $honreeFirstName);
-    $this->type("honor_last_name", $honreeLastName);
-    $this->type("honor_email", $honreeFirstName . "@example.com");
 
     //PaymentReminders
     $this->click("PaymentReminders");
@@ -428,35 +386,34 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
     $this->type("additional_reminder_day", "4");
 
     $this->click("_qf_Pledge_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->waitForText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     //Add payments
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
     $this->waitForElementPresent("_qf_Contribution_upload");
     $this->click("_qf_Contribution_upload");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[3]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[3]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
     $this->waitForElementPresent("_qf_Contribution_upload");
     $this->click("_qf_Contribution_upload");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[4]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[4]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[4]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[4]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
     $this->waitForElementPresent("_qf_Contribution_upload");
     $this->click("_qf_Contribution_upload");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     //click through to the Pledge view screen
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_PledgeView_next-bottom");
     $pledgeDate = date('F jS, Y', strtotime('now'));
 
@@ -468,7 +425,6 @@ class WebTest_Pledge_ContactContextPledgePaymentAddTest extends CiviSeleniumTest
         'Pledge Made' => $pledgeDate,
         'Financial Type' => 'Donation',
         'Pledge Status' => 'Completed',
-        'In Honor of' => 'Mr. ' . $honreeFirstName . ' ' . $honreeLastName,
         'Initial Reminder Day' => '4 days prior to schedule date',
         'Maximum Reminders Send' => 2,
         'Send additional reminders' => '4 days after the last one sent',
