@@ -80,7 +80,7 @@ class HTML_QuickForm_DrupalWysiwyg extends HTML_QuickForm_textarea
         }
     }
     
-    function exportValue($submitValues, $assoc = false) {
+    function exportValue(&$submitValues, $assoc = false) {
       return $this->_prepareValue($this->getValue(), $assoc);
     }
 
