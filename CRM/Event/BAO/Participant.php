@@ -1864,16 +1864,34 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     }
     // insert new 'adjusted amount' transaction entry and update contribution entry.
     // ensure entity_financial_trxn table has a linking of it.
-    $updatedAmount = $params['amount'];
-    self::recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId);
-    $fetchCon = array('id' => $contributionId);
-    $updatedContribution = CRM_Contribute_BAO_Contribution::retrieve($fetchCon, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
-
     // insert new line items
     foreach ($insertLines as $valueId => $lineParams) {
       $lineParams['entity_table'] = 'civicrm_participant';
       $lineParams['entity_id'] = $participantId;
       $lineObj = CRM_Price_BAO_LineItem::create($lineParams);
+    }
+
+    // the recordAdjustedAmt code would execute over here
+    $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
+    if (count($ids) > 1) {
+      $total = 0;
+      foreach ($ids as $val) {
+        $total += CRM_Price_BAO_LineItem::getLineTotal($val, 'civicrm_participant');
+      }
+      $updatedAmount = $total;
+    }
+    else {
+      $updatedAmount = $params['amount'];
+    }
+    self::recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId);
+
+    $fetchCon = array('id' => $contributionId);
+    $updatedContribution = CRM_Contribute_BAO_Contribution::retrieve($fetchCon, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
+    // insert financial items
+    foreach ($insertLines as $valueId => $lineParams) {
+      $lineParams['entity_table'] = 'civicrm_participant';
+      $lineParams['entity_id'] = $participantId;
+      $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
       // insert financial items
       // ensure entity_financial_trxn table has a linking of it.
       $prevItem = CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution);

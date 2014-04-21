@@ -3036,10 +3036,13 @@ WHERE eft.entity_table = 'civicrm_contribution'
 
         if ($participantId) {
           // update participant status
-          $participantUpdate['id'] = $participantId;
           $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
-          $participantUpdate['status_id'] = array_search('Registered', $participantStatuses);
-          CRM_Event_BAO_Participant::add($participantUpdate);
+          $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
+          foreach ($ids as $val) {
+            $participantUpdate['id'] = $val;
+            $participantUpdate['status_id'] = array_search('Registered', $participantStatuses);
+            CRM_Event_BAO_Participant::add($participantUpdate);
+          }
         }
 
         // update financial item statuses
@@ -3096,10 +3099,13 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       }
       if ($participantId) {
         // update participant status
-        $participantUpdate['id'] = $participantId;
         $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
-        $participantUpdate['status_id'] = array_search('Registered', $participantStatuses);
-        CRM_Event_BAO_Participant::add($participantUpdate);
+        $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
+        foreach ($ids as $val) {
+          $participantUpdate['id'] = $val;
+          $participantUpdate['status_id'] = array_search('Registered', $participantStatuses);
+          CRM_Event_BAO_Participant::add($participantUpdate);
+        }
       }
     }
 
