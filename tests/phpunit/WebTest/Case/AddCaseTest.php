@@ -61,7 +61,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
 
     // Try submitting the form without creating or selecting a contact (test for CRM-7971)
     $this->clickLink("_qf_Case_upload-bottom", "css=span.crm-error");
-    $this->assertElementContainsText('Case', "Please select a contact or create new contact", "Expected form rule error for submit without selecting contact did not show up after clicking Save.");
+    $this->assertElementContainsText('Case', "Client is a required field.", "Expected form rule error for submit without selecting contact did not show up after clicking Save.");
 
     // Adding contact with randomized first name (so we can then select that contact when creating case)
     // We're using pop-up New Contact dialog
@@ -70,7 +70,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $contactName = "{$lastName}, {$firstName}";
     $displayName = "{$firstName} {$lastName}";
     $email = "{$lastName}.{$firstName}@example.org";
-    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4);
+    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4, "s2id_client_id");
 
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel = "Adult Day Care Referral";
@@ -101,10 +101,10 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Case opened successfully.");
 
     $summaryStrings = array(
-      "Case Summary",
+      "Summary",
       $displayName,
-      "Case Type: {$caseTypeLabel}",
-      "Start Date: {$today}",
+      "Type: {$caseTypeLabel}",
+      "Open Date: {$today}",
       "Status: {$caseStatusLabel}",
     );
 
@@ -133,7 +133,6 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Activity_cancel-bottom");
     $this->select("case_status_id","value=2");
     $this->click("_qf_Activity_upload-top");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->_testSearchbyDate($firstName, $lastName, "this.quarter");
     $this->_testSearchbyDate($firstName, $lastName, "0");
@@ -158,10 +157,10 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
   function _testVerifyCaseSummary($validateStrings, $activityTypes) {
     $this->assertStringsPresent($validateStrings);
     foreach ($activityTypes as $aType) {
-      $this->assertText("activity_type_id", $aType);
+      $this->assertText("add_activity_type_id", $aType);
     }
     $this->assertElementPresent("link=Assign to Another Client", "Assign to Another Client link is missing.");
-    $this->assertElementPresent("name=case_report_all", "Print Case Summary button is missing.");
+    $this->assertElementPresent("xpath=//a[text()=' Print Report']", "Print Case Summary button is missing.");
   }
 
   function _testVerifyCaseRoles($caseRoles, $creatorName) {
@@ -175,26 +174,28 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
   }
 
   function _testVerifyCaseActivities($activityTypes) {
+    $id = $this->urlArg('id');
     // check that expected auto-created activities are listed in the Case Activities table
     foreach ($activityTypes as $aType) {
-      $this->assertText("activities-selector", $aType);
+      $this->assertText("case_id_$id", $aType);
     }
   }
 
   function _testVerifyOpenCaseActivity($subject, $openCaseData) {
+    $id = $this->urlArg('id');
     // check that open case subject is present
-    $this->assertText("activities-selector", $subject);
+    $this->assertText("case_id_$id", $subject);
     // click open case activity pop-up dialog
     $this->click("link=$subject");
-    $this->waitForElementPresent("view-activity");
+    $this->waitForElementPresent("ActivityView");
     $this->waitForElementPresent("css=tr.crm-case-activity-view-Activity");
     // set page location of table containing activity view data
-    $activityViewPrefix = "//div[@id='activity-content']";
+    $activityViewPrefix = "//*[@id='ActivityView']";
     $activityViewTableId = "crm-activity-view-table";
     // Probably don't need both tableId and prefix - but good examples for other situations where only one can be used
 
     $this->webtestVerifyTabularData($openCaseData, '', $activityViewTableId);
-    $this->click("xpath=//span[@class='ui-icon ui-icon-closethick']");
+    $this->click("xpath=//span[@class='ui-button-icon-primary ui-icon ui-icon-closethick']");
   }
 
   function _testSearchbyDate($firstName, $lastName, $action) {

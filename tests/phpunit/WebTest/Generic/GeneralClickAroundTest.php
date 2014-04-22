@@ -33,7 +33,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
 
   function login() {
     $this->webtestLogin();
-    $this->click("//a[contains(text(),'CiviCRM')]");
+    $this->open($this->sboxPath . "civicrm");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
@@ -67,7 +67,6 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->login();
 
     // Create New → Individual
-    $this->waitForElementPresent("xpath=//*[@id='crm-create-new-link']");
     $this->click("crm-create-new-link");
     $this->click("link=Individual");
     $this->waitForPageToLoad($this->getTimeoutMsec());
