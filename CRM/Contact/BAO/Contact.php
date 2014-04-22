@@ -1298,6 +1298,10 @@ WHERE id={$id}; ";
     $cacheKeyString .= $export ? '_1' : '_0';
     $cacheKeyString .= $status ? '_1' : '_0';
     $cacheKeyString .= $search ? '_1' : '_0';
+    //CRM-14501 it turns out that the impact of permissioning here is sometimes inconsistent. The field that
+    //calculates custom fields takes into account the logged in user & caches that for all users
+    //as an interim fix we will cache the fields by contact
+    $cacheKeyString .= '_' . CRM_Core_Session::getLoggedInContactID();
 
     if (!self::$_exportableFields || !CRM_Utils_Array::value($cacheKeyString, self::$_exportableFields)) {
       if (!self::$_exportableFields) {
@@ -2079,7 +2083,7 @@ ORDER BY civicrm_email.is_primary DESC";
           if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 &&
             ($value == '' || !isset($value))) {
             continue;
-          } 
+          }
 
           $valueId = NULL;
           if (CRM_Utils_Array::value('customRecordValues', $params)) {
@@ -2136,21 +2140,21 @@ ORDER BY civicrm_email.is_primary DESC";
               }
             }
           }
-          else if (in_array($key, 
-              array('nick_name', 
-                'job_title', 
-                'middle_name', 
-                'birth_date', 
+          else if (in_array($key,
+              array('nick_name',
+                'job_title',
+                'middle_name',
+                'birth_date',
                 'gender_id',
-                'current_employer', 
-                'prefix_id', 
+                'current_employer',
+                'prefix_id',
                 'suffix_id')) &&
             ($value == '' || !isset($value)) &&
             ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
-            // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value 
+            // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
             // to avoid update with empty values
             continue;
-          } 
+          }
           else {
             $data[$key] = $value;
           }
