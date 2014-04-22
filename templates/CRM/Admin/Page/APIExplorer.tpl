@@ -41,17 +41,15 @@
     width: 35%;
   }
   #api-params-table td:first-child + td,
-  #api-params-table th:first-child + th {
-    width: 10em;
+  #api-params-table th:first-child + th,
+  #api-generated td:first-child {
+    width: 9em;
   }
   #api-params {
     min-height: 1em;
   }
   #api-params .red-icon {
     margin-top: .5em;
-  }
-  #api-generated td:first-child {
-    width: 10em;
   }
   #api-explorer label {
     display:inline;
