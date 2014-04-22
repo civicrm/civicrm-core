@@ -249,3 +249,8 @@ UPDATE civicrm_custom_field cf
   WHERE cg.is_multiple = 1 AND cf.html_type != 'TextArea';
 ALTER TABLE `civicrm_custom_group`
  CHANGE COLUMN `style` `style` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Visual relationship between this form and its parent.';
+
+-- CRM-14436
+ALTER TABLE `civicrm_mailing`
+  ADD COLUMN `hash` varchar(16) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Key for validating requests related to this mailing.',
+  ADD INDEX `index_hash` (`hash`);
