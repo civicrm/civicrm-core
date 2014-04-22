@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
@@ -23,38 +22,39 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+*}
+{htxt id="param-name-title"}
+  {ts}Parameter Name{/ts}
+{/htxt}
+{htxt id="param-name"}
+  <p>
+    {ts}Choose a parameter from the list, or select "other" for manual entry.{/ts}
+  </p>
+{/htxt}
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
+{htxt id="param-op-title"}
+  {ts}Operator{/ts}
+{/htxt}
+{htxt id="param-op"}
+  <p>
+    {ts}The default operator is equals (=), and is the only operator supported for "create" or "delete" actions.{/ts}
+  </p>
+  <p>
+    {ts}Some apis support a special syntax to allow other operators for "get" type actions. Choosing a different operator will automatically use this syntax, although it may not work with every api.{/ts}
+  </p>
+{/htxt}
 
-/**
- * Api Explorer
- */
-class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
-
-  function run() {
-    CRM_Utils_System::setTitle(ts('API explorer and generator'));
-    CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'templates/CRM/Admin/Page/APIExplorer.js')
-      ->addScriptUrl('//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js', 99)
-      ->addStyleUrl('//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css', 99);
-    $this->assign('operators', CRM_Core_DAO::acceptedSQLOperators());
-    return parent::run();
-  }
-
-  /**
-   * Get user context.
-   *
-   * @return string user context.
-   */
-  function userContext() {
-    return 'civicrm/api/explorer';
-  }
-}
-
+{htxt id="param-value-title"}
+  {ts}Parameter Value{/ts}
+{/htxt}
+{htxt id="param-value"}
+  <p>
+    {ts}The following formats are accepted:{/ts}
+    <ul>
+      <li>{ts}Simple values such as numbers, true, false and null.{/ts}</li>
+      <li>{ts}Strings. You may include quotes around the string to ensure it's not interpreted otherwise, e.g. "false".{/ts}</li>
+      <li>{ts}Arrays should be in js format, e.g. [1, 2, 3, 'foo', 'bar', 'baz'].{/ts}</li>
+      <li>{ts}Associative arrays should be in js object format, e.g. {ldelim}first: "one", second: "two", third: 3{rdelim}.{/ts}</li>
+    </ul>
+  </p>
+{/htxt}
