@@ -2,12 +2,17 @@
   var
     entity,
     action,
+    actions = ['get'],
     fields = [],
     options = {},
     params = {},
+    smartyStub,
     fieldTpl = _.template($('#api-param-tpl').html()),
     chainTpl = _.template($('#api-chain-tpl').html());
 
+  /**
+   * Call prettyPrint function if it successfully loaded from the cdn
+   */
   function prettyPrint() {
     if (window.prettyPrint) {
       window.prettyPrint();
@@ -26,8 +31,11 @@
     $('.api-chain-entity', $row).crmSelect2({
       formatSelection: function(item) {
         return '<span class="icon ui-icon-link"></span> API ' + item.text;
-      }
+      },
+      placeholder: '<span class="icon ui-icon-link"></span> ' + ts('Entity'),
+      escapeMarkup: function(m) {return m}
     });
+
   }
 
   function getFields() {
@@ -66,6 +74,25 @@
         }
       });
       showFields(required);
+    });
+  }
+
+  function getActions() {
+    if (entity) {
+      CRM.api3(entity, 'getactions').done(function(data) {
+        // Ensure 'get' is always an action
+        actions = _.union(['get'], data.values);
+        populateActions();
+      });
+    } else {
+      actions = ['get'];
+      populateActions();
+    }
+  }
+
+  function populateActions(el) {
+    $('#api-action').select2({
+      data: _.transform(actions, function(ret, item) {ret.push({text: item, id: item})})
     });
   }
 
@@ -165,6 +192,7 @@
    */
   function smartyFormat(js, key) {
     if (js.indexOf('[') > -1 || js.indexOf('{') > -1) {
+      smartyStub = true;
       return '$' + key.replace(/[. -]/g, '_');
     }
     return js;
@@ -204,6 +232,7 @@
     if (!$(el).hasClass('crm-error')) {
       $(el)
         .addClass('crm-error')
+        .css('width', '82%')
         .attr('title', ts('Syntax error'))
         .before('<div class="icon red-icon ui-icon-alert"/>');
     }
@@ -213,6 +242,7 @@
     $(el)
       .removeClass('crm-error')
       .attr('title', '')
+      .css('width', '85%')
       .siblings('.ui-icon-alert').remove();
   }
 
@@ -223,6 +253,7 @@
       json: "CRM.api3('" + entity + "', '" + action + "'",
       rest: CRM.config.resourceBase + "extern/rest.php?entity=" + entity + "&action=" + action + "&json=" + JSON.stringify(params) + "&api_key=yoursitekey&key=yourkey"
     };
+    smartyStub = false;
     $.each(params, function(key, value) {
       var js = JSON.stringify(value);
       if (!i++) {
@@ -233,7 +264,6 @@
       }
       q.php += "  '" + key + "' => " + phpFormat(value) + ",\n";
       q.json += "  \"" + key + '": ' + js;
-      // FIXME: How to deal with complex values in smarty?
       q.smarty += ' ' + key + '=' + smartyFormat(js, key);
     });
     if (i) {
@@ -245,6 +275,8 @@
     q.smarty += "}\n{foreach from=$result.values item=" + entity.toLowerCase() + "}\n  {$" + entity.toLowerCase() + ".some_field}\n{/foreach}";
     if (action.indexOf('get') < 0) {
       q.smarty = '{* Smarty API only works with get actions *}';
+    } else if (smartyStub) {
+      q.smarty = "{* Smarty does not have a syntax for array literals; assign complex variables on the server *}\n" + q.smarty;
     }
     $.each(q, function(type, val) {
       $('#api-' + type).removeClass('prettyprinted').text(val);
@@ -255,7 +287,7 @@
   function submit(e) {
     e.preventDefault();
     if (!entity || !action) {
-      alert(ts('Select an entity & action.'));
+      alert(ts('Select an entity.'));
       return;
     }
     if (action.indexOf('get') < 0) {
@@ -279,7 +311,7 @@
       type: action.indexOf('get') < 0 ? 'POST' : 'GET',
       dataType: 'text'
     }).done(function(text) {
-      $('#api-result').addClass('prettyprint linenums').removeClass('prettyprinted').text(text);
+      $('#api-result').addClass('prettyprint').removeClass('prettyprinted').text(text);
       prettyPrint();
     });
   }
@@ -288,6 +320,10 @@
     $('form#api-explorer')
       .on('change', '#api-entity, #api-action', function() {
         entity = $('#api-entity').val();
+        if ($(this).is('#api-entity')) {
+          $('#api-action').select2('val', 'get');
+          getActions();
+        }
         action = $('#api-action').val();
         if (entity && action) {
           $('#api-params').html('<tr><td colspan="4" class="crm-loading-element"></td></tr>');
@@ -299,7 +335,7 @@
           $('#api-param-buttons, #api-params-table thead').hide();
         }
       })
-      .on('change keyup', 'input.api-param-checkbox, input.api-param-value, input.api-param-name, #api-params select', buildParams)
+      .on('change keyup', 'input.api-input, #api-params select', buildParams)
       .on('submit', submit);
     $('#api-params')
       .on('change', '.api-param-name', toggleOptions)

@@ -25,9 +25,16 @@
 *}
 <style>
   {literal}
-  #api-result {
+  #api-explorer pre {
+    line-height: 1.3em;
+    font-size: 11px;
+    margin: 0;
+    border: 0 none;
+  }
+  pre#api-result {
     padding:1em;
     max-height: 50em;
+    border: 1px solid lightgrey;
   }
   #api-params-table th:first-child,
   #api-params-table td:first-child {
@@ -50,11 +57,6 @@
     display:inline;
     font-weight: bold;
   }
-  #api-explorer pre {
-    line-height: 1.3em;
-    font-size: 11px;
-    margin: 0;
-  }
   #api-generated-wraper,
   #api-result {
     overflow: auto;
@@ -63,10 +65,19 @@
     margin-top: .2em;
     background-image: url("{/literal}{$config->resourceBase}{literal}/i/icons/jquery-ui-2786C2.png");
   }
+  .select2-default .icon {
+    background-image: url("{/literal}{$config->resourceBase}{literal}/i/icons/jquery-ui-52534D.png");
+    opacity: .8;
+  }
+  pre ol.linenums li {
+    list-style-type: decimal;
+    color: #CFCFCF;
+  }
+  pre ol.linenums li:hover {
+    color: #9c9c9c;
+  }
   {/literal}
 </style>
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css" />
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
 
 <form id="api-explorer">
   <label for="api-entity">{ts}Entity{/ts}:</label>
@@ -79,20 +90,16 @@
   </select>
   &nbsp;&nbsp;
   <label for="api-action">{ts}Action{/ts}:</label>
-  <select class="crm-form-select crm-select2" id="api-action" name="action">
-    {foreach from=$actions item='act'}
-      <option value="{$act}">{$act}</option>
-    {/foreach}
-  </select>
+  <input class="crm-form-text" id="api-action" name="action" value="get">
   &nbsp;&nbsp;
 
   <label for="debug-checkbox" title="{ts}Display debug output with results.{/ts}">
-    <input type="checkbox" class="crm-form-checkbox api-param-checkbox" id="debug-checkbox" name="debug" checked="checked" value="1" >debug
+    <input type="checkbox" class="crm-form-checkbox api-param-checkbox api-input" id="debug-checkbox" name="debug" checked="checked" value="1" >debug
   </label>
   &nbsp;|&nbsp;
 
   <label for="sequential-checkbox" title="{ts}Sequential is more compact format, well-suited for json and smarty.{/ts}">
-    <input type="checkbox" class="crm-form-checkbox api-param-checkbox" id="sequential-checkbox" name="sequential" checked="checked" value="1">sequential
+    <input type="checkbox" class="crm-form-checkbox api-param-checkbox api-input" id="sequential-checkbox" name="sequential" checked="checked" value="1">sequential
   </label>
 
   <table id="api-params-table">
@@ -119,14 +126,15 @@
     </table>
   </div>
   <input type="submit" value="{ts}Execute{/ts}" class="form-submit"/>
-<pre class="prettyprint" id="api-result">
+<pre id="api-result" class="linenums">
 {ts}The result of api calls are displayed in this area.{/ts}
 </pre>
 </form>
+
 {strip}
 <script type="text/template" id="api-param-tpl">
   <tr class="api-param-row">
-    <td><input style="width: 100%;" class="crm-form-text api-param-name" value="<%= name %>" placeholder="{ts}Parameter{/ts}" /></td>
+    <td><input style="width: 100%;" class="crm-form-text api-param-name api-input" value="<%= name %>" placeholder="{ts}Parameter{/ts}" /></td>
     <td>
       <select class="crm-form-select api-param-op">
         {foreach from=$operators item='op'}
@@ -135,7 +143,7 @@
       </select>
     </td>
     <td>
-      <input style="width: 85%;" class="crm-form-text api-param-value" placeholder="{ts}Value{/ts}"/>
+      <input style="width: 85%;" class="crm-form-text api-param-value api-input" placeholder="{ts}Value{/ts}"/>
       <a class="crm-hover-button api-param-remove" href="#"><span class="icon ui-icon-close"></span></a>
     </td>
   </tr>
@@ -144,7 +152,7 @@
 <script type="text/template" id="api-chain-tpl">
   <tr class="api-chain-row">
     <td>
-      <select style="width: 100%;" class="crm-form-select api-chain-entity" placeholder="{ts}Entity{/ts}">
+      <select style="width: 100%;" class="crm-form-select api-chain-entity">
         <option value=""></option>
         {foreach from=$entities.values item=entity}
           <option value="{$entity}">{$entity}</option>
@@ -153,13 +161,15 @@
     </td>
     <td>
       <select class="crm-form-select api-chain-action">
-        {foreach from=$actions item='act'}
-          <option value="{$act}">{$act}</option>
-        {/foreach}
+        <option value="get">get</option>
+        <option value="getsingle">getsingle</option>
+        <option value="getcount">getcount</option>
+        <option value="create">create</option>
+        <option value="delete">delete</option>
     </select>
     </td>
     <td>
-      <input style="width: 85%;" class="crm-form-text api-param-value" value="{ldelim}{rdelim}" placeholder="{ts}Api Params{/ts}"/>
+      <input style="width: 85%;" class="crm-form-text api-param-value api-input" value="{ldelim}{rdelim}" placeholder="{ts}Api Params{/ts}"/>
       <a class="crm-hover-button api-param-remove" href="#"><span class="icon ui-icon-close"></span></a>
     </td>
   </tr>
