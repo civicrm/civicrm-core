@@ -91,7 +91,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $custFname = "Mike" . substr(sha1(rand()), 0, 7);
     $custMname = "Dav" . substr(sha1(rand()), 0, 7);
     $custLname = "Krist" . substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4);
+    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4, "s2id_client_id");
 
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel = "Adult Day Care Referral";
@@ -132,7 +132,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->openCiviPage('case', 'reset=1', "xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[8]/a[text()='Open Case']");
     $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[8]/a[text()='Open Case']");
-    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Done']");
+    $this->waitForElementPresent("xpath=//span[@class='ui-button-icon-primary ui-icon ui-icon-closethick']");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
@@ -151,7 +151,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       "Priority" => "Normal",
     );
     $this->webtestVerifyTabularData($openCaseData);
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Done']");
+    $this->click("xpath=//span[@class='ui-button-icon-primary ui-icon ui-icon-closethick']");
 
     // verify if custom data is present
     $this->openCiviPage('case', 'reset=1');
@@ -196,7 +196,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       "Priority" => "Normal",
     );
     $this->webtestVerifyTabularData($openCaseChangeData);
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Done']");
+    $this->click("xpath=//span[@class='ui-button-icon-primary ui-icon ui-icon-closethick']");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
@@ -357,7 +357,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $email = "{$lastName}.{$firstName}@example.org";
     $custFname = "Mike" . substr(sha1(rand()), 0, 7);
     $custLname = "Krist" . substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4);
+    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4, "s2id_client_id");
 
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel = "Adult Day Care Referral";
@@ -395,7 +395,6 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[8]/a[text()='Open Case']");
 
     $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[8]/a[text()='Open Case']");
-    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Done']");
 
     $openCaseData = array(
       "Client" => $displayName,
@@ -414,7 +413,6 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       $this->waitForElementPresent("xpath=//table/tbody/tr/td[text()='{$label}']/following-sibling::td");
     }
     $this->webtestVerifyTabularData($openCaseData);
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Done']");
 
     // verify if custom data is present
     $this->openCiviPage('case', 'reset=1');
@@ -424,12 +422,9 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
     $cusId_1 = 'custom_' . $customId[0] . '_1';
     $cusId_2 = 'custom_' . $customId[1] . '_1';
-    $this->click("css=#{$customGrp1} a.button");
+    $this->clickLink("css=#{$customGrp1} a.button");
 
-    // wait for dialog element
-    $this->waitForElementPresent("css=div.ui-dialog div.ui-dialog-titlebar");
-    // check for dialog box Title
-    $this->assertElementContainsText("css=div.ui-dialog div.ui-dialog-titlebar", 'Update Case Information');
+    $this->assertElementContainsText("page-title", "Edit $customGrp1");
 
     $custFname = "Miky" . substr(sha1(rand()), 0, 7);
     $custLname = "Kristy" . substr(sha1(rand()), 0, 7);
