@@ -59,18 +59,18 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
 
     $this->select("activity_type_id", "value=1");
 
-    $this->click("token-input-assignee_contact_id");
+    $this->click("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: tokeninput has a slight delay
     sleep(1);
-    $this->type("token-input-assignee_contact_id", "$firstName1");
-    $this->typeKeys("token-input-assignee_contact_id", "$firstName1");
+    $this->keyDown("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input", " ");
+    $this->type("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input", $firstName1);
+    $this->typeKeys("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input", $firstName1);
 
-    $this->waitForElementPresent("css=div.token-input-dropdown-facebook");
-    $this->waitForElementPresent("css=li.token-input-dropdown-item2-facebook");
-    $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
-    $this->waitForElementPresent("css=tr.crm-activity-form-block-assignee_contact_id td ul li span.token-input-delete-token-facebook");
+    $this->waitForElementPresent("xpath=//div[@class='select2-result-label']");
+    $this->clickAt("xpath=//div[@class='select2-result-label']");
+    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$firstName1");
 
     $subject = "Testing Ical attachment for activity assignee";
     $this->type("subject", $subject);

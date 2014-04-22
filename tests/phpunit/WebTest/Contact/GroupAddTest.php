@@ -70,7 +70,6 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $params['name']);
     $this->click('_qf_Search_refresh');
-    $this->waitForVisible('crm-group-selector_processing');
     $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(., '{$params['name']}')]");
     $createdBy = $this->getText("xpath=//table[@id='crm-group-selector']/tbody/tr/td[3]/a");
     $this->click("xpath=//table[@id='crm-group-selector']/tbody/tr/td[7]/span/a[2]");

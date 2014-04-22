@@ -48,35 +48,35 @@ class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
 
     $this->select("activity_type_id", "label=Meeting");
 
-    $this->click("css=tr.crm-activity-form-block-target_contact_id input#token-input-contact_1");
-    $this->type("css=tr.crm-activity-form-block-target_contact_id input#token-input-contact_1", "$contactFirstName1");
-    $this->typeKeys("css=tr.crm-activity-form-block-target_contact_id input#token-input-contact_1", "$contactFirstName1");
+    $this->click("xpath=//div[@id='s2id_target_contact_id']/ul/li/input");
+    $this->keyDown("xpath=//div[@id='s2id_target_contact_id']/ul/li/input", " ");
+    $this->type("xpath=//div[@id='s2id_target_contact_id']/ul/li/input", $contactFirstName1);
+    $this->typeKeys("xpath=//div[@id='s2id_target_contact_id']/ul/li/input", $contactFirstName1);
 
     // ...waiting for drop down with results to show up...
-    $this->waitForElementPresent("css=div.token-input-dropdown-facebook");
-    $this->waitForElementPresent("css=li.token-input-dropdown-item2-facebook");
+    $this->waitForElementPresent("xpath=//div[@class='select2-result-label']");
 
     // ...need to use mouseDownAt on first result (which is a li element), click does not work
-    $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
+    $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up (span with delete token class indicates that it's present)...
-    $this->waitForElementPresent("css=tr.crm-activity-form-block-target_contact_id td ul li span.token-input-delete-token-facebook");
+    $this->waitForText("xpath=//div[@id='s2id_target_contact_id']","$contactFirstName1");
 
     // Now we're doing the same for "Assigned To" field.
     // Typing contact's name into the field (using typeKeys(), not type()!)...
-    $this->click("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id");
-    $this->type("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id", "$contactFirstName2");
-    $this->typeKeys("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id", "$contactFirstName2");
+    $this->click("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input");
+    $this->keyDown("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input", " ");
+    $this->type("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input", $contactFirstName2);
+    $this->typeKeys("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input", $contactFirstName2);
 
     // ...waiting for drop down with results to show up...
-    $this->waitForElementPresent("css=div.token-input-dropdown-facebook");
-    $this->waitForElementPresent("css=li.token-input-dropdown-item2-facebook");
+    $this->waitForElementPresent("xpath=//div[@class='select2-result-label']");
 
     //..need to use mouseDownAt on first result (which is a li element), click does not work
-    $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
+    $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up...
-    $this->waitForElementPresent("css=tr.crm-activity-form-block-assignee_contact_id td ul li span.token-input-delete-token-facebook");
+    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$contactFirstName2");
   }
 }
 
