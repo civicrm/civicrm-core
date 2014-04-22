@@ -1891,7 +1891,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     foreach ($insertLines as $valueId => $lineParams) {
       $lineParams['entity_table'] = 'civicrm_participant';
       $lineParams['entity_id'] = $participantId;
-      $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
+      $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams, CRM_Core_DAO::$_nullArray);
       // insert financial items
       // ensure entity_financial_trxn table has a linking of it.
       $prevItem = CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution);
