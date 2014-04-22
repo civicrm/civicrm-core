@@ -537,10 +537,7 @@ SELECT civicrm_custom_group.name as name,
       CRM_Event_BAO_Participant::getValues($params, $defaults, $ids);
       $sep = CRM_Core_DAO::VALUE_SEPARATOR;
       if ($defaults[$this->_id]['role_id']) {
-        foreach (explode($sep, $defaults[$this->_id]['role_id']) as $k => $v) {
-          $defaults[$this->_id]["role_id[{$v}]"] = 1;
-        }
-        unset($defaults[$this->_id]['role_id']);
+        $roleIDs = explode($sep, $defaults[$this->_id]['role_id']);
       }
       $this->_contactId = $defaults[$this->_id]['contact_id'];
       $this->_statusId = $defaults[$this->_id]['participant_status_id'];
@@ -582,7 +579,7 @@ SELECT civicrm_custom_group.name as name,
       if (!empty($defaults[$this->_id]['event_id'])) {
         $contributionTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event',
           $defaults[$this->_id]['event_id'],
-          'financial_type_id' 
+          'financial_type_id'
         );
         if ($contributionTypeId) {
           $defaults[$this->_id]['financial_type_id'] = $contributionTypeId;
@@ -643,14 +640,37 @@ SELECT civicrm_custom_group.name as name,
     if (!empty($defaults[$this->_id]['participant_role_id'])) {
       $roleIDs = explode($sep, $defaults[$this->_id]['participant_role_id']);
     }
-    if (isset($roleIDs)) {
-      $this->assign('roleID', $roleIDs);
-    }
     if (isset($_POST['event_id'])) {
       $eventID = $_POST['event_id'];
-      if ($eventID) {
-        $this->_eventTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventID, 'event_type_id', 'id');
+    }
+
+    if($this->_eID) {
+      $eventID = $this->_eID;
+      //@todo - rationalise the $this->_eID with $POST['event_id'],  $this->_eid is set when eid=x is in the url
+      $roleID = CRM_Core_DAO::getFieldValue(
+        'CRM_Event_DAO_Event',
+        $this->_eID,
+        'default_role_id'
+      );
+      if(empty($roleIDs)) {
+        $roleIDs = (array) $defaults[$this->_id]['participant_role_id'] = $roleID;
       }
+      $defaults[$this->_id]['event_id'] = $eventID;
+    }
+    if (!empty($eventID)) {
+      $this->_eventTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventID, 'event_type_id', 'id');
+    }
+    //these should take precedence so we state them last
+    $urlRoleIDS = CRM_Utils_Request::retrieve('roles', 'String');
+    if($urlRoleIDS) {
+      $roleIDs = explode(',', $urlRoleIDS);
+    }
+    if (isset($roleIDs)) {
+      foreach ($roleIDs as $roleID) {
+        $defaults[$this->_id]["role_id[{$roleID}]"] = 1;
+      }
+      unset($defaults[$this->_id]['role_id']);
+      $this->assign('roleID', $roleIDs);
     }
 
     if (isset($eventID)) {
