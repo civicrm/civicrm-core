@@ -1562,6 +1562,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $transaction->rollback();
       return $mailing;
     }
+    // update mailings with hash values
+    CRM_Contact_BAO_Contact_Utils::generateChecksum($mailing->id, NULL, NULL, NULL, 'mailing', 16);
 
     $groupTableName = CRM_Contact_BAO_Group::getTableName();
     $mailingTableName = CRM_Mailing_BAO_Mailing::getTableName();
@@ -1620,6 +1622,18 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     return $mailing;
+  }
+
+  /**
+   * get hash value of the mailing
+   *
+   */
+  public static function getMailingHash($id) {
+    $hash = NULL;
+    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'hash_mailing_url')) {
+      $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_BAO_Mailing', $id, 'hash', 'id');
+    }
+    return $hash;
   }
 
   /**
@@ -2564,14 +2578,21 @@ SELECT  $mailing.id as mailing_id
       }
     }
 
+    $mailingKey = $form->_mailing_id;
+    if (!$isSMS) {
+      if ($hash = CRM_Mailing_BAO_Mailing::getMailingHash($mailingKey)) {
+        $mailingKey = $hash;
+      }
+    }
+
     if (!empty($report['mailing']['body_text'])) {
-      $url = CRM_Utils_System::url('civicrm/mailing/view', 'reset=1&text=1&id=' . $form->_mailing_id);
+      $url = CRM_Utils_System::url('civicrm/mailing/view', 'reset=1&text=1&id=' . $mailingKey);
       $form->assign('textViewURL', $url);
     }
 
     if (!$isSMS) {
       if (!empty($report['mailing']['body_html'])) {
-        $url = CRM_Utils_System::url('civicrm/mailing/view', 'reset=1&id=' . $form->_mailing_id);
+        $url = CRM_Utils_System::url('civicrm/mailing/view', 'reset=1&id=' . $mailingKey);
         $form->assign('htmlViewURL', $url);
       }
     }
@@ -2757,7 +2778,7 @@ AND        m.id = %1
         CRM_Core_Action::VIEW => array(
           'name' => ts('View'),
           'url' => 'civicrm/mailing/view',
-          'qs' => "reset=1&id=%%mid%%",
+          'qs' => "reset=1&id=%%mkey%%",
           'title' => ts('View Mailing'),
           'class' => 'crm-popup',
         ),
@@ -2769,12 +2790,18 @@ AND        m.id = %1
         )
       );
 
+      $mailingKey = $values['mailing_id'];
+      if ($hash = CRM_Mailing_BAO_Mailing::getMailingHash($mailingKey)) {
+        $mailingKey = $hash;
+      }
+
       $contactMailings[$mailingId]['links'] = CRM_Core_Action::formLink(
         $actionLinks,
         null,
         array(
           'mid' => $values['mailing_id'],
           'cid' => $params['contact_id'],
+          'mkey' => $mailingKey,
         ),
         ts('more'),
         FALSE,
@@ -2822,4 +2849,3 @@ AND        m.id = %1
     return civicrm_api('MailingContact', 'getcount', $params);
   }
 }
-
