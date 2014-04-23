@@ -268,3 +268,8 @@ VALUES
 -- CRM-14435
 ALTER TABLE `civicrm_mail_settings`
   ADD CONSTRAINT `FK_civicrm_mail_settings_domain_id` FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain` (`id`) ON DELETE SET NULL;
+
+-- CRM-14436
+ALTER TABLE `civicrm_mailing`
+  ADD COLUMN `hash` varchar(16) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Key for validating requests related to this mailing.',
+  ADD INDEX `index_hash` (`hash`);
