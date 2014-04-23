@@ -108,7 +108,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
         // if mailing is present and associated hash is present
         // while 'hash' is not been used for mailing view : throw 'permissionDenied'
         if ($this->_mailing->find() &&
-          CRM_Core_DAO::getFieldValue('CRM_Mailing_BAO_Mailing', $this->_mailingID, 'hash', 'id')
+          CRM_Core_DAO::getFieldValue('CRM_Mailing_BAO_Mailing', $this->_mailingID, 'hash', 'id') &&
           !$allowID
         ) {
           CRM_Utils_System::permissionDenied();
