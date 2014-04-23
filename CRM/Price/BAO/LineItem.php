@@ -95,9 +95,9 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
   static function getLineTotal($entityId, $entityTable) {
     $sqlLineItemTotal = "SELECT SUM(li.line_total)
 FROM civicrm_line_item li
-INNER JOIN civicrm_participant_payment pp ON ( li.entity_id = pp.participant_id
-AND li.entity_table = '{$entityTable}'
-AND li.entity_id = {$entityId})";
+WHERE li.entity_table = '{$entityTable}'
+AND li.entity_id = {$entityId}
+";
     $lineItemTotal = CRM_Core_DAO::singleValueQuery($sqlLineItemTotal);
     return $lineItemTotal;
   }
