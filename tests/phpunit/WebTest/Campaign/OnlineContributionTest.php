@@ -51,7 +51,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "John", "$firstName2.john@example.org");
@@ -64,7 +64,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     // Enable CiviCampaign module if necessary
     $this->enableComponents(array('CiviCampaign'));
@@ -148,7 +148,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->type("value_1", "100");
     $this->type("label_2", "amount 2");
     $this->type("value_2", "200");
-    $this->click("CIVICRM_QFID_1_2");
+    $this->click("xpath=//*[@id='map-field-table']//tr[2]//input[1][@name='default']");
 
     $this->click("_qf_Amount_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -189,7 +189,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Custom_next-bottom");
 
     // fill in step 6 (Include Profiles)
-    $this->select('custom_pre_id', 'value=1');
+    $this->select('css=tr.crm-contribution-contributionpage-custom-form-block-custom_pre_id span.crm-profile-selector-select select', 'value=1');
 
     $this->click('_qf_Custom_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -293,7 +293,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
 
     $this->type("sort_name", "$firstName $lastName");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
     //View Contribution Record
     $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody/tr[10]/td[2]", preg_quote($campaignTitle));
