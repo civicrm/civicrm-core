@@ -249,3 +249,19 @@ UPDATE civicrm_custom_field cf
   WHERE cg.is_multiple = 1 AND cf.html_type != 'TextArea';
 ALTER TABLE `civicrm_custom_group`
  CHANGE COLUMN `style` `style` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Visual relationship between this form and its parent.';
+
+-- Add "developer" help menu
+SELECT @parent_id := `id` FROM `civicrm_navigation` WHERE `name` = 'Help' AND `domain_id` = {$domainID};
+
+INSERT INTO civicrm_navigation
+( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+VALUES
+( {$domainID}, NULL, '{ts escape="sql" skip="true"}Developer{/ts}', 'Developer', 'administer CiviCRM', '', @parent_id, '1', NULL, 5 );
+
+SET @devellastID:=LAST_INSERT_ID();
+INSERT INTO civicrm_navigation
+( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+VALUES
+( {$domainID}, 'civicrm/api/explorer', '{ts escape="sql" skip="true"}API Explorer{/ts}','API Explorer', 'administer CiviCRM', '', @devellastID, '1', NULL, 1 ),
+( {$domainID}, 'http://wiki.civicrm.org/confluence/display/CRMDOC/Develop', '{ts escape="sql" skip="true"}Developer Docs{/ts}', 'Developer Docs', 'administer CiviCRM', '', @devellastID, '1', NULL, 3 );
+
