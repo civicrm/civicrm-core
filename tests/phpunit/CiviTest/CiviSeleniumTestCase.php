@@ -1893,7 +1893,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->type("//*[@id='select2-drop']/div/input", $label);
       $this->typeKeys("//*[@id='select2-drop']/div/input", $label);
       $this->waitForElementPresent("//*[@class='select2-result-label']");
-      $this->clickAt("//*[@class='select2-results']/li[1]");
+      $this->clickAt("//*[@class='select2-result-label']");
     }
   }
 }

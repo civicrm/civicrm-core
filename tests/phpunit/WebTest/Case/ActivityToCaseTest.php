@@ -54,7 +54,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $contactName = "{$lastName}, {$firstName}";
     $displayName = "{$firstName} {$lastName}";
     $email = "{$lastName}.{$firstName}@example.org";
-    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4);
+    $this->webtestNewDialogContact($firstName, $lastName, $email, $type = 4, "s2id_client_id");
 
     // Fill in other form values. We'll use a case type which is included in CiviCase sample data / xml files.
     $caseTypeLabel = "Adult Day Care Referral";
@@ -73,7 +73,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $today = date('F jS, Y', strtotime('now'));
 
     $this->type('duration', "20");
-    $this->clickLink('_qf_Case_upload-bottom', '_qf_CaseView_cancel-bottom');
+    $this->clickLink('_qf_Case_upload-bottom', '_qf_CaseView_cancel-bottom', FALSE);
 
     // Is status message correct?
     $this->waitForText('crm-notification-container', "Case opened successfully.");
@@ -106,26 +106,26 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Activity_upload-bottom");
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
-    $this->assertElementContainsText('css=tr.crm-activity-form-block-target_contact_id td ul li.token-input-token-facebook', 'Anderson, ' . $firstName2, "Contact not found in line " . __LINE__);
+    $this->waitForText("xpath=//div[@id='s2id_target_contact_id']", 'Anderson, ' . $firstName2, "Contact not found in line " . __LINE__);
 
     // Now we're filling the "Assigned To" field.
     // Typing contact's name into the field (using typeKeys(), not type()!)...
-    $this->click("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id");
-    $this->type("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id", $firstName1);
-    $this->typeKeys("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id", $firstName1);
+    $this->click("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input");
+    $this->keyDown("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input", " ");
+    $this->type("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input", $firstName1);
+    $this->typeKeys("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input", $firstName1);
 
     // ...waiting for drop down with results to show up...
-    $this->waitForElementPresent("css=div.token-input-dropdown-facebook");
-    $this->waitForElementPresent("css=li.token-input-dropdown-item2-facebook");
+    $this->waitForElementPresent("xpath=//div[@class='select2-result-label']");
 
     //..need to use mouseDownAt on first result (which is a li element), click does not work
-    $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
+    $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up...
-    $this->waitForElementPresent("css=tr.crm-activity-form-block-assignee_contact_id td ul li span.token-input-delete-token-facebook");
+    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$firstName1");
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
-    $this->assertElementContainsText('css=tr.crm-activity-form-block-assignee_contact_id td ul li.token-input-token-facebook', 'Summerson, ' . $firstName1, "Contact not found in line " . __LINE__);
+    $this->assertElementContainsText("xpath=//div[@id='s2id_assignee_contact_id']", "Summerson, $firstName1", 'Contact not found in line ' . __LINE__);
 
     // Putting the contents into subject field - assigning the text to variable, it'll come in handy later
     $subject = "This is subject of test activity being added through activity tab of contact summary screen.";
@@ -152,8 +152,9 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->select("priority_id", "value=1");
 
     $textField = 'This is test custom data';
-    $this->click($customGroupTitle);
-    $this->click("xpath=//div[@id='{$customGroupTitle}']/table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/input");
+    $this->click("xpath=//div[@id='customData']//div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper collapsed']");
+    $this->waitForElementPresent("xpath=//div[@class='crm-accordion-body']//table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/input");
+    $this->click("xpath=//div[@class='crm-accordion-body']//table/tbody/tr[2]/td[2]/table/tbody/tr/td[1]/input");
     $this->type($customDataParams[1], $textField);
 
     // Scheduling follow-up.
@@ -164,47 +165,40 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click("_qf_Activity_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
     $this->waitForText('crm-notification-container', $subject);
 
     // click through to the Activity view screen
-    $this->waitForElementPresent("xpath=//div[@id='Activities']//table/tbody/tr[2]/td[8]");
-    $this->click("xpath=//div[@id='Activities']//table/tbody/tr[2]/td[8]/span[2]/ul/li/a[text()='File On Case']");
+    $this->waitForElementPresent("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[1]/td[8]");
+    $this->click("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[2]/td[8]/span[2]/ul/li/a[text()='File On Case']");
     $this->waitForElementPresent("css=div#fileOnCaseDialog");
-    $this->waitForElementPresent('case_activity_subject');
+    $this->waitForElementPresent('file_on_case_activity_subject');
 
     // file activity on case
-    $this->type('unclosed_cases', $firstName);
-    $this->click('unclosed_cases');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
-    $this->assertContains($firstName, $this->getValue('unclosed_cases'),
-      "autocomplete expected $firstName but didn’t find it in " .
-      $this->getValue('unclosed_cases')
-    );
-
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Ok']");
-    $this->waitForElementPresent("xpath=//div[@id='Activities']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->select2('file_on_case_unclosed_case_id', $firstName);
+    $this->assertElementContainsText("xpath=//div[@id='s2id_file_on_case_unclosed_case_id']", "$firstName", 'Contact not found in line ' . __LINE__);
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
+    $this->waitForElementPresent("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
 
     // verify if custom data is present
     $this->openCiviPage('case', 'reset=1');
     $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[9]/span/a[text()='Manage']");
 
     $this->waitForElementPresent('_qf_CaseView_cancel-bottom');
-    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='activities-selector']/tbody/tr[1]/td[2]");
+    $id = $this->urlArg('id');
+    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_".$id."']/tbody/tr[1]/td[2]");
 
-    $this->click("xpath=//div[@id='activities']//table[@id='activities-selector']//a[text()='{$subject}']");
+    $this->click("xpath=//div[@id='activities']//table[@id='case_id_".$id."']/tbody/tr[1]/td[2]//a[text()='{$subject}']");
 
-    $this->waitForElementPresent('view-activity');
+    $this->waitForElementPresent('ActivityView');
     $this->waitForElementPresent("css=table#crm-activity-view-table tr.crm-case-activityview-form-block-groupTitle");
     $this->assertElementContainsText('crm-activity-view-table', "$customDataParams[0]");
     $this->assertElementContainsText('crm-activity-view-table', "$textField");
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Done']");
-    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='activities-selector']/tbody/tr[1]/td[2]");
+    $this->click("xpath=//span[@class='ui-button-icon-primary ui-icon ui-icon-closethick']");
+    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_".$id."']/tbody/tr[1]/td[2]");
 
-    $this->click("xpath=//div[@id='activities']//table[@id='activities-selector']/tbody//tr/td[2]/a[text()='{$subject}']/../../td[6]/a[text()='Scheduled']");
+    $this->click("xpath=//div[@id='activities']//table[@id='case_id_".$id."']/tbody//tr/td[2]/a[text()='{$subject}']/../../td[6]/a[text()='Scheduled']");
 
     $this->waitForElementPresent("xpath=//html/body/div[7]");
     $this->waitForElementPresent('activity_change_status');
@@ -215,9 +209,10 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->openCiviPage('case', 'reset=1');
     $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[9]/span/a[text()='Manage']");
     $this->waitForElementPresent('_qf_CaseView_cancel-bottom');
-    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='activities-selector']/tbody/tr[1]/td[2]");
-    $this->click("xpath=//div[@id='activities']//table[@id='activities-selector']//a[text()='{$subject}']");
-    $this->waitForElementPresent('view-activity');
+    $id2 = $this->urlArg('id');
+    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_".$id2."']/tbody/tr[1]/td[2]");
+    $this->click("xpath=//div[@id='activities']//table[@id='case_id_".$id2."']//a[text()='{$subject}']");
+    $this->waitForElementPresent('ActivityView');
     $this->waitForElementPresent("css=table#crm-activity-view-table tr.crm-case-activityview-form-block-groupTitle");
   }
 
@@ -277,11 +272,11 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->waitForText('crm-notification-container', "Your custom field '$radioFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$radioFieldLabel' has been saved.");
 
     // create another custom field - text field
     $this->click("//a[@id='newCustomField']/span");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     $textFieldLabel = 'Custom Field Text_' . substr(sha1(rand()), 0, 4);
     $this->type('label', $textFieldLabel);
@@ -297,11 +292,12 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
     //clicking save
     $this->click('_qf_Field_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("//a[@id='newCustomField']/span");
 
     //Is custom field created
-    $this->waitForText('crm-notification-container', "Your custom field '$textFieldLabel' has been saved.");
-    $textFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$textFieldLabel']/../../td[8]/span/a[text()='Edit Field']/@href"));
+    $this->waitForText('crm-notification-container', "Custom field '$textFieldLabel' has been saved.");
+    $this->waitForElementPresent("xpath=//div[@id='field_page']//div//table/tbody//tr/td/span[text()='$textFieldLabel']");
+    $textFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//div//table/tbody//tr/td/span[text()='$textFieldLabel']/../../td[8]/span/a[text()='Edit Field']/@href"));
     $textFieldId = $textFieldId[1];
 
     return array($radioOptionLabel1, "custom_{$textFieldId}_-1");
