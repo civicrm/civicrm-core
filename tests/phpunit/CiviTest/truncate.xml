@@ -9,8 +9,6 @@
 
   <civicrm_location_type />
 
-  <civicrm_mail_settings />
-
   <civicrm_managed />
 
   <civicrm_mapping />
@@ -122,6 +120,8 @@
   <civicrm_job_log />
 
   <civicrm_log />
+
+  <civicrm_mail_settings />
 
   <civicrm_mapping_field />
 
