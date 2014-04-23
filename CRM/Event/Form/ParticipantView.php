@@ -76,6 +76,15 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     );
     $this->assign('hasPayment', $paymentId);
 
+    if ($parentParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
+          $participantID, 'registered_by_id'
+      )) {
+      $parentHasPayment = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+        $parentParticipantId, 'id', 'participant_id'
+      );
+      $this->assign('parentHasPayment', $parentHasPayment);
+    }
+
     $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'status_id', 'id');
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
 

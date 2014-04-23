@@ -77,6 +77,12 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $this->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($this->_eventId);
 
     $this->_contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_participantId, 'contribution_id', 'participant_id');
+    if (!$this->_contributionId) {
+      if ($primaryParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $this->_participantId, 'registered_by_id')) {
+        $this->_contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $primaryParticipantId, 'contribution_id', 'participant_id');
+      }
+    }
+
     if ($this->_contributionId) {
       $this->_isPaidEvent = TRUE;
     }
@@ -97,6 +103,18 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $this->_paidAmount = $paymentInfo['paid'];
     $this->assign('paymentInfo', $paymentInfo);
     $this->assign('feePaid', $this->_paidAmount);
+
+    $ids = CRM_Event_BAO_Participant::getParticipantIds($this->_contributionId);
+    if (count($ids) > 1) {
+      $total = 0;
+      foreach ($ids as $val) {
+        $total += CRM_Price_BAO_LineItem::getLineTotal($val, 'civicrm_participant');
+      }
+      $this->assign('totalLineTotal', $total);
+
+      $lineItemTotal = CRM_Price_BAO_LineItem::getLineTotal($this->_participantId, 'civicrm_participant');
+      $this->assign('lineItemTotal', $lineItemTotal);
+    }
 
     $title = "Change selections for {$this->_contributorDisplayName}";
     if ($title) {
@@ -179,12 +197,13 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       'isDefault' => TRUE,
     );
 
-    $buttons[] = array(
-      'type' => 'upload',
-      'name' => ts('Save and Record Payment'),
-      'subName' => 'new'
-    );
-
+    if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->_participantId)) {
+      $buttons[] = array(
+        'type' => 'upload',
+        'name' => ts('Save and Record Payment'),
+        'subName' => 'new'
+      );
+    }
     $buttons[] = array(
       'type' => 'cancel',
       'name' => ts('Cancel'),

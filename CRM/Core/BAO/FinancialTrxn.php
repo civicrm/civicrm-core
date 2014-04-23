@@ -418,7 +418,17 @@ WHERE ceft.entity_id = %1";
         $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeId, $relationTypeId);
 
         if (empty($lineItemTotal)) {
-          $lineItemTotal = CRM_Price_BAO_LineItem::getLineTotal($entityId, 'civicrm_participant');
+          $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
+          if (count($ids) > 1) {
+            $total = 0;
+            foreach ($ids as $val) {
+              $total += CRM_Price_BAO_LineItem::getLineTotal($val, 'civicrm_participant');
+            }
+            $lineItemTotal = $total;
+          }
+          else {
+            $lineItemTotal = CRM_Price_BAO_LineItem::getLineTotal($entityId, 'civicrm_participant');
+          }
         }
         $sqlFtTotalAmt = "
 SELECT SUM(ft.total_amount)

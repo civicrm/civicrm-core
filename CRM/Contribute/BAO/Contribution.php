@@ -3036,10 +3036,13 @@ WHERE eft.entity_table = 'civicrm_contribution'
 
         if ($participantId) {
           // update participant status
-          $participantUpdate['id'] = $participantId;
           $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
-          $participantUpdate['status_id'] = array_search('Registered', $participantStatuses);
-          CRM_Event_BAO_Participant::add($participantUpdate);
+          $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
+          foreach ($ids as $val) {
+            $participantUpdate['id'] = $val;
+            $participantUpdate['status_id'] = array_search('Registered', $participantStatuses);
+            CRM_Event_BAO_Participant::add($participantUpdate);
+          }
         }
 
         // update financial item statuses
@@ -3096,10 +3099,13 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       }
       if ($participantId) {
         // update participant status
-        $participantUpdate['id'] = $participantId;
         $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
-        $participantUpdate['status_id'] = array_search('Registered', $participantStatuses);
-        CRM_Event_BAO_Participant::add($participantUpdate);
+        $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
+        foreach ($ids as $val) {
+          $participantUpdate['id'] = $val;
+          $participantUpdate['status_id'] = array_search('Registered', $participantStatuses);
+          CRM_Event_BAO_Participant::add($participantUpdate);
+        }
       }
     }
 
@@ -3163,6 +3169,13 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       $entity = 'participant';
       $entityTable = 'civicrm_participant';
       $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $id, 'contribution_id', 'participant_id');
+
+      if (!$contributionId) {
+        if ($primaryParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $id, 'registered_by_id')) {
+          $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $primaryParticipantId, 'contribution_id', 'participant_id');
+          $id = $primaryParticipantId;
+        }
+      }
     }
     $total = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
     $baseTrxnId = !empty($total['trxn_id']) ? $total['trxn_id'] : NULL;
@@ -3176,7 +3189,17 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       $isBalance = FALSE;
     }
     if (empty($total) || $usingLineTotal) {
-      $total = CRM_Price_BAO_LineItem::getLineTotal($id, $entityTable);
+      // for additional participants
+      if ($entityTable == 'civicrm_participant') {
+       $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
+       $total = 0;
+       foreach ($ids as $val) {
+         $total += CRM_Price_BAO_LineItem::getLineTotal($val, $entityTable);
+       }
+      }
+      else {
+        $total = CRM_Price_BAO_LineItem::getLineTotal($id, $entityTable);
+      }
     }
     else {
       $baseTrxnId = $total['trxn_id'];
@@ -3184,11 +3207,17 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     }
 
     $paymentBalance = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($id, $entity, FALSE, $total);
+    $contributionIsPayLater = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'is_pay_later');
+    if ($paymentBalance == 0 && $contributionIsPayLater) {
+      $paymentBalance = $total;
+    }
+
     $info['total'] = $total;
     $info['paid'] = $total - $paymentBalance;
     $info['balance'] = $paymentBalance;
     $info['id'] = $id;
     $info['component'] = $component;
+    $info['payLater'] = $contributionIsPayLater;
     $rows = array();
     if ($getTrxnInfo && $baseTrxnId) {
       $sql = "
