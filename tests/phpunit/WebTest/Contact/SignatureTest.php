@@ -50,7 +50,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage("contact/add", "reset=1&action=update&cid=$contactId");
 
-    $this->click("//tr[@id='Email_Block_1']/td[1]/div[2]/div[1]");
+    $this->click("//tr[@id='Email_Block_1']/td[1]/div[3]/div[1]");
     // HTML format message
     $signature = 'Contact Signature in html';
 
@@ -68,7 +68,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     // Go for Ckeck Your Editor, Click on Send Mail
     $this->click("//a[@id='crm-contact-actions-link']/span");
     //after clicking on 'Send an Email', wait for the text in tinymce editor to load
-    $this->clickLink('link=Send an Email', "xpath=//body[@id='tinymce']/p[2]");
+    $this->clickLink('link=Send an Email', "xpath=//body[@id='tinymce']/p[2]", FALSE);
 
     $this->click('subject');
     $subject = 'Subject_' . substr(sha1(rand()), 0, 8);
@@ -78,7 +78,6 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     $this->_checkSignature('html_message', $signature, 'TinyMCE');
 
     $this->click('_qf_Email_upload-top');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Go for Activity Search
     $this->_checkActivity($subject, $signature);
@@ -105,7 +104,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     $this->_selectEditor('CKEditor');
 
     $this->openCiviPage("contact/add", "reset=1&action=update&cid={$contactId}");
-    $this->click("//tr[@id='Email_Block_1']/td[1]/div[2]/div[1]");
+    $this->click("//tr[@id='Email_Block_1']/td[1]/div[3]/div[1]");
 
     // HTML format message
     $signature = 'Contact Signature in html';
@@ -122,7 +121,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
 
     // Go for Ckeck Your Editor, Click on Send Mail
     $this->click("//a[@id='crm-contact-actions-link']/span");
-    $this->clickLink('link=Send an Email', 'subject');
+    $this->clickLink('link=Send an Email', 'subject', FALSE);
 
     $this->click('subject');
     $subject = 'Subject_' . substr(sha1(rand()), 0, 7);
@@ -132,7 +131,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     $this->_checkSignature('html_message', $signature, 'CKEditor');
 
     $this->click('_qf_Email_upload-top');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("//a[@id='crm-contact-actions-link']/span");
 
     // Go for Activity Search
     $this->_checkActivity($subject, $signature);
@@ -180,7 +179,7 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_Search_refresh', 'Search');
 
     // View your Activity
-    $this->clickLink("xpath=id('Search')/div[3]/div/div[2]/table/tbody/tr[2]/td[9]/span/a[text()='View']", '_qf_ActivityView_next-bottom');
+    $this->clickLink("xpath=id('Search')/div[3]/div/div[2]/table/tbody/tr[2]/td[9]/span/a[text()='View']", '_qf_ActivityView_cancel-bottom', FALSE);
 
     // Is signature correct? in Activity
     $this->assertTextPresent($signature);
