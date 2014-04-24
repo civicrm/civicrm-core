@@ -98,7 +98,7 @@
   &nbsp;&nbsp;
 
   <label for="debug-checkbox" title="{ts}Display debug output with results.{/ts}">
-    <input type="checkbox" class="crm-form-checkbox api-param-checkbox api-input" id="debug-checkbox" name="debug" checked="checked" value="1" >debug
+    <input type="checkbox" class="crm-form-checkbox api-param-checkbox api-input" id="debug-checkbox" name="debug" value="1" >debug
   </label>
   &nbsp;|&nbsp;
 
@@ -124,7 +124,7 @@
   <div id="api-generated-wraper">
     <table id="api-generated" border=1>
       <caption>{ts}Code{/ts}</caption>
-      <tr><td>Rest</td><td><pre class="prettyprint linenums" id="api-rest"></pre></td></tr>
+      <tr><td>Rest</td><td><pre class="prettyprint" id="api-rest"></pre></td></tr>
       <tr><td>Smarty</td><td><pre class="prettyprint linenums" id="api-smarty" title='smarty syntax (for get actions)'></pre></td></tr>
       <tr><td>Php</td><td><pre class="prettyprint linenums" id="api-php" title='php syntax'></pre></td></tr>
       <tr><td>Javascript</td><td><pre class="prettyprint linenums" id="api-json" title='javascript syntax'></pre></td></tr>
