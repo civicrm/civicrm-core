@@ -8,6 +8,7 @@
     params = {},
     smartyStub,
     fieldTpl = _.template($('#api-param-tpl').html()),
+    returnTpl = _.template($('#api-return-tpl').html()),
     chainTpl = _.template($('#api-chain-tpl').html());
 
   /**
@@ -19,12 +20,21 @@
     }
   }
 
+  /**
+   * Add a "fields" row
+   * @param name
+   */
   function addField(name) {
     $('#api-params').append($(fieldTpl({name: name || ''})));
     var $row = $('tr:last-child', '#api-params');
-    $('.api-param-name', $row).crmSelect2({data: fields}).change();
+    $('.api-param-name', $row).crmSelect2({
+      data: fields.concat({id: '-', text: ts('Other') + '...'})
+    }).change();
   }
 
+  /**
+   * Add an "api chain" row
+   */
   function addChainField() {
     $('#api-params').append($(chainTpl({})));
     var $row = $('tr:last-child', '#api-params');
@@ -38,6 +48,9 @@
 
   }
 
+  /**
+   * Fetch fields for entity+action
+   */
   function getFields() {
     var required = [];
     fields = [];
@@ -74,9 +87,24 @@
         }
       });
       showFields(required);
+      if (action === 'get' || action === 'getsingle') {
+        showReturn();
+      }
     });
   }
 
+  /**
+   * For "get" actions show the "return" options
+   */
+  function showReturn() {
+    $('#api-params').prepend($(returnTpl({})));
+    console.log($(returnTpl({})));
+    $('#api-return-value').crmSelect2({data: fields, multiple: true});
+  }
+
+  /**
+   * Fetch actions for entity
+   */
   function getActions() {
     if (entity) {
       CRM.api3(entity, 'getactions').done(function(data) {
@@ -90,17 +118,21 @@
     }
   }
 
+  /**
+   * Called after getActions to populate action list
+   * @param el
+   */
   function populateActions(el) {
     $('#api-action').select2({
       data: _.transform(actions, function(ret, item) {ret.push({text: item, id: item})})
     });
   }
 
+  /**
+   * Called after getfields to show buttons and required fields
+   * @param required
+   */
   function showFields(required) {
-    fields.push({
-      id: '-',
-      text: ts('Other') + '...'
-    });
     $('#api-params').empty();
     $('#api-param-buttons').show();
     if (required.length) {
@@ -208,6 +240,11 @@
         val = evaluate($(this).val(), $(this).is('.select2-offscreen')),
         name = $('input.api-param-name', $row).val(),
         op = $('select.api-param-op', $row).val() || '=';
+
+      // Ignore blank values for the return field
+      if ($(this).is('#api-return-value') && !val) {
+        return;
+      }
       // Special syntax for api chaining
       if (!name && $('select.api-chain-entity', $row).val()) {
         name = 'api.' + $('select.api-chain-entity', $row).val() + '.' + $('select.api-chain-action', $row).val();
