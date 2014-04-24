@@ -8,6 +8,7 @@
     params = {},
     smartyStub,
     fieldTpl = _.template($('#api-param-tpl').html()),
+    optionsTpl = _.template($('#api-options-tpl').html()),
     returnTpl = _.template($('#api-return-tpl').html()),
     chainTpl = _.template($('#api-chain-tpl').html());
 
@@ -33,6 +34,26 @@
   }
 
   /**
+   * Add a new "options" row
+   * @param name
+   */
+  function addOptionField(name) {
+    if ($('.api-options-row', '#api-params').length) {
+      $('.api-options-row:last', '#api-params').after($(optionsTpl({})));
+    } else {
+      $('#api-params').append($(optionsTpl({})));
+    }
+    var $row = $('.api-options-row:last', '#api-params');
+    $('.api-option-name', $row).crmSelect2({data: [
+      {id: 'limit', text: 'limit'},
+      {id: 'offset', text: 'offset'},
+      {id: 'sort', text: 'sort'},
+      {id: 'metadata', text: 'metadata'},
+      {id: '-', text: ts('Other') + '...'}
+    ]});
+  }
+
+  /**
    * Add an "api chain" row
    */
   function addChainField() {
@@ -45,7 +66,6 @@
       placeholder: '<span class="icon ui-icon-link"></span> ' + ts('Entity'),
       escapeMarkup: function(m) {return m}
     });
-
   }
 
   /**
@@ -142,6 +162,9 @@
     }
   }
 
+  /**
+   * Add/remove option list for selected field's pseudoconstant
+   */
   function toggleOptions() {
     var name = $(this).val(),
       $valField = $(this).closest('tr').find('.api-param-value');
@@ -155,10 +178,6 @@
     }
     else if ($valField.data('select2')) {
       $valField.select2('destroy');
-    }
-    if (name === '-') {
-      $(this).select2('destroy');
-      $(this).val('').focus();
     }
   }
 
@@ -205,7 +224,7 @@
     var ret = '';
     if ($.isPlainObject(val)) {
       $.each(val, function(k, v) {
-        ret += (ret ? ',' : '') + "'" + k + "' => " + phpFormat(v);
+        ret += (ret ? ', ' : '') + "'" + k + "' => " + phpFormat(v);
       });
       return 'array(' + ret + ')';
     }
@@ -230,12 +249,16 @@
     return js;
   }
 
+  /**
+   * Create the params array from user input
+   * @param e
+   */
   function buildParams(e) {
     params = {};
     $('.api-param-checkbox:checked').each(function() {
       params[this.name] = 1;
     });
-    $('input.api-param-value').each(function() {
+    $('input.api-param-value, input.api-option-value').each(function() {
       var $row = $(this).closest('tr'),
         val = evaluate($(this).val(), $(this).is('.select2-offscreen')),
         name = $('input.api-param-name', $row).val(),
@@ -249,8 +272,15 @@
       if (!name && $('select.api-chain-entity', $row).val()) {
         name = 'api.' + $('select.api-chain-entity', $row).val() + '.' + $('select.api-chain-action', $row).val();
       }
+      // Special handling for options
+      if ($(this).is('.api-option-value')) {
+        op = $('input.api-option-name', $row).val();
+        if (op) {
+          name = 'options';
+        }
+      }
       if (name && val !== undefined) {
-        params[name] = op === '=' ? val : {};
+        params[name] = op === '=' ? val : (params[name] || {});
         if (op !== '=') {
           params[name][op] = val;
         }
@@ -376,6 +406,12 @@
       .on('submit', submit);
     $('#api-params')
       .on('change', '.api-param-name', toggleOptions)
+      .on('change', '.api-param-name, .api-option-name', function() {
+        if ($(this).val() === '-') {
+          $(this).select2('destroy');
+          $(this).val('').focus();
+        }
+      })
       .on('click', '.api-param-remove', function(e) {
         e.preventDefault();
         $(this).closest('tr').remove();
@@ -384,6 +420,10 @@
     $('#api-params-add').on('click', function(e) {
       e.preventDefault();
       addField();
+    });
+    $('#api-option-add').on('click', function(e) {
+      e.preventDefault();
+      addOptionField();
     });
     $('#api-chain-add').on('click', function(e) {
       e.preventDefault();
