@@ -170,7 +170,7 @@
       <label>{ts}Options{/ts}: &nbsp;</label>
     </td>
     <td>
-      <input class="crm-form-text api-option-name api-input" placeholder="{ts}Option{/ts}"/>
+      <input class="crm-form-text api-option-name api-input" style="width: 12em;" placeholder="{ts}Option{/ts}"/>
     </td>
     <td>
       <input style="width: 85%;" class="crm-form-text api-option-value api-input" placeholder="{ts}Value{/ts}"/>
