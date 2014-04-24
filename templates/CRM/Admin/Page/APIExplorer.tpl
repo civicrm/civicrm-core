@@ -52,12 +52,18 @@
     margin-top: .5em;
   }
   #api-explorer label {
-    display:inline;
+    display: inline;
     font-weight: bold;
   }
   #api-generated-wraper,
   #api-result {
     overflow: auto;
+  }
+  #api-explorer .api-options-row + .api-options-row label {
+    display: none;
+  }
+  .api-options-row td:first-child {
+    text-align: right;
   }
   .select2-choice .icon {
     margin-top: .2em;
@@ -92,7 +98,7 @@
   &nbsp;&nbsp;
 
   <label for="debug-checkbox" title="{ts}Display debug output with results.{/ts}">
-    <input type="checkbox" class="crm-form-checkbox api-param-checkbox api-input" id="debug-checkbox" name="debug" checked="checked" value="1" >debug
+    <input type="checkbox" class="crm-form-checkbox api-param-checkbox api-input" id="debug-checkbox" name="debug" value="1" >debug
   </label>
   &nbsp;|&nbsp;
 
@@ -112,12 +118,13 @@
   </table>
   <div id="api-param-buttons" style="display: none;">
     <a href="#" class="crm-hover-button" id="api-params-add"><span class="icon ui-icon-plus"></span>{ts}Add Parameter{/ts}</a>
+    <a href="#" class="crm-hover-button" id="api-option-add"><span class="icon ui-icon-gear"></span>{ts}Add Option{/ts}</a>
     <a href="#" class="crm-hover-button" id="api-chain-add"><span class="icon ui-icon-link"></span>{ts}Chain API Call{/ts}</a>
   </div>
   <div id="api-generated-wraper">
     <table id="api-generated" border=1>
       <caption>{ts}Code{/ts}</caption>
-      <tr><td>Rest</td><td><pre class="prettyprint linenums" id="api-rest"></pre></td></tr>
+      <tr><td>Rest</td><td><pre class="prettyprint" id="api-rest"></pre></td></tr>
       <tr><td>Smarty</td><td><pre class="prettyprint linenums" id="api-smarty" title='smarty syntax (for get actions)'></pre></td></tr>
       <tr><td>Php</td><td><pre class="prettyprint linenums" id="api-php" title='php syntax'></pre></td></tr>
       <tr><td>Javascript</td><td><pre class="prettyprint linenums" id="api-json" title='javascript syntax'></pre></td></tr>
@@ -142,6 +149,31 @@
     </td>
     <td>
       <input style="width: 85%;" class="crm-form-text api-param-value api-input" placeholder="{ts}Value{/ts}"/>
+      <a class="crm-hover-button api-param-remove" href="#"><span class="icon ui-icon-close"></span></a>
+    </td>
+  </tr>
+</script>
+
+<script type="text/template" id="api-return-tpl">
+  <tr class="api-return-row">
+    <td colspan="3">
+      <label for="api-return-value">{ts}Fields to return{/ts}:</label> &nbsp;
+      <input type="hidden" class="api-param-name" value="return" />
+      <input style="width: 50%;" id="api-return-value" class="crm-form-text api-param-value api-input" placeholder="{ts}Leave blank for default{/ts}"/>
+    </td>
+  </tr>
+</script>
+
+<script type="text/template" id="api-options-tpl">
+  <tr class="api-options-row">
+    <td>
+      <label>{ts}Options{/ts}: &nbsp;</label>
+    </td>
+    <td>
+      <input class="crm-form-text api-option-name api-input" placeholder="{ts}Option{/ts}"/>
+    </td>
+    <td>
+      <input style="width: 85%;" class="crm-form-text api-option-value api-input" placeholder="{ts}Value{/ts}"/>
       <a class="crm-hover-button api-param-remove" href="#"><span class="icon ui-icon-close"></span></a>
     </td>
   </tr>
