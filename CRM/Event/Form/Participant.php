@@ -1436,7 +1436,7 @@ SELECT civicrm_custom_group.name as name,
           }
 
           // if multiple participants are link, consider contribution total amount as the amount Owed
-          if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->_id)) {
+          if ($this->_id && CRM_Event_BAO_Participant::isPrimaryParticipant($this->_id)) {
             $amountOwed = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
               $ids['contribution'],
               'total_amount'
