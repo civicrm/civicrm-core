@@ -273,3 +273,15 @@ ALTER TABLE `civicrm_mail_settings`
 ALTER TABLE `civicrm_mailing`
   ADD COLUMN `hash` varchar(16) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Key for validating requests related to this mailing.',
   ADD INDEX `index_hash` (`hash`);
+  
+-- CRM-11182 -- Make event confirmation page optional
+ALTER TABLE civicrm_event 
+  ADD COLUMN is_confirm_enabled tinyint(4) DEFAULT '1';
+
+UPDATE civicrm_event
+  SET is_confirm_enabled = 1
+  WHERE is_monetary = 1;
+
+UPDATE civicrm_event
+  SET is_confirm_enabled = 0
+  WHERE is_monetary = 0;

@@ -85,6 +85,10 @@
            <td>{include file="CRM/common/jcalendar.tpl" elementName=registration_end_date}</td>
         </tr>
        {/if}
+        <tr class="crm-event-manage-registration-form-block-is_confirm_enabled">
+            <td scope="row" class="label" width="20%">{$form.is_confirm_enabled.label}</td>
+            <td>{$form.is_confirm_enabled.html}</td>
+        </tr>
         <tr class="crm-event-manage-registration-form-block-is_multiple_registrations">
             <td scope="row" class="label" width="20%">{$form.is_multiple_registrations.label}</td>
             <td>{$form.is_multiple_registrations.html} {help id="id-allow_multiple"}</td>

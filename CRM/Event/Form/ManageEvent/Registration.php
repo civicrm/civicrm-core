@@ -282,6 +282,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     foreach ($dedupeRuleFields as $key => $fields) {
       $ruleFields[$key] = ucwords(str_replace('_', ' ', $fields));
     }
+    
+    // CRM-11182 - Optional confirmation page
+    $this->addElement('checkbox', 'is_confirm_enabled', ts('Use a confirmation page?'));
 
     $this->addElement('checkbox',
       'is_multiple_registrations',
@@ -698,8 +701,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     $params['id'] = $this->_id;
 
-    //format params
+    // format params
     $params['is_online_registration'] = CRM_Utils_Array::value('is_online_registration', $params, FALSE);
+    $params['is_confirm_enabled'] = CRM_Utils_Array::value('is_confirm_enabled', $params, FALSE); // CRM-11182
     $params['is_multiple_registrations'] = CRM_Utils_Array::value('is_multiple_registrations', $params, FALSE);
     $params['allow_same_participant_emails'] = CRM_Utils_Array::value('allow_same_participant_emails', $params, FALSE);
     $params['requires_approval'] = CRM_Utils_Array::value('requires_approval', $params, FALSE);
