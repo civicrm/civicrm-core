@@ -268,8 +268,6 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     foreach ($expected as $column => $value) {
       $this->verifyText("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[$column]/", preg_quote($value));
     }
-
   }
-
 }
 
