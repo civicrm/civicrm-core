@@ -50,7 +50,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "John", "$firstName2.john@example.org");
@@ -63,7 +63,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     // Enable CiviCampaign module if necessary
     $this->enableComponents(array('CiviCampaign'));
@@ -209,6 +209,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("Go");
     $this->click("CIVICRM_QFID_ts_all_4");
+    $this->select('task', "Reserve Respondents");
     $this->click("Go");
 
     $this->waitForElementPresent("_qf_Reserve_done_reserve-bottom");
@@ -255,7 +256,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     // Reserve Respondents
     $this->openCiviPage("survey/search", "reset=1&op=reserve", "_qf_Search_refresh");
@@ -267,6 +268,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("Go");
     $this->click("CIVICRM_QFID_ts_all_4");
+    $this->select('task', "Reserve Respondents");
     $this->click("Go");
 
     $this->waitForElementPresent("_qf_Reserve_done_reserve-bottom");
@@ -284,10 +286,10 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("Go");
     $this->click("xpath=id('mark_x_$id')");
-
-    $this->waitForElementPresent("Go");
-    $this->clickLink("Go", "_qf_Release_done-bottom");
-    $this->clickLink("_qf_Release_done-bottom", 'access');
+    $this->click("CIVICRM_QFID_ts_sel_2");
+    $this->select("task", "label=Release Respondents");
+    $this->clickLink("Go", "_qf_Release_done-bottom", FALSE);
+    $this->clickLink("_qf_Release_done-bottom", 'access', FALSE);
     $this->waitForText('crm-notification-container', "released");
 
     // check whether contact is available for reserving again
@@ -329,7 +331,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "John", "$firstName2.john@example.org");
@@ -343,7 +345,7 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     // Create custom group and add custom data fields
     $this->openCiviPage("admin/custom/group", "reset=1");
@@ -475,15 +477,16 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select('campaign_survey_id', "label=$surveyTitle");
 
     // need to wait for Groups field to reload dynamically
-    $this->waitForElementPresent("//select[@class='campaignGroupsSelect']/option[text()='$groupName']");
+    $this->waitForElementPresent("//select[@id='group']/option[text()='$groupName']");
 
     // select group
-    $this->click('campaignGroupsSelect1');
-    $this->select('campaignGroupsSelect1', "label=$groupName");
+    $this->click('group');
+    $this->select('group', "label=$groupName");
     $this->click('_qf_Search_refresh');
 
-    $this->waitForElementPresent('_qf_Search_next_print');
+    $this->waitForElementPresent('Go');
     $this->click("CIVICRM_QFID_ts_all_4");
+    $this->select('task', "Reserve Respondents");
     $this->click("Go");
     $this->waitForElementPresent('_qf_Reserve_done_reserve-bottom');
 
@@ -519,16 +522,16 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->select('campaign_survey_id', "label=$surveyTitle");
 
     // need to wait for Groups field to reload dynamically
-    $this->waitForElementPresent("//select[@class='campaignGroupsSelect']/option[text()='$groupName']");
+    $this->waitForElementPresent("//select[@id='group']/option[text()='$groupName']");
 
     // select group
-    $this->click('campaignGroupsSelect1');
-    $this->select('campaignGroupsSelect1', "label=$groupName");
-    $this->waitForElementPresent("xpath=//ul[@id='crmasmList1']/li");
+    $this->click('group');
+    $this->select('group', "label=$groupName");
+    //$this->waitForElementPresent("xpath=//ul[@id='crmasmList1']/li");
     $this->click('_qf_Search_refresh');
 
-    $this->waitForElementPresent('_qf_Search_next_print');
-    $this->click("xpath=//table[@class='selector']/tbody//tr[@id='rowid{$id1}']/td[1]");
+    $this->waitForElementPresent('Go');
+    //$this->click("xpath=//*[@class='selector']//tbody//tr[@id='rowid{$id1}']/td[1]");
     $this->click("mark_x_{$id1}");
     $this->click("Go");
     $this->waitForElementPresent('_qf_Interview_cancel_interview');
@@ -571,13 +574,14 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     // select survey
     $this->select('campaign_survey_id', "label=$surveyTitle");
     // need to wait for Groups field to reload dynamically
-    $this->waitForElementPresent("//select[@class='campaignGroupsSelect']/option[text()='$groupName']");
+    $this->waitForElementPresent("//select[@id='group']/option[text()='$groupName']");
 
     // select group
-    $this->click('campaignGroupsSelect1');
-    $this->select('campaignGroupsSelect1', "label=$groupName");
-    $this->waitForElementPresent("xpath=//ul[@id='crmasmList1']/li");
-    $this->click("xpath=//div[@id='search_form_gotv']/div[2]/table/tbody/tr[6]/td/a[text()='Search']");
+    $this->click('group');
+    $this->select('group', "label=$groupName");
+    //$this->waitForElementPresent("xpath=//ul[@id='crmasmList1']/li");
+    //$this->click("xpath=//div[@id='search_form_gotv']/div[2]/table/tbody/tr[6]/td/a[text()='Search']");
+    $this->click("link=Search");
 
     $this->waitForElementPresent("xpath=//table[@id='gotvVoterRecords']/tbody/tr/td[7]");
     $this->check("xpath=//table[@id='gotvVoterRecords']/tbody/tr/td[7]/input");
@@ -588,10 +592,10 @@ class WebTest_Campaign_SurveyUsageScenarioTest extends CiviSeleniumTestCase {
     $this->click('_qf_Search_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->verifyText("xpath=//table[@class='selector']/tbody//tr/td[5]/a[text()='Smith, $firstName1']/../../td[3]",
+    $this->verifyText("xpath=//table/tbody//tr/td[5]/a[text()='Smith, $firstName1']/../../td[3]",
       preg_quote("$surveyTitle - Respondent Interview")
     );
-    $this->verifyText("xpath=//table[@class='selector']/tbody//tr/td[5]/a[text()='John, $firstName2']/../../td[3]",
+    $this->verifyText("xpath=//table/tbody//tr/td[5]/a[text()='John, $firstName2']/../../td[3]",
       preg_quote("$surveyTitle - Respondent Reservation")
     );
   }
