@@ -546,16 +546,22 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     //take the common contact params
     $params = $this->contactParams();
     $params['note'] = 'test note';
-    $params['create_employer'] = 1;
 
     //create the contact with given params.
     $contact = CRM_Contact_BAO_Contact::create($params);
     //Now check $contact is object of contact DAO..
     $this->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
     $contactId = $contact->id;
+    //create the organization contact with the given params.
+    $orgParams = array(
+      'organization_name' => 'Test Organization ' . substr(sha1(rand()), 0, 4),
+      'contact_type' => 'Organization',
+    );
+    $orgContact = CRM_Contact_BAO_Contact::add($orgParams);
+    $this->assertInstanceOf('CRM_Contact_DAO_Contact', $orgContact, 'Check for created object');
 
     //create employee of relationship.
-    CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($contactId, $params['create_employer']);
+    CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($contactId, $orgContact->id);
 
     //retrieve the contact values from database.
     $values          = array();
@@ -574,8 +580,9 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($params['contact_type'], $values['contact_type'], 'Check for contact type creation.');
 
     //Now check values of address
-    // $this->assertAttributesEquals( CRM_Utils_Array::value( 'address', $params ),
-    // CRM_Utils_Array::value( 'address', $values ) );
+    $this->assertAttributesEquals(CRM_Utils_Array::value('1', $params['address']),
+      CRM_Utils_Array::value('1', $values['address'])
+    );
 
     //Now check values of email
     $this->assertAttributesEquals(CRM_Utils_Array::value('1', $params['email']),
@@ -615,11 +622,11 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $values['relationship']['totalCount'], 'Check for total relationship count');
     foreach ($values['relationship']['data'] as $key => $val) {
       //Now check values of Relationship organization.
-      $this->assertEquals($params['create_employer'], $val['id'], 'Check for organization');
+      $this->assertEquals($orgContact->id, $val['contact_id_b'], 'Check for organization');
       //Now check values of Relationship type.
       $this->assertEquals('Employee of', $val['relation'], 'Check for relationship type');
       //delete the organization.
-      Contact::delete(CRM_Utils_Array::value('cid', $val));
+      Contact::delete(CRM_Utils_Array::value('contact_id_b', $val));
     }
 
     //delete all notes related to contact
