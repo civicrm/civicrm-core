@@ -100,8 +100,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->openCiviPage("event/search", "reset=1");
 
     $eventName = "Fall Fundraiser Dinner";
-    $this->type("event_name", $eventName);
-    $this->type("event_id", 1);
+    $this->select2("event_id", $eventName);
 
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -152,8 +151,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('event_end_date_high', '+1 year');
 
     $eventTypeName = 'Fundraiser';
-    $this->type("event_type", $eventTypeName);
-    $this->type("event_type_id", 3);
+    $this->select2("event_type_id", $eventTypeName);
 
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());

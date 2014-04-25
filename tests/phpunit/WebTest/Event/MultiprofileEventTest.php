@@ -88,7 +88,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $firstName);
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top");
+    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top", FALSE);
 
     $name = $firstName . " " . $lastName;
     $status = 'Registered';
@@ -101,7 +101,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $participantfname);
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top");
+    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top", FALSE);
 
     $name = $participantfname . " " . $participantlname;
     $status = 'Registered';
@@ -191,7 +191,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $firstName);
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top");
+    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top", FALSE);
 
     $name = $firstName . " " . $lastName;
     $status = 'Registered';
@@ -204,7 +204,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $participantfname);
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top");
+    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top", FALSE);
 
     $name = $participantfname . " " . $participantlname;
     $status = 'Registered';
@@ -229,7 +229,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->openCiviPage('event/search', "reset=1");
     $this->type("sort_name", $firstName2);
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top");
+    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top", FALSE);
 
     $name = $firstName2 . " " . $lastName2;
     $status = 'Registered';
@@ -242,7 +242,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $participantfname2);
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top");
+    $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top", FALSE);
 
     $name = $participantfname2 . " " . $participantlname2;
     $status = 'Registered';
@@ -317,7 +317,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->click("xpath=//select[@id='additional_custom_post_id_multiple_3']/../span/a[text()='remove profile']");
     $this->click("xpath=//select[@id='additional_custom_post_id_multiple_4']/../span/a[text()='remove profile']");
     $this->click("_qf_Registration_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("_qf_Registration_upload-bottom");
   }
 
   function _testGetProfileId($customId) {
@@ -412,6 +412,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
     //Name of profile
     $this->type('title', $profilename);
+    $this->click('uf_group_type_Profile');
     $this->click('_qf_Group_next-top');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $profileId = $this->urlArg('gid');
@@ -477,8 +478,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->click("_qf_Location_upload-bottom");
 
     // Wait for "saved" status msg
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Location' information has been saved.");
+    $this->waitForElementPresent("_qf_Location_upload-bottom");
+    $this->waitForTextPresent("'Event Location' information has been saved.");
   }
 
   function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName = "PP Pro") {
@@ -511,8 +512,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->click("_qf_Fee_upload-bottom");
 
     // Wait for "saved" status msg
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Fee' information has been saved.");
+    $this->waitForElementPresent("_qf_Fee_upload-bottom");
+    $this->waitForTextPresent("'Fees' information has been saved.");
   }
 
   function _testAddMultipleProfile($profileId) {
@@ -576,8 +577,8 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->click("_qf_Registration_upload-bottom");
 
     // Wait for "saved" status msg
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForText('crm-notification-container', "'Registration' information has been saved.");
+    $this->waitForElementPresent("_qf_Registration_upload-bottom");
+    $this->waitForText('crm-notification-container', "'Online Registration' information has been saved.");
 
     return $this->urlArg('id');
   }
