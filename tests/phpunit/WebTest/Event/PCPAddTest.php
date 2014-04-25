@@ -175,8 +175,8 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Location_upload-bottom");
 
     // Wait for "saved" status msg
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Location' information has been saved.");
+    $this->waitForElementPresent("_qf_Location_upload-bottom");
+    $this->waitForTextPresent("'Event Location' information has been saved.");
   }
 
   function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName = "PP Pro") {
@@ -205,8 +205,8 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Fee_upload-bottom");
 
     // Wait for "saved" status msg
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Fee' information has been saved.");
+    $this->waitForElementPresent("_qf_Fee_upload-bottom");
+    $this->waitForTextPresent("'Fees' information has been saved.");
   }
 
   function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
@@ -230,8 +230,8 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->type("confirm_from_email", "jane.doe@example.org");
 
     $this->click("_qf_Registration_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Registration' information has been saved.");
+    $this->waitForElementPresent("_qf_Registration_upload-bottom");
+    $this->waitForTextPresent("'Online Registration' information has been saved.");
   }
 
   function _testOnlineRegistration($eventTitle, $pageId, $firstName, $lastName, $middleName, $email, $numberRegistrations = 1, $campaignType, $anonymous = TRUE) {
@@ -423,8 +423,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
 
     $this->click('_qf_Event_upload-bottom');
     $this->waitForElementPresent('_qf_Event_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $text = "'Event' information has been saved.";
+    $text = "'Personal Campaigns' information has been saved.";
     $this->waitForText('crm-notification-container', $text);
 
     // parse URL to grab the contribution page id
@@ -435,17 +434,14 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $sortName = $lastNameDonar . ', ' . $firstNameDonar;
     $this->openCiviPage("event/search", "reset=1");
 
-    $this->type("event_name", $eventName);
-    $this->click("event_name");
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2("event_id", $eventName);
 
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->clickLink("xpath=//div[@id='participantSearch']/table/tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$sortName}']/../../td[11]/span/a[text()='View']", "xpath=//table[@class='selector']/tbody/tr/td[8]/span/a[text()='View']");
-    $this->click("xpath=//table[@class='selector']/tbody/tr/td[8]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//div[@id='participantSearch']/table/tbody/tr[1]/td[@class='crm-participant-sort_name']/a[text()='{$sortName}']/../../td[11]/span/a[text()='View']", "xpath=//table[@class='selector row-highlight']/tbody/tr/td[8]/span/a[text()='View']", FALSE);
+    $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
       array(
@@ -455,7 +451,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
       )
     );
     $softCreditor = "{$firstNameCreator} {$lastNameCreator}";
-    $this->verifyText("xpath=//table[@class='crm-info-panel crm-soft-credit-listing']/tbody/tr/td[1]", preg_quote($softCreditor), 'In line ' . __LINE__);
+    $this->verifyText("xpath=//div[@id='PCPView']/div[2]//table[@class='crm-info-panel']/tbody/tr[2]/td[2]", preg_quote($softCreditor), 'In line ' . __LINE__);
   }
 
   function _testSearchTest($firstName, $lastName, $pcpCreatorFirstName, $pcpCreatorLastName, $amount) {
@@ -476,8 +472,8 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->click("css=li#tab_contribute a");
-    $this->waitForElementPresent("xpath=//div[@id='Contributions']/div/form[@id='Search']/div[@class='view-content']/table[2]/tbody/tr[@id='rowid']/td/a[text()='$displayName']");
-    $this->click("xpath=//div[@id='Contributions']/div/form[@id='Search']/div[@class='view-content']/table[2]/tbody/tr[@id='rowid']/td[7]/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@id='Search']/div[@class='view-content']/table[2]/tbody/tr[@id='rowid']/td/a[text()='$displayName']");
+    $this->click("xpath=//form[@id='Search']/div[@class='view-content']/table[2]/tbody/tr[@id='rowid']/td[8]/a[text()='View']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->webtestVerifyTabularData(
@@ -488,7 +484,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
       )
     );
     $softCreditor = "{$pcpCreatorFirstName} {$pcpCreatorLastName}";
-    $this->verifyText("xpath=//table[@class='crm-info-panel crm-soft-credit-listing']/tbody/tr/td[1]", preg_quote($softCreditor), 'In line ' . __LINE__);
+    $this->verifyText("xpath=//div[@id='PCPView']/div[2]//table[@class='crm-info-panel']/tbody/tr[2]/td[2]", preg_quote($softCreditor), 'In line ' . __LINE__);
   }
 }
 
