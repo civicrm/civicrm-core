@@ -381,6 +381,7 @@ invert              = 0
                 global  : false,
           success : function ( content ) {
                  cj( "#profile_post" ).parent().append( content );
+		cj('#crm-container').trigger('crmLoad');
                 }
       });
     }
