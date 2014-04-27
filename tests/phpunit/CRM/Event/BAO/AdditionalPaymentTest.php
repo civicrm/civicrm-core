@@ -46,6 +46,23 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->_eventId = Event::create($this->_contactId);
   }
 
+  function tearDown() {
+    $this->eventDelete($this->_eventId);
+    $this->quickCleanup(
+      array(
+        'civicrm_contact',
+        'civicrm_contribution',
+        'civicrm_participant',
+        'civicrm_participant_payment',
+        'civicrm_line_item',
+        'civicrm_financial_item',
+        'civicrm_financial_trxn',
+        'civicrm_entity_financial_trxn',
+      ),
+      TRUE
+    );
+  }
+
   // helper function to record participant with paid contribution
   function _addParticipantWithPayment($feeTotal, $actualPaidAmt) {
     // creating price set, price field
@@ -159,3 +176,4 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->assertEquals($contribution->contribution_status_id, 8, 'Status record is not proper for contribution');
   }
 }
+
