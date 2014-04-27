@@ -278,12 +278,23 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return $entitiesWithout;
   }
 
+  /**
+   * @param $entity
+   * @param $key
+   *
+   * @return array
+   */
   public function getKnownUnworkablesUpdateSingle($entity, $key){
     // can't update values are values for which updates don't result in the value being changed
     $knownFailures = array(
       'ActionSchedule' => array(
         'cant_update' => array(
           'group_id',
+        ),
+      ),
+      'ActivityContact' => array(
+        'cant_update' => array(
+          'activity_id', //we have an FK on activity_id + contact_id + record id so if we don't leave this one distinct we get an FK constraint error
         ),
       ),
       'Address' => array(
