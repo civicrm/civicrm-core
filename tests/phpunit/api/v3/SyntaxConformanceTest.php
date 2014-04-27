@@ -129,11 +129,14 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     return $entities;
   }
+
   /**
    * Mailing Contact Just doesn't support id. We have always insisted on finding a way to
    * support id in API but in this case the underlying tables are crying out for a restructue
    * & it just doesn't make sense
-   * @param unknown_type $sequential
+   *
+   * @param bool|\unknown_type $sequential
+   *
    * @return multitype:string |multitype:multitype:string
    */
   public static function toBeSkipped_getByID($sequential = FALSE) {
@@ -163,6 +166,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     return $entities;
   }
+
 /**
  * Generate list of entities to test for get by id functions
  * @param boolean $sequential
@@ -181,10 +185,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
 
-  /*
+  /**
   * At this stage exclude the ones that don't pass & add them as we can troubleshoot them
   */
-
   public static function toBeSkipped_updatesingle($sequential = FALSE) {
     $entitiesWithout = array(
       'Mailing',
@@ -262,9 +265,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return $entities;
   }
 
-  /*
+  /**
    * At this stage exclude the ones that don't pass & add them as we can troubleshoot them
-  */
+   */
   public static function toBeSkipped_getlimit() {
     $entitiesWithout = array(
       'Case',//case api has non-std mandatory fields one of (case_id, contact_id, activity_id, contact_id)
@@ -839,7 +842,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
         case CRM_Utils_Type::T_FLOAT:
         case CRM_Utils_Type::T_MONEY:
-          $entity[$field] = '222';
+          $entity[$field] = '22';
           break;
 
         case CRM_Utils_Type::T_URL:
