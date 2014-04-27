@@ -46,8 +46,11 @@ class CRM_Upgrade_Incremental_php_FourFour {
    * Note: This function is called iteratively for each upcoming
    * revision to the database.
    *
-   * @param $postUpgradeMessage string, alterable
+   * @param $preUpgradeMessage
    * @param $rev string, a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'
+   * @param null $currentVer
+   *
+   * @internal param string $postUpgradeMessage , alterable
    * @return void
    */
   function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
@@ -296,7 +299,7 @@ ALTER TABLE civicrm_dashboard
   END;
     ";
     CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
- 
+
     // CRM-13998 : missing alter statements for civicrm_report_instance
     $this->addTask(ts('Confirm civicrm_report_instance sql table for upgrades'), 'updateReportInstanceTable');
 
@@ -414,6 +417,8 @@ WHERE       source_contact_id IS NOT NULL";
   /**
    * Migrate word-replacements from $config to civicrm_word_replacement
    *
+   * @param CRM_Queue_TaskContext $ctx
+   *
    * @return bool TRUE for success
    * @see http://issues.civicrm.org/jira/browse/CRM-13187
    */
@@ -442,6 +447,9 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
    * and bad configurations, we change the constraint name from "UI_find"
    * (the original name in 4.4.0) to "UI_domain_find" (the new name in
    * 4.4.1).
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param $rev
    *
    * @return bool TRUE for success
    * @see http://issues.civicrm.org/jira/browse/CRM-13655
@@ -565,13 +573,13 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
     CRM_Core_BAO_WordReplacement::rebuild();
   }
 
-  
+
   /***
    * CRM-13998 missing alter statements for civicrm_report_instance
    ***/
   public function updateReportInstanceTable() {
 
-    // add civicrm_report_instance.name 
+    // add civicrm_report_instance.name
 
     $sql = "SELECT count(*) FROM information_schema.columns "
       . "WHERE table_schema = database() AND table_name = 'civicrm_report_instance' AND COLUMN_NAME = 'name' ";
@@ -583,7 +591,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
       $res = CRM_Core_DAO::executeQuery($sql);
     }
 
-    // add civicrm_report_instance args 
+    // add civicrm_report_instance args
 
     $sql = "SELECT count(*) FROM information_schema.columns WHERE table_schema = database() AND table_name = 'civicrm_report_instance' AND COLUMN_NAME = 'args' ";
 
