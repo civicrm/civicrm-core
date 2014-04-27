@@ -224,6 +224,9 @@ function civicrm_api3_membership_get($params) {
  * as stable as possible
  *
  * @param array $params parameters passed into get function
+ * @param $membershipTypeId
+ * @param $activeOnly
+ *
  * @return array result for calling function
  */
 function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTypeId, $activeOnly) {
@@ -240,9 +243,13 @@ function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTyp
 
 /**
  * non-standard behaviour inherited from v2
-* @param array $params parameters passed into get function
-* @return array result for calling function
-*/
+ *
+ * @param array $params parameters passed into get function
+ * @param $membershipValues
+ * @param $contactID
+ *
+ * @return array result for calling function
+ */
 function _civicrm_api3_membership_relationsship_get_customv2behaviour(&$params, $membershipValues, $contactID) {
   $relationships = array();
   foreach ($membershipValues as $membershipId => $values) {
