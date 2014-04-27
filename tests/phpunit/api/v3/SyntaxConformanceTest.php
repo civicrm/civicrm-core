@@ -842,7 +842,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
         case CRM_Utils_Type::T_FLOAT:
         case CRM_Utils_Type::T_MONEY:
-          $entity[$field] = '222';
+          $entity[$field] = '22';
           break;
 
         case CRM_Utils_Type::T_URL:
