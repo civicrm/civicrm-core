@@ -1255,9 +1255,11 @@ SELECT contact_id
     return self::escapeString($string);
   }
 
-  //Creates a test object, including any required objects it needs via recursion
-  //createOnly: only create in database, do not store or return the objects (useful for perf testing)
-  //ONLY USE FOR TESTING
+  /**
+   * Creates a test object, including any required objects it needs via recursion
+   *createOnly: only create in database, do not store or return the objects (useful for perf testing)
+   *ONLY USE FOR TESTING
+   */
   static function createTestObject(
     $daoName,
     $params = array(),
@@ -1435,9 +1437,10 @@ SELECT contact_id
     else return $objects;
   }
 
-  //deletes the this object plus any dependent objects that are associated with it
-  //ONLY USE FOR TESTING
-
+  /**
+   * deletes the this object plus any dependent objects that are associated with it
+   * ONLY USE FOR TESTING
+   */
   static function deleteTestObjects($daoName, $params = array(
     )) {
     //this is a test function  also backtrace is set for the test suite it sometimes unsets itself
