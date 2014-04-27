@@ -146,6 +146,12 @@ function showLocFields( ) {
    var useExisting = document.getElementsByName("location_option")[1].checked;
    if ( createNew ) {
      cj('#existingLoc').hide();
+     //clear all location fields values.
+     cj("input[id *= 'address_1_']").val("");
+     cj("input[id *= 'email_1_']").val("");
+     cj("input[id *= 'phone_1_']").val("");
+     //reset country/state.
+     cj("select[id *= 'address_1_']").val("");
      displayMessage(false);
    } else if ( useExisting ) {
      cj('#existingLoc').show();
