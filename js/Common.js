@@ -226,7 +226,7 @@ CRM.validate = CRM.validate || {
         $elect = $(this),
         val = $elect.val() || [],
         opts = removePlaceholder ? '' : '[value!=""]';
-      if (typeof(val) !== 'array') {
+      if (!$.isArray(val)) {
         val = [val];
       }
       $elect.find('option' + opts).remove();
