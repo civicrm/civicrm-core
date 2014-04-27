@@ -759,12 +759,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $baoString = _civicrm_api3_get_DAO($entityName);
     $this->assertNotEmpty($baoString, $entityName);
     $this->assertNotEmpty($entityName, $entityName);
-    $fieldsget = $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'get'));
+    $fieldsGet = $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'get'));
     if($entityName != 'Pledge'){
       $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'create'));
     }
     $fields = $fields['values'];
-    $return = array_keys($fieldsget['values']);
+    $return = array_keys($fieldsGet['values']);
     $valuesNotToReturn = $this->getKnownUnworkablesUpdateSingle($entityName, 'break_return');
       // these can't be requested as return values
     $entityValuesThatDontWork = array_merge(
@@ -776,7 +776,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $return = array_diff($return,$valuesNotToReturn);
     $baoObj = new CRM_Core_DAO();
     $baoObj->createTestObject($baoString, array('currency' => 'USD'), 2, 0);
-    $getentities = $this->callAPISuccess($entityName, 'get', array(
+
+    $getEntities = $this->callAPISuccess($entityName, 'get', array(
       'sequential' => 1,
       'return' => $return,
       'options' => array(
@@ -785,8 +786,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       ),
     ));
     // lets use first rather than assume only one exists
-    $entity = $getentities['values'][0];
-    $entity2 = $getentities['values'][1];
+    $entity = $getEntities['values'][0];
+    $entity2 = $getEntities['values'][1];
+    $this->deletableTestObjects[$baoString][] = $entity['id'];
+    $this->deletableTestObjects[$baoString][] = $entity2['id'];
     foreach ($fields as $field => $specs) {
       $fieldName = $field;
       if (!empty($specs['uniquename'])) {
@@ -873,7 +876,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $checkEntity = $this->callAPISuccess($entityName, 'getsingle', $checkParams);
       $this->assertAPIArrayComparison($entity, $checkEntity, array(), "checking if $fieldName was correctly updaetd\n" . print_r(array('update-params' => $updateParams, 'update-result' => $update, 'getsingle-params' => $checkParams, 'getsingle-result' => $checkEntity, 'expected entity' => $entity), TRUE));
     }
-    $baoObj->deleteTestObjects($baoString);
     $baoObj->free();
   }
 

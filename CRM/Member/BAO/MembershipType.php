@@ -108,7 +108,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
     $membershipType->id = CRM_Utils_Array::value('membershipType', $ids);
 
-    // $previousID is the old organization id for memberhip type i.e 'member_of_contact_id'. This is used when an oganization is changed.
+    // $previousID is the old organization id for membership type i.e 'member_of_contact_id'. This is used when an oganization is changed.
     $previousID = NULL;
     if ($membershipType->id) {
       $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipType->id, 'member_of_contact_id');

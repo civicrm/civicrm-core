@@ -86,8 +86,10 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   /**
    * Takes an associative array and creates a membership Status object
    * See http://wiki.civicrm.org/confluence/display/CRM/Database+layer
-   * @param array    $params      (reference ) an assoc array of name/value pairs
    *
+   * @param array $params (reference ) an assoc array of name/value pairs
+   *
+   * @throws Exception
    * @return object CRM_Member_BAO_MembershipStatus object
    * @access public
    * @static
@@ -158,6 +160,8 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * Function to get  membership status
    *
    * @param int $membershipStatusId
+   *
+   * @return array
    * @static
    */
   public static function getMembershipStatus($membershipStatusId) {

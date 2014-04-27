@@ -37,8 +37,6 @@ class api_v3_DashboardContactTest extends CiviUnitTestCase {
   protected $_entity = 'dashboard_contact';
   protected $_apiversion = 3;
 
-  public $_eNoticeCompliant = TRUE;
-
   /**
    *  Test setup for every test
    *
