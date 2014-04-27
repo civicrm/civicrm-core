@@ -1073,7 +1073,7 @@ class CRM_Contact_BAO_Query {
 
               if (substr_count($a, 'state_province_name') > 0) {
                 $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"] =
-                  array('pseudoField' => '{$pf}_id', 'idCol' => "{$tName}_id", 'bao' => 'CRM_Core_BAO_Address');
+                  array('pseudoField' => ("{$pf}_id"), 'idCol' => "{$tName}_id", 'bao' => 'CRM_Core_BAO_Address');
                 $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['select'] = "`$tName`.name as `{$name}-{$elementFullName}`";
               }
               else {
