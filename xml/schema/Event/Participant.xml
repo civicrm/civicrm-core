@@ -89,7 +89,7 @@
   <field>
       <name>role_id</name>
       <uniqueName>participant_role_id</uniqueName>
-      <title>Participant Role Id</title>
+      <title>Participant Role(s)</title>
       <pseudoconstant>
         <optionGroupName>participant_role</optionGroupName>
       </pseudoconstant>
