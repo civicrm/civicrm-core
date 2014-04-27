@@ -735,8 +735,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
         $groupList[$id]['is_parent'] = $value['is_parent'];
       }
-      return $groupList;
     }
+    return $groupList;
   }
 
   /**
@@ -819,7 +819,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       // it may be that this checking is now obsolete - or that what remains
       // should be removed to the whereClause (which is also accessed by getCount)
 
-      if ($permission) {
         $newLinks = $links;
         $values[$object->id] = array('class' => array());
         CRM_Core_DAO::storeValues($object, $values[$object->id]);
@@ -916,7 +915,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           $contactUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$object->created_id}");
           $values[$object->id]['created_by'] = "<a href='{$contactUrl}'>{$object->created_by}</a>";
         }
-      }
+
     }
 
     return $values;
@@ -1037,6 +1036,8 @@ WHERE  id IN $groupIdString
   }
 
   static function getGroupCount(&$params) {
+    //@todo - this function returns an incorrect result for contacts with 'access civicrm' permission & no contact access
+    // as the where clause is empty
     $whereClause = self::whereClause($params, FALSE);
     $query = "SELECT COUNT(*) FROM civicrm_group groups";
 
@@ -1157,6 +1158,10 @@ WHERE {$whereClause}";
       if (!empty( $groups)) {
         $groupList = implode( ', ', array_values( $groups ) );
         $clauses[] = "groups.id IN ( $groupList ) ";
+      }
+      else {
+        // they don't have view all contacts & they don't have permission to view any group
+        $clauses[] = " 0 = 1 ";
       }
     }
 
