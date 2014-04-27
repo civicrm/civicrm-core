@@ -70,7 +70,7 @@ class CRM_Member_Task {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
         1 => array(
-          'title' => ts('Delete Members'),
+          'title' => ts('Delete Memberships'),
           'class' => 'CRM_Member_Form_Task_Delete',
           'result' => FALSE,
         ),
