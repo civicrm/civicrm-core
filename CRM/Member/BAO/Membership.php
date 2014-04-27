@@ -1350,15 +1350,15 @@ AND civicrm_membership.is_test = %2";
     }
 
     $index = !empty($memBlockDetails['is_separate_payment']) ? 2 : 1;
-
+    $createdMemberships = array();
+    $membership = NULL;
     if (empty($errors[$index])) {
       if (isset($membershipParams['onbehalf']) && !empty($membershipParams['onbehalf']['member_campaign_id'])) {
         $form->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
       }
+      //!!B
       if (is_array($membershipTypeID)) {
         $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
-        $createdMemberships = array();
-
         foreach ($membershipTypeID as $memType) {
           $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
           $membership = self::renewMembership($contactID, $memType,
@@ -1400,7 +1400,7 @@ AND civicrm_membership.is_test = %2";
         }
       }
       else {
-        $membership = self::renewMembership($contactID, $membershipTypeID,
+        $membership = $createdMemberships[$membershipTypeID] = self::renewMembership($contactID, $membershipTypeID,
           $isTest, $form, NULL,
           CRM_Utils_Array::value('cms_contactID', $membershipParams),
           $customFieldsFormatted, CRM_Utils_Array::value('types_terms', $membershipParams, 1)
@@ -1430,14 +1430,19 @@ AND civicrm_membership.is_test = %2";
       $message = ts('Payment Processor Error message') . ': ' . implode('<br/>', $message);
       throw new CRM_Core_Exception($message);
     }
+    $form->_params['createdMembershipIDs'] = array();
 
-    // CRM-7851
-    CRM_Core_BAO_CustomValueTable::postProcess($form->_params,
-      CRM_Core_DAO::$_nullArray,
-      'civicrm_membership',
-      $membership->id,
-      'Membership'
-    );
+    // CRM-7851 - Moved after processing Payment Errors
+    foreach ($createdMemberships as $createdMembership) {
+      CRM_Core_BAO_CustomValueTable::postProcess(
+        $form->_params,
+        CRM_Core_DAO::$_nullArray,
+        'civicrm_membership',
+        $createdMembership->id,
+        'Membership'
+      );
+      $form->_params['createdMembershipIDs'][] = $createdMembership->id;
+    }
 
     $form->_params['membershipID'] = $membership->id;
     if ($form->_contributeMode == 'notify') {
