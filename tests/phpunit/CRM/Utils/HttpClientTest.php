@@ -2,8 +2,8 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
 
-  const VALID_HTTP_URL = 'http://civicrm.org/INSTALL.mysql.txt';
-  const VALID_HTTP_REGEX = '/MySQL/';
+  const VALID_HTTP_URL = 'http://sandbox.civicrm.org/';
+  const VALID_HTTP_REGEX = '/<html/';
   const VALID_HTTPS_URL = 'https://civicrm.org/INSTALL.mysql.txt';
   const VALID_HTTPS_REGEX = '/MySQL/';
   const SELF_SIGNED_HTTPS_URL = 'https://self-signed.onebitwise.com:4443/';
