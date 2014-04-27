@@ -193,11 +193,6 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
   public $_paymentId = NULL;
 
   /**
-   * array of participant role custom data
-   */
-  public $_participantRoleIds = array();
-
-  /**
    * Function to set variables up before form is built
    *
    * @return void
@@ -459,52 +454,6 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
       );
     }
     $this->set('onlinePendingContributionId', $this->_onlinePendingContributionId);
-    $roleIds = CRM_Event_PseudoConstant::participantRole();
-    if (!empty($roleIds)) {
-      $query = "
-SELECT civicrm_custom_group.name as name,
-       civicrm_custom_group.id as id,
-       extends_entity_column_value as value
-  FROM civicrm_custom_group
- WHERE ( extends_entity_column_value REGEXP '[[:<:]]" . implode('[[:>:]]|[[:<:]]', array_keys($roleIds)) . "[[:>:]]'
-    OR extends_entity_column_value IS NULL )
-   AND extends_entity_column_id = '{$this->_roleCustomDataTypeID}'
-   AND extends = 'Participant'
-   AND is_active = 1";
-
-      $dao = CRM_Core_DAO::executeQuery($query);
-      while ($dao->fetch()) {
-        if ($dao->value) {
-          $getRole = explode(CRM_Core_DAO::VALUE_SEPARATOR, $dao->value);
-          foreach ($getRole as $r) {
-            if (!$r) {
-              continue;
-            }
-            if (isset($this->_participantRoleIds[$r])) {
-              $this->_participantRoleIds[$r] .= ',' . $dao->name;
-            }
-            else {
-              $this->_participantRoleIds[$r] = $dao->name;
-            }
-          }
-        }
-        else {
-          if (isset($this->_participantRoleIds[0])) {
-            $this->_participantRoleIds[0] .= ',' . $dao->name;
-          }
-          else {
-            $this->_participantRoleIds[0] = $dao->name;
-          }
-        }
-      }
-      $dao->free();
-    }
-    foreach ($roleIds as $k => $v) {
-      if (!isset($this->_participantRoleIds[$k])) {
-        $this->_participantRoleIds[$k] = '';
-      }
-    }
-    $this->assign('participantRoleIds', $this->_participantRoleIds);
   }
 
   /**
@@ -666,11 +615,7 @@ SELECT civicrm_custom_group.name as name,
       $roleIDs = explode(',', $urlRoleIDS);
     }
     if (isset($roleIDs)) {
-      foreach ($roleIDs as $roleID) {
-        $defaults[$this->_id]["role_id[{$roleID}]"] = 1;
-      }
-      unset($defaults[$this->_id]['role_id']);
-      $this->assign('roleID', $roleIDs);
+      $defaults[$this->_id]['role_id'] = implode(',', $roleIDs);
     }
 
     if (isset($eventID)) {
@@ -822,14 +767,7 @@ SELECT civicrm_custom_group.name as name,
       $this->assign('entityID', $this->_id);
     }
 
-    $roleids = CRM_Event_PseudoConstant::participantRole();
-
-    foreach ($roleids as $rolekey => $rolevalue) {
-      $roleTypes[] = $this->createElement('checkbox', $rolekey, NULL, $rolevalue);
-    }
-
-    $this->addGroup($roleTypes, 'role_id', ts('Participant Role'));
-    $this->addRule('role_id', ts('Role is required'), 'required');
+    $this->addSelect('role_id', array('multiple' => TRUE, 'class' => 'huge'), TRUE);
 
     // CRM-4395
     $checkCancelledJs = array('onchange' => "return sendNotification( );");
@@ -1154,7 +1092,7 @@ SELECT civicrm_custom_group.name as name,
       //modify params according to parameter used in create
       //participant method (addParticipant)
       $this->_params['participant_status_id'] = $params['status_id'];
-      $this->_params['participant_role_id'] = $params['role_id'];
+      $this->_params['participant_role_id'] = explode(',', $params['role_id']);
       $this->_params['participant_register_date'] = $params['register_date'];
 
       $eventTitle =
@@ -1213,9 +1151,8 @@ SELECT civicrm_custom_group.name as name,
       $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $fields, $this->_contactId, NULL, NULL, $ctype);
     }
 
-    $roleAllIds = CRM_Utils_Array::value('role_id', $params);
-    if ($roleAllIds) {
-      foreach ($roleAllIds as $rkey => $rvalue) {
+    if ($this->_params['participant_role_id']) {
+      foreach ($this->_params['participant_role_id'] as $rkey) {
         $customFieldsRole = CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, $rkey, $this->_roleCustomDataTypeID);
         $customFieldsEvent = CRM_Core_BAO_CustomField::getFields('Participant',
           FALSE,
@@ -1312,7 +1249,7 @@ SELECT civicrm_custom_group.name as name,
       $participants = array();
       if (!empty($this->_params['participant_role_id']) && is_array($this->_params['participant_role_id'])) {
         $this->_params['participant_role_id'] = implode(CRM_Core_DAO::VALUE_SEPARATOR,
-          array_keys($this->_params['participant_role_id'])
+          $this->_params['participant_role_id']
         );
       }
       $participants[] = CRM_Event_Form_Registration::addParticipant($this->_params, $contactID);
@@ -1338,11 +1275,7 @@ SELECT civicrm_custom_group.name as name,
       $participants = array();
       if ($this->_single) {
         if ($params['role_id']) {
-          foreach ($params['role_id'] as $k => $v) {
-            $rolesIDS[] = $k;
-          }
-          $seperator = CRM_Core_DAO::VALUE_SEPARATOR;
-          $params['role_id'] = implode($seperator, $rolesIDS);
+          $params['role_id'] = str_replace(',', CRM_Core_DAO::VALUE_SEPARATOR, $params['role_id']);
         }
         else {
           $params['role_id'] = 'NULL';
@@ -1354,13 +1287,7 @@ SELECT civicrm_custom_group.name as name,
           $commonParams = $params;
           $commonParams['contact_id'] = $contactID;
           if ($commonParams['role_id']) {
-            $rolesIDS = array();
-            foreach ($commonParams['role_id'] as $k => $v) {
-              $rolesIDS[] = $k;
-            }
-            $seperator = CRM_Core_DAO::VALUE_SEPARATOR;
-            $commonParams['role_id'] = implode($seperator, $rolesIDS);
-            $commonParams['participant_role_id'] = implode($seperator, $rolesIDS);
+            $commonParams['participant_role_id'] = $commonParams['role_id'] = str_replace(',', CRM_Core_DAO::VALUE_SEPARATOR, $params['role_id']);
           }
           else {
             $commonParams['role_id'] = 'NULL';
