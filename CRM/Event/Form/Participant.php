@@ -231,7 +231,6 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
 
     if ($this->_id) {
       $this->assign('participantId', $this->_id);
-      $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $this->_id, 'status_id', 'id');
 
       $this->_paymentId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
         $this->_id, 'id', 'participant_id'
@@ -567,7 +566,6 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
       }
 
       $this->assign('participant_status_id', $defaults[$this->_id]['participant_status_id']);
-      $roleID = $defaults[$this->_id]['participant_role_id'];
       $eventID = $defaults[$this->_id]['event_id'];
 
       $this->_eventTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventID, 'event_type_id', 'id');
@@ -806,7 +804,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     $this->assign('notificationStatusIds', $notificationStatusIds);
 
     $this->_participantStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
-    $this->addSelect('status_id', $checkCancelledJs, TRUE);
+    $this->addSelect('status_id', $checkCancelledJs + array('option_url' => 'civicrm/admin/participant_status'), TRUE);
 
     $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
       'enable_cart'
