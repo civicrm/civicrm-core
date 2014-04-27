@@ -221,7 +221,7 @@ input.crm-form-entityref {
   padding: 4px;
   margin-bottom: 4px;
   font-size: 13px;
-  background-color: #E6E6DC;
+  background-color: #efefe5;
   color: #3E3E3E;
 }
 
@@ -2077,7 +2077,7 @@ div.grippie {
 
 #crm-container table.crm-inline-edit-form td,
 #crm-container div.crm-inline-edit-form {
-  background-color: #E6E6DC;
+  background-color: #efefe5;
   white-space: nowrap;
 }
 #crm-container table.crm-inline-edit-form td.crm-label,
