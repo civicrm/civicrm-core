@@ -863,8 +863,8 @@ AND    u.status = 1
         if ($urlType == LOCALE_LANGUAGE_NEGOTIATION_URL_DOMAIN) {
           if (isset($language->domain) && $language->domain) {
             if ($addLanguagePart) {
-              $cleaned_url = preg_replace('#^https?://#', '', $language->domain);
-              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $cleaned_url . base_path();
+              $cleanedUrl = preg_replace('#^https?://#', '', $language->domain);
+              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $cleanedUrl . base_path();
             }
             if ($removeLanguagePart && defined('CIVICRM_UF_BASEURL')) {
               $url = str_replace('\\', '/', $url);
