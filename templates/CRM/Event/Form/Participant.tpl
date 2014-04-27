@@ -365,12 +365,7 @@
           var info = $(this).select2('data').extra;
 
           // Set role from default
-          $('[name^=role_id]:checkbox', $form).each(function() {
-            var check = $(this).is('[name="role_id[' + info.default_role_id + ']"]');
-            if (check !== $(this).prop('checked')) {
-              $(this).prop('checked', check).change();
-            }
-          });
+          $('select[name^=role_id]', $form).select2('val', [info.default_role_id], true);
 
           // Set campaign default
           $('#campaign_id', $form).select2('val', info.campaign_id);
@@ -383,17 +378,21 @@
         });
 
         // Handle participant role selection
-        $('[name^=role_id]:checkbox', $form).change(function() {
-          var roleId = $(this).attr('name').replace(/role_id\[|\]/g, '');
-          showCustomData('Participant', roleId, {/literal}{$roleCustomDataTypeID}{literal});
-        });
-        $('[name^=role_id]:checked', $form).change();
+        $('select[name^=role_id]', $form).change(buildRoleCustomData);
+        if ($('select[name^=role_id]', $form).val()) {
+          buildRoleCustomData();
+        }
 
         buildFeeBlock();
 
         //build discount block
         if ($('#discount_id', $form).val()) {
           buildFeeBlock($('#discount_id', $form).val());
+        }
+
+        function buildRoleCustomData() {
+          var roleId = $('select[name^=role_id]', $form).select2('val').join();
+          CRM.buildCustomData('Participant', roleId, {/literal}{$roleCustomDataTypeID}{literal});
         }
 
         //build fee block
@@ -434,8 +433,6 @@
 
           $.ajax({
             url: dataUrl,
-            async: false,
-            global: false,
             success: function ( html ) {
               $("#feeBlock").html( html ).trigger('crmLoad');
             }
@@ -455,111 +452,6 @@
           }
           else {
             $( "#eventFullMsg" ).hide( );
-          }
-        }
-
-        var roleGroupMapper = {/literal}{$participantRoleIds|@json_encode}{literal};
-        function showCustomData( type, subType, subName ) {
-          var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
-          var roleid = "role_id_"+subType;
-          var loadData = false;
-
-          if ( document.getElementById( roleid ).checked == true ) {
-            if ( typeof roleGroupMapper !== 'undefined' && roleGroupMapper[subType] ) {
-              var splitGroup = roleGroupMapper[subType].split(",");
-              for ( i = 0; i < splitGroup.length; i++ ) {
-                var roleCustomGroupId = splitGroup[i];
-                if ( $( '#'+roleCustomGroupId ).length > 0 ) {
-                  $( '#'+roleCustomGroupId ).remove( );
-                }
-              }
-              loadData = true;
-            }
-          }
-          else {
-            var groupUnload = [];
-            var x = 0;
-
-            if ( roleGroupMapper[0] ) {
-              var splitGroup = roleGroupMapper[0].split(",");
-              for ( x = 0; x < splitGroup.length; x++ ) {
-                groupUnload[x] = splitGroup[x];
-              }
-            }
-
-            for ( var i in roleGroupMapper ) {
-              if ( ( i > 0 ) && ( document.getElementById( "role_id_"+i ).checked ) ) {
-                var splitGroup = roleGroupMapper[i].split(",");
-                for ( j = 0; j < splitGroup.length; j++ ) {
-                  groupUnload[x+j+1] = splitGroup[j];
-                }
-              }
-            }
-
-            if ( roleGroupMapper[subType] ) {
-              var splitGroup = roleGroupMapper[subType].split(",");
-              for ( i = 0; i < splitGroup.length; i++ ) {
-                var roleCustomGroupId = splitGroup[i];
-                if ( $( '#'+roleCustomGroupId ).length > 0 ) {
-                  if ( $.inArray( roleCustomGroupId, groupUnload ) == -1  ) {
-                    $( '#'+roleCustomGroupId ).remove( );
-                  }
-                }
-              }
-            }
-          }
-
-          if ( !( loadData ) ) {
-            return false;
-          }
-
-          if ( subType ) {
-            dataUrl += '&subType=' + subType;
-          }
-
-          if ( subName ) {
-            dataUrl += '&subName=' + subName;
-            $( '#customData' + subName ).show( );
-          }
-          else {
-            $( '#customData' ).show( );
-          }
-
-          {/literal}
-          {if $urlPathVar}
-            dataUrl += '&{$urlPathVar}';
-          {/if}
-          {if $groupID}
-            dataUrl += '&groupID=' + '{$groupID}';
-          {/if}
-          {if $qfKey}
-            dataUrl += '&qfKey=' + '{$qfKey}';
-          {/if}
-          {if $entityID}
-            dataUrl += '&entityID=' + '{$entityID}';
-          {/if}
-
-          {literal}
-
-          if ( subName && subName != 'null' ) {
-            var fname = '#customData' + subName;
-          }
-          else {
-            var fname = '#customData';
-          }
-
-          var response = $.ajax({url: dataUrl,
-            async: false
-          }).responseText;
-
-          if ( subType != 'null' ) {
-            if ( document.getElementById(roleid).checked == true ) {
-              var response_text = '<div style="display:block;" id = '+subType+'_chk >'+response+'</div>';
-              $( fname ).append(response_text).trigger('crmLoad');
-            }
-            else {
-              $('#'+subType+'_chk').remove();
-            }
           }
         }
 
