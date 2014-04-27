@@ -45,7 +45,7 @@
       });
       view.on('change:ufGroupId', function() {
         $(select).val(view.getUfGroupId()).change();
-      })
+      });
       view.render();
       $(select).after(view.el);
       setTimeout(function() {
