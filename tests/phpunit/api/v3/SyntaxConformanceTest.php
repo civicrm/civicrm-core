@@ -846,7 +846,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
         case CRM_Utils_Type::T_FLOAT:
         case CRM_Utils_Type::T_MONEY:
-          $entity[$field] = '22';
+          $entity[$field] = '22.75';
           break;
 
         case CRM_Utils_Type::T_URL:
@@ -855,6 +855,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       if (!empty($specs['pseudoconstant'])) {
         $options = $this->callAPISuccess($entityName, 'getoptions', array('context' => 'create', 'field' => $field));
         if (empty($options['values'])) {
+          //eg. pdf_format id doesn't ship with any
+          if(isset($specs['pseudoconstant']['optionGroupName'])) {
+            $optionGroupID = $this->callAPISuccess('option_group', 'getvalue', array('name' => 'pdf_format', 'return' => 'id'));
+            $optionValue = $this->callAPISuccess('option_value', 'create', array('option_group_id' => $optionGroupID, 'label' => 'new option value'));
+            $options['values'][] = $optionValue['id'];
+          }
         }
         $entity[$field] = array_rand($options['values']);
       }
