@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -39,7 +39,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -498,7 +498,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
         $row = array();
         foreach ($this->_columnHeaders as $columnKey => $columnValue) {
           if (array_key_exists($columnKey, $value)) {
-            $row[$columnKey] = CRM_Utils_Array::value($columnKey, $value) ? $value[$columnKey] : '';
+            $row[$columnKey] = !empty($value[$columnKey]) ? $value[$columnKey] : '';
           }
         }
         $rows[] = $row;

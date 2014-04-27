@@ -681,6 +681,18 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * A stub for the API interface. This can be overriden by subclasses to change how the API is called.
+   *
+   * @param $entity
+   * @param $action
+   * @param $params
+   * @return array|int
+   */
+  function civicrm_api($entity, $action, $params) {
+    return civicrm_api($entity, $action, $params);
+  }
+
+  /**
    * This function exists to wrap api functions
    * so we can ensure they succeed & throw exceptions without litterering the test with checks
    * @param string $entity
@@ -706,7 +718,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       case 'getcount' :
           return $this->callAPISuccessGetCount($entity, $params, $checkAgainst);
     }
-    $result = civicrm_api($entity, $action, $params);
+    $result = $this->civicrm_api($entity, $action, $params);
     $this->assertAPISuccess($result, "Failure in api call for $entity $action");
     return $result;
   }
@@ -730,7 +742,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'version' => $this->_apiversion,
       'debug' => 1,
     );
-    $result = civicrm_api($entity, 'getvalue', $params);
+    $result = $this->civicrm_api($entity, 'getvalue', $params);
     if($type){
       if($type == 'integer'){
         // api seems to return integers as strings
@@ -761,7 +773,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'version' => $this->_apiversion,
       'debug' => 1,
     );
-    $result = civicrm_api($entity, 'getsingle', $params);
+    $result = $this->civicrm_api($entity, 'getsingle', $params);
     if(!is_array($result) || !empty($result['is_error']) || isset($result['values'])) {
       throw new Exception('Invalid getsingle result' . print_r($result, TRUE));
     }
@@ -790,7 +802,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'version' => $this->_apiversion,
       'debug' => 1,
     );
-    $result = civicrm_api($entity, 'getcount', $params);
+    $result = $this->civicrm_api($entity, 'getcount', $params);
     if(!is_integer($result) || !empty($result['is_error']) || isset($result['values'])) {
       throw new Exception('Invalid getcount result : ' . print_r($result, TRUE) . " type :" . gettype($result));
     }
@@ -799,6 +811,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
     return $result;
   }
+
   /**
    * This function exists to wrap api functions
    * so we can ensure they succeed, generate and example & throw exceptions without litterering the test with checks
@@ -808,6 +821,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $params
    * @param string $function - pass this in to create a generated example
    * @param string $file - pass this in to create a generated example
+   * @param string $description
+   * @param string|null $subfile
+   * @param string|null $actionName
+   * @return array|int
    */
   function callAPIAndDocument($entity, $action, $params, $function, $file, $description = "", $subfile = NULL, $actionName = NULL){
     $params['version'] = $this->_apiversion;
@@ -830,7 +847,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'version' => $this->_apiversion,
       );
     }
-    $result = civicrm_api($entity, $action, $params);
+    $result = $this->civicrm_api($entity, $action, $params);
     $this->assertAPIFailure($result, "We expected a failure for $entity $action but got a success");
     return $result;
   }
@@ -913,9 +930,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   private function _contactCreate($params) {
     $result = $this->callAPISuccess('contact', 'create', $params);
-    if (CRM_Utils_Array::value('is_error', $result) ||
-      !CRM_Utils_Array::value('id', $result)
-    ) {
+    if (!empty($result['is_error']) || empty($result['id'])) {
       throw new Exception('Could not create test contact, with message: ' . CRM_Utils_Array::value('error_message', $result) . "\nBacktrace:" . CRM_Utils_Array::value('trace', $result));
     }
     return $result['id'];
@@ -1579,7 +1594,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'contact_id.1' => $contactId,
       'group_id' => 1,
     );
-    civicrm_api('GroupContact', 'Delete', $params);
+    $this->civicrm_api('GroupContact', 'Delete', $params);
   }
 
   /**
@@ -1861,6 +1876,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       elseif (strstr($function, 'GetFields')) {
         $action = empty($action) ? 'getfields' : $action;
         $entityAction = 'GetFields';
+      }
+      elseif (strstr($function, 'GetList')) {
+        $action = empty($action) ? 'getlist' : $action;
+        $entityAction = 'GetList';
       }
       elseif (strstr($function, 'Get')) {
         $action = empty($action) ? 'get' : $action;
@@ -2189,7 +2208,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     if (array_key_exists('id', $unformattedArray)) {
       unset($unformattedArray['id']);
     }
-    if (CRM_Utils_Array::value('values', $unformattedArray) && is_array($unformattedArray['values'])) {
+    if (!empty($unformattedArray['values']) && is_array($unformattedArray['values'])) {
       foreach ($unformattedArray['values'] as $key => $value) {
         if (is_Array($value)) {
           foreach ($value as $k => $v) {
@@ -2495,6 +2514,67 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'HTML_QuickForm_advmultiselect'
       )
     );
+  }
+
+  /**
+   * Set up an acl allowing contact to see 2 specified groups
+   *  - $this->_permissionedGroup & $this->_permissionedDisbaledGroup
+   *
+   *  You need to have precreated these groups & created the user e.g
+   *  $this->createLoggedInUser();
+   *   $this->_permissionedDisabledGroup = $this->groupCreate(array('title' => 'pick-me-disabled', 'is_active' => 0, 'name' => 'pick-me-disabled'));
+   *   $this->_permissionedGroup = $this->groupCreate(array('title' => 'pick-me-active', 'is_active' => 1, 'name' => 'pick-me-active'));
+   *
+   */
+  function setupACL() {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
+    $optionGroupID = $this->callAPISuccessGetValue('option_group', array('return' => 'id', 'name' => 'acl_role'));
+    $optionValue = $this->callAPISuccess('option_value', 'create', array('option_group_id' => $optionGroupID,
+      'label' => 'pick me',
+      'value' => 55,
+    ));
+
+
+    CRM_Core_DAO::executeQuery("
+      TRUNCATE civicrm_acl_cache
+    ");
+
+    CRM_Core_DAO::executeQuery("
+      TRUNCATE civicrm_acl_contact_cache
+    ");
+
+
+    CRM_Core_DAO::executeQuery("
+    INSERT INTO civicrm_acl_entity_role (
+    `acl_role_id`, `entity_table`, `entity_id`
+    ) VALUES (55, 'civicrm_group', {$this->_permissionedGroup});
+    ");
+
+    CRM_Core_DAO::executeQuery("
+    INSERT INTO civicrm_acl (
+    `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
+    )
+    VALUES (
+    'view picked', 'civicrm_group', $this->_permissionedGroup , 'Edit', 'civicrm_saved_search', {$this->_permissionedGroup}, 1
+    );
+    ");
+
+    CRM_Core_DAO::executeQuery("
+    INSERT INTO civicrm_acl (
+    `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
+    )
+    VALUES (
+    'view picked', 'civicrm_group',  $this->_permissionedGroup, 'Edit', 'civicrm_saved_search', {$this->_permissionedDisabledGroup}, 1
+    );
+    ");
+    $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
+    $this->callAPISuccess('group_contact', 'create', array(
+      'group_id' => $this->_permissionedGroup,
+      'contact_id' => $this->_loggedInUser,
+    ));
+    //flush cache
+    CRM_ACL_BAO_Cache::resetCache();
+      CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL, TRUE);
   }
 
 /**

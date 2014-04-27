@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  *
  * @package CiviCRM_APIv3_Core
  * @subpackage API_Settings
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Settings.php
  *
  */
@@ -61,7 +61,7 @@ function civicrm_api3_setting_getfields($params) {
     CRM_Utils_Array::value('profile', $params, null)
   );
   // find any supplemental information
-  if(CRM_Utils_Array::value('action',$params)){
+  if (!empty($params['action'])){
     $specFunction = '_civicrm_api3_setting_' . strtolower($params['action']) . '_spec';
     if (function_exists($specFunction)) {
       $specFunction($result);

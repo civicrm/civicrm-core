@@ -5,7 +5,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 /**
@@ -21,6 +21,9 @@
  */
 class API_Exception extends Exception
 {
+  const UNAUTHORIZED = 'unauthorized';
+  const NOT_IMPLEMENTED = 'not-found';
+
   private $extraParams = array();
   public function __construct($message, $error_code = 0, $extraParams = array(),Exception $previous = null) {
     if (is_numeric ($error_code)) // using int for error code "old way")
@@ -44,7 +47,9 @@ class API_Exception extends Exception
     return array(
         2000 => '$params was not an array',
         2001 => 'Invalid Value for Date field',
-        2100 => 'String value is longer than permitted length'
+        2100 => 'String value is longer than permitted length',
+        self::UNAUTHORIZED => 'Unauthorized',
+        self::NOT_IMPLEMENTED => 'Entity or method is not implemented',
         );
   }
 }

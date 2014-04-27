@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -203,30 +203,6 @@ SELECT module
         }
       }
 
-      if ($this->_multiRecordProfile) {
-        $urlParams = "reset=1&id={$this->_id}&gid={$gidString}";
-
-        // get checksum if present
-        if ($this->get('cs')) {
-          $urlParams .= "&cs=" . $this->get('cs');
-        }
-        $this->_postURL = CRM_Utils_System::url('civicrm/profile/edit', $urlParams);
-        $this->_cancelURL = CRM_Utils_System::url('civicrm/profile/edit', $urlParams);
-
-        //passing the post url to template so the popup form does
-        //proper redirection and proccess form errors if any
-        if (!isset($this->_onPopupClose) || $this->_onPopupClose == 'redirectToProfile') {
-          $popupRedirect = CRM_Utils_System::url('civicrm/profile/edit', $urlParams, FALSE, NULL, FALSE);
-        }
-        elseif ($this->_onPopupClose == 'redirectToTab') {
-          $popupRedirect = CRM_Utils_System::url('civicrm/contact/view',
-            "reset=1&cid={$this->_id}&selectedChild=custom_{$this->_customGroupId}", FALSE, NULL, FALSE);
-        }
-
-        $this->assign('urlParams', $urlParams);
-        $this->assign('postUrl', $popupRedirect);
-      }
-
       // we do this gross hack since qf also does entity replacement
       $this->_postURL = str_replace('&amp;', '&', $this->_postURL);
       $this->_cancelURL = str_replace('&amp;', '&', $this->_cancelURL);
@@ -254,10 +230,7 @@ SELECT module
     if (($this->_multiRecord & CRM_Core_Action::DELETE) && $this->_recordExists) {
       $this->_deleteButtonName = $this->getButtonName('upload', 'delete');
 
-      $this->addElement('submit',
-        $this->_deleteButtonName,
-        ts('Delete')
-      );
+      $this->addElement('submit', $this->_deleteButtonName, ts('Delete'));
 
       $buttons[] = array(
         'type' => 'cancel',
@@ -285,13 +258,11 @@ SELECT module
       'isDefault' => TRUE,
     );
 
-    if ($this->_context != 'dialog') {
-      $buttons[] = array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-        'isDefault' => TRUE,
-      );
-    }
+    $buttons[] = array(
+      'type' => 'cancel',
+      'name' => ts('Cancel'),
+      'isDefault' => TRUE,
+    );
 
     $this->addButtons($buttons);
 
@@ -308,23 +279,12 @@ SELECT module
   public function postProcess() {
     parent::postProcess();
 
-    // this is special case when we create contact using Dialog box
-    if ($this->_context == 'dialog') {
-      $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'display_name');
-      $sortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'sort_name');
-      $returnArray = array(
-        'contactID' => $this->_id,
-        'displayName' => $displayName,
-        'sortName' => $sortName,
-        'newContactSuccess' => TRUE,
-      );
+    $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'display_name');
+    $sortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'sort_name');
+    $this->ajaxResponse['label'] = $sortName;
 
-      echo json_encode($returnArray);
-      CRM_Utils_System::civiExit();
-    }
-
-    //for delete record handling
-    if (!CRM_Utils_Array::value($this->_deleteButtonName, $_POST)) {
+    // When saving (not deleting) and not in an ajax popup
+    if (empty($_POST[$this->_deleteButtonName]) && $this->_context != 'dialog') {
       CRM_Core_Session::setStatus(ts('Your information has been saved.'), ts('Thank you.'), 'success');
     }
 
@@ -386,9 +346,7 @@ SELECT module
   function validate() {
     $errors = parent::validate();
 
-    if (!$errors &&
-      CRM_Utils_Array::value('errorURL', $_POST)
-    ) {
+    if (!$errors && !empty($_POST['errorURL'])) {
       $message = NULL;
       foreach ($this->_errors as $name => $mess) {
         $message .= $mess;

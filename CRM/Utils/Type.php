@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
  *
  */
@@ -164,7 +164,25 @@ class CRM_Utils_Type {
         // CRM-8925
       case 'Country':
       case 'StateProvince':
-        if (CRM_Utils_Rule::positiveInteger($data)) {
+        // Checked for multi valued state/country value
+        if (is_array($data)) {
+          $returnData = TRUE;
+          foreach ($data as $data) {
+            if (CRM_Utils_Rule::positiveInteger($data) || CRM_Core_DAO::escapeString($data)) {
+              $returnData = TRUE;
+            }
+            else {
+              $returnData = FALSE;
+            }
+          }
+          if ($returnData) {
+            return $data;
+          }
+        }
+        elseif (!is_numeric($data) &&  CRM_Core_DAO::escapeString($data)) {
+          return $data;
+        }
+        elseif (CRM_Utils_Rule::positiveInteger($data)) {
           return $data;
         }
         break;

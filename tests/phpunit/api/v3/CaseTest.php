@@ -362,6 +362,50 @@ class api_v3_CaseTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test get function based on subject
+   */
+  function testCaseGetBySubject() {
+    // Create Case
+    $result = $this->callAPISuccess('case', 'create', $this->_params);
+    $id = $result['id'];
+
+    // Store result for later
+    $case = $this->callAPISuccess('case', 'getsingle', array('id' => $id));
+
+    // Fetch case based on client contact id
+    $result = $this->callAPISuccess('case', 'get', array('subject' => $this->_params['subject'], 'return' => array('activities', 'contacts')));
+    $this->assertAPIArrayComparison($result['values'][$id], $case);
+  }
+
+  /**
+   * Test get function based on wrong subject
+   */
+  function testCaseGetByWrongSubject() {
+    // Create Case
+    $result = $this->callAPISuccess('case', 'create', $this->_params);
+    $id = $result['id'];
+
+    // Append 'wrong' to subject so that it is no longer the same
+    $result = $this->callAPISuccess('case', 'get', array('subject' => $this->_params['subject'] . 'wrong', 'return' => array('activities', 'contacts')));
+    $this->assertEquals(0, $result['count'], 'in line ' . __LINE__);
+  }
+
+  /**
+   * Test get function with no criteria
+   */
+  function testCaseGetNoCriteria() {
+    // Create Case
+    $result = $this->callAPISuccess('case', 'create', $this->_params);
+    $id = $result['id'];
+
+    // Store result for later
+    $case = $this->callAPISuccess('case', 'getsingle', array('id' => $id));
+
+    $result = $this->callAPISuccess('case', 'get', array('return' => array('activities', 'contacts')));
+    $this->assertAPIArrayComparison($result['values'][$id], $case);
+  }
+
+  /**
    *  Test activity api create for case activities
    */
   function testCaseActivityCreate() {

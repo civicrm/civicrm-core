@@ -2,9 +2,9 @@
 
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -32,7 +32,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Case
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  *
  */
 
@@ -190,30 +190,7 @@ function _civicrm_api3_case_delete_spec(&$params) {
  * @todo Erik Hommel 16 dec 2010 check if all DB fields are returned
  */
 function civicrm_api3_case_get($params) {
-  civicrm_api3_verify_mandatory($params, NULL, array(
-    array('case_id', 'contact_id', 'activity_id', 'contact_id')
-  ));
-
   $options = _civicrm_api3_get_options_from_params($params);
-
-  // Get by id
-  $caseId = CRM_Utils_Array::value('id', $params);
-  if ($caseId) {
-    // Validate param
-    if (!is_numeric($caseId)) {
-      return civicrm_api3_create_error('Invalid parameter: case_id. Must provide a numeric value.');
-    }
-    // For historic reasons we always return these when an id is provided
-    $options['return'] = array('contacts' => 1, 'activities' => 1);
-    $case = _civicrm_api3_case_read($caseId, $options);
-
-    if ($case) {
-      return civicrm_api3_create_success(array($caseId => $case), $params, 'case', 'get');
-    }
-    else {
-      return civicrm_api3_create_success(array(), $params, 'case', 'get');
-    }
-  }
 
   //search by client
   if (!empty($params['contact_id'])) {
@@ -265,6 +242,22 @@ SELECT DISTINCT case_id
     }
     return civicrm_api3_create_success($cases, $params, 'case', 'get');
   }
+
+  // For historic reasons we always return these when an id is provided
+  $caseId = CRM_Utils_Array::value('id', $params);
+  if ($caseId) {
+    $options['return'] = array('contacts' => 1, 'activities' => 1);
+  }
+
+  $foundcases =  _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case');
+  $cases = array();
+  foreach ($foundcases['values'] as $foundcase) {
+      if ($case = _civicrm_api3_case_read($foundcase['id'], $options)) {
+        $cases[$foundcase['id']] = $case;
+      }
+    }
+
+  return civicrm_api3_create_success($cases, $params, 'case', 'get');
 }
 
 /**

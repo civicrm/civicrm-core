@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -158,7 +158,7 @@ class CRM_Export_BAO_Export {
         }
 
         if (array_key_exists($relationshipTypes, $contactRelationshipTypes)) {
-          if (CRM_Utils_Array::value(2, $value)) {
+          if (!empty($value[2])) {
             $relationField = CRM_Utils_Array::value(2, $value);
             if (trim(CRM_Utils_Array::value(3, $value))) {
               $relLocTypeId = CRM_Utils_Array::value(3, $value);
@@ -174,7 +174,7 @@ class CRM_Export_BAO_Export {
               $relIMProviderId = CRM_Utils_Array::value(4, $value);
             }
           }
-          elseif (CRM_Utils_Array::value(4, $value)) {
+          elseif (!empty($value[4])) {
             $relationField = CRM_Utils_Array::value(4, $value);
             $relLocTypeId = CRM_Utils_Array::value(5, $value);
             if ($relationField == 'phone') {
@@ -242,7 +242,7 @@ class CRM_Export_BAO_Export {
       }
       elseif ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT) {
         $returnProperties['participant_id'] = 1;
-        if (CRM_Utils_Array::value('participant_role', $returnProperties)) {
+        if (!empty($returnProperties['participant_role'])) {
           unset($returnProperties['participant_role']);
           $returnProperties['participant_role_id'] = 1;
         }
@@ -308,6 +308,13 @@ class CRM_Export_BAO_Export {
 
       if ($queryMode != CRM_Contact_BAO_Query::MODE_CONTACTS) {
         $componentReturnProperties = CRM_Contact_BAO_Query::defaultReturnProperties($queryMode);
+        if ($queryMode == CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
+          // soft credit columns are not automatically populated, because contribution search doesn't require them by default
+          $componentReturnProperties = 
+            array_merge(
+              $componentReturnProperties, 
+              CRM_Contribute_BAO_Query::softCreditReturnProperties(TRUE));
+        }
         $returnProperties = array_merge($returnProperties, $componentReturnProperties);
 
         if (!empty($extraReturnProperties)) {
@@ -349,7 +356,7 @@ class CRM_Export_BAO_Export {
       }
     }
 
-    if (!$selectAll && $componentTable && CRM_Utils_Array::value('additional_group', $exportParams)) {
+    if (!$selectAll && $componentTable && !empty($exportParams['additional_group'])) {
       // If an Additional Group is selected, then all contacts in that group are
       // added to the export set (filtering out duplicates).
       $query = "
@@ -359,7 +366,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     if ($moreReturnProperties) {
       // fix for CRM-7066
-      if (CRM_Utils_Array::value('group', $moreReturnProperties)) {
+      if (!empty($moreReturnProperties['group'])) {
         unset($moreReturnProperties['group']);
         $moreReturnProperties['groups'] = 1;
       }
@@ -506,7 +513,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     // make sure the groups stuff is included only if specifically specified
     // by the fields param (CRM-1969), else we limit the contacts outputted to only
     // ones that are part of a group
-    if (CRM_Utils_Array::value('groups', $returnProperties)) {
+    if (!empty($returnProperties['groups'])) {
       $oldClause = "( contact_a.id = civicrm_group_contact.contact_id )";
       $newClause = " ( $oldClause AND ( civicrm_group_contact.status = 'Added' OR civicrm_group_contact.status IS NULL ) )";
       // total hack for export, CRM-3618
@@ -545,8 +552,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     $queryString = "$select $from $where $having";
 
     $groupBy = "";
-    if (CRM_Utils_Array::value('tags', $returnProperties) ||
-      CRM_Utils_Array::value('groups', $returnProperties) ||
+    if (!empty($returnProperties['tags']) || !empty($returnProperties['groups']) ||
       CRM_Utils_Array::value('notes', $returnProperties) ||
       // CRM-9552
       ($queryMode & CRM_Contact_BAO_Query::MODE_CONTACTS && $query->_useGroupBy)
@@ -557,6 +563,10 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     switch ($exportMode) {
       case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
         $groupBy = 'GROUP BY civicrm_contribution.id';
+        if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
+          // especial group by  when soft credit columns are included
+          $groupBy = 'GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.scredit_id';
+        }
         break;
 
       case CRM_Export_Form_Select::EVENT_EXPORT:
@@ -575,7 +585,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     if ($order) {
       list($field, $dir) = explode(' ', $order, 2);
       $field = trim($field);
-      if (CRM_Utils_Array::value($field, $returnProperties)) {
+      if (!empty($returnProperties[$field])) {
         // $queryString .= " ORDER BY $order";
       }
     }
@@ -678,7 +688,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
                   $type = explode('-', $fld);
                   $hdr = "{$ltype}-" . $query->_fields[$type[0]]['title'];
 
-                  if (CRM_Utils_Array::value(1, $type)) {
+                  if (!empty($type[1])) {
                     if (CRM_Utils_Array::value(0, $type) == 'phone') {
                       $hdr .= "-" . CRM_Utils_Array::value($type[1], $phoneTypes);
                     }
@@ -744,7 +754,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
                       $hdr = "{$ltype}-" . $relationQuery[$field]->_fields[$type[0]]['title'];
 
-                      if (CRM_Utils_Array::value(1, $type)) {
+                      if (!empty($type[1])) {
                         if (CRM_Utils_Array::value(0, $type) == 'phone') {
                           $hdr .= "-" . CRM_Utils_Array::value($type[1], $phoneTypes);
                         }
@@ -831,7 +841,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
                 // FIXME: We should not be using labels as keys!
                 $daoField = CRM_Utils_String::munge($ltype) . '-' . $type[0];
 
-                if (CRM_Utils_Array::value(1, $type)) {
+                if (!empty($type[1])) {
                   $fldValue .= "-" . $type[1];
                   $daoField .= "-" . $type[1];
                 }
@@ -897,7 +907,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
                   foreach (array_keys($val) as $fld) {
                     $type = explode('-', $fld);
                     $fldValue = "{$ltype}-" . $type[0];
-                    if (CRM_Utils_Array::value(1, $type)) {
+                    if (!empty($type[1])) {
                       $fldValue .= "-" . $type[1];
                     }
                     // CRM-3157: localise country, region (both have ‘country’ context)
@@ -1003,6 +1013,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
                 case 'gender':
                 case 'preferred_communication_method':
                 case 'preferred_mail_format':
+                case 'communication_style':
                   $row[$field] = $i18n->crm_translate($fieldValue);
                   break;
 
@@ -1066,7 +1077,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           }
         }
         //remove organization name for individuals if it is set for current employer
-        if (CRM_Utils_Array::value('contact_type', $row) &&
+        if (!empty($row['contact_type']) &&
           $row['contact_type'] == 'Individual' && array_key_exists('organization_name', $row)
         ) {
           $row['organization_name'] = '';
@@ -1555,7 +1566,7 @@ WHERE  id IN ( $deleteIDString )
       'addressee',
     );
     foreach ($greetingFields as $greeting) {
-      if (CRM_Utils_Array::value($greeting, $exportParams)) {
+      if (!empty($exportParams[$greeting])) {
         $greetingLabel = $exportParams[$greeting];
         if (empty($contact)) {
           $values = array(
@@ -1564,7 +1575,7 @@ WHERE  id IN ( $deleteIDString )
           );
           $contact = civicrm_api('contact', 'get', $values);
 
-          if (CRM_Utils_Array::value('is_error', $contact)) {
+          if (!empty($contact['is_error'])) {
             return $greetings;
           }
           $contact = $contact['values'][$contact['id']];
@@ -1586,7 +1597,7 @@ WHERE  id IN ( $deleteIDString )
   static function _trimNonTokens(&$parsedString, $defaultGreeting,
     $addressMergeGreetings, $greetingType = 'postal_greeting'
   ) {
-    if (CRM_Utils_Array::value($greetingType, $addressMergeGreetings)) {
+    if (!empty($addressMergeGreetings[$greetingType])) {
       $greetingLabel = $addressMergeGreetings[$greetingType];
     }
     $greetingLabel = empty($greetingLabel) ? $defaultGreeting : $greetingLabel;
@@ -1662,7 +1673,7 @@ WHERE  id IN ( $deleteIDString )
 
       if (!$sharedAddress && !array_key_exists($copyID, $merge[$masterID]['copy'])) {
 
-        if (CRM_Utils_Array::value('postal_greeting_other', $exportParams) &&
+        if (!empty($exportParams['postal_greeting_other']) &&
           count($merge[$masterID]['copy']) >= 1
         ) {
           // use static greetings specified if no of contacts > 2
@@ -1678,7 +1689,7 @@ WHERE  id IN ( $deleteIDString )
           $merge[$masterID]['postalGreeting'] = str_replace(" {$copyPostalGreeting},", "", $merge[$masterID]['postalGreeting']);
         }
 
-        if (CRM_Utils_Array::value('addressee_other', $exportParams) &&
+        if (!empty($exportParams['addressee_other']) &&
           count($merge[$masterID]['copy']) >= 1
         ) {
           // use static greetings specified if no of contacts > 2
@@ -1732,7 +1743,7 @@ WHERE  id IN ( $deleteIDString )
       else {
         $householdColName = CRM_Utils_String::munge($prefixColumn . $columnNames, '_', 64);
 
-        if (CRM_Utils_Array::value($householdColName, $sqlColumns)) {
+        if (!empty($sqlColumns[$householdColName])) {
           $replaced[$columnNames] = $householdColName;
         }
       }
@@ -1866,7 +1877,7 @@ LIMIT $offset, $limit
         $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
           'address_options', TRUE, NULL, TRUE
         );
-        if (CRM_Utils_Array::value('supplemental_address_1', $addressOptions)) {
+        if (!empty($addressOptions['supplemental_address_1'])) {
           $addressWhereClause .= " AND ( (supplemental_address_1 IS NULL) OR (supplemental_address_1 = '') ) ";
           // enclose it again, since we are doing an AND in between a set of ORs
           $addressWhereClause = "( $addressWhereClause )";

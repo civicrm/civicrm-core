@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -147,6 +147,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     if (CRM_Core_Permission::access('CiviEvent')) {
       $this->_fields = array_merge(CRM_Event_BAO_Query::getParticipantFields(), $this->_fields);
+    }
+
+    if (CRM_Core_Permission::access('CiviCase')) {
+      $this->_fields = array_merge(CRM_Case_BAO_Query::getFields(), $this->_fields);
     }
 
     $this->_fields = array_merge($this->_fields, CRM_Contact_BAO_Query_Hook::singleton()->getFields());
@@ -321,6 +325,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     if (!empty($fields['Membership'])) {
       $sel1['Membership'] = 'Membership';
+    }
+
+    if (!empty($fields['Case'])) {
+      $sel1['Case'] = 'Case';
     }
 
     if (!empty($fields['Formatting'])) {
@@ -559,7 +567,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
       //reset other field is searchable and in selector settings, CRM-4363
       if ($this->_hasSearchableORInSelector &&
-        in_array($ufField->field_type, array('Participant', 'Contribution', 'Membership', 'Activity'))
+        in_array($ufField->field_type, array('Participant', 'Contribution', 'Membership', 'Activity', 'Case'))
       ) {
         CRM_Core_BAO_UFField::resetInSelectorANDSearchable($this->_gid);
       }
@@ -674,13 +682,11 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   static function formRuleCustomDataExtentColumnValue($customField, $gid, $fieldType, &$errors) {
     // fix me : check object $customField
     if (in_array($fieldType, array(
-      'Participant', 'Contribution', 'Membership', 'Activity'))) {
+          'Participant', 'Contribution', 'Membership', 'Activity', 'Case'))) {
       $params = array('id' => $customField->custom_group_id);
       $customGroup = array();
       CRM_Core_BAO_CustomGroup::retrieve($params, $customGroup);
-      if (($fieldType != CRM_Utils_Array::value('extends', $customGroup)) ||
-        !CRM_Utils_Array::value('extends_entity_column_value', $customGroup)
-      ) {
+      if (($fieldType != CRM_Utils_Array::value('extends', $customGroup)) || empty($customGroup['extends_entity_column_value'])) {
         return $errors;
       }
 
@@ -696,7 +702,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       }
 
       $fieldTypeValues = CRM_Core_BAO_UFGroup::groupTypeValues($gid, $fieldType);
-      if (!CRM_Utils_Array::value($fieldType, $fieldTypeValues)) {
+      if (empty($fieldTypeValues[$fieldType])) {
         return;
       }
 

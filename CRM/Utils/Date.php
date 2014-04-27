@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -75,7 +75,7 @@ class CRM_Utils_Date {
       $date['M'] = $date['F'];
     }
 
-    if (CRM_Utils_Array::value('M', $date)) {
+    if (!empty($date['M'])) {
       $date['M'] = (int ) $date['M'];
       if ($date['M'] < 1 || $date['M'] > 12) {
         return $invalidDate;
@@ -85,7 +85,7 @@ class CRM_Utils_Date {
       $date['M'] = 1;
     }
 
-    if (CRM_Utils_Array::value('d', $date)) {
+    if (!empty($date['d'])) {
       $date['d'] = (int ) $date['d'];
     }
     else {
@@ -106,7 +106,7 @@ class CRM_Utils_Date {
       CRM_Utils_Array::value('s', $date) != NULL
     ) {
       // we have time too..
-      if (CRM_Utils_Array::value('h', $date)) {
+      if (!empty($date['h'])) {
         if (CRM_Utils_Array::value('A', $date) == 'PM' or CRM_Utils_Array::value('a', $date) == 'pm') {
           if ($date['h'] != 12) {
             $date['h'] = $date['h'] + 12;
@@ -125,14 +125,14 @@ class CRM_Utils_Date {
       }
 
       // in 24-hour format the hour is under the 'H' key
-      if (CRM_Utils_Array::value('H', $date)) {
+      if (!empty($date['H'])) {
         $date['H'] = (int) $date['H'];
       }
       else {
         $date['H'] = 0;
       }
 
-      if (CRM_Utils_Array::value('i', $date)) {
+      if (!empty($date['i'])) {
         $date['i'] = (int ) $date['i'];
       }
       else {
@@ -143,7 +143,7 @@ class CRM_Utils_Date {
         $date['h'] = $date['H'];
       }
 
-      if (CRM_Utils_Array::value('s', $date)) {
+      if (!empty($date['s'])) {
         $date['s'] = (int ) $date['s'];
       }
       else {
@@ -480,7 +480,7 @@ class CRM_Utils_Date {
     $prevCen = $cen - 1;
 
     $value = NULL;
-    if (CRM_Utils_Array::value($dateParam, $params)) {
+    if (!empty($params[$dateParam])) {
       // suppress hh:mm or hh:mm:ss if it exists CRM-7957
       $value = preg_replace("/(\s(([01]\d)|[2][0-3])(:([0-5]\d)){1,2})$/", "", $params[$dateParam]);
     }

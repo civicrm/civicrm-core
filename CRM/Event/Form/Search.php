@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,7 +40,7 @@
 /**
  * This file is for civievent search
  */
-class CRM_Event_Form_Search extends CRM_Core_Form {
+class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Are we forced to run a search
@@ -57,14 +57,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
    * @access protected
    */
   protected $_searchButtonName;
-
-  /**
-   * name of print button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_printButtonName;
 
   /**
    * name of action button
@@ -151,7 +143,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
      * set the button names
      */
     $this->_searchButtonName = $this->getButtonName('refresh');
-    $this->_printButtonName = $this->getButtonName('next', 'print');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
@@ -233,6 +224,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
    * @return void
    */
   function buildQuickForm() {
+    parent::buildQuickForm();
     $this->addElement('text', 'sort_name', ts('Participant Name or Email'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
     CRM_Event_BAO_Query::buildSearchForm($this);
@@ -249,7 +241,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
           'toggleSelect',
           NULL,
           NULL,
-          array('onclick' => "toggleTaskAction( true ); return toggleCheckboxVals('mark_x_',this);")
+          array('onclick' => "toggleTaskAction( true );", 'class' => 'select-rows')
         );
       }
       foreach ($rows as $row) {
@@ -257,7 +249,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
         if (!$this->_single) {
           $this->addElement('checkbox', $row['checkbox'],
             NULL, NULL,
-            array('onclick' => "toggleTaskAction( true ); return checkSelectedBox('" . $row['checkbox'] . "');")
+            array('onclick' => "toggleTaskAction( true );", 'class' => 'select-row')
           );
         }
         if (CRM_Event_BAO_Event::usesPriceSet($row['event_id'])) {
@@ -275,11 +267,11 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
         if (CRM_Utils_Array::value('participant_test', $this->_formValues) == '1' || CRM_Utils_Array::value('participant_test', $this->_formValues) == '0' ) {
           $seatClause[] = "( participant.is_test = {$this->_formValues['participant_test']} )";
         }
-        if (CRM_Utils_Array::value('participant_status_id', $this->_formValues)) {
+        if (!empty($this->_formValues['participant_status_id'])) {
           $statuses = array_keys($this->_formValues['participant_status_id']);
           $seatClause[] = '( participant.status_id IN ( ' . implode(' , ', $statuses) . ' ) )';
         }
-        if (CRM_Utils_Array::value('participant_role_id', $this->_formValues)) {
+        if (!empty($this->_formValues['participant_role_id'])) {
           $roles = array_keys($this->_formValues['participant_role_id']);
           $seatClause[] = '( participant.role_id IN ( ' . implode(' , ', $roles) . ' ) )';
         }
@@ -320,30 +312,15 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
         )
       );
 
-      $this->add('submit', $this->_printButtonName, ts('Print'),
-        array(
-          'class' => 'form-submit',
-          'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 1);",
-        )
-      );
-
       // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
       $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel',
         array('checked' => 'checked')
       );
       $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all',
-        array('onclick' => $this->getName() . ".toggleSelect.checked = false; toggleCheckboxVals('mark_x_',this); toggleTaskAction( true );")
+        array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );")
       );
     }
 
-    // add buttons
-    $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      ));
   }
 
   /**
@@ -398,7 +375,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
-    if ($buttonName == $this->_actionButtonName || $buttonName == $this->_printButtonName) {
+    if ($buttonName == $this->_actionButtonName) {
       // check actionName and if next, then do not repeat a search, since we are going to the next page
 
       // hack, make sure we reset the task values
@@ -456,40 +433,11 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
    * This function is used to add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
-   * @return None
+   * @return void
    * @access public
    * @see valid_date
    */
-  function addRules() {
-    $this->addFormRule(array('CRM_Event_Form_Search', 'formRule'));
-  }
-
-  /**
-   * global validation rules for the form
-   *
-   * @param array $fields posted values of the form
-   * @param array $errors list of errors to be posted back to the form
-   *
-   * @return void
-   * @static
-   * @access public
-   */
-  static function formRule($fields) {
-    $errors = array();
-
-    if ($fields['event_name'] && !is_numeric($fields['event_id'])) {
-      $errors['event_id'] = ts('Please select valid event.');
-    }
-
-    if ($fields['event_type'] && !is_numeric($fields['event_type_id'])) {
-      $errors['event_type'] = ts('Please select valid event type.');
-    }
-    if (!empty($errors)) {
-      return $errors;
-    }
-
-    return TRUE;
-  }
+  function addRules() {}
 
   /**
    * Set the default form values

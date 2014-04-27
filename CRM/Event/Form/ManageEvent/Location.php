@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -103,12 +103,12 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = $this->_values;
 
-    if (CRM_Utils_Array::value('loc_block_id', $defaults)) {
+    if (!empty($defaults['loc_block_id'])) {
       $defaults['loc_event_id'] = $defaults['loc_block_id'];
       $countLocUsed = CRM_Event_BAO_Event::countEventsUsingLocBlockId($defaults['loc_block_id']);
       if ($countLocUsed > 1) {
@@ -173,7 +173,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   /**
    *  function to build location block
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -202,10 +202,10 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $locationEvents = CRM_Event_BAO_Event::getLocationEvents();
     // remove duplicates and make sure that the duplicate entry with key as
     // loc_block_id of this event (this->_id) is preserved
-    if (CRM_Utils_Array::value($this->_oldLocBlockId, $locationEvents)) {
+    if (!empty($locationEvents[$this->_oldLocBlockId])) {
       $possibleDuplicate = $locationEvents[$this->_oldLocBlockId];
       $locationEvents = array_flip(array_unique($locationEvents));
-      if (CRM_Utils_Array::value($possibleDuplicate, $locationEvents)) {
+      if (!empty($locationEvents[$possibleDuplicate])) {
         $locationEvents[$possibleDuplicate] = $this->_oldLocBlockId;
       }
       $locationEvents = array_flip($locationEvents);
@@ -241,15 +241,14 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();
     $deleteOldBlock = FALSE;
 
     // if 'use existing location' option is selected -
-    if (CRM_Utils_Array::value('location_option', $params) == 2 &&
-      CRM_Utils_Array::value('loc_event_id', $params) &&
+    if (CRM_Utils_Array::value('location_option', $params) == 2 && !empty($params['loc_event_id']) &&
       ($params['loc_event_id'] != $this->_oldLocBlockId)
     ) {
       // if new selected loc is different from old loc, update the loc_block_id
@@ -283,7 +282,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
     foreach (array(
       'address', 'phone', 'email') as $block) {
-      if (!CRM_Utils_Array::value($block, $params) || !is_array($params[$block])) {
+      if (empty($params[$block]) || !is_array($params[$block])) {
         continue;
       }
       foreach ($params[$block] as $count => & $values) {
@@ -302,6 +301,8 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $params['id'] = $this->_id;
     CRM_Event_BAO_Event::add($params);
 
+    // Update tab "disabled" css class
+    $this->ajaxResponse['tabValid'] = TRUE;
     parent::endPostProcess();
   }
   //end of function

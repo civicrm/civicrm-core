@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -91,7 +91,7 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
     $form->add('text', 'prox_postal_code', ts('Postal Code'), NULL, FALSE);
 
     $defaults = self::setDefaultValues($form);
-    if (CRM_Utils_Array::value('prox_country_id', $defaults)) {
+    if (!empty($defaults['prox_country_id'])) {
       $stateProvince = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvinceForCountry($defaults['prox_country_id']);
     }
     else {
@@ -133,10 +133,8 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
   static function formRule($fields, $files, $form) {
     $errors = array();
     // If Distance is present, make sure state, country and city or postal code are populated.
-    if (CRM_Utils_Array::value('prox_distance', $fields)) {
-      if (!CRM_Utils_Array::value('prox_state_province_id', $fields) ||
-        !CRM_Utils_Array::value('prox_country_id', $fields)
-      ) {
+    if (!empty($fields['prox_distance'])) {
+      if (empty($fields['prox_state_province_id']) || empty($fields['prox_country_id'])) {
         $errors["prox_state_province_id"] = ts("Country AND State/Province are required to search by distance.");
       }
       if (!CRM_Utils_Array::value('prox_postal_code', $fields) AND

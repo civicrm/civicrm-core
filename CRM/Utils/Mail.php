@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -72,10 +72,7 @@ class CRM_Utils_Mail {
     CRM_Utils_Hook::alterMailParams($params);
 
     // check if any module has aborted mail sending
-    if (
-      CRM_Utils_Array::value('abortMailSend', $params) ||
-      !CRM_Utils_Array::value('toEmail', $params)
-    ) {
+    if (!empty($params['abortMailSend']) || empty($params['toEmail'])) {
       return FALSE;
     }
 
@@ -90,7 +87,7 @@ class CRM_Utils_Mail {
 
     $headers         = array();
     // CRM-10699 support custom email headers
-    if (CRM_Utils_Array::value('headers', $params)) {
+    if (!empty($params['headers'])) {
       $headers = array_merge($headers, $params['headers']);
     }
     $headers['From'] = $params['from'];
@@ -118,7 +115,7 @@ class CRM_Utils_Mail {
     if ($includeMessageId) {
       $headers['Message-ID'] = '<' . uniqid('civicrm_', TRUE) . "@$emailDomain>";
     }
-    if (CRM_Utils_Array::value('autoSubmitted', $params)) {
+    if (!empty($params['autoSubmitted'])) {
       $headers['Auto-Submitted'] = "Auto-Generated";
     }
 
@@ -171,17 +168,16 @@ class CRM_Utils_Mail {
     if (get_class($mailer) != "Mail_mail") {
         //get emails from headers, since these are 
         //combination of name and email addresses.
-        if ( CRM_Utils_Array::value( 'Cc', $headers ) ) {
+        if (!empty($headers['Cc'])) {
             $to[] = CRM_Utils_Array::value( 'Cc', $headers );
         }
-        if ( CRM_Utils_Array::value( 'Bcc', $headers ) ) {
+        if (!empty($headers['Bcc'])) {
             $to[] = CRM_Utils_Array::value( 'Bcc', $headers );
         }
     }
     if (is_object($mailer)) {
-      CRM_Core_Error::ignoreException();
+      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       $result = $mailer->send($to, $headers, $message);
-      CRM_Core_Error::setCallback();
       if (is_a($result, 'PEAR_Error')) {
         $message = self::errorMessage($mailer, $result);
         // append error message in case multiple calls are being made to

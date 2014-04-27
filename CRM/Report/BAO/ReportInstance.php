@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -73,7 +73,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     }
 
     $instanceID = CRM_Utils_Array::value('id', $params);
-    if (CRM_Utils_Array::value('instance_id', $params)) {
+    if (!empty($params['instance_id'])) {
       $instanceID = CRM_Utils_Array::value('instance_id', $params);
     }
 
@@ -143,7 +143,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     }
 
     // build navigation parameters
-    if (CRM_Utils_Array::value('is_navigation', $params)) {
+    if (!empty($params['is_navigation'])) {
       if (!array_key_exists('navigation', $params)) {
         $params['navigation'] = array();
       }
@@ -168,7 +168,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
     // add to dashboard
     $dashletParams = array();
-    if (CRM_Utils_Array::value('addToDashboard', $params)) {
+    if (!empty($params['addToDashboard'])) {
       $dashletParams = array(
         'label' => $params['title'],
         'is_active' => 1,
@@ -188,15 +188,13 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
     // add / update navigation as required
     if (!empty($navigationParams)) {
-      if (!CRM_Utils_Array::value('id',$params) &&
-        !CRM_Utils_Array::value('instance_id',$params) &&
-        CRM_Utils_Array::value('id', $navigationParams)) {
+      if (empty($params['id']) && empty($params['instance_id']) && !empty($navigationParams['id'])) {
         unset($navigationParams['id']);
       }
       $navigationParams['url'] = "civicrm/report/instance/{$instance->id}&reset=1";
       $navigation = CRM_Core_BAO_Navigation::add($navigationParams);
 
-      if (CRM_Utils_Array::value('is_active', $navigationParams)) {
+      if (!empty($navigationParams['is_active'])) {
         //set the navigation id in report instance table
         CRM_Core_DAO::setFieldValue('CRM_Report_DAO_ReportInstance', $instance->id, 'navigation_id', $navigation->id);
       }
@@ -212,7 +210,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     if (!empty($dashletParams)) {
       $section = 2;
       $chart  = '';
-      if (CRM_Utils_Array::value('charts', $params)) {
+      if (!empty($params['charts'])) {
         $section = 1;
         $chart   = "&charts=" . $params['charts'];
       }

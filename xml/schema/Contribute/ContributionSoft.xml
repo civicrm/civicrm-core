@@ -76,6 +76,9 @@
         <labelColumn>full_name</labelColumn>
         <nameColumn>numeric_code</nameColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <field>
       <name>pcp_id</name>
@@ -114,6 +117,17 @@
        <type>varchar</type>
        <length>255</length>
        <default>NULL</default>
+       <add>2.2</add>
+  </field>
+  <field>
+       <name>soft_credit_type_id</name>
+       <type>int unsigned</type>
+       <default>NULL</default>
+       <title>Soft Credit Type</title>
+       <pseudoconstant>
+         <optionGroupName>soft_credit_type</optionGroupName>
+       </pseudoconstant>
+       <comment>Soft Credit Type ID.Implicit FK to civicrm_option_value where option_group = soft_credit_type.</comment>
        <add>2.2</add>
   </field>
 </table>

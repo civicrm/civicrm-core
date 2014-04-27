@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -38,6 +38,8 @@
  * Page for displaying list of PDF Page Formats
  */
 class CRM_Admin_Page_PdfFormats extends CRM_Core_Page_Basic {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -124,7 +126,16 @@ class CRM_Admin_Page_PdfFormats extends CRM_Core_Page_Basic {
     // Add action links to each of the PDF Page Formats
     $action = array_sum(array_keys($this->links()));
     foreach ($pdfFormatList as & $format) {
-      $format['action'] = CRM_Core_Action::formLink(self::links(), $action, array('id' => $format['id']));
+      $format['action'] = CRM_Core_Action::formLink(
+        self::links(),
+        $action,
+        array('id' => $format['id']),
+        ts('more'),
+        FALSE,
+        'pdfFormat.manage.action',
+        'PdfFormat',
+        $format['id']
+      );
     }
 
     // Order Label Formats by weight

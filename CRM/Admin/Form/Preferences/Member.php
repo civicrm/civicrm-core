@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: Display.php 36505 2011-10-03 14:19:56Z lobo $
  *
  */
@@ -58,7 +58,7 @@ class CRM_Admin_Form_Preferences_Member extends CRM_Admin_Form_Preferences {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   function buildQuickForm() {

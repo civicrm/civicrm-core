@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -199,6 +199,20 @@ return array (
     'html_type' => 'Text',
     'default' => null,
     'add' => '4.1',
+    'title' => null,
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => null,
+    'help_text' => null,
+  ),
+  'ajaxPopupsEnabled' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'ajaxPopupsEnabled',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => 1,
+    'add' => '4.5',
     'title' => null,
     'is_domain' => 1,
     'is_contact' => 0,

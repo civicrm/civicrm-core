@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -99,17 +99,18 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    * Test civicrm_group_organization_get with group_id.
    */
   public function testGroupOrganizationGetWithGroupId() {
-
-    $params = array(
+    $createParams = array(
       'organization_id' => $this->_orgID,
-      'group_id' => $this->_groupID,      'sequential' => 1,
+      'group_id' => $this->_groupID,
     );
-    $result = $this->callAPISuccess('group_organization', 'create', $params);
+    $createResult = $this->callAPISuccess('group_organization', 'create', $createParams);
 
-    $paramsGet = array('organization_id' => $result['values'][0]['organization_id']);
-
-    $result = $this->callAPISuccess('group_organization', 'get', $params);
-    $this->assertAPISuccess($result);
+    $getParams = array(
+      'group_id' => $this->_groupID,
+      'sequential' => 1,
+    );
+    $getResult = $this->callAPISuccess('group_organization', 'get', $getParams);
+    $this->assertEquals($createResult['values'], $getResult['values'][0]);
   }
 
   /**

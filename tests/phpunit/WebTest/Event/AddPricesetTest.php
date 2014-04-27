@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -73,7 +73,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
       $this->check('extends[2]');
     }
 
-    $this->select("css=select.form-select", "label={$financialType}");
+    $this->select("financial_type_id", "label={$financialType}");
 
     $this->type('help_pre', $setHelp);
 
@@ -170,7 +170,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage('admin/price', 'reset=1');
 
     // Use the price set id ($sid) to pick the correct row
-    $this->clickLink("css=tr#row_{$sid} a[title='Preview Price Set']", '_qf_Preview_cancel-bottom');
+    $this->clickLink("//*[@id='price_set-{$sid}']/td[4]/span[1]/a[2]", '_qf_Preview_cancel-bottom');
 
     // Check for expected price set field strings
     $this->assertStringsPresent($validateStrings);
@@ -234,21 +234,20 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->click('_qf_EventInfo_upload-bottom');
 
     // Wait for Location tab form to load
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('_qf_Location_upload_done-bottom');
 
     // Go to Fees tab
     $this->click('link=Fees');
-    $this->waitForElementPresent('_qf_Fee_upload-bottom');
+    $this->waitForElementPresent('_qf_Fee_upload_done-bottom');
     $this->click('CIVICRM_QFID_1_is_monetary');
     $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
     $this->select('financial_type_id','label=Event Fee');
     $this->select('price_set_id', 'label=' . $setTitle);
 
-    $this->click('_qf_Fee_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // intro text for registration page
     $registerIntro = 'Fill in all the fields below and click Continue.';
+    $this->clickLink('_qf_Fee_upload-bottom', 'link=Online Registration', FALSE);
 
     // Go to Online Registration tab
     $this->click('link=Online Registration');
@@ -265,8 +264,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('confirm_from_email', 'jane.doe@example.org');
 
     $this->click('_qf_Registration_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Registration' information has been saved.");
+    $this->waitForTextPresent("'Online Registration' information has been saved.");
 
     // verify event input on info page
     // start at Manage Events listing
@@ -276,14 +274,16 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $eventInfoUrl = $this->getLocation();
 
+    $permissions = array("edit-1-register-for-events");
+    $this->changePermissions($permissions);
     $this->webtestLogout();
     $this->open($eventInfoUrl);
     $this->click('link=Register Now');
     $this->waitForElementPresent('_qf_Register_upload-bottom');
 
-    $this->type("xpath=//input[@class='form-text four required']", "1");
-    $this->click("xpath=//input[@class='form-radio']");
-    $this->click("xpath=//input[@class='form-checkbox']");
+    $this->type("xpath=//input[@class='four crm-form-text required']", "1");
+    $this->click("xpath=//input[@class='crm-form-radio']");
+    $this->click("xpath=//input[@class='crm-form-checkbox']");
     $this->type("first_name", "Jane");
     $lastName = "Smith" . substr(sha1(rand()), 0, 7);
     $this->type("last_name", $lastName);
@@ -328,7 +328,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
       4 => 'Evening Sessions - First Night',
     );
     foreach ($expected as $value => $label) {
-      $this->verifyText("xpath=id('ParticipantView')/div[2]/table[1]/tbody/tr[7]/td[2]/table/tbody/tr[$value]/td", $label);
+      $this->verifyText("xpath=id('ParticipantView')/div[2]/table[1]/tbody/tr[8]/td[2]/table/tbody/tr[$value]/td", $label);
     }
     // Fixme: We can't asset full string like - "Event Total: $ 590.00" as it has special char
     $this->assertStringsPresent(' 590.00');
@@ -404,8 +404,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->select('financial_type_id','label=Event Fee');
     $this->select('price_set_id', 'label=' . $setTitle);
 
-    $this->click('_qf_Fee_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Fee_upload-bottom', 'link=Online Registration', FALSE);
 
     // intro text for registration page
     $registerIntro = 'Fill in all the fields below and click Continue.';
@@ -425,8 +424,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('confirm_from_email', 'jane.doe@example.org');
 
     $this->click('_qf_Registration_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Registration' information has been saved.");
+    $this->waitForTextPresent("'Online Registration' information has been saved.");
 
     // verify event input on info page
     // start at Manage Events listing
@@ -447,12 +445,12 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->webtestFillAutocomplete($firstName);
 
     // Select event. Based on label for now.
-    $this->select('event_id', "label=regexp:$eventTitle");
+    $this->select2('s2id_event_id', "$eventTitle");
     // Select role
     $this->click('role_id[2]');
 
-    $this->click("xpath=//input[@class='form-radio']");
-    $this->click("xpath=//input[@class='form-checkbox']");
+    $this->click("xpath=//input[@class='crm-form-radio']");
+    $this->click("xpath=//input[@class='crm-form-checkbox']");
 
     // Choose Registration Date.
     // Using helper webtestFillDate function.
@@ -468,10 +466,10 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->assertElementContainsText("css=#crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
 
-    $this->waitForElementPresent("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
 
     //click through to the participant view screen
-    $this->click("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
   }
 
@@ -554,13 +552,13 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->select('price_set_id', 'label=' . $setTitle);
 
     $this->click('_qf_Fee_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText("crm-notification-container","'Fees' information has been saved.");
 
     $this->openCiviPage('participant/add', 'reset=1&action=add&context=standalone', '_qf_Participant_upload-bottom');
 
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
     $this->webtestFillAutocomplete($firstName);
-    $this->select('event_id', "label=regexp:$eventTitle");
+    $this->select2('event_id', $eventTitle);
     // Select role
     $this->click('role_id[2]');
 
@@ -578,11 +576,11 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
     // Select an event fee
     $this->waitForElementPresent('priceset');
-    $this->type("//div[@id='priceset']//div[@class='crm-section Full_Conference-section']/div[2]/input", '5');
-    $this->fireEvent("//div[@id='priceset']//div[@class='crm-section Full_Conference-section']/div[2]/input", 'blur');
-    $this->click("xpath=//div[@id='priceset']//div[@class='crm-section Pre_conference_Meetup_-section']/div[2]/div[1]/span/input");
-    $this->click("xpath=//div[@id='priceset']//div[@class='crm-section Evening_Sessions-section']/div[2]/div[1]/span/input");
-    $this->click("xpath=//div[@id='priceset']//div[@class='crm-section Evening_Sessions-section']/div[2]/div[2]/span/input");
+    $this->type("//div[@id='priceset']/div[2]/div[2]/input", '5');
+    $this->fireEvent("//div[@id='priceset']/div[2]/div[2]/input", 'blur');
+    $this->click("xpath=//div[@id='priceset']/div[3]/div[2]/div[1]/span/input");
+    $this->click("xpath=//div[@id='priceset']/div[4]/div[2]/div[1]/span/input");
+    $this->click("xpath=//div[@id='priceset']/div[4]/div[2]/div[2]/span/input");
 
     // Select payment method = Check and enter chk number
     $this->select('payment_instrument_id', 'value=4');
@@ -596,9 +594,9 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->assertElementContainsText("css=#crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
 
-    $this->waitForElementPresent("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->click("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -607,7 +605,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         'Participant Role' => 'Attendee',
         'Status' => 'Registered',
         'Event Source' => 'Event StandaloneAddTest Webtest',
-        'Event Fees' => 'Event Total: $ 2,705.00',
+        'Fees' => 'Total Fee(s) Total Paid Balance $ 2,705.00',
       )
     );
     $expectedLineItems = array(
@@ -638,7 +636,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->_checkLineItems($expectedLineItems);
     // check contribution record as well
     // click through to the contribution view screen
-    $this->click("xpath=id('ParticipantView')/div[2]/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//*[@id='ParticipantView']/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -681,13 +679,15 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->clickLink('newEventTemplate');
     $this->select("template_id", "value=6");
     // Wait for event type to be filled in (since page reloads)
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("template_id");
     // Enter Event Title, Summary and Description
-    $this->type('template_title', "Test Template");
+    $this->select("event_type_id", "value=4");
+    $this->select("default_role_id", "value=1");
     $this->type("title", "Test Event");
     $this->type("summary", "This is a great conference. Sign up now!");
-    $this->clickLink("_qf_EventInfo_upload-bottom");
     
+    $this->click("_qf_EventInfo_upload-bottom");
+    $this->waitForElementPresent('link=Fees');
     // Go to Fees tab
     $this->click('link=Fees');
     $this->waitForElementPresent('_qf_Fee_upload-bottom');
@@ -695,7 +695,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->select('financial_type_id','label=Event Fee');
     $this->select('price_set_id', 'label=' . $setTitle);
     $templateId = $this->urlArg('id');
-    $this->clickLink('_qf_Fee_upload-bottom');
+    $this->click('_qf_Fee_upload-bottom');
     
     //check the delete for price field
     $this->openCiviPage("admin/price/field", "reset=1&action=browse&sid={$sid}");
@@ -727,7 +727,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
   function _checkLineItems($expectedLineItems) {
     foreach ($expectedLineItems as $lineKey => $lineValue) {
       foreach ($lineValue as $key => $value) {
-        $this->verifyText("xpath=//table/tbody/tr/td[text()='Event Fees']/following-sibling::td/table/tbody/tr[$lineKey]/td[$key]", preg_quote($value));
+        $this->verifyText("xpath=//table/tbody//tr/td[text()='Selections']/following-sibling::td/table/tbody//tr[$lineKey]/td[$key]", preg_quote($value));
       }
     }
   }

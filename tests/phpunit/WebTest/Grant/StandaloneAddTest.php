@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -85,10 +85,10 @@ class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->type("note", "Grant Note");
 
     // Clicking save.
-    $this->clickLink("_qf_Grant_upload", "xpath=//div[@id='Grants']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->clickLink("_qf_Grant_upload", "xpath=//div[@class='view-content']//table//tbody/tr[1]/td[8]/span/a[text()='View']", FALSE);
 
     //click through to the Grant view screen
-    $this->click("xpath=//div[@id='Grants']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
 
     $this->waitForElementPresent("_qf_GrantView_cancel-bottom");
 

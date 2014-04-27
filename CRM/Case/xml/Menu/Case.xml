@@ -68,7 +68,6 @@
      <path>civicrm/admin/options/case_type</path>
      <title>Case Types</title>
      <desc>List of types which can be assigned to Cases. (Enable the Cases tab from System Settings - Enable Components if you want to track cases.)</desc>
-     <path_arguments>group=case_type</path_arguments>
      <access_arguments>administer CiviCase</access_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>CiviCase</adminGroup>
@@ -79,7 +78,6 @@
      <path>civicrm/admin/options/redaction_rule</path>
      <title>Redaction Rules</title>
      <desc>List of rules which can be applied to user input strings so that the redacted output can be recognized as repeated instances of the same string or can be identified as a "semantic type of the data element" within case data.</desc>
-     <path_arguments>group=redaction_rule</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <access_arguments>administer CiviCase</access_arguments>
      <adminGroup>CiviCase</adminGroup>
@@ -90,7 +88,6 @@
      <path>civicrm/admin/options/case_status</path>
      <title>Case Statuses</title>
      <desc>List of statuses that can be assigned to a case.</desc>
-     <path_arguments>group=case_status</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <access_arguments>administer CiviCase</access_arguments>
      <adminGroup>CiviCase</adminGroup>
@@ -101,7 +98,6 @@
      <path>civicrm/admin/options/encounter_medium</path>
      <title>Encounter Mediums</title>
      <desc>List of encounter mediums.</desc>
-     <path_arguments>group=encounter_medium</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <access_arguments>administer CiviCase</access_arguments>
      <adminGroup>CiviCase</adminGroup>
@@ -116,10 +112,6 @@
   <item>
      <path>civicrm/case/ajax/unclosed</path>
      <page_callback>CRM_Case_Page_AJAX::unclosedCases</page_callback>
-  </item>
-  <item>
-     <path>civicrm/case/ajax/relcases</path>
-     <page_callback>CRM_Case_Page_AJAX::getRelatedCases</page_callback>
   </item>
   <item>
      <path>civicrm/case/ajax/addclient</path>

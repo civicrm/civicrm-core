@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,7 +41,7 @@
   <td>
     <div class="float-left">
       <label>{ts}Payment Method{/ts}</label> <br />
-      {$form.contribution_payment_instrument_id.html}
+      {$form.contribution_payment_instrument_id.html|crmAddClass:twenty}
     </div>
     <div class="float-left" id="contribution_check_number_wrapper">
       {$form.contribution_check_number.label} <br />
@@ -55,36 +55,36 @@
 </tr>
 <tr>
   <td>
+    {$form.contribution_or_softcredits.label} <br />
+    {$form.contribution_or_softcredits.html}
+  </td>
+  <td>
+    <div class="float-left" id="contribution_soft_credit_type_wrapper">
+      {$form.contribution_soft_credit_type_id.label} <br />
+      {$form.contribution_soft_credit_type_id.html|crmAddClass:twenty}
+    </div>  
+  </td>
+</tr>
+<tr>
+  <td>
     <table style="width:auto">
       <tbody>
       <tr>
         <td>{$form.contribution_thankyou_date_is_not_null.label}</td>
         <td>
           {$form.contribution_thankyou_date_is_not_null.html}
-          <span class="crm-clear-link">
-            (<a href="#" onclick="unselectRadio('contribution_thankyou_date_is_not_null','{$form.formName}')">
-            {ts}clear{/ts}</a>)
-          </span>
         </td>
       </tr>
       <tr>
         <td>{$form.contribution_receipt_date_is_not_null.label}</td>
         <td>
           {$form.contribution_receipt_date_is_not_null.html}
-          <span class="crm-clear-link">
-            (<a href="#" onclick="unselectRadio('contribution_receipt_date_is_not_null','{$form.formName}')">
-            {ts}clear{/ts}</a>)
-          </span>
         </td>
       </tr>
       <tr>
         <td>{$form.contribution_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}</td>
         <td>
           {$form.contribution_test.html}
-          <span class="crm-clear-link">
-            (<a href="#" onclick="unselectRadio('contribution_test','{$form.formName}')">
-            {ts}clear{/ts}</a>)
-          </span>
         </td>
       </tr>
       </tbody>
@@ -97,18 +97,12 @@
         <td>{$form.contribution_pay_later.label}</td>
         <td>
           {$form.contribution_pay_later.html}
-            <span class="crm-clear-link">
-              (<a href="#" onclick="unselectRadio('contribution_pay_later','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
-            </span>
         </td>
       </tr>
       <tr>
         <td>{$form.contribution_recurring.label}</td>
         <td>
           {$form.contribution_recurring.html}
-            <span class="crm-clear-link">
-              (<a href="#" onclick="unselectRadio('contribution_recurring','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
-            </span>
         </td>
       </tr>
       </tbody>
@@ -127,10 +121,6 @@
 </tr>
 <tr>
   <td>
-    {$form.contribution_in_honor_of.label} <br />
-    {$form.contribution_in_honor_of.html|crmAddClass:twenty}
-  </td>
-  <td>
     {$form.contribution_source.label} <br />
     {$form.contribution_source.html|crmAddClass:twenty}
   </td>
@@ -143,16 +133,13 @@
   <td>
     {$form.contribution_pcp_display_in_roll.label}
     {$form.contribution_pcp_display_in_roll.html}
-      <span class="crm-clear-link">
-        (<a href="#" onclick="unselectRadio('contribution_pcp_display_in_roll','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
-      </span>
   </td>
 </tr>
 
 <tr>
   <td>
     <label>{ts}Currency{/ts}</label> <br />
-    {$form.contribution_currency_type.html}
+    {$form.contribution_currency_type.html|crmAddClass:twenty}
   </td>
   {if $form.contribution_batch_id.html }
     <td>
@@ -186,6 +173,15 @@ campaignTrClass='' campaignTdClass=''}
     else {
       cj('#contribution_check_number_wrapper').hide();
       cj('#contribution_check_number').val('');
+    }
+  }).change();
+  cj('#contribution_or_softcredits').change(function() {
+    if (cj(this).val() == 'only_contribs') {
+      cj('#contribution_soft_credit_type_wrapper').hide();
+      cj('#contribution_soft_credit_type_id').val('');
+    }
+    else {
+      cj('#contribution_soft_credit_type_wrapper').show();
     }
   }).change();
 </script>

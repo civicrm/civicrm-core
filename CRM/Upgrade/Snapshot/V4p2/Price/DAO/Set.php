@@ -1,9 +1,9 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.5                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -27,7 +27,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -301,7 +301,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set extends CRM_Core_DAO
             self::$_import = array();
             $fields = self::fields();
             foreach($fields as $name => $field) {
-                if (CRM_Utils_Array::value('import', $field)) {
+                if (!empty($field['import'])) {
                     if ($prefix) {
                         self::$_import['price_set'] = & $fields[$name];
                     } else {
@@ -325,7 +325,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set extends CRM_Core_DAO
             self::$_export = array();
             $fields = self::fields();
             foreach($fields as $name => $field) {
-                if (CRM_Utils_Array::value('export', $field)) {
+                if (!empty($field['export'])) {
                     if ($prefix) {
                         self::$_export['price_set'] = & $fields[$name];
                     } else {

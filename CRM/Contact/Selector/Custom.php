@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: Selector.php 11510 2007-09-18 09:21:34Z lobo $
  *
  */
@@ -332,7 +332,12 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
         $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $contactID;
         $row['action'] = CRM_Core_Action::formLink($links,
           $mask,
-          array('id' => $contactID)
+          array('id' => $contactID),
+          ts('more'),
+          FALSE,
+          'contact.custom.actions',
+          'Contact',
+          $contactID
         );
         $row['contact_id'] = $contactID;
 
@@ -406,7 +411,12 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     foreach ($rows as $id => & $row) {
       $row['action'] = CRM_Core_Action::formLink($links,
         $mask,
-        array('id' => $row['contact_id'])
+        array('id' => $row['contact_id']),
+        ts('more'),
+        FALSE,
+        'contact.custom.actions',
+        'Contact',
+        $row['contact_id']
       );
     }
   }

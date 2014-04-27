@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -36,7 +36,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -169,11 +169,18 @@ ORDER BY entity_id
         // form all action links
         $action = array_sum(array_keys($this->links()));
 
-        $acl[$dao->entity_id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-          array('id' => $dao->entity_id)
+        $acl[$dao->entity_id]['action'] = CRM_Core_Action::formLink(
+          self::links(),
+          $action,
+          array('id' => $dao->entity_id),
+          ts('more'),
+          FALSE,
+          'aclRole.manage.action',
+          'ACLRole',
+          $dao->entity_id
         );
       }
-      elseif (CRM_Utils_Array::value($dao->object_table, $permissions)) {
+      elseif (!empty($permissions[$dao->object_table])) {
         $acl[$dao->entity_id]['object_table'] .= ", {$permissions[$dao->object_table]}";
       }
     }

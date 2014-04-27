@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -136,22 +136,22 @@ class api_v3_TagTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_tag_create contribution tag- success expected. Test checks that used_for is set
+   * Test civicrm_tag_create activity tag- success expected. Test checks that used_for is set
    * and not over-written by default on update
    */
-  function testCreateContributionTag() {
+  function testCreateEntitySpecificTag() {
     $params = array(
       'name' => 'New Tag4',
-      'description' => 'This is description for New Cont tag',
-      'used_for' => 'civicrm_contribution',
+      'description' => 'This is description for New Activity tag',
+      'used_for' => 'civicrm_activity',
     );
     $result = $this->callAPISuccess('tag', 'create', $params);
-    $check = $this->callAPISuccess('tag', 'get', array());
+    $this->callAPISuccess('tag', 'get', array());
     $this->getAndCheck($params, $result['id'], 'tag', 0, __FUNCTION__ . ' tag first created');
     unset($params['used_for']);
     $params['id'] = $result['id'];
     $result = $this->callAPISuccess('tag', 'create', $params);
-    $params['used_for'] = 'civicrm_contribution';
+    $params['used_for'] = 'civicrm_activity';
     $this->getAndCheck($params, $result['id'], 'tag', 1, __FUNCTION__ . ' tag updated in line ' . __LINE__);
   }
   ///////////////// civicrm_tag_delete methods
@@ -190,6 +190,18 @@ class api_v3_TagTest extends CiviUnitTestCase {
     $params      = array('action' => 'create');
     $result      = $this->callAPIAndDocument('tag', 'getfields', $params, __FUNCTION__, __FILE__, $description, NULL, 'getfields');
     $this->assertEquals('civicrm_contact', $result['values']['used_for']['api.default']);
+  }
+
+  function testTagGetList() {
+    $description = "Demonstrates use of api.getlist for autocomplete and quicksearch applications";
+    $params = array(
+      'input' => $this->tag['name'],
+      'extra' => array('used_for')
+    );
+    $result = $this->callAPIAndDocument('tag', 'getlist', $params, __FUNCTION__, __FILE__, $description);
+    $this->assertEquals($this->tag['id'], $result['values'][0]['id'], 'In line ' . __LINE__);
+    $this->assertEquals($this->tag['description'], $result['values'][0]['description'][0], 'In line ' . __LINE__);
+    $this->assertEquals($this->tag['used_for'], $result['values'][0]['extra']['used_for'], 'In line ' . __LINE__);
   }
 }
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,10 +28,13 @@
 class CRM_Utils_Constant {
 
   /**
-   * Determine the value of a constant. If undefined, return a default value
+   * Determine the value of a constant, if any.
+   * 
+   * If the specified constant is undefined, return a default value.
    *
    * @param string $name
    * @param mixed $default
+   *   (optional)
    * @return mixed
    */
   public static function value($name, $default = NULL) {

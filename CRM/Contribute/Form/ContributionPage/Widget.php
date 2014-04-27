@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -205,16 +205,16 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
    */
   public static function formRule($params, $files, $self) {
     $errors = array();
-    if (CRM_Utils_Array::value('is_active', $params)) {
-      if (!CRM_Utils_Array::value('title', $params)) {
+    if (!empty($params['is_active'])) {
+      if (empty($params['title'])) {
         $errors['title'] = ts('Title is a required field.');
       }
-      if (!CRM_Utils_Array::value('about', $params)) {
+      if (empty($params['about'])) {
         $errors['about'] = ts('About is a required field.');
       }
 
       foreach ($params as $key => $val) {
-        if (substr($key, 0, 6) == 'color_' && !CRM_Utils_Array::value($key, $params)) {
+        if (substr($key, 0, 6) == 'color_' && empty($params[$key])) {
           $errors[$key] = ts('%1 is a required field.', array(1 => $self->_colorFields[$key][0]));
         }
       }

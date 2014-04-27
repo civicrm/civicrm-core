@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -175,7 +175,7 @@ class CRM_Utils_Rule {
     }
 
     // CRM-9017 CiviContribute/CiviMember form with expiration date format 'm Y'
-    if (!$m && CRM_Utils_Array::value('m', $date)) {
+    if (!$m && !empty($date['m'])) {
       $m = CRM_Utils_Array::value('m', $date);
     }
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -69,29 +69,30 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
       'advanced_search_options'
     );
 
-    if (CRM_Utils_Array::value('contactType', $searchOptions)) {
+    if (!empty($searchOptions['contactType'])) {
       $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements();
       $this->add('select', 'contact_type',
         ts('is...'),
-        $contactTypes
+        $contactTypes,
+        FALSE,
+        array('class' => 'crm-select2')
       );
     }
 
-    if (CRM_Utils_Array::value('groups', $searchOptions)) {
+    if (!empty($searchOptions['groups'])) {
       // Arrange groups into hierarchical listing (child groups follow their parents and have indentation spacing in title)
       $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($this->_group, NULL, '&nbsp;&nbsp;', TRUE);
 
       // add select for groups
       $group = array('' => ts('- any group -')) + $groupHierarchy;
-      $this->_groupElement = &$this->addElement('select', 'group', ts('in'), $group);
+      $this->add('select', 'group', ts('in'), $group, FALSE, array('class' => 'crm-select2'));
     }
 
-    if (CRM_Utils_Array::value('tags', $searchOptions)) {
+    if (!empty($searchOptions['tags'])) {
       // tag criteria
       if (!empty($this->_tag)) {
-        $tag = array(
-          '' => ts('- any tag -')) + $this->_tag;
-        $this->_tagElement = &$this->addElement('select', 'tag', ts('with'), $tag);
+        $tag = array('' => ts('- any tag -')) + $this->_tag;
+        $this->add('select', 'tag', ts('with'), $tag, FALSE, array('class' => 'crm-select2'));
       }
     }
 
@@ -110,7 +111,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
     $defaults['sort_name'] = CRM_Utils_Array::value('sort_name', $this->_formValues);
     foreach (self::$csv as $v) {
-      if (CRM_Utils_Array::value($v, $this->_formValues) && is_array($this->_formValues[$v])) {
+      if (!empty($this->_formValues[$v]) && is_array($this->_formValues[$v])) {
         $tmpArray = array_keys($this->_formValues[$v]);
         $defaults[$v] = array_pop($tmpArray);
       }
@@ -121,9 +122,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
     if ($this->_context === 'amtg') {
       $defaults['task'] = CRM_Contact_Task::GROUP_CONTACTS;
-    }
-    else {
-      $defaults['task'] = CRM_Contact_Task::PRINT_CONTACTS;
     }
 
     if ($this->_context === 'smog') {
@@ -177,7 +175,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
       $this->normalizeFormValues();
     }
 
-    if (isset($this->_groupID) && !CRM_Utils_Array::value('group', $this->_formValues)) {
+    if (isset($this->_groupID) && empty($this->_formValues['group'])) {
       $this->_formValues['group'][$this->_groupID] = 1;
     }
     elseif (isset($this->_ssID) && empty($_POST)) {
@@ -250,7 +248,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   static function formRule($fields) {
     // check actionName and if next, then do not repeat a search, since we are going to the next page
     if (array_key_exists('_qf_Search_next', $fields)) {
-      if (!CRM_Utils_Array::value('task', $fields)) {
+      if (empty($fields['task'])) {
         return array('task' => 'Please select a valid action.');
       }
 

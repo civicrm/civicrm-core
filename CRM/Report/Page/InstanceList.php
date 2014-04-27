@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -98,7 +98,8 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
       if ($this->compID == 99) {
         $report .= " AND v.component_id IS NULL ";
         $this->_compName = 'Contact';
-      } else {
+      }
+      else {
         $report .= " AND v.component_id = {$this->compID} ";
         $cmpName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Component', $this->compID,
           'name', 'id'
@@ -134,13 +135,12 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
           ORDER BY  v.weight";
 
     $dao = CRM_Core_DAO::executeQuery($sql, array(
-        1 => array(CRM_Core_Config::domainID(), 'Integer'),
-      ));
-
+      1 => array(CRM_Core_Config::domainID(), 'Integer'),
+    ));
 
     $config = CRM_Core_Config::singleton();
-    $rows   = array();
-    $url    = 'civicrm/report/instance';
+    $rows = array();
+    $url = 'civicrm/report/instance';
     while ($dao->fetch()) {
       if (in_array($dao->report_id, self::$_exceptions)) {
         continue;
@@ -172,7 +172,6 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
         }
       }
     }
-
     return $rows;
   }
 
@@ -186,7 +185,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
     $this->ovID   = CRM_Utils_Request::retrieve('ovid', 'Positive', $this);
     $this->compID = CRM_Utils_Request::retrieve('compid', 'Positive', $this);
     $this->grouping = CRM_Utils_Request::retrieve('grp', 'String', $this);
-    
+
     $rows   = $this->info();
 
     $this->assign('list', $rows);

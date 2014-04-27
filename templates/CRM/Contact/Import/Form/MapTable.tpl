@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -168,7 +168,7 @@
 
       {* // Set default location type *}
       {literal}
-      cj(function() {
+      CRM.$(function($) {
         var defaultLocationType = "{/literal}{$defaultLocationType}{literal}";
         if (defaultLocationType.length) {
           cj('#map-field').on('change', 'select[id^="mapper"][id$="_0"]', function() {

@@ -1,7 +1,7 @@
 <?php
 /*
  +----------------------------------------------------------------------------+
- | Elavon (Nova) Virtual Merchant Core Payment Module for CiviCRM version 4.4 |
+ | Elavon (Nova) Virtual Merchant Core Payment Module for CiviCRM version 4.5 |
  +----------------------------------------------------------------------------+
  | Licensed to CiviCRM under the Academic Free License version 3.0            |
  |                                                                            |
@@ -193,7 +193,9 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     // set this for debugging -look for output in apache error log
     //curl_setopt ($ch,CURLOPT_VERBOSE,1 );
     // ensures any Location headers are followed
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    if (ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off') {
+      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    }
 
     /**********************************************************
      * Send the data out over the wire

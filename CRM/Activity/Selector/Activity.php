@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -108,8 +108,10 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
                                      $key                 = NULL,
                                      $compContext         = NULL) {
     static $activityActTypes = NULL;
+    //CRM-14277 added addtitional param to handle activity search
+    $extraParams = "&searchContext=activity";
 
-    $extraParams = ($key) ? "&key={$key}" : NULL;
+    $extraParams .= ($key) ? "&key={$key}" : NULL;
     if ($compContext) {
       $extraParams .= "&compContext={$compContext}";
     }
@@ -128,6 +130,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
     //when activity type is disabled or no more exists give only delete.
     switch ($activityTypeName) {
       case 'Event Registration':
+      case 'Change Registration':
         $url = 'civicrm/contact/view/participant';
         $qsView = "action=view&reset=1&id={$sourceRecordId}&cid=%%cid%%&context=%%cxt%%{$extraParams}";
         break;
@@ -135,6 +138,15 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
       case 'Contribution':
         $url = 'civicrm/contact/view/contribution';
         $qsView = "action=view&reset=1&id={$sourceRecordId}&cid=%%cid%%&context=%%cxt%%{$extraParams}";
+        break;
+
+      case 'Payment':
+      case 'Refund':
+        $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $sourceRecordId, 'participant_id', 'contribution_id');
+        if (!empty($participantId)) {
+          $url = 'civicrm/contact/view/participant';
+          $qsView = "action=view&reset=1&id={$participantId}&cid=%%cid%%&context=%%cxt%%{$extraParams}";
+        }
         break;
 
       case 'Membership Signup':
@@ -401,7 +413,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
 
       //CRM-3553
       $accessMailingReport = FALSE;
-      if (CRM_Utils_Array::value('mailingId', $row)) {
+      if (!empty($row['mailingId'])) {
         $accessMailingReport = TRUE;
       }
 
@@ -422,7 +434,12 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
             'cid' => $this->_contactId,
             'cxt' => $this->_context,
             'caseid' => CRM_Utils_Array::value('case_id', $row),
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'activity.selector.action',
+          'Activity',
+          $row['activity_id']
         );
       }
 

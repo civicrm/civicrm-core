@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -41,48 +41,11 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * @static
    */
   static $_links = NULL;
-  static $_honorLinks = NULL;
   static $_recurLinks = NULL;
   public $_permission = NULL;
   public $_contactId = NULL;
   public $_crid = NULL;
 
-  /**
-   * This method returns the links that are given for honor search row.
-   * currently the links added for each row are
-   *
-   * - View
-   * - Edit
-   *
-   * @return array
-   * @access public
-   *
-   */
-  static function &honorLinks() {
-    if (!(self::$_honorLinks)) {
-      self::$_honorLinks = array(
-        CRM_Core_Action::VIEW => array(
-          'name' => ts('View'),
-          'url' => 'civicrm/contact/view/contribution',
-          'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&honorId=%%honorId%%&action=view&context=%%cxt%%&selectedChild=contribute',
-          'title' => ts('View Contribution'),
-        ),
-        CRM_Core_Action::UPDATE => array(
-          'name' => ts('Edit'),
-          'url' => 'civicrm/contact/view/contribution',
-          'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&honorId=%%honorId%%&context=%%cxt%%&subType=%%contributionType%%',
-          'title' => ts('Edit Contribution'),
-        ),
-        CRM_Core_Action::DELETE => array(
-          'name' => ts('Delete'),
-          'url' => 'civicrm/contact/view/contribution',
-          'qs' => 'reset=1&action=delete&id=%%id%%&cid=%%cid%%&honorId=%%honorId%%&context=%%cxt%%',
-          'title' => ts('Delete Contribution'),
-        ),
-      );
-    }
-    return self::$_honorLinks;
-  }
   //end of function
 
   /**
@@ -114,8 +77,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Cancel'),
           'title' => ts('Cancel'),
-          'extra' => 'onclick = "enableDisable( %%crid%%,\'' . 'CRM_Contribute_BAO_ContributionRecur' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
         ),
       );
     }
@@ -147,7 +109,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * @access public
    */
   function browse() {
-
     // add annual contribution
     $annual = array();
     list($annual['count'],
@@ -166,7 +127,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     $controller->reset();
     $controller->set('cid', $this->_contactId);
     $controller->set('crid', $this->_crid);
-    $controller->set('context', 'contribution');
+    $controller->set('context', 'Search');
     $controller->set('limit', 50);
     $controller->process();
     $controller->run();
@@ -194,7 +155,12 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
               'cid' => $this->_contactId,
               'crid' => $ids,
               'cxt' => 'contribution',
-            )
+            ),
+            ts('more'),
+            FALSE,
+            'contribution.selector.recurring',
+            'Contribution',
+            $ids
           );
         }
       }
@@ -202,33 +168,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $this->assign('action', $this->_action);
       $this->assign('recurRows', $params);
       $this->assign('recur', TRUE);
-    }
-
-    //add honor block
-    // form all action links
-    $action = array_sum(array_keys($this->honorLinks()));
-
-    $params = array();
-    $params = CRM_Contribute_BAO_Contribution::getHonorContacts($this->_contactId);
-    if (!empty($params)) {
-      foreach ($params as $ids => $honorId) {
-        $params[$ids]['action'] = CRM_Core_Action::formLink(
-          self::honorLinks(),
-          $action,
-          array(
-            'cid' => $honorId['honorId'],
-            'id' => $ids,
-            'cxt' => 'contribution',
-            'contributionType' => $honorId['type_id'],
-            'honorId' => $this->_contactId,
-          )
-        );
-      }
-
-      // assign vars to templates
-      $this->assign('action', $this->_action);
-      $this->assign('honorRows', $params);
-      $this->assign('honor', TRUE);
     }
 
     //enable/disable soft credit records for test contribution
@@ -256,6 +195,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     if ($this->_contactId) {
       $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
       $this->assign('displayName', $displayName);
+      $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId);
     }
   }
 
@@ -365,6 +305,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     );
     $compContext = CRM_Utils_Request::retrieve('compContext', 'String', $this);
 
+    $searchContext = CRM_Utils_Request::retrieve('searchContext', 'String', $this);
+
     //swap the context.
     if ($context == 'search' && $compContext) {
       $context = $compContext;
@@ -399,17 +341,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         break;
 
       case 'contribution':
-        $honorId = CRM_Utils_Request::retrieve('honorId', 'Positive', $this, FALSE);
-
-        if ($honorId) {
-          $cid = $honorId;
-        }
-        else {
-          $cid = $this->_contactId;
-        }
-
         $url = CRM_Utils_System::url('civicrm/contact/view',
-          "reset=1&force=1&cid={$cid}&selectedChild=contribute"
+          "reset=1&force=1&cid={$this->_contactId}&selectedChild=contribute"
         );
         break;
 
@@ -423,6 +356,9 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         $this->assign('searchKey', $qfKey);
         if ($context == 'advanced') {
           $url = CRM_Utils_System::url('civicrm/contact/search/advanced', $extraParams);
+        }
+        else if ($searchContext) {
+          $url = CRM_Utils_System::url("civicrm/$searchContext/search", $extraParams);
         }
         else {
           $url = CRM_Utils_System::url('civicrm/contribute/search', $extraParams);

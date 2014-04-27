@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -84,7 +84,7 @@ class CRM_Badge_BAO_Badge {
   static function formatLabel(&$row, &$layout) {
     $formattedRow = array('labelFormat' => $layout['label_format_name']);
 
-    if (CRM_Utils_Array::value('rowElements', $layout['data'])) {
+    if (!empty($layout['data']['rowElements'])) {
       foreach ($layout['data']['rowElements'] as $key => $element) {
         $value = '';
         if ($element) {
@@ -106,27 +106,27 @@ class CRM_Badge_BAO_Badge {
       }
     }
 
-    if (CRM_Utils_Array::value('image_1', $layout['data'])) {
+    if (!empty($layout['data']['image_1'])) {
       $formattedRow['image_1'] = $layout['data']['image_1'];
     }
-    if (CRM_Utils_Array::value('width_image_1', $layout['data'])) {
+    if (!empty($layout['data']['width_image_1'])) {
       $formattedRow['width_image_1'] = $layout['data']['width_image_1'];
     }
-    if (CRM_Utils_Array::value('height_image_1', $layout['data'])) {
+    if (!empty($layout['data']['height_image_1'])) {
       $formattedRow['height_image_1'] = $layout['data']['height_image_1'];
     }
 
-    if (CRM_Utils_Array::value('image_2', $layout['data'])) {
+    if (!empty($layout['data']['image_2'])) {
       $formattedRow['image_2'] = $layout['data']['image_2'];
     }
-    if (CRM_Utils_Array::value('width_image_2', $layout['data'])) {
+    if (!empty($layout['data']['width_image_2'])) {
       $formattedRow['width_image_2'] = $layout['data']['width_image_2'];
     }
-    if (CRM_Utils_Array::value('height_image_2', $layout['data'])) {
+    if (!empty($layout['data']['height_image_2'])) {
       $formattedRow['height_image_2'] = $layout['data']['height_image_2'];
     }
 
-    if (CRM_Utils_Array::value('add_barcode', $layout['data'])) {
+    if (!empty($layout['data']['add_barcode'])) {
       $formattedRow['barcode'] = array(
         'alignment' => $layout['data']['barcode_alignment'],
         'type' => $layout['data']['barcode_type'],
@@ -160,22 +160,21 @@ class CRM_Badge_BAO_Badge {
     $y = $this->pdf->getY();
 
     $startOffset = 0;
-    if (CRM_Utils_Array::value('image_1', $formattedRow)) {
+    if (!empty($formattedRow['image_1'])) {
       $this->printImage($formattedRow['image_1'], NULL, NULL, CRM_Utils_Array::value('width_image_1', $formattedRow),
         CRM_Utils_Array::value('height_image_1', $formattedRow));
     }
 
-    if (CRM_Utils_Array::value('image_2', $formattedRow)) {
+    if (!empty($formattedRow['image_2'])) {
       $this->printImage($formattedRow['image_2'], $x + 68, NULL, CRM_Utils_Array::value('width_image_2', $formattedRow),
         CRM_Utils_Array::value('height_image_2', $formattedRow));
     }
 
     if ((CRM_Utils_Array::value('height_image_1', $formattedRow) >
-      CRM_Utils_Array::value('height_image_2', $formattedRow)) &&
-      CRM_Utils_Array::value('height_image_1', $formattedRow)) {
+      CRM_Utils_Array::value('height_image_2', $formattedRow)) && !empty($formattedRow['height_image_1'])) {
       $startOffset = CRM_Utils_Array::value('height_image_1', $formattedRow);
     }
-    elseif (CRM_Utils_Array::value('height_image_2', $formattedRow)) {
+    elseif (!empty($formattedRow['height_image_2'])) {
       $startOffset = CRM_Utils_Array::value('height_image_2', $formattedRow);
     }
 
@@ -207,7 +206,7 @@ class CRM_Badge_BAO_Badge {
       }
     }
 
-    if (CRM_Utils_Array::value('barcode', $formattedRow)) {
+    if (!empty($formattedRow['barcode'])) {
       $data = $formattedRow['values'];
 
       if ($formattedRow['barcode']['type'] == 'barcode') {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -128,14 +128,14 @@ class CRM_Activity_Import_Form_Preview extends CRM_Import_Form_Preview {
     foreach ($mapper as $key => $value) {
       $mapperKeys[$key] = $mapper[$key][0];
 
-      if (CRM_Utils_Array::value(1, $mapper[$key]) && is_numeric($mapper[$key][1])) {
+      if (!empty($mapper[$key][1]) && is_numeric($mapper[$key][1])) {
         $mapperLocType[$key] = $mapper[$key][1];
       }
       else {
         $mapperLocType[$key] = NULL;
       }
 
-      if (CRM_Utils_Array::value(2, $mapper[$key]) && (!is_numeric($mapper[$key][2]))) {
+      if (!empty($mapper[$key][2]) && (!is_numeric($mapper[$key][2]))) {
         $mapperPhoneType[$key] = $mapper[$key][2];
       }
       else {

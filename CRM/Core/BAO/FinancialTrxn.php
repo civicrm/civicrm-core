@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -81,6 +81,27 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
     $entityTrxn->copyValues($entityFinancialTrxnParams);
     $entityTrxn->save();
     return $trxn;
+  }
+
+  static function getBalanceTrxnAmt($contributionId, $contributionFinancialTypeId = NULL) {
+    if (!$contributionFinancialTypeId) {
+      $contributionFinancialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'financial_type_id');
+    }
+    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+    $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($contributionFinancialTypeId, $relationTypeId);
+    $q = "SELECT ft.id, ft.total_amount FROM civicrm_financial_trxn ft INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution') WHERE eft.entity_id = %1 AND ft.to_financial_account_id = %2";
+
+    $p[1] = array($contributionId, 'Integer');
+    $p[2] = array($toFinancialAccount, 'Integer');
+
+    $balanceAmtDAO = CRM_Core_DAO::executeQuery($q, $p);
+    $ret = array();
+    while($balanceAmtDAO->fetch()) {
+      $ret['trxn_id'] = $balanceAmtDAO->id;
+      $ret['total_amount'] = $balanceAmtDAO->total_amount;
+    }
+
+    return $ret;
   }
 
   /**
@@ -284,16 +305,16 @@ WHERE ceft.entity_id = %1";
    * @static
    */
   static function createPremiumTrxn($params) {
-    if ((!CRM_Utils_Array::value('financial_type_id', $params) || !CRM_Utils_Array::value('contributionId', $params)) && !CRM_Utils_Array::value('oldPremium', $params)) {
+    if ((empty($params['financial_type_id']) || empty($params['contributionId'])) && empty($params['oldPremium'])) {
       return;
     }
 
-    if (CRM_Utils_Array::value('cost', $params)) {
+    if (!empty($params['cost'])) {
       $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       $financialAccountType = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id']);
       $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND label IN ('Premiums Inventory Account is', 'Cost of Sales Account is')");
-      $toFinancialAccount = CRM_Utils_Array::value('isDeleted', $params) ? 'Premiums Inventory Account is' : 'Cost of Sales Account is';
-      $fromFinancialAccount = CRM_Utils_Array::value('isDeleted', $params) ? 'Cost of Sales Account is': 'Premiums Inventory Account is';
+      $toFinancialAccount = !empty($params['isDeleted']) ? 'Premiums Inventory Account is' : 'Cost of Sales Account is';
+      $fromFinancialAccount = !empty($params['isDeleted']) ? 'Cost of Sales Account is': 'Premiums Inventory Account is';
       $accountRelationship = array_flip($accountRelationship);
       $financialtrxn = array(
         'to_financial_account_id' => $financialAccountType[$accountRelationship[$toFinancialAccount]],
@@ -308,7 +329,7 @@ WHERE ceft.entity_id = %1";
       CRM_Core_BAO_FinancialTrxn::create($financialtrxn, $trxnEntityTable);
     }
 
-    if (CRM_Utils_Array::value('oldPremium', $params)) {
+    if (!empty($params['oldPremium'])) {
       $premiumParams = array(
         'id' => $params['oldPremium']['product_id']
       );
@@ -337,23 +358,31 @@ WHERE ceft.entity_id = %1";
     $expenseTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Expense Account is' "));
     $domainId = CRM_Core_Config::domainID();
     $amount = 0;
-    if (CRM_Utils_Array::value('prevContribution', $params)) {
+    if (!empty($params['prevContribution'])) {
       $amount = $params['prevContribution']->fee_amount;
     }
     $amount = $params['fee_amount'] - $amount;
     if (!$amount) {
       return FALSE;
     }
-    $financialAccount = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id'], $expenseTypeId);
+    $contributionId = isset($params['contribution']->id) ? $params['contribution']->id : $params['contribution_id'];
+    if (empty($params['financial_type_id'])) {
+      $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'financial_type_id', 'id');
+    }
+    else {
+      $financialTypeId = $params['financial_type_id'];
+    }
+    $financialAccount = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeId, $expenseTypeId);
+
     $params['trxnParams']['from_financial_account_id'] = $params['to_financial_account_id'];
     $params['trxnParams']['to_financial_account_id'] = $financialAccount;
     $params['trxnParams']['total_amount'] = $amount;
     $params['trxnParams']['fee_amount'] =
       $params['trxnParams']['net_amount'] = 0;
     $params['trxnParams']['status_id'] = CRM_Core_OptionGroup::getValue('contribution_status','Completed','name');
-    $params['trxnParams']['contribution_id'] = isset($params['contribution']->id) ? $params['contribution']->id : $params['contribution_id'];
+    $params['trxnParams']['contribution_id'] = $contributionId;
     $trxn = self::create($params['trxnParams']);
-    if (!CRM_Utils_Array::value('entity_id', $params)) {
+    if (empty($params['entity_id'])) {
       $financialTrxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['trxnParams']['contribution_id'], 'DESC');
       $params['entity_id'] = $financialTrxnID['financialTrxnId'];
     }
@@ -373,5 +402,70 @@ WHERE ceft.entity_id = %1";
     $trxnIDS['id'] = $trxn->id;
     $financialItem = CRM_Financial_BAO_FinancialItem::create($fItemParams, NULL, $trxnIDS);
   }
-}
 
+  /*
+   * function to get partial payment amount and type of it
+   * return @array : payment type => amount
+   * payment type  : 'amount_owed' or 'refund_due'
+   */
+  static function getPartialPaymentWithType($entityId, $entityName = 'participant', $returnType = TRUE, $lineItemTotal = NULL) {
+    $value = NULL;
+    if (empty($entityName)) {
+      return $value;
+    }
+
+    if ($entityName == 'participant') {
+      $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $entityId, 'contribution_id', 'participant_id');
+      $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'financial_type_id');
+
+      if ($contributionId && $financialTypeId) {
+        $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+        $refundStatusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Refunded', 'name');
+
+        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+        $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeId, $relationTypeId);
+
+        if (empty($lineItemTotal)) {
+          $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
+          if (count($ids) > 1) {
+            $total = 0;
+            foreach ($ids as $val) {
+              $total += CRM_Price_BAO_LineItem::getLineTotal($val, 'civicrm_participant');
+            }
+            $lineItemTotal = $total;
+          }
+          else {
+            $lineItemTotal = CRM_Price_BAO_LineItem::getLineTotal($entityId, 'civicrm_participant');
+          }
+        }
+        $sqlFtTotalAmt = "
+SELECT SUM(ft.total_amount)
+FROM civicrm_financial_trxn ft
+  LEFT JOIN civicrm_entity_financial_trxn eft ON (ft.id = eft.financial_trxn_id AND eft.entity_table = 'civicrm_contribution')
+  LEFT JOIN civicrm_contribution c ON (eft.entity_id = c.id)
+  LEFT JOIN civicrm_participant_payment pp ON (pp.contribution_id = c.id)
+WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFinancialAccount}
+  AND ft.status_id IN ({$statusId}, {$refundStatusId})
+";
+        $ftTotalAmt = CRM_Core_DAO::singleValueQuery($sqlFtTotalAmt);
+        $value = 0;
+        if ($ftTotalAmt) {
+          $value = $paymentVal = $lineItemTotal - $ftTotalAmt;
+        }
+        if ($returnType) {
+          $value = array();
+          if ($paymentVal < 0) {
+            $value['refund_due']  = $paymentVal;
+          }
+          elseif ($paymentVal > 0) {
+            $value['amount_owed'] = $paymentVal;
+          }
+          elseif ($lineItemTotal == $ftTotalAmt) {
+            $value['full_paid'] = $ftTotalAmt;
+          }
+        }
+      }
+    }
+    return $value;
+  }
+}

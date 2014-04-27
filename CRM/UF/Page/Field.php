@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -42,6 +42,8 @@
  *
  */
 class CRM_UF_Page_Field extends CRM_Core_Page {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The group id of the field
@@ -81,14 +83,12 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_UFField' . '\',\'' . 'enable-disable' . '\',0,\'UFField\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable CiviCRM Profile Field'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_UFField' . '\',\'' . 'disable-enable' . '\',0,\'UFField\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable CiviCRM Profile Field'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -144,11 +144,12 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
     $select['group'] = ts('Group(s)');
     $select['tag'] = ts('Tag(s)');
 
+    $visibility = CRM_Core_SelectValues::ufVisibility();
     while ($ufFieldBAO->fetch()) {
       $ufField[$ufFieldBAO->id] = array();
       $phoneType = $locType = '';
       CRM_Core_DAO::storeValues($ufFieldBAO, $ufField[$ufFieldBAO->id]);
-      CRM_Core_DAO_UFField::addDisplayEnums($ufField[$ufFieldBAO->id]);
+      $ufField[$ufFieldBAO->id]['visibility_display'] = $visibility[$ufFieldBAO->visibility];
 
       $ufField[$ufFieldBAO->id]['label'] = $ufFieldBAO->label;
 
@@ -171,7 +172,12 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
         array(
           'id' => $ufFieldBAO->id,
           'gid' => $this->_gid,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'ufField.row.actions',
+        'UFField',
+        $ufFieldBAO->id
       );
     }
 

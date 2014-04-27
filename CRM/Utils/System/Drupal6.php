@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -153,10 +153,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     _user_edit_validate(NULL, $params);
     $errors = form_get_errors();
     if ($errors) {
-      if (CRM_Utils_Array::value('name', $errors)) {
+      if (!empty($errors['name'])) {
         $errors['cms_name'] = $errors['name'];
       }
-      if (CRM_Utils_Array::value('mail', $errors)) {
+      if (!empty($errors['mail'])) {
         $errors[$emailName] = $errors['mail'];
       }
       // also unset drupal messages to avoid twice display of errors
@@ -555,10 +555,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     drupal_set_message($message);
   }
 
-  function permissionDenied() {
-    drupal_access_denied();
-  }
-
   function logout() {
     module_load_include('inc', 'user', 'user.pages');
     return user_logout();
@@ -942,25 +938,20 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Get timezone from Drupal
-   * @return boolean|string
+   * Over-ridable function to get timezone as a string eg.
+   * @return string Timezone e.g. 'America/Los_Angeles'
    */
-  function getTimeZoneOffset(){
+  function getTimeZoneString() {
     global $user;
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
       $timezone = $user->timezone;
     } else {
       $timezone = variable_get('date_default_timezone', null);
     }
-    if(empty($timezone)){
-      return false;
+    if (!$timezone) {
+      $timezone = parent::getTimeZoneString();
     }
-    $hour = $user->timezone / 3600;
-    $timeZoneOffset = sprintf("%02d:%02d", $timezone / 3600, abs(($timeZoneOffset/60)%60));
-    if($timeZoneOffset > 0){
-      $timeZoneOffset = '+' . $timeZoneOffset;
-    }
-    return $timeZoneOffset;
+    return $timezone;
   }
 
 

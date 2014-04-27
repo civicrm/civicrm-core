@@ -54,10 +54,13 @@
     <name>record_type_id</name>
     <type>int unsigned</type>
     <title>Record Type ID</title>
-    <comment>The record type id for this row</comment>
+    <comment>Nature of this contact's role in the activity: 1 assignee, 2 creator, 3 focus or target.</comment>
     <pseudoconstant>
       <optionGroupName>activity_contacts</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>4.4</add>
   </field>
   <index>

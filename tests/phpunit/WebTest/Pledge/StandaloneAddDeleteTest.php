@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -53,10 +53,10 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
     // verify if Pledge is created
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
 
     //click through to the Pledge view screen
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_PledgeView_next-bottom');
     $pledgeDate = date('F jS, Y', strtotime('now'));
 
@@ -70,10 +70,10 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
         'Pledge Status' => 'Pending',
       )
     );
-    $this->clickLink('_qf_PledgeView_next-bottom', "xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody//tr//td/table/tbody/tr[2]/td[8]/a");
+    $this->clickLink('_qf_PledgeView_next-bottom', "xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']", FALSE);
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a");
     $this->waitForElementPresent("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->click("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->type('total_amount', '300.00');
@@ -82,10 +82,10 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad("30000");
     $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
-    $this->click("xpath=//div[@id='Pledges']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->click("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a");
     $this->waitForElementPresent("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->click("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->type('total_amount', '250.00');
@@ -93,10 +93,10 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad("30000");
     $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
-    $this->click("xpath=//div[@id='Pledges']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[8]/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->click("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[8]/a");
     $this->waitForElementPresent("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
     $this->click("xpath=//form[@id='Contribution']//div[2]/table/tbody/tr[3]/td[2]/a");
 
@@ -106,28 +106,28 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
     // delete the contribution associated with the 2nd payment
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a[text()='View Payment']");
-    $this->click("xpath=//div[@id='Pledges']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a[text()='View Payment']");
+    $this->click("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[8]/a");
     $this->waitForElementPresent("xpath=//form[@id='ContributionView']//div[2]/div/div/a[2]");
     $this->click("xpath=//form[@id='ContributionView']//div[2]/div/div/a[2]");
     $this->waitForElementPresent("_qf_Contribution_next-bottom");
     $this->click("_qf_Contribution_next-bottom");
-    $this->waitForElementPresent("ui-id-3");
-    $this->click("ui-id-3");
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]");
+    $this->waitForElementPresent("ui-id-4");
+    $this->click("ui-id-4");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[10]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]");
 
-    $this->verifyText("xpath=//div[@id='Pledges']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]","Pending");
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td");
+    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]","Pending");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td");
 
     // verify that payment owed amount is correct (250.00)
-    $this->verifyText("xpath=//div[@id='Pledges']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td","250.00");
+    $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td","250.00");
     // verify that Total Paid and Balance sums are correct
-    $this->verifyText("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[3]","470.00");
-    $this->verifyText("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[4]","1,930.00");
+    $this->verifyText("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[3]","470.00");
+    $this->verifyText("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[4]","1,930.00");
 
   }
 }

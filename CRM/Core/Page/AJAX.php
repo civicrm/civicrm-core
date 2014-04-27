@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -97,11 +97,11 @@ class CRM_Core_Page_AJAX {
    */
   static function setIsQuickConfig() {
     $id = $context = NULL;
-    if (CRM_Utils_Array::value('id', $_REQUEST)) {
+    if (!empty($_REQUEST['id'])) {
       $id = CRM_Utils_Type::escape($_REQUEST['id'], 'Integer');
     }
 
-    if (CRM_Utils_Array::value('context', $_REQUEST)) {
+    if (!empty($_REQUEST['context'])) {
       $context = CRM_Utils_Type::escape($_REQUEST['context'], 'String');
     }
     // return false if $id is null and
@@ -161,6 +161,61 @@ class CRM_Core_Page_AJAX {
       default:
         return FALSE;
     }
+  }
+
+  /**
+   * Outputs the CiviCRM standard json-formatted page/form response
+   * @param array|string $response
+   */
+  static function returnJsonResponse($response) {
+    // Allow lazy callers to not wrap content in an array
+    if (is_string($response)) {
+      $response = array('content' => $response);
+    }
+    // Add session variables to response
+    $session = CRM_Core_Session::singleton();
+    $response += array(
+      'status' => 'success',
+      'userContext' => htmlspecialchars_decode($session->readUserContext()),
+      'title' => CRM_Utils_System::$title,
+    );
+    // crmMessages will be automatically handled by our ajax preprocessor
+    // @see js/Common.js
+    if ($session->getStatus(FALSE)) {
+      $response['crmMessages'] = $session->getStatus(TRUE);
+    }
+
+    // CRM-11831 @see http://www.malsup.com/jquery/form/#file-upload
+    $xhr = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+    if (!$xhr) {
+      echo '<textarea>';
+    }
+    echo json_encode($response);
+    if (!$xhr) {
+      echo '</textarea>';
+    }
+    CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Send autocomplete results to the client. Input can be a simple or nested array.
+   * @param array $results - If nested array, also provide:
+   * @param string $val - array key to use as the value
+   * @param string $key - array key to use as the key
+   */
+  static function autocompleteResults($results, $val='label', $key='id') {
+    $output = array();
+    if (is_array($results)) {
+      foreach ($results as $k => $v) {
+        if (is_array($v)) {
+          echo $v[$val] . '|' . $v[$key] . "\n";
+        }
+        else {
+          echo "$v|$k\n";
+        }
+      }
+    }
+    CRM_Utils_System::civiExit();
   }
 }
 

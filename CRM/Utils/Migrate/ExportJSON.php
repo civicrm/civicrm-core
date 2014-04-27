@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -120,6 +120,7 @@ class CRM_Utils_Migrate_ExportJSON {
       'status_id' => 'activity_status_id',
       'priority_id' => 'activity_priority_id',
       'medium_id' => 'encounter_medium',
+      'communication_style_id' => 'communication_style',
       'email_greeting' => 'email_greeting',
       'postal_greeting' => 'postal_greeting',
       'addressee_id' => 'addressee',

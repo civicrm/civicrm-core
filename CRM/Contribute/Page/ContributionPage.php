@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -85,13 +85,11 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
           'title' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contribute_BAO_ContributionPage' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contribute_BAO_ContributionPage' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -230,10 +228,9 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
     if (!isset(self::$_contributionLinks)) {
       //get contribution dates.
       $dates = CRM_Contribute_BAO_Contribution::getContributionDates();
-      foreach (array(
-        'now', 'yearDate', 'monthDate') as $date) {
-        $$date = $dates[$date];
-      }
+      $now = $dates['now'];
+      $yearDate = $dates['yearDate'];
+      $monthDate = $dates['monthDate'];
       $yearNow = $yearDate + 10000;
 
       $urlString = 'civicrm/contribute/search';
@@ -487,7 +484,10 @@ ORDER BY title asc
         $action,
         array('id' => $dao->id),
         ts('Configure'),
-        TRUE
+        TRUE,
+        'contributionpage.configure.actions',
+        'ContributionPage',
+        $dao->id
       );
 
       //build the contributions links.
@@ -495,7 +495,10 @@ ORDER BY title asc
         $action,
         array('id' => $dao->id),
         ts('Contributions'),
-        TRUE
+        TRUE,
+        'contributionpage.contributions.search',
+        'ContributionPage',
+        $dao->id
       );
 
       //build the online contribution links.
@@ -503,7 +506,10 @@ ORDER BY title asc
         $action,
         array('id' => $dao->id),
         ts('Links'),
-        TRUE
+        TRUE,
+        'contributionpage.online.links',
+        'ContributionPage',
+        $dao->id
       );
 
       //build the normal action links.
@@ -511,7 +517,10 @@ ORDER BY title asc
         $action,
         array('id' => $dao->id),
         ts('more'),
-        TRUE
+        TRUE,
+        'contributionpage.action.links',
+        'ContributionPage',
+        $dao->id
       );
 
       //show campaigns on selector.
@@ -653,7 +662,7 @@ SELECT count(id)
         $classes = $link['class'];
       }
 
-      if (!CRM_Utils_Array::value($sectionName, $sectionsInfo)) {
+      if (empty($sectionsInfo[$sectionName])) {
         $classes = array();
         if (isset($link['class'])) {
           $classes = $link['class'];

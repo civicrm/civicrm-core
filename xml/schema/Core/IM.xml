@@ -68,6 +68,9 @@
       <pseudoconstant>
         <optionGroupName>instant_messenger_service</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <index>
     <name>UI_provider_id</name>

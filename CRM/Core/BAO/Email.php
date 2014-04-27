@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -287,10 +287,12 @@ AND    reset_date IS NULL
     $contactID       = $session->get('userID');
     $fromEmailValues = array();
 
-    // add the domain email id
-    $domainEmail = CRM_Core_BAO_Domain::getNameAndEmail();
-    $domainEmail = "$domainEmail[0] <$domainEmail[1]>";
-    $fromEmailValues[$domainEmail] = htmlspecialchars($domainEmail);
+    // add all configured FROM email addresses
+    $domainFrom = CRM_Core_OptionGroup::values('from_email_address');
+    foreach (array_keys($domainFrom) as $k) {
+      $domainEmail = $domainFrom[$k];
+      $fromEmailValues[$domainEmail] = htmlspecialchars($domainEmail);
+    }
 
     // add logged in user's active email ids
     if ($contactID) {
@@ -305,7 +307,7 @@ AND    reset_date IS NULL
         $fromEmail = "$fromDisplayName <$email>";
         $fromEmailHtml = htmlspecialchars($fromEmail) . ' ' . $emailVal['locationType'];
 
-        if (CRM_Utils_Array::value('is_primary', $emailVal)) {
+        if (!empty($emailVal['is_primary'])) {
           $fromEmailHtml .= ' ' . ts('(preferred)');
         }
         $fromEmailValues[$fromEmail] = $fromEmailHtml;

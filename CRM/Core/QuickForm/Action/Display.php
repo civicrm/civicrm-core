@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Redefine the display action.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -115,8 +115,8 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
     $template = CRM_Core_Smarty::singleton();
     $form = $page->toSmarty();
 
+    // Deprecated - use snippet=6 instead of json=1
     $json = CRM_Utils_Request::retrieve('json', 'Boolean', CRM_Core_DAO::$_nullObject);
-
     if ($json) {
       echo json_encode($form);
       CRM_Utils_System::civiExit();
@@ -158,16 +158,14 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
 
     if ($controller->_QFResponseType == 'json') {
       $response = array('content' => $html);
-      // CRM-11831 @see http://www.malsup.com/jquery/form/#file-upload
-      $xhr = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
-      if (!$xhr) {
-        echo '<textarea>';
+      if (!empty($page->ajaxResponse)) {
+        $response += $page->ajaxResponse;
       }
-      echo json_encode($response);
-      if (!$xhr) {
-        echo '</textarea>';
+      if (!empty($form['errors'])) {
+        $response['status'] = 'form_error';
+        $response['errors'] = $form['errors'];
       }
-      CRM_Utils_System::civiExit();
+      CRM_Core_Page_AJAX::returnJsonResponse($response);
     }
 
     if ($print) {

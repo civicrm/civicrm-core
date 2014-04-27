@@ -57,7 +57,7 @@
   <field>
       <name>status_id</name>
       <uniqueName>participant_status_id</uniqueName>
-      <title>Participant Status Id</title>
+      <title>Participant Status</title>
       <headerPattern>/(participant.)?(status)$/i</headerPattern>
       <import>true</import>
       <type>int unsigned</type>
@@ -71,6 +71,9 @@
         <keyColumn>id</keyColumn>
         <labelColumn>label</labelColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <foreignKey>
     <name>status_id</name>
@@ -86,10 +89,13 @@
   <field>
       <name>role_id</name>
       <uniqueName>participant_role_id</uniqueName>
-      <title>Participant Role Id</title>
+      <title>Participant Role(s)</title>
       <pseudoconstant>
         <optionGroupName>participant_role</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
       <headerPattern>/(participant.)?(role)$/i</headerPattern>
       <import>true</import>
       <type>varchar</type>
@@ -218,6 +224,9 @@
         <labelColumn>full_name</labelColumn>
         <nameColumn>numeric_code</nameColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <field>
       <name>campaign_id</name>

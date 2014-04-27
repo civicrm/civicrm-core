@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -112,9 +112,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
       'status' => CRM_Utils_Array::value('status', $params),
       'buttonTop' => CRM_Utils_Array::value('buttonTop', $params),
       'buttonBottom' => CRM_Utils_Array::value('buttonBottom', $params),
-      'twentyfive' => $this->getPerPageLink(25),
-      'fifty' => $this->getPerPageLink(50),
-      'onehundred' => $this->getPerPageLink(100),
+      'currentLocation' => $this->getCurrentLocation(),
     );
 
     /**
@@ -263,29 +261,10 @@ class CRM_Utils_Pager extends Pager_Sliding {
     return array($offset, $this->_perPage);
   }
 
-  /**
-   * given a number create a link that will display the number of
-   * rows as specified by that link
-   *
-   * @param int $perPage the number of rows
-   *
-   * @return string      the link
-   * @access void
-   */
-  function getPerPageLink($perPage) {
-    if ($perPage != $this->_perPage) {
-      $href = $this->makeURL(self::PAGE_ROWCOUNT, $perPage);
-      $link = sprintf('<a href="%s" %s>%s</a>',
-        $href,
-        $this->_classString,
-        $perPage
-      ) . $this->_spacesBefore . $this->_spacesAfter;
-    }
-    else {
-      $link = $this->_spacesBefore . $perPage . $this->_spacesAfter;
-    }
-
-    return $link;
+  function getCurrentLocation() {
+    $config = CRM_Core_Config::singleton();
+    $path = CRM_Utils_Array::value($config->userFrameworkURLVar, $_GET);
+    return CRM_Utils_System::url($path, CRM_Utils_System::getLinksUrl(self::PAGE_ID, FALSE, TRUE), FALSE, NULL, FALSE) . $this->getCurrentPageID();
   }
 
   function getFirstPageLink() {
@@ -294,7 +273,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
     }
 
     $href = $this->makeURL(self::PAGE_ID, 1);
-    return sprintf('<a href="%s" title="%s">%s</a>',
+    return sprintf('<a class="crm-pager-link" href="%s" title="%s">%s</a>',
       $href,
       str_replace('%d', 1, $this->_altFirst),
       $this->_firstPagePre . $this->_firstPageText . $this->_firstPagePost
@@ -307,7 +286,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
     }
 
     $href = $this->makeURL(self::PAGE_ID, $this->_totalPages);
-    return sprintf('<a href="%s" title="%s">%s</a>',
+    return sprintf('<a class="crm-pager-link" href="%s" title="%s">%s</a>',
       $href,
       str_replace('%d', $this->_totalPages, $this->_altLast),
       $this->_lastPagePre . $this->_lastPageText . $this->_lastPagePost
@@ -317,7 +296,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   function getBackPageLink() {
     if ($this->_currentPage > 1) {
       $href = $this->makeURL(self::PAGE_ID, $this->getPreviousPageID());
-      return sprintf('<a href="%s" title="%s">%s</a>',
+      return sprintf('<a class="crm-pager-link" href="%s" title="%s">%s</a>',
         $href,
         $this->_altPrev, $this->_prevImg
       ) . $this->_spacesBefore . $this->_spacesAfter;
@@ -328,7 +307,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   function getNextPageLink() {
     if ($this->_currentPage < $this->_totalPages) {
       $href = $this->makeURL(self::PAGE_ID, $this->getNextPageID());
-      return $this->_spacesAfter . sprintf('<a href="%s" title="%s">%s</a>',
+      return $this->_spacesAfter . sprintf('<a class="crm-pager-link" href="%s" title="%s">%s</a>',
         $href,
         $this->_altNext, $this->_nextImg
       ) . $this->_spacesBefore . $this->_spacesAfter;

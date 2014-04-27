@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -304,7 +304,7 @@ class CRM_Core_BAO_ConfigSetting {
       global $dbLocale;
 
       // try to inherit the language from the hosting CMS
-      if (CRM_Utils_Array::value('inheritLocale', $defaults)) {
+      if (!empty($defaults['inheritLocale'])) {
         // FIXME: On multilanguage installs, CRM_Utils_System::getUFLocale() in many cases returns nothing if $dbLocale is not set
         $dbLocale = $multiLang ? "_{$defaults['lcMessages']}" : '';
         $lcMessages = CRM_Utils_System::getUFLocale();

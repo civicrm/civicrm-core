@@ -3,9 +3,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Activity
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Activity.php 30486 2010-11-02 16:12:09Z shot $
  *
  */
@@ -48,7 +48,7 @@
  *
  */
 function civicrm_api3_dashboard_create($params) {
-  if (!CRM_Utils_Array::value('id', $params)) {
+  if (empty($params['id'])) {
     civicrm_api3_verify_one_mandatory($params,
       NULL,
       array(

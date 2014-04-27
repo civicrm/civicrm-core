@@ -1,4 +1,4 @@
-cj(function ($) {
+CRM.$(function($) {
   'use strict';
 
   // Behind the scenes method deals with browser for setting cursor position
@@ -99,8 +99,7 @@ cj(function ($) {
       }
       else{
         $('#crm-contact-toggle-text-'  + id_field).text(hidden_text);
-        $('#' + id_field).val('');
-        $('#' + name_field).val('');
+        $('#' + id_field + ', #' + name_field).val('');
         CRM.api('profile', 'get', {'profile_id' : profileids}, {
           success: function(result) {
             $.each(result.values, function (id, values){

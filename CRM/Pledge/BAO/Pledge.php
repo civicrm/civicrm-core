@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -84,7 +84,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @return object
    */
   static function add(&$params) {
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Pledge', $params['id'], $params);
     }
     else {
@@ -108,7 +108,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
     $result = $pledge->save();
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'Pledge', $pledge->id, $pledge);
     }
     else {
@@ -160,7 +160,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
     $paymentParams = array();
     $paymentParams['status_id'] = CRM_Utils_Array::value('status_id', $params);
-    if (CRM_Utils_Array::value('installment_amount', $params)) {
+    if (!empty($params['installment_amount'])) {
       $params['amount'] = $params['installment_amount'] * $params['installments'];
     }
 
@@ -191,20 +191,18 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     }
 
     //handle custom data.
-    if (CRM_Utils_Array::value('custom', $params) &&
+    if (!empty($params['custom']) &&
       is_array($params['custom'])
     ) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_pledge', $pledge->id);
     }
 
     // skip payment stuff inedit mode
-    if (!isset($params['id']) ||
-      CRM_Utils_Array::value('is_pledge_pending', $params)
-    ) {
+    if (!isset($params['id']) || !empty($params['is_pledge_pending'])) {
 
 
       //if pledge is pending delete all payments and recreate.
-      if (CRM_Utils_Array::value('is_pledge_pending', $params)) {
+      if (!empty($params['is_pledge_pending'])) {
         CRM_Pledge_BAO_PledgePayment::deletePayments($pledge->id);
       }
 
@@ -449,26 +447,36 @@ GROUP BY  currency
    */
   static function getHonorContacts($honorId) {
     $params = array();
-    $honorDAO = new CRM_Pledge_DAO_Pledge();
-    $honorDAO->honor_contact_id = $honorId;
+    $honorDAO = new CRM_Contribute_DAO_ContributionSoft();
+    $honorDAO->contact_id = $honorId;
     $honorDAO->find();
 
     //get all status.
     while ($honorDAO->fetch()) {
-      $params[$honorDAO->id] = array(
-        'honorId' => $honorDAO->contact_id,
-        'amount' => $honorDAO->amount,
-        'status' => CRM_Contribute_PseudoConstant::contributionStatus($honorDAO->status_id),
-        'create_date' => $honorDAO->create_date,
-        'acknowledge_date' => $honorDAO->acknowledge_date,
-        'type' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
-          $honorDAO->financial_type_id, 'name'
-        ),
-        'display_name' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-          $honorDAO->contact_id, 'display_name'
-        ),
-      );
+      $pledgePaymentDAO = new CRM_Pledge_DAO_PledgePayment();
+      $pledgePaymentDAO->contribution_id = $honorDAO->contribution_id;
+      if ($pledgePaymentDAO->find(TRUE)) {
+        $pledgeDAO = new CRM_Pledge_DAO_Pledge();
+        $pledgeDAO->id = $pledgePaymentDAO->pledge_id;
+        if ($pledgeDAO->find(TRUE)) {
+          $params[$pledgeDAO->id] = array(
+            'honor_type' => CRM_Core_OptionGroup::getLabel('soft_credit_type', $honorDAO->soft_credit_type_id, 'value'),
+            'honorId' => $pledgeDAO->contact_id,
+            'amount' => $pledgeDAO->amount,
+            'status' => CRM_Contribute_PseudoConstant::contributionStatus($pledgeDAO->status_id),
+            'create_date' => $pledgeDAO->create_date,
+            'acknowledge_date' => $pledgeDAO->acknowledge_date,
+            'type' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
+              $pledgeDAO->financial_type_id, 'name'
+            ),
+            'display_name' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+              $pledgeDAO->contact_id, 'display_name'
+            ),
+          );
+        }
+      }
     }
+
     return $params;
   }
 
@@ -479,7 +487,7 @@ GROUP BY  currency
    * @param array  $params (reference ) an assoc array of name/value pairs.
    * @access public
    *
-   * @return None.
+   * @return void.
    */
   function sendAcknowledgment(&$form, $params) {
     //handle Acknowledgment.
@@ -527,7 +535,7 @@ GROUP BY  currency
       'installments', 'frequency_day', 'scheduled_amount', 'currency',
     );
     foreach ($pledgeFields as $field) {
-      if (CRM_Utils_Array::value($field, $params)) {
+      if (!empty($params[$field])) {
         $form->assign($field, $params[$field]);
       }
     }
@@ -536,25 +544,6 @@ GROUP BY  currency
     if ($payments) {
       $form->assign('payments', $payments);
     }
-
-    //assign honor fields.
-    $honor_block_is_active = FALSE;
-    //make sure we have values for it
-    if (CRM_Utils_Array::value('honor_type_id', $params) &&
-      ((!empty($params['honor_first_name']) && !empty($params['honor_last_name'])) ||
-        (!empty($params['honor_email']))
-      )
-    ) {
-      $honor_block_is_active = TRUE;
-      $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-      $honor = CRM_Core_PseudoConstant::get('CRM_Pledge_DAO_Pledge', 'honor_type_id');
-      $form->assign('honor_type', $honor[$params['honor_type_id']]);
-      $form->assign('honor_prefix', $prefix[$params['honor_prefix_id']]);
-      $form->assign('honor_first_name', $params['honor_first_name']);
-      $form->assign('honor_last_name', $params['honor_last_name']);
-      $form->assign('honor_email', $params['honor_email']);
-    }
-    $form->assign('honor_block_is_active', $honor_block_is_active);
 
     //handle domain token values
     $domain = CRM_Core_BAO_Domain::getDomain();
@@ -584,7 +573,7 @@ GROUP BY  currency
     $form->assign('contact', $details[0][$params['contact_id']]);
 
     //handle custom data.
-    if (CRM_Utils_Array::value('hidden_custom', $params)) {
+    if (!empty($params['hidden_custom'])) {
       $groupTree    = CRM_Core_BAO_CustomGroup::getTree('Pledge', CRM_Core_DAO::$_nullObject, $params['id']);
       $pledgeParams = array(array('pledge_id', '=', $params['id'], 0, 0));
       $customGroup  = array();
@@ -614,11 +603,11 @@ GROUP BY  currency
 
     //check for online pledge.
     $session = CRM_Core_Session::singleton();
-    if (CRM_Utils_Array::value('receipt_from_email', $params)) {
+    if (!empty($params['receipt_from_email'])) {
       $userName = CRM_Utils_Array::value('receipt_from_name', $params);
       $userEmail = CRM_Utils_Array::value('receipt_from_email', $params);
     }
-    elseif (CRM_Utils_Array::value('from_email_id', $params)) {
+    elseif (!empty($params['from_email_id'])) {
       $receiptFrom = $params['from_email_id'];
     }
     elseif ($userID = $session->get('userID')) {
@@ -676,7 +665,7 @@ GROUP BY  currency
       );
 
       //lets insert assignee record.
-      if (CRM_Utils_Array::value('contact_id', $params)) {
+      if (!empty($params['contact_id'])) {
         $activityParams['assignee_contact_id'] = $params['contact_id'];
       }
 

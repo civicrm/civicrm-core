@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -107,6 +107,7 @@ class CRM_Core_BAO_CustomQuery {
   /**
    * This stores custom data group types and tables that it extends
    *
+   * @todo add comments explaining why survey & campaign are missing from this
    * @var array
    * @static
    */
@@ -272,35 +273,27 @@ SELECT label, value
       $this->_select[$fieldName] = "{$field['table_name']}.{$field['column_name']} as $fieldName";
       $this->_element[$fieldName] = 1;
       $joinTable = NULL;
-      if ($field['extends'] == 'civicrm_contact') {
+      // CRM-14265
+      if ($field['extends'] == 'civicrm_group') {
+        return;
+      }
+      elseif ($field['extends'] == 'civicrm_contact') {
         $joinTable = 'contact_a';
       }
       elseif ($field['extends'] == 'civicrm_contribution') {
-        $joinTable = 'civicrm_contribution';
+        $joinTable = $field['extends'];
       }
-      elseif ($field['extends'] == 'civicrm_participant') {
-        $joinTable = 'civicrm_participant';
+      elseif (in_array($field['extends'], self::$extendsMap)) {
+        $joinTable = $field['extends'];
       }
-      elseif ($field['extends'] == 'civicrm_membership') {
-        $joinTable = 'civicrm_membership';
+      else {
+        return;
       }
-      elseif ($field['extends'] == 'civicrm_pledge') {
-        $joinTable = 'civicrm_pledge';
-      }
-      elseif ($field['extends'] == 'civicrm_activity') {
-        $joinTable = 'civicrm_activity';
-      }
-      elseif ($field['extends'] == 'civicrm_relationship') {
-        $joinTable = 'civicrm_relationship';
-      }
-      elseif ($field['extends'] == 'civicrm_grant') {
-        $joinTable = 'civicrm_grant';
-      }
-      elseif ($field['extends'] == 'civicrm_address') {
-        $joinTable = 'civicrm_address';
-      }
-      elseif ($field['extends'] == 'civicrm_case') {
-        $joinTable = 'civicrm_case';
+
+      $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = $joinTable.id";
+
+      if ($this->_ids[$id]) {
+        $this->_whereTables[$name] = $this->_tables[$name];
       }
 
       if ($joinTable) {
@@ -420,12 +413,7 @@ SELECT label, value
                 );
               }
               else {
-                if ($field['html_type'] == 'Autocomplete-Select') {
-                  $wildcard = FALSE;
-                  $val = array_search($value, $this->_options[$field['id']]);
-                }
-                elseif (in_array($field['html_type'], array(
-                  'Select', 'Radio'))) {
+                if (in_array($field['html_type'], array('Select', 'Radio', 'Autocomplete-Select'))) {
                   $wildcard = FALSE;
                   $val = CRM_Utils_Type::escape($value, 'String');
                 }

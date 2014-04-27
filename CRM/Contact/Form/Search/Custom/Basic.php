@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -62,9 +62,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
 
     foreach ($this->_columns as $name => $field) {
       if (in_array($field, array(
-        'street_address', 'city', 'state_province', 'postal_code', 'country')) &&
-        !CRM_Utils_Array::value($field, $addressOptions)
-      ) {
+        'street_address', 'city', 'state_province', 'postal_code', 'country')) && empty($addressOptions[$field])) {
         unset($this->_columns[$name]);
         continue;
       }

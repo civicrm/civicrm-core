@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -57,9 +57,20 @@
     <tr class="crm-preferences-display-form-block-contact_edit_options">
       <td class="label">{$form.contact_edit_options.label}</td>
       <td>
-        <table style="width:80%">
+        <table style="width:90%">
           <tr>
-            <td style="width:40%">
+            <td style="width:30%">
+              <span class="label"><strong>{ts}Individual Name Fields{/ts}</strong></span>
+              <ul id="contactEditNameFields">
+                {foreach from=$nameFields item="title" key="opId"}
+                  <li id="preference-{$opId}-contactedit" class="ui-state-default ui-corner-all"
+                      style="padding-left:1px;">
+                    <span>{$form.contact_edit_options.$opId.html}</span>
+                  </li>
+                {/foreach}
+              </ul>
+            </td>
+            <td style="width:30%">
               <span class="label"><strong>{ts}Contact Details{/ts}</strong></span>
               <ul id="contactEditBlocks">
                 {foreach from=$contactBlocks item="title" key="opId"}
@@ -184,6 +195,16 @@
           fields).{/ts} {help id="id-editor_id"}
       </td>
     </tr>
+    <tr class="crm-preferences-display-form-block-ajaxPopupsEnabled">
+      <td class="label">{$form.ajaxPopupsEnabled.label}</td>
+      <td>{$form.ajaxPopupsEnabled.html}</td>
+    </tr>
+    <tr class="crm-preferences-display-form-block-description">
+      <td>&nbsp;</td>
+      <td class="description">
+        {ts}If you disable this option, the CiviCRM interface will be limited to traditional browsing. Opening a form will refresh the page rather than opening a popup dialog.{/ts}
+      </td>
+    </tr>
     <tr class="crm-preferences-display-form-block-display_name_format">
       <td class="label">{$form.display_name_format.label}</td>
       <td>{$form.display_name_format.html}</td>
@@ -206,7 +227,7 @@
 {if $form.contact_edit_options.html}
   {literal}
     <script type="text/javascript">
-      cj(function () {
+      CRM.$(function($) {
         cj("#contactEditBlocks").sortable({
           placeholder: 'ui-state-highlight',
           update: getSorting

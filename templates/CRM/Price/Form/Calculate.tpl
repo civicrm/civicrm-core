@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,6 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{if $noCalcValueDisplay neq 'false'}
 <div id="pricesetTotal" class="crm-section section-pricesetTotal">
   <div class="label" id="pricelabel"><label>
     {if ( $extends eq 'Contribution' ) || ( $extends eq 'Membership' )}
@@ -31,7 +32,7 @@
     {/if}</label></div>
   <div class="content calc-value" id="pricevalue" ></div>
 </div>
-
+{/if}
 <script type="text/javascript">
 {literal}
 
@@ -58,7 +59,7 @@ cj("input,#priceset select,#priceset").each(function () {
     optionPart = option[1].split(optionSep);
     addprice   = parseFloat( optionPart[0] );
 
-    if( cj(this).attr('checked') ) {
+    if( cj(this).prop('checked') ) {
       totalfee   += addprice;
       price[ele] += addprice;
     }
@@ -66,7 +67,7 @@ cj("input,#priceset select,#priceset").each(function () {
     //event driven calculation of element.
     cj(this).click( function(){
 
-      if ( cj(this).attr('checked') )  {
+      if ( cj(this).prop('checked') )  {
   totalfee   += addprice;
   price[ele] += addprice;
       } else {
@@ -89,7 +90,7 @@ cj("input,#priceset select,#priceset").each(function () {
       price[ele] = 0;
     }
 
-    if( cj(this).attr('checked') ) {
+    if( cj(this).prop('checked') ) {
       totalfee   = parseFloat(totalfee) + addprice - parseFloat(price[ele]);
       price[ele] = addprice;
     }
@@ -198,7 +199,9 @@ function calculateText( object ) {
     }
   display( totalfee );
 }
-
+{/literal}
+{if $displayOveride neq 'true'}
+{literal}
 //display calculated amount
 function display( totalfee ) {
     // totalfee is monetary, round it to 2 decimal points so it can
@@ -213,7 +216,9 @@ function display( totalfee ) {
     ( totalfee < 0 ) ? cj('table#pricelabel').addClass('disabled') : cj('table#pricelabel').removeClass('disabled');
 
 }
-
+{/literal}
+{/if}
+{literal}
 //money formatting/localization
 function formatMoney (amount, c, d, t) {
 var n = amount,

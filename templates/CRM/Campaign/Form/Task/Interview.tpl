@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -167,9 +167,6 @@
                 {else}
                   {$form.field.$voterId.$fieldName.html}
                 {/if}
-                {if $field.html_type eq 'Autocomplete-Select'}
-                  {include file="CRM/Custom/Form/AutoComplete.tpl" element_name = field[`$voterId`][`$fieldName`]}
-                {/if}
               </td>
             {/foreach}
           {/if}
@@ -212,7 +209,7 @@
 <script type="text/javascript">
 var updateVote = "{/literal}{ts escape='js'}Update Response{/ts}{literal}";
 var updateVoteforall = "{/literal}{ts escape='js'}Update Responses for All{/ts}{literal}";
-cj( function( ) {
+CRM.$(function($) {
   var count = 0; var columns='';
 
   cj('#voterRecords th').each( function( ) {

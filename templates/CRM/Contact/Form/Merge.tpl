@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -149,25 +149,19 @@ cj(document).ready(function(){
 
        switch ( element['1'] ) {
            case 'addressee':
-                 var ele = '#' + element['0'] + '_' + element['1'];
+                 ele = '#' + element['0'] + '_' + element['1'];
                  break;
 
            case 'email':
            case 'postal':
-                 var ele = '#' + element['0'] + '_' + element['1'] + '_' + element['2'];
+                 ele = '#' + element['0'] + '_' + element['1'] + '_' + element['2'];
                  break;
        }
 
        if( ele ) {
-          cj(this).bind( 'click', function() {
-
-              if( cj( this).attr( 'checked' ) ){
-                  cj('input' + ele ).attr('checked', true );
-                  cj('input' + ele + '_custom' ).attr('checked', true );
-              } else {
-                  cj('input' + ele ).attr('checked', false );
-                  cj('input' + ele + '_custom' ).attr('checked', false );
-              }
+          cj(this).on('click', function() {
+            var val = cj(this).prop('checked');
+            cj('input' + ele + ', input' + ele + '_custom').prop('checked', val);
           });
        }
     });

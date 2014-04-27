@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -108,16 +108,15 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
    */
   static function formRule($fields, $errors) {
     $hasData = $hasPrimary = $errors = array();
-    if (CRM_Utils_Array::value('openid', $fields) && is_array($fields['openid'])) {
+    if (!empty($fields['openid']) && is_array($fields['openid'])) {
       foreach ($fields['openid'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
 
         if ($dataExists) {
           $hasData[] = $instance;
-          if (CRM_Utils_Array::value('is_primary', $blockValues)) {
+          if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
-            if (!$primaryID &&
-              CRM_Utils_Array::value('openid', $blockValues)) {
+            if (!$primaryID && !empty($blockValues['openid'])) {
                 $primaryID = $blockValues['openid'];
             }
           }

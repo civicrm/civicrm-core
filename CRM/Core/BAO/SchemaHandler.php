@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -128,21 +128,21 @@ class CRM_Core_BAO_SchemaHandler {
     $sql .= $prefix;
     $sql .= "`{$params['name']}` {$params['type']}";
 
-    if (CRM_Utils_Array::value('required', $params)) {
+    if (!empty($params['required'])) {
       $sql .= " NOT NULL";
     }
 
-    if (CRM_Utils_Array::value('attributes', $params)) {
+    if (!empty($params['attributes'])) {
       $sql .= " {$params['attributes']}";
     }
 
-    if (CRM_Utils_Array::value('default', $params) &&
+    if (!empty($params['default']) &&
       $params['type'] != 'text'
     ) {
       $sql .= " DEFAULT {$params['default']}";
     }
 
-    if (CRM_Utils_Array::value('comment', $params)) {
+    if (!empty($params['comment'])) {
       $sql .= " COMMENT '{$params['comment']}'";
     }
 
@@ -151,7 +151,7 @@ class CRM_Core_BAO_SchemaHandler {
 
   static function buildPrimaryKeySQL(&$params, $separator, $prefix) {
     $sql = NULL;
-    if (CRM_Utils_Array::value('primary', $params)) {
+    if (!empty($params['primary'])) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= $prefix;
@@ -171,13 +171,13 @@ class CRM_Core_BAO_SchemaHandler {
     //create index only for searchable fields during ADD,
     //create index only if field is become searchable during MODIFY,
     //drop index only if field is no more searchable and index was exist.
-    if (CRM_Utils_Array::value('searchable', $params) && !$indexExist) {
+    if (!empty($params['searchable']) && !$indexExist) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= $prefix;
       $sql .= "INDEX_{$params['name']} ( {$params['name']} )";
     }
-    elseif (!CRM_Utils_Array::value('searchable', $params) && $indexExist) {
+    elseif (empty($params['searchable']) && $indexExist) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= "DROP INDEX INDEX_{$params['name']}";
@@ -235,9 +235,7 @@ ALTER TABLE {$tableName}
 
   static function buildForeignKeySQL(&$params, $separator, $prefix, $tableName) {
     $sql = NULL;
-    if (CRM_Utils_Array::value('fk_table_name', $params) &&
-      CRM_Utils_Array::value('fk_field_name', $params)
-    ) {
+    if (!empty($params['fk_table_name']) && !empty($params['fk_field_name'])) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= $prefix;
@@ -280,10 +278,10 @@ ALTER TABLE {$tableName}
 
       case 'delete':
         $sql .= " DROP COLUMN `{$params['name']}`";
-        if (CRM_Utils_Array::value('primary', $params)) {
+        if (!empty($params['primary'])) {
           $sql .= ", DROP PRIMARY KEY";
         }
-        if (CRM_Utils_Array::value('fk_table_name', $params)) {
+        if (!empty($params['fk_table_name'])) {
           $sql .= ", DROP FOREIGN KEY FK_{$params['fkName']}";
         }
         break;

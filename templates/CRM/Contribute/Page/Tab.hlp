@@ -66,6 +66,18 @@
 <p>
 {ts}When a contribution is made via a Personal Campaign Page, a soft credit for that contribution is automatically assigned to the contact who created the Personal Campaign Page.{/ts}
 </p>
+{/htxt}
+
+{htxt id="id-pcp-title"}
+  {ts}Personal Campaign Page{/ts}
+{/htxt}
+{htxt id="id-pcp"}
+<p>
+{ts}Use this section to indicate that the contribution came in via a constituent's Personal Campaign Page (PCP), OR should be credited to that PCP post facto.{/ts}
+</p>
+<p>
+{ts}When contributions are made via a Personal Campaign Page a soft credit (of type 'Personal Campaign Page') is automatically created and assigned to the 'owner' of the the Personal Campaign Page.{/ts}
+</p>
 {/htxt} 
 
 {htxt id="adjust-payment-amount-title"}

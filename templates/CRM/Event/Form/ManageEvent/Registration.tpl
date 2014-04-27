@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -62,7 +62,7 @@
          <tr class="crm-event-manage-registration-form-block-is_online_registration">
             <td class="label">{$form.is_online_registration.label}</td>
             <td>{$form.is_online_registration.html}
-            <span class="description">{ts}Enable or disable online registration for this event.{/ts}</span>
+            <span class="description">{ts}Online registration enabled?{/ts}</span>
             </td>
          </tr>
      </table>
@@ -346,7 +346,7 @@ invert              = 0
 <script type="text/javascript">
     {literal}
     cj("#is_multiple_registrations").change( function( ) {
-        if ( !cj(this).attr( 'checked') ) {
+        if ( !cj(this).prop('checked') ) {
             cj("#additional_custom_pre_id").val('');
             cj("#additional_custom_post_id").val('');
       cj(".crm-event-manage-registration-form-block-additional_custom_post_multiple").hide();
@@ -365,11 +365,11 @@ invert              = 0
 
         // Display info
         cj('.ui-notify-message .ui-notify-close').click();
-        if ( cj("#allow_same_participant_emails").attr( 'checked' ) && cj("#is_multiple_registrations").attr( 'checked' ) ) {
+        if ( cj("#allow_same_participant_emails").prop('checked' ) && cj("#is_multiple_registrations").prop('checked' ) ) {
             CRM.alert( msg1, '', 'info', {expires:0} );
-        } else if ( cj("#allow_same_participant_emails").attr( 'checked' ) && !cj("#is_multiple_registrations").attr( 'checked' ) ) {
+        } else if ( cj("#allow_same_participant_emails").prop('checked' ) && !cj("#is_multiple_registrations").prop('checked' ) ) {
             CRM.alert( msg2, '', 'info', {expires:0} );
-        } else if ( !cj("#allow_same_participant_emails").attr( 'checked' ) && cj("#is_multiple_registrations").attr( 'checked' ) ) {
+        } else if ( !cj("#allow_same_participant_emails").prop('checked' ) && cj("#is_multiple_registrations").prop('checked' ) ) {
             CRM.alert( msg3, '', 'info', {expires:0} );
         }
     }
@@ -425,9 +425,9 @@ invert              = 0
     }
 
     //show edit profile field links
-    cj(function() {
+    CRM.$(function($) {
         // show edit for main profile
-        cj('select[id^="custom_p"]').live( 'change',  function( event ) {
+        cj(document).on('change', 'select[id^="custom_p"]', function( event ) {
             buildLinks( cj(this), cj(this).val());
         });
 
@@ -437,7 +437,7 @@ invert              = 0
         });
 
         //show edit profile field links in additional participant
-        cj('select[id^="additional_custom_p"]').live( 'change',  function( event ) {
+      cj(document).on('change', 'select[id^="additional_custom_p"]', function( event ) {
             buildLinks( cj(this), cj(this).val());
         });
 

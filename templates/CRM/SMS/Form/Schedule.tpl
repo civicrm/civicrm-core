@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -73,22 +73,17 @@
 
 <script type="text/javascript">
 {if $preview}
-{literal}
-cj(function() {
-   cj().crmAccordions();
-});
-{/literal}
 {/if}
 
 {literal}
-cj(function() {
+CRM.$(function($) {
    cj('#start_date_display').change( function( ) { 
        if ( cj(this).val( ) ) {
-          cj('#now').attr( 'checked', false );
+          cj('#now').prop('checked', false );
        }
    });
    cj('#now').change( function( ) { 
-       if ( cj('#now').attr('checked', true ) ) {
+       if ( cj('#now').prop('checked', true ) ) {
           cj('#start_date_display').val( '' );
           cj('#start_date').val( '' );
           cj('#start_date_time').val( '' );

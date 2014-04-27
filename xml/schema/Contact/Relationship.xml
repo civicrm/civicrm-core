@@ -22,7 +22,7 @@
   <field>
       <name>contact_id_a</name>
       <type>int unsigned</type>
-      <title>Contact A ID</title>
+      <title>Contact A</title>
       <required>true</required>
       <comment>id of the first contact</comment>
        <add>1.1</add>
@@ -37,7 +37,7 @@
   <field>
       <name>contact_id_b</name>
       <type>int unsigned</type>
-      <title>Contact B ID</title>
+      <title>Contact B</title>
       <required>true</required>
       <comment>id of the second contact</comment>
        <add>1.1</add>
@@ -52,10 +52,10 @@
   <field>
       <name>relationship_type_id</name>
       <type>int unsigned</type>
-      <title>Relationship Type ID</title>
+      <title>Relationship Type</title>
       <required>true</required>
       <comment>id of the relationship</comment>
-       <add>1.1</add>
+      <add>1.1</add>
   </field>
   <foreignKey>
        <name>relationship_type_id</name>
@@ -115,7 +115,7 @@
   <field>
        <name>case_id</name>
        <type>int unsigned</type>
-       <title>Relationship Case ID</title>
+       <title>Relationship Case</title>
        <default>NULL</default>
        <comment>FK to civicrm_case</comment>
        <add>2.2</add>

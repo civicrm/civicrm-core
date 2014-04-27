@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,7 +41,7 @@
                 {$form.value[$x][$i].html|crmAddClass:'required'}
               </span>
               {if $i gt 0 or $x gt 1}
-                &nbsp;&nbsp;<a href="#" class="crm-reset-builder-row" title="{ts}Remove this row{/ts}"><img src="{$config->resourceBase}i/close.png" class="action-icon" alt="X" /></a>
+                &nbsp;<a href="#" class="crm-reset-builder-row crm-hover-button" title="{ts}Remove this row{/ts}"><span class="icon close-icon"></span></a>
               {/if}
             </td>
           </tr>

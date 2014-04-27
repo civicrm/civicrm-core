@@ -1,4 +1,4 @@
-(function($) {
+(function($, _) {
   var ufGroupCollection = new CRM.UF.UFGroupCollection(_.sortBy(CRM.initialProfileList.values, 'title'));
   //var ufGroupCollection = new CRM.UF.UFGroupCollection(CRM.initialProfileList.values, {
   //  comparator: 'title' // no point, this doesn't work with subcollections
@@ -45,7 +45,7 @@
       });
       view.on('change:ufGroupId', function() {
         $(select).val(view.getUfGroupId()).change();
-      })
+      });
       view.render();
       $(select).after(view.el);
       setTimeout(function() {
@@ -54,14 +54,13 @@
     });
   };
 
-  // FIXME: this needs a better place to live
-  CRM.scanProfileSelectors = function() {
-    $('.crm-profile-selector').each(function(){
+  $('#crm-container').on('crmLoad', function() {
+    $('.crm-profile-selector:not(.rendered)', this).addClass('rendered').each(function() {
       $(this).crmProfileSelector({
         groupTypeFilter: $(this).attr('data-group-type'),
-        entities: eval('(' + $(this).attr('data-entities') + ')')
+        entities: $(this).data('entities')
       });
     });
-  };
+  });
 
-})(cj);
+})(CRM.$, CRM._);

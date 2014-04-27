@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -127,7 +127,7 @@
   {if $context EQ "makeContribution"}
     {literal}
     <script>
-      cj(function($){
+      CRM.$(function($) {
         var is_separate_payment = {/literal}{if $membershipBlock.is_separate_payment}{$membershipBlock.is_separate_payment}{else}0{/if}{literal};
 
         // select a new premium
@@ -159,6 +159,10 @@
         function get_amount() {
           var amount;
 
+          if (typeof totalfee !== "undefined") {
+            return totalfee;
+          }
+
           // see if other amount exists and has a value
           if(cj('.other_amount-content input').length) {
             amount = Number(cj('.other_amount-content input').val());
@@ -167,14 +171,15 @@
           }
 
           function check_price_set(price_set_radio_buttons) {
-            if(!amount) {
+            if (!amount) {
               cj(price_set_radio_buttons).each(function(){
-                if(cj(this).attr('checked')) {
+                if (cj(this).prop('checked')) {
                   amount = cj(this).attr('data-amount');
-                  if(amount) {
+                  if (typeof amount !== "undefined") {
                     amount = Number(amount);
-                    if(isNaN(amount))
-                      amount = 0;
+                  }
+                  else {
+                    amount = 0;
                   }
                 }
               });
@@ -188,14 +193,11 @@
             amount = 0;
           }
 
-          // next, check for contribution amount price sets
-          check_price_set('.contribution_amount-content input[type="radio"]');
-
-          // next, check for membership level price set
-          check_price_set('.membership_amount-content input[type="radio"]');
-
           // make sure amount is a number at this point
           if(!amount) amount = 0;
+
+          // next, check for membership/contribution level price set
+          check_price_set('#priceset input[type="radio"]');
 
           // account for is_separate_payment
           if(is_separate_payment && additional_amount) {
@@ -219,20 +221,31 @@
           });
         }
         cj('.other_amount-content input').change(update_premiums);
-        cj('.contribution_amount-content input[type="radio"]').click(update_premiums);
-        cj('.membership_amount-content input[type="radio"]').click(update_premiums);
+        cj('input, #priceset').change(update_premiums);
         update_premiums();
 
         // build a list of price sets
         var amounts = [];
         var price_sets = {};
-        cj('#priceset input[type="radio"]').each(function(){
-          var amount = Number(cj(this).attr('data-amount'));
-          if(!isNaN(amount)) {
-            amounts.push(amount);
+        cj('input, #priceset  select,#priceset').each(function(){
+          if (this.tagName == 'SELECT') {
+            var selectID = cj(this).attr('id');
+            var selectvalues = JSON.parse(cj(this).attr('price'));
+            Object.keys(selectvalues).forEach(function (key) {
+              var option = selectvalues[key].split(optionSep);
+              amount = Number(option[0]);
+              price_sets[amount] = '#' + selectID + '-' + key;
+              amounts.push(amount);
+            });
+          }
+          else {
+            var amount = Number(cj(this).attr('data-amount'));
+            if (!isNaN(amount)) {
+              amounts.push(amount);
 
-            var id = cj(this).attr('id');
-            price_sets[amount] = '#'+id;
+             var id = cj(this).attr('id');
+             price_sets[amount] = '#'+id;
+            }
           }
         });
         amounts.sort(function(a,b){return a - b});
@@ -240,8 +253,28 @@
         // make contribution instead buttons work
         cj('.premium-full-disabled input').click(function(){
           var amount = Number(cj(this).attr('amount'));
-          if(price_sets[amount]) {
-            cj(price_sets[amount]).click();
+          if (price_sets[amount]) {
+            if (!cj(price_sets[amount]).length) {
+              var option =  price_sets[amount].split('-');
+              cj(option[0]).val(option[1]);
+              cj(option[0]).trigger('change');
+            }
+            else if (cj(price_sets[amount]).attr('type') == 'checkbox') {
+               cj(price_sets[amount]).prop("checked",true);
+               if ((typeof totalfee !== 'undefined') && (typeof display == 'function')) {
+                 if (totalfee > 0) {
+                   totalfee += amount;
+                 }
+                 else {
+                   totalfee = amount;
+                 }
+                 display(totalfee);
+               }
+             }
+             else {
+               cj(price_sets[amount]).click();
+               cj(price_sets[amount]).trigger('click');
+             }
           } else {
             // is there an other amount input box?
             if(cj('.other_amount-section input').length) {
@@ -270,7 +303,28 @@
               if(!selected_price_set) {
                 selected_price_set = amounts[amounts.length-1];
               }
-              cj(price_sets[selected_price_set]).click();
+
+              if (!cj(price_sets[selected_price_set]).length) {
+                var option =  price_sets[selected_price_set].split('-');
+                cj(option[0]).val(option[1]);
+                cj(option[0]).trigger('change');
+              }
+              else if (cj(price_sets[selected_price_set]).attr('type') == 'checkbox') {
+                cj(price_sets[selected_price_set]).prop("checked",true);
+                if ((typeof totalfee !== 'undefined') && (typeof display == 'function')) {
+                  if (totalfee > 0) {
+                    totalfee += amount;
+                  }
+                  else {
+                    totalfee = amount;
+                  }
+                  display(totalfee);
+                }
+             }
+             else {
+               cj(price_sets[selected_price_set]).click();
+               cj(price_sets[selected_price_set]).trigger('click');
+             }
             }
           }
           update_premiums();
@@ -303,7 +357,7 @@
   {else}
     {literal}
     <script>
-      cj(function(){
+      CRM.$(function($) {
         cj('.premium-short').hide();
         cj('.premium-full').show();
       });

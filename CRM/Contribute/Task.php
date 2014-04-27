@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -68,41 +68,49 @@ class CRM_Contribute_Task {
   static function &tasks() {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
-        1 => array('title' => ts('Delete Contributions'),
+        1 => array(
+          'title' => ts('Delete Contributions'),
           'class' => 'CRM_Contribute_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array('title' => ts('Print Contributions'),
+        2 => array(
+          'title' => ts('Print Selected Rows'),
           'class' => 'CRM_Contribute_Form_Task_Print',
           'result' => FALSE,
         ),
-        3 => array('title' => ts('Export Contributions'),
+        3 => array(
+          'title' => ts('Export Contributions'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
           ),
           'result' => FALSE,
         ),
-        4 => array('title' => ts('Batch Update Contributions Via Profile'),
+        4 => array(
+          'title' => ts('Batch Update Contributions Via Profile'),
           'class' => array(
             'CRM_Contribute_Form_Task_PickProfile',
             'CRM_Contribute_Form_Task_Batch',
           ),
           'result' => TRUE,
         ),
-        5 => array('title' => ts('Send Email to Contacts'),
+        5 => array(
+          'title' => ts('Send Email to Contacts'),
           'class' => 'CRM_Contribute_Form_Task_Email',
           'result' => TRUE,
         ),
-        6 => array('title' => ts('Update Pending Contribution Status'),
+        6 => array(
+          'title' => ts('Update Pending Contribution Status'),
           'class' => 'CRM_Contribute_Form_Task_Status',
           'result' => TRUE,
         ),
-        7 => array('title' => ts('Print or Email Contribution Receipts'),
+        7 => array(
+          'title' => ts('Print or Email Contribution Receipts'),
           'class' => 'CRM_Contribute_Form_Task_PDF',
           'result' => FALSE,
         ),
-        8 => array('title' => ts('Thank-you Letters for Contributions'),
+        8 => array(
+          'title' => ts('Thank-you Letters for Contributions'),
           'class' => 'CRM_Contribute_Form_Task_PDFLetter',
           'result' => FALSE,
         ),
@@ -132,10 +140,7 @@ class CRM_Contribute_Task {
     self::tasks();
     $titles = array();
     foreach (self::$_tasks as $id => $value) {
-      // skip Print Contribution task
-      if ($id != 2) {
-        $titles[$id] = $value['title'];
-      }
+      $titles[$id] = $value['title'];
     }
     return $titles;
   }
@@ -149,7 +154,7 @@ class CRM_Contribute_Task {
    * @return array set of tasks that are valid for the user
    * @access public
    */
-  static function &permissionedTaskTitles($permission) {
+  static function &permissionedTaskTitles($permission, $softCreditFiltering = FALSE) {
     $tasks = array();
     if (($permission == CRM_Core_Permission::EDIT)
       || CRM_Core_Permission::check('edit contributions')
@@ -167,6 +172,9 @@ class CRM_Contribute_Task {
       if (CRM_Core_Permission::check('delete in CiviContribute')) {
         $tasks[1] = self::$_tasks[1]['title'];
       }
+    }
+    if ($softCreditFiltering) {
+      unset($tasks[4], $tasks[7]);
     }
     return $tasks;
   }

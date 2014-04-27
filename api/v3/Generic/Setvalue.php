@@ -28,19 +28,19 @@ function civicrm_api3_generic_setValue($apiRequest) {
   $def = $fields[$field];
   // Disallow empty values except for the number zero.
   // TODO: create a utility for this since it's needed in many places
+  // if (array_key_exists('required', $def) && CRM_Utils_System::isNull($value)) {
   if (array_key_exists('required', $def) && empty($value) && $value !== '0' && $value !== 0) {
     return civicrm_api3_create_error(ts("This can't be empty, please provide a value"), array("error_code" => "required", "field" => $field));
   }
 
   switch ($def['type']) {
-    case 1:
-      //int
+    case CRM_Utils_Type::T_INT:
       if (!is_numeric($value)) {
         return civicrm_api3_create_error("Param '$field' must be a number", array('error_code' => 'NaN'));
       }
 
-    case 2:
-      //string
+    case CRM_Utils_Type::T_STRING:
+    case CRM_Utils_Type::T_TEXT:
       if (!CRM_Utils_Rule::xssString($value)) {
         return civicrm_api3_create_error(ts('Illegal characters in input (potential scripting attack)'), array('error_code' => 'XSS'));
       }
@@ -49,15 +49,13 @@ function civicrm_api3_generic_setValue($apiRequest) {
     }
     break;
 
-    case 12:
-      //date
+    case CRM_Utils_Type::T_DATE:
       $value = CRM_Utils_Type::escape($value,"Date",false);
       if (!$value)
         return civicrm_api3_create_error("Param '$field' is not a date. format YYYYMMDD or YYYYMMDDHHMMSS");
       break;
 
-    case 16:
-      //boolean
+    case CRM_Utils_Type::T_BOOLEAN:
       $value = (boolean) $value;
       break;
 

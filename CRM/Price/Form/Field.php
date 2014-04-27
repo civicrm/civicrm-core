@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -127,13 +127,13 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         $defaults['price'] = CRM_Utils_Money::format($defaults['amount'], NULL, '%a');
       }
 
-      if (CRM_Utils_Array::value('active_on', $defaults)) {
+      if (!empty($defaults['active_on'])) {
         list($defaults['active_on'],
           $defaults['active_on_time']
         ) = CRM_Utils_Date::setDateDefaults($defaults['active_on'], 'activityDateTime');
       }
 
-      if (CRM_Utils_Array::value('expire_on', $defaults)) {
+      if (!empty($defaults['expire_on'])) {
         list($defaults['expire_on'],
           $defaults['expire_on_time']
         ) = CRM_Utils_Date::setDateDefaults($defaults['expire_on'], 'activityDateTime');
@@ -153,7 +153,11 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $defaults['options_per_line'] = 1;
       $defaults['is_display_amounts'] = 1;
     }
-    $eventComponentId  = CRM_Core_Component::getComponentID('CiviEvent');
+    $enabledComponents = CRM_Core_Component::getEnabledComponents();
+    $eventComponentId = NULL;
+    if (array_key_exists('CiviEvent',$enabledComponents)) {
+      $eventComponentId  = CRM_Core_Component::getComponentID('CiviEvent');
+    }
 
     if (isset($this->_sid) && $this->_action == CRM_Core_Action::ADD) {
       $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'financial_type_id');
@@ -197,9 +201,15 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     if (count($financialType)) {
       $this->assign('financialType', $financialType);
     }
+    $enabledComponents = CRM_Core_Component::getEnabledComponents();
+    $eventComponentId = $memberComponentId = NULL;
+    if (array_key_exists('CiviEvent',$enabledComponents)) {
+      $eventComponentId  = CRM_Core_Component::getComponentID('CiviEvent');
+    }
+    if (array_key_exists('CiviMember',$enabledComponents)) {
+      $memberComponentId = CRM_Core_Component::getComponentID('CiviMember');
+    }
 
-    $eventComponentId  = CRM_Core_Component::getComponentID('CiviEvent');
-    $memberComponentId = CRM_Core_Component::getComponentID('CiviMember');
     $attributes        = CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceFieldValue');
 
     $this->add('select', 'financial_type_id',
@@ -479,7 +489,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
               $_flagOption = 1;
             }
           }
-          if (!$noLabel && !$noAmount && CRM_Utils_Array::value('option_financial_type_id', $fields) && $fields['option_financial_type_id'][$index] == '' && $fields['html_type'] != 'Text') {
+          if (!$noLabel && !$noAmount && !empty($fields['option_financial_type_id']) && $fields['option_financial_type_id'][$index] == '' && $fields['html_type'] != 'Text') {
             $errors["option_financial_type_id[{$index}]"] = ts('Financial Type is a Required field.');
           }
           if ($noLabel && !$noAmount) {
@@ -548,7 +558,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
           foreach ($memTypesIDS as $key => $val) {
             // see if any price field option values in this price field are for memberships with autorenew
             $memTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($val);
-            if (CRM_Utils_Array::value('auto_renew', $memTypeDetails)) {
+            if (!empty($memTypeDetails['auto_renew'])) {
               $foundAutorenew = TRUE;
               break;
             }

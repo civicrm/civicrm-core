@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.4                                                |
+-- | CiviCRM version 4.5                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2013                                |
+-- | Copyright CiviCRM LLC (c) 2004-2014                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -49,10 +49,11 @@
       'contribution_recurring_notify' => ts('Contributions - Recurring Start and End Notification',           array('escape' => 'sql')),
       'contribution_recurring_cancelled' => ts('Contributions - Recurring Cancellation Notification',         array('escape' => 'sql')),
       'contribution_recurring_billing' => ts('Contributions - Recurring Billing Updates',                     array('escape' => 'sql')),
-      'contribution_recurring_edit'    => ts('Contributions - Recurring Updates',                           array('escape' => 'sql')),
+      'contribution_recurring_edit'    => ts('Contributions - Recurring Updates',                             array('escape' => 'sql')),
       'pcp_notify'                    => ts('Personal Campaign Pages - Admin Notification',                   array('escape' => 'sql')),
       'pcp_status_change'             => ts('Personal Campaign Pages - Supporter Status Change Notification', array('escape' => 'sql')),
       'pcp_supporter_notify'          => ts('Personal Campaign Pages - Supporter Welcome',                    array('escape' => 'sql')),
+      'payment_or_refund_notification' => ts('Additional Payment Receipt or Refund Notification',             array('escape' => 'sql')),
     ),
     'event' => array(
       'event_offline_receipt' => ts('Events - Registration Confirmation and Receipt (off-line)', array('escape' => 'sql')),
@@ -166,7 +167,7 @@ INSERT INTO civicrm_msg_template
         To use CiviMail:
         <ul>
           <li><a href="http://book.civicrm.org/user/advanced-configuration/email-system-configuration/">Configure your Email System</a>.</li>
-          <li>Make sure your web hosting provider allows outgoing bulk mail, and see if they have a restriction on quantity.  If they don\'t allow bulk mail, consider <a href="http://wiki.civicrm.org/confluence/display/CRM/Hosting+provider+information">finding a new host</a>.</li>
+          <li>Make sure your web hosting provider allows outgoing bulk mail, and see if they have a restriction on quantity.  If they don\'t allow bulk mail, consider <a href="https://civicrm.org/providers/hosting">finding a new host</a>.</li>
         </ul>
         Sincerely,
         <br /><br />

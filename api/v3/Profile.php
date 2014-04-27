@@ -2,9 +2,9 @@
 
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -31,7 +31,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_ActivityProfile
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: ActivityProfile.php 30486 2011-05-20 16:12:09Z rajan $
  *
  */
@@ -271,7 +271,7 @@ function civicrm_api3_profile_submit($params) {
     );
   }
 
-  if (CRM_Utils_Array::value('add_to_group_id', $ufGroupDetails)) {
+  if (!empty($ufGroupDetails['add_to_group_id'])) {
     $contactIds = array($params['contact_id']);
     CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds,
       $ufGroupDetails['add_to_group_id']
@@ -531,6 +531,7 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
       'soft_credit' => 'soft_credit_to',
       'group' => 'group_id',
       'tag' => 'tag_id',
+      'soft_credit_type' => 'soft_credit_type_id',
     );
 
     if(array_key_exists($ufFieldTaleFieldName, $hardCodedEntityFields)) {
@@ -664,6 +665,7 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
     'check_number' => 'contribution',
     'contribution_status_id' => 'contribution',
     'soft_credit' => 'contribution',
+    'soft_credit_type' => 'contribution_soft',
     'group' => 'group_contact',
     'tag' => 'entity_tag',
    );

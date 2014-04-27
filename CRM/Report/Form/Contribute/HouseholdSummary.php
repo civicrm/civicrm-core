@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -220,9 +220,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if ($tableName == 'civicrm_address') {
               $this->_addressField = TRUE;
             }
@@ -230,7 +228,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
               $this->_emailField = TRUE;
             }
 
-            if (CRM_Utils_Array::value('statistics', $field)) {
+            if (!empty($field['statistics'])) {
               foreach ($field['statistics'] as $stat => $label) {
                 $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}_{$stat}";
                 $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
@@ -380,14 +378,14 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
 
     $params = array('contact_type_b' => 'Household', 'version' => 3);
     $typesA = civicrm_api('relationship_type', 'get', $params);
-    if (!CRM_Utils_Array::value('is_error', $typesA)) {
+    if (empty($typesA['is_error'])) {
       foreach ($typesA['values'] as $rel) {
         $relationTypes[$rel['id']][$rel['id'] . '_b_a'] = $rel['label_b_a'];
       }
     }
     $params = array('contact_type_a' => 'Household', 'version' => 3);
     $typesB = civicrm_api('relationship_type', 'get', $params);
-    if (!CRM_Utils_Array::value('is_error', $typesB)) {
+    if (empty($typesB['is_error'])) {
       foreach ($typesB['values'] as $rel) {
         $relationTypes[$rel['id']][$rel['id'] . '_a_b'] = $rel['label_a_b'];
         //$this->relationTypes[$rel['id'].'_a_b'] = $rel['label_a_b'];
@@ -513,7 +511,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
-      if (CRM_Utils_Array::value('civicrm_contribution_total_amount', $row)) {
+      if (!empty($row['civicrm_contribution_total_amount'])) {
         $row['civicrm_contribution_total_amount'] = CRM_Utils_Money::format($row['civicrm_contribution_total_amount'], $row['civicrm_contribution_currency']);
       }
 

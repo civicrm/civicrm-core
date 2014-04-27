@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -84,46 +84,46 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
     $vcard->setFormattedName($defaults['display_name']);
     $vcard->setSortString($defaults['sort_name']);
 
-    if (CRM_Utils_Array::value('nick_name', $defaults)) {
+    if (!empty($defaults['nick_name'])) {
       $vcard->addNickname($defaults['nick_name']);
     }
 
-    if (CRM_Utils_Array::value('job_title', $defaults)) {
+    if (!empty($defaults['job_title'])) {
       $vcard->setTitle($defaults['job_title']);
     }
 
-    if (CRM_Utils_Array::value('birth_date_display', $defaults)) {
+    if (!empty($defaults['birth_date_display'])) {
       $vcard->setBirthday(CRM_Utils_Array::value('birth_date_display', $defaults));
     }
 
-    if (CRM_Utils_Array::value('home_URL', $defaults)) {
+    if (!empty($defaults['home_URL'])) {
       $vcard->setURL($defaults['home_URL']);
     }
 
     // TODO: $vcard->setGeo($lat, $lon);
-    if (CRM_Utils_Array::value('address', $defaults)) {
+    if (!empty($defaults['address'])) {
       $stateProvices = CRM_Core_PseudoConstant::stateProvince();
       $countries = CRM_Core_PseudoConstant::country();
       foreach ($defaults['address'] as $location) {
         // we don't keep PO boxes in separate fields
         $pob = '';
         $extend = CRM_Utils_Array::value('supplemental_address_1', $location);
-        if (CRM_Utils_Array::value('supplemental_address_2', $location)) {
+        if (!empty($location['supplemental_address_2'])) {
           $extend .= ', ' . $location['supplemental_address_2'];
         }
         $street   = CRM_Utils_Array::value('street_address', $location);
         $locality = CRM_Utils_Array::value('city', $location);
         $region   = NULL;
-        if (CRM_Utils_Array::value('state_province_id', $location)) {
+        if (!empty($location['state_province_id'])) {
           $region = $stateProvices[CRM_Utils_Array::value('state_province_id', $location)];
         }
         $country = NULL;
-        if (CRM_Utils_Array::value('country_id', $location)) {
+        if (!empty($location['country_id'])) {
           $country = $countries[CRM_Utils_Array::value('country_id', $location)];
         }
 
         $postcode = CRM_Utils_Array::value('postal_code', $location);
-        if (CRM_Utils_Array::value('postal_code_suffix', $location)) {
+        if (!empty($location['postal_code_suffix'])) {
           $postcode .= '-' . $location['postal_code_suffix'];
         }
 
@@ -132,12 +132,12 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
         if ($vcardName) {
           $vcard->addParam('TYPE', $vcardName);
         }
-        if (CRM_Utils_Array::value('is_primary', $location)) {
+        if (!empty($location['is_primary'])) {
           $vcard->addParam('TYPE', 'PREF');
         }
       }
     }
-    if (CRM_Utils_Array::value('phone', $defaults)) {
+    if (!empty($defaults['phone'])) {
       foreach ($defaults['phone'] as $phone) {
         $vcard->addTelephone($phone['phone']);
         $vcardName = $vcardNames[$phone['location_type_id']];
@@ -150,7 +150,7 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
       }
     }
 
-    if (CRM_Utils_Array::value('email', $defaults)) {
+    if (!empty($defaults['email'])) {
       foreach ($defaults['email'] as $email) {
         $vcard->addEmail($email['email']);
         $vcardName = $vcardNames[$email['location_type_id']];

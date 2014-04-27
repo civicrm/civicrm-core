@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -120,9 +120,7 @@ class CRM_Core_Form_Tag {
 
           switch ($entityTable) {
             case 'civicrm_activity':
-              if (!empty($form->_submitValues['activity_taglist']) &&
-                CRM_Utils_Array::value($parentId, $form->_submitValues['activity_taglist'])
-              ) {
+              if (!empty($form->_submitValues['activity_taglist']) && !empty($form->_submitValues['activity_taglist'][$parentId])) {
                 $allTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
                 $tagIds = explode(',', $form->_submitValues['activity_taglist'][$parentId]);
                 foreach ($tagIds as $tagId) {
@@ -141,9 +139,7 @@ class CRM_Core_Form_Tag {
               break;
 
             case 'civicrm_case':
-              if (!empty($form->_submitValues['case_taglist']) &&
-                CRM_Utils_Array::value($parentId, $form->_submitValues['case_taglist'])
-              ) {
+              if (!empty($form->_submitValues['case_taglist']) && !empty($form->_submitValues['case_taglist'][$parentId])) {
                 $allTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
                 $tagIds = explode(',', $form->_submitValues['case_taglist'][$parentId]);
                 foreach ($tagIds as $tagId) {
@@ -166,9 +162,7 @@ class CRM_Core_Form_Tag {
                 $tagset[$i] = $tagset[$tagsetItem];
                 $tagset[$i]['tagsetElementName'] = "attachment_taglist_$i";
                 $form->add('text', "attachment_taglist_{$i}[{$parentId}]", NULL);
-                if (!empty($form->_submitValues["attachment_taglist_$i"]) &&
-                  CRM_Utils_Array::value($parentId, $form->_submitValues["attachment_taglist_$i"])
-                ) {
+                if (!empty($form->_submitValues["attachment_taglist_$i"]) && !empty($form->_submitValues["attachment_taglist_$i"][$parentId])) {
                   $allTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
                   $tagIds = explode(',', $form->_submitValues["attachment_taglist_$i"][$parentId]);
                   foreach ($tagIds as $tagId) {
@@ -193,7 +187,7 @@ class CRM_Core_Form_Tag {
                 $contactTags = CRM_Core_BAO_Tag::getTagsUsedFor('civicrm_contact', TRUE, FALSE, $parentId);
 
                 foreach (array_keys($form->_formValues['contact_tags']) as $tagId) {
-                  if (CRM_Utils_Array::value($tagId, $contactTags)) {
+                  if (!empty($contactTags[$tagId])) {
                     $tagName = $tagId;
                     if (is_numeric($tagId)) {
                       $tagName = $contactTags[$tagId];
@@ -228,6 +222,7 @@ class CRM_Core_Form_Tag {
     if (!empty($tagset)) {
       // assign current tagsets which is used in postProcess
       $form->_tagsetInfo = $tagset;
+      $form->assign("tagsetType", $mode);
       $form->assign("tagsetInfo_$mode", $tagset);
       $form->assign("isTagset", TRUE);
     }

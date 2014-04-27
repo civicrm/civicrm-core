@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -118,7 +118,12 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
           array(
             'id' => $note->id,
             'cid' => $this->_contactId,
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'note.selector.row',
+          'Note',
+          $note->id
         );
         $contact = new CRM_Contact_DAO_Contact();
         $contact->id = $note->contact_id;
@@ -126,6 +131,10 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
         $contact->fetch();
         $values[$note->id]['createdBy'] = $contact->display_name;
         $values[$note->id]['comment_count'] = CRM_Core_BAO_Note::getChildCount($note->id);
+
+        // paper icon view for attachments part
+        $paperIconAttachmentInfo = CRM_Core_BAO_File::paperIconAttachment('civicrm_note', $note->id);
+        $values[$note->id]['attachment'] = $paperIconAttachmentInfo;
       }
     }
 
@@ -141,9 +150,16 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
         'id' => $note->id,
         'pid' => $note->entity_id,
         'cid' => $note->entity_id,
-      )
+      ),
+      ts('more'),
+      FALSE,
+      'note.comment.action',
+      'Note',
+      $note->id
     );
     $this->assign('commentAction', $commentAction);
+
+    $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('note', $this->_contactId);
   }
 
   /**
@@ -270,7 +286,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/note',
           'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=note',
-          'extra' => 'onclick = "if (confirm(\'' . $deleteExtra . '\') ) this.href+=\'&amp;confirmed=1\'; else return false;"',
           'title' => ts('Delete Note'),
         ),
       );
@@ -286,7 +301,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
    */
   static function &commentLinks() {
     if (!(self::$_commentLinks)) {
-      $deleteExtra = ts('Are you sure you want to delete this comment?');
       self::$_commentLinks = array(
         CRM_Core_Action::VIEW => array(
           'name' => ts('View'),
@@ -304,7 +318,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/note',
           'qs' => 'action=delete&reset=1&cid=%%cid%%&id={id}&selectedChild=note',
-          'extra' => 'onclick = "if (confirm(\'' . $deleteExtra . '\') ) this.href+=\'&amp;confirmed=1\'; else return false;"',
           'title' => ts('Delete Comment'),
         ),
       );

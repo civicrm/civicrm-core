@@ -14,7 +14,7 @@
 {literal}
 <script type="text/javascript">
 
-cj(function() {
+CRM.$(function($) {
   // Note: Queue API provides "#remaining tasks" but not "#completed tasks" or "#total tasks".
   // To compute a %complete, we manually track #completed. This only works nicely if we
   // assume that the queue began with a fixed #tasks.
@@ -23,7 +23,7 @@ cj(function() {
 
   var displayResponseData = function(data, textStatus, jqXHR) {
     if (data.redirect_url) {
-      window.location = data.redirect_url;
+      window.location.href = data.redirect_url;
       return;
     }
     

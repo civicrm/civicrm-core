@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -109,7 +109,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Case', $params['id'], $params);
     }
     else {
@@ -118,7 +118,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
 
     $case = self::add($params);
 
-    if (CRM_Utils_Array::value('custom', $params) &&
+    if (!empty($params['custom']) &&
       is_array($params['custom'])
     ) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_case', $case->id);
@@ -129,7 +129,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
       return $case;
     }
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'Case', $case->id, $case);
     }
     else {
@@ -810,7 +810,12 @@ AND civicrm_case.status_id != $closedId";
               'id' => $result->case_id,
               'cid' => $result->contact_id,
               'cxt' => $context,
-            )
+            ),
+            ts('more'),
+            FALSE,
+            'case.actions.primary',
+            'Case',
+            $result->case_id
           );
           $casesList[$result->case_id]['moreActions'] = CRM_Core_Action::formLink($actions['moreActions'],
             $mask,
@@ -820,7 +825,10 @@ AND civicrm_case.status_id != $closedId";
               'cxt' => $context,
             ),
             ts('more'),
-            TRUE
+            TRUE,
+            'case.actions.more',
+            'Case',
+            $result->case_id
           );
         }
         elseif ($field == 'case_status') {
@@ -919,7 +927,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
 
     $res = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
     while ($res->fetch()) {
-      if (CRM_Utils_Array::value($res->case_type, $rows) && CRM_Utils_Array::value($res->case_status, $rows[$res->case_type])) {
+      if (!empty($rows[$res->case_type]) && !empty($rows[$res->case_type][$res->case_status])) {
         $rows[$res->case_type][$res->case_status]['count'] = $rows[$res->case_type][$res->case_status]['count'] + 1;
       }
       else {
@@ -1049,29 +1057,29 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
     $where = 'WHERE cca.case_id= %1
                     AND ca.is_current_revision = 1';
 
-    if (CRM_Utils_Array::value('reporter_id', $params)) {
+    if (!empty($params['reporter_id'])) {
       $where .= " AND cac.contact_id = " . CRM_Utils_Type::escape($params['reporter_id'], 'Integer');
     }
 
-    if (CRM_Utils_Array::value('status_id', $params)) {
+    if (!empty($params['status_id'])) {
       $where .= " AND ca.status_id = " . CRM_Utils_Type::escape($params['status_id'], 'Integer');
     }
 
-    if (CRM_Utils_Array::value('activity_deleted', $params)) {
+    if (!empty($params['activity_deleted'])) {
       $where .= " AND ca.is_deleted = 1";
     }
     else {
       $where .= " AND ca.is_deleted = 0";
     }
 
-    if (CRM_Utils_Array::value('activity_type_id', $params)) {
+    if (!empty($params['activity_type_id'])) {
       $where .= " AND ca.activity_type_id = " . CRM_Utils_Type::escape($params['activity_type_id'], 'Integer');
     }
 
-    if (CRM_Utils_Array::value('activity_date_low', $params)) {
+    if (!empty($params['activity_date_low'])) {
       $fromActivityDate = CRM_Utils_Type::escape(CRM_Utils_Date::processDate($params['activity_date_low']), 'Date');
     }
-    if (CRM_Utils_Array::value('activity_date_high', $params)) {
+    if (!empty($params['activity_date_high'])) {
       $toActivityDate = CRM_Utils_Type::escape(CRM_Utils_Date::processDate($params['activity_date_high']), 'Date');
       $toActivityDate = $toActivityDate ? $toActivityDate + 235959 : NULL;
     }
@@ -1236,7 +1244,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
       //check for view activity.
       $subject = (empty($dao->subject)) ? '(' . ts('no subject') . ')' : $dao->subject;
       if ($allowView) {
-        $subject = '<a href="javascript:' . $type . 'viewActivity(' . $dao->id . ',' . $contactID . ',' . '\'' . $type . '\' );" title=\'' . $viewTitle . '\'>' . $subject . '</a>';
+        $url = CRM_Utils_System::url('civicrm/case/activity/view', array('cid' => $contactID, 'aid' => $dao->id));
+        $subject = '<a class="crm-popup medium-popup" href="' . $url . '" title="' . $viewTitle . '">' . $subject . '</a>';
       }
       $values[$dao->id]['subject'] = $subject;
 
@@ -1252,34 +1261,33 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
           $values[$dao->id]['reporter'] .= ' / ' . ts('(multiple)');
         }
       }
+      // FIXME: Why are we not using CRM_Core_Action for these links? This is too much manual work and likely to get out-of-sync with core markup.
       $url = "";
+      $css = 'class="action-item crm-hover-button"';
       $additionalUrl = "&id={$dao->id}";
       if (!$dao->deleted) {
         //hide edit link of activity type email.CRM-4530.
         if (!in_array($dao->type, $emailActivityTypeIDs)) {
           //hide Edit link if activity type is NOT editable (special case activities).CRM-5871
           if ($allowEdit) {
-            $url = '<a href="' . $editUrl . $additionalUrl . '">' . ts('Edit') . '</a> ';
+            $url = '<a ' . $css . ' href="' . $editUrl . $additionalUrl . '">' . ts('Edit') . '</a> ';
           }
         }
         if ($allowDelete) {
-          if (!empty($url)) {
-            $url .= " | ";
-          }
-          $url .= '<a href="' . $deleteUrl . $additionalUrl . '">' . ts('Delete') . '</a>';
+          $url .= ' <a ' . str_replace('action-item', 'action-item small-popup', $css) . ' href="' . $deleteUrl . $additionalUrl . '">' . ts('Delete') . '</a>';
         }
       }
       elseif (!$caseDeleted) {
-        $url = '<a href="' . $restoreUrl . $additionalUrl . '">' . ts('Restore') . '</a>';
+        $url = ' <a ' . $css . ' href="' . $restoreUrl . $additionalUrl . '">' . ts('Restore') . '</a>';
         $values[$dao->id]['status'] = $values[$dao->id]['status'] . '<br /> (deleted)';
       }
 
       //check for operations.
       if (self::checkPermission($dao->id, 'Move To Case', $dao->activity_type_id)) {
-        $url .= " | " . '<a href="#" onClick="Javascript:fileOnCase( \'move\',' . $dao->id . ', ' . $caseID . ' ); return false;">' . ts('Move To Case') . '</a> ';
+        $url .= ' <a ' . $css . ' href="#" onClick="Javascript:fileOnCase( \'move\',' . $dao->id . ', ' . $caseID . ' ); return false;">' . ts('Move To Case') . '</a> ';
       }
       if (self::checkPermission($dao->id, 'Copy To Case', $dao->activity_type_id)) {
-        $url .= " | " . '<a href="#" onClick="Javascript:fileOnCase( \'copy\',' . $dao->id . ',' . $caseID . ' ); return false;">' . ts('Copy To Case') . '</a> ';
+        $url .= ' <a ' . $css . ' href="#" onClick="Javascript:fileOnCase( \'copy\',' . $dao->id . ',' . $caseID . ' ); return false;">' . ts('Copy To Case') . '</a> ';
       }
       // if there are file attachments we will return how many and, if only one, add a link to it
       if (!empty($dao->attachment_ids)) {
@@ -1294,7 +1302,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
             NULL,
             FALSE
           );
-          $url .= " | " . "<a href=$attachmentViewUrl >" . ts('View Attachment') . '</a> ';
+          $url .= " <a href='$attachmentViewUrl' ><span class='icon paper-icon'></span></a>";
         }
       }
 
@@ -1393,7 +1401,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
     if ($caseId) {
       $activityTypeId = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activityId, 'activity_type_id');
       $nonCaseActivityTypes = CRM_Core_PseudoConstant::activityType();
-      if (CRM_Utils_Array::value($activityTypeId, $nonCaseActivityTypes)) {
+      if (!empty($nonCaseActivityTypes[$activityTypeId])) {
         $anyActivity = TRUE;
       }
       else {
@@ -1591,7 +1599,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
       // (Or for efficiency call the global one outside the loop and then union with this each time.)
       $contactDetails = self::getRelatedContacts($caseId, TRUE);
 
-      if (CRM_Utils_Array::value($result['from']['id'], $contactDetails)) {
+      if (!empty($contactDetails[$result['from']['id']])) {
         $params = array();
         $params['subject'] = $result['subject'];
         $params['activity_date_time'] = $result['date'];
@@ -1749,9 +1757,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
           $groupInfo['id'] = $results['id'];
           $groupInfo['title'] = $results['title'];
           $params = array(array('group', 'IN', array($groupInfo['id'] => 1), 0, 0));
-          $return = array('sort_name' => 1, 'display_name' => 1, 'email' => 1, 'phone' => 1);
           $return = array('contact_id' => 1, 'sort_name' => 1, 'display_name' => 1, 'email' => 1, 'phone' => 1);
-          list($globalContacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, $return, NULL, $sort, $offset, $rowCount, TRUE, $returnOnlyCount);
+          list($globalContacts) = CRM_Contact_BAO_Query::apiQuery($params, $return, NULL, $sort, $offset, $rowCount, TRUE, $returnOnlyCount);
 
           if ($returnOnlyCount) {
             return $globalContacts;
@@ -1759,7 +1766,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
 
           if ($showLinks) {
             foreach ($globalContacts as $idx => $contact) {
-              $globalContacts[$idx]['sort_name'] = '<a href="' . $contactViewUrl . $contact['contact_id'] . '">' . $contact['sort_name'] . '</a>';
+              $globalContacts[$idx]['sort_name'] = '<a href="' . CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$contact['contact_id']}") . '">' . $contact['sort_name'] . '</a>';
             }
           }
         }
@@ -1811,13 +1818,13 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
     }
 
     if ($latestDate) {
-      if (CRM_Utils_Array::value('activity_type_id', $criteriaParams)) {
+      if (!empty($criteriaParams['activity_type_id'])) {
         $where .= " AND ca.activity_type_id    = " . CRM_Utils_Type::escape($criteriaParams['activity_type_id'], 'Integer');
         $where .= " AND ca.is_current_revision = 1";
         $groupBy .= " GROUP BY ca.activity_type_id";
       }
 
-      if (CRM_Utils_Array::value('newest', $criteriaParams)) {
+      if (!empty($criteriaParams['newest'])) {
         $selectDate = " max(ca.activity_date_time) ";
       }
       else {
@@ -2223,7 +2230,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
       if (!$doFilterCases || array_key_exists($dao->id, $filterCases)) {
         $caseViewStr = "reset=1&id={$dao->id}&cid={$dao->client_id}&action=view&context=case&selectedChild=case";
         $caseViewUrl = CRM_Utils_System::url("civicrm/contact/view/case", $caseViewStr);
-        $caseView = "<a href='{$caseViewUrl}'>" . ts('View Case') . "</a>";
+        $caseView = "<a class='action-item no-popup crm-hover-button' href='{$caseViewUrl}'>" . ts('View Case') . "</a>";
       }
       $clientView = $dao->client_name;
       if ($hasViewContact) {
@@ -2679,7 +2686,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       'activity_type_id', 'id'
     );
 
-    if (CRM_Utils_Array::value('isCaseActivity', $tplParams)) {
+    if (!empty($tplParams['isCaseActivity'])) {
       $tplParams['editActURL'] = CRM_Utils_System::url('civicrm/case/activity',
         "reset=1&cid={$activityParams['target_id']}&caseid={$activityParams['case_id']}&action=update&id={$activityParams['source_record_id']}", TRUE
       );
@@ -3127,36 +3134,29 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * Used during case component enablement and during ugprade
    */
   static function createCaseViews() {
+    $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     $dao = new CRM_Core_DAO();
 
     $sql = self::createCaseViewsQuery('upcoming');
-    CRM_Core_Error::ignoreException();
     $dao->query($sql);
-    CRM_Core_Error::setCallback();
     if (PEAR::getStaticProperty('DB_DataObject', 'lastError')) {
       return FALSE;
     }
 
     // Above error doesn't get caught?
-    CRM_Core_Error::ignoreException();
     $doublecheck = $dao->singleValueQuery("SELECT count(id) FROM civicrm_view_case_activity_upcoming");
-    CRM_Core_Error::setCallback();
     if (is_null($doublecheck)) {
       return FALSE;
     }
 
     $sql = self::createCaseViewsQuery('recent');
-    CRM_Core_Error::ignoreException();
     $dao->query($sql);
-    CRM_Core_Error::setCallback();
     if (PEAR::getStaticProperty('DB_DataObject', 'lastError')) {
       return FALSE;
     }
 
     // Above error doesn't get caught?
-    CRM_Core_Error::ignoreException();
     $doublecheck = $dao->singleValueQuery("SELECT count(id) FROM civicrm_view_case_activity_recent");
-    CRM_Core_Error::setCallback();
     if (is_null($doublecheck)) {
       return FALSE;
     }

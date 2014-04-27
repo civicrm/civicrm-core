@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -85,7 +85,7 @@
 {$initHideBlocks}
 {literal}
 <script type="text/Javascript">
-cj(function($) {
+CRM.$(function($) {
 
   showHideStyle();
   cj('#extends_0').change(function() {
@@ -138,7 +138,7 @@ cj(function($) {
     if (!showMaxMultiple) {
       cj("tr#multiple").hide();
     }
-    else if(cj( '#is_multiple').attr('checked')) {
+    else if(cj( '#is_multiple').prop('checked')) {
       cj("tr#multiple").show();
     }
   }
@@ -146,12 +146,14 @@ cj(function($) {
   function showRange(onFormLoad) {
     if(cj("#is_multiple :checked").length) {
       cj("tr#multiple").show();
-      cj("select#style option[value='Tab']").attr("selected", "selected");
+      cj('#collapse_display').prop('checked', '');
+      cj("select#style option[value='Tab with table']").prop("selected", true);
     }
     else {
+      cj('#collapse_display').prop('checked', 'checked');
       cj("tr#multiple").hide();
       if (!onFormLoad) {
-        cj("select#style option[value='Inline']").attr("selected", "selected");
+        cj("select#style option[value='Inline']").prop("selected", true);
       }
     }
   }

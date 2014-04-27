@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_CustomField
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: CustomField.php 30879 2010-11-22 15:45:55Z shot $
  */
 
@@ -206,14 +206,14 @@ function civicrm_api3_custom_value_get($params) {
         $n = $idArray[2];
         $id = $fieldNumber . "." . $idArray[2];
       }
-      if (CRM_Utils_Array::value('format.field_names', $params)) {
+      if (!empty($params['format.field_names'])) {
         $id = $info['field_name'];
       }
       else {
         $id = $fieldNumber;
       }
       $values[$id]['entity_id'] = $getParams['entityID'];
-      if (CRM_Utils_Array::value('entityType', $getParams)) {
+      if (!empty($getParams['entityType'])) {
         $values[$n]['entity_table'] = $getParams['entityType'];
       }
       //set 'latest' -useful for multi fields but set for single for consistency

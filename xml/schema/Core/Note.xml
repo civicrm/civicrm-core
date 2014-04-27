@@ -48,9 +48,11 @@
        <name>note</name>
        <type>text</type>
        <comment>Note and/or Comment.</comment>
-       <htmlType>textarea</htmlType>
-       <rows>4</rows>
-       <cols>60</cols>
+       <html>
+         <type>TextArea</type>
+         <rows>4</rows>
+         <cols>60</cols>
+       </html>
        <import>true</import>
        <headerPattern>/Note|Comment/i</headerPattern>
        <dataPattern>//</dataPattern>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -640,7 +640,7 @@ WHERE  id = %1";
     $radioLevel = $checkboxLevel = $selectLevel = $textLevel = array();
 
     foreach ($fields as $id => $field) {
-      if (!CRM_Utils_Array::value("price_{$id}", $params) ||
+      if (empty($params["price_{$id}"]) ||
         (empty($params["price_{$id}"]) && $params["price_{$id}"] == NULL)
       ) {
         // skip if nothing was submitted for this field
@@ -741,7 +741,7 @@ WHERE  id = %1";
 /**
  * Function to build the price set form.
  *
- * @return None
+ * @return void
  * @access public
  */
 static function buildPriceSet(&$form) {
@@ -826,12 +826,12 @@ return;
 static $_contact_memberships = array();
 $checklifetime = FALSE;
 foreach ($options as $key => $value) {
-if (CRM_Utils_Array::value('membership_type_id', $value)) {
+if (!empty($value['membership_type_id'])) {
 if (!isset($_contact_memberships[$userid][$value['membership_type_id']])) {
 $_contact_memberships[$userid][$value['membership_type_id']] = CRM_Member_BAO_Membership::getContactMembership($userid, $value['membership_type_id'], FALSE);
 }
 $currentMembership = $_contact_memberships[$userid][$value['membership_type_id']];
-if (!empty($currentMembership) && !CRM_Utils_Array::value('end_date', $currentMembership)) {
+if (!empty($currentMembership) && empty($currentMembership['end_date'])) {
 unset($options[$key]);
 $checklifetime = TRUE;
 }

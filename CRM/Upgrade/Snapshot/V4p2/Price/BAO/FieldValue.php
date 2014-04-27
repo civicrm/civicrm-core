@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -56,7 +56,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
     if ($id = CRM_Utils_Array::value('id', $ids)) {
       $fieldValueBAO->id = $id;
     }
-    if (CRM_Utils_Array::value('is_default', $params)) {
+    if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_price_field_value SET is_default = 0 WHERE  price_field_id = %1';
       $p = array(1 => array($params['price_field_id'], 'Integer'));
       CRM_Core_DAO::executeQuery($query, $p);
@@ -93,10 +93,10 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue', $oldWeight, $params['weight'], $fieldValues);
     }
     else {
-      if (!CRM_Utils_Array::value('name', $params)) {
+      if (empty($params['name'])) {
         $params['name'] = CRM_Utils_String::munge(CRM_Utils_Array::value('label', $params), '_', 64);
       }
-      if (!CRM_Utils_Array::value('weight', $params)) {
+      if (empty($params['weight'])) {
         $params['weight'] = 1;
       }
     }

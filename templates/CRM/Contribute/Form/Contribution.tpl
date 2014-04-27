@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -75,7 +75,7 @@
       {else}
         {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
       {/if}
-      <span class="action-link crm-link-credit-card-mode">&nbsp;<a href="{$ccModeLink}">&raquo; {ts}submit credit card contribution{/ts}</a>
+      <span class="action-link crm-link-credit-card-mode">&nbsp;<a class="open-inline crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card contribution{/ts}</a></span>
     {/if}
   </div>
   {if $isOnline}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}
@@ -88,8 +88,8 @@
       {if !$contributionMode and !$email and $outBound_option != 2}
         {assign var='profileCreateCallback' value=1 }
       {/if}
-      {* note that if we are using multiple instances of NewContact always pass values for blockNo and prefix *}
-      {include file="CRM/Contact/Form/NewContact.tpl" blockNo=1 prefix=''}
+      <td class="label">{$form.contact_id.label}</td>
+      <td>{$form.contact_id.html}</td>
     {/if}
     {if $contributionMode}
     <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
@@ -223,32 +223,39 @@
 
   </table>
     <!-- start of soft credit -->
-    <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="softCredit">
+    <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noSoftCredit}collapsed{/if}" id="softCredit">
       <div class="crm-accordion-header">
         {ts}Soft Credit{/ts}&nbsp;{help id="id-soft_credit"}
       </div>
       <div class="crm-accordion-body">
         <table class="form-layout-compressed">
-          {if $siteHasPCPs}
-            <tr class="crm-contribution-pcp-block-link">
-              <td colspan="2">
-                <div id="showPCP">
-                  <a href='#'>{ts}credit this contribution to a personal campaign page{/ts}</a>
-                </div>
-              </td>
-            </tr>
-            <tr class="crm-contribution-pcp-block crm-contribution-form-block-pcp_made_through_id hiddenElement">
-              <td class="label">{$form.pcp_made_through.label}</td>
+          <tr class="crm-contribution-form-block-soft_credit_to">
+            <td colspan="2">
+              {include file="CRM/Contribute/Form/SoftCredit.tpl"}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <!-- end of soft credit -->
+
+    <!-- start of PCP -->
+    {if $siteHasPCPs}
+      <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noPCP}collapsed{/if}" id="softCredit">
+        <div class="crm-accordion-header">
+          {ts}Personal Campaign Page{/ts}&nbsp;{help id="id-pcp"}
+        </div>
+        <div class="crm-accordion-body">
+          <table class="form-layout-compressed">
+            <tr class="crm-contribution-pcp-block crm-contribution-form-block-pcp_made_through_id">
+              <td class="label">{$form.pcp_made_through_id.label}</td>
               <td>
-                {$form.pcp_made_through.html} &nbsp;
-                <span class="showSoftCreditLink">
-                  <a href="#" id="showSoftCredit">{ts}unlink from personal campaign page{/ts}</a>
-                </span><br/>
+                {$form.pcp_made_through_id.html} &nbsp;
                 <span class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or
                  email address.{/ts}</span>
 
                 <div class="spacer"></div>
-                <div class="crm-contribution-form-block-pcp_details">
+                 <div class="crm-contribution-form-block-pcp_details">
                   <table class="crm-contribution-form-table-credit_to_pcp">
                     <tr id="pcpDisplayRollID" class="crm-contribution-form-block-pcp_display_in_roll">
                       <td class="label">{$form.pcp_display_in_roll.label}</td>
@@ -273,16 +280,12 @@
                 </div>
               </td>
             </tr>
-          {/if}
-          <tr class="crm-contribution-form-block-soft_credit_to">
-            <td colspan="2">
-              {include file="CRM/Contribute/Form/SoftCredit.tpl"}
-            </td>
-          </tr>
-        </table>
+          </table>
+        </div>
       </div>
-    </div>
-    <!-- end of soft credit -->
+    {/if}
+    <!-- end of PCP -->
+
     {if !$contributionMode}
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information">
       <div class="crm-accordion-header">
@@ -347,7 +350,7 @@
 
     {literal}
     <script type="text/javascript">
-      cj( function( ) {
+      CRM.$(function($) {
     {/literal}
     CRM.buildCustomData( '{$customDataType}' );
     {if $customDataSubType}
@@ -360,7 +363,7 @@
 
     // bind first click of accordion header to load crm-accordion-body with snippet
     // everything else taken care of by cj().crm-accordions()
-    cj(function() {
+    CRM.$(function($) {
       cj('#adjust-option-type').hide();
       cj('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
         loadPanes(cj(this).attr('id'));
@@ -385,7 +388,7 @@
         cj('div.'+id).html(loading);
         cj.ajax({
           url    : url,
-          success: function(data) { cj('div.'+id).html(data); }
+          success: function(data) { cj('div.'+id).html(data).trigger('crmLoad'); }
         });
       }
     }
@@ -395,7 +398,7 @@
   {/literal}
     {if $context eq 'standalone' and $outBound_option != 2 }
       {literal}
-      cj( function( ) {
+      CRM.$(function($) {
         cj("#contact_1").blur( function( ) {
           checkEmail( );
         });
@@ -458,7 +461,7 @@
   {literal}
   <script type="text/javascript">
   function verify( ) {
-    if (cj('#is_email_receipt').attr( 'checked' )) {
+    if (cj('#is_email_receipt').prop('checked' )) {
       var ok = confirm( '{/literal}{ts escape='js'}Click OK to save this contribution record AND send a receipt to the contributor now{/ts}{literal}.' );
       if (!ok) {
         return false;
@@ -477,7 +480,7 @@
   {if $action neq 8}
     {literal}
     <script type="text/javascript">
-      cj( function( ) {
+      CRM.$(function($) {
         checkEmailDependancies( );
         cj('#is_email_receipt').click( function( ) {
           checkEmailDependancies( );
@@ -485,7 +488,7 @@
       });
 
       function checkEmailDependancies( ) {
-        if (cj('#is_email_receipt').attr( 'checked' )) {
+        if (cj('#is_email_receipt').prop('checked' )) {
           cj('#fromEmail').show( );
           cj('#receiptDate').hide( );
         }
@@ -496,7 +499,7 @@
       }
 
     {/literal}{if !$contributionMode}{literal}
-     cj( function( ) {
+     CRM.$(function($) {
       showHideCancelInfo(cj('#contribution_status_id'));
 
       cj('#contribution_status_id').change(function() {
@@ -538,9 +541,6 @@
 
 {literal}
 <script type="text/javascript">
-cj(function() {
-  cj().crmAccordions();
-});
 
 {/literal}
 
@@ -583,7 +583,7 @@ function buildAmount( priceSetId ) {
     async: false
   }).responseText;
 
-  cj( fname ).show( ).html( response );
+  cj( fname ).show( ).html( response ).trigger('crmLoad');
   // freeze total amount text field.
   cj( "#total_amount").val('');
 

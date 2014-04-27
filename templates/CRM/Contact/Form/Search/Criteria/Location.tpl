@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -94,17 +94,17 @@
         </tr>
         <tr>
       <td colspan="2">{$form.county.label}<br />
-        {$form.county.html|crmAddClass:bigSelect}&nbsp;
+        {$form.county.html}&nbsp;
       </td>
       <td>{$form.country.label}<br />
-        {$form.country.html|crmAddClass:big}&nbsp;
+        {$form.country.html}&nbsp;
       </td>
         </tr>
     </table>
         {/if}&nbsp;
         </td>
         <td>{$form.state_province.label}<br />
-            {$form.state_province.html|crmAddClass:bigSelect}
+            {$form.state_province.html}
         </td>
     </tr>
     {if $addressGroupTree}
@@ -141,7 +141,7 @@ function processAddressFields( name, loadData ) {
 
 }
 
-cj(function( ) {
+CRM.$(function($) {
   if (  cj('#street_name').val( ).length > 0 ||
         cj('#street_unit').val( ).length > 0 ||
         cj('#street_number').val( ).length > 0 ) {

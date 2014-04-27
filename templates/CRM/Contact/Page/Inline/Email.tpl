@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -73,21 +73,12 @@ function showHideSignature( blockId ) {
   cj("#Email_Block_" + blockId + "_signature").dialog({
       title: "Signature",
       modal: true,
-      bgiframe: true,
       width: 900,
       height: 500,
-      overlay: { 
-          opacity: 0.5, 
-          background: "black"
-      },
-
       beforeclose: function(event, ui) {
         cj(this).dialog("destroy");
       },
-      open:function() {
-      },
-
-      buttons: { 
+      buttons: {
         "Done": function() { 
                   cj(this).dialog("destroy"); 
                 } 

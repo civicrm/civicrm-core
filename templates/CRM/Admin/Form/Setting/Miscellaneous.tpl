@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -54,8 +54,7 @@
           <td>
             {$form.logging.html}<br />
           {if $validTriggerPermission}
-            <p class="description">{ts}If enabled, all actions performed on non-cache tables will be logged (in the respective log_* tables).{/ts}</p>
-            <div class="status message">{ts}Logging functionality is currently in beta. Please test this feature on a copy of your database prior to using it on a production site.{/ts}</div>
+            <p class="description">{ts}If enabled, all actions will be logged with a complete record of changes.{/ts}</p>
           {else}
             <p class="description">{ts}In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.{/ts}&nbsp;{ts}This functionality cannot be enabled on multilingual installations.{/ts}</p>
            {/if}
@@ -116,7 +115,7 @@
         <tr class="crm-miscellaneous-form-block-recaptchaOptions">
             <td class="label">{$form.recaptchaOptions.label}</td>
             <td>{$form.recaptchaOptions.html}<br />
-                <span class="description">{ts}You can specify the reCAPTCHA theme options as an comma seperated data.(eg: theme:'blackglass', lang : 'fr' ).<br />You can check the available options for reCAPTCHA here <a href="http://code.google.com/apis/recaptcha/docs/customization.html" "target=_blank">Customizing the Look and Feel of reCAPTCHA</a>.{/ts}</span></td>
+              <span class="description">{ts}You can specify the reCAPTCHA theme options as comma separated data.(eg: theme:'blackglass', lang : 'fr' ).<br />Check the available options for reCAPTCHA here: <a href="https://developers.google.com/recaptcha/docs/customization" target="_blank">Customizing the Look and Feel of reCAPTCHA</a>.{/ts}</span></td>
         </tr>
         </table>
            <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

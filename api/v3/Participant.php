@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Participant
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Participant.php 30486 2010-11-02 16:12:09Z shot $
  *
  */
@@ -56,7 +56,7 @@
  */
 function civicrm_api3_participant_create($params) {
   //check that event id is not an template - should be done @ BAO layer
-  if (CRM_Utils_Array::value('event_id', $params)) {
+  if (!empty($params['event_id'])) {
     $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'is_template');
     if (!empty($isTemplate)) {
       return civicrm_api3_create_error(ts('Event templates are not meant to be registered'));
@@ -69,7 +69,7 @@ function civicrm_api3_participant_create($params) {
 
   $participantBAO = CRM_Event_BAO_Participant::create($params);
 
-  if(empty($params['price_set_id']) && empty($params['id']) && CRM_Utils_Array::value('fee_level', $params)){
+  if(empty($params['price_set_id']) && empty($params['id']) && !empty($params['fee_level'])){
     _civicrm_api3_participant_createlineitem($params, $participantBAO);
   }
   _civicrm_api3_object_to_array($participantBAO, $participant[$participantBAO->id]);

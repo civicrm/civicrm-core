@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 {* Include this file in any form where we want to alert user if they've added or change form data, and then navigate away. *}
 {literal}
 <script type="text/javascript">
-     cj( function( ) {
+     CRM.$(function($) {
          cj("#{/literal}{$form.formName}{literal}").FormNavigate("{/literal}{ts escape='js'}You have unsaved changes.{/ts}{literal}"); 
      });
 </script>

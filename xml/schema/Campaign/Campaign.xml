@@ -28,6 +28,9 @@
       <required>true</required>
       <comment>Name of the Campaign.</comment>
       <import>true</import>
+      <html>
+        <type>Text</type>
+      </html>
       <add>3.3</add>
   </field>
 
@@ -38,6 +41,9 @@
        <length>255</length>
        <comment>Title of the Campaign.</comment>
        <import>true</import>
+       <html>
+        <type>Text</type>
+      </html>
        <add>3.3</add>
   </field>
 
@@ -45,9 +51,11 @@
       <name>description</name>
       <title>Campaign Description</title>
       <type>text</type>
-      <htmlType>textarea</htmlType>
-      <rows>8</rows>
-      <cols>60</cols>
+      <html>
+        <type>TextArea</type>
+        <rows>8</rows>
+        <cols>60</cols>
+      </html>
       <comment>Full description of Campaign.</comment>
       <add>3.3</add>
   </field>
@@ -59,6 +67,9 @@
       <headerPattern>/^start|(s(tart\s)?date)$/i</headerPattern>
       <comment>Date and time that Campaign starts.</comment>
       <import>true</import>
+      <html>
+        <type>Select Date</type>
+      </html>
       <add>3.3</add>
   </field>
 
@@ -69,12 +80,15 @@
       <headerPattern>/^end|(e(nd\s)?date)$/i</headerPattern>
       <comment>Date and time that Campaign ends.</comment>
       <import>true</import>
+      <html>
+        <type>Select Date</type>
+      </html>
       <add>3.3</add>
   </field>
 
   <field>
       <name>campaign_type_id</name>
-      <title>Campaign Type ID</title>
+      <title>Campaign Type</title>
       <type>int unsigned</type>
       <default>NULL</default>
       <comment>Campaign Type ID.Implicit FK to civicrm_option_value where option_group = campaign_type</comment>
@@ -82,6 +96,9 @@
       <pseudoconstant>
         <optionGroupName>campaign_type</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
       <add>3.3</add>
   </field>
   <index>
@@ -92,7 +109,7 @@
 
    <field>
       <name>status_id</name>
-      <title>Campaign Status ID</title>
+      <title>Campaign Status</title>
       <type>int unsigned</type>
       <default>NULL</default>
       <comment>Campaign status ID.Implicit FK to civicrm_option_value where option_group = campaign_status</comment>
@@ -100,6 +117,9 @@
       <pseudoconstant>
         <optionGroupName>campaign_status</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
       <add>3.3</add>
   </field>
   <index>
@@ -118,6 +138,9 @@
        <comment>Unique trusted external ID (generally from a legacy app/datasource). Particularly useful for deduping operations.</comment>
        <import>true</import>
        <add>3.3</add>
+       <html>
+         <type>Text</type>
+       </html>
   </field>
   <index>
        <name>UI_external_identifier</name>
@@ -134,6 +157,9 @@
        <comment>Optional parent id for this Campaign.</comment>
        <import>true</import>
        <add>3.3</add>
+       <html>
+         <type>Autocomplete-Select</type>
+       </html>
   </field>
   <foreignKey>
        <name>parent_id</name>
@@ -150,6 +176,9 @@
       <default>1</default>
       <comment>Is this Campaign enabled or disabled/cancelled?</comment>
       <add>3.3</add>
+      <html>
+        <type>CheckBox</type>
+      </html>
   </field>
 
   <field>
@@ -173,6 +202,9 @@
       <title>Campaign Created Date</title>
       <comment>Date and time that Campaign was created.</comment>
       <add>3.3</add>
+      <html>
+        <type>Select Date</type>
+      </html>
   </field>
 
   <field>
@@ -203,11 +235,17 @@
       <title>Campaign Goals</title>
       <comment>General goals for Campaign.</comment>
       <add>3.4</add>
+      <html>
+        <type>RichTextEditor</type>
+      </html>
   </field>
   <field>
       <name>goal_revenue</name>
       <type>decimal</type>
       <comment>The target revenue for this campaign.</comment>
       <add>3.4</add>
+      <html>
+        <type>Text</type>
+      </html>
   </field>
 </table>

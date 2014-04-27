@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -494,7 +494,7 @@ SELECT    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $contactId    contact id
    *
-   * @return none
+   * @return void
    * @access public
    * @static
    */
@@ -535,11 +535,11 @@ SELECT    *
 
     // check which values has to be add/remove contact from group
     foreach ($allGroup as $key => $varValue) {
-      if (CRM_Utils_Array::value($key, $params) && !array_key_exists($key, $contactGroup)) {
+      if (!empty($params[$key]) && !array_key_exists($key, $contactGroup)) {
         // add contact to group
         CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds, $key, $method);
       }
-      elseif (!CRM_Utils_Array::value($key, $params) && array_key_exists($key, $contactGroup)) {
+      elseif (empty($params[$key]) && array_key_exists($key, $contactGroup)) {
         // remove contact from group
         CRM_Contact_BAO_GroupContact::removeContactsFromGroup($contactIds, $key, $method);
       }

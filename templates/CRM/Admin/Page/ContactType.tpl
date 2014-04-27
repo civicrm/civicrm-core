@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,7 +35,8 @@
 <div>
     {strip}
     {* handle enable/disable actions*}
-    {include file="CRM/common/enableDisable.tpl"}
+    {include file="CRM/common/enableDisableApi.tpl"}
+    {include file="CRM/common/crmeditable.tpl"}
     {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
     <thead>
@@ -47,10 +48,10 @@
     </tr>
     </thead>
     {foreach from=$rows item=row}
-      <tr id="row_{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-contactType {if NOT $row.is_active} disabled{/if}">
-        <td class="crm-contactType-label">{ts}{$row.label}{/ts}</td>
+      <tr id="contact_type-{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-contactType crm-entity {if NOT $row.is_active} disabled{/if}">
+        <td class="crm-contactType-label crm-editable" data-field="label">{ts}{$row.label}{/ts}</td>
         <td class="crm-contactType-parent">{if $row.parent}{ts}{$row.parent_label}{/ts}{else}{ts}(built-in){/ts}{/if}</td>
-        <td class="crm-contactType-description">{$row.description}</td>
+        <td class="crm-contactType-description crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
         <td>{$row.action|replace:'xx':$row.id}</td>
     </tr>
     {/foreach}

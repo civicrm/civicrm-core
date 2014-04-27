@@ -37,7 +37,10 @@
        <title>Website</title>
        <type>varchar</type>
        <length>128</length>
-       <size>BIG</size>
+       <html>
+         <type>Text</type>
+         <size>BIG</size>
+       </html>
        <import>true</import>
        <headerPattern>/Website/i</headerPattern>
        <dataPattern>/^[A-Za-z][0-9A-Za-z]{20,}$/</dataPattern>
@@ -53,6 +56,9 @@
       <pseudoconstant>
         <optionGroupName>website_type</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <index>
     <name>UI_website_type_id</name>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  *
  */
 
@@ -219,21 +219,17 @@ class CRM_Core_Page_AJAX_Location {
     CRM_Utils_System::civiExit();
   }
 
-  static function jqState($config) {
-    if (
-      !isset($_GET['_value']) ||
-      empty($_GET['_value'])
-    ) {
+  static function jqState() {
+    if (empty($_GET['_value'])) {
       CRM_Utils_System::civiExit();
     }
 
     $result = CRM_Core_PseudoConstant::stateProvinceForCountry($_GET['_value']);
 
-    $elements = array(
-      array('name' => ts('- select a state -'),
-        'value' => '',
-      )
-    );
+    $elements = array(array(
+      'name' => $result ? ts('- select a state -') : ts('- N/A -'),
+      'value' => '',
+    ));
     foreach ($result as $id => $name) {
       $elements[] = array(
         'name' => $name,
@@ -245,29 +241,23 @@ class CRM_Core_Page_AJAX_Location {
     CRM_Utils_System::civiExit();
   }
 
-  static function jqCounty($config) {
-    if (CRM_Utils_System::isNull($_GET['_value'])) {
+  static function jqCounty() {
+    if (!isset($_GET['_value']) || CRM_Utils_System::isNull($_GET['_value'])) {
       $elements = array(
-        array('name' => ts('- select state -'), 'value' => '')
+        array('name' => ts('(choose state first)'), 'value' => '')
       );
     }
     else {
       $result = CRM_Core_PseudoConstant::countyForState($_GET['_value']);
 
-      $elements = array(
-        array('name' => ts('- select -'), 'value' => '')
-      );
+      $elements = array(array(
+        'name' => $result ? ts('- select -') : ts('- N/A -'),
+        'value' => '',
+      ));
       foreach ($result as $id => $name) {
         $elements[] = array(
           'name' => $name,
           'value' => $id,
-        );
-      }
-
-      if ($elements == array(
-        array('name' => ts('- select -'), 'value' => ''))) {
-        $elements = array(
-          array('name' => ts('- no counties -'), 'value' => '')
         );
       }
     }

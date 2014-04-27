@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -95,7 +95,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
     else {
       $financialTypeAccount->id = CRM_Utils_Array::value('entityFinancialAccount', $ids);
     }
-    if (CRM_Utils_Array::value('entityFinancialAccount', $ids)) {
+    if (!empty($ids['entityFinancialAccount'])) {
       $financialTypeAccount->id = $ids['entityFinancialAccount'];
     }
     $financialTypeAccount->copyValues($params);

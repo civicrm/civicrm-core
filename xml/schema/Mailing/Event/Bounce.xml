@@ -36,6 +36,9 @@
         <keyColumn>id</keyColumn>
         <labelColumn>name</labelColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
     </field>
     <field>
         <name>bounce_reason</name>

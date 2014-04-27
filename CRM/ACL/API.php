@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -178,10 +178,17 @@ class CRM_ACL_API {
     $contactID      = NULL,
     $tableName      = 'civicrm_saved_search',
     $allGroups      = NULL,
-    $includedGroups = NULL
+    $includedGroups = NULL,
+    $flush = FALSE
   ) {
-    static $cache = array();
 
+    static $cache = array();
+    //@todo this is pretty hacky!!!
+    //adding a way for unit tests to flush the cache
+    if ($flush) {
+      $cache = array();
+      return;
+    }
     if (!$contactID) {
       $session = CRM_Core_Session::singleton();
       $contactID = NULL;

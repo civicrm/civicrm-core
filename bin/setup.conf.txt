@@ -48,3 +48,8 @@ DBLOAD=
 GENCODE_CMS=""
 # GENCODE_CMS=drupal
 # GENCODE_CMS=wordpress
+
+# GenCode is relatively slow; and, usually, it only needs
+# to run if the gencode files have changed. Set
+# this option to enable caching (and speed up setup.sh)
+# export CIVICRM_GENCODE_DIGEST=/tmp/gencode.md5

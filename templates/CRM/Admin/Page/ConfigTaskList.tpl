@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -95,7 +95,7 @@
         <td>{ts}Settings for outbound email - either SMTP server, port and authentication or Sendmail path and argument.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/from_email_address" q="group=from_email_address`$fromAction`&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}From Email Addresses{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/from_email_address" q="reset=1`$fromAction`&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}From Email Addresses{/ts}</a></td>
         <td>{ts}Define general email address(es) that can be used as the FROM address when sending email to contacts from within CiviCRM (e.g. info@example.org){/ts}</td>
     </tr>
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -346,9 +346,8 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     $from = (substr($table, 0, 4) == 'log_') ? "`{$this->db}`.$table" : $table;
 
     if (!isset($columnsOf[$table]) || $force) {
-      CRM_Core_Error::ignoreException();
+      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       $dao = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $from");
-      CRM_Core_Error::setCallback();
       if (is_a($dao, 'DB_Error')) {
         return array();
       }
@@ -372,7 +371,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
         $dao = new CRM_Contact_DAO_Contact();
         $civiDB = $dao->_database;
       }
-      CRM_Core_Error::ignoreException();
+      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       // NOTE: W.r.t Performance using one query to find all details and storing in static array is much faster
       // than firing query for every given table.
       $query = "
@@ -380,7 +379,6 @@ SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEF
 FROM   INFORMATION_SCHEMA.COLUMNS
 WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
       $dao = CRM_Core_DAO::executeQuery($query);
-      CRM_Core_Error::setCallback();
       if (is_a($dao, 'DB_Error')) {
         return array();
       }

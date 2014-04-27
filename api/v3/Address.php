@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Address
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Address.php 2011-02-16 ErikHommel $
  */
 
@@ -100,6 +100,21 @@ function _civicrm_api3_address_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
   $params['country'] = array('title' => 'Name or 2-letter abbreviation of country. Looked up in civicrm_country table');
   $params['street_parsing'] = array('title' => 'optional param to indicate you want the street_address field parsed into individual params');
+  $params['world_region'] = array(
+    'title' => ts('World Region'),
+    'name' => 'world_region',
+  );
+}
+/**
+ * Adjust Metadata for Get action
+ *
+ * @param array $params array or parameters determined by getfields
+ */
+function _civicrm_api3_address_get_spec(&$params) {
+  $params['world_region'] = array(
+    'title' => ts('World Region'),
+    'name' => 'world_region',
+  );
 }
 
 /**

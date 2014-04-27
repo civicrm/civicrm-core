@@ -2,9 +2,9 @@
 
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -239,6 +239,11 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
         ),
         'order_bys' =>
         array(
+          'participant_register_date' =>
+          array('title' => ts('Registration Date'),
+            'default_weight' => '1',
+            'default_order' => 'ASC',
+          ),
           'event_id' =>
           array('title' => ts('Event'), 'default_weight' => '1', 'default_order' => 'ASC'),
         ),
@@ -306,7 +311,6 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'no_display' => TRUE
           ),
           'trxn_id' => NULL,
-          'honor_type_id' => array('title' => ts('Honor Type')),
           'fee_amount' => array('title' => ts('Transaction Fee')),
           'net_amount' => NULL
         ),
@@ -420,8 +424,7 @@ GROUP BY  cv.label
     $this->_columnHeaders = array();
 
     //add blank column at the Start
-    if (array_key_exists('options', $this->_params) &&
-      CRM_Utils_Array::value('blank_column_begin', $this->_params['options'])) {
+    if (array_key_exists('options', $this->_params) && !empty($this->_params['options']['blank_column_begin'])) {
       $select[] = " '' as blankColumnBegin";
       $this->_columnHeaders['blankColumnBegin']['title'] = '_ _ _ _';
     }
@@ -431,9 +434,7 @@ GROUP BY  cv.label
       }
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if ($tableName == 'civicrm_contribution') {
               $this->_contribField = TRUE;
             }
@@ -593,7 +594,6 @@ GROUP BY  cv.label
     $financialTypes  = CRM_Contribute_PseudoConstant::financialType();
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
-    $honorTypes = CRM_Core_OptionGroup::values('honor_type', FALSE, FALSE, FALSE, NULL, 'label');
     $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id', array('localize' => TRUE));
 
     foreach ($rows as $rowNum => $row) {
@@ -731,13 +731,6 @@ GROUP BY  cv.label
       if (array_key_exists('civicrm_contribution_financial_type_id', $row)) {
         if ($value = $row['civicrm_contribution_financial_type_id']) {
           $rows[$rowNum]['civicrm_contribution_financial_type_id'] = $financialTypes[$value];
-        }
-        $entryFound = TRUE;
-      }
-
-      if (array_key_exists('civicrm_contribution_honor_type_id', $row)) {
-        if ($value = $row['civicrm_contribution_honor_type_id']) {
-          $rows[$rowNum]['civicrm_contribution_honor_type_id'] = $honorTypes[$value];
         }
         $entryFound = TRUE;
       }

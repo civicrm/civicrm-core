@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -178,7 +178,12 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
           array(
             'id' => $dao->id,
             'aid'=> $dao->entity_id,
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'financialTypeAccount.manage.action',
+          'FinancialTypeAccount',
+          $dao->id
         );
       }
       $this->assign('rows', $financialType);

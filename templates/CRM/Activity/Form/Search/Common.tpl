@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,12 +26,6 @@
 <tr>
   <td colspan="2">
     {$form.activity_role.html}
-    <span class="crm-clear-link">
-      (<a href="#" title="unselect"
-          onclick="unselectRadio('activity_role', '{$form.formName}');
-            return false;">
-        {ts}clear{/ts}
-      </a>)
     </span>
   </td>
 </tr>
@@ -103,9 +97,6 @@
   <td colspan="2">
     {$form.activity_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}
     &nbsp; {$form.activity_test.html}
-    <span class="crm-clear-link">
-      (<a href="#" onclick="unselectRadio('activity_test','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
-    </span>
   </td>
 </tr>
 {if $buildSurveyResult }
@@ -113,12 +104,6 @@
 	  <td id="activityResult">
 	    <label>{$form.activity_result.label}</label><br />
 	    {$form.activity_result.html}
-	    <script type="text/javascript">
-	    {literal}
-	      cj("select#activity_result").crmasmSelect({
-	      });
-	    {/literal}
-	    </script>
 	  </td>
 		<td colspan="2">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td>
 	</tr>
@@ -142,7 +127,7 @@ campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
 
 {literal}
 <script type="text/javascript">
-  cj(function() {
+  CRM.$(function($) {
     //Searchable activity custom fields which extend ALL activity types are always displayed in the form
     //hence hide remaining activity custom data
     cj('#activityCustom').children( ).each( function( ) {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -86,12 +86,11 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
         }
       }
 
-      if (!CRM_Utils_Array::value('id', $values) &&
+      if (empty($values['id']) &&
         is_array($ids) && !empty($ids)
       ) {
         foreach ($ids as $id => $value) {
-          if (($value['website_type_id'] == $values['website_type_id'])
-            && CRM_Utils_Array::value('url', $values)) {
+          if (($value['website_type_id'] == $values['website_type_id']) && !empty($values['url'])) {
             $values['id'] = $id;
             unset($ids[$id]);
             break;
@@ -99,7 +98,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
         }
       }
       $values['contact_id'] = $contactID;
-      if ( CRM_Utils_Array::value('url', $values) ) {
+      if (!empty($values['url'])) {
         self::add($values);
       }
     }

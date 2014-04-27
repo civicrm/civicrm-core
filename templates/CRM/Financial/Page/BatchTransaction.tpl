@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -76,7 +76,7 @@
 
 {literal}
 <script type="text/javascript">
-cj( function() {
+CRM.$(function($) {
   var entityID = {/literal}{$entityID}{literal};
   batchSummary(entityID);
   cj('#close_batch').click( function() {
@@ -101,11 +101,6 @@ function assignRemove(recordID, op) {
     cj("#enableDisableStatusMsg").dialog({
       title: {/literal}'{ts escape="js"}Close Batch{/ts}'{literal},
       modal: true,
-      bgiframe: true,
-      overlay: {
-        opacity: 0.5,
-        background: "black"
-      },
       open:function() {
         if (op == 'close') {
           var msg = {/literal}'{ts escape="js"}Are you sure you want to close this batch?{/ts}'{literal};

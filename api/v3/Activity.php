@@ -3,9 +3,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Activity
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Activity.php 30486 2010-11-02 16:12:09Z shot $
  *
  */
@@ -54,7 +54,7 @@
  */
 function civicrm_api3_activity_create($params) {
 
-  if (!CRM_Utils_Array::value('id', $params)) {
+  if (empty($params['id'])) {
     // an update does not require any mandatory parameters
     civicrm_api3_verify_one_mandatory($params,
       NULL,
@@ -96,22 +96,25 @@ function civicrm_api3_activity_create($params) {
   $case_id           = '';
   $createRevision    = FALSE;
   $oldActivityValues = array();
-  if (CRM_Utils_Array::value('case_id', $params)) {
+  if (!empty($params['case_id'])) {
     $case_id = $params['case_id'];
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       $oldActivityParams = array('id' => $params['id']);
       if (!$oldActivityValues) {
         CRM_Activity_BAO_Activity::retrieve($oldActivityParams, $oldActivityValues);
       }
       if (empty($oldActivityValues)) {
-        return civicrm_api3_create_error(ts("Unable to locate existing activity."), NULL, CRM_Core_DAO::$_nullObject);
+        return civicrm_api3_create_error(ts("Unable to locate existing activity."));
       }
       else {
         $activityDAO = new CRM_Activity_DAO_Activity();
         $activityDAO->id = $params['id'];
         $activityDAO->is_current_revision = 0;
         if (!$activityDAO->save()) {
-          return civicrm_api3_create_error(ts("Unable to revision existing case activity."), NULL, $activityDAO);
+          if (is_object($activityDAO)) {
+            $activityDAO->free();
+          }
+          return civicrm_api3_create_error(ts("Unable to revision existing case activity."));
         }
         $createRevision = TRUE;
       }
@@ -154,7 +157,7 @@ function civicrm_api3_activity_create($params) {
       $params['original_id'] = empty($oldActivityValues['original_id']) ? $oldActivityValues['id'] : $oldActivityValues['original_id'];
     }
     else {
-      return civicrm_api3_create_error(ts("Unable to create new revision of case activity."), NULL, CRM_Core_DAO::$_nullObject);
+      return civicrm_api3_create_error(ts("Unable to create new revision of case activity."));
     }
   }
 
@@ -387,12 +390,12 @@ SELECT  count(*)
   // this should be handled by wrapper layer & probably the api would already manage it
   //correctly by doing pseudoconstant validation
   // needs testing
-  $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name', TRUE);
+  $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
   $activityName  = CRM_Utils_Array::value('activity_name', $params);
   $activityName  = ucfirst($activityName);
   $activityLabel = CRM_Utils_Array::value('activity_label', $params);
   if ($activityLabel) {
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
+    $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'create');
   }
 
   $activityTypeId = CRM_Utils_Array::value('activity_type_id', $params);
@@ -426,9 +429,7 @@ SELECT  count(*)
   //if adding a new activity & date_time not set make it now
   // this should be managed by the wrapper layer & setting ['api.default'] in speces
   // needs testing
-  if (!CRM_Utils_Array::value('id', $params) &&
-    !CRM_Utils_Array::value('activity_date_time', $params)
-  ) {
+  if (empty($params['id']) && empty($params['activity_date_time'])) {
     $params['activity_date_time'] = CRM_Utils_Date::processDate(date('Y-m-d H:i:s'));
   }
 

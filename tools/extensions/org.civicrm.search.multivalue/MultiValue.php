@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -65,7 +65,7 @@ class org_civicrm_search_multivalue extends CRM_Contact_Form_Search_Custom_Basei
     // add all the fields for chosen groups
     $this->_tables = $this->_options = array();
     foreach ($this->_groupTree as $groupID => $group) {
-      if (!CRM_Utils_Array::value($groupID, $this->_customGroupIDs)) {
+      if (empty($this->_customGroupIDs[$groupID])) {
         continue;
       }
 
@@ -122,7 +122,7 @@ class org_civicrm_search_multivalue extends CRM_Contact_Form_Search_Custom_Basei
     $includeContactIDs = FALSE
   ) {
     //redirect if custom group not select in search criteria
-    if (!CRM_Utils_Array::value('custom_group', $this->_formValues)) {
+    if (empty($this->_formValues['custom_group'])) {
       CRM_Core_Error::statusBounce(ts("You must select at least one Custom Group as a search criteria."),
         CRM_Utils_System::url('civicrm/contact/search/custom',
           "reset=1&csid={$this->_formValues['customSearchID']}",

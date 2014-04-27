@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -38,6 +38,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   protected $_summary = NULL;
   protected $_emailField_a = FALSE;
   protected $_emailField_b = FALSE;
+  protected $_phoneField_a = FALSE;
+  protected $_phoneField_b = FALSE;
   protected $_customGroupExtends = array(
     'Relationship');
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
@@ -143,6 +145,44 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           'email_b' =>
           array('title' => ts('Email of Contact B'),
             'name' => 'email',
+          ),
+        ),
+        'grouping' => 'conact_b_fields',
+      ),
+      'civicrm_phone' =>
+      array(
+        'dao' => 'CRM_Core_DAO_Phone',
+        'alias' => 'phone_a',
+        'fields' =>
+        array(
+          'phone_a' => 
+          array(
+            'title' => ts('Phone of Contact A'),
+            'name' => 'phone',
+          ),
+          'phone_ext_a' =>   
+          array(
+            'title' => ts('Phone Extension of Contact A'),
+            'name' => 'phone_ext',
+          ),
+        ),
+        'grouping' => 'conact_a_fields',
+      ),
+      'civicrm_phone_b' =>
+      array(
+        'dao' => 'CRM_Core_DAO_Phone',
+        'alias' => 'phone_b',
+        'fields' =>
+        array(
+          'phone_b' =>   
+          array(
+            'title' => ts('Phone of Contact B'),
+            'name' => 'phone'
+          ),
+          'phone_ext_b' =>   
+          array(
+            'title' => ts('Phone Extension of Contact B'),
+            'name' => 'phone_ext'
           ),
         ),
         'grouping' => 'conact_b_fields',
@@ -267,15 +307,19 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
 
             if ($fieldName == 'email_a') {
               $this->_emailField_a = TRUE;
             }
             if ($fieldName == 'email_b') {
               $this->_emailField_b = TRUE;
+            }
+            if ($fieldName == 'phone_a'){
+              $this->_phoneField_a = TRUE;
+            }
+            if ($fieldName == 'phone_b'){
+              $this->_phoneField_b = TRUE;
             }
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
@@ -333,6 +377,21 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
                        ON ( {$this->_aliases['civicrm_contact_b']}.id =
                             {$this->_aliases['civicrm_email_b']}.contact_id AND
                             {$this->_aliases['civicrm_email_b']}.is_primary = 1 )";
+    }
+    // include Phone Field
+    if ($this->_phoneField_a) {
+      $this->_from .= "
+             LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
+                       ON ( {$this->_aliases['civicrm_contact']}.id =
+                            {$this->_aliases['civicrm_phone']}.contact_id AND
+                            {$this->_aliases['civicrm_phone']}.is_primary = 1 )";
+    }
+    if ($this->_phoneField_b) {
+      $this->_from .= "
+             LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone_b']}
+                       ON ( {$this->_aliases['civicrm_contact_b']}.id =
+                            {$this->_aliases['civicrm_phone_b']}.contact_id AND
+                            {$this->_aliases['civicrm_phone_b']}.is_primary = 1 )";
     }
   }
 
@@ -415,7 +474,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           }
 
           if (!empty($clause)) {
-            if (CRM_Utils_Array::value('having', $field)) {
+            if (!empty($field['having'])) {
               $havingClauses[] = $clause;
             }
             else {
@@ -455,7 +514,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     elseif (CRM_Utils_Array::value('is_active_value', $this->_params) == '0') {
       $relStatus = 'Is equal to Inactive';
     }
-    if (CRM_Utils_Array::value('filters', $statistics)) {
+    if (!empty($statistics['filters'])) {
       foreach ($statistics['filters'] as $id => $value) {
         //for displaying relationship type filter
         if ($value['title'] == 'Relationship') {
@@ -507,7 +566,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
 
     $this->relationType = NULL;
     $relType = array();
-    if (CRM_Utils_Array::value('relationship_type_id_value', $this->_params)) {
+    if (!empty($this->_params['relationship_type_id_value'])) {
       $relType = explode('_', $this->_params['relationship_type_id_value']);
 
       $this->relationType = $relType[1] . '_' . $relType[2];

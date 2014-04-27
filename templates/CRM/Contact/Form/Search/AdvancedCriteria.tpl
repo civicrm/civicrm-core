@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,8 +26,7 @@
 {* Advanced Search Criteria Fieldset *}
 {literal}
 <script type="text/javascript">
-cj(function($) {
-  $().crmAccordions();
+CRM.$(function($) {
   // Bind first click of accordion header to load crm-accordion-body with snippet
   // everything else is taken care of by crmAccordions()
   $('.crm-search_criteria_basic-accordion .crm-accordion-header').addClass('active');
@@ -86,23 +85,14 @@ cj(function($) {
   * Loads snippet based on id of crm-accordion-header
   */
   function loadPanes(id) {
-    var url = "{/literal}{crmURL p='civicrm/contact/search/advanced' q="snippet=1&qfKey=`$qfKey`&searchPane=" h=0}{literal}" + id;
+    var url = "{/literal}{crmURL p='civicrm/contact/search/advanced' q="qfKey=`$qfKey`&searchPane=" h=0}{literal}" + id;
     var header = $('#' + id);
     var body = $('.crm-accordion-body.' + id);
     if (header.length > 0 && body.length > 0 && !body.html()) {
       body.html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Loading{/ts}{literal}...</span></div>');
-      header.append('{/literal}<a href="#" class="crm-close-accordion" title="{ts escape='js'}Remove from search criteria{/ts}"><span>{ts escape='js'}Reset{/ts}</span> &nbsp;<img src="{$config->resourceBase}i/close.png" /></a>{literal}');
+      header.append('{/literal}<a href="#" class="crm-close-accordion crm-hover-button css_right" title="{ts escape='js'}Remove from search criteria{/ts}"><span class="icon close-icon"></span></a>{literal}');
       header.addClass('active');
-      $.ajax({
-        url : url,
-        success: function(data) {
-          body.html(data);
-        },
-        error: function() {
-          CRM.alert({/literal}'{ts escape="js"}Sorry, could not load the requested information from the server.{/ts}', '{ts escape="js"}Network Error{/ts}'{literal});
-          $('.crm-close-accordion', header).click();
-        }
-      });
+      CRM.loadPage(url, {target: body, block: false});
     }
   }
 });

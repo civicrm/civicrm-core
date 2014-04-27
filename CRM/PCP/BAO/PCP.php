@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -159,7 +159,8 @@ ORDER BY page_type, page_id";
       else {
         $mask -= CRM_Core_Action::DISABLE;
       }
-      $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace);
+      $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace, ts('more'),
+        FALSE, 'pcp.dashboard.active', 'PCP', $pcpInfoDao->id);
       $component = $pcpInfoDao->page_type;
       $pageTitle = CRM_Utils_Array::value($pcpInfoDao->page_id, $$component);
 
@@ -206,7 +207,8 @@ ORDER BY target_entity_type, target_entity_id
         );
       }
       $pcpLink = $links['add'];
-      $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace);
+      $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace, ts('more'),
+        FALSE, 'pcp.dashboard.other', "{$pcpBlockDao->target_entity_type}_PCP", $pcpBlockDao->target_entity_id);
       $component = $pcpBlockDao->target_entity_type;
       $pageTitle = CRM_Utils_Array::value($pcpBlockDao->target_entity_id, $$component);
       $pcpBlock[] = array(
@@ -363,7 +365,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *
    * @param object $form form object
    *
-   * @return None
+   * @return void
    * @access public
    */
   public static function buildPCPForm($form) {
@@ -509,11 +511,11 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
       $statusMessage = ts('The Personal Campaign Page you have just visited is currently %1. However you can still support the campaign here.', array(1 => $pcpStatus[$pcpInfo['status_id']]));
       CRM_Core_Error::statusBounce($statusMessage, $url);
     }
-    elseif (!CRM_Utils_Array::value('is_active', $pcpBlock)) {
+    elseif (empty($pcpBlock['is_active'])) {
       $statusMessage = ts('Personal Campaign Pages are currently not enabled for this contribution page. However you can still support the campaign here.');
       CRM_Core_Error::statusBounce($statusMessage, $url);
     }
-    elseif (!CRM_Utils_Array::value('is_active', $pcpInfo)) {
+    elseif (empty($pcpInfo['is_active'])) {
       $statusMessage = ts('The Personal Campaign Page you have just visited is currently inactive. However you can still support the campaign here.');
       CRM_Core_Error::statusBounce($statusMessage, $url);
     }

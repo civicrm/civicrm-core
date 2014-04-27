@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
   | Copyright (C) 2011 Marty Wright                                    |
   | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -75,7 +75,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   static function getSelection($id = NULL) {
     $mapping = self::getMapping($id);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
-    $activityType = CRM_Core_PseudoConstant::activityType(FALSE) + CRM_Core_PseudoConstant::activityType(FALSE, TRUE);
+    $activityType   = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
 
     $participantStatus = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $event = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
@@ -368,8 +368,9 @@ WHERE   cas.entity_value = $id AND
     return $list;
   }
 
-  static function sendReminder($contactId, $email, $scheduleID, $from, $tokenParams) {
-
+  static function sendReminder($contactId, $to, $scheduleID, $from, $tokenParams) {
+    $email = $to['email'];
+    $phoneNumber = $to['phone'];
     $schedule = new CRM_Core_DAO_ActionSchedule();
     $schedule->id = $scheduleID;
 
@@ -441,45 +442,76 @@ WHERE   cas.entity_value = $id AND
         foreach ($matches[1] as $token) {
           list($type, $name) = preg_split('/\./', $token, 2);
           if ($name) {
-            if (!isset($subjectToken['contact'])) {
-              $subjectToken['contact'] = array();
+            if (!isset($subjectToken[$type])) {
+              $subjectToken[$type] = array();
             }
-            $subjectToken['contact'][] = $name;
+            $subjectToken[$type][] = $name;
           }
         }
       }
 
       $messageSubject = CRM_Utils_Token::replaceContactTokens($body_subject, $contact, FALSE, $subjectToken);
-      $messageSubject = CRM_Utils_Token::replaceDomainTokens($messageSubject, $domain, TRUE, $tokens[$value]);
-      $messageSubject = CRM_Utils_Token::replaceComponentTokens($messageSubject, $contact, $tokens[$value], TRUE);
+      $messageSubject = CRM_Utils_Token::replaceDomainTokens($messageSubject, $domain, TRUE, $subjectToken);
+      $messageSubject = CRM_Utils_Token::replaceComponentTokens($messageSubject, $contact, $subjectToken, TRUE);
       $messageSubject = CRM_Utils_Token::replaceHookTokens($messageSubject, $contact, $categories, TRUE);
 
       $messageSubject = $smarty->fetch("string:{$messageSubject}");
 
-      // set up the parameters for CRM_Utils_Mail::send
-      $mailParams = array(
-        'groupName' => 'Scheduled Reminder Sender',
-        'from' => $from,
-        'toName' => $contact['display_name'],
-        'toEmail' => $email,
-        'subject' => $messageSubject,
-        'entity' => 'action_schedule',
-        'entity_id' => $scheduleID,
-      );
+      if ($schedule->mode == 'SMS' or $schedule->mode == 'User_Preference') {
+        $session = CRM_Core_Session::singleton();
+        $userID = $session->get('userID') ? $session->get('userID') : $contactId;
+        $smsParams = array('To' => $phoneNumber, 'provider_id' => $schedule->sms_provider_id, 'activity_subject' => $messageSubject);
+        $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
+          'SMS',
+          'name'
+        );
+        $details = $html ? $html : $text;
+        $activityParams = array(
+          'source_contact_id' => $userID,
+          'activity_type_id' => $activityTypeID,
+          'activity_date_time' => date('YmdHis'),
+          'subject' => $messageSubject,
+          'details' => $details,
+          'status_id' => CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name'),
+        );
 
-      if (!$html || $contact['preferred_mail_format'] == 'Text' ||
-        $contact['preferred_mail_format'] == 'Both'
-      ) {
-        // render the &amp; entities in text mode, so that the links work
-        $mailParams['text'] = str_replace('&amp;', '&', $text);
+        $activity = CRM_Activity_BAO_Activity::create($activityParams);
+
+        CRM_Activity_BAO_Activity::sendSMSMessage($contactId,
+          $text,
+          $html,
+          $smsParams,
+          $activity->id,
+          $userID
+        );
       }
-      if ($html && ($contact['preferred_mail_format'] == 'HTML' ||
+
+      if ($schedule->mode == 'Email' or $schedule->mode == 'User_Preference') {
+        // set up the parameters for CRM_Utils_Mail::send
+        $mailParams = array(
+          'groupName' => 'Scheduled Reminder Sender',
+          'from' => $from,
+          'toName' => $contact['display_name'],
+          'toEmail' => $email,
+          'subject' => $messageSubject,
+          'entity' => 'action_schedule',
+          'entity_id' => $scheduleID,
+        );
+
+        if (!$html || $contact['preferred_mail_format'] == 'Text' ||
           $contact['preferred_mail_format'] == 'Both'
-        )) {
-        $mailParams['html'] = $html;
+        ) {
+          // render the &amp; entities in text mode, so that the links work
+          $mailParams['text'] = str_replace('&amp;', '&', $text);
+        }
+        if ($html && ($contact['preferred_mail_format'] == 'HTML' ||
+            $contact['preferred_mail_format'] == 'Both'
+          )
+        ) {
+          $mailParams['html'] = $html;
+        }
+        $result = CRM_Utils_Mail::send($mailParams);
       }
-
-      $result = CRM_Utils_Mail::send($mailParams);
     }
     $schedule->free();
 
@@ -617,7 +649,7 @@ LEFT JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option
 
       if ($mapping->entity == 'civicrm_participant') {
         $tokenEntity = 'event';
-        $tokenFields = array('event_type', 'title', 'event_id', 'start_date', 'end_date', 'summary', 'description', 'location', 'info_url', 'registration_url', 'fee_amount', 'contact_email', 'contact_phone');
+        $tokenFields = array('event_type', 'title', 'event_id', 'start_date', 'end_date', 'summary', 'description', 'location', 'info_url', 'registration_url', 'fee_amount', 'contact_email', 'contact_phone', 'balance');
         $extraSelect = ', ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone ';
 
         $extraJoin   = "
@@ -697,19 +729,44 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           elseif (in_array($field, array('start_date','end_date','join_date','activity_date_time'))) {
             $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Date::customFormat($dao->$field);
           }
+          elseif ($field == 'balance') {
+            $info = CRM_Contribute_BAO_Contribution::getPaymentInfo($dao->entityID, 'event');
+            $balancePay = CRM_Utils_Array::value('balance', $info);
+            $balancePay = CRM_Utils_Money::format($balancePay);
+            $entityTokenParams["{$tokenEntity}." . $field] = $balancePay;
+          }
+          elseif ($field == 'fee_amount') {
+            $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Money::format($dao->$field);
+          }
           else {
             $entityTokenParams["{$tokenEntity}." . $field] = $dao->$field;
           }
         }
 
         $isError  = 0;
-        $errorMsg = '';
-        $toEmail  = CRM_Contact_BAO_Contact::getPrimaryEmail($dao->contactID);
-        if ($toEmail) {
+        $errorMsg = $toEmail = $toPhoneNumber = '';
+
+        if ($actionSchedule->mode == 'SMS' or $actionSchedule->mode == 'User_Preference') {
+          $filters = array('is_deceased' => 0, 'is_deleted' => 0, 'do_not_sms' => 0);
+          $toPhoneNumbers = CRM_Core_BAO_Phone::allPhones($dao->contactID, FALSE, 'Mobile', $filters);
+          //to get primary mobile ph,if not get a first mobile phONE
+          if (!empty($toPhoneNumbers)) {
+            $toPhoneNumberDetails = reset($toPhoneNumbers);
+            $toPhoneNumber = CRM_Utils_Array::value('phone', $toPhoneNumberDetails);
+            //contact allows to send sms
+            $toDoNotSms = 0;
+          }
+        }
+        if ($actionSchedule->mode == 'Email' or $actionSchedule->mode == 'User_Preference') {
+          $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($dao->contactID);
+        }
+        if ($toEmail || !(empty($toPhoneNumber) or $toDoNotSms)) {
+          $to['email'] = $toEmail;
+          $to['phone'] = $toPhoneNumber;
           $result =
             CRM_Core_BAO_ActionSchedule::sendReminder(
               $dao->contactID,
-              $toEmail,
+              $to,
               $actionSchedule->id,
               $fromEmailAddress,
               $entityTokenParams
@@ -1205,7 +1262,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     switch ($mapping['entity']) {
       case 'civicrm_participant':
         $eventContacts = CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name');
-        if (!CRM_Utils_Array::value($recipientType, $eventContacts)) {
+        if (empty($eventContacts[$recipientType])) {
           return $options;
         }
         if ($eventContacts[$recipientType] == 'participant_role') {

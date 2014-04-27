@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
 *}
 {literal}
 <script type="text/javascript" >
-cj( function( ) {
+CRM.$(function($) {
     {/literal}
     {if $generateAjaxRequest}
         {foreach from=$ajaxRequestBlocks key="blockName" item="instances"}
@@ -80,9 +80,7 @@ function buildAdditionalBlocks( blockName, className ) {
         async   : false,
         success : function(html){
             cj(fname).after(html);
-            if ((typeof(Drupal) != 'undefined') && Drupal.attachBehaviors) {
-              Drupal.attachBehaviors(cj('#' + blockName + '_Block_'+ currentInstance)[0]);
-            }
+            cj(fname).next().trigger('crmLoad');
         }
     });
 
@@ -101,27 +99,27 @@ function singleSelect( object ) {
     var execBlock  = '#' + element['0'] + '-' + block + '-html Input[id*="' + element['2'] + '"]';
 
     //element to check for checkbox
-    var elementChecked =  cj( '#' + object ).attr('checked');
+    var elementChecked =  cj( '#' + object ).prop('checked');
     if ( elementChecked ) {
         cj( execBlock ).each( function() {
             if ( cj(this).attr('id') != object ) {
-                cj(this).attr( 'checked', false );
+                cj(this).prop('checked', false );
             }
         });
     } else {
-        cj( '#' + object ).attr( 'checked', false );
+        cj( '#' + object ).prop('checked', false );
     }
 
   //check if non of elements is set Primary / Allowed to Login.
   if( cj.inArray( element['2'].slice('2'), [ 'Primary', 'Login' ] ) != -1 ) {
     primary = false;
     cj( execBlock ).each( function( ) {
-      if ( cj(this).attr( 'checked' ) ) {
+      if ( cj(this).prop('checked' ) ) {
         primary = true;
       }
     });
     if( ! primary ) {
-      cj('#' + object).attr( 'checked', true );
+      cj('#' + object).prop('checked', true );
     }
   }
 }
@@ -132,7 +130,7 @@ function removeBlock( blockName, blockId ) {
       return clearFirstBlock(blockName , blockId);
     }
 
-    if ( cj( "#"+ blockName + "_" + blockId + "_IsPrimary").attr('checked') ) {
+    if ( cj( "#"+ blockName + "_" + blockId + "_IsPrimary").prop('checked') ) {
          var primaryBlockId = 1;
         // consider next block as a primary,
         // when user delete first block
@@ -148,7 +146,7 @@ function removeBlock( blockName, blockId ) {
         }
 
         // finally sets the primary address
-        cj( '#'+ blockName + '_' + primaryBlockId + '_IsPrimary').attr('checked', true);
+        cj( '#'+ blockName + '_' + primaryBlockId + '_IsPrimary').prop('checked', true);
     }
 
     //remove the spacer for address block only.

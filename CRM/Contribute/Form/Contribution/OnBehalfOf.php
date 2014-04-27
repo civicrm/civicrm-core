@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -73,7 +73,7 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
       if (!empty($form->_membershipContactID) && $contactID != $form->_membershipContactID) {
         // renewal case - membership being renewed may or may not be for organization
         if (!empty($form->_employers) && array_key_exists($form->_membershipContactID, $form->_employers)) {
-          // if _membershipContactID belongs to employers list, we can say: 
+          // if _membershipContactID belongs to employers list, we can say:
           $form->_relatedOrganizationFound = TRUE;
         }
       } else if (!empty($form->_employers)) {
@@ -162,11 +162,17 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
           }
 
           $stateCountryMap[$index][$prefixName] = 'onbehalf[' . $name . ']';
+
+          if (count($form->_submitValues)) {
+            $locationTypeId = $field['location_type_id'];
+            if (!empty($form->_submitValues['onbehalf']["country-{$locationTypeId}"]) &&
+              $prefixName == "state_province") {
+              $field['is_required'] = CRM_Core_Payment_Form::checkRequiredStateProvince($form, "country-{$locationTypeId}", TRUE);
+            }
+          }
         }
         elseif (in_array($prefixName, array(
-          'organization_name', 'email')) &&
-          !CRM_Utils_Array::value('is_required', $field)
-        ) {
+          'organization_name', 'email')) && empty($field['is_required'])) {
           $field['is_required'] = 1;
         }
 

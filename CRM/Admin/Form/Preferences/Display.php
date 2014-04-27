@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: Display.php 45499 2013-02-08 12:31:05Z kurund $
  *
  */
@@ -40,12 +40,6 @@
 class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   function preProcess() {
     CRM_Utils_System::setTitle(ts('Settings - Display Preferences'));
-
-    if (defined('CIVICRM_ACTIVITY_ASSIGNEE_MAIL') && CIVICRM_ACTIVITY_ASSIGNEE_MAIL) {
-      CRM_Core_Session::setStatus(ts('Your civicrm.settings.php file contains CIVICRM_ACTIVITY_ASSIGNEE_MAIL but this
-      constant is no longer used. Please remove this from your config file and set your "Notify Activity Assignees"
-      preference below.'), ts("Deprecated Constant"), "alert");
-    }
 
     $this->_varNames = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME =>
@@ -104,6 +98,11 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'html_type' => NULL,
           'weight' => 11,
         ),
+        'ajaxPopupsEnabled' => array(
+          'html_type' => 'checkbox',
+          'title' => ts('Enable Popup Forms'),
+          'weight' => 12,
+        ),
       ),
     );
 
@@ -143,7 +142,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -189,6 +188,9 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     $contactBlocks = CRM_Core_OptionGroup::values('contact_edit_options', FALSE, FALSE, FALSE, 'AND v.filter = 1');
     $this->assign('contactBlocks', $contactBlocks);
 
+    $nameFields = CRM_Core_OptionGroup::values('contact_edit_options', FALSE, FALSE, FALSE, 'AND v.filter = 2');
+    $this->assign('nameFields', $nameFields);
+
     $this->addElement('hidden', 'contact_edit_preferences', NULL, array('id' => 'contact_edit_preferences'));
 
     parent::buildQuickForm();
@@ -199,7 +201,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     if ($this->_action == CRM_Core_Action::VIEW) {
@@ -208,7 +210,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
     $this->_params = $this->controller->exportValues($this->_name);
 
-    if (CRM_Utils_Array::value('contact_edit_preferences', $this->_params)) {
+    if (!empty($this->_params['contact_edit_preferences'])) {
       $preferenceWeights = explode(',', $this->_params['contact_edit_preferences']);
       foreach ($preferenceWeights as $key => $val) {
         if (!$val) {

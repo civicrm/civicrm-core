@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -134,10 +134,10 @@ class CRM_GCD {
     }
     // Init DB
     $config = CRM_Core_Config::singleton();
-    
+
     // Relationship types indexed by name_a_b from the table civicrm_relationship_type
     $this->relTypes = CRM_Utils_Array::index(array('name_a_b'), CRM_Core_PseudoConstant::relationshipType('name'));
-    
+
   }
 
   /**
@@ -1714,23 +1714,28 @@ VALUES
     $sql = "SELECT id from civicrm_contribution where contact_id = 34";
     $contriId2 = CRM_Core_DAO::singleValueQuery($sql);
 
+    $sql = "SELECT cov.value FROM civicrm_option_value cov LEFT JOIN civicrm_option_group cog ON cog.id = cov.option_group_id WHERE cov.name = 'pcp' AND cog.name = 'soft_credit_type'";
+
+    $pcpId = CRM_Core_DAO::singleValueQuery($sql);
+
     $query = "
 INSERT INTO `civicrm_contribution_soft`
-      ( contribution_id, contact_id ,amount , currency, pcp_id , pcp_display_in_roll ,pcp_roll_nickname,pcp_personal_note )
+      ( contribution_id, contact_id ,amount , currency, pcp_id , pcp_display_in_roll ,pcp_roll_nickname,pcp_personal_note, soft_credit_type_id )
 VALUES
-    ( $contriId1, {$this->Individual[3]}, 10.00, 'USD', 1, 1, 'Jones Family', 'Helping Hands'),
-    ( $contriId2, {$this->Individual[3]}, 250.00, 'USD', 1, 1, 'Annie and the kids', 'Annie Helps');
+    ( $contriId1, {$this->Individual[3]}, 10.00, 'USD', 1, 1, 'Jones Family', 'Helping Hands', $pcpId),
+    ( $contriId2, {$this->Individual[3]}, 250.00, 'USD', 1, 1, 'Annie and the kids', 'Annie Helps', $pcpId);
  ";
+
     $this->_query($query);
   }
 
   private function addPledge() {
     $pledge = "INSERT INTO civicrm_pledge
-        (contact_id, financial_type_id, contribution_page_id, amount, original_installment_amount, currency,frequency_unit, frequency_interval, frequency_day, installments, start_date, create_date, acknowledge_date, modified_date, cancel_date, end_date, honor_contact_id, honor_type_id, status_id, is_test)
+        (contact_id, financial_type_id, contribution_page_id, amount, original_installment_amount, currency,frequency_unit, frequency_interval, frequency_day, installments, start_date, create_date, acknowledge_date, modified_date, cancel_date, end_date, status_id, is_test)
         VALUES
-       (71, 1, 1, 500.00, '500', 'USD', 'month', 1, 1, 1, '2009-07-01 00:00:00', '2009-06-26 00:00:00', NULL, NULL, NULL,'2009-07-01 00:00:00', NULL, NULL, 1, 0),
-       (43, 1, 1, 800.00, '200', 'USD', 'month', 3, 1, 4, '2009-07-01 00:00:00', '2009-06-23 00:00:00', '2009-06-23 00:00:00', NULL, NULL, '2009-04-01 10:11:40', NULL, NULL, 5, 0),
-       (32, 1, 1, 600.00, '200', 'USD', 'month', 1, 1, 3, '2009-10-01 00:00:00', '2009-09-14 00:00:00', '2009-09-14 00:00:00', NULL, NULL, '2009-12-01 00:00:00', NULL, NULL, 5, 0);
+       (71, 1, 1, 500.00, '500', 'USD', 'month', 1, 1, 1, '2009-07-01 00:00:00', '2009-06-26 00:00:00', NULL, NULL, NULL,'2009-07-01 00:00:00', 1, 0),
+       (43, 1, 1, 800.00, '200', 'USD', 'month', 3, 1, 4, '2009-07-01 00:00:00', '2009-06-23 00:00:00', '2009-06-23 00:00:00', NULL, NULL, '2009-04-01 10:11:40', 5, 0),
+       (32, 1, 1, 600.00, '200', 'USD', 'month', 1, 1, 3, '2009-10-01 00:00:00', '2009-09-14 00:00:00', '2009-09-14 00:00:00', NULL, NULL, '2009-12-01 00:00:00', 5, 0);
 ";
     $this->_query($pledge);
   }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -115,8 +115,8 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //the civicrm messages should indicate the username is taken
-    $this->assertElementContainsText("css=#crm-notification-container", "already taken", "CiviCRM Message does not indicate the username is in user");
 
+    $this->assertElementContainsText("xpath=//span[@class = 'crm-error']", "already taken", "CiviCRM Message does not indicate the username is in user");
     //check the uf match table that no contact has been created
     $results = $this->webtest_civicrm_api("UFMatch", "get", array('contact_id' => $cid));
     $this->assertTrue($results['count'] == 0);
@@ -139,7 +139,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check that that there is a password mismatch text
-    $this->assertElementContainsText("css=#crm-notification-container", "Password mismatch", "No form error given on password missmatch");
+    $this->assertElementContainsText("xpath=//table[@class='form-layout-compressed']/tbody/tr[3]/td/span[@class='crm-error']", "Password mismatch", "No form error given on password missmatch");
 
     //check that no user was created;
     $results = $this->webtest_civicrm_api("UFMatch", "get", array('contact_id' => $cid));
@@ -161,13 +161,13 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //the civicrm messages section should not indicate that a user has been created
-    $this->assertElementNotContainsText("css=#crm-notification-container", "User has been added", "CiviCRM messages say that a user was created when username left blank");
+    $this->assertElementNotContainsText("xpath=//span[@class='crm-error']", "User has been added", "CiviCRM messages say that a user was created when username left blank");
 
     //the civicrm message should say username is required
-    $this->assertElementContainsText("css=#crm-notification-container", "Username is required", "The CiviCRM messae does not indicate that the username is required");
+    $this->assertElementContainsText("xpath=//span[@class='crm-error']", "Username is required", "The CiviCRM messae does not indicate that the username is required");
 
     //the civicrm message should say password is required
-    $this->assertElementContainsText("css=#crm-notification-container", "Password is required", "The CiviCRM messae does not indicate that the password is required");
+    $this->assertElementContainsText("xpath=//table[@class='form-layout-compressed']/tbody/tr[3]/td/span[@class='crm-error']", "Password is required", "The CiviCRM messae does not indicate that the password is required");
 
     //check that no user was created;
     $results = $this->webtest_civicrm_api("UFMatch", "get", array('contact_id' => $cid));

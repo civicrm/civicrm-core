@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -68,22 +68,26 @@ class CRM_Case_Task {
   static function &tasks() {
     if (!self::$_tasks) {
       self::$_tasks = array(
-        1 => array('title' => ts('Delete Cases'),
+        1 => array(
+          'title' => ts('Delete Cases'),
           'class' => 'CRM_Case_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array('title' => ts('Print Cases'),
+        2 => array(
+          'title' => ts('Print Selected Rows'),
           'class' => 'CRM_Case_Form_Task_Print',
           'result' => FALSE,
         ),
-        3 => array('title' => ts('Export Cases'),
+        3 => array(
+          'title' => ts('Export Cases'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
           ),
           'result' => FALSE,
         ),
-        4 => array('title' => ts('Restore Cases'),
+        4 => array(
+          'title' => ts('Restore Cases'),
           'class' => 'CRM_Case_Form_Task_Restore',
           'result' => FALSE,
         ),
@@ -110,10 +114,7 @@ class CRM_Case_Task {
     self::tasks();
     $titles = array();
     foreach (self::$_tasks as $id => $value) {
-      // skip Print Cases task
-      if ($id != 2) {
-        $titles[$id] = $value['title'];
-      }
+      $titles[$id] = $value['title'];
     }
     return $titles;
   }

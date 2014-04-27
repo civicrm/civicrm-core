@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -89,11 +89,15 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @return array - array reference of all case statues
    * @static
    */
-  public static function caseStatus($column = 'label', $onlyActive = TRUE) {
+  public static function caseStatus($column = 'label', $onlyActive = TRUE, $condition = NULL) {
     $cacheKey = "{$column}_" . (int)$onlyActive;
+    if (!$condition) {
+      $condition = 'AND filter = 0';
+    }
+
     if (!isset(self::$caseStatus[$cacheKey])) {
       self::$caseStatus[$cacheKey] = CRM_Core_OptionGroup::values('case_status',
-        FALSE, FALSE, FALSE, NULL,
+        FALSE, FALSE, FALSE, $condition,
         $column, $onlyActive
       );
     }
@@ -137,11 +141,14 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @return array - array reference of all case type
    * @static
    */
-  public static function caseType($column = 'label', $onlyActive = TRUE) {
+  public static function caseType($column = 'label', $onlyActive = TRUE, $condition = NULL) {
     $cacheKey = "{$column}_" . (int)$onlyActive;
+    if (!$condition) {
+      $condition = 'AND filter = 0';
+    }
     if (!isset(self::$caseType[$cacheKey])) {
       self::$caseType[$cacheKey] = CRM_Core_OptionGroup::values('case_type',
-        FALSE, FALSE, FALSE, NULL,
+        FALSE, FALSE, FALSE, $condition,
         $column, $onlyActive
       );
     }

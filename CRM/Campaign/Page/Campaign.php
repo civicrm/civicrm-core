@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -37,6 +37,8 @@
  * Page for displaying Campaigns
  */
 class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -65,14 +67,12 @@ class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
           'title' => ts('Disable Campaign'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Campaign' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
           'title' => ts('Enable Campaign'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Campaign' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
         ),
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
@@ -110,7 +110,12 @@ class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
           $action -= CRM_Core_Action::DISABLE;
         }
         $campaigns[$cmpid]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
-          array('id' => $campaign['id'])
+          array('id' => $campaign['id']),
+          ts('more'),
+          FALSE,
+          'campaign.selector.row',
+          'Campaign',
+          $campaign['id']
         );
       }
     }

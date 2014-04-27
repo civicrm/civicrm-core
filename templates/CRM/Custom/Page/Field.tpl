@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,7 +35,7 @@
     <div id="field_page">
         {strip}
       {* handle enable/disable actions*}
-        {include file="CRM/common/enableDisable.tpl"}
+        {include file="CRM/common/enableDisableApi.tpl"}
         {include file="CRM/common/jsortable.tpl"}
          <table id="options" class="display">
          <thead>
@@ -70,7 +70,7 @@
         {/strip}
 
         <div class="action-link">
-            <a href="{crmURL p='civicrm/admin/custom/group/field/add' q="reset=1&action=add&gid=$gid"}" id="newCustomField" class="button"><span><div class="icon add-icon"></div>{ts}Add Custom Field{/ts}</span></a>
+            <a href="{crmURL p='civicrm/admin/custom/group/field/add' q="reset=1&action=add&gid=$gid"}" id="newCustomField" class="button action-item"><span><div class="icon add-icon"></div>{ts}Add Custom Field{/ts}</span></a>
         </div>
      </div>
 
@@ -79,7 +79,7 @@
         <div class="messages status no-popup">
         <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
         {capture assign=crmURL}{crmURL p='civicrm/admin/custom/group/field/add' q="action=add&reset=1&gid=$gid"}{/capture}
-        {ts 1=$groupTitle 2=$crmURL}There are no custom fields for custom group '%1', <a href='%2'>add one</a>.{/ts}
+        {ts 1=$groupTitle 2=$crmURL}There are no custom fields for custom group '%1', <a class="action-item" href='%2'>add one</a>.{/ts}
         </div>
         {/if}
     {/if}

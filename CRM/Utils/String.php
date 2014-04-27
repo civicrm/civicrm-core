@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -479,19 +479,6 @@ class CRM_Utils_String {
       }
     }
     return $result;
-  }
-
-  /**
-   * Function to add include files needed for jquery
-   *
-   * This appears to be used in cases where the normal html-header
-   * provided by CRM_Core_Resources can't be used (e.g. when outputting in
-   * "print" mode, the execution will short-circuit without allowing the
-   * CMS to output JS/CSS tags).
-   */
-  static function addJqueryFiles(&$html) {
-    CRM_Core_Resources::singleton()->addCoreResources('html-header');
-    return CRM_Core_Region::instance('html-header')->render('', FALSE) . $html;
   }
 
   /**

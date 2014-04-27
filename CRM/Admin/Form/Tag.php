@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -43,7 +43,7 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -53,20 +53,6 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
         $url = CRM_Utils_System::url('civicrm/admin/tag', "reset=1");
         CRM_Utils_System::redirect($url);
         return TRUE;
-      }
-      else {
-        $this->addButtons(array(
-            array(
-              'type' => 'next',
-              'name' => ts('Delete'),
-              'isDefault' => TRUE,
-            ),
-            array(
-              'type' => 'cancel',
-              'name' => ts('Cancel'),
-            ),
-          )
-        );
       }
     }
     else {
@@ -86,7 +72,7 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
       }
 
       if (!$this->_isTagSet) {
-        $this->add('select', 'parent_id', ts('Parent Tag'), $allTag);
+        $this->add('select', 'parent_id', ts('Parent Tag'), $allTag, FALSE, array('class' => 'crm-select2'));
       }
 
       $this->assign('isTagSet', $this->_isTagSet);
@@ -107,10 +93,7 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
 
       $isReserved = $this->add('checkbox', 'is_reserved', ts('Reserved?'));
 
-      $usedFor = $this->add('select', 'used_for', ts('Used For'),
-        CRM_Core_OptionGroup::values('tag_used_for')
-      );
-      $usedFor->setMultiple(TRUE);
+      $usedFor = $this->addSelect('used_for', array('multiple' => TRUE, 'option_url' => NULL));
 
       if ($this->_id &&
         CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'parent_id')
@@ -131,8 +114,8 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
       }
       $this->assign('adminReservedTags', $adminReservedTags);
 
-      parent::buildQuickForm();
     }
+    parent::buildQuickForm();
   }
 
   /**
@@ -140,7 +123,7 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $ids = array();

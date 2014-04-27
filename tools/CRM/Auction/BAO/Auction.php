@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -97,7 +97,7 @@ class CRM_Auction_BAO_Auction extends CRM_Auction_DAO_Auction {
   function add(&$params) {
     require_once 'CRM/Utils/Hook.php';
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Auction', $params['id'], $params);
     }
     else {
@@ -109,7 +109,7 @@ class CRM_Auction_BAO_Auction extends CRM_Auction_DAO_Auction {
     $auction->copyValues($params);
     $result = $auction->save();
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'Auction', $auction->id, $auction);
     }
     else {

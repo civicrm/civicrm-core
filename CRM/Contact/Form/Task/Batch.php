@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -190,7 +190,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if (empty($this->_fields)) {
@@ -251,7 +251,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -265,7 +265,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
       //CRM-5521
       //validate subtype before updating
-      if (CRM_Utils_Array::value('contact_sub_type', $value) && !CRM_Contact_BAO_ContactType::isAllowEdit($key)) {
+      if (!empty($value['contact_sub_type']) && !CRM_Contact_BAO_ContactType::isAllowEdit($key)) {
         unset($value['contact_sub_type']);
         $inValidSubtypeCnt++;
       }
@@ -330,9 +330,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
         //street address consider to be parsed properly,
         //If we get street_name and street_number.
-        if (!CRM_Utils_Array::value('street_name', $parsedFields) ||
-          !CRM_Utils_Array::value('street_number', $parsedFields)
-        ) {
+        if (empty($parsedFields['street_name']) || empty($parsedFields['street_number'])) {
           $parsedFields = array_fill_keys(array_keys($parsedFields), '');
         }
 

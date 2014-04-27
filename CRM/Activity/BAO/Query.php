@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -42,13 +42,13 @@ class CRM_Activity_BAO_Query {
    * @access public
    */
   static function select(&$query) {
-    if (CRM_Utils_Array::value('activity_id', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['activity_id'])) {
       $query->_select['activity_id'] = "civicrm_activity.id as activity_id";
       $query->_element['activity_id'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
-    if (CRM_Utils_Array::value('activity_type_id', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['activity_type_id'])) {
       $query->_select['activity_type_id'] = "activity_type.id as activity_type_id";
       $query->_element['activity_type_id'] = 1;
       $query->_tables['civicrm_activity'] = 1;
@@ -57,7 +57,7 @@ class CRM_Activity_BAO_Query {
       $query->_whereTables['activity_type'] = 1;
     }
 
-    if (CRM_Utils_Array::value('activity_type', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['activity_type'])) {
       $query->_select['activity_type'] = "activity_type.label as activity_type";
       $query->_element['activity_type'] = 1;
       $query->_tables['civicrm_activity'] = 1;
@@ -66,19 +66,19 @@ class CRM_Activity_BAO_Query {
       $query->_whereTables['activity_type'] = 1;
     }
 
-    if (CRM_Utils_Array::value('activity_subject', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['activity_subject'])) {
       $query->_select['activity_subject'] = "civicrm_activity.subject as activity_subject";
       $query->_element['activity_subject'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
-    if (CRM_Utils_Array::value('activity_date_time', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['activity_date_time'])) {
       $query->_select['activity_date_time'] = "civicrm_activity.activity_date_time as activity_date_time";
       $query->_element['activity_date_time'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
-    if (CRM_Utils_Array::value('activity_status_id', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['activity_status_id'])) {
       $query->_select['activity_status_id'] = "activity_status.value as activity_status_id";
       $query->_element['activity_status_id'] = 1;
       $query->_tables['civicrm_activity'] = 1;
@@ -87,7 +87,7 @@ class CRM_Activity_BAO_Query {
       $query->_whereTables['activity_status'] = 1;
     }
 
-    if (CRM_Utils_Array::value('activity_status', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['activity_status'])) {
       $query->_select['activity_status'] = "activity_status.label as activity_status";
       $query->_element['activity_status'] = 1;
       $query->_tables['civicrm_activity'] = 1;
@@ -96,55 +96,55 @@ class CRM_Activity_BAO_Query {
       $query->_whereTables['activity_status'] = 1;
     }
 
-    if (CRM_Utils_Array::value('activity_duration', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['activity_duration'])) {
       $query->_select['activity_duration'] = "civicrm_activity.duration as activity_duration";
       $query->_element['activity_duration'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
-    if (CRM_Utils_Array::value('activity_location', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['activity_location'])) {
       $query->_select['activity_location'] = "civicrm_activity.location as activity_location";
       $query->_element['activity_location'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
-    if (CRM_Utils_Array::value('activity_details', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['activity_details'])) {
       $query->_select['activity_details'] = "civicrm_activity.details as activity_details";
       $query->_element['activity_details'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
-    if (CRM_Utils_Array::value('source_record_id', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['source_record_id'])) {
       $query->_select['source_record_id'] = "civicrm_activity.source_record_id as source_record_id";
       $query->_element['source_record_id'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
-    if (CRM_Utils_Array::value('activity_is_test', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['activity_is_test'])) {
       $query->_select['activity_is_test'] = "civicrm_activity.is_test as activity_is_test";
       $query->_element['activity_is_test'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
-    if (CRM_Utils_Array::value('activity_campaign_id', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['activity_campaign_id'])) {
       $query->_select['activity_campaign_id'] = 'civicrm_activity.campaign_id as activity_campaign_id';
       $query->_element['activity_campaign_id'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
-    if (CRM_Utils_Array::value('activity_engagement_level', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['activity_engagement_level'])) {
       $query->_select['activity_engagement_level'] = 'civicrm_activity.engagement_level as activity_engagement_level';
       $query->_element['activity_engagement_level'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
-    if (CRM_Utils_Array::value('source_contact', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['source_contact'])) {
       $query->_select['source_contact'] = 'source_contact.sort_name as source_contact';
       $query->_element['source_contact'] = 1;
       $query->_tables['source_contact'] = $query->_whereTables['source_contact'] = 1;
     }
 
-    if (CRM_Utils_Array::value('activity_result', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['activity_result'])) {
       $query->_select['activity_result'] = 'civicrm_activity.result as activity_result';
       $query->_element['result'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
@@ -420,6 +420,7 @@ class CRM_Activity_BAO_Query {
    *
    * @access public
    *
+   * @param $form CRM_Core_Form
    * @return void
    * @static
    */
@@ -444,13 +445,13 @@ class CRM_Activity_BAO_Query {
       2 => ts('Assigned to'),
       1 => ts('Added by'),
     );
-    $form->addRadio('activity_role', NULL, $activityRoles);
+    $form->addRadio('activity_role', NULL, $activityRoles, array('allowClear' => TRUE));
     $form->setDefaults(array('activity_role' => 3));
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     foreach ($activityStatus as $activityStatusID => $activityStatusName) {
       $activity_status[] = $form->createElement('checkbox', $activityStatusID, NULL, $activityStatusName);
     }
-    $form->addGroup($activity_status, 'activity_status', ts('Activity Status'));
+    $form->addGroup($activity_status, 'activity_status', ts('Activity Status'), TRUE);
     $form->setDefaults(array('activity_status[1]' => 1, 'activity_status[2]' => 1));
     $form->addElement('text', 'activity_subject', ts('Subject'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
     $form->addYesNo('activity_test', ts('Activity is a Test?'));
@@ -468,8 +469,8 @@ class CRM_Activity_BAO_Query {
 
     $surveys = CRM_Campaign_BAO_Survey::getSurveys(TRUE, FALSE, FALSE, TRUE);
     if ($surveys) $form->add('select', 'activity_survey_id', ts('Survey / Petition'),
-      array(
-        '' => ts('- none -')) + $surveys, FALSE
+      array('' => ts('- none -')) + $surveys, FALSE,
+      array('class' => 'crm-select2')
     );
 
     $extends = array('Activity');
@@ -494,10 +495,7 @@ class CRM_Activity_BAO_Query {
       CRM_Campaign_BAO_Campaign::accessCampaign()
     ) {
       $buildEngagementLevel = TRUE;
-      $form->add('select', 'activity_engagement_level',
-        ts('Engagement Index'),
-        array('' => ts('- any -')) + CRM_Campaign_PseudoConstant::engagementLevel()
-      );
+      $form->addSelect('activity_engagement_level', array('entity' => 'activity', 'option_url' => NULL));
 
       // Add survey result field.
       $optionGroups  = CRM_Campaign_BAO_Survey::getResultSets( 'name' );
@@ -520,7 +518,7 @@ class CRM_Activity_BAO_Query {
         asort($resultOptions);
         $form->add('select', 'activity_result', ts("Survey Result"),
           $resultOptions, FALSE,
-          array('id' => 'activity_result', 'multiple' => 'multiple', 'title' => ts('- select -'))
+          array('id' => 'activity_result', 'multiple' => 'multiple', 'class' => 'crm-select2')
         );
       }
     }
@@ -528,11 +526,6 @@ class CRM_Activity_BAO_Query {
     $form->assign('buildEngagementLevel', $buildEngagementLevel);
     $form->assign('buildSurveyResult', $buildSurveyResult);
     $form->setDefaults(array('activity_test' => 0));
-  }
-
-  static function addShowHide(&$showHide) {
-    $showHide->addHide('caseActivityForm');
-    $showHide->addShow('caseActivityForm_show');
   }
 
   static function defaultReturnProperties($mode, $includeCustomFields = TRUE) {

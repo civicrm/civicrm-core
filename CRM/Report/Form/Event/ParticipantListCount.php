@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                       |
+ | CiviCRM version 4.5                                       |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                    |
+ | Copyright CiviCRM LLC (c) 2004-2014                    |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                      |
  |                                      |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -324,17 +324,15 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     $this->_columnHeaders = array();
 
     //add blank column at the Start
-    if (array_key_exists('options', $this->_params) && CRM_Utils_Array::value('blank_column_begin', $this->_params['options'])) {
+    if (array_key_exists('options', $this->_params) && !empty($this->_params['options']['blank_column_begin'])) {
       $select[] = " '' as blankColumnBegin";
       $this->_columnHeaders['blankColumnBegin']['title'] = '_ _ _ _';
     }
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
-            if (CRM_Utils_Array::value('statistics', $field)) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
+            if (!empty($field['statistics'])) {
               foreach ($field['statistics'] as $stat => $label) {
                 switch (strtolower($stat)) {
                   case 'sum':
@@ -400,14 +398,14 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
 
   function groupBy() {
     $this->_groupBy = "";
-    if (CRM_Utils_Array::value('group_bys', $this->_params) &&
+    if (!empty($this->_params['group_bys']) &&
       is_array($this->_params['group_bys']) &&
       !empty($this->_params['group_bys'])
     ) {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $field) {
-            if (CRM_Utils_Array::value($fieldName, $this->_params['group_bys'])) {
+            if (!empty($this->_params['group_bys'][$fieldName])) {
               $this->_groupBy[] = $field['dbAlias'];
             }
           }

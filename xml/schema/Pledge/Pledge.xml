@@ -28,6 +28,9 @@
     <required>true</required>
     <comment>Foreign key to civicrm_contact.id .</comment>
     <add>2.1</add>
+    <html>
+       <type>Autocomplete-Select</type>
+     </html>
   </field>
   <foreignKey>
     <name>contact_id</name>
@@ -60,6 +63,9 @@
     <type>int unsigned</type>
     <comment>FK to Financial Type</comment>
     <add>4.3</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <foreignKey>
     <name>financial_type_id</name>
@@ -90,6 +96,9 @@
     <import>true</import>
     <comment>Total pledged amount.</comment>
     <add>2.1</add>
+    <html>
+     <type>Text</type>
+   </html>
   </field>
   <field>
     <name>original_installment_amount</name>
@@ -99,6 +108,9 @@
     <required>true</required>
     <comment>Original amount for each of the installments.</comment>
     <add>3.2</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>currency</name>
@@ -114,16 +126,26 @@
       <labelColumn>full_name</labelColumn>
       <nameColumn>numeric_code</nameColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>frequency_unit</name>
     <uniqueName>pledge_frequency_unit</uniqueName>
     <title>Pledge Frequency Unit</title>
-    <type>enum</type>
-    <values>day,week,month,year</values>
+    <type>varchar</type>
+    <length>8</length>
     <default>'month'</default>
     <comment>Time units for recurrence of pledge payments.</comment>
+    <pseudoconstant>
+      <optionGroupName>recur_frequency_units</optionGroupName>
+      <keyColumn>name</keyColumn>
+    </pseudoconstant>
     <add>2.1</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>frequency_interval</name>
@@ -134,6 +156,9 @@
     <default>1</default>
     <comment>Number of time units for recurrence of pledge payments.</comment>
     <add>2.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>frequency_day</name>
@@ -143,6 +168,9 @@
     <required>true</required>
     <comment>Day in the period when the pledge payment is due e.g. 1st of month, 15th etc. Use this to set the scheduled dates for pledge payments.</comment>
     <add>2.1</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>installments</name>
@@ -151,6 +179,9 @@
     <default>1</default>
     <comment>Total number of payments to be made.</comment>
     <add>2.1</add>
+    <html>
+     <type>Text</type>
+   </html>
   </field>
   <field>
     <name>start_date</name>
@@ -159,6 +190,9 @@
     <required>true</required>
     <comment>The date the first scheduled pledge occurs.</comment>
     <add>2.1</add>
+    <html>
+        <type>Select Date</type>
+      </html>
   </field>
   <field>
     <name>create_date</name>
@@ -169,6 +203,9 @@
     <import>true</import>
     <comment>When this pledge record was created.</comment>
     <add>2.1</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>acknowledge_date</name>
@@ -176,6 +213,9 @@
     <title>Pledge Acknowledged</title>
     <comment>When a pledge acknowledgement message was sent to the contributor.</comment>
     <add>2.1</add>
+    <html>
+        <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>modified_date</name>
@@ -190,6 +230,9 @@
     <title>Pledge Cancelled Date</title>
     <comment>Date this pledge was cancelled by contributor.</comment>
     <add>2.1</add>
+    <html>
+        <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>end_date</name>
@@ -197,31 +240,9 @@
     <title>Pledge End Date</title>
     <comment>Date this pledge finished successfully (total pledge payments equal to or greater than pledged amount).</comment>
     <add>2.1</add>
-  </field>
-  <field>
-    <name>honor_contact_id</name>
-    <type>int unsigned</type>
-    <title>Pledge Honor Contact</title>
-    <comment>FK to contact ID. Used when pledge is made in honor of another contact. This is propagated to contribution records when pledge payments are made.</comment>
-    <add>2.1</add>
-  </field>
-  <foreignKey>
-    <name>honor_contact_id</name>
-    <table>civicrm_contact</table>
-    <key>id</key>
-    <add>2.1</add>
-    <onDelete>SET NULL</onDelete>
-  </foreignKey>
-  <field>
-    <name>honor_type_id</name>
-    <title>Honor Type</title>
-    <type>int unsigned</type>
-    <comment>Implicit FK to civicrm_option_value.</comment>
-    <add>2.1</add>
-    <onDelete>SET NULL</onDelete>
-    <pseudoconstant>
-      <optionGroupName>honor_type</optionGroupName>
-    </pseudoconstant>
+    <html>
+        <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>max_reminders</name>
@@ -229,6 +250,9 @@
     <type>int unsigned</type>
     <default>1</default>
     <comment>The maximum number of payment reminders to send for any given payment.</comment>
+    <html>
+         <type>Text</type>
+       </html>
     <add>2.1</add>
   </field>
   <field>
@@ -238,6 +262,9 @@
     <default>5</default>
     <comment>Send initial reminder this many days prior to the payment due date.</comment>
     <add>2.1</add>
+    <html>
+          <type>Select</type>
+        </html>
   </field>
   <field>
     <name>additional_reminder_day</name>
@@ -246,6 +273,9 @@
     <default>5</default>
     <comment>Send additional reminder this many days after last one sent, up to maximum number of reminders.</comment>
     <add>2.1</add>
+    <html>
+         <type>Text</type>
+       </html>
   </field>
   <field>
     <name>status_id</name>
@@ -269,6 +299,9 @@
     <title>Test</title>
     <type>boolean</type>
     <default>0</default>
+    <html>
+     <type>CheckBox</type>
+   </html>
   </field>
   <field>
     <name>campaign_id</name>
@@ -283,6 +316,9 @@
       <labelColumn>title</labelColumn>
     </pseudoconstant>
     <add>3.4</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <foreignKey>
     <name>campaign_id</name>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -135,7 +135,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -219,7 +219,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $config = CRM_Core_Config::singleton();
@@ -238,14 +238,14 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcessCommon() {
     foreach ($this->_varNames as $groupName => $groupValues) {
       foreach ($groupValues as $settingName => $fieldValue) {
         switch ($fieldValue['html_type']) {
           case 'checkboxes':
-            if (CRM_Utils_Array::value($settingName, $this->_params) &&
+            if (!empty($this->_params[$settingName]) &&
               is_array($this->_params[$settingName])
             ) {
               $this->_config->$settingName = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
@@ -258,7 +258,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
             break;
 
           case 'checkbox':
-            $this->_config->$settingName = CRM_Utils_Array::value($settingName, $this->_params) ? 1 : 0;
+            $this->_config->$settingName = !empty($this->_params[$settingName]) ? 1 : 0;
             break;
 
           case 'text':

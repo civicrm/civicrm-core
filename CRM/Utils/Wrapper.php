@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,7 @@
  * run method as explained below.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
  *
  */
@@ -60,7 +60,7 @@ class CRM_Utils_Wrapper {
    * @param boolean addSequence should we add a unique sequence number to the end of the key
    * @param boolean ignoreKey   should we not set a qfKey for this controller (for standalone forms)
    *
-   * @return none.
+   * @return void.
    * @access public
    */
   function run($formName, $formLabel = NULL, $arguments = NULL) {

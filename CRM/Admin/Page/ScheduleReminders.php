@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -38,6 +38,8 @@
  * Page for displaying list of Reminders
  */
 class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -73,14 +75,12 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_ActionSchedule' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Label Format'),
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_ActionSchedule' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Label Format'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -143,7 +143,16 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
         else {
           $action -= CRM_Core_Action::DISABLE;
         }
-        $format['action'] = CRM_Core_Action::formLink(self::links(), $action, array('id' => $format['id']));
+        $format['action'] = CRM_Core_Action::formLink(
+          self::links(),
+          $action,
+          array('id' => $format['id']),
+          ts('more'),
+          FALSE,
+          'actionSchedule.manage.action',
+          'ActionSchedule',
+          $format['id']
+        );
       }
     }
 

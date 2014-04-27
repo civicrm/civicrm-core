@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -163,7 +163,7 @@ WHERE  inst.report_id = %1";
     $params['toEmail'] = CRM_Utils_Array::value('email_to', $instanceInfo);
     $params['cc']      = CRM_Utils_Array::value('email_cc', $instanceInfo);
     $params['subject'] = CRM_Utils_Array::value('email_subject', $instanceInfo);
-    if (!CRM_Utils_Array::value('attachments', $instanceInfo)) {
+    if (empty($instanceInfo['attachments'])) {
       $instanceInfo['attachments'] = array();
     }
     $params['attachments'] = array_merge(CRM_Utils_Array::value('attachments', $instanceInfo), $attachments);

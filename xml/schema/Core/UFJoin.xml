@@ -77,6 +77,9 @@
         <keyColumn>id</keyColumn>
         <labelColumn>title</labelColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <foreignKey>
        <name>uf_group_id</name>
@@ -84,4 +87,10 @@
        <key>id</key>
        <add>1.3</add>
   </foreignKey>
+  <field>
+       <name>module_data</name>
+       <type>longtext</type>
+       <comment>Json serialized array of data used by the ufjoin.module</comment>
+       <add>4.5</add>
+  </field>
 </table>

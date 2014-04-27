@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,14 +33,12 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <base href="{$config->resourceBase}" />
   <style type="text/css" media="screen">@import url({$config->resourceBase}css/civicrm.css);</style>
-  <style type="text/css" media="screen">@import url({$config->resourceBase}css/extras.css);</style>
 </head>
 <body>
 <div id="crm-container" class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
 {else}
 <div id="crm-container" class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
   <style type="text/css" media="screen">@import url({$config->resourceBase}css/civicrm.css);</style>
-  <style type="text/css" media="screen">@import url({$config->resourceBase}css/extras.css);</style>
 {/if}
 <div class="messages status no-popup">  <div class="icon red-icon alert-icon"></div>
  <span class="status-fatal">{ts}Sorry but we are not able to provide this at the moment.{/ts}</span>

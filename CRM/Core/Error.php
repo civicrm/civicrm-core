@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * PEAR_ErrorStack and use that framework
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -309,6 +309,21 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         // so we just exit
         self::abend(CRM_Core_Error::FATAL_ERROR);
       }
+    }
+
+    // If we are in an ajax callback, format output appropriately
+    if (CRM_Utils_Array::value('snippet', $_REQUEST) === CRM_Core_Smarty::PRINT_JSON) {
+      $out = array(
+        'status' => 'fatal',
+        'content' => '<div class="messages status no-popup"><div class="icon inform-icon"></div>' . ts('Sorry but we are not able to provide this at the moment.') . '</div>',
+      );
+      if ($config->backtrace && CRM_Core_Permission::check('view debug output')) {
+        $out['backtrace'] = self::parseBacktrace(debug_backtrace());
+        $message .= '<p><em>See console for backtrace</em></p>';
+      }
+      CRM_Core_Session::setStatus($message, ts('Sorry an Error Occured'), 'error');
+      CRM_Core_Transaction::forceRollbackIfEnabled();
+      CRM_Core_Page_AJAX::returnJsonResponse($out);
     }
 
     if ($config->backtrace) {
@@ -604,15 +619,32 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param boolean $showArgs TRUE if we should try to display content of function arguments (which could be sensitive); FALSE to display only the type of each function argument
    * @param int $maxArgLen maximum number of characters to show from each argument string
    * @return string printable plain-text
-   * @see debug_backtrace
-   * @see Exception::getTrace()
    */
   static function formatBacktrace($backTrace, $showArgs = TRUE, $maxArgLen = 80) {
     $message = '';
-    foreach ($backTrace as $idx => $trace) {
+    foreach (self::parseBacktrace($backTrace, $showArgs, $maxArgLen) as $idx => $trace) {
+      $message .= sprintf("#%s %s\n", $idx, $trace);
+    }
+    $message .= sprintf("#%s {main}\n", 1+$idx);
+    return $message;
+  }
+
+  /**
+   * Render a backtrace array as an array
+   *
+   * @param array $backTrace array of stack frames
+   * @param boolean $showArgs TRUE if we should try to display content of function arguments (which could be sensitive); FALSE to display only the type of each function argument
+   * @param int $maxArgLen maximum number of characters to show from each argument string
+   * @return array
+   * @see debug_backtrace
+   * @see Exception::getTrace()
+   */
+  static function parseBacktrace($backTrace, $showArgs = TRUE, $maxArgLen = 80) {
+    $ret = array();
+    foreach ($backTrace as $trace) {
       $args = array();
       $fnName = CRM_Utils_Array::value('function', $trace);
-      $className = array_key_exists('class', $trace) ? ($trace['class'] . $trace['type']) : '';
+      $className = isset($trace['class']) ? ($trace['class'] . $trace['type']) : '';
 
       // do now show args for a few password related functions
       $skipArgs = ($className == 'DB::' && $fnName == 'connect') ? TRUE : FALSE;
@@ -651,9 +683,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         }
       }
 
-      $message .= sprintf(
-        "#%s %s(%s): %s%s(%s)\n",
-        $idx,
+      $ret[] = sprintf(
+        "%s(%s): %s%s(%s)",
         CRM_Utils_Array::value('file', $trace, '[internal function]'),
         CRM_Utils_Array::value('line', $trace, ''),
         $className,
@@ -661,8 +692,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         implode(", ", $args)
       );
     }
-    $message .= sprintf("#%s {main}\n", 1+$idx);
-    return $message;
+    return $ret;
   }
 
   /**
@@ -742,6 +772,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       $redirect = $session->readUserContext();
     }
     $session->setStatus($status, $title);
+    if (CRM_Utils_Array::value('snippet', $_REQUEST) === CRM_Core_Smarty::PRINT_JSON) {
+      CRM_Core_Page_AJAX::returnJsonResponse(array('status' => 'error'));
+    }
     CRM_Utils_System::redirect($redirect);
   }
 
@@ -757,25 +790,21 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $error->_errorsByLevel = array();
   }
 
-  public static function ignoreException($callback = NULL) {
-    if (!$callback) {
-      $callback = array('CRM_Core_Error', 'nullHandler');
-    }
-
-    $GLOBALS['_PEAR_default_error_mode'] = PEAR_ERROR_CALLBACK;
-    $GLOBALS['_PEAR_default_error_options'] = $callback;
-  }
-
+  /**
+   * PEAR error-handler which converts errors to exceptions
+   *
+   * @param $pearError
+   * @throws PEAR_Exception
+   */
   public static function exceptionHandler($pearError) {
     CRM_Core_Error::backtrace('backTrace', TRUE);
     throw new PEAR_Exception($pearError->getMessage(), $pearError);
   }
 
   /**
-   * Error handler to quietly catch otherwise fatal smtp transport errors.
+   * PEAR error-handler to quietly catch otherwise fatal errors. Intended for use with smtp transport.
    *
    * @param object $obj       The PEAR_ERROR object
-   *
    * @return object $obj
    * @access public
    * @static
@@ -784,21 +813,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     CRM_Core_Error::debug_log_message("Ignoring exception thrown by nullHandler: {$obj->code}, {$obj->message}");
     CRM_Core_Error::backtrace('backTrace', TRUE);
     return $obj;
-  }
-
-  /**
-   * (Re)set the default callback method
-   *
-   * @return void
-   * @access public
-   * @static
-   */
-  public static function setCallback($callback = NULL) {
-    if (!$callback) {
-      $callback = array('CRM_Core_Error', 'handle');
-    }
-    $GLOBALS['_PEAR_default_error_mode'] = PEAR_ERROR_CALLBACK;
-    $GLOBALS['_PEAR_default_error_options'] = $callback;
   }
 
   /*
@@ -842,7 +856,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   public static function isAPIError($error, $type = CRM_Core_Error::FATAL_ERROR) {
-    if (is_array($error) && CRM_Utils_Array::value('is_error', $error)) {
+    if (is_array($error) && !empty($error['is_error'])) {
       $code = $error['error_message']['code'];
       if ($code == $type) {
         return TRUE;

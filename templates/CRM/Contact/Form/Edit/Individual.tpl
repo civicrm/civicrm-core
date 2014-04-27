@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 {* tpl for building Individual related fields *}
 <script type="text/javascript">
 {literal}
-cj(function($) {
+CRM.$(function($) {
 {/literal}
   var cid=parseFloat("{$contactId}");//parseInt is octal by default
   var contactIndividual = "{crmURL p='civicrm/ajax/rest' q='entity=contact&action=get&json=1&contact_type=Individual&return=display_name,sort_name,email&rowCount=50' h=0}";
@@ -86,18 +86,30 @@ cj(function($) {
       {$form.prefix_id.html}
     </td>    
     {/if}
+    {if $form.formal_title}
+    <td>
+      {$form.formal_title.label}<br/>
+      {$form.formal_title.html}
+    </td>
+    {/if}
+    {if $form.first_name}
     <td>
       {$form.first_name.label}<br /> 
       {$form.first_name.html}
     </td>
+    {/if}
+    {if $form.middle_name}
     <td>
       {$form.middle_name.label}<br />
       {$form.middle_name.html}
     </td>
+    {/if}
+    {if $form.last_name}
     <td>
       {$form.last_name.label}<br />
       {$form.last_name.html}
     </td>
+    {/if}
     {if $form.suffix_id}
     <td>
       {$form.suffix_id.label}<br/>
@@ -108,9 +120,8 @@ cj(function($) {
 
   <tr>
     <td colspan="2">
-      {$form.current_employer.label}&nbsp;{help id="id-current-employer" file="CRM/Contact/Form/Contact.hlp"}<br />
-      {$form.current_employer.html|crmAddClass:twenty}
-      <div id="employer_address" style="display:none;"></div>
+      {$form.employer_id.label}&nbsp;{help id="id-current-employer" file="CRM/Contact/Form/Contact.hlp"}<br />
+      {$form.employer_id.html}
     </td>
     <td>
       {$form.job_title.label}<br />
@@ -128,5 +139,3 @@ cj(function($) {
     </td>
   </tr>
 </table>
-
-{include file="CRM/Contact/Form/CurrentEmployer.tpl"}

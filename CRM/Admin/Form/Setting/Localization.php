@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -45,7 +45,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -223,7 +223,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
     // CRM-7962, CRM-7713, CRM-9004
     if (!empty($fields['defaultContactCountry']) &&
-      (CRM_Utils_Array::value('countryLimit', $fields) &&
+      (!empty($fields['countryLimit']) &&
         (!in_array($fields['defaultContactCountry'], $fields['countryLimit']))
       )
     ) {
@@ -304,12 +304,12 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     unset($values['currencyLimit']);
 
     // make the site multi-lang if requested
-    if (CRM_Utils_Array::value('makeMultilingual', $values)) {
+    if (!empty($values['makeMultilingual'])) {
       CRM_Core_I18n_Schema::makeMultilingual($values['lcMessages']);
       $values['languageLimit'][$values['lcMessages']] = 1;
       // make the site single-lang if requested
     }
-    elseif (CRM_Utils_Array::value('makeSinglelingual', $values)) {
+    elseif (!empty($values['makeSinglelingual'])) {
       CRM_Core_I18n_Schema::makeSinglelingual($values['lcMessages']);
       $values['languageLimit'] = '';
     }

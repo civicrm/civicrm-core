@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Relationship
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Relationship.php 30486 2010-11-02 16:12:09Z shot $
  *
  */
@@ -56,7 +56,7 @@ function civicrm_api3_relationship_create($params) {
   _civicrm_api3_relationship_format_params($params, $values);
   $ids = array();
 
-  if (CRM_Utils_Array::value('id', $params)) {
+  if (!empty($params['id'])) {
     $ids['contactTarget'] = $values['contact_id_b'];
   }
 
@@ -138,7 +138,7 @@ function civicrm_api3_relationship_delete($params) {
 function civicrm_api3_relationship_get($params) {
   $options = _civicrm_api3_get_options_from_params($params);
 
-  if (!CRM_Utils_Array::value('contact_id', $params)) {
+  if (empty($params['contact_id'])) {
     if(!empty($params['membership_type_id']) && empty($params['relationship_type_id'])) {
       CRM_Contact_BAO_Relationship::membershipTypeToRelationshipTypes($params);
     }
@@ -186,7 +186,7 @@ function _civicrm_api3_relationship_format_params($params, &$values) {
   _civicrm_api3_store_values($fields, $params, $values);
 
   $relationTypes = CRM_Core_PseudoConstant::relationshipType('name');
-  if (CRM_Utils_Array::value('id', $params)) {
+  if (!empty($params['id'])) {
     $relation = new CRM_Contact_BAO_Relationship();
     $relation->id = $params['id'];
     if (!$relation->find(TRUE)) {
@@ -244,7 +244,7 @@ function _civicrm_api3_relationship_format_params($params, &$values) {
         }
 
         if ($relationshipTypeId) {
-          if (CRM_Utils_Array::value('relationship_type_id', $values) &&
+          if (!empty($values['relationship_type_id']) &&
             $relationshipTypeId != $values['relationship_type_id']
           ) {
             throw new Exception('Mismatched Relationship Type and Relationship Type Id');

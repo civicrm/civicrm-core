@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -68,10 +68,13 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
+      ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
     // get categories for the contact id
     $entityTag = CRM_Core_BAO_EntityTag::getTag($this->_entityID, $this->_entityTable);
     $this->assign('tagged', $entityTag);
@@ -83,14 +86,12 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
     foreach ($allTag as $tagID => $varValue) {
       if (in_array($tagID, $entityTag)) {
         $tagAttribute = array(
-          'onclick' => "return changeRowColor(\"rowidtag_$tagID\")",
           'checked' => 'checked',
           'id' => "tag_{$tagID}",
         );
       }
       else {
         $tagAttribute = array(
-          'onclick' => "return changeRowColor(\"rowidtag_$tagID\")",
           'id' => "tag_{$tagID}",
         );
       }
@@ -133,7 +134,7 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     CRM_Utils_System::flushCache('CRM_Core_DAO_Tag');

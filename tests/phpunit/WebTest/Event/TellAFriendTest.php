@@ -1,9 +1,9 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.4                                                |
+   | CiviCRM version 4.5                                                |
    +--------------------------------------------------------------------+
-   | Copyright CiviCRM LLC (c) 2004-2013                                |
+   | Copyright CiviCRM LLC (c) 2004-2014                                |
    +--------------------------------------------------------------------+
    | This file is a part of CiviCRM.                                    |
    |                                                                    |
@@ -135,32 +135,31 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/search", "reset=1", '_qf_Basic_refresh');
     $this->type('sort_name', $firstName);
     $this->click('_qf_Basic_refresh ');
-    $this->waitForElementPresent('Print');
+    $this->waitForElementPresent('Go');
     $this->assertTrue($this->isTextPresent('1 Contact'));
 
     // Verify Activity created
     $this->openCiviPage("activity/search", "reset=1", '_qf_Search_refresh');
     $this->type('sort_name', $firstName1);
     $this->click('_qf_Search_refresh');
-    $this->waitForElementPresent("_qf_Search_next_print");
-    $this->click("xpath=//div[@class='crm-search-results']//table[@class='selector']/tbody/tr[2]/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("Go");
+    $this->click("xpath=//div[@class='crm-search-results']//table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
-
-    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[1]/td[2]",
+    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[1]/td[2]/span/a[1]",
       preg_quote("$lastName, $firstName")
     );
 
-    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/a[1]",
+    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/span/a[1]",
       preg_quote("$lastName1, $firstName1")
     );
-    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/a[2]",
+    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/span/a[2]",
       preg_quote("$lastName2, $firstName2")
     );
-    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/a[3]",
+    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/span/a[3]",
       preg_quote("$lastName3, $firstName3")
     );
 
-    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[4]/td[2]",
+    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[4]/td[2]/span",
       preg_quote("Tell a Friend:")
     );
   }
@@ -206,8 +205,8 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->click("_qf_Location_upload-bottom");
 
     // Wait for "saved" status msg
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Location' information has been saved.");
+    $this->waitForElementPresent("_qf_Location_upload-bottom");
+    $this->waitForTextPresent("'Event Location' information has been saved.");
   }
 
   function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
@@ -230,8 +229,8 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->type("confirm_from_email", "jane.doe@example.org");
 
     $this->click("_qf_Registration_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Registration' information has been saved.");
+    $this->waitForElementPresent("_qf_Registration_upload-bottom");
+    $this->waitForTextPresent("'Online Registration' information has been saved.");
   }
 
   function _testAddTellAFriend($subject, $thankYouMsg, $eventTitle) {

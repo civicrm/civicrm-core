@@ -98,30 +98,45 @@
        <type>varchar</type>
        <length>128</length>
        <comment>Mailing Name.</comment>
+       <html>
+         <type>Text</type>
+       </html>
   </field>
   <field>
        <name>from_name</name>
        <type>varchar</type>
        <length>128</length>
        <comment>From Header of mailing</comment>
+       <html>
+         <type>Text</type>
+       </html>
   </field>
   <field>
        <name>from_email</name>
        <type>varchar</type>
        <length>128</length>
        <comment>From Email of mailing</comment>
+       <html>
+         <type>Text</type>
+       </html>
   </field>
   <field>
        <name>replyto_email</name>
        <type>varchar</type>
        <length>128</length>
        <comment>Reply-To Email of mailing</comment>
+       <html>
+         <type>Text</type>
+       </html>
   </field>
   <field>
        <name>subject</name>
        <type>varchar</type>
        <length>128</length>
        <comment>Subject of mailing</comment>
+       <html>
+         <type>Text</type>
+       </html>
   </field>
   <field>
        <name>body_text</name>
@@ -137,16 +152,25 @@
        <name>url_tracking</name>
        <type>boolean</type>
        <comment>Should we track URL click-throughs for this mailing?</comment>
+       <html>
+         <type>CheckBox</type>
+       </html>
   </field>
   <field>
        <name>forward_replies</name>
        <type>boolean</type>
        <comment>Should we forward replies back to the author?</comment>
+       <html>
+         <type>CheckBox</type>
+       </html>
   </field>
   <field>
         <name>auto_responder</name>
         <type>boolean</type>
         <comment>Should we enable the auto-responder?</comment>
+        <html>
+          <type>CheckBox</type>
+        </html>
   </field>
   <field>
        <name>open_tracking</name>
@@ -157,6 +181,9 @@
        <name>is_completed</name>
        <type>boolean</type>
        <comment>Has at least one job associated with this mailing finished?</comment>
+       <html>
+         <type>CheckBox</type>
+       </html>
   </field>
   <field>
       <name>msg_template_id</name>
@@ -175,11 +202,14 @@
       <default>0</default>
       <add>2.2</add>
       <comment>Should we overrite VERP address in Reply-To</comment>
+      <html>
+         <type>CheckBox</type>
+      </html>
   </field>
   <field>
       <name>created_id</name>
       <type>int unsigned</type>
-      <comment>FK to Contact ID who first created this mailing</comment>
+      <comment>FK to Contact ID who first created this mailing</comment>      
   </field>
   <foreignKey>
        <name>created_id</name>
@@ -193,6 +223,9 @@
       <title>Mailing Created Date</title>
       <comment>Date and time this mailing was created.</comment>
       <add>3.0</add>
+      <html>
+        <type>Select Date</type>
+      </html>
   </field>
   <field>
       <name>scheduled_id</name>
@@ -238,6 +271,9 @@
       <pseudoconstant>
         <optionGroupName>mail_approval_status</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
       <add>3.3</add>
   </field>
   <field>
@@ -246,21 +282,33 @@
       <title>Approval Note</title>
       <comment>Note behind the decision.</comment>
       <add>3.3</add>
+      <html>
+         <type>TextArea</type>
+       </html>
   </field>
   <field>
        <name>is_archived</name>
        <type>boolean</type>
        <default>0</default>
        <comment>Is this mailing archived?</comment>
+       <html>
+         <type>CheckBox</type>
+       </html>
        <add>2.2</add>
   </field>
   <field>
        <name>visibility</name>
-       <type>enum</type>
-       <values>User and User Admin Only,Public Pages</values>
+       <type>varchar</type>
+       <length>40</length>
        <default>'User and User Admin Only'</default>
        <comment>In what context(s) is the mailing contents visible (online viewing)</comment>
+       <pseudoconstant>
+         <callback>CRM_Core_SelectValues::groupVisibility</callback>
+       </pseudoconstant>
        <add>3.3</add>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <field>
        <name>campaign_id</name>
@@ -272,6 +320,9 @@
           <labelColumn>title</labelColumn>
        </pseudoconstant>
        <add>3.4</add>
+       <html>
+          <type>Select</type>
+        </html>
   </field>
   <foreignKey>
        <name>campaign_id</name>
@@ -285,11 +336,17 @@
       <default>0</default>
       <add>4.1</add>
       <comment>Remove duplicate emails?</comment>
+      <html>
+         <type>CheckBox</type>
+       </html>
   </field>
   <field>
        <name>sms_provider_id</name>
        <type>int unsigned</type>
        <add>4.2</add>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <foreignKey>
        <name>sms_provider_id</name>
@@ -298,4 +355,17 @@
        <onDelete>SET NULL</onDelete>
        <add>4.2</add>
   </foreignKey>
+  <field>
+      <name>hash</name>
+      <title>Mailing Hash</title>
+      <type>varchar</type>
+      <length>16</length>
+      <comment>Key for validating requests related to this mailing.</comment>
+      <add>4.5</add>
+  </field>
+  <index>
+       <name>index_hash</name>
+       <fieldName>hash</fieldName>
+       <add>4.5</add>
+  </index>
 </table>

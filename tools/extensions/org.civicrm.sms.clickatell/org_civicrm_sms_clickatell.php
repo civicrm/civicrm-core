@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -133,7 +133,9 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
     curl_setopt($this->_ch, CURLOPT_TIMEOUT, 20);
     curl_setopt($this->_ch, CURLOPT_VERBOSE, 1);
     curl_setopt($this->_ch, CURLOPT_FAILONERROR, 1);
-    curl_setopt($this->_ch, CURLOPT_FOLLOWLOCATION, 1);
+    if (ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off') {
+      curl_setopt($this->_ch, CURLOPT_FOLLOWLOCATION, 1);
+    }
     curl_setopt($this->_ch, CURLOPT_COOKIEJAR, "/dev/null");
     curl_setopt($this->_ch, CURLOPT_SSL_VERIFYHOST, 2);
     curl_setopt($this->_ch, CURLOPT_USERAGENT, 'CiviCRM - http://civicrm.org/');

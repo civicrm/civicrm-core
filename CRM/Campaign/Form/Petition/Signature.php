@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -237,7 +237,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $this->_defaults = array();
@@ -322,7 +322,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    * This function is used to add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
-   * @return None
+   * @return void
    * @access public
    * @see valid_date
    */
@@ -338,7 +338,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $tag_name = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME,
@@ -584,7 +584,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   /**
    * Function to build the petition profile form
    *
-   * @return None
+   * @return void
    * @access public
    */
   function buildCustom($id, $name, $viewOnly = FALSE) {

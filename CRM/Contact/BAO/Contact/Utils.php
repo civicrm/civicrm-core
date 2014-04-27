@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -59,7 +59,7 @@ class CRM_Contact_BAO_Contact_Utils {
       $params = array('name' => $contactType);
       CRM_Contact_BAO_ContactType::retrieve($params, $typeInfo);
 
-      if (CRM_Utils_Array::value('image_URL', $typeInfo)) {
+      if (!empty($typeInfo['image_URL'])) {
         $imageUrl = $typeInfo['image_URL'];
         $config = CRM_Core_Config::singleton();
 
@@ -139,9 +139,9 @@ WHERE  id IN ( $idString )
   }
 
   /**
-   * Generate a checksum for a contactID
+   * Generate a checksum for a $entityId of type $entityType
    *
-   * @param int    $contactID
+   * @param int    $entityId
    * @param int    $ts         timestamp that checksum was generated
    * @param int    $live       life of this checksum in hours/ 'inf' for infinite
    * @param string $hash       contact hash, if sent, prevents a query in inner loop
@@ -150,26 +150,45 @@ WHERE  id IN ( $idString )
    * @static
    * @access public
    */
-  static function generateChecksum($contactID, $ts = NULL, $live = NULL, $hash = NULL) {
-    // return a warning message if we dont get a contactID
+  static function generateChecksum($entityId, $ts = NULL, $live = NULL, $hash = NULL, $entityType = 'contact', $hashSize = NULL) {
+    // return a warning message if we dont get a entityId
     // this typically happens when we do a message preview
     // or an anon mailing view - CRM-8298
-    if (!$contactID) {
+    if (!$entityId) {
       return 'invalidChecksum';
     }
 
     if (!$hash) {
-      $hash = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-        $contactID, 'hash'
-      );
+      if ($entityType == 'contact') {
+        $hash = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+          $entityId, 'hash'
+        );
+      }
+      elseif ($entityType == 'mailing') {
+        $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing',
+          $entityId, 'hash'
+        );
+      }
     }
 
     if (!$hash) {
       $hash = md5(uniqid(rand(), TRUE));
-      CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact',
-        $contactID,
-        'hash', $hash
-      );
+      if ($hashSize) {
+        $hash = substr($hash, 0, $hashSize);
+      }
+
+      if ($entityType == 'contact') {
+        CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact',
+          $entityId,
+          'hash', $hash
+        );
+      }
+      elseif ($entityType == 'mailing') {
+        CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_Mailing',
+          $entityId,
+          'hash', $hash
+        );
+      }
     }
 
     if (!$ts) {
@@ -185,7 +204,7 @@ WHERE  id IN ( $idString )
       $live = 24 * $days;
     }
 
-    $cs = md5("{$hash}_{$contactID}_{$ts}_{$live}");
+    $cs = md5("{$hash}_{$entityId}_{$ts}_{$live}");
     return "{$cs}_{$ts}_{$live}";
   }
 
@@ -259,44 +278,8 @@ UNION
    * @access public
    * @static
    */
-  static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL) {
-    $organizationId = NULL;
-
-    // if organization id is passed.
-    if (is_numeric($organization)) {
-      $organizationId = $organization;
-    }
-    else {
-      $orgName = explode('::', $organization);
-      trim($orgName[0]);
-
-      $organizationParams = array();
-      $organizationParams['organization_name'] = $orgName[0];
-
-      $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
-
-      $dedupeParams['check_permission'] = FALSE;
-      $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Organization', 'Supervised');
-
-      if (is_array($dupeIDs) && !empty($dupeIDs)) {
-        // we should create relationship only w/ first org CRM-4193
-        foreach ($dupeIDs as $orgId) {
-          $organizationId = $orgId;
-          break;
-        }
-      }
-      else {
-        //create new organization
-        $newOrg = array(
-          'contact_type' => 'Organization',
-          'organization_name' => trim($orgName[0]),
-        );
-        $org = CRM_Contact_BAO_Contact::create($newOrg);
-        $organizationId = $org->id;
-      }
-    }
-
-    if ($organizationId) {
+  static function createCurrentEmployerRelationship($contactID, $organizationId, $previousEmployerID = NULL) {
+    if ($organizationId && is_numeric($organizationId)) {
       $cid = array('contact' => $contactID);
 
       // get the relationship type id of "Employee of"
@@ -664,7 +647,7 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
 
       // do check for view.
       if (array_key_exists('view', $hasPermissions)) {
-        $contactLinks['rows'][$i]['view'] = '<a class="action-item action-item-first" href="' . CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $dao->id) . '" target="_blank">' . ts('View') . '</a>';
+        $contactLinks['rows'][$i]['view'] = '<a class="action-item" href="' . CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $dao->id) . '" target="_blank">' . ts('View') . '</a>';
         if (!$contactLinks['msg']) {
           $contactLinks['msg'] = 'view';
         }
@@ -848,9 +831,7 @@ Group By  componentId";
     $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'master_id');
     foreach ($address as & $values) {
       // 2. check if master id exists, if not continue
-      if (!CRM_Utils_Array::value('master_id', $values) ||
-        !CRM_Utils_Array::value('use_shared_address', $values)
-      ) {
+      if (empty($values['master_id']) || empty($values['use_shared_address'])) {
         // we should unset master id when use uncheck share address for existing address
         $values['master_id'] = 'null';
         continue;
@@ -889,7 +870,7 @@ Group By  componentId";
     // get the list of master id's for address
     $masterAddressIds = array();
     foreach ($addresses as $key => $addressValue) {
-      if (CRM_Utils_Array::value('master_id', $addressValue)) {
+      if (!empty($addressValue['master_id'])) {
         $masterAddressIds[] = $addressValue['master_id'];
       }
     }
@@ -1042,7 +1023,7 @@ Group By  componentId";
         }
       }
 
-      CRM_Utils_Token::replaceGreetingTokens($greetingString, $contactDetails, $contactID, 'CRM_UpdateGreeting');
+      self::processGreetingTemplate($greetingString, $contactDetails, $contactID, 'CRM_UpdateGreeting');
       $greetingString = CRM_Core_DAO::escapeString($greetingString);
       $cacheFieldQuery .= " WHEN {$contactID} THEN '{$greetingString}' ";
 
@@ -1095,6 +1076,32 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
     if (!empty($id)) {
       return current($id);
     }
+  }
+
+  /**
+   * Process a greeting template string to produce the individualised greeting text.
+   *
+   * This works just like message templates for mailings:
+   * the template is processed with the token substitution mechanism,
+   * to supply the individual contact data;
+   * and it is also processed with Smarty,
+   * to allow for conditionals etc. based on the contact data.
+   *
+   * Note: We don't pass any variables to Smarty --
+   * all variable data is inserted into the input string
+   * by the token substitution mechanism,
+   * before Smarty is invoked.
+   *
+   * @param string $templateString the greeting template string with contact tokens + Smarty syntax
+   *
+   * @return void
+   * @static
+   */
+  static function processGreetingTemplate(&$templateString, $contactDetails, $contactID, $className) {
+    CRM_Utils_Token::replaceGreetingTokens($templateString, $contactDetails, $contactID, $className, TRUE);
+
+    $smarty = CRM_Core_Smarty::singleton();
+    $templateString = $smarty->fetch("string:$templateString");
   }
 }
 

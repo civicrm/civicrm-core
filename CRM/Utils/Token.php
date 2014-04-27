@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
  *
  */
@@ -230,9 +230,7 @@ class CRM_Utils_Token {
   ) {
     $key = 'domain';
     if (
-      !$knownTokens ||
-      !CRM_Utils_Array::value($key, $knownTokens)
-    ) {
+      !$knownTokens || empty($knownTokens[$key])) {
       return $str;
     }
 
@@ -267,7 +265,7 @@ class CRM_Utils_Token {
       $value = NULL;
       /* Construct the address token */
 
-      if (CRM_Utils_Array::value($token, $loc)) {
+      if (!empty($loc[$token])) {
         if ($html) {
           $value = $loc[$token][1]['display'];
           $value = str_replace("\n", '<br />', $value);
@@ -285,7 +283,7 @@ class CRM_Utils_Token {
       /* Construct the phone and email tokens */
 
       $value = NULL;
-      if (CRM_Utils_Array::value($token, $loc)) {
+      if (!empty($loc[$token])) {
         foreach ($loc[$token] as $index => $entity) {
           $value = $entity[$token];
           break;
@@ -434,8 +432,12 @@ class CRM_Utils_Token {
         break;
 
       case 'viewUrl':
+        $mailingKey = $mailing->id;
+        if ($hash = CRM_Mailing_BAO_Mailing::getMailingHash($mailingKey)) {
+          $mailingKey = $hash;
+        }
         $value = CRM_Utils_System::url('civicrm/mailing/view',
-          "reset=1&id={$mailing->id}",
+          "reset=1&id={$mailingKey}",
           TRUE, NULL, FALSE, TRUE
         );
         break;
@@ -456,7 +458,7 @@ class CRM_Utils_Token {
 
       case 'html':
         $page = new CRM_Mailing_Page_View();
-        $value = $page->run($mailing->id, NULL, FALSE);
+        $value = $page->run($mailing->id, NULL, FALSE, TRUE);
         break;
 
       case 'approvalStatus':
@@ -519,7 +521,7 @@ class CRM_Utils_Token {
     // so that we remove anything we do not recognize
     // I hope to move this step out of here soon and
     // then we will just iterate on a list of tokens that are passed to us
-    if (!$knownTokens || !CRM_Utils_Array::value($key, $knownTokens)) {
+    if (!$knownTokens || empty($knownTokens[$key])) {
       return $str;
     }
 
@@ -607,7 +609,7 @@ class CRM_Utils_Token {
     // so that we remove anything we do not recognize
     // I hope to move this step out of here soon and
     // then we will just iterate on a list of tokens that are passed to us
-    if (!$knownTokens || !CRM_Utils_Array::value($key, $knownTokens)) {
+    if (!$knownTokens || empty($knownTokens[$key])) {
       return $str;
     }
 
@@ -643,6 +645,7 @@ class CRM_Utils_Token {
     /* Construct value from $token and $contact */
 
     $value = NULL;
+    $noReplace = FALSE;
 
     // Support legacy tokens
     $token = CRM_Utils_Array::value($token, self::legacyContactTokens(), $token);
@@ -652,7 +655,7 @@ class CRM_Utils_Token {
     // called only when we find a token in the string
 
     if (!in_array($token, self::$_tokens['contact'])) {
-      $value = "{contact.$token}";
+      $noReplace = TRUE;
     }
     elseif ($token == 'checksum') {
       $hash = CRM_Utils_Array::value('hash', $contact);
@@ -686,10 +689,15 @@ class CRM_Utils_Token {
 
     // if null then return actual token
     if ($returnBlankToken && !$value) {
+      $noReplace = TRUE;
+    }
+
+    if ($noReplace) {
       $value = "{contact.$token}";
     }
 
-    if ($escapeSmarty) {
+    if ($escapeSmarty
+        && !($returnBlankToken && $noReplace)) { // $returnBlankToken means the caller wants to do further attempts at processing unreplaced tokens -- so don't escape them yet in this case.
       $value = self::tokenEscapeSmarty($value);
     }
 
@@ -1118,7 +1126,7 @@ class CRM_Utils_Token {
         //special case for greeting replacement
         foreach (array(
           'email_greeting', 'postal_greeting', 'addressee') as $val) {
-          if (CRM_Utils_Array::value($val, $contactDetails[$contactID])) {
+          if (!empty($contactDetails[$contactID][$val])) {
             $contactDetails[$contactID][$val] = $contactDetails[$contactID]["{$val}_display"];
           }
         }
@@ -1208,18 +1216,18 @@ class CRM_Utils_Token {
         CRM_Core_DAO::storeValues($dao, $details[$dao->id]);
 
         // do the necessary transformation
-        if (CRM_Utils_Array::value('payment_instrument_id', $details[$dao->id])) {
+        if (!empty($details[$dao->id]['payment_instrument_id'])) {
           $piId = $details[$dao->id]['payment_instrument_id'];
           $pis = CRM_Contribute_PseudoConstant::paymentInstrument();
           $details[$dao->id]['payment_instrument'] = $pis[$piId];
         }
-        if (CRM_Utils_Array::value('campaign_id', $details[$dao->id])) {
+        if (!empty($details[$dao->id]['campaign_id'])) {
           $campaignId = $details[$dao->id]['campaign_id'];
           $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
           $details[$dao->id]['campaign'] = $campaigns[$campaignId];
         }
 
-        if (CRM_Utils_Array::value('financial_type_id', $details[$dao->id])) {
+        if (!empty($details[$dao->id]['financial_type_id'])) {
           $financialtypeId = $details[$dao->id]['financial_type_id'];
           $ftis = CRM_Contribute_PseudoConstant::financialType();
           $details[$dao->id]['financial_type'] = $ftis[$financialtypeId];
@@ -1245,7 +1253,7 @@ class CRM_Utils_Token {
    *
    * @access public
    */
-  static function replaceGreetingTokens(&$tokenString, $contactDetails = NULL, $contactId = NULL, $className = NULL) {
+  static function replaceGreetingTokens(&$tokenString, $contactDetails = NULL, $contactId = NULL, $className = NULL, $escapeSmarty = FALSE) {
 
     if (!$contactDetails && !$contactId) {
       return;
@@ -1257,7 +1265,7 @@ class CRM_Utils_Token {
     if (!empty($greetingTokens)) {
       // first use the existing contact object for token replacement
       if (!empty($contactDetails)) {
-        $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString, $contactDetails, TRUE, $greetingTokens, TRUE);
+        $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString, $contactDetails, TRUE, $greetingTokens, TRUE, $escapeSmarty);
       }
 
       // check if there are any unevaluated tokens
@@ -1281,7 +1289,9 @@ class CRM_Utils_Token {
         $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString,
           $greetingDetails,
           TRUE,
-          $greetingTokens
+          $greetingTokens,
+          FALSE,
+          $escapeSmarty
         );
       }
     }
@@ -1392,7 +1402,7 @@ class CRM_Utils_Token {
    * @return string string with replacements made
    */
   public static function replaceEntityTokens($entity, $entityArray, $str, $knownTokens = array(), $escapeSmarty = FALSE) {
-    if (!$knownTokens || !CRM_Utils_Array::value($entity, $knownTokens)) {
+    if (!$knownTokens || empty($knownTokens[$entity])) {
       return $str;
     }
 
@@ -1414,7 +1424,7 @@ class CRM_Utils_Token {
     // I hope to move this step out of here soon and
     // then we will just iterate on a list of tokens that are passed to us
     $key = 'contribution';
-    if (!$knownTokens || !CRM_Utils_Array::value($key, $knownTokens)) {
+    if (!$knownTokens || empty($knownTokens[$key])) {
       return $str;
     }
 
@@ -1521,7 +1531,43 @@ class CRM_Utils_Token {
       'individual_prefix' => 'prefix_id',
       'individual_suffix' => 'suffix_id',
       'gender' => 'gender_id',
+      'communication_style' => 'communication_style_id',
     );
+  }
+
+  /**
+   * Formats a token list for the select2 widget
+   * @param $tokens
+   * @return array
+   */
+  static function formatTokensForDisplay($tokens) {
+    $sorted = $output = array();
+
+    // Sort in ascending order by ignoring word case
+    natcasesort($tokens);
+
+    // Attempt to place tokens into optgroups
+    // TODO: These groupings could be better and less hackish. Getting them pre-grouped from upstream would be nice.
+    foreach ($tokens as $k => $v) {
+      // Check to see if this token is already in a group e.g. for custom fields
+      $split = explode(' :: ', $v);
+      if (!empty($split[1])) {
+        $sorted[$split[1]][] = array('id' => $k, 'text' => $split[0]);
+      }
+      // Group by entity
+      else {
+        $split = explode('.', trim($k, '{}'));
+        $entity = isset($split[1]) ? ucfirst($split[0]) : 'Contact';
+        $sorted[ts($entity)][] = array('id' => $k, 'text' => $v);
+      }
+    }
+
+    ksort($sorted);
+    foreach ($sorted as $k => $v) {
+      $output[] = array('text' => $k, 'children' => $v);
+    }
+
+    return $output;
   }
 
 }

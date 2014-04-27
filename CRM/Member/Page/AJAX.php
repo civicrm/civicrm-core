@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -41,7 +41,7 @@ class CRM_Member_Page_AJAX {
   /**
    * Function to setDefaults according to membership type
    */
-  function getMemberTypeDefaults($config) {
+  static function getMemberTypeDefaults() {
     if (!$_POST['mtype']) {
       $details['name'] = '';
       $details['auto_renew'] = '';

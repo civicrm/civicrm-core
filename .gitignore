@@ -20,6 +20,7 @@ CRM/Contact/DAO/RelationshipType.php
 CRM/Contact/DAO/SavedSearch.php
 CRM/Contact/DAO/SubscriptionHistory.php
 CRM/Contribute/DAO
+CRM/Core/DAO/AllCoreTables.php
 CRM/Core/DAO/.listAll.php
 CRM/Core/DAO/listAll.php
 CRM/Core/DAO/ActionLog.php
@@ -27,7 +28,6 @@ CRM/Core/DAO/ActionMapping.php
 CRM/Core/DAO/ActionSchedule.php
 CRM/Core/DAO/Address.php
 CRM/Core/DAO/AddressFormat.php
-CRM/Core/DAO/AllCoreTables.php
 CRM/Core/DAO/Batch.php
 CRM/Core/DAO/Cache.php
 CRM/Core/DAO/Component.php

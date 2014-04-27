@@ -168,8 +168,6 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
           $contribution->invoice_id = $input['invoice'];
           $contribution->total_amount = $dataRoot['order-total']['VALUE'];
           $contribution->contribution_status_id = 2;
-          $contribution->honor_contact_id = $objects['contribution']->honor_contact_id;
-          $contribution->honor_type_id = $objects['contribution']->honor_type_id;
           $contribution->campaign_id = $objects['contribution']->campaign_id;
 
           $objects['contribution'] = $contribution;
@@ -213,10 +211,10 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
              * lets make use of it by passing the eventID/membershipTypeID to next level.
              * And change trxn_id to google-order-number before finishing db update */
 
-      if (CRM_Utils_Array::value('event', $ids)) {
+      if (!empty($ids['event'])) {
         $contribution->trxn_id = $ids['event'] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['participant'];
       }
-      elseif (CRM_Utils_Array::value('membership', $ids)) {
+      elseif (!empty($ids['membership'])) {
         $contribution->trxn_id = $ids['membership'][0] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['related_contact'] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['onbehalf_dupe_alert'];
       }
     }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -554,7 +554,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $name  = $dao->escape(CRM_Utils_Array::value('name', $params));
     $email = $dao->escape(CRM_Utils_Array::value('mail', $params));
 
-    if (CRM_Utils_Array::value('name', $params)) {
+    if (!empty($params['name'])) {
       if (!validate_username($params['name'])) {
         $errors['cms_name'] = ts("Your username contains invalid characters");
       }
@@ -563,7 +563,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       }
     }
 
-    if (CRM_Utils_Array::value('mail', $params)) {
+    if (!empty($params['mail'])) {
       if (!is_email($params['mail'])) {
         $errors[$emailName] = "Your email is invaid";
       }
@@ -590,6 +590,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     return $isloggedIn;
   }
 
+  function getLoggedInUserObject() {
+    if (function_exists('is_user_logged_in') &&
+    is_user_logged_in()) {
+      global $current_user;
+    }
+    return $current_user;
+  }
   /**
    * Get currently logged in user uf id.
    *
@@ -597,13 +604,37 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function getLoggedInUfID() {
     $ufID = NULL;
-    if (function_exists('is_user_logged_in') &&
-      is_user_logged_in()
-    ) {
-      global $current_user;
-      $ufID = $current_user->ID;
-    }
-    return $ufID;
+    $current_user = $this->getLoggedInUserObject();
+    return isset($current_user->ID) ? $current_user->ID : NULL;
+  }
+
+  /**
+   * Get currently logged in user unique identifier - this tends to be the email address or user name.
+   *
+   * @return string $userID logged in user unique identifier
+   */
+  function getLoggedInUniqueIdentifier() {
+    $user = $this->getLoggedInUserObject();
+    return $this->getUniqueIdentifierFromUserObject($user);
+  }
+
+  /**
+   * Get User ID from UserFramework system (Joomla)
+   * @param object $user object as described by the CMS
+   * @return mixed <NULL, number>
+   */
+  function getUserIDFromUserObject($user) {
+    return !empty($user->ID) ? $user->ID : NULL;
+  }
+
+  /**
+   * Get Unique Identifier from UserFramework system (CMS)
+   * @param object $user object as described by the User Framework
+   * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
+   *
+   */
+  function getUniqueIdentifierFromUserObject($user) {
+    return empty($user->user_email) ? NULL : $user->user_email;
   }
 
   /**

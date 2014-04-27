@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,19 +23,19 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="help">
-    {ts}Location types provide convenient labels to differentiate contacts' location(s). Administrators may define as many additional types as appropriate for your constituents (examples might be Main Office, School, Vacation Home...).{/ts}
-</div>
-
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Admin/Form/LocationType.tpl"}
 {else}
+  <div id="help">
+    {ts}Location types provide convenient labels to differentiate contacts' location(s). Administrators may define as many additional types as appropriate for your constituents (examples might be Main Office, School, Vacation Home...).{/ts}
+  </div>
 
 {if $rows}
 <div id="ltype">
     {strip}
   {* handle enable/disable actions*}
-   {include file="CRM/common/enableDisable.tpl"}
+   {include file="CRM/common/enableDisableApi.tpl"}
+   {include file="CRM/common/crmeditable.tpl"}
     {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
     <thead>
@@ -50,7 +50,7 @@
     </tr>
     </thead>
     {foreach from=$rows item=row}
-    <tr id="row_{$row.id}"class="{cycle values="odd-row,even-row"} {$row.class} crm-locationType {if NOT $row.is_active} disabled{/if}">
+    <tr id="location_type-{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-entity {if NOT $row.is_active} disabled{/if}">
         <td class="crm-locationType-name">{$row.name}</td>
         <td class="crm-locationType-display_name">{$row.display_name}</td>
         <td class="crm-locationType-vcard_name">{$row.vcard_name}</td>

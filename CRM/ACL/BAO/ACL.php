@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -538,7 +538,7 @@ SELECT      $acl.*
       $rule->query($query);
 
       while ($rule->fetch()) {
-        $results[$rule->id] = &$rule->toArray();
+        $results[$rule->id] = $rule->toArray();
       }
     }
 
@@ -648,6 +648,7 @@ SELECT $acl.*
     $dao = new CRM_ACL_DAO_ACL();
     $dao->copyValues($params);
     $dao->save();
+    return $dao;
   }
 
   static function retrieve(&$params, &$defaults) {

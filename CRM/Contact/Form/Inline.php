@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -140,14 +140,13 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
   }
 
   /**
-   * Final response from successful form submit
-   *
-   * @param response: array - data to send to the client
+   * Common function for all inline contact edit forms
+   * Prepares ajaxResponse
    *
    * @return void
    * @protected
    */
-  protected function response($response = array()) {
+  protected function response() {
     // Load changelog footer from template
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('contactId', $this->_contactId);
@@ -157,27 +156,16 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
       'contact_view_options', TRUE
     );
     $smarty->assign('changeLog', $viewOptions['log']);
-    $response = array_merge(
+    $this->ajaxResponse = array_merge(
       array(
-        'status' => 'save',
         'changeLog' => array(
          'count' => CRM_Contact_BAO_Contact::getCountComponent('log', $this->_contactId),
          'markup' => $smarty->fetch('CRM/common/contactFooter.tpl'),
         ),
       ),
-      $response,
+      $this->ajaxResponse,
       CRM_Contact_Form_Inline_Lock::getResponse($this->_contactId)
     );
-    $this->postProcessHook();
-    // CRM-11831 @see http://www.malsup.com/jquery/form/#file-upload
-    $xhr = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
-    if (!$xhr) {
-      echo '<textarea>';
-    }
-    echo json_encode($response);
-    if (!$xhr) {
-      echo '</textarea>';
-    }
-    CRM_Utils_System::civiExit();
+    // Note: Post hooks will be called by CRM_Core_Form::mainProcess
   }
 }

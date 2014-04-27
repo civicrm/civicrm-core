@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
 {capture assign=iconURL}<img src="{$config->resourceBase}i/TreePlus.gif" alt="{ts}open section{/ts}"/>{/capture}
 {ts 1=$iconURL}Click %1 to view pledge payments.{/ts}
 {strip}
-<table class="selector">
+<table class="selector row-highlight">
     <thead class="sticky">
         {if ! $single and $context eq 'Search' }
             <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
@@ -107,14 +107,6 @@
 {/strip}
 
 {if $context EQ 'Search'}
-    <script type="text/javascript">
-    {* this function is called to change the color of selected row(s) *}
-    var fname = "{$form.formName}";
-    on_load_init_checkboxes(fname);
- </script>
-{/if}
-
-{if $context EQ 'Search'}
     {include file="CRM/common/pager.tpl" location="bottom"}
 {/if}
 
@@ -131,7 +123,7 @@
                 dataType: "html",
                 timeout : 5000, //Time in milliseconds
                 success : function( data ){
-                            cj( '#paymentDetails' + pledgeId ).html( data );
+                            cj( '#paymentDetails' + pledgeId ).html( data ).trigger('crmLoad');
                           },
                 error   : function( XMLHttpRequest, textStatus, errorThrown ) {
                             console.error( 'Error: '+ textStatus );

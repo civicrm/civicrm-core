@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -91,14 +91,12 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_UFGroup' . '\',\'' . 'enable-disable\',0,\'UFGroup' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable CiviCRM Profile Group'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_UFGroup' . '\',\'' . 'disable-enable\',0,\'UFGroup' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable CiviCRM Profile Group'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -244,8 +242,9 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $profile = str_replace('/wp-admin/admin.php', '/index.php', $profile);
     }
 
-    // add jquery files
-    $profile = CRM_Utils_String::addJqueryFiles($profile);
+    // add header files
+    CRM_Core_Resources::singleton()->addCoreResources('html-header');
+    $profile = CRM_Core_Region::instance('html-header')->render('', FALSE) . $profile;
 
     $this->assign('profile', htmlentities($profile, ENT_NOQUOTES, 'UTF-8'));
     //get the title of uf group
@@ -331,7 +330,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       }
 
       $groupTypes = self::extractGroupTypes($value['group_type']);
-      $groupComponents = array('Contribution', 'Membership', 'Activity', 'Participant');
+      $groupComponents = array('Contribution', 'Membership', 'Activity', 'Participant', 'Case');
 
       // drop Create, Edit and View mode links if profile group_type is Contribution, Membership, Activities or Participant
       $componentFound = array_intersect($groupComponents, array_keys($groupTypes));
@@ -362,7 +361,12 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $ufGroup[$id]['group_type'] = $groupTypesString;
 
       $ufGroup[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
-        array('id' => $id)
+        array('id' => $id),
+        ts('more'),
+        FALSE,
+        'ufGroup.row.actions',
+        'UFGroup',
+        $id
       );
       //get the "Used For" from uf_join
       $ufGroup[$id]['module'] = implode(', ', CRM_Core_BAO_UFGroup::getUFJoinRecord($id, TRUE));
@@ -417,7 +421,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $returnGroupTypes[$type] = $type;
     }
 
-    if (CRM_Utils_Array::value(1, $groupTypeParts)) {
+    if (!empty($groupTypeParts[1])) {
       foreach (explode(',', $groupTypeParts[1]) as $typeValue) {
         $groupTypeValues = $valueLabels = array();
         $valueParts = explode(':', $typeValue);
@@ -451,6 +455,10 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           case 'ActivityType':
             $typeName = 'Activity';
             $valueLabels = CRM_Core_PseudoConstant::ActivityType(TRUE, TRUE, FALSE, 'label', TRUE);
+            break;
+          case 'CaseType':
+            $typeName = 'Case';
+            $valueLabels = CRM_Case_PseudoConstant::caseType();
             break;
         }
 

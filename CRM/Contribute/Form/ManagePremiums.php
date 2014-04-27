@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -44,7 +44,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function preProcess() {
     parent::preProcess();
@@ -56,7 +56,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = parent::setDefaultValues();
@@ -89,7 +89,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -164,12 +164,11 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     $this->add('text', 'fixed_period_start_day', ts('Fixed Period Start Day'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'fixed_period_start_day'));
 
-
-    $this->add('Select', 'duration_unit', ts('Duration Unit'), array('' => '- select period -', 'day' => 'Day', 'week' => 'Week', 'month' => 'Month', 'year' => 'Year'));
+    $this->add('Select', 'duration_unit', ts('Duration Unit'), array('' => '- select period -') + CRM_Core_SelectValues::getPremiumUnits());
 
     $this->add('text', 'duration_interval', ts('Duration'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'duration_interval'));
 
-    $this->add('Select', 'frequency_unit', ts('Frequency Unit'), array('' => '- select period -', 'day' => 'Day', 'week' => 'Week', 'month' => 'Month', 'year' => 'Year'));
+    $this->add('Select', 'frequency_unit', ts('Frequency Unit'), array('' => '- select period -') + CRM_Core_SelectValues::getPremiumUnits());
 
     $this->add('text', 'frequency_interval', ts('Frequency'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'frequency_interval'));
 
@@ -250,7 +249,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       }
     }
     // CRM-13231 financial type required if product has cost
-    if (CRM_Utils_Array::value('cost', $params) && !CRM_Utils_Array::value('financial_type_id', $params)) {
+    if (!empty($params['cost']) && empty($params['financial_type_id'])) {
       $errors['financial_type_id'] = ts('Financial Type is required for product having cost.');
     }
     $fileLocation = $files['uploadFile']['tmp_name'];
@@ -299,7 +298,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
 

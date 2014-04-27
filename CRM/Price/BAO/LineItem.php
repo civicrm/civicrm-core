@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -92,6 +92,16 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     return NULL;
   }
 
+  static function getLineTotal($entityId, $entityTable) {
+    $sqlLineItemTotal = "SELECT SUM(li.line_total)
+FROM civicrm_line_item li
+WHERE li.entity_table = '{$entityTable}'
+AND li.entity_id = {$entityId}
+";
+    $lineItemTotal = CRM_Core_DAO::singleValueQuery($sqlLineItemTotal);
+    return $lineItemTotal;
+  }
+
   /**
    * Given a participant id/contribution id,
    * return contribution/fee line items
@@ -101,7 +111,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    *
    * @return array of line items
    */
-  static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL) {
+  static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL , $isQtyZero = TRUE) {
     $selectClause = $whereClause = $fromClause = NULL;
     $selectClause = "
       SELECT    li.id,
@@ -131,6 +141,11 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       $fromClause .= " LEFT JOIN civicrm_price_set cps on cps.id = pf.price_set_id ";
       $whereClause .= " and cps.is_quick_config = 0";
     }
+
+    if (!$isQtyZero) {
+      $whereClause .= " and li.qty != 0";
+    }
+
     $lineItems = array();
 
     if (!$entityId || !$entity || !$fromClause) {
@@ -288,7 +303,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
         $line['entity_id'] = $entityId;
         // if financial type is not set and if price field value is NOT NULL
         // get financial type id of price field value
-        if (CRM_Utils_Array::value('price_field_value_id', $line) && !CRM_Utils_Array::value('financial_type_id', $line)) {
+        if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
           $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
         }
         $lineItems = CRM_Price_BAO_LineItem::create($line);
@@ -385,7 +400,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
             $setID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $values['price_field_id'], 'price_set_id');
             $params['is_quick_config'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID, 'is_quick_config');
           }
-          if (CRM_Utils_Array::value('is_quick_config', $params) && array_key_exists('total_amount', $params)
+          if (!empty($params['is_quick_config']) && array_key_exists('total_amount', $params)
             && $totalEntityId == 1) {
             $values['line_total'] = $values['unit_price'] = $params['total_amount'];
           }

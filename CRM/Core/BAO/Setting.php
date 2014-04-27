@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -509,7 +509,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       list($name) = array_keys($settingParams);
       $getFieldsParams['name'] = $name;
     }
-    $fields = civicrm_api('setting','getfields', $getFieldsParams);
+    $fields = civicrm_api3('setting','getfields', $getFieldsParams);
     $invalidParams = (array_diff_key($settingParams, $fields['values']));
     if (!empty($invalidParams)) {
       throw new api_Exception(implode(',', $invalidParams) . " not valid settings");
@@ -855,7 +855,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
       $cbValues = array();
       foreach ($groupValues as $key => $val) {
-        if (CRM_Utils_Array::value($val, $value)) {
+        if (!empty($value[$val])) {
           $cbValues[$key] = 1;
         }
       }
@@ -1012,7 +1012,7 @@ AND domain_id = %3
         }
       }
       // CRM-10931, If DB doesn't have any value, carry on with any default value thats already available
-      if (!isset($value) && CRM_Utils_Array::value($dao->name, $params)) {
+      if (!isset($value) && !empty($params[$dao->name])) {
         $value = $params[$dao->name];
       }
       $params[$dao->name] = $value;

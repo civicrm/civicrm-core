@@ -74,6 +74,10 @@ table.form-layout td, table.form-layout th {
    border-top       : 2px groove #DCDCDC;
 }
 
+#crm-container table.report-layout tr.crm-report-sectionHeader.page-break {
+  page-break-before: always;
+}
+
 #crm-container .report-label {
     text-align       : right;
     font-weight      : bold;

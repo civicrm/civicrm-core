@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,7 +38,7 @@
  * for other useful tips and suggestions
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -234,8 +234,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
         // also used for the various tabs via TabHeader
         $this->_print = CRM_Core_Smarty::PRINT_NOFORM;
       }
-      elseif ($snippet == 6) {
-        $this->_print = CRM_Core_Smarty::PRINT_NOFORM;
+      // Respond with JSON if in AJAX context (also support legacy value '6')
+      elseif (in_array($snippet, array(CRM_Core_Smarty::PRINT_JSON, 6))) {
+        $this->_print = CRM_Core_Smarty::PRINT_JSON;
         $this->_QFResponseType = 'json';
       }
       else {
@@ -244,7 +245,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     }
 
    // if the request has a reset value, initialize the controller session
-    if (CRM_Utils_Array::value('reset', $_GET)) {
+    if (!empty($_GET['reset'])) {
       $this->reset();
 
       // in this case we'll also cache the url as a hidden form variable, this allows us to
@@ -433,7 +434,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       $title     = CRM_Utils_Array::value('title', $value);
       $options   = CRM_Utils_Array::value('options', $value);
       $stateName = CRM_Utils_String::getClassName($className);
-      if (CRM_Utils_Array::value('className', $value)) {
+      if (!empty($value['className'])) {
         $formName = $name;
       }
       else {
@@ -453,6 +454,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       }
       if ($options) {
         $$stateName->setOptions($options);
+      }
+      if (property_exists($$stateName, 'urlPath') && isset($_GET[CRM_Core_Config::singleton()->userFrameworkURLVar])) {
+        $$stateName->urlPath = explode('/', $_GET[CRM_Core_Config::singleton()->userFrameworkURLVar]);
       }
       $this->addPage($$stateName);
       $this->addAction($stateName, new HTML_QuickForm_Action_Direct());

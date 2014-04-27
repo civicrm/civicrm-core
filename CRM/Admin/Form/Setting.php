@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -48,7 +48,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if (!$this->_defaults) {
@@ -116,7 +116,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -171,7 +171,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -183,7 +183,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   public function commonProcess(&$params) {
 
     // save autocomplete search options
-    if (CRM_Utils_Array::value('autocompleteContactSearch', $params)) {
+    if (!empty($params['autocompleteContactSearch'])) {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
         array_keys($params['autocompleteContactSearch'])
       ) . CRM_Core_DAO::VALUE_SEPARATOR;
@@ -197,7 +197,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     }
 
     // save autocomplete contact reference options
-    if (CRM_Utils_Array::value('autocompleteContactReference', $params)) {
+    if (!empty($params['autocompleteContactReference'])) {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
         array_keys($params['autocompleteContactReference'])
       ) . CRM_Core_DAO::VALUE_SEPARATOR;
@@ -221,7 +221,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     }
 
     // save checksum timeout
-    if (CRM_Utils_Array::value('checksumTimeout', $params)) {
+    if (!empty($params['checksumTimeout'])) {
       CRM_Core_BAO_Setting::setItem($params['checksumTimeout'],
         CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'checksum_timeout'
@@ -229,7 +229,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     }
 
     // update time for date formats when global time is changed
-    if (CRM_Utils_Array::value('timeInputFormat', $params)) {
+    if (!empty($params['timeInputFormat'])) {
       $query = "
 UPDATE civicrm_preferences_date
 SET    time_format = %1

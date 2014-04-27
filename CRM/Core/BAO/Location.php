@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -106,8 +106,8 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
 
     foreach (array(
       'phone', 'email', 'im', 'address') as $loc) {
-      $locBlock["{$loc}_id"] = CRM_Utils_Array::value(0, $location["$loc"]) ? $location["$loc"][0]->id : NULL;
-      $locBlock["{$loc}_2_id"] = CRM_Utils_Array::value(1, $location["$loc"]) ? $location["$loc"][1]->id : NULL;
+      $locBlock["{$loc}_id"] = !empty($location["$loc"][0]) ? $location["$loc"][0]->id : NULL;
+      $locBlock["{$loc}_2_id"] = !empty($location["$loc"][1]) ? $location["$loc"][1]->id : NULL;
     }
 
     $countNull = 0;

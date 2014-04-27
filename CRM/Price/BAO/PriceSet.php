@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -649,7 +649,7 @@ WHERE  id = %1";
       $autoRenew[0] = $autoRenew[1] = $autoRenew[2] = 0;
     }
     foreach ($fields as $id => $field) {
-      if (!CRM_Utils_Array::value("price_{$id}", $params) ||
+      if (empty($params["price_{$id}"]) ||
         (empty($params["price_{$id}"]) && $params["price_{$id}"] == NULL)
       ) {
         // skip if nothing was submitted for this field
@@ -783,7 +783,7 @@ WHERE  id = %1";
   /**
    * Function to build the price set form.
    *
-   * @return None
+   * @return void
    * @access public
    */
   static function buildPriceSet(&$form) {
@@ -802,6 +802,7 @@ WHERE  id = %1";
 
     $priceSet           = self::getSetDetail($priceSetId, TRUE, $validFieldsOnly);
     $form->_priceSet    = CRM_Utils_Array::value($priceSetId, $priceSet);
+    $validPriceFieldIds = array_keys($form->_priceSet['fields']);
     $form->_quickConfig = $quickConfig = 0;
     if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config')) {
       $quickConfig = 1;
@@ -831,7 +832,7 @@ WHERE  id = %1";
     // call the hook.
     CRM_Utils_Hook::buildAmount($component, $form, $feeBlock);
 
-    foreach ($feeBlock as $field) {
+    foreach ($feeBlock as $id => $field) {
       if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
         !$validFieldsOnly
       ) {
@@ -842,7 +843,7 @@ WHERE  id = %1";
             $form->assign('ispricelifetime', TRUE);
           }
         }
-        if (!is_array($options)) {
+        if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
           continue;
         }
         CRM_Price_BAO_PriceField::addQuickFormElement($form,
@@ -868,12 +869,12 @@ WHERE  id = %1";
     static $_contact_memberships = array();
     $checklifetime = FALSE;
     foreach ($options as $key => $value) {
-      if (CRM_Utils_Array::value('membership_type_id', $value)) {
+      if (!empty($value['membership_type_id'])) {
         if (!isset($_contact_memberships[$userid][$value['membership_type_id']])) {
           $_contact_memberships[$userid][$value['membership_type_id']] = CRM_Member_BAO_Membership::getContactMembership($userid, $value['membership_type_id'], FALSE);
         }
         $currentMembership = $_contact_memberships[$userid][$value['membership_type_id']];
-        if (!empty($currentMembership) && !CRM_Utils_Array::value('end_date', $currentMembership)) {
+        if (!empty($currentMembership) && empty($currentMembership['end_date'])) {
           unset($options[$key]);
           $checklifetime = TRUE;
         }

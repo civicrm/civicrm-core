@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Membership
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: MembershipContact.php 30171 2010-10-14 09:11:27Z mover $
  */
 
@@ -112,11 +112,11 @@ function civicrm_api3_membership_create($params) {
   $action = CRM_Core_Action::ADD;
   // we need user id during add mode
     $ids = array ();
-    if(CRM_Utils_Array::value('contact_id', $params)) {
+    if (!empty($params['contact_id'])) {
       $ids['userId'] = $params['contact_id'];
     }
   //for edit membership id should be present
-  if (CRM_Utils_Array::value('id', $params)) {
+  if (!empty($params['id'])) {
     $ids['membership'] = $params['id'];
     $action = CRM_Core_Action::UPDATE;
   }
@@ -192,15 +192,15 @@ function civicrm_api3_membership_get($params) {
     unset($params['filters']['is_current']);
   }
   $activeOnly = CRM_Utils_Array::value('active_only', $params, $activeOnly);
-  if($activeOnly && empty($params['status_id'])) {
+  if ($activeOnly && empty($params['status_id'])) {
     $params['status_id'] = array('IN' => CRM_Member_BAO_MembershipStatus::getMembershipStatusCurrent());
   }
+
   $options = _civicrm_api3_get_options_from_params($params, TRUE,'membership', 'get');
-  if($options['is_count']) {
+  if ($options['is_count']) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
   $membershipValues = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
-
 
   $return = $options['return'];
   if(empty($membershipValues) ||
@@ -224,6 +224,9 @@ function civicrm_api3_membership_get($params) {
  * as stable as possible
  *
  * @param array $params parameters passed into get function
+ * @param $membershipTypeId
+ * @param $activeOnly
+ *
  * @return array result for calling function
  */
 function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTypeId, $activeOnly) {
@@ -240,9 +243,13 @@ function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTyp
 
 /**
  * non-standard behaviour inherited from v2
-* @param array $params parameters passed into get function
-* @return array result for calling function
-*/
+ *
+ * @param array $params parameters passed into get function
+ * @param $membershipValues
+ * @param $contactID
+ *
+ * @return array result for calling function
+ */
 function _civicrm_api3_membership_relationsship_get_customv2behaviour(&$params, $membershipValues, $contactID) {
   $relationships = array();
   foreach ($membershipValues as $membershipId => $values) {
@@ -251,7 +258,7 @@ function _civicrm_api3_membership_relationsship_get_customv2behaviour(&$params, 
 
     $membershipValues[$membershipId]['membership_name'] = $membershipType['name'];
 
-    if (CRM_Utils_Array::value('relationship_type_id', $membershipType)) {
+    if (!empty($membershipType['relationship_type_id'])) {
       $relationships[$membershipType['relationship_type_id']] = $membershipId;
     }
 

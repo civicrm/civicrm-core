@@ -12,13 +12,23 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
    * in fixing the existing pdfLetter classes to be suitably generic
    * @access public
    *
-   * @return None
+   * @return void
    */
-  static function postProcess(&$form, $membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {
+  static function postProcessMembers(&$form, $membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {
 
-    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);
+    list($formValues, $categories, $html_message, $messageToken, $returnProperties) =
+      self::processMessageTemplate($form);
 
-    $html = self::generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories);
+    $html =
+      self::generateHTML(
+        $membershipIDs,
+        $returnProperties,
+        $skipOnHold,
+        $skipDeceased,
+        $messageToken,
+        $html_message,
+        $categories
+      );
     self::createActivities($form, $html_message, $contactIDs);
 
     CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);

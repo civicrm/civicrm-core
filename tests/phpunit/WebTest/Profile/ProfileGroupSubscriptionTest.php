@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,6 +44,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     //Name of profile
     $profileTitle = 'profile_' . substr(sha1(rand()), 0, 7);
     $this->type('title', $profileTitle);
+    $this->click('uf_group_type_Profile');
 
     //Drupal user account registration option
     $this->click('CIVICRM_QFID_0_8');
@@ -113,14 +114,12 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
 
     $this->click('_qf_Edit_next');
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // assert for subscription message
-    $this->assertElementContainsText('css=div.messages', "Your subscription request has been submitted for",
-      "Subscription message is not shown");
 
+    $this->isTextPresent("Your subscription request has been submitted for");
     //check if profile is saved
-    $this->assertElementContainsText('css=span.msg-text', 'Your information has been saved.', 'Profile is not saved');
+    $this->waitForText('crm-notification-container','Your information has been saved.');
 
     // delete the profile
     $this->openCiviPage('admin/uf/group', 'reset=1');

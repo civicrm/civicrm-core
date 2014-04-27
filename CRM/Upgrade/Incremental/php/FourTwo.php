@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -379,7 +379,7 @@ WHERE  name LIKE '%.amount.%' ";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $addTo = explode('.', $dao->name);
-      if (CRM_Utils_Array::value(2, $addTo)) {
+      if (!empty($addTo[2])) {
         $options = array ('optionGroup' => $dao->name);
         self::createPriceSet($daoName, $addTo, $options);
       }
@@ -438,12 +438,12 @@ WHERE     cpse.price_set_id IS NULL";
     }
 
     $optionValue = array();
-    if (CRM_Utils_Array::value('optionGroup', $options)) {
+    if (!empty($options['optionGroup'])) {
       CRM_Core_OptionGroup::getAssoc($options['optionGroup'], $optionValue);
       if (empty($optionValue))
         return;
     }
-    elseif (!CRM_Utils_Array::value('otherAmount', $options) && !CRM_Utils_Array::value('membership', $options)) {
+    elseif (empty($options['otherAmount']) && empty($options['membership'])) {
       //CRM-12273
       //if options group, otherAmount, membersip is empty then return, contribution should be default price set
       return;
@@ -462,7 +462,7 @@ WHERE     cpse.price_set_id IS NULL";
     CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set::addTo($addTo[0], $addTo[2], $priceSet->id, 1);
 
     $fieldParams['price_set_id'] = $priceSet->id;
-    if (CRM_Utils_Array::value('optionGroup', $options)) {
+    if (!empty($options['optionGroup'])) {
       $fieldParams['html_type'] = 'Radio';
       $fieldParams['is_required'] = 1;
       if ($addTo[0] == 'civicrm_event') {
@@ -478,7 +478,7 @@ WHERE     cpse.price_set_id IS NULL";
         $fieldParams['label'] = "Contribution Amount";
         $defaultAmountColumn = 'default_amount_id';
         $options['otherAmount'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $addTo[2], 'is_allow_other_amount');
-        if (CRM_Utils_Array::value('otherAmount', $options)) {
+        if (!empty($options['otherAmount'])) {
           $fieldParams['is_required'] = 0;
         }
       }
@@ -492,7 +492,7 @@ WHERE     cpse.price_set_id IS NULL";
       $priceField = CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field::create($fieldParams);
 
     }
-    if (CRM_Utils_Array::value('membership', $options)) {
+    if (!empty($options['membership'])) {
       $dao               = new CRM_Member_DAO_MembershipBlock();
       $dao->entity_table = 'civicrm_contribution_page';
       $dao->entity_id    = $addTo[2];
@@ -533,7 +533,7 @@ WHERE     cpse.price_set_id IS NULL";
         }
       }
     }
-    if (CRM_Utils_Array::value('otherAmount', $options)) {
+    if (!empty($options['otherAmount'])) {
 
       $fieldParams = array(
         'name'               => strtolower(CRM_Utils_String::munge("Other Amount", '_', 245)),

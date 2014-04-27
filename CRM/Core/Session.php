@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -183,7 +183,7 @@ class CRM_Core_Session {
       return;
     }
 
-    if (!CRM_Utils_Array::value($prefix, $this->_session[$this->_key])) {
+    if (empty($this->_session[$this->_key][$prefix])) {
       $this->_session[$this->_key][$prefix] = array();
     }
   }
@@ -513,7 +513,7 @@ class CRM_Core_Session {
         'text' => $text,
         'title' => $title,
         'type' => $type,
-        'options' => $options ? json_encode($options) : NULL,
+        'options' => $options ? $options : NULL,
       );
     }
   }

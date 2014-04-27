@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -70,7 +70,7 @@ class CRM_Member_Form_Task_Delete extends CRM_Member_Form_Task {
    * @return void
    */
   function buildQuickForm() {
-    $this->addDefaultButtons(ts('Delete Members'), 'done');
+    $this->addDefaultButtons(ts('Delete Memberships'), 'done');
   }
 
   /**
@@ -78,7 +78,7 @@ class CRM_Member_Form_Task_Delete extends CRM_Member_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $deletedMembers = 0;
@@ -88,7 +88,7 @@ class CRM_Member_Form_Task_Delete extends CRM_Member_Form_Task {
       }
     }
 
-    CRM_Core_Session::setStatus($deletedMembers, ts('Deleted Member(s)'), 'success');
+    CRM_Core_Session::setStatus($deletedMembers, ts('Deleted Membership(s)'), 'success');
     CRM_Core_Session::setStatus(ts('Total Selected Membership(s): %1', array(1 => count($this->_memberIds))), '', 'info');
   }
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -172,7 +172,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
 
     // add group id to params if a uf group belong to a any group
     if ($groupId) {
-      if (CRM_Utils_Array::value('group', $this->_params)) {
+      if (!empty($this->_params['group'])) {
         $this->_params['group'][$groupId] = 1;
       }
       else {
@@ -318,7 +318,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
           continue;
         }
 
-        if (CRM_Utils_Array::value('in_selector', $field) &&
+        if (!empty($field['in_selector']) &&
           !in_array($name, $skipFields)
         ) {
 
@@ -509,7 +509,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         continue;
       }
 
-      if (CRM_Utils_Array::value('in_selector', $field) &&
+      if (!empty($field['in_selector']) &&
         !in_array($key, $skipFields)
       ) {
         if (strpos($key, '-') !== FALSE) {
@@ -694,7 +694,12 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
 
       $row[] = CRM_Core_Action::formLink($newLinks,
         $mask,
-        $params
+        $params,
+        ts('more'),
+        FALSE,
+        'profile.selector.row',
+        'Contact',
+        $result->contact_id
       );
 
       if (!$empty) {
@@ -749,7 +754,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
             }
           }
 
-          if (CRM_Utils_Array::value('in_selector', $properties)) {
+          if (!empty($properties['in_selector'])) {
             $selectorSet = TRUE;
           }
         }

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -281,9 +281,7 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if (isset($field['clause'])) {
               $select[] = $field['clause'];
 
@@ -299,7 +297,7 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
             $select[] = "{$field['dbAlias']} as {$field['alias']}_{$field['name']}";
             $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['type'] = CRM_Utils_Array::value('type', $field);
             $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['title'] = CRM_Utils_Array::value('title', $field);
-            if (CRM_Utils_Array::value('no_display', $field)) {
+            if (!empty($field['no_display'])) {
               $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['no_display'] = TRUE;
             }
           }
@@ -316,7 +314,7 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $field) {
-            if (CRM_Utils_Array::value($fieldName, $this->_params['group_bys'])) {
+            if (!empty($this->_params['group_bys'][$fieldName])) {
               if ($tableCol) {
                 return array($tableName, $field['alias'], $field['name']);
               }
@@ -398,11 +396,11 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
 
     if (!$this->_amountClauseWithAND) {
       $amountClauseWithAND = array();
-      if (CRM_Utils_Array::value('total_amount1', $clauses)) {
+      if (!empty($clauses['total_amount1'])) {
         $amountClauseWithAND[] = str_replace("{$this->_aliases['civicrm_contribution']}.total_amount",
           "{$this->_aliases['civicrm_contribution']}1.total_amount_sum", $clauses['total_amount1']);
       }
-      if (CRM_Utils_Array::value('total_amount2', $clauses)) {
+      if (!empty($clauses['total_amount2'])) {
         $amountClauseWithAND[] = str_replace("{$this->_aliases['civicrm_contribution']}.total_amount",
           "{$this->_aliases['civicrm_contribution']}2.total_amount_sum", $clauses['total_amount2']);
       }
@@ -527,7 +525,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
       }
     }
 
-    if (!empty($fields['gid_value']) && CRM_Utils_Array::value('group_bys', $fields)) {
+    if (!empty($fields['gid_value']) && !empty($fields['group_bys'])) {
       if (!array_key_exists('id', $fields['group_bys'])) {
         $errors['gid_value'] = ts("Filter with Group only allow with group by Contact");
       }

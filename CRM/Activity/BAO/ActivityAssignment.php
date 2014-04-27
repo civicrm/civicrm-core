@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -105,7 +105,7 @@ AND        civicrm_contact.is_deleted = 0
   /**
    * Retrieve assignee names by activity_id
    *
-   * @param int      $id             ID of the activity
+   * @param array    $activityIDs    IDs of the activities
    * @param boolean  $isDisplayName  if set returns display names of assignees
    * @param boolean  $skipDetails    if false returns all details of assignee contact.
    *
@@ -114,9 +114,9 @@ AND        civicrm_contact.is_deleted = 0
    * @access public
    *
    */
-  static function getAssigneeNames($activityID, $isDisplayName = FALSE, $skipDetails = TRUE) {
+  static function getAssigneeNames($activityIDs, $isDisplayName = FALSE, $skipDetails = TRUE) {
     $assigneeNames = array();
-    if (empty($activityID)) {
+    if (empty($activityIDs)) {
       return $assigneeNames;
     }
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
@@ -126,20 +126,21 @@ AND        civicrm_contact.is_deleted = 0
     if (!$skipDetails) {
       $whereClause = "  AND ce.is_primary= 1";
     }
+    $inClause = implode(",", $activityIDs);
 
     $query = "
-SELECT     contact_a.id, contact_a.sort_name, contact_a.display_name, ce.email
+SELECT     contact_a.id, contact_a.sort_name, contact_a.display_name, ce.email,
+           civicrm_activity_contact.activity_id
 FROM       civicrm_contact contact_a
 INNER JOIN civicrm_activity_contact ON civicrm_activity_contact.contact_id = contact_a.id
 LEFT JOIN  civicrm_email ce ON ce.contact_id = contact_a.id
-WHERE      civicrm_activity_contact.activity_id = %1
+WHERE      civicrm_activity_contact.activity_id IN ( $inClause )
 AND        contact_a.is_deleted = 0
 AND        civicrm_activity_contact.record_type_id = $assigneeID
            {$whereClause}
 ";
 
-    $queryParam = array(1 => array($activityID, 'Integer'));
-    $dao = CRM_Core_DAO::executeQuery($query, $queryParam);
+    $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       if (!$isDisplayName) {
         $assigneeNames[$dao->id] = $dao->sort_name;
@@ -154,6 +155,7 @@ AND        civicrm_activity_contact.record_type_id = $assigneeID
           $assigneeNames[$dao->id]['sort_name'] = $dao->sort_name;
           $assigneeNames[$dao->id]['email'] = $dao->email;
           $assigneeNames[$dao->id]['role'] = ts('Activity Assignee');
+          $assigneeNames[$dao->id]['activity_id'] = $dao->activity_id;
         }
       }
     }

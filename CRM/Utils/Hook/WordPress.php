@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,17 +28,17 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
   function invoke($numParams,
-    &$arg1, &$arg2, &$arg3, &$arg4, &$arg5,
+    &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix
   ) {
     return $this->commonInvoke($numParams,
-      $arg1, $arg2, $arg3, $arg4, $arg5,
+      $arg1, $arg2, $arg3, $arg4, $arg5, $arg6,
       $fnSuffix, 'wordpress'
     );
   }

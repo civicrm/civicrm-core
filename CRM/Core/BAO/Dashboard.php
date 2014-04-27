@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -124,7 +124,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
     $allDashlets = CRM_Utils_Array::index(array('name'), $getDashlets['values']);
     $defaultDashlets = array();
-    if (!$hasDashlets && CRM_Utils_Array::value('blog', $allDashlets)) {
+    if (!$hasDashlets && !empty($allDashlets['blog'])) {
       $defaultDashlets['blog'] = array(
         'dashboard_id' => $allDashlets['blog']['id'],
         'is_active' => 1,
@@ -374,7 +374,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     // special case to handle duplicate entires for report instances
     $dashboardID = CRM_Utils_Array::value('id', $params);
 
-    if (CRM_Utils_Array::value('instanceURL', $params)) {
+    if (!empty($params['instanceURL'])) {
       $query = "SELECT id
                         FROM `civicrm_dashboard`
                         WHERE url LIKE '" . CRM_Utils_Array::value('instanceURL', $params) . "&%'";
@@ -385,7 +385,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
     if (!$dashboardID) {
       // check url is same as exiting entries, if yes just update existing
-      if (CRM_Utils_Array::value('name', $params)) {
+      if (!empty($params['name'])) {
         $dashlet->name = CRM_Utils_Array::value('name', $params);
         $dashlet->find(TRUE);
       }

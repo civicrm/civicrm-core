@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -52,15 +52,15 @@
     }
   </style>
   <script type="text/javascript">
-    cj(function () {
+  CRM.$(function($) {
     cj("#navigation-tree").jstree({
     plugins : [ "themes", "json_data", "dnd","ui", "crrm","contextmenu" ],
     json_data  : {
       ajax:{
         dataType : "json",
-        async : true,
         url : {/literal}"{crmURL p='civicrm/ajax/menu' h=0 q='key='}{crmKey name='civicrm/ajax/menu'}"{literal}
-      }
+      },
+      progressive_render: true
     },
     themes: {
       "theme": 'classic',
@@ -91,14 +91,17 @@
       items: {
         create : false,
           ccp : {
-            label   : "Edit",
+            label   : "{/literal}{ts escape='js'}Edit{/ts}{literal}",
             visible : function (node, obj) { if(node.length != 1) return false;
               return obj.check("renameable", node); },
             action  : function (node, obj) {
               var nid = cj(node).prop('id');
               var nodeID = nid.substr( 5 );
               var editURL = {/literal}"{crmURL p='civicrm/admin/menu' h=0 q='action=update&reset=1&id='}"{literal} + nodeID;
-              location.href =  editURL;
+              CRM.loadForm(editURL).on('crmFormSuccess', function() {
+                cj("#navigation-tree").jstree('refresh');
+                cj("#reset-menu").show( );
+              });
             },
             submenu : false
           }
@@ -153,6 +156,12 @@
           });
       });
     });
+    $('#new-menu-item a.button')
+      .on('click', CRM.popup)
+      .on('crmPopupFormSuccess', function() {
+          $("#navigation-tree").jstree('refresh');
+          $("#reset-menu").show();
+      });
   });
 </script>
 {/literal}

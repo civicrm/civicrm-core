@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,10 +25,10 @@
 *}
 {literal}
 <script type="text/javascript">
-cj( function( ) {
+CRM.$(function($) {
 // for date sorting see http://wiki.civicrm.org/confluence/display/CRMDOC/Sorting+Date+Fields+in+dataTables+Widget
 var useAjax = {/literal}{if $useAjax}1{else}0{/if}{literal};
-
+var sortEnabled = true;
 var sourceUrl = '';
 var useClass  = 'display';
 
@@ -76,6 +76,7 @@ eval('tableId =[' + tableId + ']');
                     sortColumn += '[' + count + ', "asc" ],';
                 }
                 sortId   = getRowId(tdObject, cj(this).attr('id') +' hiddenElement' );
+                sortEnabled = false;
                 columns += '{ "sType": \'' + stype + '\', "fnRender": function (oObj) { return oObj.aData[' + sortId + ']; },"bUseRendered": false},';
             break;
             case 'nosort':
@@ -160,6 +161,7 @@ eval('tableId =[' + tableId + ']');
                 "asStripClasses" : [ "odd-row", "even-row" ],
                 "bAutoWidth"   : false,
                 "aoColumns"   : columns,
+                "bSort" : sortEnabled,
             "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
                          "sZeroRecords" : noRecordFoundMsg }
               });

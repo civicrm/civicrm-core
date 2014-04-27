@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -81,7 +81,8 @@
     <tr class="columnheader">
         <th>{ts}Pledger{/ts}</th>
         <th>{ts}Amount{/ts}</th>
-  <th>{ts}Financial Type{/ts}</th>
+        <th>{ts}Type{/ts}</th>
+        <th>{ts}Financial Type{/ts}</th>
         <th>{ts}Create date{/ts}</th>
         <th>{ts}Acknowledgment Sent{/ts}</th>
    <th>{ts}Acknowledgment Date{/ts}</th>
@@ -92,6 +93,7 @@
      <tr id='rowid{$row.honorId}' class="{cycle values="odd-row,even-row"}">
      <td class="crm-pledge-display_name"><a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$row.honorId`"}" id="view_contact">{$row.display_name}</a></td>
      <td class="crm-pledge-amount">{$row.amount|crmMoney:$row.pledge_currency}</td>
+     <td class="crm-pledge-honor-type">{$row.honor_type}</td>
            <td class="crm-pledge-type">{$row.type}</td>
            <td class="crm-pledge-create_date">{$row.create_date|truncate:10:''|crmDate}</td>
            <td align="center">{if $row.acknowledge_date}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}</td>
@@ -119,7 +121,7 @@ function buildPaymentDetails( pledgeId, contactId )
                dataType: "html",
                timeout : 5000, //Time in milliseconds
                success : function( data ){
-                              cj( '#paymentDetails' + pledgeId ).html( data );
+                              cj( '#paymentDetails' + pledgeId ).html( data ).trigger('crmLoad');
                          },
                error   : function( XMLHttpRequest, textStatus, errorThrown ) {
                                  console.error( 'Error: '+ textStatus );

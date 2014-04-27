@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -371,7 +371,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       $row['campaign'] = CRM_Utils_Array::value($result->member_campaign_id, $allCampaigns);
       $row['campaign_id'] = $result->member_campaign_id;
 
-      if (CRM_Utils_Array::value('member_is_test', $row)) {
+      if (!empty($row['member_is_test'])) {
         $row['membership_type'] = $row['membership_type'] . " (test)";
       }
 
@@ -397,7 +397,12 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
             'id' => $result->membership_id,
             'cid' => $result->contact_id,
             'cxt' => $this->_context,
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'membership.selector.row',
+          'Membership',
+          $result->membership_id
         );
       }
       else {
@@ -406,7 +411,12 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
             'id' => $result->membership_id,
             'cid' => $result->contact_id,
             'cxt' => $this->_context,
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'membership.selector.row',
+          'Membership',
+          $result->membership_id
         );
       }
 

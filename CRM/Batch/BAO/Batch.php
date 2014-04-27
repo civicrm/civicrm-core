@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -60,13 +60,13 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @access public
    */
   static function create(&$params, $ids = NULL, $context = NULL) {
-    if (!CRM_Utils_Array::value('id', $params)) {
+    if (empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
 
     $batch = new CRM_Batch_DAO_Batch();
     $batch->copyValues($params);
-    if ($context == 'financialBatch' && CRM_Utils_Array::value('batchID', $ids)) {
+    if ($context == 'financialBatch' && !empty($ids['batchID'])) {
       $batch->id = $ids['batchID'];
     }
     $batch->save();
@@ -220,7 +220,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       $batch['total'] = $batch['item_count'] = '';
       $batch['payment_instrument'] = $value['payment_instrument'];
       $batch['item_count'] = CRM_Utils_Array::value('item_count', $value);
-      if (CRM_Utils_Array::value('total', $value)) {
+      if (!empty($value['total'])) {
         $batch['total'] = CRM_Utils_Money::format($value['total']);
       }
 
@@ -266,7 +266,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     {$limit}";
 
     $object = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Batch_DAO_Batch');
-    if (CRM_Utils_Array::value('context', $params)) {
+    if (!empty($params['context'])) {
       $links = self::links($params['context']);
     }
     else {
@@ -308,7 +308,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
             CRM_Utils_Array::remove($newLinks, 'close', 'edit', 'reopen', 'export');
         }
       }
-      if (CRM_Utils_Array::value('type_id', $values)) {
+      if (!empty($values['type_id'])) {
         $values['batch_type'] = $batchTypes[$values['type_id']];
       }
       $values['batch_status'] = $batchStatus[$values['status_id']];
@@ -328,7 +328,12 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       $values['action'] = CRM_Core_Action::formLink(
         $newLinks,
         $action,
-        $tokens
+        $tokens,
+        ts('more'),
+        FALSE,
+        'batch.selector.row',
+        'Batch',
+        $object->id
       );
       $results[$object->id] = $values;
     }

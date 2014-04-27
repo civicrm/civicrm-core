@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -159,7 +159,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
       foreach ($this->_fields as $name => $field) {
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
           $customValue = CRM_Utils_Array::value($customFieldID, $customFields);
-          if (CRM_Utils_Array::value('extends_entity_column_value', $customValue)) {
+          if (!empty($customValue['extends_entity_column_value'])) {
             $entityColumnValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
               $customValue['extends_entity_column_value']
             );
@@ -194,7 +194,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if (empty($this->_fields)) {
@@ -215,7 +215,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -228,11 +228,11 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
       $customFields = array();
       foreach ($params['field'] as $key => $value) {
         $ids['membership'] = $key;
-        if (CRM_Utils_Array::value('membership_source', $value)) {
+        if (!empty($value['membership_source'])) {
           $value['source'] = $value['membership_source'];
         }
 
-        if (CRM_Utils_Array::value('membership_type', $value)) {
+        if (!empty($value['membership_type'])) {
           $membershipTypeId = $value['membership_type_id'] = $value['membership_type'][1];
         }
 
@@ -248,7 +248,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
           }
         }
         if (empty($customFields)) {
-          if (!CRM_Utils_Array::value('membership_type_id', $value)) {
+          if (empty($value['membership_type_id'])) {
             $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $key, 'membership_type_id');
           }
 
@@ -272,7 +272,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
         $membership = CRM_Member_BAO_Membership::add($value, $ids);
 
         // add custom field values
-        if (CRM_Utils_Array::value('custom', $value) &&
+        if (!empty($value['custom']) &&
           is_array($value['custom'])
         ) {
           CRM_Core_BAO_CustomValueTable::store($value['custom'], 'civicrm_membership', $membership->id);

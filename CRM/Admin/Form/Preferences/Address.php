@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -132,7 +132,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -151,17 +151,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
 
     //get the tokens for Mailing Label field
     $tokens = CRM_Core_SelectValues::contactTokens();
-    natcasesort($tokens);
-    $this->assign('tokens', json_encode($tokens));
-
-    $this->add('select', 'token1', ts('Insert Token'),
-      $tokens, FALSE,
-      array(
-        'size' => "5",
-        'multiple' => TRUE,
-        'onclick' => "return tokenReplText(this);",
-      )
-    );
+    $this->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
     parent::buildQuickForm();
   }
@@ -193,7 +183,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     if ($this->_action == CRM_Core_Action::VIEW) {

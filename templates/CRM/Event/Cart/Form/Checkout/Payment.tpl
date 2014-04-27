@@ -134,7 +134,6 @@
 <div class="crm-section {$form.payment_type.name}-section">
   <div class="label">{$form.payment_type.label}</div>
   <div class="content">{$form.payment_type.html}
-    <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('payment_type', '{$form.formName}'); return false;">{ts}clear{/ts}</a>)</span>
   </div>
   <div class="clear"></div>
 </div>
@@ -158,12 +157,12 @@ var pay_later_sel = "input#{$form.is_pay_later.name}";
 {literal}
 cj("document").ready(function() {
   function refresh() {
-    var is_pay_later = cj(pay_later_sel).attr("checked");
+    var is_pay_later = cj(pay_later_sel).prop("checked");
     cj(".credit_card_info-group").toggle(!is_pay_later);
     cj(".pay-later-instructions").toggle(is_pay_later);
     cj("div.billingNameInfo-section .description").html(is_pay_later ? "Enter the billing address at which you can be invoiced." : "Enter the name as shown on your credit or debit card, and the billing address for this card.");
   }
-  cj("input#source").attr('disabled', 'disabled');
+  cj("input#source").prop('disabled', true);
 
   cj(pay_later_sel).change(function() {
     refresh();

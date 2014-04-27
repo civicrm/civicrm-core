@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,84 +29,10 @@
 /**
  *
  * @package CiviCRM_Hook
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
  *
  */
-class CRM_Utils_Hook_Drupal extends CRM_Utils_Hook {
-
-  /**
-   * @var bool
-   */
-  private $isBuilt = FALSE;
-
-  /**
-   * @var array(string)
-   */
-  private $allModules = NULL;
-
-  /**
-   * @var array(string)
-   */
-  private $civiModules = NULL;
-
-  /**
-   * @var array(string)
-   */
-  private $drupalModules = NULL;
-
-  function invoke($numParams,
-                  &$arg1, &$arg2, &$arg3, &$arg4, &$arg5,
-                  $fnSuffix
-  ) {
-
-    $this->buildModuleList();
-
-    return $this->runHooks($this->allModules, $fnSuffix,
-      $numParams, $arg1, $arg2, $arg3, $arg4, $arg5
-    );
-  }
-
-  /**
-   * Build the list of modules to be processed for hooks.
-   */
-  function buildModuleList() {
-    if ($this->isBuilt === FALSE) {
-      if ($this->drupalModules === NULL) {
-        if (function_exists('module_list')) {
-          // copied from user_module_invoke
-          $this->drupalModules = module_list();
-        }
-      }
-
-      if ($this->civiModules === NULL) {
-        $this->civiModules = array();
-        $this->requireCiviModules($this->civiModules);
-      }
-
-      // we should add civicrm's module's just after main civicrm drupal module
-      // Note: Assume that drupalModules and civiModules may each be array() or NULL
-      if ($this->drupalModules !== NULL) {
-        foreach ($this->drupalModules as $moduleName) {
-          $this->allModules[$moduleName] = $moduleName;
-          if ($moduleName == 'civicrm') {
-            if (!empty($this->civiModules)) {
-              foreach ($this->civiModules as $civiModuleName) {
-                $this->allModules[$civiModuleName] = $civiModuleName;
-              }
-            }
-          }
-        }
-      }
-      else {
-        $this->allModules = (array) $this->civiModules;
-      }
-
-      if ($this->drupalModules !== NULL && $this->civiModules !== NULL) {
-        // both CRM and CMS have bootstrapped, so this is the final list
-        $this->isBuilt = TRUE;
-      }
-    }
-  }
+class CRM_Utils_Hook_Drupal extends CRM_Utils_Hook_DrupalBase {
 
 }

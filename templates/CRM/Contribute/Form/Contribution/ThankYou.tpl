@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -173,7 +173,19 @@
     </div>
     {/if}
 
-    {include file="CRM/Contribute/Form/Contribution/Honor.tpl"}
+    {if $honor_block_is_active}
+        <div class="crm-group honor_block-group">
+            <div class="header-dark">
+                {$soft_credit_type}
+            </div>
+            <div class="display-block">
+                <div class="label-left crm-section honoree_profile-section">
+                    <strong>{$honorName}</strong></br>
+                    {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields prefix='honor'}
+                </div>
+            </div>
+         </div>
+    {/if}
 
     {if $customPre}
       <fieldset class="label-left crm-profile-view">

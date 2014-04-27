@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -72,7 +72,7 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Pledge', $this, $params['id']);
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree);
 
-    if (CRM_Utils_Array::value('contribution_page_id', $values)) {
+    if (!empty($values['contribution_page_id'])) {
       $values['contribution_page'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $values['contribution_page_id'], 'title');
     }
 
@@ -134,7 +134,7 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

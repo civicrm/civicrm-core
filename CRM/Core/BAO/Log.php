@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -86,6 +86,14 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
     if (!$userID) {
       $session = CRM_Core_Session::singleton();
       $userID = $session->get('userID');
+    }
+
+    if (!$userID) {
+      $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
+
+      if ($api_key && strtolower($api_key) != 'null') {
+        $userID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
+      }
     }
 
     if (!$userID) {
@@ -168,8 +176,8 @@ UPDATE civicrm_log
       CRM_Report_BAO_ReportInstance::retrieve($params, $instance);
 
       if (!empty($instance) &&
-        (!CRM_Utils_Array::value('permission', $instance) ||
-          (CRM_Utils_Array::value('permission', $instance) && CRM_Core_Permission::check($instance['permission']))
+        (empty($instance['permission']) ||
+          (!empty($instance['permission']) && CRM_Core_Permission::check($instance['permission']))
         )
       ) {
         return $instance['id'];

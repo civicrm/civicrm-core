@@ -32,7 +32,6 @@
  *
  */
 
-
 /**
  * @access public
  */
@@ -66,9 +65,9 @@ function civicrm_api3_message_template_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
-
 function _civicrm_api3_message_template_get_spec(&$params) {
 }
+
 /**
  * Retrieve one or more message_template
  *
@@ -87,3 +86,29 @@ function civicrm_api3_message_template_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * Sends a template.
+ */
+function civicrm_api3_message_template_send($params) {
+  CRM_Core_BAO_MessageTemplates::sendTemplate($params);
+}
+
+/**
+ * Adjust Metadata for Create action
+ *
+ * The metadata is used for setting defaults, documentation &
+ * validation.
+ *
+ * @param array $params array or parameters determined by getfields
+ */
+function _civicrm_api3_message_template_send_spec(&$params) {
+  $required = array(
+    'messageTemplateID',
+    'contactId',
+    'toEmail',
+    'toName',
+  );
+  foreach ($required as $value) {
+    $params[$value]['api.required'] = 1;
+  }
+}

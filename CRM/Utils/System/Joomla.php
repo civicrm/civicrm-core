@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -647,6 +647,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     jimport('joomla.application.cli');
+    
+    // CRM-14281 Joomla wasn't available during bootstrap, so hook_civicrm_config never executes.
+    $config = CRM_Core_Config::singleton();
+    CRM_Utils_Hook::config($config);
 
     return TRUE;
   }
@@ -669,6 +673,34 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function getLoggedInUfID() {
     $user = JFactory::getUser();
     return ($user->guest) ? NULL : $user->id;
+  }
+
+  /**
+   * Get currently logged in user unique identifier - this tends to be the email address or user name.
+   *
+   * @return string $userID logged in user unique identifier
+   */
+  function getLoggedInUniqueIdentifier() {
+    $user = JFactory::getUser();
+    return $this->getUniqueIdentifierFromUserObject($user);
+  }
+  /**
+   * Get User ID from UserFramework system (Joomla)
+   * @param object $user object as described by the CMS
+   * @return mixed <NULL, number>
+   */
+  function getUserIDFromUserObject($user) {
+    return !empty($user->id) ? $user->id : NULL;
+  }
+
+  /**
+   * Get Unique Identifier from UserFramework system (CMS)
+   * @param object $user object as described by the User Framework
+   * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
+   *
+   */
+  function getUniqueIdentifierFromUserObject($user) {
+    return ($user->guest) ? NULL : $user->email;
   }
 
   /**

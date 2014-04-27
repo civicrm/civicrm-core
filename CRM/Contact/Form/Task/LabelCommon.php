@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -48,7 +48,7 @@ class CRM_Contact_Form_Task_LabelCommon {
   function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
     foreach (array_merge($mailingFormatProperties, array_fill_keys($tokenFields, 1)) as $key => $dontCare) {
       //we should not consider addressee for data exists, CRM-6025
-       if ($key != 'addressee' && CRM_Utils_Array::value($key, $contact)) {
+       if ($key != 'addressee' && !empty($contact[$key])) {
         return TRUE;
       }
     }
@@ -114,7 +114,7 @@ class CRM_Contact_Form_Task_LabelCommon {
     if (stristr($mailingFormat, 'custom_')) {
       foreach ($mailingFormatProperties as $token => $true) {
         if (substr($token, 0, 7) == 'custom_') {
-          if (!CRM_Utils_Array::value($token, $customFormatProperties)) {
+          if (empty($customFormatProperties[$token])) {
             $customFormatProperties[$token] = $mailingFormatProperties[$token];
           }
         }
@@ -138,7 +138,7 @@ class CRM_Contact_Form_Task_LabelCommon {
     }
 
     // fix for CRM-2651
-    if (CRM_Utils_Array::value('do_not_mail', $respectDoNotMail)) {
+    if (!empty($respectDoNotMail['do_not_mail'])) {
       $params[] = array('do_not_mail', '=', 0, 0, 0);
     }
     // fix for CRM-2613
@@ -188,7 +188,7 @@ class CRM_Contact_Form_Task_LabelCommon {
       // we need to remove all the "_id"
       unset($contact['contact_id']);
 
-      if ($locName && CRM_Utils_Array::value($locName, $contact)) {
+      if ($locName && !empty($contact[$locName])) {
         // If location type is not primary, $contact contains
         // one more array as "$contact[$locName] = array( values... )"
 
@@ -198,7 +198,7 @@ class CRM_Contact_Form_Task_LabelCommon {
 
         unset($contact[$locName]);
 
-        if (CRM_Utils_Array::value('county_id', $contact)) {
+        if (!empty($contact['county_id'])) {
           unset($contact['county_id']);
         }
 
@@ -234,10 +234,10 @@ class CRM_Contact_Form_Task_LabelCommon {
           continue;
         }
 
-        if (CRM_Utils_Array::value('addressee_display', $contact)) {
+        if (!empty($contact['addressee_display'])) {
           $contact['addressee_display'] = trim($contact['addressee_display']);
         }
-        if (CRM_Utils_Array::value('addressee', $contact)) {
+        if (!empty($contact['addressee'])) {
           $contact['addressee'] = $contact['addressee_display'];
         }
 

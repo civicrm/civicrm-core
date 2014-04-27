@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -495,15 +495,11 @@ WHERE  gcc.group_id = {$ssGroup->id}
      */
 
     /*
-         * check the situation and set booleans
-         */
-
+     * check the situation and set booleans
+     */
     $Ig = ($iGroups != 0);
-
     $It = ($iTags != 0);
-
     $Xg = ($xGroups != 0);
-
     $Xt = ($xTags != 0);
 
     //PICK UP FROM HERE
@@ -512,8 +508,8 @@ WHERE  gcc.group_id = {$ssGroup->id}
     }
 
     /*
-         * Set from statement depending on array sel
-         */
+     * Set from statement depending on array sel
+     */
     $whereitems = array();
     foreach (array('Ig', 'It') as $inc) {
       if ($this->_andOr == 1) {

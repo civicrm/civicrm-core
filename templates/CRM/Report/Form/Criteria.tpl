@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -99,6 +99,7 @@
         <th> Column</th>
         <th> Order</th>
         <th> Section Header / Group By</th>
+        <th> Page Break</th>
         </tr>
 
   {section name=rowLoop start=1 loop=6}
@@ -112,6 +113,7 @@
         <td> {$form.order_bys.$index.column.html}</td>
         <td> {$form.order_bys.$index.order.html}</td>
         <td> {$form.order_bys.$index.section.html}</td>
+        <td> {$form.order_bys.$index.pageBreak.html}</td>
   </tr>
         {/section}
         </table>
@@ -132,13 +134,25 @@
 
             // hide and display the appropriate blocks as directed by the php code
             on_load_init_blocks( showRows, hideBlocks, '' );
+            
+            cj('input[id^="order_by_section_"]').click(disPageBreak).each(disPageBreak);
+            
+            function disPageBreak() {
+              if (!cj(this).prop('checked')) {
+                cj(this).parent('td').next('td').children('input[id^="order_by_pagebreak_"]').prop({checked: false, disabled: true});
+              }
+              else {
+                cj(this).parent('td').next('td').children('input[id^="order_by_pagebreak_"]').prop({disabled: false});
+              }
+            }
 
             function hideRow(i) {
                 showHideRow(i);
                 // clear values on hidden field, so they're not saved
                 cj('select#order_by_column_'+ i).val('');
                 cj('select#order_by_order_'+ i).val('ASC');
-                cj('input#order_by_section_'+ i).attr('checked', false);
+                cj('input#order_by_section_'+ i).prop('checked', false);
+                cj('input#order_by_pagebreak_'+ i).prop('checked', false);
             }
 
             {/literal}

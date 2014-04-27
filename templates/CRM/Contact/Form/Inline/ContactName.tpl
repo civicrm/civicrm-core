@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,18 +36,30 @@
         {$form.prefix_id.html}
       </div>
     {/if}
-    <div class="crm-inline-edit-field">
-      {$form.first_name.label}<br /> 
-      {$form.first_name.html}
-    </div>
-    <div class="crm-inline-edit-field">
-      {$form.middle_name.label}<br />
-      {$form.middle_name.html}
-    </div>
-    <div class="crm-inline-edit-field">
-      {$form.last_name.label}<br />
-      {$form.last_name.html}
-    </div>
+    {if $form.formal_title}
+      <div class="crm-inline-edit-field">
+        {$form.formal_title.label}<br/>
+        {$form.formal_title.html}
+      </div>
+    {/if}
+    {if $form.first_name}
+      <div class="crm-inline-edit-field">
+        {$form.first_name.label}<br /> 
+        {$form.first_name.html}
+      </div>
+    {/if}
+    {if $form.middle_name}
+      <div class="crm-inline-edit-field">
+        {$form.middle_name.label}<br />
+        {$form.middle_name.html}
+      </div>
+    {/if}
+    {if $form.last_name}
+      <div class="crm-inline-edit-field">
+        {$form.last_name.label}<br />
+        {$form.last_name.html}
+      </div>
+    {/if}
     {if $form.suffix_id}
       <div class="crm-inline-edit-field">
         {$form.suffix_id.label}<br/>

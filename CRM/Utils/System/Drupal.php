@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -51,7 +51,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    */
   function createUser(&$params, $mail) {
     $form_state = form_state_defaults();
-    
+
     $form_state['input'] = array(
       'name' => $params['cms_name'],
       'mail' => $params[$mail],
@@ -136,7 +136,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       unset($_SESSION['messages']);
     }
 
-    if (CRM_Utils_Array::value('name', $params)) {
+    if (!empty($params['name'])) {
       if ($nameError = user_validate_name($params['name'])) {
         $errors['cms_name'] = $nameError;
       }
@@ -151,7 +151,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       }
     }
 
-    if (CRM_Utils_Array::value('mail', $params)) {
+    if (!empty($params['mail'])) {
       if ($emailError = user_validate_mail($params['mail'])) {
         $errors[$emailName] = $emailError;
       }
@@ -581,10 +581,6 @@ AND    u.status = 1
     drupal_set_message($message);
   }
 
-  function permissionDenied() {
-    drupal_access_denied();
-  }
-
   function logout() {
     module_load_include('inc', 'user', 'user.pages');
     return user_logout();
@@ -867,7 +863,8 @@ AND    u.status = 1
         if ($urlType == LOCALE_LANGUAGE_NEGOTIATION_URL_DOMAIN) {
           if (isset($language->domain) && $language->domain) {
             if ($addLanguagePart) {
-              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $language->domain . base_path();
+              $cleanedUrl = preg_replace('#^https?://#', '', $language->domain);
+              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $cleanedUrl . base_path();
             }
             if ($removeLanguagePart && defined('CIVICRM_UF_BASEURL')) {
               $url = str_replace('\\', '/', $url);
@@ -964,30 +961,20 @@ AND    u.status = 1
   }
 
   /**
-   * Get timezone from Drupal
-   * @return boolean|string
+   * Over-ridable function to get timezone as a string eg.
+   * @return string Timezone e.g. 'America/Los_Angeles'
    */
-  function getTimeZoneOffset(){
+  function getTimeZoneString() {
     global $user;
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
       $timezone = $user->timezone;
     } else {
       $timezone = variable_get('date_default_timezone', null);
     }
-    $tzObj = new DateTimeZone($timezone);
-    $dateTime = new DateTime("now", $tzObj);
-    $tz = $tzObj->getOffset($dateTime);
-
-    if(empty($tz)){
-      return false;
+    if (!$timezone) {
+      $timezone = parent::getTimeZoneString();
     }
-
-    $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz/60)%60));
-
-    if($timeZoneOffset > 0){
-      $timeZoneOffset = '+' . $timeZoneOffset;
-    }
-    return $timeZoneOffset;
+    return $timezone;
   }
   /**
    * Reset any system caches that may be required for proper CiviCRM

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -162,12 +162,12 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
       foreach ($this->_fields as $name => $field) {
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
           $customValue = CRM_Utils_Array::value($customFieldID, $customFields);
-          if (CRM_Utils_Array::value('extends_entity_column_value', $customValue)) {
+          if (!empty($customValue['extends_entity_column_value'])) {
             $entityColumnValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
               $customValue['extends_entity_column_value']
             );
           }
-          if (CRM_Utils_Array::value($typeId, $entityColumnValue) ||
+          if (!empty($entityColumnValue[$typeId]) ||
             CRM_Utils_System::isNull($entityColumnValue[$typeId])
           ) {
             CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $activityId);
@@ -197,7 +197,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if (empty($this->_fields)) {
@@ -218,7 +218,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -236,23 +236,23 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
           $value['activity_date_time'] = CRM_Utils_Date::processDate($value['activity_date_time'], $value['activity_date_time_time']);
         }
 
-        if (CRM_Utils_Array::value('activity_status_id', $value)) {
+        if (!empty($value['activity_status_id'])) {
           $value['status_id'] = $value['activity_status_id'];
         }
 
-        if (CRM_Utils_Array::value('activity_details', $value)) {
+        if (!empty($value['activity_details'])) {
           $value['details'] = $value['activity_details'];
         }
 
-        if (CRM_Utils_Array::value('activity_duration', $value)) {
+        if (!empty($value['activity_duration'])) {
           $value['duration'] = $value['activity_duration'];
         }
 
-        if (CRM_Utils_Array::value('activity_location', $value)) {
+        if (!empty($value['activity_location'])) {
           $value['location'] = $value['activity_location'];
         }
 
-        if (CRM_Utils_Array::value('activity_subject', $value)) {
+        if (!empty($value['activity_subject'])) {
           $value['subject'] = $value['activity_subject'];
         }
 
@@ -280,7 +280,7 @@ WHERE  a.id = %1 ";
         $activityId = civicrm_api('activity', 'update', $value);
 
         // add custom field values
-        if (CRM_Utils_Array::value('custom', $value) &&
+        if (!empty($value['custom']) &&
           is_array($value['custom'])
         ) {
           CRM_Core_BAO_CustomValueTable::store($value['custom'], 'civicrm_activity', $activityId['id']);

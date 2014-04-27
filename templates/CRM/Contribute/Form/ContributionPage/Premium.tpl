@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -140,8 +140,7 @@
 
 <script type="text/javascript">
   {literal}
-  cj(function () {
-    cj().crmAccordions();
+  CRM.$(function($) {
 
     // bind click event to premiums_active checkbox
     cj('#premiums_active').click(function () {

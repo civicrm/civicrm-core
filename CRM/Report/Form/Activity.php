@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -577,14 +577,12 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy}";
   }
 
   function postProcess() {
-    $this->buildACLClause(array('civicrm_contact_source', 'civicrm_contact_target', 'civicrm_contact_assignee'));
     $this->beginPostProcess();
 
     //Assign those recordtype to array which have filter operator as 'Is not empty' or 'Is empty'
     $nullFilters = array();
     foreach (array('target', 'source', 'assignee') as $type) {
-      if (CRM_Utils_Array::value("contact_{$type}_op", $this->_params) == 'nnll' ||
-        CRM_Utils_Array::value("contact_{$type}_value", $this->_params)) {
+      if (CRM_Utils_Array::value("contact_{$type}_op", $this->_params) == 'nnll' || !empty($this->_params["contact_{$type}_value"])) {
         $nullFilters[] = " civicrm_contact_contact_{$type} IS NOT NULL ";
       }
       else if (CRM_Utils_Array::value("contact_{$type}_op", $this->_params) == 'nll') {
@@ -593,6 +591,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy}";
     }
 
       // 1. fill temp table with target results
+    $this->buildACLClause(array('civicrm_contact_target'));
     $this->select('target');
     $this->from('target');
     $this->customDataFrom();
@@ -615,6 +614,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy}";
     CRM_Core_DAO::executeQuery($tempQuery);
 
     // 3. fill temp table with assignee results
+    $this->buildACLClause(array('civicrm_contact_assignee'));
     $this->select('assignee');
     $this->from('assignee');
     $this->customDataFrom();
@@ -626,6 +626,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy}";
     CRM_Core_DAO::executeQuery($tempQuery);
 
     // 4. fill temp table with source results
+    $this->buildACLClause(array('civicrm_contact_source'));
     $this->select('source');
     $this->from('source');
     $this->customDataFrom();
@@ -785,7 +786,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
           $fullDetails = $rows[$rowNum]['civicrm_activity_details'];
           $rows[$rowNum]['civicrm_activity_details'] = substr($fullDetails, 0, strrpos(substr($fullDetails, 0, 80), ' '));
           if ($actUrl) {
-            $rows[$rowNum]['civicrm_activity_details'] .= " <a href='{$actUrl}' title='{$onHoverAct}'>(more)</a>"; 
+            $rows[$rowNum]['civicrm_activity_details'] .= " <a href='{$actUrl}' title='{$onHoverAct}'>(more)</a>";
           }
           $entryFound = TRUE;
         }
