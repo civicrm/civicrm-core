@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   public $_permission = NULL;
   public $_contactId = NULL;

@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   function run($caseType, &$params) {
     $xml = $this->retrieve($caseType);

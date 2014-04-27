@@ -25,13 +25,6 @@
   +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**

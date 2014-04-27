@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   CONST
     NUM_ROWS_TO_INSERT = 100;

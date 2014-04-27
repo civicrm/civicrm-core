@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Utils_Cache_APCcache {
   const DEFAULT_TIMEOUT = 3600;
   const DEFAULT_PREFIX  = '';

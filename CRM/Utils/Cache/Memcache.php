@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Utils_Cache_Memcache {
   const DEFAULT_HOST    = 'localhost';
   const DEFAULT_PORT    = 11211;

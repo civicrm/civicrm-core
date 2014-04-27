@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Upgrade_Incremental_php_FourOne {
   // This was changed in 4.3 so we define it locally for compatability with older dbs
   const NAVIGATION_NAME = "Navigation Menu";

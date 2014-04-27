@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 
 require_once 'Mail.php';
 class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {

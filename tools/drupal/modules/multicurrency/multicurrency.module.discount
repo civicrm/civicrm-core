@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2009
- * $Id$
- *
- */
 
 define( 'MULTICURRENCY_EVENT_ID', 4  );
 define( 'DISCOUNT_EVENT_ID',      4  );

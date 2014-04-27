@@ -25,13 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 
 require_once 'CRM/Contact/Form/Search/Interface.php';
 class org_civicrm_search_activityimplementsCRM_Contact_Form_Search_Interface {

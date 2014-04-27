@@ -25,13 +25,6 @@ s | under the terms of the GNU Affero General Public License           |
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 
 /**
  * Files required

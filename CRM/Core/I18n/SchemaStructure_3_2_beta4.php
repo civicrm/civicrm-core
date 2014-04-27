@@ -25,13 +25,6 @@
 +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Core_I18n_SchemaStructure_3_2_beta4 {
   static function &columns() {
     static $result = NULL;

@@ -26,13 +26,6 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
 class CRM_Report_Form_Contact_LoggingDetail extends CRM_Logging_ReportDetail {
   function __construct() {
     $logging        = new CRM_Logging_Schema;
