@@ -800,6 +800,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         //@todo id & entity_id are correct but we should fix currency & frequency_day
         continue;
       }
+      $this->assertArrayHasKey('type', $specs, "the _spec function for $entityName field $field does not specify the type");
       switch ($specs['type']) {
         case CRM_Utils_Type::T_DATE:
         case CRM_Utils_Type::T_TIMESTAMP:
