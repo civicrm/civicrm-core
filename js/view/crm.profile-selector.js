@@ -57,6 +57,7 @@
       this.selectRegion.show(view);
       this.setUfGroupId(this.options.ufGroupId, {silent: true});
       this.toggleButtons();
+      this.$('.crm-profile-selector-select select').css('width', '25em').crmSelect2();
     },
     onChangeUfGroupId: function(event) {
       this.options.ufGroupId = $(event.target).val();
@@ -72,10 +73,7 @@
     },
     setUfGroupId: function(value, options) {
       this.options.ufGroupId = value;
-      this.$('.crm-profile-selector-select select').val(value);
-      if (!options || !options.silent) {
-        this.$('.crm-profile-selector-select select').change();
-      }
+      this.$('.crm-profile-selector-select select').select2('val', value, (!options || !options.silent));
     },
     getUfGroupId: function() {
       return this.options.ufGroupId;

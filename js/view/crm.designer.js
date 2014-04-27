@@ -208,7 +208,7 @@
       }
     },
     doSave: function(e) {
-      e.preentDefault();
+      e.preventDefault();
       var ufGroupModel = this.model;
       if (ufGroupModel.getRel('ufFieldCollection').hasDuplicates()) {
         CRM.alert(ts('Please correct errors before saving.'), '', 'alert');
