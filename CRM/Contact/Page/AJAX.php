@@ -102,14 +102,14 @@ class CRM_Contact_Page_AJAX {
     // check that this is a valid, active custom field of Contact Reference type
     $params           = array('id' => $cfID);
     $returnProperties = array('filter', 'data_type', 'is_active');
-    $fldValues        = array();
+    $fldValues = $cf = array();
     CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $cf, $returnProperties);
     if (!$cf['id'] || !$cf['is_active'] || $cf['data_type'] = !'ContactReference') {
       echo "$name|error\n";
       CRM_Utils_System::civiExit();
     }
 
-    if ($cf['filter']) {
+    if (!empty($cf['filter'])) {
       $filterParams = array();
       parse_str($cf['filter'], $filterParams);
 
