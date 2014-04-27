@@ -63,7 +63,7 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  static function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
       self::$_links = array(
