@@ -73,7 +73,9 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
       $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements();
       $this->add('select', 'contact_type',
         ts('is...'),
-        $contactTypes
+        $contactTypes,
+        FALSE,
+        array('class' => 'crm-select2')
       );
     }
 
@@ -83,15 +85,14 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
       // add select for groups
       $group = array('' => ts('- any group -')) + $groupHierarchy;
-      $this->_groupElement = &$this->addElement('select', 'group', ts('in'), $group);
+      $this->add('select', 'group', ts('in'), $group, FALSE, array('class' => 'crm-select2'));
     }
 
     if (!empty($searchOptions['tags'])) {
       // tag criteria
       if (!empty($this->_tag)) {
-        $tag = array(
-          '' => ts('- any tag -')) + $this->_tag;
-        $this->_tagElement = &$this->addElement('select', 'tag', ts('with'), $tag);
+        $tag = array('' => ts('- any tag -')) + $this->_tag;
+        $this->add('select', 'tag', ts('with'), $tag, FALSE, array('class' => 'crm-select2'));
       }
     }
 
