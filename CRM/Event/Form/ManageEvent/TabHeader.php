@@ -50,6 +50,15 @@ class CRM_Event_Form_ManageEvent_TabHeader {
       ->addSetting(array('tabSettings' => array(
         'active' => self::getCurrentTab($tabs),
       )));
+
+    // Preload libraries required by Online Registration Include Profiles
+    $schemas = array('IndividualModel', 'ParticipantModel');
+    if (in_array('CiviMember', CRM_Core_Config::singleton()->enableComponents)) {
+      $schemas[] = 'MembershipModel';
+    }
+    CRM_UF_Page_ProfileEditor::registerProfileScripts();
+    CRM_UF_Page_ProfileEditor::registerSchemas($schemas);
+
     return $tabs;
   }
 
