@@ -1574,12 +1574,9 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
 function  _civicrm_api3_resolve_contactID($contactIdExpr) {
   //if value = 'user_contact_id' replace value with logged in user id
   if ($contactIdExpr == "user_contact_id") {
-    $session = &CRM_Core_Session::singleton();
-    if (!is_numeric($session->get('userID'))) {
-      return NULL;
-    }
-    return $session->get('userID');
-  } elseif (preg_match('/^@user:(.*)$/', $contactIdExpr, $matches)) {
+    return CRM_Core_Session::getLoggedInContactID();
+  }
+  elseif (preg_match('/^@user:(.*)$/', $contactIdExpr, $matches)) {
     $config = CRM_Core_Config::singleton();
 
     $ufID = $config->userSystem->getUfId($matches[1]);
