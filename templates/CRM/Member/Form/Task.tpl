@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{ts 1=$totalSelectedMembers}Number of selected members: %1{/ts}
+{ts 1=$totalSelectedMembers}Number of selected memberships: %1{/ts}
 
 {if $rows } 
 <div class="form-item">
