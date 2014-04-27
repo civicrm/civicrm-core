@@ -252,10 +252,13 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
-   * @param array   $params      (reference ) an assoc array of name/value pairs
-   * @param boolean $fixAddress  if we need to fix address
+   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param boolean $fixAddress if we need to fix address
    * @param boolean $invokeHooks if we need to invoke hooks
    *
+   * @param bool $skipDelete
+   *
+   * @throws Exception
    * @return object CRM_Contact_BAO_Contact object
    * @access public
    * @static
@@ -449,6 +452,8 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * Get the display name and image of a contact
    *
    * @param int $id the contactId
+   *
+   * @param bool $type
    *
    * @return array the displayName and contactImage for this contact
    * @access public
