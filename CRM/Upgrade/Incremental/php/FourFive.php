@@ -44,8 +44,11 @@ class CRM_Upgrade_Incremental_php_FourFive {
    * Note: This function is called iteratively for each upcoming
    * revision to the database.
    *
-   * @param $postUpgradeMessage string, alterable
+   * @param $preUpgradeMessage
    * @param $rev string, a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'
+   * @param null $currentVer
+   *
+   * @internal param string $postUpgradeMessage , alterable
    * @return void
    */
   function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
@@ -77,6 +80,8 @@ class CRM_Upgrade_Incremental_php_FourFive {
   /**
    * Add defaults for the newly introduced name fields configuration in 'contact_edit_options' setting
    *
+   * @param CRM_Queue_TaskContext $ctx
+   *
    * @return bool TRUE for success
    */
   static function addNameFieldOptions(CRM_Queue_TaskContext $ctx) {
@@ -105,7 +110,7 @@ class CRM_Upgrade_Incremental_php_FourFive {
   }
 
   /**
-   * Syntatic sugar for adding a task which (a) is in this class and (b) has
+   * Syntactic sugar for adding a task which (a) is in this class and (b) has
    * a high priority.
    *
    * After passing the $funcName, you can also pass parameters that will go to
