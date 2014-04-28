@@ -43,7 +43,7 @@ class CRM_Financial_Page_AJAX {
    * $financialAccountType array with key account relationship and value financial account type option groups
    *
    */
-  function jqFinancial($config) {
+  static function jqFinancial($config) {
     if (!isset($_GET['_value']) ||
       empty($_GET['_value'])) {
       CRM_Utils_System::civiExit();
@@ -91,7 +91,7 @@ class CRM_Financial_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 
-  function jqFinancialRelation($config) {
+  static function jqFinancialRelation($config) {
     if (!isset($_GET['_value']) ||
       empty($_GET['_value'])) {
       CRM_Utils_System::civiExit();
@@ -148,7 +148,7 @@ class CRM_Financial_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 
-  function jqFinancialType($config) {
+  static function jqFinancialType($config) {
     if (! isset($_GET['_value']) ||
       empty($_GET['_value'])) {
       CRM_Utils_System::civiExit();
