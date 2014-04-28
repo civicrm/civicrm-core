@@ -100,9 +100,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
      * & giving it a change to act on the params array
      */
     $newParams = $params;
-    if (!empty($params['is_recur']) &&
-      $params['contributionRecurID']
-    ) {
+    if (!empty($params['is_recur']) && !empty($params['contributionRecurID'])) {
       CRM_Utils_Hook::alterPaymentProcessorParams($this,
         $params,
         $newParams
@@ -112,9 +110,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       $this->_setParam($field, $value);
     }
 
-    if (!empty($params['is_recur']) &&
-      $params['contributionRecurID']
-    ) {
+    if (!empty($params['is_recur']) && !empty($params['contributionRecurID'])) {
       $result = $this->doRecurPayment();
       if (is_a($result, 'CRM_Core_Error')) {
         return $result;

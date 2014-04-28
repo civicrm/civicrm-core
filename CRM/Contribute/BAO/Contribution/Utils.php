@@ -209,6 +209,19 @@ class CRM_Contribute_BAO_Contribution_Utils {
         // When we get a callback from the payment processor
 
         $paymentParams['contactID'] = $contactID;
+
+        // Fix for CRM-14354. If the membership is recurring, don't create a
+        // civicrm_contribution_recur record for the additional contribution
+        // (i.e., the amount NOT associated with the membership). Temporarily
+        // cache the is_recur values so we can process the additional gift as a
+        // one-off payment.
+        if ($form->_membershipBlock['is_separate_payment']) {
+          $cachedFormValue = CRM_Utils_Array::value('is_recur', $form->_values);
+          unset($form->_values['is_recur']);
+          $cachedParamValue = CRM_Utils_Array::value('is_recur', $paymentParams);
+          unset($paymentParams['is_recur']);
+        }
+
         $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution(
           $form,
           $paymentParams,
@@ -217,6 +230,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
           $contributionType,
           TRUE, TRUE, TRUE
         );
+
+        // restore cached values (part of fix for CRM-14354)
+        if ($form->_membershipBlock['is_separate_payment']) {
+          $form->_values['is_recur'] = $cachedFormValue;
+          $paymentParams['is_recur'] = $cachedParamValue;
+        }
 
         $paymentParams['contributionID'] = $contribution->id;
         $paymentParams['contributionTypeID'] = $contribution->financial_type_id;

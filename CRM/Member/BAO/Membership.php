@@ -1291,19 +1291,15 @@ AND civicrm_membership.is_test = %2";
       $invoiceID = md5(uniqid(rand(), TRUE));
       $tempParams['invoiceID'] = $invoiceID;
 
-      //we don't allow recurring membership.CRM-3781.
-      if (!empty($tempParams['is_recur'])) {
-        $tempParams['is_recur'] = 0;
-      }
       $result = NULL;
       if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
         $payment = CRM_Core_Payment::singleton($form->_mode, $form->_paymentProcessor, $form);
 
         if ($form->_contributeMode == 'express') {
-          $result = &$payment->doExpressCheckout($tempParams);
+          $result = $payment->doExpressCheckout($tempParams);
         }
         else {
-          $result = &$payment->doDirectPayment($tempParams);
+          $result = $payment->doDirectPayment($tempParams);
         }
       }
 
@@ -1367,6 +1363,9 @@ AND civicrm_membership.is_test = %2";
             $customFieldsFormatted, CRM_Utils_Array::value($memType, $typesTerms, 1)
           );
 
+          // update recurring id for membership record
+          self::updateRecurMembership($membership, $contribution[$index]);
+
           $createdMemberships[$memType] = $membership;
           if (isset($contribution[$index])) {
             //insert payment record
@@ -1405,6 +1404,10 @@ AND civicrm_membership.is_test = %2";
           CRM_Utils_Array::value('cms_contactID', $membershipParams),
           $customFieldsFormatted, CRM_Utils_Array::value('types_terms', $membershipParams, 1)
         );
+
+        // update recurring id for membership record
+        self::updateRecurMembership($membership, $contribution[$index]);
+
         if (isset($contribution[$index])) {
           //insert payment record
           $dao = new CRM_Member_DAO_MembershipPayment();
@@ -1467,6 +1470,32 @@ AND civicrm_membership.is_test = %2";
       $isTest, FALSE,
       $includeFieldTypes
     );
+  }
+
+  /**
+   * Function for updating a membership record's contribution_recur_id
+   *
+   * @param object CRM_Member_BAO_Membership $membership
+   * @param object CRM_Contribute_BAO_Contribution $contribution
+   *
+   * @return void
+   * @static
+   * @access public
+   */
+  static public function updateRecurMembership(CRM_Member_BAO_Membership &$membership,
+    CRM_Contribute_BAO_Contribution &$contribution) {
+
+    if (empty($contribution->contribution_recur_id)) {
+      return;
+    }
+
+    $params = array(
+      1 => array($contribution->contribution_recur_id, 'Integer'),
+      2 => array($membership->id, 'Integer'),
+    );
+
+    $sql = "UPDATE civicrm_membership SET contribution_recur_id = %1 WHERE id = %2";
+    CRM_Core_DAO::executeQuery($sql, $params);
   }
 
   /**
