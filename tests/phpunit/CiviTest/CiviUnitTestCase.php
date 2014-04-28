@@ -2115,6 +2115,29 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     }
   }
 
+  /**
+   * Clean up financial entities after financial tests (so we remember to get all the tables :-))
+   */
+  function quickCleanUpFinancialEntities() {
+    $tablesToTruncate = array(
+      'civicrm_contribution',
+      'civicrm_financial_trxn',
+      'civicrm_contribution_recur',
+      'civicrm_line_item',
+      'civicrm_contribution_page',
+      'civicrm_payment_processor',
+      'civicrm_entity_financial_trxn',
+      'civicrm_membership',
+      'civicrm_membership_type',
+      'civicrm_membership_payment',
+      'civicrm_membership_status',
+      'civicrm_event',
+      'civicrm_participant',
+      'civicrm_participant_payment',
+      'civicrm_pledge',
+    );
+    $this->quickCleanup($tablesToTruncate);
+  }
   /*
    * Function does a 'Get' on the entity & compares the fields in the Params with those returned
    * Default behaviour is to also delete the entity

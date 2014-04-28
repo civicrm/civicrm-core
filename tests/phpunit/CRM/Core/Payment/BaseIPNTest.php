@@ -109,21 +109,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   }
 
   function tearDown() {
-
-    $tablesToTruncate = array(
-      'civicrm_contribution',
-      'civicrm_contribution_recur',
-      'civicrm_membership',
-      'civicrm_membership_type',
-      'civicrm_membership_payment',
-      'civicrm_membership_status',
-      'civicrm_payment_processor',
-      'civicrm_event',
-      'civicrm_participant',
-      'civicrm_pledge',
-      'civicrm_line_item',
-    );
-    $this->quickCleanup($tablesToTruncate);
+    $this->quickCleanUpFinancialEntities();
     CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
     CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'name', TRUE);
   }
