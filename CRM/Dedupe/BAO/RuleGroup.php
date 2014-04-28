@@ -391,6 +391,25 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
   }
 
   /**
+   * Get all of the combinations of fields that would work with a rule
+   */
+
+  function combos($rgFields, $threshold, &$combos, $running = array()) {
+    foreach ($rgFields as $rgField => $weight) {
+      unset($rgFields[$rgField]);
+      $diff = $threshold - $weight;
+      $runningnow = $running;
+      $runningnow[] = $rgField;
+      if ($diff > 0) {
+        self::combos($rgFields, $diff, $combos, $runningnow);
+      }
+      else {
+        $combos[] = $runningnow;
+      }
+    }
+  }
+
+  /**
    * Get an array of rule group id to rule group name
    * for all th groups for that contactType. If contactType
    * not specified, do it for all

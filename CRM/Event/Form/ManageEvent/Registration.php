@@ -499,6 +499,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
           $errorMsg['is_email_confirm'] = ts("Please add a profile with an email address if 'Send Confirmation Email?' is selected");
         }
       }
+      self::canProfilesDedupe();
       $additionalCustomPreId = $additionalCustomPostId = NULL;
       $isPreError = $isPostError = TRUE;
       if (!empty($values['allow_same_participant_emails']) && !empty($values['is_multiple_registrations'])) {
@@ -672,6 +673,54 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       || (in_array('first_name', $profileReqFields) && in_array('last_name', $profileReqFields))
     );
     return $profileComplete;
+  }
+
+  /**
+   * Check if the profiles collect enough information to dedupe
+   *
+   * @return boolean
+   */
+
+  static function canProfilesDedupe($profileIds) {
+    // find the unsupervised rule
+
+    $rgParams = array(
+      'used' => 'Unsupervised',
+      'contact_type' => 'Individual',
+    );
+    $activeRg = CRM_Dedupe_BAO_RuleGroup::dedupeRuleFieldsWeight($rgParams);
+
+    $combos = array();
+
+    CRM_Dedupe_BAO_RuleGroup::combos($activeRg[0], $activeRg[1], $combos);
+
+    /* TODO get profiles and see if they have the necessary combos
+    $profileReqFields = array();
+    foreach ($profileIds as $profileId) {
+      if ($profileId && is_numeric($profileId)) {
+        $fields = CRM_Core_BAO_UFGroup::getFields($profileId);
+        foreach ($fields as $field) {
+          switch (TRUE) {
+            case substr_count($field['name'], 'email'):
+              $profileReqFields[] = 'email';
+              break;
+
+            case substr_count($field['name'], 'first_name'):
+              $profileReqFields[] = 'first_name';
+              break;
+
+            case substr_count($field['name'], 'last_name'):
+              $profileReqFields[] = 'last_name';
+              break;
+          }
+        }
+      }
+    }
+    $profileComplete = (in_array('email', $profileReqFields)
+      || (in_array('first_name', $profileReqFields) && in_array('last_name', $profileReqFields))
+    );
+    return $profileComplete;
+    */
   }
 
   /**
