@@ -1468,6 +1468,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $recurParams['installments'] = CRM_Utils_Array::value('installments', $params);
     $recurParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params);
 
+    // CRM-14354: For an auto-renewing membership with an additional contribution,
+    // if separate payments is not enabled, make sure only the membership fee recurs
+    if ($form->_membershipBlock['is_separate_payment'] === '0'
+      && isset($params['selectMembership'])
+      && $form->_values['is_allow_other_amount'] == '1'
+    ) {
+      $recurParams['amount'] = $form->_membershipTypeValues[$params['selectMembership']]['minimum_fee'];
+    }
+
     $recurParams['is_test'] = 0;
     if (($form->_action & CRM_Core_Action::PREVIEW) ||
       (isset($form->_mode) && ($form->_mode == 'test'))
