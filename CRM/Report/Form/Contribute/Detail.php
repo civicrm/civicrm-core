@@ -144,18 +144,6 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'name' => 'id',
             'title' => ts('Contribution ID'),
           ),
-          'contribution_or_soft' =>
-          array('title' => ts('Contribution OR Soft Credit?'),
-            'dbAlias' => "'Contribution'"
-          ),
-          'soft_credits' =>
-          array('title' => ts('Soft Credits'),
-            'dbAlias' => "NULL"
-          ),
-          'soft_credit_for' =>
-          array('title' => ts('Soft Credit For'),
-            'dbAlias' => "NULL"
-          ),
           'financial_type_id' => array('title' => ts('Financial Type'),
             'default' => TRUE,
           ),
@@ -176,12 +164,24 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'trxn_id' => NULL,
           'receive_date' => array('default' => TRUE),
           'receipt_date' => NULL,
-          'fee_amount' => NULL,
-          'net_amount' => NULL,
           'total_amount' => array('title' => ts('Amount'),
             'required' => TRUE,
             'statistics' =>
             array('sum' => ts('Amount')),
+          ),
+          'fee_amount' => NULL,
+          'net_amount' => NULL,
+          'contribution_or_soft' =>
+          array('title' => ts('Contribution OR Soft Credit?'),
+            'dbAlias' => "'Contribution'"
+          ),
+          'soft_credits' =>
+          array('title' => ts('Soft Credits'),
+            'dbAlias' => "NULL"
+          ),
+          'soft_credit_for' =>
+          array('title' => ts('Soft Credit For'),
+            'dbAlias' => "NULL"
           ),
         ),
         'filters' =>
