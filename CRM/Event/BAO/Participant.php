@@ -77,8 +77,9 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * participant object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
-   * @param array $ids    the array that holds all the db ids
+   * @param array $params (reference ) an assoc array of name/value pairs
+   *
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return object CRM_Event_BAO_Participant object
    * @access public
@@ -158,6 +159,8 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * @param array $params input parameters to find object
    * @param array $values output values of the object
    *
+   * @param $ids
+   *
    * @return CRM_Event_BAO_Participant|null the found object or null
    * @access public
    * @static
@@ -182,7 +185,8 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * takes an associative array and creates a participant object
    *
    * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $ids    the array that holds all the db ids
+   *
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return object CRM_Event_BAO_Participant object
    * @access public
@@ -334,18 +338,15 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * Check whether the event is full for participation and return as
    * per requirements.
    *
-   * @param int      $eventId            event id.
-   * @param boolean  $returnEmptySeats   are we require number if empty seats.
-   * @param boolean  $includeWaitingList consider waiting list in event full
+   * @param int $eventId event id.
+   * @param boolean $returnEmptySeats are we require number if empty seats.
+   * @param boolean $includeWaitingList consider waiting list in event full
    *                 calculation or not. (it is for cron job  purpose)
    *
-   * @return
-   * 1. false                 => If event having some empty spaces.
-   * 2. null                  => If no registration yet or no limit.
-   * 3. Event Full Message    => If event is full.
-   * 4. Number of Empty Seats => If we are interested in empty spaces.( w/ include/exclude waitings. )
+   * @param bool $returnWaitingCount
+   * @param bool $considerTestParticipant
    *
-   * @static
+   * @return bool|int|null|string 1. false                 => If event having some empty spaces.@static
    * @access public
    */
   static function eventFull(
@@ -481,9 +482,14 @@ SELECT  event.event_full_text,
    * Return the array of all price set field options,
    * with total participant count that field going to carry.
    *
-   * @param int     $eventId          event id.
-   * @param array   $skipParticipants an array of participant ids those we should skip.
-   * @param int     $isTest           would you like to consider test participants.
+   * @param int $eventId event id.
+   * @param array $skipParticipantIds
+   * @param bool $considerCounted
+   * @param bool $considerWaiting
+   * @param bool $considerTestParticipants
+   *
+   * @internal param array $skipParticipants an array of participant ids those we should skip.
+   * @internal param int $isTest would you like to consider test participants.
    *
    * @return array $optionsCount an array of each option id and total count
    * @static
@@ -608,6 +614,10 @@ GROUP BY  participant.event_id
 
   /**
    * combine all the importable fields from the lower levels object
+   *
+   * @param string $contactType
+   * @param bool $status
+   * @param bool $onlyParticipant
    *
    * @return array array of importable Fields
    * @access public
@@ -889,7 +899,7 @@ WHERE  civicrm_participant.id = {$participantId}
   }
 
   /**
-   *Checks duplicate participants
+   * Checks duplicate participants
    *
    * @param array  $duplicates (reference ) an assoc array of name/value pairs
    * @param array $input an assosiative array of name /value pairs
@@ -936,7 +946,7 @@ WHERE  civicrm_participant.id = {$participantId}
    * fix the event level
    *
    * When price sets are used as event fee, fee_level is set as ^A
-   * seperated string. We need to change that string to comma
+   * separated string. We need to change that string to comma
    * separated string before using fee_level in view mode.
    *
    * @param string  $eventLevel  event_leval string from db
