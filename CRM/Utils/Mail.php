@@ -166,7 +166,7 @@ class CRM_Utils_Mail {
     // Mail_smtp and Mail_sendmail mailers require Bcc anc Cc emails
     // be included in both $to and $headers['Cc', 'Bcc']
     if (get_class($mailer) != "Mail_mail") {
-        //get emails from headers, since these are 
+        //get emails from headers, since these are
         //combination of name and email addresses.
         if (!empty($headers['Cc'])) {
             $to[] = CRM_Utils_Array::value( 'Cc', $headers );
@@ -362,6 +362,35 @@ class CRM_Utils_Mail {
     }
 
     return $name;
+  }
+
+  /**
+   *
+   * @param string $fileName
+   * @param string $html
+   * @param string $format
+   *
+   * @return array $attachments
+   */
+  static function appendPDF($fileName, $html, $format = NULL) {
+    $pdf_filename = CRM_Core_Config::singleton()->templateCompileDir . CRM_Utils_File::makeFileName($fileName);
+
+    //FIXME : CRM-7894
+    //xmlns attribute is required in XHTML but it is invalid in HTML,
+    //Also the namespace "xmlns=http://www.w3.org/1999/xhtml" is default,
+    //and will be added to the <html> tag even if you do not include it.
+    $html = preg_replace('/(<html)(.+?xmlns=["\'].[^\s]+["\'])(.+)?(>)/', '\1\3\4', $html);
+
+    file_put_contents($pdf_filename, CRM_Utils_PDF_Utils::html2pdf($html,
+      $fileName,
+      TRUE,
+      $format)
+    );
+    return array(
+      'fullPath' => $pdf_filename,
+      'mime_type' => 'application/pdf',
+      'cleanName' => $fileName,
+    );
   }
 }
 
