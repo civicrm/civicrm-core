@@ -1546,4 +1546,20 @@ abstract class CRM_Utils_Hook {
   static function post_case_merge($mainContactId, $mainCaseId = NULL, $otherContactId = NULL, $otherCaseId = NULL, $changeClient = FALSE) {
     return self::singleton()->invoke(5, $mainContactId, $mainCaseId, $otherContactId, $otherCaseId, $changeClient, 'civicrm_post_case_merge');
   }
+
+  /**
+   * Issue CRM-14276
+   * Add a hook for altering the display name
+   *
+   * hook_civicrm_contact_get_displayname(&$display_name, $objContact)
+   * @param string $displayName
+   * @param int $contactId
+   * @param object $dao the contact object
+   */
+  static function alterDisplayName($displayName, $contactId, $dao) {
+    return self::singleton()->invoke(3,
+      $displayName, $contactId, $dao, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject, 'civicrm_contact_get_displayname'
+    );
+  }
 }
