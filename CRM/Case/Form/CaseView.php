@@ -267,7 +267,8 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
           "action=add&context=standalone&reset=1&caseid={$this->_caseID}&atype=$type",
           FALSE, NULL, FALSE
         );
-      }else if ($type == $pdfActivityType ) {
+      }
+      else if ($type == $pdfActivityType ) {
          $url = CRM_Utils_System::url('civicrm/activity/pdf/add',
           "action=add&context=standalone&reset=1&cid={$this->_contactID}&caseid={$this->_caseID}&atype=$type",
           FALSE, NULL, FALSE ); 
