@@ -61,14 +61,19 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
       ),
     );
     
+    $this->waitForElementPresent('newFinancialType');
+    $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[7]/span/a[text()='Accounts']");
+    $this->waitForElementPresent('newfinancialTypeAccount');
+    
     foreach ($expected as  $value => $label) {
-      $this->verifyText("xpath=id('ltype')/div/table/tbody/tr/td[2][text()='$label[financial_account]']/../td[1]", preg_quote($label['account_relationship']));
+      $this->verifyText("xpath=//div[@id='ltype']/div/table/tbody/tr/td[2][text()='$label[financial_account]']/../td[1]", preg_quote($label['account_relationship']));
     }
+    
     $this->openCiviPage('admin/financial/financialType', 'reset=1', 'newFinancialType');
     $this->verifyText("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[3]", 'Accounts Receivable,Banking Fees,Premiums,' . $financialType['name']);
     $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[7]/span/a[text()='Accounts']");
     $this->waitForElementPresent('newfinancialTypeAccount');
-    $this->click("xpath=id('ltype')/div/table/tbody/tr/td[2][text()='Banking Fees']/../td[7]/span/a[text()='Edit']");
+    $this->click("xpath=//div[@id='ltype']/div/table/tbody/tr/td[2][text()='Banking Fees']/../td[7]/span/a[text()='Edit']");
     $this->waitForElementPresent('_qf_FinancialTypeAccount_next');
     $this->select('account_relationship', "value=select");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
@@ -78,11 +83,11 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
     $this->select('account_relationship', "label=Premiums Inventory Account is");
     $this->select('financial_account_id', "label=Premiums inventory");
     $this->click('_qf_FinancialTypeAccount_next');
-    $this->waitForElementPresent("xpath=id('ltype')/div/table/tbody/tr/td[2][text()='Premiums inventory']/../td[7]/span/a[text()='Edit']");
-    $this->verifyText("xpath=id('ltype')/div/table/tbody/tr/td[2][text()='Premiums inventory']/../td[1]", preg_quote('Premiums Inventory Account is'));
-    $this->clickLink("xpath=id('ltype')/div/table/tbody/tr/td[2][text()='Premiums inventory']/../td[7]/span/a[text()='Delete']", '_qf_FinancialTypeAccount_next-botttom');
+    $this->waitForElementPresent("xpath=//div[@id='ltype']/div/table/tbody/tr/td[2][text()='Premiums inventory']/../td[7]/span/a[text()='Edit']");
+    $this->verifyText("xpath=//div[@id='ltype']/div/table/tbody/tr/td[2][text()='Premiums inventory']/../td[1]", preg_quote('Premiums Inventory Account is'));
+    $this->clickLink("xpath=//div[@id='ltype']/div/table/tbody/tr/td[2][text()='Premiums inventory']/../td[7]/span/a[text()='Delete']", '_qf_FinancialTypeAccount_next-botttom', FALSE);
     $this->click('_qf_FinancialTypeAccount_next-botttom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("newfinancialTypeAccount");
     $this->waitForText('crm-notification-container', 'Selected financial type account has been deleted.');
 
     //edit financial type
