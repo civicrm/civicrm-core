@@ -227,7 +227,12 @@ class CRM_Contact_Page_AJAX {
             SELECT pcp.id as id, CONCAT_WS( ' :: ', {$select} ) as data, sort_name
             FROM civicrm_pcp pcp, civicrm_contribution_page cp, civicrm_contact cc
             {$includeEmailFrom}
-            {$whereClause}
+            {$whereClause} AND pcp.page_type = 'contribute'
+            UNION ALL
+            SELECT pcp.id as id, CONCAT_WS( ' :: ', {$select} ) as data, sort_name
+            FROM civicrm_pcp pcp, civicrm_event cp, civicrm_contact cc
+            {$includeEmailFrom}
+            {$whereClause} AND pcp.page_type = 'event'
             LIMIT 0, {$limit}
             ) t
         ORDER BY sort_name
