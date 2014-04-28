@@ -89,16 +89,16 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @return array - array reference of all case statues
    * @static
    */
-  public static function caseStatus($column = 'label', $onlyActive = TRUE, $condition = NULL) {
+  public static function caseStatus($column = 'label', $onlyActive = TRUE, $condition = NULL, $fresh = FALSE) {
     $cacheKey = "{$column}_" . (int)$onlyActive;
     if (!$condition) {
       $condition = 'AND filter = 0';
     }
 
-    if (!isset(self::$caseStatus[$cacheKey])) {
+    if (!isset(self::$caseStatus[$cacheKey]) || $fresh) {
       self::$caseStatus[$cacheKey] = CRM_Core_OptionGroup::values('case_status',
         FALSE, FALSE, FALSE, $condition,
-        $column, $onlyActive
+        $column, $onlyActive, $fresh
       );
     }
 
