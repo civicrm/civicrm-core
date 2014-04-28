@@ -295,9 +295,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $extra = array('onclick' => 'useAmountOther();');
         }
 
-        // if seperate membership payment is used with quick config priceset then change the other amount label
         if (!empty($qf->_membershipBlock) && !empty($qf->_quickConfig) && $field->name == 'other_amount' && empty($qf->_contributionAmount)) {
-          $label = ts('Additional Contribution');
           $useRequired = 0;
         }
         elseif (!empty($fieldOptions[$optionKey]['label'])) {      //check for label.
