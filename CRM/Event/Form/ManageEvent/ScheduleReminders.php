@@ -68,7 +68,8 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
           else {
             $action += CRM_Core_Action::ENABLE;
           }
-          $links = CRM_Admin_Page_ScheduleReminders::links();
+          $scheduleReminder = new CRM_Admin_Page_ScheduleReminders;
+          $links = $scheduleReminder->links();
           $links[CRM_Core_Action::DELETE]['qs'] .= "&context=event&eventId={$this->_id}";
           $links[CRM_Core_Action::UPDATE]['qs'] .= "&context=event&eventId={$this->_id}";
           $format['action'] = CRM_Core_Action::formLink(
@@ -389,7 +390,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
       $params['msg_template_id'] = CRM_Utils_Array::value('template', $values);
     }
 
-    CRM_Core_BAO_ActionSchedule::add($params, $ids);
+    CRM_Core_BAO_ActionSchedule::add($params);
 
     $status = ts("Your new Reminder titled %1 has been saved.",
       array(1 => "<strong>{$values['title']}</strong>")
