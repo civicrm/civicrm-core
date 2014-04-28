@@ -137,6 +137,16 @@ abstract class CRM_Core_Component_Info {
   }
 
   /**
+   * Provides permissions that are unwise for Anonymous Roles to have
+   *
+   * @return array list of permissions
+   * @see CRM_Component_Info::getPermissions
+   */
+  public function getAnonymousPermissionWarnings() {
+    return array();
+  }
+
+  /**
    * Provides permissions that are used by component.
    * Needs to be implemented in component's information
    * class.
