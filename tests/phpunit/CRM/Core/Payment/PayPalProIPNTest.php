@@ -65,17 +65,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   }
 
   function tearDown() {
-  // $this->paymentProcessor->delete($this->processorParams->id);
-    $tablesToTruncate = array(
-      'civicrm_contribution',
-      'civicrm_financial_trxn',
-      'civicrm_contribution_recur',
-      'civicrm_line_item',
-      'civicrm_contribution_page',
-      'civicrm_payment_processor',
-      'civicrm_entity_financial_trxn',
-    );
-    $this->quickCleanup($tablesToTruncate);
+    $this->quickCleanUpFinancialEntities();
   }
 
   /**
