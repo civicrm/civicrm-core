@@ -425,8 +425,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $contact = $contact[$contactID];
     }
 
-    $subject = CRM_Utils_Token::replaceDomainTokens($subject, $domain, TRUE, $tokens['text'], TRUE);
-    $text    = CRM_Utils_Token::replaceDomainTokens($text, $domain, TRUE, $tokens['text'], TRUE);
+    $subject = CRM_Utils_Token::replaceDomainTokens($subject, $domain, FALSE, $tokens['text'], TRUE);
+    $text    = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text'], TRUE);
     $html    = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html'], TRUE);
 
     if ($contactID) {
@@ -509,4 +509,3 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     return array($sent, $subject, $text, $html);
   }
 }
-
