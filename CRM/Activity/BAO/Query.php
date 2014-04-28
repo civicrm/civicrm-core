@@ -58,7 +58,8 @@ class CRM_Activity_BAO_Query {
     }
 
     if (!empty($query->_returnProperties['activity_type'])) {
-      $query->_select['activity_type'] = "activity_type.label as activity_type";
+      $query->_select['activity_type'] = "activity_type.label as activity_type,
+        civicrm_activity.activity_type_id as activity_type_id";
       $query->_element['activity_type'] = 1;
       $query->_tables['civicrm_activity'] = 1;
       $query->_tables['activity_type'] = 1;
@@ -538,6 +539,7 @@ class CRM_Activity_BAO_Query {
         'sort_name' => 1,
         'display_name' => 1,
         'activity_type' => 1,
+        'activity_type_id' => 1,
         'activity_subject' => 1,
         'activity_date_time' => 1,
         'activity_duration' => 1,
