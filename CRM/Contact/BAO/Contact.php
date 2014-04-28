@@ -461,7 +461,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    */
   static function getDisplayAndImage($id, $type = FALSE) {
     //CRM-14276 added the * on the civicrm_contact table so that we have all the contact info available
-		$sql = "
+    $sql = "
 SELECT    civicrm_contact.*,
           civicrm_email.email          as email
 FROM      civicrm_contact
@@ -482,13 +482,13 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       if (empty($dao->display_name)) {
         $display_name = $dao->email;
       } else {
-				$display_name = $dao->display_name;
-			}
+        $display_name = $dao->display_name;
+      }
 
-			/**
+      /**
        * Issue CRM-14276
        * Add a hook for altering the display name
-       * 
+       *
        * hook_civicrm_contact_get_displayname(&$display_name, $objContact)
        * @param String &$disply_name
        * @param int $contactId
@@ -497,6 +497,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       $hooks = CRM_Utils_Hook::singleton();
       $hooks->invoke(3,
         $display_name, $id, $dao, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject,
+        CRM_Utils_Hook::$_nullObject,
         'civicrm_contact_get_displayname'
       );
 
