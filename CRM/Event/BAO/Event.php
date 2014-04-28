@@ -123,6 +123,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *
    * @param array $params reference array contains the values submitted by the form
    *
+   * @return object
    * @access public
    * @static
    *
