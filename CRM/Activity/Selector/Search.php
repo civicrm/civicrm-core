@@ -252,6 +252,8 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+    //get all activity types
+    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name', TRUE);    
 
     while ($result->fetch()) {
       $row = array();
@@ -286,12 +288,11 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
       $accessMailingReport = FALSE;
-      $activityType        = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
-      $activityTypeId      = CRM_Utils_Array::key($row['activity_type'], $activityType);
+      $activityTypeId      = $row['activity_type_id'];
       if ($row['activity_is_test']) {
         $row['activity_type'] = $row['activity_type'] . " (test)";
       }
-      $bulkActivityTypeID = CRM_Utils_Array::key('Bulk Email', CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name', TRUE));
+      $bulkActivityTypeID = CRM_Utils_Array::key('Bulk Email', $activityTypes);
       $row['mailingId'] = '';
       if (
         $accessCiviMail &&
