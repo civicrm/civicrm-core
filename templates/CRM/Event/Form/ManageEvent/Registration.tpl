@@ -362,26 +362,6 @@ invert              = 0
 
       //show edit profile field links
     CRM.$(function($) {
-        // show edit for main profile
-        cj(document).on('change', 'select[id^="custom_p"]', function( event ) {
-            buildLinks( cj(this), cj(this).val());
-        });
-
-        // make sure we set edit links for main contact profile when form loads
-        cj('select[id^="custom_p"]').each( function(e) {
-            buildLinks( cj(this), cj(this).val());
-        });
-
-        //show edit profile field links in additional participant
-      cj(document).on('change', 'select[id^="additional_custom_p"]', function( event ) {
-            buildLinks( cj(this), cj(this).val());
-        });
-
-        // make sure we set edit links for additional profile  when form loads
-        cj('select[id^="additional_custom_p"]').each( function(e) {
-            buildLinks( cj(this), cj(this).val());
-        });
-
         var profileBottomCount = Number({/literal}{$profilePostMultiple|@count}{literal});
         var profileBottomCountAdd = Number({/literal}{$profilePostMultipleAdd|@count}{literal});
 
@@ -400,8 +380,6 @@ invert              = 0
 
             $(this).closest('tbody').append('<tr></tr>');
             var $el = $(this).closest('tbody').find('tr:last');
-
-//            CRM.loadPage(urlPath, { target: $el } );
             $el.load(urlPath, function() { $(this).trigger('crmLoad') });
         }
 
