@@ -273,3 +273,8 @@ ALTER TABLE `civicrm_mail_settings`
 ALTER TABLE `civicrm_mailing`
   ADD COLUMN `hash` varchar(16) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Key for validating requests related to this mailing.',
   ADD INDEX `index_hash` (`hash`);
+
+-- CRM-14445
+ALTER TABLE `civicrm_option_group`
+  ADD COLUMN `is_locked` int(1) DEFAULT 0 COMMENT 'A lock to remove the ability to add new options via the UI';
+UPDATE `civicrm_option_group` SET is_locked = 1 WHERE name = 'contribution_status';
