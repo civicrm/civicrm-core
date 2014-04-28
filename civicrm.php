@@ -1152,7 +1152,7 @@ class CiviCRM_For_WordPress {
     $screen = get_current_screen();
 
     // only add on default WP post types
-    if ( $screen->post_type == 'post' OR $screen->post_type == 'page' ) {
+    if ( $screen->base == 'post') {
 
       if ( ! $this->initialize() ) {
         return '';
@@ -1299,9 +1299,7 @@ class CiviCRM_For_WordPress {
 
     // only add on edit page for default WP post types
     if (
-      $screen->base == 'post' AND
-      ( $screen->id == 'post' OR $screen->id == 'page' ) AND
-      ( $screen->post_type == 'post' OR $screen->post_type == 'page' )
+      $screen->base == 'post' 
     ) {
 
       $title = __( 'Please select a CiviCRM front-end page type.', 'civicrm-wordpress' );
