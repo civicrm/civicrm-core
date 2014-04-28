@@ -252,10 +252,13 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
-   * @param array   $params      (reference ) an assoc array of name/value pairs
-   * @param boolean $fixAddress  if we need to fix address
+   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param boolean $fixAddress if we need to fix address
    * @param boolean $invokeHooks if we need to invoke hooks
    *
+   * @param bool $skipDelete
+   *
+   * @throws Exception
    * @return object CRM_Contact_BAO_Contact object
    * @access public
    * @static
@@ -449,6 +452,8 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * Get the display name and image of a contact
    *
    * @param int $id the contactId
+   *
+   * @param bool $type
    *
    * @return array the displayName and contactImage for this contact
    * @access public
@@ -2070,7 +2075,7 @@ ORDER BY civicrm_email.is_primary DESC";
           if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 &&
             ($value == '' || !isset($value))) {
             continue;
-          } 
+          }
 
           $valueId = NULL;
           if (!empty($params['customRecordValues'])) {
@@ -2127,21 +2132,21 @@ ORDER BY civicrm_email.is_primary DESC";
               }
             }
           }
-          else if (in_array($key, 
-              array('nick_name', 
-                'job_title', 
-                'middle_name', 
-                'birth_date', 
+          else if (in_array($key,
+              array('nick_name',
+                'job_title',
+                'middle_name',
+                'birth_date',
                 'gender_id',
-                'current_employer', 
-                'prefix_id', 
+                'current_employer',
+                'prefix_id',
                 'suffix_id')) &&
             ($value == '' || !isset($value)) &&
             ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
-            // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value 
+            // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
             // to avoid update with empty values
             continue;
-          } 
+          }
           else {
             $data[$key] = $value;
           }
