@@ -84,7 +84,7 @@ class CCase extends \Civi\Core\Entity {
   /**
    * @var date
    *
-   * @JMS\Type("date")
+   * @JMS\Type("datetime")
    * @ORM\Column(name="start_date", type="date", nullable=true)
    * 
    */
@@ -93,7 +93,7 @@ class CCase extends \Civi\Core\Entity {
   /**
    * @var date
    *
-   * @JMS\Type("date")
+   * @JMS\Type("datetime")
    * @ORM\Column(name="end_date", type="date", nullable=true)
    * 
    */

@@ -417,7 +417,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var date
    *
-   * @JMS\Type("date")
+   * @JMS\Type("datetime")
    * @ORM\Column(name="birth_date", type="date", nullable=true)
    * 
    */
@@ -435,7 +435,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var date
    *
-   * @JMS\Type("date")
+   * @JMS\Type("datetime")
    * @ORM\Column(name="deceased_date", type="date", nullable=true)
    * 
    */
