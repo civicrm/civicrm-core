@@ -3933,10 +3933,10 @@ div.m ul#civicrm-menu,
   top: 3px;
 }
 .crm-container .crm-action-menu.action-icon-plus .select2-default span.select2-chosen:before {
-  background-position: -16px -128px;
+  background-position: 0 -192px;
 }
 .crm-container .crm-action-menu.action-icon-play .select2-default span.select2-chosen:before {
-  background-position: 0 -160px;
+  background-position: -48px -192px;
 }
 .crm-container .crm-action-menu.action-icon-clipboard .select2-default span.select2-chosen:before {
   background-position: -160px -128px;
