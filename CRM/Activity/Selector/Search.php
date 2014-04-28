@@ -286,12 +286,12 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
       $accessMailingReport = FALSE;
-      $activityType        = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name', TRUE);
+      $activityType        = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
       $activityTypeId      = CRM_Utils_Array::key($row['activity_type'], $activityType);
       if ($row['activity_is_test']) {
         $row['activity_type'] = $row['activity_type'] . " (test)";
       }
-      $bulkActivityTypeID = CRM_Utils_Array::key('Bulk Email', $activityType);
+      $bulkActivityTypeID = CRM_Utils_Array::key('Bulk Email', CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name', TRUE));
       $row['mailingId'] = '';
       if (
         $accessCiviMail &&
