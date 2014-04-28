@@ -106,8 +106,8 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // soft credit
-    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 'soft_credit_contact_1');
-
+    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 'soft_credit_contact_id_1');
+    $this->type("soft_credit_amount_1", "100");
     //Custom Data
     //$this->click('CIVICRM_QFID_3_6');
 
@@ -122,15 +122,6 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->type("invoice_id", time());
     $this->webtestFillDate('thankyou_date');
 
-    //Honoree section
-    $this->click("Honoree");
-    $this->waitForElementPresent("honor_email");
-
-    $this->click("CIVICRM_QFID_1_2");
-    $this->select("honor_prefix_id", "label=Ms.");
-    $this->type("honor_first_name", "Foo");
-    $this->type("honor_last_name", "Bar");
-    $this->type("honor_email", "foo@bar.com");
 
     //Premium section
     $this->click("Premium");
@@ -147,10 +138,10 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->assertTrue($this->isTextPresent("The contribution record has been saved."), "Status message didn't show up after saving!");
 
     // verify if Contribution is created
-    $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[2]//tbody/tr[1]/td[8]/span/a[text()='View']");
 
     //click through to the Contribution view screen
-    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table[2]/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
 
     // View Contribution Record and test for expected values
@@ -173,9 +164,9 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
 
     // verify soft credit details
     $expected = array(
-      3 => 'Donation',
+      4 => 'Donation',
       2 => '100.00',
-      5 => 'Pending',
+      6 => 'Pending',
       1 => "{$firstName} Contributor",
     );
     foreach ($expected as $value => $label) {

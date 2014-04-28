@@ -81,8 +81,8 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     $this->click("_qf_Location_upload-bottom");
 
     // Wait for "saved" status msg
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Location' information has been saved.");
+    $this->waitForElementPresent("_qf_Location_upload-bottom");
+    $this->waitForTextPresent("'Event Location' information has been saved.");
 
     // Go to Fees tab
     $this->click("link=Fees");
@@ -101,8 +101,8 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     $this->click("_qf_Fee_upload-bottom");
 
     // Wait for "saved" status msg
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Fee' information has been saved.");
+    $this->waitForElementPresent("_qf_Fee_upload-bottom");
+    $this->waitForTextPresent("'Fees' information has been saved.");
 
     // intro text for registration page
     $registerIntro = "Fill in all the fields below and click Continue.";
@@ -127,8 +127,8 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     $this->type("confirm_from_email", "jane.doe@example.org");
 
     $this->click("_qf_Registration_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Registration' information has been saved.");
+    $this->waitForElementPresent("_qf_Registration_upload-bottom");
+    $this->waitForTextPresent("'Online Registration' information has been saved.");
 
     $eventInfoStrings = array($eventTitle, $eventDescription, $streetAddress);
     $this->_testVerifyEventInfo($eventTitle, $eventInfoStrings);

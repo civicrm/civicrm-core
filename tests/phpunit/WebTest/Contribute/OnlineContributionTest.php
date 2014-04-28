@@ -163,10 +163,10 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->typeKeys("css=input#sort_name_navigation", $honorSortName);
 
     // wait for result list
-    $this->waitForElementPresent("css=div.ac_results-inner li");
+    $this->waitForElementPresent("css=ul.ui-autocomplete li");
 
     // visit contact summary page
-    $this->click("css=div.ac_results-inner li");
+    $this->click("css=ul.ui-autocomplete li");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is contact present?
