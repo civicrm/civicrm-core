@@ -1478,6 +1478,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @params array $params        Form values
    *
+   * @param $params
+   * @param array $ids
+   *
    * @return object $mailing      The new mailing object
    * @access public
    * @static
