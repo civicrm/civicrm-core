@@ -60,8 +60,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
   function tearDown() {
     $this->paymentProcessor->delete($this->processorParams->id);
-    $tablesToTruncate = array('civicrm_contribution', 'civicrm_contribution_recur', 'civicrm_line_item' );
-    $this->quickCleanup($tablesToTruncate);
+    $this->quickCleanUpFinancialEntities();
   }
 
   /**
