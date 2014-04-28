@@ -97,18 +97,29 @@ class CRM_Batch_Page_AJAX {
     $batches = CRM_Batch_BAO_Batch::getBatchListSelector($params);
 
     $iFilteredTotal = $iTotal = $params['total'];
-    $selectorElements = array(
-      'batch_name',
-      'payment_instrument',
-      'item_count',
-      'total',
-      'status',
-      'created_by',
-      'links',
-    );
 
     if ($context == 'financialBatch') {
-      $selectorElements = array_merge(array('check'), $selectorElements);
+      $selectorElements = array(
+        'check',
+        'batch_name',
+        'payment_instrument',
+        'item_count',
+        'total',
+        'status',
+        'created_by',
+        'links',
+      );
+    }
+    else {
+      $selectorElements = array(
+        'batch_name',
+        'type',
+        'item_count',
+        'total',
+        'status',
+        'created_by',
+        'links',
+      );
     }
     echo CRM_Utils_JSON::encodeDataTableSelector($batches, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
