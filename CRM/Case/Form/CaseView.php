@@ -243,6 +243,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $allActTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name');
 
     $emailActivityType = array_search('Email', $allActTypes);
+    $pdfActivityType = array_search('Print PDF Letter', $allActTypes);
 
     // remove Open Case activity type since we're inside an existing case
     if ($openActTypeId = array_search('Open Case', $allActTypes)) {
@@ -266,7 +267,11 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
           "action=add&context=standalone&reset=1&caseid={$this->_caseID}&atype=$type",
           FALSE, NULL, FALSE
         );
-      }
+      }else if ($type == $pdfActivityType ) {
+         $url = CRM_Utils_System::url('civicrm/activity/pdf/add',
+          "action=add&context=standalone&reset=1&cid={$this->_contactID}&caseid={$this->_caseID}&atype=$type",
+          FALSE, NULL, FALSE ); 
+    }
       else {
         $url = CRM_Utils_System::url('civicrm/case/activity',
           "action=add&reset=1&cid={$this->_contactID}&caseid={$this->_caseID}&atype=$type",
@@ -535,4 +540,3 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     }
   }
 }
-
