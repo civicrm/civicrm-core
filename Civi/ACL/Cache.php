@@ -84,7 +84,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * @var date
    *
-   * @JMS\Type("date")
+   * @JMS\Type("datetime")
    * @ORM\Column(name="modified_date", type="date", nullable=true)
    * 
    */

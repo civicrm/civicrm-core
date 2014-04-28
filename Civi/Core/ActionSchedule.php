@@ -309,7 +309,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var date
    *
-   * @JMS\Type("date")
+   * @JMS\Type("datetime")
    * @ORM\Column(name="absolute_date", type="date", nullable=true)
    * 
    */

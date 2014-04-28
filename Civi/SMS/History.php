@@ -84,7 +84,7 @@ class History extends \Civi\Core\Entity {
   /**
    * @var date
    *
-   * @JMS\Type("date")
+   * @JMS\Type("datetime")
    * @ORM\Column(name="sent_date", type="date", nullable=true)
    * 
    */

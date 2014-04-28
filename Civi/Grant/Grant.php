@@ -75,7 +75,7 @@ class Grant extends \Civi\Core\Entity {
   /**
    * @var date
    *
-   * @JMS\Type("date")
+   * @JMS\Type("datetime")
    * @ORM\Column(name="application_received_date", type="date", nullable=true)
    * 
    */
@@ -84,7 +84,7 @@ class Grant extends \Civi\Core\Entity {
   /**
    * @var date
    *
-   * @JMS\Type("date")
+   * @JMS\Type("datetime")
    * @ORM\Column(name="decision_date", type="date", nullable=true)
    * 
    */
@@ -93,7 +93,7 @@ class Grant extends \Civi\Core\Entity {
   /**
    * @var date
    *
-   * @JMS\Type("date")
+   * @JMS\Type("datetime")
    * @ORM\Column(name="money_transfer_date", type="date", nullable=true)
    * 
    */
@@ -102,7 +102,7 @@ class Grant extends \Civi\Core\Entity {
   /**
    * @var date
    *
-   * @JMS\Type("date")
+   * @JMS\Type("datetime")
    * @ORM\Column(name="grant_due_date", type="date", nullable=true)
    * 
    */

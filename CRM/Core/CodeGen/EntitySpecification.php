@@ -6,6 +6,9 @@
 class CRM_Core_CodeGen_EntitySpecification {
   public $tables;
   public $database;
+  public static $phpTypeToJmsType = array(
+    'date' => 'datetime',
+  );
 
   protected $classNames;
 
@@ -255,7 +258,7 @@ class CRM_Core_CodeGen_EntitySpecification {
 
       $field['columnType'] = $field['phpType'];
 
-      $field['jmsType'] = '@JMS\Type("' . $field['phpType'] . '")';
+      $field['jmsType'] = '@JMS\Type("' . CRM_Utils_Array::value($field['phpType'], static::$phpTypeToJmsType, $field['phpType']) . '")';
 
       $field['columnJoin'] = '';
 
