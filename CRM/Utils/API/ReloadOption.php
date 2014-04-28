@@ -82,6 +82,7 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
       case NULL:
       case '0':
       case 'null':
+      case '':
         return $result;
 
       case '1':
@@ -106,7 +107,7 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
         return $result;
 
       default:
-        throw new API_Exception("Unknown reload mode");
+        throw new API_Exception("Unknown reload mode " . $reloadMode);
     }
   }
 
