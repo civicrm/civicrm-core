@@ -864,6 +864,10 @@ AND    u.status = 1
           if (isset($language->domain) && $language->domain) {
             if ($addLanguagePart) {
               $cleanedUrl = preg_replace('#^https?://#', '', $language->domain);
+              // drupal function base_path() adds a "/" to the beginning and end of the returned path
+              if (substr($cleanedUrl, -1) == '/') {
+                $cleanedUrl = substr($cleanedUrl, 0, -1);
+              }
               $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $cleanedUrl . base_path();
             }
             if ($removeLanguagePart && defined('CIVICRM_UF_BASEURL')) {
