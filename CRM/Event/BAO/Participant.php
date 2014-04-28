@@ -981,8 +981,10 @@ WHERE  civicrm_participant.id = {$participantId}
   /**
    * get the additional participant ids.
    *
-   * @param int     $primaryParticipantId  primary partycipant Id
-   * @param boolean $excludeCancel         do not include participant those are cancelled.
+   * @param int $primaryParticipantId primary partycipant Id
+   * @param boolean $excludeCancel do not include participant those are cancelled.
+   *
+   * @param null $oldStatusId
    *
    * @return array $additionalParticipantIds
    * @static
@@ -1115,8 +1117,14 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * Function for update primary and additional participant status
    *
    * @param  int $participantID primary participant's id
-   * @param  int $statusId status id for participant
+   * @param $oldStatusID
+   * @param null $newStatusID
+   * @param bool $updatePrimaryStatus
+   *
+   * @internal param int $statusId status id for participant
    * return void
+   *
+   * @return bool
    * @access public
    * @static
    */
@@ -1147,11 +1155,13 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
   /**
    * Function for update status for given participant ids
    *
-   * @param  int     $participantIds      array of participant ids
-   * @param  int     $statusId status     id for participant
+   * @param  int $participantIds array of participant ids
+   * @param  int $statusId status     id for participant
+   * @param bool $updateRegisterDate
    * @params boolean $updateRegisterDate  way to track when status changed.
    *
    * return void
+   *
    * @access public
    * @static
    */
@@ -1178,16 +1188,20 @@ UPDATE  civicrm_participant
     $dao = CRM_Core_DAO::executeQuery($query);
   }
 
-  /*
+  /**
    * Function takes participant ids and statuses
    * update status from $fromStatusId to $toStatusId
    * and send mail + create activities.
    *
-   * @param  array $participantIds   participant ids.
-   * @param  int   $toStatusId       update status id.
-   * @param  int   $fromStatusId     from status id
+   * @param  array $participantIds participant ids.
+   * @param  int $toStatusId update status id.
+   * @param  int $fromStatusId from status id
    *
    * return  void
+   * @param bool $returnResult
+   * @param bool $skipCascadeRule
+   *
+   * @return array
    * @access public
    * @static
    */
@@ -1410,14 +1424,16 @@ UPDATE  civicrm_participant
    * Function to send mail and create activity
    * when participant status changed.
    *
-   * @param  int     $participantId      participant id.
-   * @param  array   $participantValues  participant detail values. status id for participants
-   * @param  array   $eventDetails       required event details
-   * @param  array   $contactDetails     required contact details
-   * @param  array   $domainValues       required domain values.
-   * @param  string  $mailType           (eg 'approval', 'confirm', 'expired' )
+   * @param  int $participantId participant id.
+   * @param  array $participantValues participant detail values. status id for participants
+   * @param  array $eventDetails required event details
+   * @param  array $contactDetails required contact details
+   * @param  array $domainValues required domain values.
+   * @param  string $mailType (eg 'approval', 'confirm', 'expired' )
    *
    * return  void
+   *
+   * @return bool
    * @access public
    * @static
    */
@@ -1516,6 +1532,10 @@ UPDATE  civicrm_participant
   /**
    * get participant status change message.
    *
+   * @param $participantId
+   * @param $statusChangeTo
+   * @param $fromStatusId
+   *
    * @return string
    * @access public
    */
@@ -1549,6 +1569,9 @@ UPDATE  civicrm_participant
 
   /**
    * get event full and waiting list message.
+   *
+   * @param $eventId
+   * @param null $participantId
    *
    * @return string
    * @access public
@@ -1657,7 +1680,9 @@ UPDATE  civicrm_participant
   /**
    * Function to get participant record count for a Contact
    *
-   * @param int $contactId Contact ID
+   * @param $contactID
+   *
+   * @internal param int $contactId Contact ID
    *
    * @return int count of participant records
    * @access public
@@ -1706,7 +1731,9 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   /**
    * Function to get additional Participant edit & view url .
    *
-   * @param array  $paticipantIds an array of additional participant ids.
+   * @param $participantIds
+   *
+   * @internal param array $paticipantIds an array of additional participant ids.
    *
    * @return array of Urls.
    * @access public
@@ -1731,8 +1758,10 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   /**
    * to create trxn entry if an event has discount.
    *
-   * @param int     $eventID  event id
-   * @param array   $contributionParams  contribution params.
+   * @param int $eventID event id
+   * @param array $contributionParams contribution params.
+   *
+   * @param $feeLevel
    *
    * @static
    */
