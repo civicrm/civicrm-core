@@ -36,6 +36,8 @@ class Request {
    * @param string $action
    * @param array $params
    * @param mixed $extra
+   *
+   * @throws \API_Exception
    * @return array the request descriptor; keys:
    *   - version: int
    *   - entity: string
