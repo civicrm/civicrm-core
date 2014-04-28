@@ -85,10 +85,6 @@
            <td>{include file="CRM/common/jcalendar.tpl" elementName=registration_end_date}</td>
         </tr>
        {/if}
-        <tr class="crm-event-manage-registration-form-block-is_confirm_enabled">
-            <td scope="row" class="label" width="20%">{$form.is_confirm_enabled.label}</td>
-            <td>{$form.is_confirm_enabled.html}</td>
-        </tr>
         <tr class="crm-event-manage-registration-form-block-is_multiple_registrations">
             <td scope="row" class="label" width="20%">{$form.is_multiple_registrations.label}</td>
             <td>{$form.is_multiple_registrations.html} {help id="id-allow_multiple"}</td>
@@ -206,30 +202,38 @@
 
         {*Confirmation Block*}
         <fieldset id="confirm" class="crm-collapsible {if $defaultsEmpty}collapsed{/if}">
-        <legend class="collapsible-title">{ts}Confirmation Screen{/ts}</legend>
-         <table class= "form-layout-compressed">
-           <tr class="crm-event-manage-registration-form-block-confirm_title">
-              <td scope="row" class="label" width="20%">{$form.confirm_title.label} <span class="marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_title' id=$eventID}{/if}</td>
-              <td>{$form.confirm_title.html}<br />
-                  <span class="description">{ts}Page title for screen where user reviews and confirms their registration information.{/ts}</span>
-              </td>
-           </tr>
-           <tr class="crm-event-manage-registration-form-block-confirm_text">
-              <td scope="row" class="label" width="20%">{$form.confirm_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_text' id=$eventID}{/if}</td>
-              <td>{$form.confirm_text.html}
-                  <div class="description">{ts}Optional instructions / message for Confirmation screen.{/ts}</div>
-              </td>
-           </tr>
-           <tr class="crm-event-manage-registration-form-block-confirm_footer_text">
-              <td scope="row" class="label" width="20%">{$form.confirm_footer_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_footer_text' id=$eventID}{/if}</td>
-              <td>{$form.confirm_footer_text.html}
-                 <div class="description">{ts}Optional page footer text for Confirmation screen.{/ts}</div>
-              </td>
-           </tr>
-         </table>
-       </fieldset>
+          <legend class="collapsible-title">{ts}Confirmation Screen{/ts}</legend>
+          <table class= "form-layout-compressed">
+            <tr class="crm-event-manage-registration-form-block-is_confirm_enabled">
+              <td scope="row" class="label" width="20%">{$form.is_confirm_enabled.label}</td>
+              <td>{$form.is_confirm_enabled.html}</td>
+            </tr>
+          </table>
+          <div id="confirm_screen_settings">
+            <table class= "form-layout-compressed">
+              <tr class="crm-event-manage-registration-form-block-confirm_title">
+                <td scope="row" class="label" width="20%">{$form.confirm_title.label} <span class="marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_title' id=$eventID}{/if}</td>
+                <td>{$form.confirm_title.html}<br />
+                    <span class="description">{ts}Page title for screen where user reviews and confirms their registration information.{/ts}</span>
+                </td>
+              </tr>
+              <tr class="crm-event-manage-registration-form-block-confirm_text">
+                <td scope="row" class="label" width="20%">{$form.confirm_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_text' id=$eventID}{/if}</td>
+                <td>{$form.confirm_text.html}
+                    <div class="description">{ts}Optional instructions / message for Confirmation screen.{/ts}</div>
+                </td>
+              </tr>
+              <tr class="crm-event-manage-registration-form-block-confirm_footer_text">
+                <td scope="row" class="label" width="20%">{$form.confirm_footer_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_footer_text' id=$eventID}{/if}</td>
+                <td>{$form.confirm_footer_text.html}
+                   <div class="description">{ts}Optional page footer text for Confirmation screen.{/ts}</div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </fieldset>
 
-         {*ThankYou Block*}
+        {*ThankYou Block*}
         <fieldset id="thankyou" class="crm-collapsible {if $defaultsEmpty}collapsed{/if}">
         <legend class="collapsible-title">{ts}Thank-you Screen{/ts}</legend>
          <table class= "form-layout-compressed">
@@ -313,6 +317,14 @@
 trigger_field_id    ="is_online_registration"
 trigger_value       =""
 target_element_id   ="registration_blocks"
+target_element_type ="block"
+field_type          ="radio"
+invert              = 0
+}
+{include file="CRM/common/showHideByFieldValue.tpl"
+trigger_field_id    ="is_confirm_enabled"
+trigger_value       =""
+target_element_id   ="confirm_screen_settings"
 target_element_type ="block"
 field_type          ="radio"
 invert              = 0
