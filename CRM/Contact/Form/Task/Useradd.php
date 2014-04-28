@@ -95,7 +95,6 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
     $element->freeze();
     $this->add('text', 'cms_name', ts('Username'), array('class' => 'huge'));
     $this->addRule('cms_name', 'Username is required', 'required');
-    $this->addRule('cms_name', 'Enter a valid username', 'minlength', 2);
     $this->add('password', 'cms_pass', ts('Password'), array('class' => 'huge'));
     $this->add('password', 'cms_confirm_pass', ts('Confirm Password'), array('class' => 'huge'));
     $this->addRule('cms_pass', 'Password is required', 'required');
