@@ -51,6 +51,7 @@ class CRM_Event_StateMachine_Registration extends CRM_Core_StateMachine {
     parent::__construct($controller, $action);
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $controller, TRUE);
     $is_monetary = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'is_monetary');
+    $is_confirm_enabled = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'is_confirm_enabled');
 
     $pages = array('CRM_Event_Form_Registration_Register' => NULL);
 
@@ -88,8 +89,9 @@ class CRM_Event_StateMachine_Registration extends CRM_Core_StateMachine {
     );
 
     $pages = array_merge($pages, $additionalPages);
-
-    if (!$is_monetary) {
+    
+    // CRM-11182 - Optional confirmation screen
+    if (!$is_confirm_enabled && !$is_monetary) {
       unset($pages['CRM_Event_Form_Registration_Confirm']);
     }
 

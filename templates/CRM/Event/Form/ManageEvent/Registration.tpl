@@ -203,12 +203,16 @@
         {*Confirmation Block*}
         <fieldset id="confirm" class="crm-collapsible {if $defaultsEmpty}collapsed{/if}">
           <legend class="collapsible-title">{ts}Confirmation Screen{/ts}</legend>
-          <table class= "form-layout-compressed">
-            <tr class="crm-event-manage-registration-form-block-is_confirm_enabled">
-              <td scope="row" class="label" width="20%">{$form.is_confirm_enabled.label}</td>
-              <td>{$form.is_confirm_enabled.html}</td>
-            </tr>
-          </table>
+          {if !$is_monetary}
+            <table class= "form-layout-compressed">
+              <tr class="crm-event-manage-registration-form-block-is_confirm_enabled">
+                <td scope="row" class="label" width="20%">{$form.is_confirm_enabled.label}</td>
+                <td>{$form.is_confirm_enabled.html}
+                  <div class="description">{ts}Optionally hide the confirmation screen for free events.{/ts}</div>
+                </td>
+              </tr>
+            </table>
+          {/if}
           <div id="confirm_screen_settings">
             <table class= "form-layout-compressed">
               <tr class="crm-event-manage-registration-form-block-confirm_title">
@@ -321,14 +325,16 @@ target_element_type ="block"
 field_type          ="radio"
 invert              = 0
 }
-{include file="CRM/common/showHideByFieldValue.tpl"
-trigger_field_id    ="is_confirm_enabled"
-trigger_value       =""
-target_element_id   ="confirm_screen_settings"
-target_element_type ="block"
-field_type          ="radio"
-invert              = 0
-}
+{if !$is_monetary}
+  {include file="CRM/common/showHideByFieldValue.tpl"
+    trigger_field_id    ="is_confirm_enabled"
+    trigger_value       =""
+    target_element_id   ="confirm_screen_settings"
+    target_element_type ="block"
+    field_type          ="radio"
+    invert              = 0
+  }
+{/if}
 {include file="CRM/common/showHideByFieldValue.tpl"
 trigger_field_id    ="is_email_confirm"
 trigger_value       =""

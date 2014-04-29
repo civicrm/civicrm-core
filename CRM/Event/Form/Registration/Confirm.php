@@ -225,54 +225,60 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    */
   public function buildQuickForm() {
     $this->assignToTemplate();
-    if ($this->_params[0]['amount'] || $this->_params[0]['amount'] == 0) {
-      $this->_amount = array();
+    
+    // CRM-11182 - Confirmation screen might not be monetary
+    if ($this->_values['event']['is_monetary']) {
+    
+      if ($this->_params[0]['amount'] || $this->_params[0]['amount'] == 0) {
+        $this->_amount = array();
 
-      foreach ($this->_params as $k => $v) {
-        if (is_array($v)) {
-          foreach (array(
-            'first_name', 'last_name') as $name) {
-            if (isset($v['billing_' . $name]) &&
-              !isset($v[$name])
-            ) {
-              $v[$name] = $v['billing_' . $name];
-            }
-          }
-
-          if (!empty($v['first_name']) && !empty($v['last_name'])) {
-            $append = $v['first_name'] . ' ' . $v['last_name'];
-          }
-          else {
-            //use an email if we have one
-            foreach ($v as $v_key => $v_val) {
-              if (substr($v_key, 0, 6) == 'email-') {
-                $append = $v[$v_key];
+        foreach ($this->_params as $k => $v) {
+          if (is_array($v)) {
+            foreach (array(
+              'first_name', 'last_name') as $name) {
+              if (isset($v['billing_' . $name]) &&
+                !isset($v[$name])
+              ) {
+                $v[$name] = $v['billing_' . $name];
               }
             }
-          }
 
-          $this->_amount[$k]['amount'] = $v['amount'];
-          if (!empty($v['discountAmount'])) {
-            $this->_amount[$k]['amount'] -= $v['discountAmount'];
-          }
+            if (!empty($v['first_name']) && !empty($v['last_name'])) {
+              $append = $v['first_name'] . ' ' . $v['last_name'];
+            }
+            else {
+              //use an email if we have one
+              foreach ($v as $v_key => $v_val) {
+                if (substr($v_key, 0, 6) == 'email-') {
+                  $append = $v[$v_key];
+                }
+              }
+            }
 
-          $this->_amount[$k]['label'] = preg_replace('//', '', $v['amount_level']) . '  -  ' . $append;
-          $this->_part[$k]['info'] = CRM_Utils_Array::value('first_name', $v) . ' ' . CRM_Utils_Array::value('last_name', $v);
-          if (empty($v['first_name'])) {
-            $this->_part[$k]['info'] = $append;
-          }
-          $this->_totalAmount = $this->_totalAmount + $this->_amount[$k]['amount'];
-          if (!empty($v['is_primary'])) {
-            $this->set('primaryParticipantAmount', $this->_amount[$k]['amount']);
+            $this->_amount[$k]['amount'] = $v['amount'];
+            if (!empty($v['discountAmount'])) {
+              $this->_amount[$k]['amount'] -= $v['discountAmount'];
+            }
+
+            $this->_amount[$k]['label'] = preg_replace('//', '', $v['amount_level']) . '  -  ' . $append;
+            $this->_part[$k]['info'] = CRM_Utils_Array::value('first_name', $v) . ' ' . CRM_Utils_Array::value('last_name', $v);
+            if (empty($v['first_name'])) {
+              $this->_part[$k]['info'] = $append;
+            }
+            $this->_totalAmount = $this->_totalAmount + $this->_amount[$k]['amount'];
+            if (!empty($v['is_primary'])) {
+              $this->set('primaryParticipantAmount', $this->_amount[$k]['amount']);
+            }
           }
         }
-      }
 
-      $this->assign('part', $this->_part);
-      $this->set('part', $this->_part);
-      $this->assign('amounts', $this->_amount);
-      $this->assign('totalAmount', $this->_totalAmount);
-      $this->set('totalAmount', $this->_totalAmount);
+        $this->assign('part', $this->_part);
+        $this->set('part', $this->_part);
+        $this->assign('amounts', $this->_amount);
+        $this->assign('totalAmount', $this->_totalAmount);
+        $this->set('totalAmount', $this->_totalAmount);
+      }
+    
     }
 
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
@@ -410,7 +416,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $cancelledIds = $this->_additionalParticipantIds;
 
     $params = $this->_params;
-    $this->set('finalAmount', $this->_amount);
+    
+    // CRM-11182 - Confirmation page might not be monetary
+    if ( $this->_values['event']['is_monetary'] ) {
+      $this->set('finalAmount', $this->_amount);
+    }
+    
     $participantCount = array();
 
     //unset the skip participant from params.
@@ -606,15 +617,20 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       if (empty($value['currencyID'])) {
         $value['currencyID'] = $primaryCurrencyID;
       }
+      
+      // CRM-11182 - Confirmation page might not be monetary
+      if ($this->_values['event']['is_monetary']) {
 
-      if (!$pending && !empty($value['is_primary']) &&
-        !$this->_allowWaitlist && !$this->_requireApproval
-      ) {
-        // transactionID & receive date required while building email template
-        $this->assign('trxn_id', $value['trxn_id']);
-        $this->assign('receive_date', CRM_Utils_Date::mysqlToIso($value['receive_date']));
-        $this->set('receiveDate', CRM_Utils_Date::mysqlToIso($value['receive_date']));
-        $this->set('trxnId', CRM_Utils_Array::value('trxn_id', $value));
+        if (!$pending && !empty($value['is_primary']) &&
+          !$this->_allowWaitlist && !$this->_requireApproval
+        ) {
+          // transactionID & receive date required while building email template
+          $this->assign('trxn_id', $value['trxn_id']);
+          $this->assign('receive_date', CRM_Utils_Date::mysqlToIso($value['receive_date']));
+          $this->set('receiveDate', CRM_Utils_Date::mysqlToIso($value['receive_date']));
+          $this->set('trxnId', CRM_Utils_Array::value('trxn_id', $value));
+        }
+      
       }
 
       $value['fee_amount'] = CRM_Utils_Array::value('amount', $value);
@@ -778,7 +794,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $this->assign('isPrimary', 0);
           $this->assign('customProfile', NULL);
           //Additional Participant should get only it's payment information
-          if ($this->_amount) {
+          if (!empty($this->_amount)) {
             $amount = array();
             $params = $this->get('params');
             $amount[$participantNum]['label'] = preg_replace('//', '', $params[$participantNum]['amount_level']);
