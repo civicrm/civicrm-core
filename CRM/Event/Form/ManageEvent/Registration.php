@@ -493,41 +493,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       $isProfileComplete = self::isProfileComplete($profileIds);
       $isAdditionalProfileComplete = self::isProfileComplete($additionalProfileIds);
 
-      $cant_dedupe = false;
-      switch (self::canProfilesDedupe($profileIds)) {
-        case 0:
-          $cant_dedupe = ts("The selected profiles do not contain the fields necessary to match registrations with existing contacts.");
-          $warntype = 'error';
-          break;
-        case 1:
-          $cant_dedupe = ts("The selected profiles can collect enough information to match registrations with existing contacts, but not all of the relevant fields are required.");
-          $warntype = 'alert';
-      }
-      if (!empty($values['is_multiple_registrations'])) {
-        switch(self::canProfilesDedupe($additionalProfileIds)) {
-          case 0:
-            $warntype = 'error';
-            if ($cant_dedupe) {
-              $cant_dedupe .= ' ' . ts("They also do not contain the fields necessary to match additional participants with existing contacts.");
-            }
-            else {
-              $cant_dedupe = ts("The selected profiles do not contain the fields necessary to match additional participants with existing contacts.");
-            }
-            break;
-          case 1:
-            if ($cant_dedupe) {
-              $cant_dedupe .= ' ' . ts("Likewise, they can collect enough information to match additional participants with existing contacts, but not all of the relevant fields are required.");
-            }
-            else {
-              $warntype = 'alert';
-              $cant_dedupe = ts("The selected profiles can collect enough information to match additional participants with existing contacts, but not all of the relevant fields are required.");
-            }
-        }
-      }
-      if ($cant_dedupe) {
-        $title = 'Can\'t find duplicates';
-        CRM_Core_Session::setStatus($cant_dedupe, $title, $warntype);
-      }
       //Check main profiles have an email address available if 'send confirmation email' is selected
       if ($values['is_email_confirm']) {
         $emailFields = self::getEmailFields($profileIds);
@@ -932,6 +897,62 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
           unset($ufJoinParamsAdd['id']);
         }
       }
+    }
+
+    // get the profiles to evaluate what they collect
+    $profileIds = array(
+      CRM_Utils_Array::value('custom_pre_id', $params),
+      CRM_Utils_Array::value('custom_post_id', $params),
+    );
+    $additionalProfileIds = array(
+      CRM_Utils_Array::value('additional_custom_pre_id', $params),
+      CRM_Utils_Array::value('additional_custom_post_id', $params),
+    );
+    // additional profile fields default to main if not set
+    if (!is_numeric($additionalProfileIds[0])) {
+      $additionalProfileIds[0] = $profileIds[0];
+    }
+    if (!is_numeric($additionalProfileIds[1])) {
+      $additionalProfileIds[1] = $profileIds[1];
+    }
+    //add multiple profiles if set
+    self::addMultipleProfiles($profileIds, $params, 'custom_post_id_multiple');
+    self::addMultipleProfiles($additionalProfileIds, $params, 'additional_custom_post_id_multiple');
+
+    $cantDedupe = false;
+    switch (self::canProfilesDedupe($profileIds)) {
+      case 0:
+        $cantDedupe = ts("The selected profiles do not contain the fields necessary to match registrations with existing contacts.");
+        $warntype = 'error';
+        break;
+      case 1:
+        $cantDedupe = ts("The selected profiles can collect enough information to match registrations with existing contacts, but not all of the relevant fields are required.");
+        $warntype = 'alert';
+    }
+    if (!empty($values['is_multiple_registrations'])) {
+      switch(self::canProfilesDedupe($additionalProfileIds)) {
+        case 0:
+        $warntype = 'error';
+        if ($cantDedupe) {
+          $cantDedupe .= ' ' . ts("They also do not contain the fields necessary to match additional participants with existing contacts.");
+        }
+        else {
+          $cantDedupe = ts("The selected profiles do not contain the fields necessary to match additional participants with existing contacts.");
+        }
+        break;
+        case 1:
+        if ($cantDedupe) {
+          $cantDedupe .= ' ' . ts("Likewise, they can collect enough information to match additional participants with existing contacts, but not all of the relevant fields are required.");
+        }
+        else {
+          $warntype = 'alert';
+          $cantDedupe = ts("The selected profiles can collect enough information to match additional participants with existing contacts, but not all of the relevant fields are required.");
+        }
+      }
+    }
+    if ($cantDedupe) {
+      $title = 'Can\'t find duplicates';
+      CRM_Core_Session::setStatus($cantDedupe, $title, $warntype, array('expires' => 0, 'unique' => false));
     }
 
     // Update tab "disabled" css class
