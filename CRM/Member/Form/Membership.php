@@ -980,11 +980,11 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         if ($endDate) {
           if ($membershipDetails['duration_unit'] == 'lifetime') {
             // Check if status is NOT cancelled or similar. For lifetime memberships, there is no automated
-	    // process to update status based on end-date. The user must change the status now.
-    	    $result = civicrm_api3('MembershipStatus', 'get', array(
-	      'sequential' => 1,
-	      'is_current_member' => 0,
-	    ));
+            // process to update status based on end-date. The user must change the status now.
+            $result = civicrm_api3('MembershipStatus', 'get', array(
+              'sequential' => 1,
+              'is_current_member' => 0,
+            ));
             $tmp_statuses = $result['values'];
             $status_ids = array(); 
       	    foreach($tmp_statuses as $cur_stat) {
