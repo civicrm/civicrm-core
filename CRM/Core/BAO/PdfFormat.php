@@ -361,7 +361,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
     // serialize PDF Page Format fields into a single string to store in the 'value' column of the Option Value table
     $v = json_decode($this->value, TRUE);
     foreach (self::$optionValueFields as $name => $field) {
-      $v[$name] = self::getValue($name, $values, $v[$name]);
+      $v[$name] = self::getValue($name, $values, CRM_Utils_Array::value($name, $v));
     }
     $this->value = json_encode($v);
 
