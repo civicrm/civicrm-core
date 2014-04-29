@@ -330,23 +330,7 @@ invert              = 0
 {include file="CRM/common/buildProfileLink.tpl"}
 
 <script type="text/javascript">
-    {literal}    (function($, _) { // Generic Closure
-
-    $("#is_multiple_registrations").change( function( ) {
-        if ( !$(this).prop('checked') ) {
-            $("#additional_custom_pre_id").val('');
-            $("#additional_custom_post_id").val('');
-            $(".crm-event-manage-registration-form-block-additional_custom_post_multiple").hide();
-            $('#additional_profile_pre,#additional_profile_post').hide();
-        } else {
-            $(".crm-event-manage-registration-form-block-additional_custom_post_multiple").show();
-            $('#additional_profile_pre,#additional_profile_post').show();
-        }
-
-       showRuleFields({/literal}{$ruleFields}{literal});
-    });
-
-    $('#allow_same_participant_emails').change( function() { showRuleFields({/literal}{$ruleFields}{literal}) });
+{literal}    (function($, _) { // Generic Closure
 
     function showRuleFields( ruleFields ) {
         var msg1 = '{/literal}{ts 1="' + ruleFields + '"}Primary participants will be able to register additional participants using the same email address.  The configured "Supervised" Dedupe Rule will use the following fields to prevent duplicate registrations: %1.  First and Last Name will be used to check for matches among multiple participants.{/ts}{literal}';
@@ -363,44 +347,61 @@ invert              = 0
             CRM.alert( msg3, '', 'info', {expires:0} );
         }
     }
+    function addBottomProfile( e ) {
+        e.preventDefault();
 
-    $(function($) {
-        showRuleFields( {/literal}{$ruleFields}{literal} );
+        var addtlPartc = $(this).data('addtlPartc');
 
-        var profileBottomCount = Number({/literal}{$profilePostMultiple|@count}{literal});
-        var profileBottomCountAdd = Number({/literal}{$profilePostMultipleAdd|@count}{literal});
-
-        function addBottomProfile( e ) {
-            e.preventDefault();
-
-            var addtlPartc = $(this).data('addtlPartc');
-
-            if (addtlPartc) {
-              profileBottomCount++;
-              urlPath = CRM.url('civicrm/event/manage/registration', { addProfileBottomAdd: 1, addProfileNumAdd: profileBottomCountAdd, snippet: 4 } ) ;
-            } else {
-              profileBottomCountAdd++;
-              urlPath = CRM.url('civicrm/event/manage/registration', { addProfileBottom: 1 , addProfileNum : profileBottomCount, snippet: 4 } ) ;
-            }
-
-            $(this).closest('tbody').append('<tr></tr>');
-            var $el = $(this).closest('tbody').find('tr:last');
-            $el.load(urlPath, function() { $(this).trigger('crmLoad') });
+        if (addtlPartc) {
+            profileBottomCount++;
+            urlPath = CRM.url('civicrm/event/manage/registration', { addProfileBottomAdd: 1, addProfileNumAdd: profileBottomCountAdd, snippet: 4 } ) ;
+        } else {
+            profileBottomCountAdd++;
+            urlPath = CRM.url('civicrm/event/manage/registration', { addProfileBottom: 1 , addProfileNum : profileBottomCount, snippet: 4 } ) ;
         }
 
-        function removeBottomProfile( e ) {
-            e.preventDefault();
+        $(this).closest('tbody').append('<tr></tr>');
+        var $el = $(this).closest('tbody').find('tr:last');
+        $el.load(urlPath, function() { $(this).trigger('crmLoad') });
+    }
 
-            $(e.target).parents('tr').find('.crm-profile-selector').val('');
-            $(e.target).parents('tr').hide();
+    function removeBottomProfile( e ) {
+        e.preventDefault();
+
+        $(e.target).parents('tr').find('.crm-profile-selector').val('');
+        $(e.target).parents('tr').hide();
+    }
+
+$(function($) {
+
+    showRuleFields( {/literal}{$ruleFields}{literal} );
+
+    $("#is_multiple_registrations").change( function( ) {
+        if ( !$(this).prop('checked') ) {
+            $("#additional_custom_pre_id").val('');
+            $("#additional_custom_post_id").val('');
+            $(".crm-event-manage-registration-form-block-additional_custom_post_multiple").hide();
+            $('#additional_profile_pre,#additional_profile_post').hide();
+        } else {
+            $(".crm-event-manage-registration-form-block-additional_custom_post_multiple").show();
+            $('#additional_profile_pre,#additional_profile_post').show();
         }
 
-        $('#registration_blocks').on('click', '.crm-button-add-profile', addBottomProfile);
-        $('#registration_blocks').on('click', '.crm-button-rem-profile', removeBottomProfile);
+        showRuleFields({/literal}{$ruleFields}{literal});
     });
 
-    }(CRM.$, CRM._)); //Generic Closure
-    {/literal}
+    $('#allow_same_participant_emails').change( function() { showRuleFields({/literal}{$ruleFields}{literal}) });
+
+    var profileBottomCount = Number({/literal}{$profilePostMultiple|@count}{literal});
+    var profileBottomCountAdd = Number({/literal}{$profilePostMultipleAdd|@count}{literal});
+
+    $('#registration_blocks').on('click', '.crm-button-add-profile', addBottomProfile);
+    $('#registration_blocks').on('click', '.crm-button-rem-profile', removeBottomProfile);
+
+}); // END onReady
+
+}(CRM.$, CRM._)); //Generic Closure 
+{/literal}
 </script>
 {include file="CRM/common/formNavigate.tpl"}
 {/if}
