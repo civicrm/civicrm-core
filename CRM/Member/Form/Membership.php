@@ -956,8 +956,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
         // if end date is set, ensure that start date is also set
         // and that end date is later than start date
-        // If selected membership type has duration unit as 'lifetime'
-        // and end date is set, then give error
         $endDate = NULL;
         if (!empty($params['end_date'])) {
           $endDate = CRM_Utils_Date::processDate($params['end_date']);
@@ -984,7 +982,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       	    foreach($tmp_statuses as $cur_stat) {
               $status_ids[] = $cur_stat['id']; 
             }
-            if( in_array( $params['status_id'] , $status_ids)  == false ) {
+            if (empty($params['status_id']) || in_array( $params['status_id'] , $status_ids) == false) {
               $errors['status_id'] = ts('Please enter a status that does NOT represent a current membership status.');
               $errors['is_override']  = ts('This must be checked because you set an End Date for a lifetime membership');
             }
