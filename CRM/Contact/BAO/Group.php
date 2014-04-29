@@ -1017,7 +1017,9 @@ WHERE  id IN $groupIdString
        //list. This maintains the hierarchical ordering of the tags.
        $roots = array_merge($new_roots, $roots);
      }
-
+     foreach($rows as $value) {
+        $groups[$value['id']] = array($value['prefix'], $value['title']); 
+     }
      // Prefix titles with the calcuated spacing to give the visual
      // appearance of ordering when transformed into HTML in the form layer. Add description and visibility.
      $groupsReturn = array();
