@@ -982,7 +982,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       	    foreach($tmp_statuses as $cur_stat) {
               $status_ids[] = $cur_stat['id']; 
             }
-            if( $params['status_id'] == false || in_array( $params['status_id'] , $status_ids)  == false ) {
+            if( empty( $params['status_id'] ) || in_array( $params['status_id'] , $status_ids)  == false ) {
               $errors['status_id'] = ts('Please enter a status that does NOT represent a current membership status.');
               $errors['is_override']  = ts('This must be checked because you set an End Date for a lifetime membership');
             }
