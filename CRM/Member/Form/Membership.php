@@ -979,7 +979,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
         if ($endDate) {
           if ($membershipDetails['duration_unit'] == 'lifetime') {
-            $errors['end_date'] = ts('The selected Membership Type has a lifetime duration. You cannot specify an End Date for lifetime memberships. Please clear the End Date OR select a different Membership Type.');
+           
           }
           else {
             if (!$startDate) {
