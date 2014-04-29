@@ -330,38 +330,43 @@ invert              = 0
 {include file="CRM/common/buildProfileLink.tpl"}
 
 <script type="text/javascript">
-    {literal}
-    cj("#is_multiple_registrations").change( function( ) {
-        if ( !cj(this).prop('checked') ) {
-            cj("#additional_custom_pre_id").val('');
-            cj("#additional_custom_post_id").val('');
-      cj(".crm-event-manage-registration-form-block-additional_custom_post_multiple").hide();
+    {literal}    (function($, _) { // Generic Closure
+
+    $("#is_multiple_registrations").change( function( ) {
+        if ( !$(this).prop('checked') ) {
+            $("#additional_custom_pre_id").val('');
+            $("#additional_custom_post_id").val('');
+            $(".crm-event-manage-registration-form-block-additional_custom_post_multiple").hide();
+            $('#additional_profile_pre,#additional_profile_post').hide();
         } else {
-      cj(".crm-event-manage-registration-form-block-additional_custom_post_multiple").show();
-  }
+            $(".crm-event-manage-registration-form-block-additional_custom_post_multiple").show();
+            $('#additional_profile_pre,#additional_profile_post').show();
+        }
+
+       showRuleFields({/literal}{$ruleFields}{literal});
     });
 
-    showRuleFields( {/literal}{$ruleFields}{literal} );
+    $('#allow_same_participant_emails').change( function() { showRuleFields({/literal}{$ruleFields}{literal}) });
 
-    function showRuleFields( ruleFields )
-    {
+    function showRuleFields( ruleFields ) {
         var msg1 = '{/literal}{ts 1="' + ruleFields + '"}Primary participants will be able to register additional participants using the same email address.  The configured "Supervised" Dedupe Rule will use the following fields to prevent duplicate registrations: %1.  First and Last Name will be used to check for matches among multiple participants.{/ts}{literal}';
         var msg2 = '{/literal}{ts escape='js'}Primary participants will be allowed to register for this event multiple times.  No duplicate registration checking will be performed.{/ts}{literal}';
         var msg3 = '{/literal}{ts escape='js'}Primary participants will be able to register additional participants during registration.{/ts}{literal}';
 
         // Display info
-        cj('.ui-notify-message .ui-notify-close').click();
-        if ( cj("#allow_same_participant_emails").prop('checked' ) && cj("#is_multiple_registrations").prop('checked' ) ) {
+        $('.ui-notify-message .ui-notify-close').click();
+        if ( $("#allow_same_participant_emails").prop('checked' ) && cj("#is_multiple_registrations").prop('checked' ) ) {
             CRM.alert( msg1, '', 'info', {expires:0} );
-        } else if ( cj("#allow_same_participant_emails").prop('checked' ) && !cj("#is_multiple_registrations").prop('checked' ) ) {
+        } else if ( $("#allow_same_participant_emails").prop('checked' ) && !cj("#is_multiple_registrations").prop('checked' ) ) {
             CRM.alert( msg2, '', 'info', {expires:0} );
-        } else if ( !cj("#allow_same_participant_emails").prop('checked' ) && cj("#is_multiple_registrations").prop('checked' ) ) {
+        } else if ( !$("#allow_same_participant_emails").prop('checked' ) && cj("#is_multiple_registrations").prop('checked' ) ) {
             CRM.alert( msg3, '', 'info', {expires:0} );
         }
     }
 
-      //show edit profile field links
-    CRM.$(function($) {
+    $(function($) {
+        showRuleFields( {/literal}{$ruleFields}{literal} );
+
         var profileBottomCount = Number({/literal}{$profilePostMultiple|@count}{literal});
         var profileBottomCountAdd = Number({/literal}{$profilePostMultipleAdd|@count}{literal});
 
@@ -386,14 +391,15 @@ invert              = 0
         function removeBottomProfile( e ) {
             e.preventDefault();
 
-            cj(e.target).parents('tr').find('.crm-profile-selector').val('');
-            cj(e.target).parents('tr').hide();
+            $(e.target).parents('tr').find('.crm-profile-selector').val('');
+            $(e.target).parents('tr').hide();
         }
 
         $('#registration_blocks').on('click', '.crm-button-add-profile', addBottomProfile);
         $('#registration_blocks').on('click', '.crm-button-rem-profile', removeBottomProfile);
     });
 
+    }(CRM.$, CRM._)); //Generic Closure
     {/literal}
 </script>
 {include file="CRM/common/formNavigate.tpl"}
