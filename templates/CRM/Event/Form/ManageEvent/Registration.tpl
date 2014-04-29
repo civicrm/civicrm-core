@@ -347,6 +347,10 @@ invert              = 0
             CRM.alert( msg3, '', 'info', {expires:0} );
         }
     }
+
+    var profileBottomCount = Number({/literal}{$profilePostMultiple|@count}{literal});
+    var profileBottomCountAdd = Number({/literal}{$profilePostMultipleAdd|@count}{literal});
+
     function addBottomProfile( e ) {
         e.preventDefault();
 
@@ -376,10 +380,13 @@ $(function($) {
 
     showRuleFields( {/literal}{$ruleFields}{literal} );
 
-    $("#is_multiple_registrations").change( function( ) {
+    var allow_multiple = $("#is_multiple_registrations");
+    if ( !allow_multiple.prop('checked') ) { 
+        $('#additional_profile_pre,#additional_profile_post').hide(); 
+    }
+    allow_multiple.change( function( ) {
         if ( !$(this).prop('checked') ) {
-            $("#additional_custom_pre_id").val('');
-            $("#additional_custom_post_id").val('');
+            $("#additional_custom_pre_id,#additional_custom_post_id").val('');
             $(".crm-event-manage-registration-form-block-additional_custom_post_multiple").hide();
             $('#additional_profile_pre,#additional_profile_post').hide();
         } else {
@@ -392,14 +399,10 @@ $(function($) {
 
     $('#allow_same_participant_emails').change( function() { showRuleFields({/literal}{$ruleFields}{literal}) });
 
-    var profileBottomCount = Number({/literal}{$profilePostMultiple|@count}{literal});
-    var profileBottomCountAdd = Number({/literal}{$profilePostMultipleAdd|@count}{literal});
-
     $('#registration_blocks').on('click', '.crm-button-add-profile', addBottomProfile);
     $('#registration_blocks').on('click', '.crm-button-rem-profile', removeBottomProfile);
 
 }); // END onReady
-
 }(CRM.$, CRM._)); //Generic Closure 
 {/literal}
 </script>
