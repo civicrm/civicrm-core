@@ -73,8 +73,8 @@
             <td><label>{$form.tag_1.label}</label> <div class="crm-select-container crm-attachment-tags">{$form.tag_1.html}</div></td>
           </tr>
         {/if}
-        {if $tagsetInfo_attachment}
-          <tr><td></td><td>{include file="CRM/common/Tag.tpl" tagsetType='attachment' tagsetNumber=1 }</td></tr>
+        {if $tagsetInfo.attachment}
+          <tr><td></td><td>{include file="CRM/common/Tagset.tpl" tagsetType='attachment' tagsetNumber=1 }</td></tr>
         {/if}
         {section name=attachLoop start=2 loop=$numAttachments+1}
           {assign var=index value=$smarty.section.attachLoop.index}
@@ -90,8 +90,8 @@
               <td></td>
               <td><label>{$form.$tagElement.label}</label> <div class="crm-select-container crm-attachment-tags">{$form.$tagElement.html}</div></td>
             </tr>
-            {if $tagsetInfo_attachment}
-              <tr><td></td><td>{include file="CRM/common/Tag.tpl" tagsetType='attachment' tagsetNumber=$index}</td></tr>
+            {if $tagsetInfo.attachment}
+              <tr><td></td><td>{include file="CRM/common/Tagset.tpl" tagsetType='attachment' tagsetNumber=$index}</td></tr>
             {/if}
         {/section}
 

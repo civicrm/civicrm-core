@@ -23,30 +23,23 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-form-block crm-block crm-activity-task-addtotag-form-block">
-<h3>
-{ts}Tag Activities{/ts}
-</h3>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-<table class="form-layout-compressed">
-    <tr class="crm-activity-task-addtotag-form-block-tag">
-        <td>
-            <div class="listing-box">
-            {foreach from=$form.tag item="tag_val"}
-                <div class="{cycle values="odd-row,even-row"}">
-                {$tag_val.html}
-                </div>
-            {/foreach}
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            {include file="CRM/common/Tagset.tpl"}
-        </td>
-    </tr>
-
-    <tr><td>{include file="CRM/Activity/Form/Task.tpl"}</td></tr>
-</table>
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-</div>
+{if empty($tagsetType)}
+  {capture assign="tagsetType"}contact{/capture}
+{/if}
+{foreach from=$tagsetInfo.$tagsetType item=tagset}
+  <div class="crm-section tag-section {$tagsetType}-tagset {$tagsetType}-tagset-{$tagset.parentID}-section">
+    <label>{$tagset.parentName}</label>
+    <div class="crm-clearfix"{if $context EQ "contactTab"} style="margin-top:-15px;"{/if}>
+      {assign var=elemName  value = $tagset.tagsetElementName}
+      {assign var=parID     value = $tagset.parentID}
+      {assign var=editTagSet value=false}
+      {$form.$elemName.$parID.html}
+      {if $action ne 4 }
+        {assign var=editTagSet value=true}
+        {if $action eq 16 and !($permission eq 'edit') }
+          {assign var=editTagSet value=false}
+        {/if}
+      {/if}
+    </div>
+  </div>
+{/foreach}
