@@ -626,6 +626,47 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->membershipDelete($membershipId);
     Contact::delete($contactId);
   }
+
+  /**
+   * this is to test that the transaction is not lost from the DB )rolled back) if the post hook fails
+   * Note that this behaviour was observed on membership specifically - which has rollbacks in it
+   *
+   */
+  function testFailureRollback() {
+    $statusId  = 3;
+    $contactId = Contact::createIndividual();
+    $joinDate  = $startDate = date("Ymd", strtotime(date("Ymd") . " -1 year -15 days"));
+    $endDate   = date("Ymd", strtotime($joinDate . " +1 year -1 day"));
+    $ids = array();
+    $params    = array(
+      'contact_id' => $contactId,
+      'membership_type_id' => $this->_membershipTypeID,
+      'join_date' => $joinDate,
+      'start_date' => $startDate,
+      'end_date' => $endDate,
+      'source' => 'Payment',
+      'status_id' => $statusId,
+    );
+    // this call is our control - at time of writing this test passed & the one with the bad hook failed
+    $membership = CRM_Member_BAO_Membership::create($params, $ids);
+    $this->callAPISuccessGetSingle('membership', array('id' => $membership->id));
+    $this->callAPISuccess('membership', 'delete', array('id' => $membership->id));
+
+
+    $this->hookClass = CRM_Utils_Hook::singleton();
+    $this->hookClass->setHook('civicrm_post', array($this, 'badPostFunction'));
+
+    //if there is a rollback this second call will not create a membership
+    $membership = CRM_Member_BAO_Membership::create($params, $ids);
+    $this->callAPISuccessGetSingle('membership', array('id' => $membership->id));
+    CRM_Utils_Hook::singleton()->reset();
+  }
+
+  function badPostFunction($op, $objectName, $objectId, &$objectRef) {
+    if($objectName == 'Membership') {
+      civicrm_api('relationship', 'create', array());
+    }
+  }
 }
 
 
