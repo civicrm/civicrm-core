@@ -45,7 +45,6 @@ class api_v3_CaseTest extends CiviUnitTestCase {
   protected $followup_activity_type_value;
   protected $caseTypeId;
   protected $caseStatusGroup;
-  protected $caseTypeGroup;
   protected $optionValues;
 
   /**
@@ -66,20 +65,6 @@ class api_v3_CaseTest extends CiviUnitTestCase {
       'name' => 'case_status',
       'format.only_id' => 1)
     );
-    $this->caseTypeGroup = $this->callAPISuccess('option_group', 'get', array(
-      'name' => 'case_type',
-      'format.only_id' => 1)
-    );
-    $caseTypes = $this->callAPISuccess('option_value', 'Create', array(
-        'option_group_id' => $this->caseTypeGroup,
-        'name' => 'housing_support',
-        'label' => "Housing Support",
-        'sequential' => 1,
-        'description' => 'Help homeless individuals obtain temporary and long-term housing',
-      ));
-
-    $this->caseTypeId = $caseTypes['values'][0]['value'];
-    $this->optionValues[] = $caseTypes['id'];
     $optionValues = array(
       'Medical evaluation' => 'Medical evaluation',
       'Mental health evaluation' => "Mental health evaluation",
@@ -98,7 +83,8 @@ class api_v3_CaseTest extends CiviUnitTestCase {
       // store for cleanup
       $this->optionValues[] = $activityTypes['id'];
     }
-    $tablesToTruncate = array(
+    $this->caseTypeId = 1;
+    $this->tablesToTruncate = array(
       'civicrm_activity',
       'civicrm_contact',
       'civicrm_custom_group',
@@ -106,12 +92,13 @@ class api_v3_CaseTest extends CiviUnitTestCase {
       'civicrm_case',
       'civicrm_case_contact',
       'civicrm_case_activity',
+      'civicrm_case_type',
       'civicrm_activity_contact',
       'civicrm_relationship',
       'civicrm_relationship_type',
     );
 
-    $this->quickCleanup($tablesToTruncate);
+    $this->quickCleanup($this->tablesToTruncate);
 
     $this->loadAllFixtures();
 
@@ -153,20 +140,7 @@ class api_v3_CaseTest extends CiviUnitTestCase {
    * @access protected
    */
   function tearDown() {
-    foreach ($this->optionValues as $id) {
-      $this->callAPISuccess('option_value', 'delete', array('id' => $id));
-    }
-    $tablesToTruncate = array(
-      'civicrm_contact',
-      'civicrm_activity',
-      'civicrm_case',
-      'civicrm_case_contact',
-      'civicrm_case_activity',
-      'civicrm_activity_contact',
-      'civicrm_relationship',
-      'civicrm_relationship_type',
-    );
-    $this->quickCleanup($tablesToTruncate, TRUE);
+    $this->quickCleanup($this->tablesToTruncate, TRUE);
 
     $this->customDirectories(array('template_path' => FALSE));
   }
@@ -204,7 +178,7 @@ class api_v3_CaseTest extends CiviUnitTestCase {
 
     // Check result
     $result = $this->callAPISuccess('case', 'get', array('id' => $id));
-    $this->assertEquals($result['values'][$id]['id'], 1, 'in line ' . __LINE__);
+    $this->assertEquals($result['values'][$id]['id'], $id, 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$id]['case_type_id'], $this->caseTypeId, 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$id]['subject'], $params['subject'], 'in line ' . __LINE__);
   }
@@ -216,7 +190,8 @@ class api_v3_CaseTest extends CiviUnitTestCase {
     // Create Case
     $params = $this->_params;
     // Test using name instead of value
-    $params['case_type_id'] = 'housing_support';
+    unset($params['case_type_id']);
+    $params['case_type'] = 'Housing Support';
     $result = $this->callAPISuccess('case', 'create', $params);
     $id = $result['id'];
     $result = $this->callAPISuccess('case', 'get', array('id' => $id));

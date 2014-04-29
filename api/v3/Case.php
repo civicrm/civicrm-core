@@ -391,10 +391,6 @@ function _civicrm_api3_case_read($caseId, $options) {
     // Legacy support for client_id - TODO: in apiv4 remove 'client_id'
     $case['client_id'] = $case['contact_id'] = $dao->retrieveContactIdsByCaseId($caseId);
 
-    //handle multi-value case type
-    $sep = CRM_Core_DAO::VALUE_SEPARATOR;
-    $case['case_type_id'] = trim(str_replace($sep, ',', $case['case_type_id']), ',');
-
     if (!empty($return['contacts'])) {
       //get case contacts
       $contacts = CRM_Case_BAO_Case::getcontactNames($caseId);
@@ -419,14 +415,11 @@ function _civicrm_api3_case_read($caseId, $options) {
  */
 function _civicrm_api3_case_format_params(&$params) {
   // figure out case type id from case type and vice-versa
-  $caseTypes = CRM_Case_PseudoConstant::caseType('label', FALSE);
+  $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
   if (empty($params['case_type_id'])) {
     $params['case_type_id'] = array_search($params['case_type'], $caseTypes);
   }
   elseif (empty($params['case_type'])) {
     $params['case_type'] = $caseTypes[$params['case_type_id']];
   }
-  // format input with value separators
-  $sep = CRM_Core_DAO::VALUE_SEPARATOR;
-  $params['case_type_id'] = $sep . implode($sep, (array) $params['case_type_id']) . $sep;
 }

@@ -61,16 +61,16 @@ class CRM_Case_BAO_Query {
     }
 
     if (!empty($query->_returnProperties['case_type_id'])) {
-      $query->_select['case_type_id'] = "case_type.id as case_type_id";
+      $query->_select['case_type_id'] = "civicrm_case_type.id as case_type_id";
       $query->_element['case_type_id'] = 1;
       $query->_tables['case_type'] = $query->_whereTables['case_type'] = 1;
       $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_type'])) {
-      $query->_select['case_type'] = "case_type.label as case_type";
+    if (!empty($query->_returnProperties['civicrm_case_type'])) {
+      $query->_select['case_type'] = "civicrm_case_type.title as case_type";
       $query->_element['case_type'] = 1;
-      $query->_tables['case_type'] = $query->_whereTables['case_type'] = 1;
+      $query->_tables['civicrm_case_type'] = $query->_whereTables['civicrm_case_type'] = 1;
       $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
     }
 
@@ -269,7 +269,7 @@ class CRM_Case_BAO_Query {
         return;
 
       case 'case_type_id':
-        $caseTypes = CRM_Case_PseudoConstant::caseType('label', FALSE);
+        $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
 
         if (is_array($value)) {
           foreach ($value as $k => $v) {
@@ -288,11 +288,7 @@ class CRM_Case_BAO_Query {
           $names[] = $caseTypes[$caseTypeId];
         }
 
-        $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR . "%' OR civicrm_case.case_type_id LIKE '%" .
-          CRM_Core_DAO::VALUE_SEPARATOR, $val
-        ) . CRM_Core_DAO::VALUE_SEPARATOR;
-
-        $query->_where[$grouping][] = "(civicrm_case.case_type_id LIKE '%{$value}%')";
+        $query->_where[$grouping][] = "(civicrm_case.case_type_id LIKE '%{$val}%')";
 
         $query->_qill[$grouping][] = ts('Case Type is %1', array(1 => implode(' ' . ts('or') . ' ', $names)));
         $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
@@ -537,8 +533,7 @@ class CRM_Case_BAO_Query {
         break;
 
       case 'case_type':
-        $from .= " $side JOIN civicrm_option_group option_group_case_type ON (option_group_case_type.name = 'case_type')";
-        $from .= " $side JOIN civicrm_option_value case_type ON (civicrm_case.case_type_id = case_type.value AND option_group_case_type.id = case_type.option_group_id ) ";
+        $from .= " $side JOIN civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id ";
         break;
 
       case 'case_activity_type':

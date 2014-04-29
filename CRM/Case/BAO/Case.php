@@ -158,12 +158,12 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
     $caseContact->save();
 
     // add to recently viewed
-    $caseType = CRM_Case_PseudoConstant::caseTypeName($caseContact->case_id, 'label');
+    $caseType = CRM_Case_BAO_Case::getCaseType($caseContact->case_id);
     $url = CRM_Utils_System::url('civicrm/contact/view/case',
       "action=view&reset=1&id={$caseContact->case_id}&cid={$caseContact->contact_id}&context=home"
     );
 
-    $title = CRM_Contact_BAO_Contact::displayName($caseContact->contact_id) . ' - ' . $caseType['name'];
+    $title = CRM_Contact_BAO_Contact::displayName($caseContact->contact_id) . ' - ' . $caseType;
 
     $recentOther = array();
     if (CRM_Core_Permission::checkActionPermission('CiviCase', CRM_Core_Action::DELETE)) {
@@ -300,22 +300,16 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @access public
    * @static
    */
-  static function getCaseType($caseId, $colName = 'label') {
-    $caseType = NULL;
-    if (!$caseId) {
-      return $caseType;
-    }
+  static function getCaseType($caseId, $colName = 'title') {
+    $query = "
+SELECT  civicrm_case_type.{$colName} FROM civicrm_case
+LEFT JOIN civicrm_case_type ON
+  civicrm_case.case_type_id = civicrm_case_type.id
+WHERE civicrm_case.id = %1";
 
-    $sql = "
-    SELECT  ov.{$colName}
-      FROM  civicrm_case ca
- INNER JOIN  civicrm_option_group og ON og.name='case_type'
- INNER JOIN  civicrm_option_value ov ON ( ca.case_type_id=ov.value AND ov.option_group_id=og.id )
-     WHERE  ca.id = %1";
+    $queryParams = array(1 => array($caseId, 'Integer'));
 
-    $params = array(1 => array($caseId, 'Integer'));
-
-    return CRM_Core_DAO::singleValueQuery($sql, $params);
+    return CRM_Core_DAO::singleValueQuery($query, $queryParams);
   }
 
   /**
@@ -523,9 +517,8 @@ INNER JOIN civicrm_case ca ON cc.case_id = ca.id
 ";
     if (isset($caseType)) {
       $query .=
-"INNER JOIN civicrm_option_value cov ON (cov.value = ca.case_type_id)
-INNER JOIN civicrm_option_group cog ON (cog.id = cov.option_group_id and cog.name = 'case_type')
-WHERE cc.contact_id = %1 AND cov.name = '{$caseType}'";
+"INNER JOIN civicrm_case_type ON civicrm_case_type.id = ca.case_type_id
+WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
     }
     if (!isset($caseType)) {
       $query .= "WHERE cc.contact_id = %1";
@@ -564,8 +557,8 @@ civicrm_phone.phone as phone,
 civicrm_contact.contact_type as contact_type,
 civicrm_contact.contact_sub_type as contact_sub_type,
 t_act.activity_type_id,
-cov_type.label as case_type,
-cov_type.name as case_type_name,
+c_type.title as case_type,
+civicrm_case.case_type_id as case_type_id,
 cov_status.label as case_status,
 cov_status.label as case_status_name,
 t_act.status_id,
@@ -666,12 +659,8 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
  ON ( case_relation_type.id = case_relationship.relationship_type_id
       AND case_relation_type.id = case_relationship.relationship_type_id )
 
- LEFT JOIN civicrm_option_group cog_type
- ON cog_type.name = 'case_type'
-
- LEFT JOIN civicrm_option_value cov_type
- ON ( civicrm_case.case_type_id = cov_type.value
-      AND cog_type.id = cov_type.option_group_id )
+ LEFT JOIN civicrm_case_type c_type
+ ON civicrm_case.case_type_id = c_type.id
 
  LEFT JOIN civicrm_option_group cog_status
  ON cog_status.name = 'case_status'
@@ -762,7 +751,7 @@ AND civicrm_case.status_id != $closedId";
       'case_id',
       'case_subject',
       'case_type',
-      'case_type_name',
+      'case_type_id',
       'status_id',
       'case_status',
       'case_status_name',
@@ -916,15 +905,11 @@ AND civicrm_case.status_id != $closedId";
       $myGroupByClause = " GROUP BY CONCAT(case_relationship.case_id,'-',case_relationship.contact_id_b)";
     }
 
-    $seperator = CRM_Core_DAO::VALUE_SEPARATOR;
-
     $query = "
-SELECT case_status.label AS case_status, status_id, case_type.label AS case_type,
- REPLACE(case_type_id,'{$seperator}','') AS case_type_id, case_relationship.contact_id_b
+SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS case_type,
+ case_type_id, case_relationship.contact_id_b
  FROM civicrm_case
- LEFT JOIN civicrm_option_group option_group_case_type ON ( option_group_case_type.name = 'case_type' )
- LEFT JOIN civicrm_option_value case_type ON ( civicrm_case.case_type_id = case_type.value
- AND option_group_case_type.id = case_type.option_group_id )
+ LEFT JOIN civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id
  LEFT JOIN civicrm_option_group option_group_case_status ON ( option_group_case_status.name = 'case_status' )
  LEFT JOIN civicrm_option_value case_status ON ( civicrm_case.status_id = case_status.value
  AND option_group_case_status.id = case_status.option_group_id )
@@ -2002,7 +1987,7 @@ SELECT civicrm_contact.id as casemanager_id,
     //params from ajax call.
     $where = array('( ca.end_date is null )');
     if ($caseType = CRM_Utils_Array::value('case_type', $params)) {
-      $where[] = "( ov.label LIKE '%$caseType%' )";
+      $where[] = "( civicrm_case_type.title LIKE '%$caseType%' )";
     }
     if ($sortName = CRM_Utils_Array::value('sort_name', $params)) {
       $config = CRM_Core_Config::singleton();
@@ -2038,12 +2023,11 @@ SELECT civicrm_contact.id as casemanager_id,
             c.sort_name,
             ca.id,
             ca.subject as case_subject,
-            ov.label as case_type,
+            civicrm_case_type.title as case_type,
             ca.start_date as start_date
       FROM  civicrm_case ca INNER JOIN civicrm_case_contact cc ON ca.id=cc.case_id
  INNER JOIN  civicrm_contact c ON cc.contact_id=c.id
- INNER JOIN  civicrm_option_group og ON og.name='case_type'
- INNER JOIN  civicrm_option_value ov ON (ca.case_type_id=ov.value AND ov.option_group_id=og.id)
+ INNER JOIN  civicrm_case_type ON ca.case_type_id = civicrm_case_type.id
      WHERE  {$whereClause}
   ORDER BY  c.sort_name
             {$limitClause}
@@ -2124,12 +2108,10 @@ LEFT JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.case
     }
 
     $query = "
-    SELECT  civicrm_case.id, case_type_ov.label as case_type, civicrm_case.start_date
+    SELECT  civicrm_case.id, civicrm_case_type.title as case_type, civicrm_case.start_date
       FROM  civicrm_case
 INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.case_id )
- LEFT JOIN  civicrm_option_group case_type_og ON ( case_type_og.name = 'case_type' )
- LEFT JOIN  civicrm_option_value case_type_ov ON ( civicrm_case.case_type_id = case_type_ov.value
-                                                   AND case_type_og.id = case_type_ov.option_group_id )
+ LEFT JOIN  civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id
      WHERE  {$whereClause}";
 
     $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($contactId, 'Integer')));
@@ -2218,15 +2200,13 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
     //2. fetch the details of related cases.
     $query = "
     SELECT  relCase.id as id,
-            case_type_ov.label as case_type,
+            civicrm_case_type.title as case_type,
             client.display_name as client_name,
             client.id as client_id
       FROM  civicrm_case relCase
  INNER JOIN  civicrm_case_contact relCaseContact ON ( relCase.id = relCaseContact.case_id )
  INNER JOIN  civicrm_contact      client         ON ( client.id = relCaseContact.contact_id )
- LEFT JOIN  civicrm_option_group case_type_og   ON ( case_type_og.name = 'case_type' )
- LEFT JOIN  civicrm_option_value case_type_ov   ON ( relCase.case_type_id = case_type_ov.value
-                                                     AND case_type_og.id = case_type_ov.option_group_id )
+ LEFT JOIN  civicrm_case_type ON relCase.case_type_id = civicrm_case_type.id
      WHERE  {$whereClause}";
 
     $dao = CRM_Core_DAO::executeQuery($query);
