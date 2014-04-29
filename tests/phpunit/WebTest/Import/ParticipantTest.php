@@ -298,7 +298,7 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
     }
 
     $this->click("_qf_Fee_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("_qf_Fee_upload-bottom");
 
     // Go to Online Registration tab
     $this->click("link=Online Registration");
@@ -315,8 +315,8 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
     $this->type("confirm_from_email", "jane.doe@example.org");
 
     $this->click("_qf_Registration_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Registration' information has been saved.");
+    $this->waitForElementPresent("_qf_Registration_upload-bottom");
+    $this->waitForTextPresent("'Online Registration' information has been saved.");
 
     // verify event input on info page
     // start at Manage Events listing

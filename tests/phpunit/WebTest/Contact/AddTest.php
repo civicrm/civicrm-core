@@ -403,7 +403,6 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     //create new current employer
     $currentEmployer = substr(sha1(rand()), 0, 7) . "Web Access";
 
-    $this->type('current_employer', $currentEmployer);
 
     //fill in email
     $this->type("email_1_email", substr(sha1(rand()), 0, 7) . "john@gmail.com");
@@ -423,10 +422,11 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click('address[1][use_shared_address]');
 
     // create new organization with dialog
-    $this->select("profiles_1", "label=New Organization");
+    $this->clickAt("xpath=//div[@id='s2id_address_1_master_contact_id']/a");
+    $this->click("xpath=//li[@class='select2-no-results']//a[contains(text(),' New Organization')]");
 
     // create new contact using dialog
-    $this->waitForElementPresent("css=div#contact-dialog-1");
+    $this->waitForElementPresent("css=div#crm-profile-block");
     $this->waitForElementPresent("_qf_Edit_next");
 
     $this->type('organization_name', $currentEmployer);
@@ -434,11 +434,13 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->type("email-Primary", "john@gmail.com" . substr(sha1(rand()), 0, 7));
     $this->type('city-1', 'Dumfries');
     $this->type('postal_code-1', '1234');
+    $this->select('state_province-1', 'value=1001');
 
     $this->click("_qf_Edit_next");
 
     // Is new contact created?
     $this->waitForText('crm-notification-container', "$currentEmployer has been created.");
+    $this->select2('employer_id', $currentEmployer);
 
     //make sure shared address is selected
     $this->waitForElementPresent('selected_shared_address-1');
@@ -452,10 +454,11 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click('address[2][use_shared_address]');
 
     // create new household with dialog
-    $this->select('profiles_2', "label=New Household");
+    $this->clickAt("xpath=//div[@id='s2id_address_2_master_contact_id']/a");
+    $this->click("xpath=//li[@class='select2-no-results']//a[contains(text(),' New Household')]");
 
     // create new contact using dialog
-    $this->waitForElementPresent("css=div#contact-dialog-2");
+    $this->waitForElementPresent("css=div#crm-profile-block");
     $this->waitForElementPresent("_qf_Edit_next");
 
     $sharedHousehold = substr(sha1(rand()), 0, 7) . 'Smith Household';
@@ -464,6 +467,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->type("email-Primary", substr(sha1(rand()), 0, 7) . "john@gmail.com");
     $this->type('city-1', 'Birmingham');
     $this->type('postal_code-1', '3456');
+    $this->select('state_province-1', 'value=1001');
 
     $this->click("_qf_Edit_next");
 

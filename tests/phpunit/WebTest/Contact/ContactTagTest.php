@@ -112,9 +112,9 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=div#tagtree");
 
     //add Tagset to contact
-    $this->click("//div[@id='Tag']/div[2]/div[1]/div/ul/li[1]/input");
-    $this->type("//div[@id='Tag']/div[2]/div[1]/div/ul/li[1]/input", 'tagset1');
-    $this->typeKeys("//div[@id='Tag']/div[2]/div[1]/div/ul/li[1]/input", 'tagset1');
+    $this->click("//div[@id='Tag']/div[2]/div[1]/span/ul/li[1]/input");
+    $this->type("//div[@id='Tag']/div[2]/div[1]/span/ul/li[1]/input", 'tagset1');
+    $this->typeKeys("//div[@id='Tag']/div[2]/div[1]/span/ul/li[1]/input", 'tagset1');
 
     // ...waiting for drop down with results to show up...
     $this->waitForElementPresent("css=div.token-input-dropdown-facebook");
@@ -124,9 +124,9 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
 
     //$this->waitForElementPresent("//div[@id='Tag']/div[3]/div[1]/ul/li[1]/span");
-    $this->click("//div[@id='Tag']/div[2]/div[1]/div/ul/li[2]/input");
-    $this->type("//div[@id='Tag']/div[2]/div[1]/div/ul/li[2]/input", 'tagset2');
-    $this->typeKeys("//div[@id='Tag']/div[2]/div[1]/div/ul/li[2]/input", 'tagset2');
+    $this->click("//div[@id='Tag']/div[2]/div[1]/span/ul/li[2]/input");
+    $this->type("//div[@id='Tag']/div[2]/div[1]/span/ul/li[2]/input", 'tagset2');
+    $this->typeKeys("//div[@id='Tag']/div[2]/div[1]/span/ul/li[2]/input", 'tagset2');
 
     // ...waiting for drop down with results to show up...
     $this->waitForElementPresent("css=div.token-input-dropdown-facebook");
@@ -135,7 +135,7 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     // ...need to use mouseDownAt on first result (which is a li element), click does not work
     $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
 
-    $this->click("//div[@id='Tag']/div[2]/div[1]/div/ul/li");
+    $this->click("//div[@id='Tag']/div[2]/div[1]/span/ul/li");
 
     // Type search name in autocomplete.
     $this->click("css=input#sort_name_navigation");
