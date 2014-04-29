@@ -273,3 +273,8 @@ ALTER TABLE `civicrm_mail_settings`
 ALTER TABLE `civicrm_mailing`
   ADD COLUMN `hash` varchar(16) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Key for validating requests related to this mailing.',
   ADD INDEX `index_hash` (`hash`);
+
+-- CRM-14300
+UPDATE `civicrm_event` SET is_template = 0 WHERE is_template IS NULL;
+ALTER TABLE `civicrm_event`
+  CHANGE is_template is_template tinyint(4) DEFAULT '0' COMMENT 'whether the event has template';
