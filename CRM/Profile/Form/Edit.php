@@ -133,10 +133,10 @@ SELECT module,is_reserved
 
 
       //Check that the user has the "add contacts" Permission
-      $CanAdd = CRM_Core_Permission::check("add contacts");
+      $canAdd = CRM_Core_Permission::check("add contacts");
 
       //Remove need for Profile module type when using reserved profiles [CRM-14488]
-      if( !$error || ($dao->module != "Profile" && !($dao->is_reserved && $CanAdd))) {
+      if( !$error || ($dao->module != "Profile" && !($dao->is_reserved && $canAdd))) {
       CRM_Core_Error::fatal(ts('The requested Profile (gid=%1) is not configured to be used for \'Profile\' edit and view forms in its Settings. Contact the site administrator if you need assistance.',
           array(1 => $this->_gid)
         ));
