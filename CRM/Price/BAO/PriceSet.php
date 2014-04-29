@@ -832,8 +832,15 @@ WHERE  id = %1";
     // call the hook.
     CRM_Utils_Hook::buildAmount($component, $form, $feeBlock);
 
+    // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
+    $adminFieldVisible = false;
+    if (CRM_Core_Permission::check('administer CiviCRM')) {
+      $adminFieldVisible = true; 
+    }
+    
     foreach ($feeBlock as $id => $field) {
       if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
+        (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == true) ||
         !$validFieldsOnly
       ) {
         $options = CRM_Utils_Array::value('options', $field);
