@@ -37,24 +37,6 @@
  */
 class CRM_Core_SelectValues {
 
-  /**CRM/Core/SelectValues.php
-   * different types of phones
-   * @static
-   */
-  static function phoneType() {
-    static $phoneType = NULL;
-    if (!$phoneType) {
-      $phoneType = array(
-        '' => ts('- select -'),
-        'Phone' => ts('Phone'),
-        'Mobile' => ts('Mobile'),
-        'Fax' => ts('Fax'),
-        'Pager' => ts('Pager'),
-      );
-    }
-    return $phoneType;
-  }
-
   /**
    * preferred mail format
    * @static
@@ -107,20 +89,16 @@ class CRM_Core_SelectValues {
    * @static
    */
   static function unitList($unitType = NULL) {
-    static $unitList = NULL;
-    if (!$unitList) {
-      $unitList = array(
-        '' => ts('- select -'),
-        'day' => ts('day'),
-        'month' => ts('month'),
-        'year' => ts('year'),
+    $unitList = array(
+      'day' => ts('day'),
+      'month' => ts('month'),
+      'year' => ts('year'),
+    );
+    if ($unitType == 'duration') {
+      $unitAdd = array(
+        'lifetime' => ts('lifetime'),
       );
-      if ($unitType == 'duration') {
-        $unitAdd = array(
-          'lifetime' => ts('lifetime'),
-        );
-        $unitList = array_merge($unitList, $unitAdd);
-      }
+      $unitList = array_merge($unitList, $unitAdd);
     }
     return $unitList;
   }
@@ -141,16 +119,11 @@ class CRM_Core_SelectValues {
    * various pre defined period types
    * @static
    */
-  static function &periodType() {
-    static $periodType = NULL;
-    if (!$periodType) {
-      $periodType = array(
-        '' => ts('- select -'),
-        'rolling' => ts('Rolling'),
-        'fixed' => ts('Fixed'),
-      );
-    }
-    return $periodType;
+  static function periodType() {
+    return array(
+      'rolling' => ts('Rolling'),
+      'fixed' => ts('Fixed'),
+    );
   }
 
   /**
@@ -172,17 +145,12 @@ class CRM_Core_SelectValues {
    * various pre defined event dates
    * @static
    */
-  static function &eventDate() {
-    static $eventDate = NULL;
-    if (!$eventDate) {
-      $eventDate = array(
-        '' => ts('- select -'),
-        'start_date' => ts('start date'),
-        'end_date' => ts('end date'),
-        'join_date' => ts('member since'),
-      );
-    }
-    return $eventDate;
+  static function eventDate() {
+    return array(
+      'start_date' => ts('start date'),
+      'end_date' => ts('end date'),
+      'join_date' => ts('member since'),
+    );
   }
 
   /**
@@ -190,30 +158,25 @@ class CRM_Core_SelectValues {
    * @static
    */
   static function customHtmlType() {
-    static $customHtmlType = NULL;
-    if (!$customHtmlType) {
-      $customHtmlType = array(
-        '' => ts('- select -'),
-        'Text' => ts('Single-line input field (text or numeric)'),
-        'TextArea' => ts('Multi-line text box (textarea)'),
-        'Select' => ts('Drop-down (select list)'),
-        'Radio' => ts('Radio buttons'),
-        'CheckBox' => ts('Checkbox(es)'),
-        'Select Date' => ts('Select Date'),
-        'File' => ts('File'),
-        'Select State/Province' => ts('Select State/Province'),
-        'Multi-Select State/Province' => ts('Multi-Select State/Province'),
-        'Select Country' => ts('Select Country'),
-        'Multi-Select Country' => ts('Multi-Select Country'),
-        'RichTextEditor' => ts('Rich Text Editor'),
-        'Autocomplete-Select' => ts('Autocomplete-Select'),
-        'Multi-Select' => ts('Multi-Select'),
-        'AdvMulti-Select' => ts('AdvMulti-Select'),
-        'Link' => ts('Link'),
-        'ContactReference' => ts('Autocomplete Select'),
-      );
-    }
-    return $customHtmlType;
+    return array(
+      'Text' => ts('Single-line input field (text or numeric)'),
+      'TextArea' => ts('Multi-line text box (textarea)'),
+      'Select' => ts('Drop-down (select list)'),
+      'Radio' => ts('Radio buttons'),
+      'CheckBox' => ts('Checkbox(es)'),
+      'Select Date' => ts('Select Date'),
+      'File' => ts('File'),
+      'Select State/Province' => ts('Select State/Province'),
+      'Multi-Select State/Province' => ts('Multi-Select State/Province'),
+      'Select Country' => ts('Select Country'),
+      'Multi-Select Country' => ts('Multi-Select Country'),
+      'RichTextEditor' => ts('Rich Text Editor'),
+      'Autocomplete-Select' => ts('Autocomplete-Select'),
+      'Multi-Select' => ts('Multi-Select'),
+      'AdvMulti-Select' => ts('AdvMulti-Select'),
+      'Link' => ts('Link'),
+      'ContactReference' => ts('Autocomplete Select'),
+    );
   }
 
   /**
@@ -222,29 +185,26 @@ class CRM_Core_SelectValues {
    * @static
    */
   static function customGroupExtends() {
-    static $customGroupExtends = NULL;
-    if (!$customGroupExtends) {
-      $customGroupExtends = array(
-        'Activity' => ts('Activities'),
-        'Relationship' => ts('Relationships'),
-        'Contribution' => ts('Contributions'),
-        'Group' => ts('Groups'),
-        'Membership' => ts('Memberships'),
-        'Event' => ts('Events'),
-        'Participant' => ts('Participants'),
-        'ParticipantRole' => ts('Participants (Role)'),
-        'ParticipantEventName' => ts('Participants (Event Name)'),
-        'ParticipantEventType' => ts('Participants (Event Type)'),
-        'Pledge' => ts('Pledges'),
-        'Grant' => ts('Grants'),
-        'Address' => ts('Addresses'),
-        'Campaign' => ts('Campaigns'),
-      );
-      $contactTypes = self::contactType();
-      $contactTypes       = !empty($contactTypes) ? array('Contact' => 'Contacts') + $contactTypes : array();
-      $extendObjs         = CRM_Core_OptionGroup::values('cg_extend_objects');
-      $customGroupExtends = array_merge($contactTypes, $customGroupExtends, $extendObjs);
-    }
+    $customGroupExtends = array(
+      'Activity' => ts('Activities'),
+      'Relationship' => ts('Relationships'),
+      'Contribution' => ts('Contributions'),
+      'Group' => ts('Groups'),
+      'Membership' => ts('Memberships'),
+      'Event' => ts('Events'),
+      'Participant' => ts('Participants'),
+      'ParticipantRole' => ts('Participants (Role)'),
+      'ParticipantEventName' => ts('Participants (Event Name)'),
+      'ParticipantEventType' => ts('Participants (Event Type)'),
+      'Pledge' => ts('Pledges'),
+      'Grant' => ts('Grants'),
+      'Address' => ts('Addresses'),
+      'Campaign' => ts('Campaigns'),
+    );
+    $contactTypes = self::contactType();
+    $contactTypes       = !empty($contactTypes) ? array('Contact' => 'Contacts') + $contactTypes : array();
+    $extendObjs         = CRM_Core_OptionGroup::values('cg_extend_objects');
+    $customGroupExtends = array_merge($contactTypes, $customGroupExtends, $extendObjs);
     return $customGroupExtends;
   }
 
@@ -254,15 +214,11 @@ class CRM_Core_SelectValues {
    * @static
    */
   static function customGroupStyle() {
-    static $customGroupStyle = NULL;
-    if (!$customGroupStyle) {
-      $customGroupStyle = array(
-        'Tab' => ts('Tab'),
-        'Inline' => ts('Inline'),
-        'Tab with table' => ts('Tab with table'),
-      );
-    }
-    return $customGroupStyle;
+    return array(
+      'Tab' => ts('Tab'),
+      'Inline' => ts('Inline'),
+      'Tab with table' => ts('Tab with table'),
+    );
   }
 
   /**
@@ -271,19 +227,16 @@ class CRM_Core_SelectValues {
    * @static
    */
   static function ufGroupTypes() {
-    static $ufGroupType = NULL;
-    if (!$ufGroupType) {
-      $ufGroupType = array(
-        'Profile' => ts('Standalone Form or Directory'),
-        'Search Profile' => ts('Search Views'),
+    $ufGroupType = array(
+      'Profile' => ts('Standalone Form or Directory'),
+      'Search Profile' => ts('Search Views'),
+    );
+
+    if (CRM_Core_Config::singleton()->userSystem->supports_form_extensions) {
+      $ufGroupType += array(
+        'User Registration' => ts('Drupal User Registration'),
+        'User Account' => ts('View/Edit Drupal User Account'),
       );
-      $config = CRM_Core_Config::singleton();
-      if ($config->userSystem->supports_form_extensions) {
-        $ufGroupType += array(
-          'User Registration' => ts('Drupal User Registration'),
-          'User Account' => ts('View/Edit Drupal User Account'),
-        );
-      }
     }
     return $ufGroupType;
   }
@@ -294,30 +247,22 @@ class CRM_Core_SelectValues {
    * @static
    */
   static function groupContactStatus() {
-    static $groupContactStatus = NULL;
-    if (!$groupContactStatus) {
-      $groupContactStatus = array(
-        'Added' => ts('Added'),
-        'Removed' => ts('Removed'),
-        'Pending' => ts('Pending'),
-      );
-    }
-    return $groupContactStatus;
+    return array(
+      'Added' => ts('Added'),
+      'Removed' => ts('Removed'),
+      'Pending' => ts('Pending'),
+    );
   }
 
   /**
    * list of Group Types
    * @static
    */
-  static function &groupType() {
-    static $groupType = NULL;
-    if (!$groupType) {
-      $groupType = array(
-        'query' => ts('Dynamic'),
-        'static' => ts('Static'),
-      );
-    }
-    return $groupType;
+  static function groupType() {
+    return array(
+      'query' => ts('Dynamic'),
+      'static' => ts('Static'),
+    );
   }
 
   /**
@@ -378,15 +323,11 @@ class CRM_Core_SelectValues {
    * @static
    */
   static function ufVisibility() {
-    static $_visibility = array();
-    if (!$_visibility) {
-      $_visibility = array(
-        'User and User Admin Only' => ts('User and User Admin Only'),
-        'Public Pages' => ts('Public Pages'),
-        'Public Pages and Listings' => ts('Public Pages and Listings'),
-      );
-    }
-    return $_visibility;
+    return array(
+      'User and User Admin Only' => ts('User and User Admin Only'),
+      'Public Pages' => ts('Public Pages'),
+      'Public Pages and Listings' => ts('Public Pages and Listings'),
+    );
   }
 
   /**
@@ -395,14 +336,10 @@ class CRM_Core_SelectValues {
    * @static
    */
   static function groupVisibility() {
-    static $_groupVisibility = NULL;
-    if (!$_groupVisibility) {
-      $_groupVisibility = array(
+    return array(
         'User and User Admin Only' => ts('User and User Admin Only'),
         'Public Pages' => ts('Public Pages'),
       );
-    }
-    return $_groupVisibility;
   }
 
   /**
@@ -412,20 +349,15 @@ class CRM_Core_SelectValues {
    * return array
    */
   static function mailingComponents() {
-    static $components = NULL;
-
-    if (!$components) {
-      $components = array('Header' => ts('Header'),
-        'Footer' => ts('Footer'),
-        'Reply' => ts('Reply Auto-responder'),
-        'OptOut' => ts('Opt-out Message'),
-        'Subscribe' => ts('Subscription Confirmation Request'),
-        'Welcome' => ts('Welcome Message'),
-        'Unsubscribe' => ts('Unsubscribe Message'),
-        'Resubscribe' => ts('Resubscribe Message'),
-      );
-    }
-    return $components;
+    return array('Header' => ts('Header'),
+      'Footer' => ts('Footer'),
+      'Reply' => ts('Reply Auto-responder'),
+      'OptOut' => ts('Opt-out Message'),
+      'Subscribe' => ts('Subscription Confirmation Request'),
+      'Welcome' => ts('Welcome Message'),
+      'Unsubscribe' => ts('Unsubscribe Message'),
+      'Resubscribe' => ts('Resubscribe Message'),
+    );
   }
 
   /**
@@ -509,28 +441,24 @@ class CRM_Core_SelectValues {
    * return array
    */
   static function mailingTokens() {
-    static $tokens = NULL;
-
-    if (!$tokens) {
-      $tokens = array('{action.unsubscribe}' => ts('Unsubscribe via email'),
-        '{action.unsubscribeUrl}' => ts('Unsubscribe via web page'),
-        '{action.resubscribe}' => ts('Resubscribe via email'),
-        '{action.resubscribeUrl}' => ts('Resubscribe via web page'),
-        '{action.optOut}' => ts('Opt out via email'),
-        '{action.optOutUrl}' => ts('Opt out via web page'),
-        '{action.forward}' => ts('Forward this email (link)'),
-        '{action.reply}' => ts('Reply to this email (link)'),
-        '{action.subscribeUrl}' => ts('Subscribe via web page'),
-        '{domain.name}' => ts('Domain name'),
-        '{domain.address}' => ts('Domain (organization) address'),
-        '{domain.phone}' => ts('Domain (organization) phone'),
-        '{domain.email}' => ts('Domain (organization) email'),
-        '{mailing.name}' => ts('Mailing name'),
-        '{mailing.group}' => ts('Mailing group'),
-        '{mailing.viewUrl}' => ts('Mailing permalink'),
-      );
-    }
-    return $tokens;
+    return array(
+      '{action.unsubscribe}' => ts('Unsubscribe via email'),
+      '{action.unsubscribeUrl}' => ts('Unsubscribe via web page'),
+      '{action.resubscribe}' => ts('Resubscribe via email'),
+      '{action.resubscribeUrl}' => ts('Resubscribe via web page'),
+      '{action.optOut}' => ts('Opt out via email'),
+      '{action.optOutUrl}' => ts('Opt out via web page'),
+      '{action.forward}' => ts('Forward this email (link)'),
+      '{action.reply}' => ts('Reply to this email (link)'),
+      '{action.subscribeUrl}' => ts('Subscribe via web page'),
+      '{domain.name}' => ts('Domain name'),
+      '{domain.address}' => ts('Domain (organization) address'),
+      '{domain.phone}' => ts('Domain (organization) phone'),
+      '{domain.email}' => ts('Domain (organization) email'),
+      '{mailing.name}' => ts('Mailing name'),
+      '{mailing.group}' => ts('Mailing group'),
+      '{mailing.viewUrl}' => ts('Mailing permalink'),
+    );
   }
 
   /**
@@ -540,17 +468,12 @@ class CRM_Core_SelectValues {
    * return array
    */
   static function activityTokens() {
-    static $tokens = NULL;
-
-    if (!$tokens) {
-      $tokens = array(
-        '{activity.activity_id}' => ts('Activity ID'),
-        '{activity.subject}' => ts('Activity Subject'),
-        '{activity.details}' => ts('Activity Details'),
-        '{activity.activity_date_time}' => ts('Activity Date Time'),
-      );
-    }
-    return $tokens;
+    return array(
+      '{activity.activity_id}' => ts('Activity ID'),
+      '{activity.subject}' => ts('Activity Subject'),
+      '{activity.details}' => ts('Activity Details'),
+      '{activity.activity_date_time}' => ts('Activity Date Time'),
+    );
   }
 
   /**
@@ -559,21 +482,16 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function &membershipTokens() {
-    static $tokens = NULL;
-
-    if (!$tokens) {
-      $tokens = array(
-        '{membership.id}' => ts('Membership ID'),
-        '{membership.status}' => ts('Membership Status'),
-        '{membership.type}' => ts('Membership Type'),
-        '{membership.start_date}' => ts('Membership Start Date'),
-        '{membership.join_date}' => ts('Membership Join Date'),
-        '{membership.end_date}' => ts('Membership End Date'),
-        '{membership.fee}' => ts('Membership Fee'),
-      );
-    }
-    return $tokens;
+  static function membershipTokens() {
+    return array(
+      '{membership.id}' => ts('Membership ID'),
+      '{membership.status}' => ts('Membership Status'),
+      '{membership.type}' => ts('Membership Type'),
+      '{membership.start_date}' => ts('Membership Start Date'),
+      '{membership.join_date}' => ts('Membership Join Date'),
+      '{membership.end_date}' => ts('Membership End Date'),
+      '{membership.fee}' => ts('Membership Fee'),
+    );
   }
 
   /**
@@ -583,27 +501,22 @@ class CRM_Core_SelectValues {
    * return array
    */
   static function eventTokens() {
-    static $tokens = NULL;
-
-    if (!$tokens) {
-      $tokens = array(
-        '{event.event_id}' => ts('Event ID'),
-        '{event.title}' => ts('Event Title'),
-        '{event.start_date}' => ts('Event Start Date'),
-        '{event.end_date}' => ts('Event End Date'),
-        '{event.event_type}' => ts('Event Type'),
-        '{event.summary}' => ts('Event Summary'),
-        '{event.contact_email}' => ts('Event Contact Email'),
-        '{event.contact_phone}' => ts('Event Contact Phone'),
-        '{event.description}' => ts('Event Description'),
-        '{event.location}' => ts('Event Location'),
-        '{event.fee_amount}' => ts('Event Fees'),
-        '{event.info_url}' => ts('Event Info URL'),
-        '{event.registration_url}' => ts('Event Registration URL'),
-        '{event.balance}' => ts('Event Balance')
-      );
-    }
-    return $tokens;
+    return array(
+      '{event.event_id}' => ts('Event ID'),
+      '{event.title}' => ts('Event Title'),
+      '{event.start_date}' => ts('Event Start Date'),
+      '{event.end_date}' => ts('Event End Date'),
+      '{event.event_type}' => ts('Event Type'),
+      '{event.summary}' => ts('Event Summary'),
+      '{event.contact_email}' => ts('Event Contact Email'),
+      '{event.contact_phone}' => ts('Event Contact Phone'),
+      '{event.description}' => ts('Event Description'),
+      '{event.location}' => ts('Event Location'),
+      '{event.fee_amount}' => ts('Event Fees'),
+      '{event.info_url}' => ts('Event Info URL'),
+      '{event.registration_url}' => ts('Event Registration URL'),
+      '{event.balance}' => ts('Event Balance')
+    );
   }
 
   /**
@@ -613,36 +526,31 @@ class CRM_Core_SelectValues {
    * return array
    */
   static function contributionTokens() {
-    static $tokens = NULL;
-
-    if (!$tokens) {
-      $tokens = array(
-        '{contribution.contribution_id}' => ts('Contribution ID'),
-        '{contribution.total_amount}' => ts('Total Amount'),
-        '{contribution.fee_amount}' => ts('Fee Amount'),
-        '{contribution.net_amount}' => ts('Net Amount'),
-        '{contribution.non_deductible_amount}' => ts('Non Deductible Amount'),
-        '{contribution.receive_date}' => ts('Contribution Receive Date'),
-        '{contribution.payment_instrument}' => ts('Payment Instrument'),
-        '{contribution.trxn_id}' => ts('Transaction ID'),
-        '{contribution.invoice_id}' => ts('Invoice ID'),
-        '{contribution.currency}' => ts('Currency'),
-        '{contribution.cancel_date}' => ts('Contribution Cancel Date'),
-        '{contribution.cancel_reason}' => ts('Contribution Cancel Reason'),
-        '{contribution.receipt_date}' => ts('Receipt Date'),
-        '{contribution.thankyou_date}' => ts('Thank You Date'),
-        '{contribution.contribution_source}' => ts('Contribution Source'),
-        '{contribution.amount_level}' => ts('Amount Level'),
-        //'{contribution.contribution_recur_id}' => ts('Contribution Recurring ID'),
-        //'{contribution.honor_contact_id}' => ts('Honor Contact ID'),
-        '{contribution.contribution_status_id}' => ts('Contribution Status'),
-        //'{contribution.honor_type_id}' => ts('Honor Type ID'),
-        //'{contribution.address_id}' => ts('Address ID'),
-        '{contribution.check_number}' => ts('Check Number'),
-        '{contribution.campaign}' => ts('Contribution Campaign'),
-      );
-    }
-    return $tokens;
+    return array(
+      '{contribution.contribution_id}' => ts('Contribution ID'),
+      '{contribution.total_amount}' => ts('Total Amount'),
+      '{contribution.fee_amount}' => ts('Fee Amount'),
+      '{contribution.net_amount}' => ts('Net Amount'),
+      '{contribution.non_deductible_amount}' => ts('Non Deductible Amount'),
+      '{contribution.receive_date}' => ts('Contribution Receive Date'),
+      '{contribution.payment_instrument}' => ts('Payment Instrument'),
+      '{contribution.trxn_id}' => ts('Transaction ID'),
+      '{contribution.invoice_id}' => ts('Invoice ID'),
+      '{contribution.currency}' => ts('Currency'),
+      '{contribution.cancel_date}' => ts('Contribution Cancel Date'),
+      '{contribution.cancel_reason}' => ts('Contribution Cancel Reason'),
+      '{contribution.receipt_date}' => ts('Receipt Date'),
+      '{contribution.thankyou_date}' => ts('Thank You Date'),
+      '{contribution.contribution_source}' => ts('Contribution Source'),
+      '{contribution.amount_level}' => ts('Amount Level'),
+      //'{contribution.contribution_recur_id}' => ts('Contribution Recurring ID'),
+      //'{contribution.honor_contact_id}' => ts('Honor Contact ID'),
+      '{contribution.contribution_status_id}' => ts('Contribution Status'),
+      //'{contribution.honor_type_id}' => ts('Honor Type ID'),
+      //'{contribution.address_id}' => ts('Address ID'),
+      '{contribution.check_number}' => ts('Check Number'),
+      '{contribution.campaign}' => ts('Contribution Campaign'),
+    );
   }
 
   /**
@@ -749,35 +657,6 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * get qf mappig for all date parts.
-   *
-   */
-  static function qfDatePartsMapping() {
-    static $qfDatePartsMapping = NULL;
-    if (!$qfDatePartsMapping) {
-      $qfDatePartsMapping = array(
-        '%b' => 'M',
-        '%B' => 'F',
-        '%d' => 'd',
-        '%e' => 'j',
-        '%E' => 'j',
-        '%f' => 'S',
-        '%H' => 'H',
-        '%I' => 'h',
-        '%k' => 'G',
-        '%l' => 'g',
-        '%m' => 'm',
-        '%M' => 'i',
-        '%p' => 'a',
-        '%P' => 'A',
-        '%Y' => 'Y',
-      );
-    }
-
-    return $qfDatePartsMapping;
-  }
-
-  /**
    *  CiviCRM supported date input formats
    */
   static function getDatePluginInputFormats() {
@@ -869,137 +748,100 @@ class CRM_Core_SelectValues {
    * @static
    */
   static function getBarcodeTypes() {
-    static $barcodeTypes = NULL;
-    if (!$barcodeTypes) {
-      $barcodeTypes = array(
-        'barcode' => ts('Linear (1D)'),
-        'qrcode' => ts('QR code'),
-      );
-    }
-    return $barcodeTypes;
+    return array(
+      'barcode' => ts('Linear (1D)'),
+      'qrcode' => ts('QR code'),
+    );
   }
 
   /**
    * dedupe rule types
    */
   static function getDedupeRuleTypes() {
-    static $dedupeRuleTypes = NULL;
-    if (!$dedupeRuleTypes) {
-      $dedupeRuleTypes = array(
-        'Unsupervised' => ts('Unsupervised'),
-        'Supervised' => ts('Supervised'),
-        'General' => ts('General'),
-      );
-    }
-    return $dedupeRuleTypes;
+    return array(
+      'Unsupervised' => ts('Unsupervised'),
+      'Supervised' => ts('Supervised'),
+      'General' => ts('General'),
+    );
   }
 
   /**
    * campaign group types
    */
   static function getCampaignGroupTypes() {
-    static $campaignGroupTypes = NULL;
-    if (!$campaignGroupTypes) {
-      $campaignGroupTypes = array(
-        'Include' => ts('Include'),
-        'Exclude' => ts('Exclude'),
-      );
-    }
-    return $campaignGroupTypes;
+    return array(
+      'Include' => ts('Include'),
+      'Exclude' => ts('Exclude'),
+    );
   }
 
   /**
    * subscription history method
    */
   static function getSubscriptionHistoryMethods() {
-    static $subscriptionHistoryMethods = NULL;
-    if (!$subscriptionHistoryMethods) {
-      $subscriptionHistoryMethods = array(
-        'Admin' => ts('Admin'),
-        'Email' => ts('Email'),
-        'Web' => ts('Web'),
-        'API' => ts('API'),
-      );
-    }
-
-    return $subscriptionHistoryMethods;
+    return array(
+      'Admin' => ts('Admin'),
+      'Email' => ts('Email'),
+      'Web' => ts('Web'),
+      'API' => ts('API'),
+    );
   }
 
   /**
    * premium units
    */
   static function getPremiumUnits() {
-    static $premiumUnits = NULL;
-    if (!$premiumUnits) {
-      $premiumUnits = array(
-        'day' => ts('Day'),
-        'week' => ts('Week'),
-        'month' => ts('Month'),
-        'year' => ts('Year'),
-      );
-    }
-
-    return $premiumUnits;
+    return array(
+      'day' => ts('Day'),
+      'week' => ts('Week'),
+      'month' => ts('Month'),
+      'year' => ts('Year'),
+    );
   }
 
   /**
    * extension types
    */
   static function getExtensionTypes() {
-    static $extensionTypes = NULL;
-    if (!$extensionTypes) {
-      $extensionTypes = array(
-        'payment' => ts('Payment'),
-        'search' => ts('Search'),
-        'report' => ts('Report'),
-        'module' => ts('Module'),
-        'sms' => ts('SMS'),
-      );
-    }
-
-    return $extensionTypes;
+    return  array(
+      'payment' => ts('Payment'),
+      'search' => ts('Search'),
+      'report' => ts('Report'),
+      'module' => ts('Module'),
+      'sms' => ts('SMS'),
+    );
   }
 
   /**
    * job frequency
    */
   static function getJobFrequency() {
-    static $jobFrequency = NULL;
-    if (!$jobFrequency) {
-      $jobFrequency = array(
-        'Daily' => ts('Daily'),
-        'Hourly' => ts('Hourly'),
-        'Always' => ts('Every time cron job is run'),
-      );
-    }
-
-    return $jobFrequency;
+    return array(
+      'Daily' => ts('Daily'),
+      'Hourly' => ts('Hourly'),
+      'Always' => ts('Every time cron job is run'),
+    );
   }
 
   /**
    * Search builder operators
    */
   static function getSearchBuilderOperators() {
-    static $searchBuilderOperators = NULL;
-    if (!$searchBuilderOperators) {
-      $searchBuilderOperators = array(
-        '=' => '=',
-        '!=' => '≠',
-        '>' => '>',
-        '<' => '<',
-        '>=' => '≥',
-        '<=' => '≤',
-        'IN' => ts('In'),
-        'LIKE' => ts('Like'),
-        'RLIKE' => ts('Regex'),
-        'IS EMPTY' => ts('Is Empty'),
-        'IS NOT EMPTY' => ts('Not Empty'),
-        'IS NULL' => ts('Is Null'),
-        'IS NOT NULL' => ts('Not Null'),
-      );
-    }
-
-    return $searchBuilderOperators;
+    return array(
+      '=' => '=',
+      '!=' => '≠',
+      '>' => '>',
+      '<' => '<',
+      '>=' => '≥',
+      '<=' => '≤',
+      'IN' => ts('In'),
+      'LIKE' => ts('Like'),
+      'RLIKE' => ts('Regex'),
+      'IS EMPTY' => ts('Is Empty'),
+      'IS NOT EMPTY' => ts('Not Empty'),
+      'IS NULL' => ts('Is Null'),
+      'IS NOT NULL' => ts('Not Null'),
+    );
   }
 
   /**
@@ -1008,18 +850,16 @@ class CRM_Core_SelectValues {
    * @static
    */
   static function getProfileGroupType() {
-    static $profileGroupType = NULL;
-    if (!$profileGroupType) {
-      $profileGroupType = array(
-        'Activity' => ts('Activities'),
-        'Contribution' => ts('Contributions'),
-        'Membership' => ts('Memberships'),
-        'Participant' => ts('Participants'),
-      );
-      $contactTypes = self::contactType();
-      $contactTypes       = !empty($contactTypes) ? array('Contact' => 'Contacts') + $contactTypes : array();
-      $profileGroupType = array_merge($contactTypes, $profileGroupType );
-    }
+    $profileGroupType = array(
+      'Activity' => ts('Activities'),
+      'Contribution' => ts('Contributions'),
+      'Membership' => ts('Memberships'),
+      'Participant' => ts('Participants'),
+    );
+    $contactTypes = self::contactType();
+    $contactTypes       = !empty($contactTypes) ? array('Contact' => 'Contacts') + $contactTypes : array();
+    $profileGroupType = array_merge($contactTypes, $profileGroupType );
+
     return $profileGroupType;
   }
 
@@ -1028,54 +868,41 @@ class CRM_Core_SelectValues {
    * word replacement match type
    */
   static function getWordReplacementMatchType() {
-    static $wordReplacementMatchType = NULL;
-    if (!$wordReplacementMatchType) {
-      $wordReplacementMatchType = array(
+    return array(
         'exactMatch' => ts('Exact Match'),
         'wildcardMatch' => ts('Wildcard Match'),
       );
-    }
-
-    return $wordReplacementMatchType;
   }
 
   /**
    * mailing group types
    */
   static function getMailingGroupTypes() {
-    static $mailingGroupTypes = NULL;
-    if (!$mailingGroupTypes) {
-      $mailingGroupTypes = array(
-        'Include' => ts('Include'),
-        'Exclude' => ts('Exclude'),
-        'Base' => ts('Base'),
-      );
-    }
-    return $mailingGroupTypes;
+    return array(
+      'Include' => ts('Include'),
+      'Exclude' => ts('Exclude'),
+      'Base' => ts('Base'),
+    );
   }
 
   /**
    * Mailing Job Status
    */
   static function getMailingJobStatus() {
-    static $mailingJobStatus = NULL;
-    if (!$mailingJobStatus) {
-      $mailingJobStatus = array(
-        'Scheduled' => ts('Scheduled'),
-        'Running' => ts('Running'),
-        'Complete' => ts('Complete'),
-        'Paused' => ts('Paused'),
-        'Canceled' => ts('Canceled'),
-      );
-    }
-
-    return $mailingJobStatus;
+    return array(
+      'Scheduled' => ts('Scheduled'),
+      'Running' => ts('Running'),
+      'Complete' => ts('Complete'),
+      'Paused' => ts('Paused'),
+      'Canceled' => ts('Canceled'),
+    );
   }
 
   /**
    * Frequency unit for schedule reminders
    */
   static function getScheduleReminderFrequencyUnits() {
+    //@todo update schema to refer to option group direct & remove this
     static $scheduleReminderFrequencyUnits = NULL;
     if (!$scheduleReminderFrequencyUnits) {
       $scheduleReminderFrequencyUnits = array(
