@@ -73,12 +73,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->select('relationship_type_id', "label={$params['label_b_a']}");
 
     //fill in the individual
-    $this->click("//*[@id='related_contact_id']/../div/ul/li/input");
-    $this->keyDown("//*[@id='related_contact_id']/../div/ul/li/input", " ");
-    $this->type("//*[@id='related_contact_id']/../div/ul/li/input", $sortName);
-    $this->typeKeys("//*[@id='related_contact_id']/../div/ul/li/input", $sortName);
-    $this->waitForElementPresent("//*[@class='select2-result-label']");
-    $this->clickAt("//*[@class='select2-results']/li[1]");
+    $this->select2('related_contact_id', $sortName, TRUE);
 
 
     //fill in the relationship start date
@@ -164,12 +159,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->select('relationship_type_id', "label={$params['label_b_a']}");
 
     //fill in the individual
-    $this->click("//*[@id='related_contact_id']/../div/ul/li/input");
-    $this->keyDown("//*[@id='related_contact_id']/../div/ul/li/input", " ");
-    $this->type("//*[@id='related_contact_id']/../div/ul/li/input", $sortName);
-    $this->typeKeys("//*[@id='related_contact_id']/../div/ul/li/input", $sortName);
-    $this->waitForElementPresent("//*[@class='select2-result-label']");
-    $this->clickAt("//*[@class='select2-results']/li[1]");
+    $this->select2('related_contact_id', $sortName, TRUE);
 
 
     //fill in the relationship start date
@@ -264,12 +254,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
 
     //fill in the individual
 
-    $this->click("//*[@id='related_contact_id']/../div/ul/li/input");
-    $this->keyDown("//*[@id='related_contact_id']/../div/ul/li/input", " ");
-    $this->type("//*[@id='related_contact_id']/../div/ul/li/input", $sortName);
-    $this->typeKeys("//*[@id='related_contact_id']/../div/ul/li/input", $sortName);
-    $this->waitForElementPresent("//*[@class='select2-result-label']");
-    $this->clickAt("//*[@class='select2-results']/li[1]");
+    $this->select2('related_contact_id', $sortName, TRUE);
 
     //fill in the relationship start date
     $this->webtestFillDate('start_date', '-2 year');
