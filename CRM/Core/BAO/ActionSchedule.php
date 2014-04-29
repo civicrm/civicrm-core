@@ -282,7 +282,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    * @access public
    */
   static function &getList($namesOnly = FALSE, $entityValue = NULL, $id = NULL) {
-    $activity_type = CRM_Core_PseudoConstant::activityType(FALSE) + CRM_Core_PseudoConstant::activityType(FALSE, TRUE);
+    $activity_type = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
     $activity_status = CRM_Core_PseudoConstant::activityStatus();
 
     $event_type = CRM_Event_PseudoConstant::eventType();
@@ -293,7 +293,6 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $auto_renew_options = CRM_Core_OptionGroup::values('auto_renew_options');
     $civicrm_membership_type = CRM_Member_PseudoConstant::membershipType();
 
-    asort($activity_type);
     $entity = array(
       'civicrm_activity' => 'Activity',
       'civicrm_participant' => 'Event',

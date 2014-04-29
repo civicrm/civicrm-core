@@ -112,7 +112,7 @@
 
   </table>
     <div id="email">{include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}</div>
-    <div id="sms">{include file="CRM/Contact/Form/Task/SMSCommon.tpl" upload=1 noAttach=1}</div>
+    {if $sms}<div id="sms">{include file="CRM/Contact/Form/Task/SMSCommon.tpl" upload=1 noAttach=1}</div>{/if}
   </fieldset>
 
 {include file="CRM/common/showHideByFieldValue.tpl"
