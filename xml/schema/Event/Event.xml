@@ -682,6 +682,7 @@
     <title>Is an Event Template</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>whether the event has template</comment>
     <add>3.0</add>
     <html>
