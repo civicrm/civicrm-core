@@ -489,6 +489,42 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       self::addMultipleProfiles($additionalProfileIds, $values, 'additional_custom_post_id_multiple');
       $isProfileComplete = self::isProfileComplete($profileIds);
       $isAdditionalProfileComplete = self::isProfileComplete($additionalProfileIds);
+
+      $cant_dedupe = false;
+      switch (self::canProfilesDedupe($profileIds)) {
+        case 0:
+          $cant_dedupe = ts("The selected profiles do not contain the fields necessary to match registrations with existing contacts.");
+          $warntype = 'error';
+          break;
+        case 1:
+          $cant_dedupe = ts("The selected profiles can collect enough information to match registrations with existing contacts, but not all of the relevant fields are required.");
+          $warntype = 'alert';
+      }
+      if (!empty($values['is_multiple_registrations'])) {
+        switch(self::canProfilesDedupe($additionalProfileIds)) {
+          case 0:
+            $warntype = 'error';
+            if ($cant_dedupe) {
+              $cant_dedupe .= ' ' . ts("They also do not contain the fields necessary to match additional participants with existing contacts.");
+            }
+            else {
+              $cant_dedupe = ts("The selected profiles do not contain the fields necessary to match additional participants with existing contacts.");
+            }
+            break;
+          case 1:
+            if ($cant_dedupe) {
+              $cant_dedupe .= ' ' . ts("Likewise, they can collect enough information to match additional participants with existing contacts, but not all of the relevant fields are required.");
+            }
+            else {
+              $warntype = 'alert';
+              $cant_dedupe = ts("The selected profiles can collect enough information to match additional participants with existing contacts, but not all of the relevant fields are required.");
+            }
+        }
+      }
+      if ($cant_dedupe) {
+        $title = 'Can\'t find duplicates';
+        CRM_Core_Session::setStatus($cant_dedupe, $title, $warntype);
+      }
       //Check main profiles have an email address available if 'send confirmation email' is selected
       if ($values['is_email_confirm']) {
         $emailFields = self::getEmailFields($profileIds);
@@ -496,7 +532,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
           $errorMsg['is_email_confirm'] = ts("Please add a profile with an email address if 'Send Confirmation Email?' is selected");
         }
       }
-      self::canProfilesDedupe();
       $additionalCustomPreId = $additionalCustomPostId = NULL;
       $isPreError = $isPostError = TRUE;
       if (!empty($values['allow_same_participant_emails']) && !empty($values['is_multiple_registrations'])) {
@@ -678,7 +713,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * @return boolean
    */
 
-  static function canProfilesDedupe($profileIds) {
+  function canProfilesDedupe($profileIds) {
+
     // find the unsupervised rule
 
     $rgParams = array(
@@ -687,37 +723,64 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     );
     $activeRg = CRM_Dedupe_BAO_RuleGroup::dedupeRuleFieldsWeight($rgParams);
 
+    // get the combinations that could be a match for the rule
     $combos = array();
-
     CRM_Dedupe_BAO_RuleGroup::combos($activeRg[0], $activeRg[1], $combos);
 
-    /* TODO get profiles and see if they have the necessary combos
+    // create an index of what combinations involve each field
+    $index = array();
+    foreach ($combos as $comboid => $combo) {
+      foreach ($combo as $cfield) {
+        $index[$cfield][$comboid] = true;
+      }
+      $combos[$comboid] = array_fill_keys($combo, 0);
+    }
+
+    // get profiles and see if they have the necessary combos
     $profileReqFields = array();
     foreach ($profileIds as $profileId) {
       if ($profileId && is_numeric($profileId)) {
         $fields = CRM_Core_BAO_UFGroup::getFields($profileId);
+
+        // walk through the fields in the profile
         foreach ($fields as $field) {
-          switch (TRUE) {
-            case substr_count($field['name'], 'email'):
-              $profileReqFields[] = 'email';
-              break;
 
-            case substr_count($field['name'], 'first_name'):
-              $profileReqFields[] = 'first_name';
-              break;
+          // check each of the fields in the index against the profile field
+          foreach ($index as $ifield => $icombos) {
+            if(strpos($field['name'], $ifield) !== false) {
 
-            case substr_count($field['name'], 'last_name'):
-              $profileReqFields[] = 'last_name';
-              break;
+              // we found the field in the profile, now record it in the index
+              foreach ($icombos as $icombo => $dontcare) {
+                $combos[$icombo][$ifield] = ($combos[$icombo][$ifield] != 2 && !$field['is_required']) ? 1 : 2;
+
+                if ($combos[$icombo] == array_fill_keys(array_keys($combos[$icombo]), 2)) {
+                  // if any combo is complete with 2s (all fields are present and required), we can go home
+                  return 2;
+                }
+              }
+            }
           }
         }
       }
     }
-    $profileComplete = (in_array('email', $profileReqFields)
-      || (in_array('first_name', $profileReqFields) && in_array('last_name', $profileReqFields))
-    );
-    return $profileComplete;
-    */
+
+    // check the combos to see if everything is > 0
+    foreach ($combos as $comboid => $combo) {
+      $complete = false;
+      foreach ($combo as $cfield) {
+        if ($cfield > 0) {
+          $complete = true;
+        }
+        else {
+          // this combo isn't complete--skip to the next combo
+          continue 2;
+        }
+      }
+      if ($complete) { return 1; }
+    }
+
+    // no combo succeeded
+    return 0;
   }
 
   /**
