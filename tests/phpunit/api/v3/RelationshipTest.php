@@ -1089,4 +1089,13 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       $this->assertTrue(in_array($value['relationship_type_id'], array($relType1, $relType3)));
     }
   }
+
+  /**
+   * Check for enotices on enable & disable as reported in CRM-14350
+   */
+  function testSetActive() {
+    $relationship = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $this->callAPISuccess($this->_entity, 'create', array('id' => $relationship['id'], 'is_active' => 0));
+    $this->callAPISuccess($this->_entity, 'create', array('id' => $relationship['id'], 'is_active' => 1));
+  }
 }
