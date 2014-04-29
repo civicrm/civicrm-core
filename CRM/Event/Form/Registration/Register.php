@@ -595,9 +595,16 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
       $form->add('hidden', 'priceSetId', $form->_priceSetId);
 
+      // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
+      $adminFieldVisible = false;
+      if (CRM_Core_Permission::check('administer CiviCRM')) {
+        $adminFieldVisible = true; 
+      }
+
       foreach ($form->_feeBlock as $field) {
         // public AND admin visibility fields are included for back-office registration and back-office change selections
         if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
+          (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == true) ||
           $className == 'CRM_Event_Form_Participant' ||
           $className == 'CRM_Event_Form_ParticipantFeeSelection'
         ) {
