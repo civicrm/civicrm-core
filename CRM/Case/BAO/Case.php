@@ -527,6 +527,9 @@ INNER JOIN civicrm_case ca ON cc.case_id = ca.id
 INNER JOIN civicrm_option_group cog ON (cog.id = cov.option_group_id and cog.name = 'case_type')
 WHERE cc.contact_id = %1 AND cov.name = '{$caseType}'";
     }
+    if (!isset($caseType)) {
+      $query .= "WHERE cc.contact_id = %1";
+    }
     if (!$includeDeleted) {
       $query .= " AND ca.is_deleted = 0";
     }
