@@ -79,11 +79,11 @@
        {/if}
         <tr class="crm-event-manage-registration-form-block-is_multiple_registrations">
             <td scope="row" class="label" width="20%">{$form.is_multiple_registrations.label}</td>
-            <td>{$form.is_multiple_registrations.html} {help id="id-allow_multiple"}</td>
+            <td>{$form.is_multiple_registrations.html} <span class="description">{ts}Allow registration of additional participants in one transaction{/ts}</span> {help id="id-allow_multiple"}</td>
         </tr>
         <tr class="crm-event-manage-registration-form-block-allow_same_participant_emails">
             <td scope="row" class="label" width="20%">{$form.allow_same_participant_emails.label}</td>
-            <td>{$form.allow_same_participant_emails.html} {help id="id-allow_same_email"}</td>
+            <td>{$form.allow_same_participant_emails.html} <span class="description">{ts}Allow multiple registrations from the same email address{/ts}</span> {help id="id-allow_same_email"}</td>
         </tr>
         <tr class="crm-event-manage-registration-form-block-requires_approval">
           {if $form.requires_approval}
@@ -332,21 +332,9 @@ invert              = 0
 <script type="text/javascript">
 {literal}    (function($, _) { // Generic Closure
 
-    function showRuleFields( ruleFields ) {
-        var msg1 = '{/literal}{ts 1="' + ruleFields + '"}Primary participants will be able to register additional participants using the same email address.  The configured "Supervised" Dedupe Rule will use the following fields to prevent duplicate registrations: %1.  First and Last Name will be used to check for matches among multiple participants.{/ts}{literal}';
-        var msg2 = '{/literal}{ts escape='js'}Primary participants will be allowed to register for this event multiple times.  No duplicate registration checking will be performed.{/ts}{literal}';
-        var msg3 = '{/literal}{ts escape='js'}Primary participants will be able to register additional participants during registration.{/ts}{literal}';
-
-        // Display info
-        $('.ui-notify-message .ui-notify-close').click();
-        if ( $("#allow_same_participant_emails").prop('checked' ) && cj("#is_multiple_registrations").prop('checked' ) ) {
-            CRM.alert( msg1, '', 'info', {expires:0} );
-        } else if ( $("#allow_same_participant_emails").prop('checked' ) && !cj("#is_multiple_registrations").prop('checked' ) ) {
-            CRM.alert( msg2, '', 'info', {expires:0} );
-        } else if ( !$("#allow_same_participant_emails").prop('checked' ) && cj("#is_multiple_registrations").prop('checked' ) ) {
-            CRM.alert( msg3, '', 'info', {expires:0} );
-        }
-    }
+    cj(".crm-submit-buttons input").click( function() {
+      cj(".dedupenotify .ui-notify-close").click();
+    });
 
     var profileBottomCount = Number({/literal}{$profilePostMultiple|@count}{literal});
     var profileBottomCountAdd = Number({/literal}{$profilePostMultipleAdd|@count}{literal});
@@ -383,7 +371,7 @@ invert              = 0
         var $container = $("[id^='additional_profile_'],.additional_profile").not('.processed').addClass('processed');
         $container.find(".crm-profile-selector-select select").each( function() {
             var $select = $(this);
-            var selected = $select.find(':selected').val(); //cache the default 
+            var selected = $select.find(':selected').val(); //cache the default
             $select.find('option[value=""]').remove();
             $select.prepend('<option value="">'+strSameAs+'</option>');
             if ($select.closest('tr').is(':not([id*="_pre"])')) {
@@ -398,8 +386,8 @@ $(function($) {
     showRuleFields( {/literal}{$ruleFields}{literal} );
 
     var allow_multiple = $("#is_multiple_registrations");
-    if ( !allow_multiple.prop('checked') ) { 
-        $('#additional_profile_pre,#additional_profile_post').hide(); 
+    if ( !allow_multiple.prop('checked') ) {
+        $('#additional_profile_pre,#additional_profile_post').hide();
     }
     allow_multiple.change( function( ) {
         if ( !$(this).prop('checked') ) {
@@ -430,7 +418,7 @@ $(function($) {
     });
 
 }); // END onReady
-}(CRM.$, CRM._)); //Generic Closure 
+}(CRM.$, CRM._)); //Generic Closure
 {/literal}
 </script>
 {include file="CRM/common/formNavigate.tpl"}
