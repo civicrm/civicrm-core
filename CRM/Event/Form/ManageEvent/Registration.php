@@ -285,18 +285,12 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     $this->addElement('checkbox',
       'is_multiple_registrations',
-      ts('Register multiple participants?'),
-      NULL,
-      array(
-        'onclick' => "return (showHideByValue('is_multiple_registrations', '', 'additional_profile_pre|additional_profile_post', 'table-row', 'radio', false) ||
-                                                      showRuleFields( " . json_encode($ruleFields) . " ));")
+      ts('Register multiple participants?')
     );
 
     $this->addElement('checkbox',
       'allow_same_participant_emails',
-      ts('Allow multiple registrations from the same email address?'),
-      NULL,
-      array('onclick' => "return showRuleFields( " . json_encode($ruleFields) . " );")
+      ts('Allow multiple registrations from the same email address?')
     );
     $this->assign('ruleFields', json_encode($ruleFields));
 
