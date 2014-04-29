@@ -1037,6 +1037,21 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
             }
           }
 
+					/**
+           * CRM-14563
+					 *
+           * If you do a search on a custom field with the IN parameter and the field
+           * is a multiple select field, the IN query does not return the fields which have more than
+           * one selection. So rather use the Regexp
+           *
+           */
+          if (substr($fldName, 0, 7) == 'custom_' && $params['operator'][$key][$k] == 'IN') {
+            $value = str_replace(array('(', ')'), array('', '', ), $value);
+            $value = explode(",", $value);
+            $params['operator'][$key][$k] = 'REGEXP';
+            $value = "[[:<:]]" . implode('|', $value) . "[[:>:]]";
+          }
+
           if ($row) {
             $fields[] = array(
               $fldName,
