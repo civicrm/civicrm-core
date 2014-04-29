@@ -221,6 +221,9 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
   }
 
   function where() {
+    // reset where clause as its called multiple times, every time insert sql is built.
+    $this->_whereClauses = array();
+    
     parent::where();
     $this->_where .= " AND (entity_log_civireport.log_action != 'Initialization')";
   }
