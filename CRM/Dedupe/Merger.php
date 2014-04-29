@@ -222,6 +222,7 @@ class CRM_Dedupe_Merger {
         'civicrm_uf_match' => array('contact_id'),
         'civicrm_uf_group' => array('created_id'),
         'civicrm_pledge' => array('contact_id'),
+        'civicrm_action_log' => array('contact_id'),
       );
 
       $cidRefs += self::getMultiValueCustomSets('cidRefs');
