@@ -87,6 +87,8 @@
         return 'membership_1';
       case 'Participant':
         return 'participant_1';
+      case 'Case':
+        return 'case_1';
       default:
         throw "Cannot guess entity name for field_type=" + field_type;
     }
@@ -687,7 +689,11 @@
       // set proper entity model based on selected profile
       var contactTypes = ['Individual', 'Household', 'Organization'];
       var profileType = ufGroupModel.get('group_type') || '';
+      if (profileType[0]) {
+        profileType = profileType[0];
+      }
       profileType = profileType.split(',');
+
       var ufEntityModel;
       _.each(profileType, function (ptype) {
         if ($.inArray(ptype, contactTypes) > -1) {

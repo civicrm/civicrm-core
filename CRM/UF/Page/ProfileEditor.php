@@ -154,6 +154,13 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $availableFields
           );
           break;
+        case 'CaseModel':
+          $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
+            'Case',
+            ts('Case'),
+            $availableFields
+          );
+          break;
         default:
           throw new CRM_Core_Exception("Unrecognized entity type: $entityType");
       }
