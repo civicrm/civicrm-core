@@ -73,6 +73,7 @@
     },
     setUfGroupId: function(value, options) {
       this.options.ufGroupId = value;
+      this.$('.crm-profile-selector-select select').val(value);
       this.$('.crm-profile-selector-select select').select2('val', value, (!options || !options.silent));
     },
     getUfGroupId: function() {
