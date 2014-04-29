@@ -12,11 +12,11 @@ SELECT @caseCompId := id FROM `civicrm_component` where `name` like 'CiviCase';
 -- * Case Types
 -- *
 -- *******************************************************/
-SELECT @option_group_id_case_type        := max(id) from civicrm_option_group where name = 'case_type';
-SELECT @max_val :=  IF ( value <> 'NULL',max(value) , 0 ) from civicrm_option_value where option_group_id=@option_group_id_case_type;
-SELECT @max_wt  :=  IF ( value <> 'NULL',max(weight), 0 ) from civicrm_option_value where option_group_id=@option_group_id_case_type;
+SELECT @max_wt  :=  COALESCE ( max(weight), 0 ) from civicrm_case_type;
 
-INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`) VALUES (@option_group_id_case_type, 'Housing Support',  @max_val + 1, 'housing_support', NULL, 0,  0, @max_wt + 1, 'Help homeless individuals obtain temporary and long-term housing', 0, 0, 1), (@option_group_id_case_type, 'Adult Day Care Referral',  @max_val + 2, 'adult_day_care_referral', NULL, 0,  0, @max_wt + 2, 'Arranging adult day care for senior individuals', 0, 0, 1);
+INSERT INTO `civicrm_case_type` (`title`, `name`, `weight`, `description`, `is_reserved`, `is_active`) VALUES
+('Housing Support', 'housing_support', @max_wt + 1, 'Help homeless individuals obtain temporary and long-term housing', 0, 1),
+('Adult Day Care Referral', 'adult_day_care_referral', @max_wt + 2, 'Arranging adult day care for senior individuals', 0, 1);
 
 -- /*******************************************************
 -- *

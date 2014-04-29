@@ -69,7 +69,7 @@
      <title>Case Types</title>
      <desc>List of types which can be assigned to Cases. (Enable the Cases tab from System Settings - Enable Components if you want to track cases.)</desc>
      <access_arguments>administer CiviCase</access_arguments>
-     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <page_callback>CRM_Admin_Page_CaseType</page_callback>
      <adminGroup>CiviCase</adminGroup>
      <icon>admin/small/case_type.png</icon>
      <weight>390</weight>

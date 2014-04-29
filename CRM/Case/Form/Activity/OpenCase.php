@@ -115,13 +115,6 @@ class CRM_Case_Form_Activity_OpenCase {
     if ($form->_caseTypeId) {
       $caseType = $form->_caseTypeId;
     }
-    else {
-      // set default case type if only one of it exists
-      $caseType = CRM_Core_OptionGroup::values('case_type', FALSE, FALSE, FALSE, 'AND is_default = 1');
-      if (count($caseType) == 1) {
-        $caseType = key($caseType);
-      }
-    }
     $defaults['case_type_id'] = $caseType;
 
     $medium = CRM_Core_OptionGroup::values('encounter_medium', FALSE, FALSE, FALSE, 'AND is_default = 1');
