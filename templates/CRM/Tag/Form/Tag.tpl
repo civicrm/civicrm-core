@@ -110,5 +110,5 @@
     </ul>
   </div>
   <br />
-{include file="CRM/common/Tag.tpl" context="contactTab"}
+{include file="CRM/common/Tagset.tpl" context="contactTab"}
 </div>

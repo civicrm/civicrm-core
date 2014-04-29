@@ -43,7 +43,7 @@ class CRM_Core_Form_Tag {
   /**
    * Function to build tag widget if correct parent is passed
    *
-   * @param object  $form form object
+   * @param CRM_Core_Form  $form form object
    * @param string  $parentName parent name ( tag name)
    * @param string  $entityTable entitytable 'eg: civicrm_contact'
    * @param int     $entityId    entityid  'eg: contact id'
@@ -109,7 +109,12 @@ class CRM_Core_Form_Tag {
 
         $tagset[$tagsetItem]['tagsetElementName'] = $tagsetElementName;
         if ($tagsetElementName) {
-          $form->add('text', "{$tagsetElementName}[{$parentId}]", NULL);
+          $form->addEntityRef("{$tagsetElementName}[{$parentId}]", NULL, array(
+            'entity' => 'tag',
+            'multiple' => TRUE,
+            'create' => TRUE,
+            'api' => array('params' => array('parent_id' => $parentId)))
+          );
         }
 
         if ($entityId) {
@@ -223,7 +228,9 @@ class CRM_Core_Form_Tag {
       // assign current tagsets which is used in postProcess
       $form->_tagsetInfo = $tagset;
       $form->assign("tagsetType", $mode);
-      $form->assign("tagsetInfo_$mode", $tagset);
+      $tagsetInfo = (array) $form->get_template_vars("tagsetInfo");
+      $tagsetInfo[$mode] = $tagset;
+      $form->assign("tagsetInfo", $tagsetInfo);
       $form->assign("isTagset", TRUE);
     }
   }
