@@ -1453,30 +1453,32 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   function addAutoSelector($profiles = array(), $autoCompleteField = array()) {
     $autoCompleteField = array_merge(array(
-        'name_field' => 'select_contact',
         'id_field' => 'select_contact_id',
-        'field_text' => ts('Select Contact'),
+        'placeholder' => ts('Select someone else ...'),
         'show_hide' => TRUE,
-        'show_text' => ts('to select someone already in our database.'),
-        'hide_text' => ts('to clear this person\'s information, and fill the form in for someone else'),
-        'url' => array('civicrm/ajax/rest', 'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1'),
-        'max' => civicrm_api3('setting', 'getvalue', array(
-        'name' => 'search_autocomplete_count',
-        'group' => 'Search Preferences',
-        ))
+        'api' => array('params' => array('contact_type' => 'Individual'))
       ), $autoCompleteField);
 
-    if(0 < (civicrm_api3('contact', 'getcount', array('check_permissions' => 1)))) {
-      $this->addElement('text', $autoCompleteField['name_field'] , $autoCompleteField['field_text']);
-      $this->addElement('hidden',  $autoCompleteField['id_field'], '', array('id' => $autoCompleteField['id_field']));
+    if($this->canUseAjaxContactLookups()) {
       $this->assign('selectable', $autoCompleteField['id_field']);
+      $this->addEntityRef($autoCompleteField['id_field'], NULL, array('placeholder' => $autoCompleteField['placeholder'], 'api' => $autoCompleteField['api']));
 
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AutoComplete.js')
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AlternateContactSelector.js')
       ->addSetting(array(
       'form' => array('autocompletes' => $autoCompleteField),
       'ids' => array('profile' => $profiles),
       ));
     }
+  }
+
+  /**
+   *
+   */
+  function canUseAjaxContactLookups() {
+    if (0 < (civicrm_api3('contact', 'getcount', array('check_permissions' => 1))) &&
+      CRM_Core_Permission::check(array(array('access AJAX API', 'access CiviCRM')))) {
+        return TRUE;
+      }
   }
 
   /**
