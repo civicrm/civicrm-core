@@ -159,6 +159,8 @@ class Container {
   public function createEntityManager($config) {
     $dbSettings = new \CRM_DB_Settings();
     $em = EntityManager::create($dbSettings->toDoctrineArray(), $config);
+    $event_manager = $em->getEventManager();
+    $event_manager->addEventSubscriber(new \Doctrine\DBAL\Event\Listeners\MysqlSessionInit('utf8', 'utf8_unicode_ci'));
     return $em;
   }
 
