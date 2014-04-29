@@ -23,38 +23,27 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $confirm}
-    <div class="messages status no-popup">
-          <div class="icon inform-icon"></div>&nbsp;
-          <label>{$display_name} ({$email})</label> {ts}has been successfully removed from the specified mailing list(s).{/ts}
-    </div>
-{else}
-    <div>
-    <form action="{$confirmURL}" method="post">
-      {if $groupExist}
-        <div class="messages status no-popup">
-          {ts 1=$display_name 2=$email} %1 (%2){/ts}<br/>
-          {ts}Are you sure you want to be removed from the mailing list(s) shown below:{/ts}<br/>
-        </div>
-        <table class="selector" style="width: auto; margin-top: 20px;">
-            {counter start=0 skip=1 print=false}
-            {foreach from=$groups item=group}
-            <tr class="{cycle values="odd-row,even-row"}">
-             <td><strong>{$group.title}</strong></td>
-             <td>&nbsp;&nbsp;{$group.description}&nbsp;</td>
-            </tr>
-            {/foreach}  
-        </table>
-        <div class="crm-submit-buttons">
-            <span class="crm-button crm-button-type-save"><input type="submit" name="_qf_unsubscribe_next" value="{ts}Unsubscribe{/ts}" class="form-submit" /></span> &nbsp;&nbsp;&nbsp;
-            <span class="crm-button crm-button-type-cancel"><input type="submit" name="_qf_unsubscribe_cancel" value="{ts}Cancel{/ts}" class="form-submit" /></span>
-        </div>
-      {else}
-        <div class="messages status no-popup">
-          {ts 1=$display_name 2=$email} %1 (%2){/ts}<br/>
-          {ts}Sorry you are not currently on this mailing list. Perhaps you have already unsubscribed.{/ts}<br/>
-        </div>
-      {/if}
-    </form>
-    </div>
-{/if}
+
+<div class="crm-block crm-form-block crm-miscellaneous-form-block">
+
+    <p>You are requesting to unsubscribe this Email address:</p>
+    <h3>{$email_masked}</h3>
+
+    <p>If this is not your Email address, there is no need to do anything. You have <i><b>not</b></i> been added to any mailing lists. If this is your Email address and you <i><b>wish to unsubscribe</b></i> please enter your Email address below for verification purposes:</p>
+
+    <table class="form-layout">
+      <tbody>
+      <tr>
+        <td class="label">{$form.email_confirm.label}</td>
+        <td class="content">{$form.email_confirm.html}
+      </tr>
+      </tbody>
+    </table>
+
+  <div class="crm-submit-buttons">
+    {include file="CRM/common/formButtons.tpl" location="bottom"}
+  </div>
+
+<br/>
+</div>
+
