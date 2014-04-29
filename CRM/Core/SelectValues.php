@@ -131,14 +131,10 @@ class CRM_Core_SelectValues {
    * @static
    */
   static function memberVisibility() {
-    static $visible = NULL;
-    if (!$visible) {
-      $visible = array(
-        'Public' => ts('Public'),
-        'Admin' => ts('Admin'),
-      );
-    }
-    return $visible;
+    return array(
+      'Public' => ts('Public'),
+      'Admin' => ts('Admin'),
+    );
   }
 
   /**
