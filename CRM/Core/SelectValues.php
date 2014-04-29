@@ -59,7 +59,7 @@ class CRM_Core_SelectValues {
    * preferred mail format
    * @static
    */
-  static function &pmf() {
+  static function pmf() {
     static $pmf = NULL;
     if (!$pmf) {
       $pmf = array(
@@ -75,7 +75,7 @@ class CRM_Core_SelectValues {
    * privacy options
    * @static
    */
-  static function &privacy() {
+  static function privacy() {
     static $privacy = NULL;
     if (!$privacy) {
       $privacy = array(
@@ -106,7 +106,7 @@ class CRM_Core_SelectValues {
    * various pre defined unit list
    * @static
    */
-  static function &unitList($unitType = NULL) {
+  static function unitList($unitType = NULL) {
     static $unitList = NULL;
     if (!$unitList) {
       $unitList = array(
@@ -157,7 +157,7 @@ class CRM_Core_SelectValues {
    * various pre defined member visibility options
    * @static
    */
-  static function &memberVisibility() {
+  static function memberVisibility() {
     static $visible = NULL;
     if (!$visible) {
       $visible = array(
@@ -189,7 +189,7 @@ class CRM_Core_SelectValues {
    * Custom form field types
    * @static
    */
-  static function &customHtmlType() {
+  static function customHtmlType() {
     static $customHtmlType = NULL;
     if (!$customHtmlType) {
       $customHtmlType = array(
@@ -221,7 +221,7 @@ class CRM_Core_SelectValues {
    *
    * @static
    */
-  static function &customGroupExtends() {
+  static function customGroupExtends() {
     static $customGroupExtends = NULL;
     if (!$customGroupExtends) {
       $customGroupExtends = array(
@@ -253,7 +253,7 @@ class CRM_Core_SelectValues {
    *
    * @static
    */
-  static function &customGroupStyle() {
+  static function customGroupStyle() {
     static $customGroupStyle = NULL;
     if (!$customGroupStyle) {
       $customGroupStyle = array(
@@ -270,7 +270,7 @@ class CRM_Core_SelectValues {
    *
    * @static
    */
-  static function &ufGroupTypes() {
+  static function ufGroupTypes() {
     static $ufGroupType = NULL;
     if (!$ufGroupType) {
       $ufGroupType = array(
@@ -293,7 +293,7 @@ class CRM_Core_SelectValues {
    *
    * @static
    */
-  static function &groupContactStatus() {
+  static function groupContactStatus() {
     static $groupContactStatus = NULL;
     if (!$groupContactStatus) {
       $groupContactStatus = array(
@@ -323,13 +323,16 @@ class CRM_Core_SelectValues {
   /**
    * compose the parameters for a date select object
    *
-   * @param  string|NULL $type    the type of date
-   * @param  string|NULL $format  date format ( QF format)
+   * @param  string|NULL $type the type of date
+   * @param  string|NULL $format date format ( QF format)
+   *
+   * @param null $minOffset
+   * @param null $maxOffset
    *
    * @return array         the date array
    * @static
    */
-  static function &date($type = NULL, $format = NULL, $minOffset = NULL, $maxOffset = NULL) {
+  static function date($type = NULL, $format = NULL, $minOffset = NULL, $maxOffset = NULL) {
 
     $date = array(
       'addEmptyOption' => TRUE,
@@ -408,7 +411,7 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function &mailingComponents() {
+  static function mailingComponents() {
     static $components = NULL;
 
     if (!$components) {
@@ -505,7 +508,7 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function &mailingTokens() {
+  static function mailingTokens() {
     static $tokens = NULL;
 
     if (!$tokens) {
@@ -536,7 +539,7 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function &activityTokens() {
+  static function activityTokens() {
     static $tokens = NULL;
 
     if (!$tokens) {
@@ -579,7 +582,7 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function &eventTokens() {
+  static function eventTokens() {
     static $tokens = NULL;
 
     if (!$tokens) {
@@ -609,7 +612,7 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function &contributionTokens() {
+  static function contributionTokens() {
     static $tokens = NULL;
 
     if (!$tokens) {
@@ -648,7 +651,7 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function &contactTokens() {
+  static function contactTokens() {
     static $tokens = NULL;
     if (!$tokens) {
       $additionalFields = array('checksum' => array('title' => ts('Checksum')),
@@ -713,7 +716,7 @@ class CRM_Core_SelectValues {
    * @static
    * return array
    */
-  static function &participantTokens() {
+  static function participantTokens() {
     static $tokens = NULL;
     if (!$tokens) {
       $exportFields = CRM_Event_BAO_Participant::exportableFields();
@@ -749,7 +752,7 @@ class CRM_Core_SelectValues {
    * get qf mappig for all date parts.
    *
    */
-  static function &qfDatePartsMapping() {
+  static function qfDatePartsMapping() {
     static $qfDatePartsMapping = NULL;
     if (!$qfDatePartsMapping) {
       $qfDatePartsMapping = array(
