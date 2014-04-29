@@ -241,7 +241,9 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Get list of batches
    *
-   * @param  array   $params associated array for params
+   * @param  array $params associated array for params
+   *
+   * @return array
    * @access public
    */
   static function getBatchList(&$params) {
@@ -345,7 +347,9 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Get count of batches
    *
-   * @param  array   $params associated array for params
+   * @param  array $params associated array for params
+   *
+   * @return null|string
    * @access public
    */
   public static function getBatchCount(&$params) {
@@ -360,7 +364,9 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Format where clause for getting lists of batches
    *
-   * @param  array   $params associated array for params
+   * @param  array $params associated array for params
+   *
+   * @return string
    * @access public
    */
   public static function whereClause($params) {
@@ -405,6 +411,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
   /**
    * Function to define action links
+   *
+   * @param null $context
    *
    * @return array $links array of action links
    * @access public
@@ -619,6 +627,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param array $returnValues
    * @param null $notPresent
    * @param null $params
+   * @param bool $getCount
+   *
    * @return Object
    */
   static function getBatchFinancialItems($entityID, $returnValues, $notPresent = NULL, $params = NULL, $getCount = FALSE) {
