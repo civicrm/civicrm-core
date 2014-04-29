@@ -41,7 +41,7 @@ class CRM_Core_SelectValues {
    * different types of phones
    * @static
    */
-  static function &phoneType() {
+  static function phoneType() {
     static $phoneType = NULL;
     if (!$phoneType) {
       $phoneType = array(
@@ -688,7 +688,7 @@ class CRM_Core_SelectValues {
       // might as well get all the hook tokens to
       $hookTokens = array();
       CRM_Utils_Hook::tokens($hookTokens);
-      foreach ($hookTokens as $category => $tokenValues) {
+      foreach ($hookTokens as $tokenValues) {
         foreach ($tokenValues as $key => $value) {
           if (is_numeric($key)) {
             $key = $value;
