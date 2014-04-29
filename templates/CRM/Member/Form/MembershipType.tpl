@@ -65,7 +65,7 @@
         </td>
       </tr>
       <tr class="crm-membership-type-form-block-financial_type_id">
-        <td class="label">{$form.financial_type_id.label}<span class="marker"> *</span></td>
+        <td class="label">{$form.financial_type_id.label}</td>
         <td>{$form.financial_type_id.html}<br />
           <span class="description">{ts}Select the financial type assigned to fees for this membership type (for example 'Membership Fees'). This is required for all membership types - including free or complimentary memberships.{/ts}</span>
         </td>
@@ -79,13 +79,13 @@
         {/if}
       </tr>
       <tr class="crm-membership-type-form-block-duration_unit_interval">
-        <td class="label">{$form.duration_unit.label}&nbsp;<span class="marker">*</span></td>
+        <td class="label">{$form.duration_unit.label}</td>
         <td>{$form.duration_interval.html}&nbsp;&nbsp;{$form.duration_unit.html}<br />
           <span class="description">{ts}Duration of this membership (e.g. 30 days, 2 months, 5 years, 1 lifetime){/ts}</span>
         </td>
       </tr>
       <tr class="crm-membership-type-form-block-period_type">
-        <td class="label">{$form.period_type.label}<span class="marker"> *</span></td>
+        <td class="label">{$form.period_type.label}</td>
         <td>{$form.period_type.html}<br />
           <span class="description">{ts}Select 'rolling' if membership periods begin at date of signup. Select 'fixed' if membership periods begin on a set calendar date.{/ts} {help id="period-type" file="CRM/Member/Page/MembershipType.hlp"}</span>
         </td>
