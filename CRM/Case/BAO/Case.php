@@ -515,13 +515,18 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @access public
    *
    */
-  static function retrieveCaseIdsByContactId($contactID, $includeDeleted = FALSE) {
+  static function retrieveCaseIdsByContactId($contactID, $includeDeleted = FALSE, $caseType = NULL) {
     $query = "
 SELECT ca.id as id
 FROM civicrm_case_contact cc
 INNER JOIN civicrm_case ca ON cc.case_id = ca.id
-WHERE cc.contact_id = %1
 ";
+    if (isset($caseType)) {
+      $query .=
+"INNER JOIN civicrm_option_value cov ON (cov.value = ca.case_type_id)
+INNER JOIN civicrm_option_group cog ON (cog.id = cov.option_group_id and cog.name = 'case_type')
+WHERE cc.contact_id = %1 AND cov.name = '{$caseType}'";
+    }
     if (!$includeDeleted) {
       $query .= " AND ca.is_deleted = 0";
     }
