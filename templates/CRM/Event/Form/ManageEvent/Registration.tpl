@@ -364,7 +364,7 @@ invert              = 0
             urlPath = CRM.url('civicrm/event/manage/registration', { addProfileBottom: 1 , addProfileNum : profileBottomCount, snippet: 4 } ) ;
         }
 
-        $(this).closest('tbody').append('<tr></tr>');
+        $(this).closest('tbody').append('<tr class="additional_profile"></tr>');
         var $el = $(this).closest('tbody').find('tr:last');
         $el.load(urlPath, function() { $(this).trigger('crmLoad') });
     }
@@ -375,6 +375,23 @@ invert              = 0
         $(e.target).parents('tr').find('.crm-profile-selector').val('');
         $(e.target).parents('tr').hide();
     }
+
+    var strSameAs = ' - '+ts('same as for main contact')+' - ';
+    var strSelect = ' - '+ts('select')+' - ';
+
+    $('#crm-container').on('crmLoad', function() {
+        var $container = $("[id^='additional_profile_'],.additional_profile").not('.processed').addClass('processed');
+        $container.find(".crm-profile-selector-select select").each( function() {
+            var $select = $(this);
+            var selected = $select.find(':selected').val(); //cache the default 
+            $select.find('option[value=""]').remove();
+            $select.prepend('<option value="">'+strSameAs+'</option>');
+            if ($select.closest('tr').is(':not([id*="_pre"])')) {
+               $select.prepend('<option value="">'+strSelect+'</option>');
+            }
+            $select.find('option[value="'+selected+'"]').attr('selected', 'selected'); //restore default
+        });
+    });
 
 $(function($) {
 
@@ -401,6 +418,16 @@ $(function($) {
 
     $('#registration_blocks').on('click', '.crm-button-add-profile', addBottomProfile);
     $('#registration_blocks').on('click', '.crm-button-rem-profile', removeBottomProfile);
+
+    $('#crm-container').on('crmLoad', function(e) {
+        $('tr[id^="additional_profile"] input[id^="additional_custom_"]').change(function(e) {
+            $input = $(e.target);
+            if ( $input.val() == '') {
+                $selected = $input.closest('tr').find('.crm-profile-selector-select :selected');
+                if ($selected.text() == strSelect) { $input.val('none'); }
+            }
+        });
+    });
 
 }); // END onReady
 }(CRM.$, CRM._)); //Generic Closure 
