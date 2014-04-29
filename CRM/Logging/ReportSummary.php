@@ -145,7 +145,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
         'log_civicrm_activity_for_source' =>
         array(
           'fk' => 'contact_id',
-          'table_name' => 'log_civicrm_activity_contact',
+          'table_name' => 'log_civicrm_activity',
           'joins' => array(
             'table' => 'log_civicrm_activity_contact',
             'join' => "entity_log_civireport.id = fk_table.activity_id AND fk_table.record_type_id = {$sourceID}"
