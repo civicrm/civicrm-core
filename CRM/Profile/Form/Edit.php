@@ -120,16 +120,23 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
         ));
     }
 
-    // and also the profile is of type 'Profile'
-    $query = "
-SELECT module
-  FROM civicrm_uf_join
- WHERE module = 'Profile'
-   AND uf_group_id = %1
+      // and also the profile is of type 'Profile'
+      $query = "
+SELECT module,is_reserved
+  FROM civicrm_uf_group
+  LEFT JOIN civicrm_uf_join ON uf_group_id = civicrm_uf_group.id
+   WHERE civicrm_uf_group.id = %1
 ";
-    $params = array(1 => array($this->_gid, 'Integer'));
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-    if (!$dao->fetch()) {
+      $params = array(1 => array($this->_gid, 'Integer'));
+      $dao = CRM_Core_DAO::executeQuery($query, $params);
+      $error = $dao->fetch();
+
+
+      //Check that the user has the "add contacts" Permission
+      $CanAdd = CRM_Core_Permission::check("add contacts");
+
+      //Remove need for Profile module type when using reserved profiles [CRM-14488]
+      if( !$error || ($dao->module != "Profile" && !($dao->is_reserved && $CanAdd))) {
       CRM_Core_Error::fatal(ts('The requested Profile (gid=%1) is not configured to be used for \'Profile\' edit and view forms in its Settings. Contact the site administrator if you need assistance.',
           array(1 => $this->_gid)
         ));
