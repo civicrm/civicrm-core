@@ -42,15 +42,11 @@ class CRM_Core_SelectValues {
    * @static
    */
   static function pmf() {
-    static $pmf = NULL;
-    if (!$pmf) {
-      $pmf = array(
-        'Both' => ts('Both'),
-        'HTML' => ts('HTML'),
-        'Text' => ts('Text'),
-      );
-    }
-    return $pmf;
+    return array(
+      'Both' => ts('Both'),
+      'HTML' => ts('HTML'),
+      'Text' => ts('Text'),
+    );
   }
 
   /**
@@ -58,25 +54,21 @@ class CRM_Core_SelectValues {
    * @static
    */
   static function privacy() {
-    static $privacy = NULL;
-    if (!$privacy) {
-      $privacy = array(
-        'do_not_phone' => ts('Do not phone'),
-        'do_not_email' => ts('Do not email'),
-        'do_not_mail' => ts('Do not mail'),
-        'do_not_sms' => ts('Do not sms'),
-        'do_not_trade' => ts('Do not trade'),
-        'is_opt_out' => ts('No bulk emails (User Opt Out)'),
-      );
-    }
-    return $privacy;
+    return array(
+      'do_not_phone' => ts('Do not phone'),
+      'do_not_email' => ts('Do not email'),
+      'do_not_mail' => ts('Do not mail'),
+      'do_not_sms' => ts('Do not sms'),
+      'do_not_trade' => ts('Do not trade'),
+      'is_opt_out' => ts('No bulk emails (User Opt Out)'),
+    );
   }
 
   /**
    * various pre defined contact super types
    * @static
    */
-  static function &contactType() {
+  static function contactType() {
     static $contactType = NULL;
     if (!$contactType) {
       $contactType = CRM_Contact_BAO_ContactType::basicTypePairs();
@@ -95,10 +87,7 @@ class CRM_Core_SelectValues {
       'year' => ts('year'),
     );
     if ($unitType == 'duration') {
-      $unitAdd = array(
-        'lifetime' => ts('lifetime'),
-      );
-      $unitList = array_merge($unitList, $unitAdd);
+      $unitList['lifetime'] = ts('lifetime');
     }
     return $unitList;
   }
@@ -108,11 +97,7 @@ class CRM_Core_SelectValues {
    * @static
    */
   static function membershipTypeUnitList( ) {
-    static $membershipTypeUnitList = NULL;
-    if (!$membershipTypeUnitList) {
-      $membershipTypeUnitList = self::unitList('duration');
-    }
-    return $membershipTypeUnitList;
+    return self::unitList('duration');
   }
 
   /**
@@ -198,8 +183,8 @@ class CRM_Core_SelectValues {
       'Campaign' => ts('Campaigns'),
     );
     $contactTypes = self::contactType();
-    $contactTypes       = !empty($contactTypes) ? array('Contact' => 'Contacts') + $contactTypes : array();
-    $extendObjs         = CRM_Core_OptionGroup::values('cg_extend_objects');
+    $contactTypes = !empty($contactTypes) ? array('Contact' => 'Contacts') + $contactTypes : array();
+    $extendObjs = CRM_Core_OptionGroup::values('cg_extend_objects');
     $customGroupExtends = array_merge($contactTypes, $customGroupExtends, $extendObjs);
     return $customGroupExtends;
   }
@@ -307,7 +292,7 @@ class CRM_Core_SelectValues {
       }
     }
 
-    $year            = date('Y');
+    $year = date('Y');
     $date['minYear'] = $year - $minOffset;
     $date['maxYear'] = $year + $maxOffset;
     return $date;
@@ -333,9 +318,9 @@ class CRM_Core_SelectValues {
    */
   static function groupVisibility() {
     return array(
-        'User and User Admin Only' => ts('User and User Admin Only'),
-        'Public Pages' => ts('Public Pages'),
-      );
+      'User and User Admin Only' => ts('User and User Admin Only'),
+      'Public Pages' => ts('Public Pages'),
+    );
   }
 
   /**
@@ -393,7 +378,7 @@ class CRM_Core_SelectValues {
   static function mapProvider() {
     static $map = NULL;
     if (!$map) {
-      return CRM_Utils_System::getPluginList('templates/CRM/Contact/Form/Task/Map', ".tpl");
+      $map = CRM_Utils_System::getPluginList('templates/CRM/Contact/Form/Task/Map', ".tpl");
     }
     return $map;
   }
@@ -407,7 +392,7 @@ class CRM_Core_SelectValues {
   static function geoProvider() {
     static $geo = NULL;
     if (!$geo) {
-      return CRM_Utils_System::getPluginList('CRM/Utils/Geocode');
+      $geo = CRM_Utils_System::getPluginList('CRM/Utils/Geocode');
     }
     return $geo;
   }
@@ -422,10 +407,7 @@ class CRM_Core_SelectValues {
   static function addressProvider() {
     static $addr = NULL;
     if (!$addr) {
-      return CRM_Utils_System::getPluginList('CRM/Utils/Address',
-        '.php',
-        array('BatchUpdate')
-      );
+      $addr = CRM_Utils_System::getPluginList('CRM/Utils/Address', '.php', array('BatchUpdate'));
     }
     return $addr;
   }
@@ -572,9 +554,9 @@ class CRM_Core_SelectValues {
         'is_deceased', 'deceased_date', 'legal_identifier', 'contact_sub_type', 'user_unique_id',
       );
 
-      $customFields        = CRM_Core_BAO_CustomField::getFields('Individual');
+      $customFields = CRM_Core_BAO_CustomField::getFields('Individual');
       $customFieldsAddress = CRM_Core_BAO_CustomField::getFields('Address');
-      $customFields        = $customFields + $customFieldsAddress;
+      $customFields = $customFields + $customFieldsAddress;
       $legacyTokenNames = array_flip(CRM_Utils_Token::legacyContactTokens());
 
       foreach ($values as $val) {
@@ -719,10 +701,10 @@ class CRM_Core_SelectValues {
    * Time formats
    */
   static function getTimeFormats() {
-    $timeFormats = array('1' => ts('12 Hours'),
+    return array(
+      '1' => ts('12 Hours'),
       '2' => ts('24 Hours'),
     );
-    return $timeFormats;
   }
 
   /**
@@ -853,7 +835,7 @@ class CRM_Core_SelectValues {
       'Participant' => ts('Participants'),
     );
     $contactTypes = self::contactType();
-    $contactTypes       = !empty($contactTypes) ? array('Contact' => 'Contacts') + $contactTypes : array();
+    $contactTypes = !empty($contactTypes) ? array('Contact' => 'Contacts') + $contactTypes : array();
     $profileGroupType = array_merge($contactTypes, $profileGroupType );
 
     return $profileGroupType;
