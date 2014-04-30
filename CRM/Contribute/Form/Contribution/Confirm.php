@@ -172,6 +172,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
               && CRM_Utils_Array::value("price_{$contriPriceId}", $this->_params) < 1 && empty($this->_params["price_{$priceField->id}"])) {
               $this->_params['amount'] = null;
           }
+
+          // Fix for CRM-14375 - If we are using separate payments and "no
+          // thank you" is selected for the additional contribution, set
+          // contribution amount to be null, so that it will not show
+          // contribution amount same as membership amount.
+          if ($this->_membershipBlock['is_separate_payment']
+            && CRM_Utils_Array::value('name', $this->_values['fee'][$priceField->id]) == 'contribution_amount'
+            && CRM_Utils_Array::value("price_{$priceField->id}", $this->_params) == '-1'
+          ) {
+            $this->_params['amount'] = null;
+          }
         }
       }
       $this->_params['currencyID'] = $config->defaultCurrency;
