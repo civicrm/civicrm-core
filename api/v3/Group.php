@@ -53,17 +53,7 @@
  * @access public
  */
 function civicrm_api3_group_create($params) {
-
-  $group = CRM_Contact_BAO_Group::create($params);
-
-  if (is_null($group)) {
-    return civicrm_api3_create_error('Group not created');
-  }
-  else {
-    $values = array();
-    _civicrm_api3_object_to_array_unique_fields($group, $values[$group->id]);
-    return civicrm_api3_create_success($values, $params, 'group', 'create', $group);
-  }
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Group');
 }
 
 /**
@@ -90,34 +80,16 @@ function _civicrm_api3_group_create_spec(&$params) {
  * @access public
  */
 function civicrm_api3_group_get($params) {
-
-  $options          = _civicrm_api3_get_options_from_params($params, TRUE, 'group', 'get');
-  $sort             = CRM_Utils_Array::value('sort', $options, NULL);
-  $offset           = CRM_Utils_Array::value('offset', $options);
-  $rowCount         = CRM_Utils_Array::value('limit', $options);
-  $returnProperties = CRM_Utils_Array::value('return', $options, NULL);
-  $inputParams      = CRM_Utils_Array::value('input_params', $options, array());
-  if(is_array($returnProperties) && !empty($returnProperties)){
-    // group function takes $returnProperties in non standard format & doesn't add id
-    unset($returnProperties['group_id']);
-    $returnProperties['id'] = 1;
-    $returnProperties = array_keys($returnProperties);
-  }
-  if (!empty($inputParams['group_id'])) {
-    $inputParams['id'] = $inputParams['group_id'];
-  }
-  $groupObjects = CRM_Contact_BAO_Group::getGroups($inputParams, $returnProperties, $sort, $offset, $rowCount);
-  if (empty($groupObjects)) {
-    return civicrm_api3_create_success(FALSE);
-  }
-  $groups = array();
-  foreach ($groupObjects as $group) {
-    _civicrm_api3_object_to_array($group, $groups[$group->id]);
-    _civicrm_api3_custom_data_get($groups[$group->id], 'Group', $group->id);
+  $options = _civicrm_api3_get_options_from_params($params, TRUE, 'group', 'get');
+  if(empty($options['return']) || !in_array('member_count', $options['return'])) {
+    return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Group');
   }
 
-
-  return civicrm_api3_create_success($groups, $params, 'group', 'create');
+  $groups = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Group');
+  foreach ($groups as $id => $group) {
+    $groups[$id]['member_count'] = CRM_Contact_BAO_Group::memberCount($id);
+  }
+  return civicrm_api3_create_success($groups, $params, 'group', 'get');
 }
 
 /**
