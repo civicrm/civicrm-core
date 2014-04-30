@@ -115,6 +115,20 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   }
 
   /**
+   * Configuration of Required Entities for On Behalf Of Profiles
+   **/
+  public static function getOnBehalfOfRequiredEntities() {
+    return array('Contact', 'Organization');
+  }
+
+  /**
+   * Configuration of optional Entities for On Behalf Of Profiles
+   **/
+  public static function getOnBehalfOfOptionalEntities() {
+    return array('Contribution', 'Membership');
+  }
+
+  /**
    * Function to actually build the form
    *
    * @return void
@@ -141,35 +155,8 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     // is on behalf of an organization ?
     $this->addElement('checkbox', 'is_organization', ts('Allow individuals to contribute and / or signup for membership on behalf of an organization?'), NULL, array('onclick' => "showHideByValue('is_organization',true,'for_org_text','table-row','radio',false);showHideByValue('is_organization',true,'for_org_option','table-row','radio',false);"));
 
-    $required = array('Contact', 'Organization');
-    $optional = array('Contribution', 'Membership');
-
-/*    $profiles = CRM_Core_BAO_UFGroup::getValidProfiles($required, $optional);
-    //Check profiles for Organization subtypes
-    $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
-    foreach ($contactSubType as $type) {
-      $required = array('Contact', $type);
-      $subTypeProfiles = CRM_Core_BAO_UFGroup::getValidProfiles($required, $optional);
-      foreach ($subTypeProfiles as $profileId => $profileName) {
-        $profiles[$profileId] = $profileName;
-      }
-    }
-
-    $requiredProfileFields = array('organization_name', 'email');
-
-    if (!empty($profiles)) {
-      foreach ($profiles as $id => $dontCare) {
-        $validProfile = CRM_Core_BAO_UFGroup::checkValidProfile($id, $requiredProfileFields);
-        if (!$validProfile) {
-          unset($profiles[$id]);
-        }
-      }
-    }
-
-    if (empty($profiles)) {
-      $invalidProfiles = TRUE;
-      $this->assign('invalidProfiles', $invalidProfiles);
-*/
+   $required = self::getOnBehalfOfRequiredEntities();
+   $optional = self::getOnBehalfOfOptionalEntities();
    $profile_entities = array();
    foreach (array_merge($required, $optional) as $entity) {
        if ($entity = 'Contact') continue;
@@ -258,8 +245,20 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       $errors['title'] = ts("Please do not use '/' in Title");
     }
 
-    if (!empty($values['is_organization']) && empty($values['onbehalf_profile_id'])) {
-      $errors['onbehalf_profile_id'] = ts('Please select a profile to collect organization information on this contribution page.');
+    // ensure on-behalf-of profile meets minimum requirements
+    if (!empty($values['is_organization'])) {
+      if (empty($values['onbehalf_profile_id']) ) {
+        $errors['onbehalf_profile_id'] = ts('Please select a profile to collect organization information on this contribution page.');
+      } else {
+        $required = self::getOnBehalfOfRequiredEntities();
+        $optional = self::getOnBehalfOfOptionalEntities();
+        $id = $values['onbehalf_profile_id'];
+        $requiredProfileFields = array('organization_name', 'email');
+        if (! CRM_Core_BAO_UFField::checkValidProfileType($id, $required, $optional)
+             && ! CRM_Core_BAO_UFGroup::checkValidProfile($id, $requiredProfileFields) ) {
+          $errors['onbehalf_profile_id'] = ts('Profile does not contain the minimum required fields for an On Behalf Of Organization');
+        } 
+      }
     }
 
     //CRM-11494
