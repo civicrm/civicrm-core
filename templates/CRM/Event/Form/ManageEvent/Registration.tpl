@@ -336,8 +336,8 @@ invert              = 0
 <script type="text/javascript">
 {literal}    (function($, _) { // Generic Closure
 
-    cj(".crm-submit-buttons input").click( function() {
-      cj(".dedupenotify .ui-notify-close").click();
+    $(".crm-submit-buttons input").click( function() {
+      $(".dedupenotify .ui-notify-close").click();
     });
 
     var profileBottomCount = Number({/literal}{$profilePostMultiple|@count}{literal});
@@ -386,8 +386,6 @@ invert              = 0
     });
 
 $(function($) {
-
-    showRuleFields( {/literal}{$ruleFields}{literal} );
 
     var allow_multiple = $("#is_multiple_registrations");
     if ( !allow_multiple.prop('checked') ) {
