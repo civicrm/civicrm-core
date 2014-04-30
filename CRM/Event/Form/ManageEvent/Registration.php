@@ -323,13 +323,13 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     // explicit height and width.
     $form->addWysiwyg('footer_text', ts('Footer Text'), array('rows' => 2, 'cols' => 40));
 
-    extract( $this->getProfileSelectorTypes() );
+    extract( self::getProfileSelectorTypes() );
 
     $form->addProfileSelector( 'custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
     $form->addProfileSelector( 'custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
 
-    $form->addProfileSelector( 'additional_custom_pre_id',  ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntitites);
-    $form->addProfileSelector( 'additional_custom_post_id',  ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntitites);
+    $form->addProfileSelector( 'additional_custom_pre_id',  ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
+    $form->addProfileSelector( 'additional_custom_post_id',  ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
   }
 
   /**
@@ -343,7 +343,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * @param array $configs Optional, for addProfileSelector(), defaults to using getProfileSelectorTypes()
    **/
   function buildMultipleProfileBottom(&$form, $count, $prefix = '', $label = 'Include Profile', $configs = null) {
-    extract( ( is_null($configs) ) ? $this->getProfileSelectorTypes() : $configs ); 
+    extract( ( is_null($configs) ) ? self::getProfileSelectorTypes() : $configs );
     $element = $prefix . "custom_post_id_multiple[$count]";
     $label .= '<br />'.ts('(bottom of page)');
     $form->addProfileSelector( $element,  $label, $allowCoreTypes, $allowSubTypes, $profileEntitites);
@@ -354,7 +354,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @return array( 'allowCoreTypes' => array(), 'allowSubTypes' => array(), 'profileEntities' => array() )
    **/
-  function getProfileSelectorTypes() {
+  static function getProfileSelectorTypes() {
     $configs = array(
       'allowCoreTypes' => array(),
       'allowSubTypes' => array(),
