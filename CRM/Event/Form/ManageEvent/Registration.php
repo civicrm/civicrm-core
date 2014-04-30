@@ -339,13 +339,14 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * @param array &$form
    * @param int $count unique index
    * @param string $prefix dom element ID prefix
-   * @param string $name dom element name 
+   * @param string $label Label
    * @param array $configs Optional, for addProfileSelector(), defaults to using getProfileSelectorTypes()
    **/
-  function buildMultipleProfileBottom(&$form, $count, $prefix = '', $name = 'Include Profile', $configs = null) {
+  function buildMultipleProfileBottom(&$form, $count, $prefix = '', $label = 'Include Profile', $configs = null) {
     extract( ( is_null($configs) ) ? $this->getProfileSelectorTypes() : $configs ); 
     $element = $prefix . "custom_post_id_multiple[$count]";
-    $form->addProfileSelector( $element,  $name . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntitites);
+    $label .= '<br />'.ts('(bottom of page)');
+    $form->addProfileSelector( $element,  $label, $allowCoreTypes, $allowSubTypes, $profileEntitites);
   }
 
   /**
