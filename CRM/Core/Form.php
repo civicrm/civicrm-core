@@ -99,6 +99,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   static protected $_template;
 
   /**
+   *  Indicate if this form should warn users of unsaved changes
+   */
+  protected $unsavedChangesWarn;
+
+  /**
    * What to return to the client if in ajax mode (snippet=json)
    *
    * @var array
