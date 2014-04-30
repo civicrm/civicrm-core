@@ -188,6 +188,9 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
                 array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>')
               );
               break;
+
+            case 'entity_reference':
+              $this->addEntityRef($fieldName, NULL, array('entity' => 'group', 'api' => array('params' => array())));
           }
         }
 
