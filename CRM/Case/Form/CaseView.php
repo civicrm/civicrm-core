@@ -436,7 +436,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     else {
       $this->assign('showTagsets', FALSE);
     }
-    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_case', $this->_caseID, TRUE, TRUE);
+    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_case', $this->_caseID, FALSE, TRUE);
 
     $this->addButtons(array(
         array(
