@@ -174,7 +174,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       self::$_template = CRM_Core_Smarty::singleton();
     }
 
-    $this->assign('snippet', CRM_Utils_Array::value('snippet', $_REQUEST));
+    $this->assign('snippet', CRM_Utils_Array::value('snippet', $_GET));
   }
 
   static function generateID() {
