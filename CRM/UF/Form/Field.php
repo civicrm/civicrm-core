@@ -714,7 +714,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * validation rule to prevent multiple fields of primary location type and the same communication type.
+   * Validation rule to prevent multiple fields of primary location type within the same communication type.
    *
    * @param Array   $fields            Submitted fields
    * @param String  $profileFieldName  Group Id.
@@ -729,6 +729,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $checkPrimary = array('phone' => 'civicrm_phone.phone', 'phone_and_ext' => 'civicrm_phone.phone');
     $whereCheck = NULL;
     $primaryOfSameTypeFound = NULL;
+    $fieldID = empty($fields['field_id']) ? 0 : $fields['field_id'];
     // Is this a primary location type field of interest
     if (array_key_exists($profileFieldName, $checkPrimary)) {
       $whereCheck = $checkPrimary[$profileFieldName];
@@ -740,8 +741,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
       foreach ($groupFields as $groupField) {
         // if it is a phone
-        if ($groupField['where'] == $whereCheck && is_null($groupField['location_type_id'])) {
+        if ($groupField['where'] == $whereCheck && is_null($groupField['location_type_id']) && $groupField['field_id']  != $fieldID) {
           $primaryOfSameTypeFound = $groupField['title'];
+          break;
         }
       }
       if ($primaryOfSameTypeFound) {
@@ -813,9 +815,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     // Get list of fields already in the group
     $groupFields = CRM_Core_BAO_UFGroup::getFields($fields['group_id'], FALSE, NULL, NULL, NULL, TRUE, NULL, TRUE);
     // Check if we already added a primary field of the same communication type
-    if (empty($fields['field_id'])) {
-      self::formRulePrimaryCheck($fields, $profileFieldName, $groupFields, $errors);
-    }
+    self::formRulePrimaryCheck($fields, $profileFieldName, $groupFields, $errors);
 
     //check profile is configured for double option process
     //adding group field, email field should be present in the group
