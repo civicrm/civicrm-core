@@ -39,9 +39,9 @@ class CRM_Grant_BAO_Grant_Utils {
    *
    * @param object  $form   form object
    * @param array  $params  an assoc array of name/value pairs
-   * @param int      $contactID       contact id
-   * @param int      $grantTypeId       grant type id
-   * @param int      $component   component id
+   * @param int    $contactID       contact id
+   * @param int    $grantTypeId       grant type id
+   * @param int    $component   component id
    * @param array  $fieldTypes   array of field types
    *
    * @return array associated array
