@@ -337,26 +337,26 @@ AND id BETWEEN %1 AND %2
       $baseurl = CIVICRM_UF_BASEURL;
       $baselen = strlen($baseurl);
       if (substr($imageURL, 0, $baselen)==$baseurl){
-          $photo = basename($dao->image_url);
-          $config = CRM_Core_Config::singleton();
-          $fullpath = $config->customFileUploadDir.$photo;
+        $photo = basename($dao->image_url);
+        $config = CRM_Core_Config::singleton();
+        $fullpath = $config->customFileUploadDir.$photo;
           if (file_exists($fullpath)){
             $newimageurl =  CRM_Utils_System::url('civicrm/contact/imagefile', 'photo='.$photo, TRUE);
             $sql = 'UPDATE civicrm_contact SET image_url=%1 WHERE id=%2';
             $params = array(
-                1 => array($newimageurl, 'String'),
-                2 => array($dao->id, 'Integer'),
+              1 => array($newimageurl, 'String'),
+              2 => array($dao->id, 'Integer'),
             );
             $updatedao = CRM_Core_DAO::executeQuery($sql, $params);
           }
           else{
             $failures[$dao->id] = $dao->image_url;
+          }
+        }
+        else{     
+            $failures[$dao->id] = $dao->image_url;
         }
       }
-      else{     
-            $failures[$dao->id] = $dao->image_url;
-      }
-    }
     CRM_Core_Error::debug_var('imageUrlsNotUpgraded', $failures);
     return TRUE;
   }
