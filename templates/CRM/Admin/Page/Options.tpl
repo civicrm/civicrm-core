@@ -70,7 +70,7 @@
 
 <div class="crm-content-block crm-block">
 {if $rows}
-{if $action ne 1 and $action ne 2}
+{if $action ne 1 and $action ne 2 and $isLocked ne 1}
     <div class="action-link">
         <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
     </div>
@@ -153,7 +153,7 @@
         {include file="CRM/common/crmeditable.tpl"}
         {/strip}
 
-        {if $action ne 1 and $action ne 2}
+        {if $action ne 1 and $action ne 2 and $isLocked ne 1}
             <div class="action-link">
                 <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
             </div>
