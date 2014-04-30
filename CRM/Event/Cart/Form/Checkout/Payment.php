@@ -605,7 +605,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
     $contribution = &CRM_Contribute_BAO_Contribution::add($contribParams, $ids);
     if (is_a($contribution, 'CRM_Core_Error')) {
-      CRM_Core_Error::fatal(ts("There was an error creating a contribution record for your event. Please report this error to the webmaster. Details: %1\n", array(1 => $contribution->getMessages($contribution))));
+      CRM_Core_Error::fatal(ts("There was an error creating a contribution record for your event. Please report this error to the webmaster. Details: %1", array(1 => $contribution->getMessages($contribution))));
     }
     $mer_participant->contribution_id = $contribution->id;
     $params['contributionID'] = $contribution->id;
