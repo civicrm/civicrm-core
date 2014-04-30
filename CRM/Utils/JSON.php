@@ -126,10 +126,6 @@ class CRM_Utils_JSON {
         if ($addcomma) {
           $sOutput .= ",";
         }
-        //CRM-14466 --Make sure $value[$element] is defined to avoid php notice
-        if(!array_key_exists($element, $value)){
-          $value[$element] = "";
-        }        
         //CRM-7130 --lets addslashes to only double quotes,
         //since we are using it to quote the field value.
         //str_replace helps to provide a break for new-line
