@@ -211,8 +211,8 @@ FROM   civicrm_county
             global $civicrm_root;
             $sqlFilePath = $civicrm_root . DIRECTORY_SEPARATOR . 'sql' . DIRECTORY_SEPARATOR . 'counties.US.sql.gz';
 
-            CRM_Core_Session::setStatus("", ts('You have enabled the County option. Please ensure you populate the county table in your CiviCRM Database. You can find a list of US counties (in gzip format) in your distribution at: <em>%1</em>',
-              array(1 => $sqlFilePath)),
+            CRM_Core_Session::setStatus(ts('You have enabled the County option. Please ensure you populate the county table in your CiviCRM Database. You can find extensions to populate counties in the ') . '<a href="https://civicrm.org/extensions/home?title=&body_value=counties">' . ts('CiviCRM Extensions Directory') . '</a>',
+              ts('Populate counties'),
               "info"
             );
           }
