@@ -121,6 +121,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
   protected $_values = array();
 
+  protected $unsavedWarn = TRUE;
+
   /**
    * The _fields var can be used by sub class to set/unset/edit the
    * form fields based on their requirement
