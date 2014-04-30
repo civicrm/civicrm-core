@@ -929,113 +929,127 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @access public
    */
-  static function getGroupsHierarchy (
+  static function getGroupsHierarchy(
     $groupIDs,
-    $parents  = NULL,
+    $parents = NULL,
     $spacer = '<span class="child-indent"></span>',
     $titleOnly = FALSE
-   ) {
+  ) {
     if (empty($groupIDs)) {
       return array();
     }
 
     $groupIdString = '(' . implode(',', array_keys($groupIDs)) . ')';
-     // <span class="child-icon"></span>
-     // need to return id, title (w/ spacer), description, visibility
+    // <span class="child-icon"></span>
+    // need to return id, title (w/ spacer), description, visibility
 
-     // We need to build a list of tags ordered by hierarchy and sorted by
-     // name. The heirarchy will be communicated by an accumulation of
-     // separators in front of the name to give it a visual offset.
-     // Instead of recursively making mysql queries, we'll make one big
-     // query and build the heirarchy with the algorithm below.
-     $groups = array();
-     $args = array(1 => array($groupIdString, 'String'));
-     $query = "
+    // We need to build a list of tags ordered by hierarchy and sorted by
+    // name. The heirarchy will be communicated by an accumulation of
+    // separators in front of the name to give it a visual offset.
+    // Instead of recursively making mysql queries, we'll make one big
+    // query and build the heirarchy with the algorithm below.
+    $groups = array();
+    $args = array(1 => array($groupIdString, 'String'));
+    $query = "
 SELECT id, title, description, visibility, parents
 FROM   civicrm_group
 WHERE  id IN $groupIdString
 ";
-     if ($parents) {
-       // group can have > 1 parent so parents may be comma separated list (eg. '1,2,5'). We just grab and match on 1st parent.
-       $parentArray = explode(',', $parents);
-       $parent = $parentArray[0];
-       $args[2] = array($parent, 'Integer');
-       $query .= " AND SUBSTRING_INDEX(parents, ',', 1) = %2";
-     }
-     $query .= " ORDER BY title";
-     $dao = CRM_Core_DAO::executeQuery($query, $args);
+    if ($parents) {
+      // group can have > 1 parent so parents may be comma separated list (eg. '1,2,5'). We just grab and match on 1st parent.
+      $parentArray = explode(',', $parents);
+      $parent = $parentArray[0];
+      $args[2] = array($parent, 'Integer');
+      $query .= " AND SUBSTRING_INDEX(parents, ',', 1) = %2";
+    }
+    $query .= " ORDER BY title";
+    $dao = CRM_Core_DAO::executeQuery($query, $args);
 
-     // Sort the groups into the correct storage by the parent
-     // $roots represent the current leaf nodes that need to be checked for
-     // children. $rows represent the unplaced nodes
-     $roots = $rows = $allGroups = array();
-     while ($dao->fetch()) {
-       $allGroups[$dao->id] = array('title' => $dao->title,
-                                    'visibility' => $dao->visibility,
-                                    'description' => $dao->description);
+    // Sort the groups into the correct storage by the parent
+    // $roots represent the current leaf nodes that need to be checked for
+    // children. $rows represent the unplaced nodes
+    $roots = $rows = $allGroups = array();
+    while ($dao->fetch()) {
+      $allGroups[$dao->id] = array(
+        'title' => $dao->title,
+        'visibility' => $dao->visibility,
+        'description' => $dao->description
+      );
 
-       if ($dao->parents == $parents) {
-         $roots[] = array('id' => $dao->id,
-                          'prefix' => '',
-                          'title' => $dao->title);
-       }
-       else {
-         // group can have > 1 parent so $dao->parents may be comma separated list (eg. '1,2,5'). Grab and match on 1st parent.
-         $parentArray = explode(',', $dao->parents);
-         $parent = $parentArray[0];
-         $rows[] = array('id' => $dao->id,
-                          'prefix' => '',
-                          'title' => $dao->title,
-                          'parents' => $parent);
-       }
-     }
-     $dao->free();
-     // While we have nodes left to build, shift the first (alphabetically)
-     // node of the list, place it in our groups list and loop through the
-     // list of unplaced nodes to find its children. We make a copy to
-     // iterate through because we must modify the unplaced nodes list
-     // during the loop.
-     while (count($roots)) {
-       $new_roots         = array();
-       $current_rows      = $rows;
-       $root              = array_shift($roots);
-       $groups[$root['id']] = array($root['prefix'], $root['title']);
+      if ($dao->parents == $parents) {
+        $roots[] = array(
+          'id' => $dao->id,
+          'prefix' => '',
+          'title' => $dao->title
+        );
+      }
+      else {
+        // group can have > 1 parent so $dao->parents may be comma separated list (eg. '1,2,5'). Grab and match on 1st parent.
+        $parentArray = explode(',', $dao->parents);
+        $parent = $parentArray[0];
+        $rows[] = array(
+          'id' => $dao->id,
+          'prefix' => '',
+          'title' => $dao->title,
+          'parents' => $parent
+        );
+      }
+    }
+    $dao->free();
+    // While we have nodes left to build, shift the first (alphabetically)
+    // node of the list, place it in our groups list and loop through the
+    // list of unplaced nodes to find its children. We make a copy to
+    // iterate through because we must modify the unplaced nodes list
+    // during the loop.
+    while (count($roots)) {
+      $new_roots = array();
+      $current_rows = $rows;
+      $root = array_shift($roots);
+      $groups[$root['id']] = array($root['prefix'], $root['title']);
 
-       // As you find the children, append them to the end of the new set
-       // of roots (maintain alphabetical ordering). Also remove the node
-       // from the set of unplaced nodes.
-       if (is_array($current_rows)) {
-         foreach ($current_rows as $key => $row) {
-           if ($row['parents'] == $root['id']) {
-             $new_roots[] = array('id' => $row['id'], 'prefix' => $groups[$root['id']][0] . $spacer, 'title' => $row['title']);
-             unset($rows[$key]);
-           }
-         }
-       }
+      // As you find the children, append them to the end of the new set
+      // of roots (maintain alphabetical ordering). Also remove the node
+      // from the set of unplaced nodes.
+      if (is_array($current_rows)) {
+        foreach ($current_rows as $key => $row) {
+          if ($row['parents'] == $root['id']) {
+            $new_roots[] = array(
+              'id' => $row['id'],
+              'prefix' => $groups[$root['id']][0] . $spacer,
+              'title' => $row['title']
+            );
+            unset($rows[$key]);
+          }
+        }
+      }
 
-       //As a group, insert the new roots into the beginning of the roots
-       //list. This maintains the hierarchical ordering of the tags.
-       $roots = array_merge($new_roots, $roots);
-     }
-     foreach($rows as $value) {
-        $groups[$value['id']] = array($value['prefix'], $value['title']); 
-     }
-     // Prefix titles with the calcuated spacing to give the visual
-     // appearance of ordering when transformed into HTML in the form layer. Add description and visibility.
-     $groupsReturn = array();
-     foreach ($groups as $key=>$value) {
-       if ($titleOnly) {
-         $groupsReturn[$key] = $value[0] . $value[1];
-       } else {
-         $groupsReturn[$key] = array(
-           'title' => $value[0] . $value[1],
-           'description' => $allGroups[$key]['description'],
-           'visibility' => $allGroups[$key]['visibility'],
-         );
-       }
-     }
+      //As a group, insert the new roots into the beginning of the roots
+      //list. This maintains the hierarchical ordering of the tags.
+      $roots = array_merge($new_roots, $roots);
+    }
 
-     return $groupsReturn;
+    // below is the redundant looping to ensure child groups are populated in the case where user does not have
+    // access to parent groups ( esp. using ACL permissions and logged in user can assess only child groups )
+    foreach ($rows as $value) {
+      $groups[$value['id']] = array($value['prefix'], $value['title']);
+    }
+    // Prefix titles with the calcuated spacing to give the visual
+    // appearance of ordering when transformed into HTML in the form layer. Add description and visibility.
+    $groupsReturn = array();
+    foreach ($groups as $key => $value) {
+      if ($titleOnly) {
+        $groupsReturn[$key] = $value[0] . $value[1];
+      }
+      else {
+        $groupsReturn[$key] = array(
+          'title' => $value[0] . $value[1],
+          'description' => $allGroups[$key]['description'],
+          'visibility' => $allGroups[$key]['visibility'],
+        );
+      }
+    }
+
+    return $groupsReturn;
   }
 
   static function getGroupCount(&$params) {
