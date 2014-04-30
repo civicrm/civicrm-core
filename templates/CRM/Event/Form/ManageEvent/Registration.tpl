@@ -85,6 +85,10 @@
             <td scope="row" class="label" width="20%">{$form.allow_same_participant_emails.label}</td>
             <td>{$form.allow_same_participant_emails.html} <span class="description">{ts}Allow multiple registrations from the same email address{/ts}</span> {help id="id-allow_same_email"}</td>
         </tr>
+        <tr class="crm-event-manage-registration-form-block-dedupe_rule_group_id">
+            <td scope="row" class="label" width="20%">{$form.dedupe_rule_group_id.label}</td>
+            <td>{$form.dedupe_rule_group_id.html} {help id="id-dedupe_rule_group_id"}</td>
+        </tr>
         <tr class="crm-event-manage-registration-form-block-requires_approval">
           {if $form.requires_approval}
             <td scope="row" class="label" width="20%">{$form.requires_approval.label}</td>

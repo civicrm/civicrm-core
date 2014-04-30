@@ -288,6 +288,12 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     );
     $this->assign('ruleFields', json_encode($ruleFields));
 
+    $dedupeRules = array(
+      '' => '- Unsupervised rule -',
+    );
+    $dedupeRules += CRM_Dedupe_BAO_RuleGroup::getByType('Individual');
+    $this->add('select', 'dedupe_rule_group_id', ts('Duplicate matching rule'), $dedupeRules);
+
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     if (in_array('Awaiting approval', $participantStatuses) and in_array('Pending from approval', $participantStatuses) and in_array('Rejected', $participantStatuses)) {
       $this->addElement('checkbox',
@@ -678,7 +684,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    * @return boolean
    */
 
-  function canProfilesDedupe($profileIds) {
+  function canProfilesDedupe($profileIds, $rgId = 0) {
 
     // find the unsupervised rule
 
@@ -686,10 +692,13 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       'used' => 'Unsupervised',
       'contact_type' => 'Individual',
     );
+    if ($rgId > 0) {
+      $rgParams['id'] = $rgId;
+    }
     $activeRg = CRM_Dedupe_BAO_RuleGroup::dedupeRuleFieldsWeight($rgParams);
 
     // get the combinations that could be a match for the rule
-    $combos = array();
+    $okCombos = $combos = array();
     CRM_Dedupe_BAO_RuleGroup::combos($activeRg[0], $activeRg[1], $combos);
 
     // create an index of what combinations involve each field
@@ -699,6 +708,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         $index[$cfield][$comboid] = true;
       }
       $combos[$comboid] = array_fill_keys($combo, 0);
+      $okCombos[$comboid] = array_fill_keys($combo, 2);
     }
 
     // get profiles and see if they have the necessary combos
@@ -718,7 +728,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
               foreach ($icombos as $icombo => $dontcare) {
                 $combos[$icombo][$ifield] = ($combos[$icombo][$ifield] != 2 && !$field['is_required']) ? 1 : 2;
 
-                if ($combos[$icombo] == array_fill_keys(array_keys($combos[$icombo]), 2)) {
+                if ($combos[$icombo] == $okCombos[$icombo]) {
                   // if any combo is complete with 2s (all fields are present and required), we can go home
                   return 2;
                 }
@@ -917,7 +927,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     self::addMultipleProfiles($additionalProfileIds, $params, 'additional_custom_post_id_multiple');
 
     $cantDedupe = false;
-    switch (self::canProfilesDedupe($profileIds)) {
+    $rgId = CRM_Utils_Array::value('dedupe_rule_group_id', $params, 0);
+
+    switch (self::canProfilesDedupe($profileIds, $rgId)) {
       case 0:
         $dedupeTitle = 'Duplicate Contact Warning';
         $cantDedupe = ts("The selected profiles do not contain the fields necessary to match registrations with existing contacts.  This means all anonymous registrations will result in a new contact.");
@@ -929,7 +941,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         $warntype = 'info';
     }
     if (!empty($params['is_multiple_registrations'])) {
-      switch(self::canProfilesDedupe($additionalProfileIds)) {
+      switch(self::canProfilesDedupe($additionalProfileIds, $rgId)) {
         case 0:
           $dedupeTitle = 'Duplicate Contact Warning';
           $warntype = 'alert';
