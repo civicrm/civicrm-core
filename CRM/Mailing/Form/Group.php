@@ -39,8 +39,6 @@
  */
 class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
-  protected $unsavedChangesWarn = TRUE;
-  
   /**
    * the mailing ID of the mailing if we are resuming a mailing
    *
