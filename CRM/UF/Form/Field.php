@@ -714,6 +714,43 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   }
 
   /**
+   * validation rule to prevent multiple fields of primary location type and the same communication type.
+   *
+   * @param Array   $fields            Submitted fields
+   * @param String  $profileFieldName  Group Id.
+   * @param Array   $groupFields       List of fields already in the group
+   * @param Array   $errors            Collect errors
+   *
+   * @static
+   * @access public
+   */
+  static function formRulePrimaryCheck($fields, $profileFieldName, $groupFields, &$errors) {
+    //FIXME: This may need to also apply to website fields if they are refactored to allow more than one per profile
+    $checkPrimary = array('phone' => 'civicrm_phone.phone', 'phone_and_ext' => 'civicrm_phone.phone');
+    $whereCheck = NULL;
+    $primaryOfSameTypeFound = NULL;
+    // Is this a primary location type field of interest
+    if (array_key_exists($profileFieldName, $checkPrimary)) {
+      $whereCheck = $checkPrimary[$profileFieldName];
+    }
+    $potentialLocationType = CRM_Utils_Array::value(2, $fields['field_name']);
+
+    if ($whereCheck && $potentialLocationType == 0) {
+      $primaryOfSameTypeFound = '';
+
+      foreach ($groupFields as $groupField) {
+        // if it is a phone
+        if ($groupField['where'] == $whereCheck && is_null($groupField['location_type_id'])) {
+          $primaryOfSameTypeFound = $groupField['title'];
+        }
+      }
+      if ($primaryOfSameTypeFound) {
+        $errors['field_name'] = ts('You have already added a primary location field of this type: %1', $primaryOfSameTypeFound);
+      }
+    }
+  }
+
+  /**
    * global validation rules for the form
    *
    * @param array $fields posted values of the form
@@ -737,14 +774,14 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $errors['is_view'] = ts('A View Only field cannot be required');
     }
 
-    $fieldName = $fields['field_name'][0];
-    if (!$fieldName) {
+    $entityName = $fields['field_name'][0];
+    if (!$entityName) {
       $errors['field_name'] = ts('Please select a field name');
     }
 
-    if ($in_selector && in_array($fieldName, array(
+    if ($in_selector && in_array($entityName, array(
       'Contribution', 'Participant', 'Membership', 'Activity'))) {
-      $errors['in_selector'] = ts("'In Selector' cannot be checked for %1 fields.", array(1 => $fieldName));
+      $errors['in_selector'] = ts("'In Selector' cannot be checked for %1 fields.", array(1 => $entityName));
     }
 
     $isCustomField = FALSE;
@@ -771,6 +808,13 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
           }
         }
       }
+    }
+
+    // Get list of fields already in the group
+    $groupFields = CRM_Core_BAO_UFGroup::getFields($fields['group_id'], FALSE, NULL, NULL, NULL, TRUE, NULL, TRUE);
+    // Check if we already added a primary field of the same communication type
+    if (empty($fields['field_id'])) {
+      self::formRulePrimaryCheck($fields, $profileFieldName, $groupFields, $errors);
     }
 
     //check profile is configured for double option process
