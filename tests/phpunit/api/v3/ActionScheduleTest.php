@@ -83,6 +83,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
       'entity_status' => $scheduledStatus,
       'is_active' => 1,
       'record_activity' => 1,
+      'start_action_date' => 'activity_date_time',
       'mapping_id' => $mappingId,
     );
     $actionSchedule = $this->callAPISuccess('action_schedule', 'create', $params);
