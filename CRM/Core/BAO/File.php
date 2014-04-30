@@ -393,7 +393,7 @@
      }
 
      // build tagset widget
-     CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_file', NULL, TRUE, TRUE, FALSE);
+     CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_file', NULL, TRUE, TRUE);
    }
 
    /**
