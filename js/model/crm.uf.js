@@ -689,6 +689,11 @@
       // set proper entity model based on selected profile
       var contactTypes = ['Individual', 'Household', 'Organization'];
       var profileType = ufGroupModel.get('group_type') || '';
+
+      // check if selected profile have subtype defined eg: ["Individual,Contact,Case", "caseType:7"]
+      if (_.isArray(profileType) && profileType[0]) {
+        profileType = profileType[0];
+      }
       profileType = profileType.split(',');
 
       var ufEntityModel;
