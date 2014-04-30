@@ -657,6 +657,7 @@ function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
  * @param string $entity
  * @param string $action
  *
+ * @throws API_Exception
  * @return array $options options extracted from params
  */
 function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $entity = '', $action = '') {
@@ -804,10 +805,12 @@ function _civicrm_api3_get_unique_name_array(&$bao) {
 /**
  * Converts an DAO object to an array
  *
- * @param  object $dao           (reference )object to convert
+ * @param  object $dao (reference )object to convert
  * @param null $params
  * @param bool $uniqueFields
  * @param string $entity
+ *
+ * @param bool $autoFind
  *
  * @return array
  *
@@ -999,9 +1002,12 @@ function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $
 
 /**
  * Function to do a 'standard' api create - when the api is only doing a $bao::create then use this
+ *
  * @param string $bao_name Name of BAO Class
  * @param array $params parameters passed into the api call
  * @param string $entity Entity - pass in if entity is non-standard & required $ids array
+ *
+ * @throws API_Exception
  * @return array
  */
 function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {

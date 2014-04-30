@@ -175,8 +175,8 @@ function _civicrm_api3_case_delete_spec(&$params) {
  *
  * Please provide one (and only one) of the four get/search parameters:
  *
- * @param array(
-    'id' => if set, will get all available info about a case, including contacts and activities
+ * @param array (
+ * 'id' => if set, will get all available info about a case, including contacts and activities
  *
  * // if no case_id provided, this function will use one of the following search parameters:
  * 'client_id' => finds all cases with a specific client
@@ -185,12 +185,10 @@ function _civicrm_api3_case_delete_spec(&$params) {
  *
  * {@getfields case_get}
  *
- * @return (get mode, case_id provided): Array with case details, case roles, case activity ids, (search mode, case_id not provided): Array of cases found
- * @access public
+ * @return array (get mode, case_id provided): Array with case details, case roles, case activity ids, (search mode, case_id not provided): Array of cases found@access public
  * @todo Erik Hommel 16 dec 2010 check if all DB fields are returned
  */
 function civicrm_api3_case_get($params) {
-  $options = _civicrm_api3_get_options_from_params($params);
 
   //search by client
   if (!empty($params['contact_id'])) {
