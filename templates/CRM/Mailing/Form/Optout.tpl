@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
@@ -23,20 +22,28 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+*}
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
-class CRM_Mailing_Page_Unsubscribe extends CRM_Mailing_Page_Common {
+<div class="crm-block crm-form-block crm-miscellaneous-form-block">
 
-  function run() {
-    $this->_type = 'unsubscribe';
-    return parent::run();
-  }
-}
+    <p>You are requesting to unsubscribe this Email address:</p>
+    <h3>{$email_masked}</h3>
+
+    <p>If this is not your Email address, there is no need to do anything. You have <i><b>not</b></i> been added to any mailing lists. If this is your Email address and you <i><b>wish to opt out</b></i> please enter your Email address below for verification purposes:</p>
+
+    <table class="form-layout">
+      <tbody>
+      <tr>
+        <td class="label">{$form.email_confirm.label}</td>
+        <td class="content">{$form.email_confirm.html}
+      </tr>
+      </tbody>
+    </table>
+
+  <div class="crm-submit-buttons">
+    {include file="CRM/common/formButtons.tpl" location="bottom"}
+  </div>
+
+<br/>
+</div>
 

@@ -639,6 +639,61 @@ class CRM_Utils_String {
     }
   }
 
+  /**
+   * this function will mask part of the the user portion of an Email address (everything before the @)
+   *
+   * @param string $email the email address to be masked
+   * @param string $maskChar the character used for masking
+   * @param integer $percent the percentage of the user portion to be masked
+   *
+   * @return string returns the masked Email address
+   */
+  public static function maskEmail($email, $maskChar= '*', $percent=50) {
+    list($user, $domain) = preg_split("/@/", $email);
+    $len = strlen($user);
+    $maskCount = floor($len * $percent /100);
+    $offset = floor(($len - $maskCount) / 2);
+
+    $masked = substr($user, 0, $offset)
+      .str_repeat($maskChar, $maskCount)
+      .substr($user, $maskCount + $offset);
+
+    return($masked.'@'.$domain);
+  }
+
+  /**
+   * this function compares two strings
+   *
+   * @param string $strOne string one
+   * @param string $strTwo string two
+   * @param boolean $case boolean indicating whether you want the comparison to be case sensitive or not
+   *
+   * @return boolean TRUE (string are identical); FALSE (strings are not identical)
+   */
+  public static function compareStr($strOne, $strTwo, $case) {
+    if ($case == TRUE) {
+      // convert to lowercase and strip of empty white spaces
+      if (strtolower(trim($strOne)) == strtolower(trim($strTwo))) {
+        // yes - they are identical
+        return TRUE;
+      }
+      else {
+        // not identical
+        return FALSE;
+      }
+    }
+    if ($case == FALSE) {
+      // convert to lowercase and strip of empty white spaces
+      if (trim($strOne) == trim($strTwo)) {
+        // yes - they are identical
+        return TRUE;
+      }
+      else {
+        // not identical
+        return FALSE;
+      }
+    }
+  }
 
 }
 
