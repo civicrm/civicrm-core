@@ -342,8 +342,6 @@
     invert              = 0
 }
 
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
 {if $isQuick}
 {literal}
 <script type="text/javascript">
