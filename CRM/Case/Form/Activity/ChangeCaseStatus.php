@@ -66,13 +66,18 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     $form->removeElement('priority_id');
 
     $form->_caseStatus = CRM_Case_PseudoConstant::caseStatus();
-    $form->_oldCaseStatus = $form->_defaultCaseStatus = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $form->_caseId, 'status_id');
 
-    if (!array_key_exists($form->_defaultCaseStatus, $form->_caseStatus)) {
-      $form->_caseStatus[$form->_defaultCaseStatus] = CRM_Core_OptionGroup::getLabel('case_status',
-        $form->_defaultCaseStatus,
-        FALSE
-      );
+    foreach ($form->_caseId as $key => $val) {
+      $form->_oldCaseStatus[] = $form->_defaultCaseStatus[] = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $val, 'status_id');
+    }
+
+    foreach ($form->_defaultCaseStatus as $keydefault => $valdefault) {
+      if (!array_key_exists($valdefault, $form->_caseStatus)) {
+        $form->_caseStatus[$valdefault] = CRM_Core_OptionGroup::getLabel('case_status',
+          $valdefault,
+          FALSE
+        );
+      }
     }
     $element = $form->add('select', 'case_status_id', ts('Case Status'),
       $form->_caseStatus, TRUE
@@ -156,13 +161,15 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     $params['priority_id'] = CRM_Core_OptionGroup::getValue('priority', 'Normal', 'name');
     $activity->priority_id = $params['priority_id'];
 
-    if ($activity->subject == 'null') {
-      $activity->subject = ts('Case status changed from %1 to %2', array(
-          1 => CRM_Utils_Array::value($form->_oldCaseStatus, $form->_caseStatus),
-          2 => CRM_Utils_Array::value($params['case_status_id'], $form->_caseStatus)
-        )
-      );
-      $activity->save();
+    foreach ($form->_oldCaseStatus as $statuskey => $statusval ) {
+      if ($activity->subject == 'null') {
+        $activity->subject = ts('Case status changed from %1 to %2', array(
+            1 => CRM_Utils_Array::value($statusval, $form->_caseStatus),
+            2 => CRM_Utils_Array::value($params['case_status_id'], $form->_caseStatus)
+          )
+        );
+        $activity->save();
+      }
     }
 
     // FIXME: does this do anything ?
