@@ -1364,16 +1364,7 @@ VALUES
    (1, 'User Account', NULL, NULL, 1, 1),
    (1, 'Profile', NULL, NULL, 1, 1),
    (1, 'Profile', NULL, NULL, 2, 2),
-   (1, 'Profile', NULL, NULL, 3, 4),
-   (1, 'Profile', NULL, NULL, 4, 5),
-   (1, 'Profile', NULL, NULL, 5, 6),
-   (1, 'Profile', NULL, NULL, 6, 7),
-   (1, 'Profile', NULL, NULL, 7, 8),
-   (1, 'Profile', NULL, NULL, 8, 9),
-   (1, 'Profile', NULL, NULL, 9, 10),
-   (1, 'Profile', NULL, NULL, 10, 11),
-   (1, 'Profile', NULL, NULL, 11, 12),
-   (1, 'Profile', NULL, NULL, 12, 13);
+   (1, 'Profile', NULL, NULL, 11, 12);
 
 INSERT INTO civicrm_uf_field
        ( uf_group_id, field_name,              is_required, is_reserved, weight, visibility,                  in_selector, is_searchable, location_type_id, label,                                          field_type,    help_post, phone_type_id ) VALUES
