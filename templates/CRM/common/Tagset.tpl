@@ -24,22 +24,50 @@
  +--------------------------------------------------------------------+
 *}
 {if empty($tagsetType)}
-  {capture assign="tagsetType"}contact{/capture}
+  {assign var="tagsetType" value="contact"}contact{/capture}
 {/if}
 {foreach from=$tagsetInfo.$tagsetType item=tagset}
   <div class="crm-section tag-section {$tagsetType}-tagset {$tagsetType}-tagset-{$tagset.parentID}-section">
-    <label>{$tagset.parentName}</label>
     <div class="crm-clearfix"{if $context EQ "contactTab"} style="margin-top:-15px;"{/if}>
-      {assign var=elemName  value = $tagset.tagsetElementName}
-      {assign var=parID     value = $tagset.parentID}
-      {assign var=editTagSet value=false}
+      {assign var="elemName" value=$tagset.tagsetElementName}
+      {assign var="parID" value=$tagset.parentID}
+      {$form.$elemName.$parID.label}
       {$form.$elemName.$parID.html}
-      {if $action ne 4 }
-        {assign var=editTagSet value=true}
-        {if $action eq 16 and !($permission eq 'edit') }
-          {assign var=editTagSet value=false}
-        {/if}
-      {/if}
     </div>
+    {if !$tagset.skipEntityAction}
+      <script type="text/javascript">
+        {* Add/remove entity tags via ajax api *}
+        {literal}
+        (function($, _) {
+          var $el = $('.{/literal}{$tagsetType}-tagset-{$tagset.parentID}-section{literal} input.crm-form-entityref');
+          // select2 provides "added" and "removed" properties in the event
+          $el.on('change', function(e) {
+            var tags,
+              data = _.pick($(this).data(), 'entity_id', 'entity_table'),
+              apiCall = [];
+            if (e.added) {
+              tags = $.isArray(e.added) ? e.added : [e.added];
+              _.each(tags, function(tag) {
+                if (tag.id && tag.id != '0') {
+                  apiCall.push(['entity_tag', 'create', $.extend({tag_id: tag.id}, data)]);
+                }
+              });
+            }
+            if (e.removed) {
+              tags = $.isArray(e.removed) ? e.removed : [e.removed];
+              _.each(tags, function(tag) {
+                if (tag.id && tag.id != '0') {
+                  apiCall.push(['entity_tag', 'delete', $.extend({tag_id: tag.id}, data)]);
+                }
+              });
+            }
+            if (apiCall.length) {
+              CRM.api3(apiCall, true);
+            }
+          });
+        }(CRM.$, CRM._));
+        {/literal}
+      </script>
+    {/if}
   </div>
 {/foreach}

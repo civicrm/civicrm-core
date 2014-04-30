@@ -71,7 +71,8 @@
         entity: 'api3',
         action: 'call',
         json: JSON.stringify(entity)
-      }
+      };
+      status = action;
     }
     var ajax = $.ajax({
       url: CRM.url('civicrm/ajax/rest'),
