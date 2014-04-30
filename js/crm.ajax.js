@@ -364,7 +364,7 @@
             $el.crmSnippet('option', 'block') && $el.unblock();
             $el.trigger('crmFormSuccess', response);
             // Reset form for e.g. "save and new"
-            if (response.userContext && settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0) {
+            if (response.userContext && (response.status === 'redirect' || (settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0))) {
               // Force reset of original url
               $el.data('civiCrmSnippet')._originalUrl = response.userContext;
               $el.crmSnippet('resetUrl').crmSnippet('refresh');

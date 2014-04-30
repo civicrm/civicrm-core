@@ -391,6 +391,15 @@ class CRM_Utils_System {
     // replace the &amp; characters with &
     // this is kinda hackish but not sure how to do it right
     $url = str_replace('&amp;', '&', $url);
+
+    // If we are in a json context, respond appropriately
+    if (CRM_Utils_Array::value('snippet', $_GET) === 'json') {
+      CRM_Core_Page_AJAX::returnJsonResponse(array(
+        'status' => 'redirect',
+        'userContext' => $url,
+      ));
+    }
+
     header('Location: ' . $url);
     self::civiExit();
   }

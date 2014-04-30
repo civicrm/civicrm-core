@@ -126,7 +126,8 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
     $template->assign('isForm', 1);
 
     $controller = &$page->controller;
-    if ($controller->getEmbedded()) {
+    // Stop here if we are in embedded mode. Exception: displaying form errors via ajax
+    if ($controller->getEmbedded() && !(!empty($form['errors']) && $controller->_QFResponseType == 'json')) {
       return;
     }
 
