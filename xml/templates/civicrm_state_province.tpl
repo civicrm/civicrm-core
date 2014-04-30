@@ -3906,4 +3906,8 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1229, "SJ", "San Jose"),
 
 -- Added Nigeria States(CRM-14183)
-(NULL, 1157, "PL", "Plateau");
+(NULL, 1157, "PL", "Plateau"),
+
+
+-- CRM-14493 Added State for Greece
+(NULL, 1085, "61", "Pieria");

@@ -278,3 +278,6 @@ ALTER TABLE `civicrm_mailing`
 UPDATE `civicrm_event` SET is_template = 0 WHERE is_template IS NULL;
 ALTER TABLE `civicrm_event`
   CHANGE is_template is_template tinyint(4) DEFAULT '0' COMMENT 'whether the event has template';
+
+-- CRM-14493
+INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1085, "61", "Pieria");
