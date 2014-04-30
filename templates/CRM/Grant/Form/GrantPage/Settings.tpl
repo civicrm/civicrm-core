@@ -50,37 +50,37 @@
             <span class="description">{ts}Select the grant type to be assigned to grant applications made using this page.{/ts}</span></td>
 	</tr>
 	
-        <tr class="crm-contribution-contributionpage-settings-form-block-is_organization"><td>&nbsp;</td><td>{$form.is_organization.html} {$form.is_organization.label} {help id="id-is_organization"}</td></tr>
-  	<tr id="for_org_option" class="crm-contribution-form-block-is_organization">
+        <tr class="crm-grant-grantapppage-settings-form-block-is_organization"><td>&nbsp;</td><td>{$form.is_organization.html} {$form.is_organization.label} {help id="id-is_organization"}</td></tr>
+  	<tr id="for_org_option" class="crm-grant-form-block-is_organization">
           <td>&nbsp;</td>
           <td>
             <table class="form-layout-compressed">
-            <tr class="crm-contribution-for_organization_help">
+            <tr class="crm-grant-for_organization_help">
                 <td class="description" colspan="2">
                     {capture assign="profileURL"}{crmURL p='civicrm/admin/uf/group' q='reset=1'}{/capture}
                     {if $invalidProfiles}
-                      {ts 1=$profileURL}You must <a href="%1">configure a valid organization profile</a> in order to allow individuals to contribute on behalf of an organization. Valid profiles include Contact and / or Organization fields, and may include Contribution and Membership fields.{/ts}
+                      {ts 1=$profileURL}You must <a href="%1">configure a valid organization profile</a> in order to allow individuals to apply for a grant on behalf of an organization. Valid profiles include Contact and / or Organization fields, and may include Grant fields.{/ts}
                     {else}
                       {ts 1=$profileURL}To change the organization data collected use the "On Behalf Of Organization" profile (<a href="%1">Administer > Customize Data and Screens > Profiles</a>).{/ts}
                     {/if}
                 </td>
             </tr>
            {if !$invalidProfiles}
-              <tr class="crm-contribution-onbehalf_profile_id">
+              <tr class="crm-grant-onbehalf_profile_id">
                 <td class="label">{$form.onbehalf_profile_id.label}</td>
                 <td>{$form.onbehalf_profile_id.html}</td>
               </tr>
            {/if}
-            <tr id="for_org_text" class="crm-contribution-contributionpage-settings-form-block-for_organization">
-                <td class="label">{$form.for_organization.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='for_organization' id=$contributionPageID}{/if}</td>
+            <tr id="for_org_text" class="crm-grant-grantapppage-settings-form-block-for_organization">
+                <td class="label">{$form.for_organization.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_grant_app_page' field='for_organization' id=$grantAppPageID}{/if}</td>
                 <td>{$form.for_organization.html}<br />
-                    <span class="description">{ts}Text displayed next to the checkbox on the contribution form.{/ts}</span>
+                    <span class="description">{ts}Text displayed next to the checkbox on the grant application form.{/ts}</span>
                 </td>
             </tr>
-            <tr class="crm-contribution-contributionpage-settings-form-block-is_for_organization">
+            <tr class="crm-grant-grantapppage-settings-form-block-is_for_organization">
                 <td>&nbsp;</td>
                 <td>{$form.is_for_organization.html}<br />
-                    <span class="description">{ts}Check 'Required' to force ALL users to contribute/signup on behalf of an organization.{/ts}</span>
+                    <span class="description">{ts}Check 'Required' to force ALL users to apply for grant on behalf of an organization.{/ts}</span>
                 </td>
             </tr>
             </table>
