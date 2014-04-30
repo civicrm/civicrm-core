@@ -39,8 +39,6 @@
  */
 class CRM_Case_Form_Case extends CRM_Core_Form {
 
-  protected $unsavedChangesWarn = TRUE;
-  
   /**
    * The context
    *

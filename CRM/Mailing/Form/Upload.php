@@ -38,8 +38,6 @@
  */
 class CRM_Mailing_Form_Upload extends CRM_Core_Form {
 
-  protected $unsavedChangesWarn = TRUE;
-
   public $_mailingID;
 
   function preProcess() {
