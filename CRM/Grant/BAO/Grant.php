@@ -422,5 +422,32 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     $query = "SELECT count(*) FROM civicrm_grant WHERE civicrm_grant.contact_id = {$contactID} ";
     return CRM_Core_DAO::singleValueQuery($query);
   }
+
+
+/**
+ * Function to get list of grant fields for profile
+ * For now we only allow custom grant fields to be in
+ * profile
+ *
+ * @param boolean $addExtraFields true if special fields needs to be added
+ *
+ * @return return the list of grant fields
+ * @static
+ * @access public
+ */
+function getGrantFields() {
+  $grantFields = CRM_Grant_DAO_Grant::export();
+  $grantFields = array_merge($grantFields, CRM_Core_OptionValue::getFields($mode = 'grant'));
+       
+  $grantFields = array_merge($grantFields, CRM_Financial_DAO_FinancialType::export());
+    
+  foreach ($grantFields as $key => $var) {
+    $fields[$key] = $var;
+  }
+
+  $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Grant'));
+   
+  return $fields;
+}
 }
 

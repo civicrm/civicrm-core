@@ -1,0 +1,43 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.3                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2010                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id='grant-profile'}
+<p>{ts}If you want collect additional information from users, you will need to configure one or two CiviCRM Profiles - which are collections of standard or custom fields.{/ts}</p>
+        
+ <p>{ts}If you haven't already configured custom fields and a profile for this, you can save this screen without selecting a Profile, complete the steps below and then return to <strong>Grant Dashboard  &raquo; Add Grant Application Page</strong> and select your new profile.{/ts}
+        
+        <ol>
+        <li>{ts}Create a custom field group which is 'Used for' <strong>Contacts</strong> or <strong>Grants</strong> depending on what type of information you're collecting.{/ts}</li>
+        <li>{ts}Add your field(s) this custom field group.{/ts}</li>
+        <li>{ts}Create a profile (e.g. 'Grant Application Information').{/ts}</li>
+        <li>{ts}Add your custom field(s) to this profile as profile fields.{/ts}</li>
+        <li>{ts}Return to this screen (<strong>Grants &raquo; Dashboard &raquo; Configure &raquo; Profiles</strong>) and select your profile.{/ts}</li>
+        </ol>
+
+        {capture assign=docLinkCustom}{docURL page="user/organising-your-data/custom-fields" text="custom fields"}{/capture}
+        {capture assign=docLinkProfile}{docURL page="user/the-user-interface/profiles" text="profiles"}{/capture}
+        {ts 1=$docLinkCustom 2=$docLinkProfile}Refer to the online documentation for more details on creating %1 and %2.{/ts}
+</p>
+{/htxt}        

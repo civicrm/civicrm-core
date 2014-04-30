@@ -35,7 +35,6 @@
     <p>{ts 1=$findGrantsURL}This table provides a summary of <strong>Grant Totals</strong>, and includes shortcuts to view the Grant details for these commonly used search periods. Click the Grant Status to see a list of Contacts for that grant status. To run your own customized searches - click <a href='%1'>Find Grants</a>. You can search by Contact Name, Amount, Grant type and a variety of other criteria.{/ts}
     </p>
 </div>
-
 {if $grantSummary.total_grants}
 You have {$grantSummary.total_grants} grant(s) registered in your database.
 <table class="report">
@@ -43,7 +42,6 @@ You have {$grantSummary.total_grants} grant(s) registered in your database.
     <th scope="col">{ts}Grant status{/ts}</th>
     <th scope="col">{ts}Number of grants{/ts}</th>
 </tr>
-
 {foreach from=$grantSummary.per_status item=status key=id}
 <tr>
     <td><a href="{crmURL p="civicrm/grant/search" q="reset=1&status=`$id`&force=1"}">{$status.label}</a></td>
@@ -60,7 +58,7 @@ You have {$grantSummary.total_grants} grant(s) registered in your database.
 
 {/if}
 
-
+{include file="CRM/Grant/Page/GrantApplicationDashboard.tpl"}
 {if $pager->_totalItems}
     
     <h3>{ts}Recent Grants{/ts}</h3>
