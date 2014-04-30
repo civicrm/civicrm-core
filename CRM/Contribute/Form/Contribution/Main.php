@@ -1080,8 +1080,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $priceField->orderBy('weight');
         $priceField->find();
 
-        $check = array();
-        $otherAmount = FALSE;
+        $values = array();
         while ($priceField->fetch()) {
           CRM_Price_BAO_PriceFieldValue::getValues($priceField->id, $values);
           if ($priceField->name == 'membership_amount') {
