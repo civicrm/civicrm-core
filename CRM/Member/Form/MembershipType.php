@@ -132,10 +132,10 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
     );
     $this->addRule('minimum_fee', ts('Please enter a monetary value for the Minimum Fee.'), 'money');
 
-    $this->addElement('select', 'duration_unit', ts('Duration'), CRM_Core_SelectValues::membershipTypeUnitList());
+    $this->addSelect('duration_unit', array('placeholder' => NULL), TRUE);
 
     //period type
-    $this->addElement('select', 'period_type', ts('Period Type'), CRM_Core_SelectValues::periodType());
+    $this->addSelect('period_type', array(), TRUE);
 
     $this->add('text', 'duration_interval', ts('Duration Interval'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'duration_interval')
@@ -170,7 +170,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
     );
 
     $this->add('select', 'financial_type_id', ts( 'Financial Type' ),
-      array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType()
+      array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType(), TRUE, array('class' => 'crm-select2')
     );
 
     $relTypeInd = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, NULL, TRUE);
@@ -181,7 +181,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
       array('' => ts('- select -')) + $relTypeInd);
     $memberRel->setMultiple(TRUE);
 
-    $this->add('select', 'visibility', ts('Visibility'), CRM_Core_SelectValues::memberVisibility());
+    $this->addSelect('visibility', array('placeholder' => NULL, 'option_url' => NULL));
     $this->add('text', 'weight', ts('Order'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'weight')
     );
@@ -224,16 +224,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
       $errors['name'] = ts('Please enter a membership type name.');
     }
 
-    if (empty( $params['financial_type_id'] ) ) {
-      $errors['financial_type_id'] = ts('Please enter a financial type.');
-    }
-
     if (($params['minimum_fee'] > 0 ) && !$params['financial_type_id'] ) {
       $errors['financial_type_id'] = ts('Please enter the financial type.');
-    }
-
-    if (empty($params['duration_unit'])) {
-      $errors['duration_unit'] = ts('Please enter a duration unit.');
     }
 
     if (empty($params['duration_interval']) and $params['duration_unit'] != 'lifetime') {
@@ -247,10 +239,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
       ) {
         $errors['duration_unit'] = ts('Automatic renewals are not supported by the currently available payment processors when the membership duration is greater than 1 year / 12 months.');
       }
-    }
-
-    if (empty($params['period_type'])) {
-      $errors['period_type'] = ts('Please select a period type.');
     }
 
     if ($params['period_type'] == 'fixed' &&
