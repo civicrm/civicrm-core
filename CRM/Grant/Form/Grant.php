@@ -48,7 +48,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   protected $_id;
 
   /**
-   * the id of the contact associated with this contribution
+   * the id of the contact associated with this application
    *
    * @var int
    * @protected

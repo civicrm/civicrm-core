@@ -20,6 +20,9 @@
     'contribution' => array(
       'payment_or_refund_notification' => ts('Additional Payment Receipt or Refund Notification',             array('escape' => 'sql')),
     ),
+    'grant' => array(
+      'grant_online_receipt' => ts('Grants - Receipt (on-line)', array('escape' => 'sql')),
+     ),
   );
 
   $this->assign('ovNames', $ovNames);

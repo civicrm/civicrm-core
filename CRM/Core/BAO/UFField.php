@@ -926,6 +926,14 @@ SELECT  id
       }
     }
 
+    if (CRM_Core_Permission::access('CiviGrant')) {
+      $grantFields = CRM_Grant_BAO_Grant::getGrantFields(FALSE);
+      if (!empty($grantFields)) {
+        unset($grantFields['grant_id']);
+        $fields['Grant'] = $grantFields;
+      }
+    }
+
     if (CRM_Core_Permission::access('CiviEvent')) {
       $participantFields = CRM_Event_BAO_Query::getParticipantFields();
       if ($participantFields) {

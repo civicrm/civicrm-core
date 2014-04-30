@@ -37,4 +37,45 @@
      <page_callback>CRM_Grant_Page_Tab</page_callback>
      <access_arguments>access CiviGrant</access_arguments>
   </item>
+  <item>
+    <path>civicrm/admin/grant/apply</path>
+    <title>New Grant Application Page</title>
+    <page_callback>CRM_Grant_Controller_GrantPage</page_callback>
+    <path_arguments>action=add</path_arguments>
+    <access_arguments>access CiviGrant</access_arguments>
+    <page_type>1</page_type>
+    <component>CiviGrant</component>
+  </item>
+  <item>
+    <path>civicrm/admin/grant/settings</path>
+    <title>Title and Settings</title>
+    <page_callback>CRM_Grant_Form_GrantPage_Settings</page_callback>
+    <weight>400</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/grant/thankyou</path>
+    <title>Thank-you and Receipting</title>
+    <page_callback>CRM_Grant_Form_GrantPage_ThankYou</page_callback>
+    <weight>420</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/grant/custom</path>
+    <title>Include Profiles</title>
+    <page_callback>CRM_Grant_Form_GrantPage_Custom</page_callback>
+    <weight>430</weight>
+  </item>
+  <item>
+    <path>civicrm/contact/print/grant</path>
+    <page_callback>CRM_Grant_Page_PrintPDF</page_callback>
+    <access_arguments>access CiviGrant</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/grant/transact</path>
+    <title>CiviGrant</title>
+    <page_callback>CRM_Grant_Controller_Grant</page_callback>
+    <access_arguments>access CiviGrant</access_arguments>
+    <weight>0</weight> 
+    <is_ssl>true</is_ssl>
+    <is_public>true</is_public>
+  </item>
 </menu>

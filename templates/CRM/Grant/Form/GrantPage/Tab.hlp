@@ -1,0 +1,48 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.5                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-configure-grant-pages"}
+<table class="report"> 
+<tr>
+    <td class="nowrap"><a href="{crmURL p='civicrm/admin/grant/settings' q="reset=1&action=update&id=`$grantApplicationPageID`"}" id="idGrantAppPageSettings">&raquo; {ts}Title and Settings{/ts}</a></td>
+    <td>{ts}Use this form to edit the page title, grant type (e.g. emergency, family support, etc.), default amount, introduction, and status (active/inactive) for this online grant application page.{/ts}</td>
+</tr>
+<tr>
+    <td class="nowrap"><a href="{crmURL p='civicrm/admin/grant/thankYou' q="reset=1&action=update&id=`$grantApplicationPageID`"}" id="idThanks">&raquo; {ts}Thank-you and Receipting{/ts}</a></td>
+    <td>{ts}Use this form to configure the thank-you message and receipting options. Users will see a confirmation and thank-you page after whenever an online grant application is successfully processed. You provide the content and layout of the thank-you section below. You also control whether an electronic receipt is automatically emailed to each user - and can add a custom message to that receipt.{/ts}</td>
+</tr>
+<tr>
+   <td class="nowrap"><a href="{crmURL p='civicrm/admin/grant/custom' q="reset=1&action=update&id=`$grantApplicationPageID`"}" id="idCustom">&raquo; {ts}Profiles{/ts}</a></td>
+    <td>{ts}You may want to collect information from users beyond what is required. For example, you may want to inquire about volunteer availability and skills. Add any number of fields to your grant application form by selecting CiviCRM Profiles (collections of fields) to include at the beginning of the page, and/or at the bottom.<br />
+You can use existing CiviCRM Profiles on your page - OR create profile(s) specifically for use in Online Grant Application pages. Go to {/ts}<a href="{crmURL p='civicrm/admin/uf/group' q="reset=1&action=browse"}"><strong>{ts}Administer CiviCRM Profiles{/ts}</strong></a> {ts}if you need to review, modify or create profiles (you can come back at any time to select or update the Profile(s) used for this page).
+{/ts}</td>
+</tr>
+<tr>
+  <td class="nowrap"><a href="{crmURL p='civicrm/grant/transact' q="reset=1&id=`$grantApplicationPageID`"}" id="idLive">&raquo; {ts}Grant Application{/ts}</a><br /> ({ts}Live{/ts})</td>
+  <td>{ts}Review your customized <strong>LIVE</strong> online grant application page here. Use the following URL in links and buttons on any website to send visitors to this live page{/ts}:<br />
+      <strong>{crmURL a=true p="civicrm/grant/transact" q="reset=1&id=`$grantApplicationPageID`"}</strong></td>
+</tr>
+</table>
+{/htxt}

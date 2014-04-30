@@ -332,7 +332,8 @@ VALUES
     ( @domainID, 'civicrm/grant&reset=1',           '{ts escape="sql" skip="true"}Dashboard{/ts}', 'Dashboard', 'access CiviGrant', '',       @grantlastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/grant/add&reset=1&action=add&context=standalone', '{ts escape="sql" skip="true"}New Grant{/ts}', 'New Grant', 'access CiviGrant,edit grants', 'AND', @grantlastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/grant/search&reset=1',    '{ts escape="sql" skip="true"}Find Grants{/ts}', 'Find Grants', 'access CiviGrant', '',   @grantlastID, '1', 1, 3 ),
-    ( @domainID, 'civicrm/report/list&compid=5&reset=1', '{ts escape="sql" skip="true"}Grant Reports{/ts}', 'Grant Reports', 'access CiviGrant', '', @grantlastID, '1', 0,    4 );
+    ( @domainID, 'civicrm/report/list&compid=5&reset=1', '{ts escape="sql" skip="true"}Grant Reports{/ts}', 'Grant Reports', 'access CiviGrant', '', @grantlastID, '1', 0,    4 ),
+    ( @domainID, 'civicrm/admin/grant/apply&reset=1&action=add', '{ts escape="sql" skip="true"}New Grant Application Page{/ts}', 'New Grant Application Page', 'access CiviGrant', '', @grantlastID, '1', 0,    5 );
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
