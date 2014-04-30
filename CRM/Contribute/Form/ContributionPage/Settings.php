@@ -144,7 +144,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $required = array('Contact', 'Organization');
     $optional = array('Contribution', 'Membership');
 
-    $profiles = CRM_Core_BAO_UFGroup::getValidProfiles($required, $optional);
+/*    $profiles = CRM_Core_BAO_UFGroup::getValidProfiles($required, $optional);
     //Check profiles for Organization subtypes
     $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
     foreach ($contactSubType as $type) {
@@ -169,12 +169,16 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     if (empty($profiles)) {
       $invalidProfiles = TRUE;
       $this->assign('invalidProfiles', $invalidProfiles);
-    }
+*/
+   $profile_entities = array();
+   foreach (array_merge($required, $optional) as $entity) {
+       if ($entity = 'Contact') continue;
+       // as needed for CRM_UF_Page::getSchema():
+       $profile_entities[] = array('entity_name' => strtolower($entity).'_entity', 'entity_type' => $entity.'Model');
+   }
 
-    $this->add('select', 'onbehalf_profile_id', ts('Organization Profile'),
-      array(
-        '' => ts('- select -')) + $profiles
-    );
+   $this->addProfileSelector('onbehalf_profile_id', ts('Organization Profile'),
+        array_merge($required, $optional), array(), $profile_entities);
 
     $options   = array();
     $options[] = $this->createElement('radio', NULL, NULL, ts('Optional'), 1);
