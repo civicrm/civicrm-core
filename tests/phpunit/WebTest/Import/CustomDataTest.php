@@ -190,14 +190,14 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
     $this->click('_qf_Field_next-bottom');
     $this->waitForElementPresent('newCustomField');
 
-    $this->assertTrue($this->isTextPresent("Your custom field '{$dateFieldLabel}' has been saved."));
+    $this->assertTrue($this->isTextPresent("Custom field '{$dateFieldLabel}' has been saved."));
 
     $dateFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$dateFieldLabel']/../../td[8]/span/a@href"));
     $dateFieldId = $dateFieldId[1];
 
     // create another custom field - Integer Radio
     $this->click("//a[@id='newCustomField']/span");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('_qf_Field_cancel-bottom');
     $this->click("data_type[0]");
     $this->select("data_type[0]", "value=1");
     $this->click("//option[@value='1']");
@@ -228,10 +228,10 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
 
     //clicking save
     $this->click("_qf_Field_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('newCustomField');
 
     //Is custom field created
-    $this->assertTrue($this->isTextPresent("Your custom field '$radioFieldLabel' has been saved."));
+    $this->waitForText("crm-notification-container", "Custom field '$radioFieldLabel' has been saved.");
     $radioFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$radioFieldLabel']/../../td[8]/span/a@href"));
     $radioFieldId = $radioFieldId[1];
 
@@ -268,8 +268,8 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
 
     // clicking save
     $this->click('_qf_Field_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Your custom field '{$multiSelectLabel}' has been saved."));
+    $this->waitForElementPresent('newCustomField');
+    $this->waitForText("crm-notification-container", "Custom field '{$multiSelectLabel}' has been saved.");
     $multiSelectFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$multiSelectLabel']/../../td[8]/span/a@href"));
     $multiSelectFieldId = $multiSelectFieldId[1];
 
@@ -292,9 +292,9 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
 
     // clicking save
     $this->click('_qf_Field_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('newCustomField');
 
-    $this->assertTrue($this->isTextPresent("Your custom field '{$contactReferenceLabel}' has been saved."));
+    $this->waitForText("crm-notification-container", "Custom field '{$contactReferenceLabel}' has been saved.");
     $contactReferenceFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$contactReferenceLabel']/../../td[8]/span/a@href"));
     $contactReferenceFieldId = $contactReferenceFieldId[1];
 
