@@ -281,3 +281,9 @@ ALTER TABLE `civicrm_event`
 
 -- CRM-14493
 INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1085, "61", "Pieria");
+
+-- CRM-14445
+ALTER TABLE `civicrm_option_group`
+	ADD COLUMN `is_locked` int(1) DEFAULT 0 COMMENT 'A lock to remove the ability to add new options via the UI';
+
+UPDATE `civicrm_option_group` SET is_locked = 1 WHERE name IN ('contribution_status','activity_contacts','advanced_search_options','auto_renew_options','contact_autocomplete_options','batch_status','batch_type','batch_mode','contact_edit_options','contact_reference_options','contact_smart_group_display','contact_view_options','financial_item_status','mapping_type','pcp_status','user_dashboard_options','tag_used_for');
