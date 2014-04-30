@@ -208,7 +208,7 @@ FROM   civicrm_county
 ";
           $countyCount = CRM_Core_DAO::singleValueQuery($sql);
           if ($countyCount < 10) {
-            CRM_Core_Session::setStatus(ts('You have enabled the County option. Please ensure you populate the county table in your CiviCRM Database. You can find extensions to populate counties in the ') . '<a href="https://civicrm.org/extensions/home?title=&body_value=counties">' . ts('CiviCRM Extensions Directory') . '</a>',
+            CRM_Core_Session::setStatus(ts('You have enabled the County option. Please ensure you populate the county table in your CiviCRM Database. You can find extensions to populate counties in the ') . CRM_Utils_System::href(ts('CiviCRM Extensions Directory'), 'civicrm/admin/extensions', array('reset' => 1), TRUE, 'extensions-addnew'),
               ts('Populate counties'),
               "info"
             );
