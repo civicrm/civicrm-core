@@ -64,6 +64,12 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
     );
   }
 
+  public function getAnonymousPermissionWarnings() {
+    return array(
+      'access CiviEvent',
+    );
+  }
+
   // docs inherited from interface
   public function getUserDashboardElement() {
     return array('name' => ts('Events'),

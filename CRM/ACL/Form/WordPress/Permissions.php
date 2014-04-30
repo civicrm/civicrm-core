@@ -129,6 +129,25 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
           $roleObj->add_cap($key);
         }
       }
+
+      if ($role == 'anonymous_user') {
+        // Get the permissions into a format that matches what we get from WP
+        $allWarningPermissions = CRM_Core_Permission::getAnonymousPermissionsWarnings();
+        foreach ($allWarningPermissions  as $key => $permission) {
+          $allWarningPermissions[$key] = CRM_utils_String::munge(strtolower($permission));
+        }
+        $warningPermissions = array_intersect($allWarningPermissions, array_keys($rolePermissions));
+        $warningPermissionNames = array();
+        foreach ($warningPermissions as $permission) {
+          $warningPermissionNames[$permission] = $permissionsArray[$permission];
+        }
+        if (!empty($warningPermissionNames)) {
+          CRM_Core_Session::setStatus(
+            ts('The %1 role was assigned one or more permissions that may prove dangerous for users of that role to have. Please reconsider assigning %2 to them.', array( 1 => $wp_roles->role_names[$role], 2 => implode(', ', $warningPermissionNames))),
+            ts('Unsafe Permission Settings')
+          );
+        }
+      }
     }
 
     // FIXME
@@ -170,4 +189,3 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
     return $perms_array;
   }
 }
-

@@ -62,6 +62,11 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
     );
   }
 
+  public function getAnonymousPermissionWarnings() {
+    return array(
+      'access CiviContribute',
+    );
+  }
 
   // docs inherited from interface
   public function getUserDashboardElement() {
