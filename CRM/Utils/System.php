@@ -793,7 +793,8 @@ class CRM_Utils_System {
    */
   static function download($name, $mimeType, &$buffer,
     $ext = NULL,
-    $output = TRUE
+    $output = TRUE,
+    $disposition = 'attachment'
   ) {
     $now = gmdate('D, d M Y H:i:s') . ' GMT';
 
@@ -814,7 +815,7 @@ class CRM_Utils_System {
       header('Pragma: public');
     }
     else {
-      header("Content-Disposition: attachment; $fileString");
+      header("Content-Disposition: $disposition; $fileString");
       header('Pragma: no-cache');
     }
 
@@ -1788,4 +1789,5 @@ class CRM_Utils_System {
     return $cache;
   }
 }
+
 
