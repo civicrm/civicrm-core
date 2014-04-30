@@ -63,11 +63,17 @@ class CRM_Grant_BAO_GrantApplicationPage extends CRM_Grant_DAO_GrantApplicationP
    * @return Object             DAO object on sucess, null otherwise
    * @static
    */
-  static
-  function setIsActive($id, $is_active) {
+  static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Grant_DAO_GrantApplicationPage', $id, 'is_active', $is_active);
   }
 
+ /**
+   * delete the grant application page
+   *
+   * @param int      $id        id of the database record
+   * @param string $title     title of the grant application page
+   *
+   */
   function deleteGrantApplicationPage($id, $title) {
     $transaction = new CRM_Core_Transaction();
     
@@ -117,10 +123,10 @@ class CRM_Grant_BAO_GrantApplicationPage extends CRM_Grant_DAO_GrantApplicationP
   }
 
   /**
-   * Function to add activity for Membership/Event/Contribution
+   * Function to add activity for Grant Online Application
    *
    * @param object  $activity   (reference) particular component object
-   * @param string  $activityType for Membership Signup or Renewal
+   * @param string  $activityType for Grant Online Application
    *
    *
    * @static
@@ -162,7 +168,6 @@ class CRM_Grant_BAO_GrantApplicationPage extends CRM_Grant_DAO_GrantApplicationP
         $activityParams['target_contact_id'][] = $activity->contact_id;
       }
       
-      //CRM-4027
       if ($targetContactID) {
         $activityParams['target_contact_id'][] = $targetContactID;
       }

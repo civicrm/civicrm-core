@@ -53,12 +53,6 @@
     <weight>400</weight>
   </item>
   <item>
-    <path>civicrm/admin/grant/draft</path>
-    <title>Save as Draft</title>
-    <page_callback>CRM_Grant_Form_GrantPage_Draft</page_callback>
-    <weight>410</weight>
-  </item>
-  <item>
     <path>civicrm/admin/grant/thankyou</path>
     <title>Thank-you and Receipting</title>
     <page_callback>CRM_Grant_Form_GrantPage_ThankYou</page_callback>
@@ -79,7 +73,7 @@
     <path>civicrm/grant/transact</path>
     <title>CiviGrant</title>
     <page_callback>CRM_Grant_Controller_Grant</page_callback>
-    <access_arguments>make online contributions</access_arguments>
+    <access_arguments>access CiviGrant</access_arguments>
     <weight>0</weight> 
     <is_ssl>true</is_ssl>
     <is_public>true</is_public>

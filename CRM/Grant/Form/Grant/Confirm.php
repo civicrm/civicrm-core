@@ -387,7 +387,7 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
       }
     }
 
-    // if onbehalf-of-organization contribution, take out
+    // if onbehalf-of-organization grant application, take out
     // organization params in a separate variable, to make sure
     // normal behavior is continued. And use that variable to
     // process on-behalf-of functionality.
@@ -407,13 +407,7 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
             $behalfOrganization[$fld] = $values;
           }
           elseif (!(strstr($fld, '-'))) {
-            if (in_array($fld, array(
-              'contribution_campaign_id', 'member_campaign_id'))) {
-              $fld = 'campaign_id';
-            }
-            else {
-              $behalfOrganization[$fld] = $values;
-            }
+            $behalfOrganization[$fld] = $values;
             $this->_params[$fld] = $values;
           }
         }
@@ -755,7 +749,7 @@ class CRM_Grant_Form_Grant_Confirm extends CRM_Grant_Form_GrantBase {
         CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($currentEmpParams);
       }
 
-      // contribution / signup will be done using this
+      // grant will be assigned to this
       // organization id.
       $contactID = $orgID;
     }

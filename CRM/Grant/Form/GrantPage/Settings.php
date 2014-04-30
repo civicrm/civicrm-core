@@ -207,7 +207,7 @@ class CRM_Grant_Form_GrantPage_Settings extends CRM_Grant_Form_GrantPage {
     if (CRM_Utils_Array::value('is_organization', $values) &&
       !CRM_Utils_Array::value('onbehalf_profile_id', $values)
     ) {
-      $errors['onbehalf_profile_id'] = ts('Please select a profile to collect organization information on this contribution page.');
+      $errors['onbehalf_profile_id'] = ts('Please select a profile to collect organization information on this grant application page.');
     }
     return $errors;
   }

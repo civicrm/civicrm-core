@@ -438,8 +438,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
 function getGrantFields() {
   $grantFields = CRM_Grant_DAO_Grant::export();
   $grantFields = array_merge($grantFields, CRM_Core_OptionValue::getFields($mode = 'grant'));
-       
-  $grantFields = array_merge($grantFields, CRM_Financial_DAO_FinancialType::export());
     
   foreach ($grantFields as $key => $var) {
     $fields[$key] = $var;

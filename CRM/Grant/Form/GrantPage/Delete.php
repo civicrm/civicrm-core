@@ -53,7 +53,6 @@ class CRM_Grant_Form_GrantPage_Delete extends CRM_Grant_Form_GrantPage {
    * @access public
    */
   public function preProcess() {
-    //Check if there are contributions related to Contribution Page
 
     parent::preProcess();
 
