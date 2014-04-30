@@ -217,15 +217,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     );
     if (empty($defaults)) {
       $this->_showHide->addHide('registration');
-      $this->_showHide->addHide('additional_profile_pre');
-      $this->_showHide->addHide('additional_profile_post');
       $this->_showHide->addHide('id-approval-text');
     }
     else {
-      if (empty($defaults['is_multiple_registrations'])) {
-        $this->_showHide->addHide('additional_profile_pre');
-        $this->_showHide->addHide('additional_profile_post');
-      }
       if (empty($defaults['requires_approval'])) {
         $this->_showHide->addHide('id-approval-text');
       }
@@ -285,18 +279,12 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     $this->addElement('checkbox',
       'is_multiple_registrations',
-      ts('Register multiple participants?'),
-      NULL,
-      array(
-        'onclick' => "return (showHideByValue('is_multiple_registrations', '', 'additional_profile_pre|additional_profile_post', 'table-row', 'radio', false) ||
-                                                      showRuleFields( " . json_encode($ruleFields) . " ));")
+      ts('Register multiple participants?')
     );
 
     $this->addElement('checkbox',
       'allow_same_participant_emails',
-      ts('Allow multiple registrations from the same email address?'),
-      NULL,
-      array('onclick' => "return showRuleFields( " . json_encode($ruleFields) . " );")
+      ts('Allow multiple registrations from the same email address?')
     );
     $this->assign('ruleFields', json_encode($ruleFields));
 
@@ -335,43 +323,52 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     // explicit height and width.
     $form->addWysiwyg('footer_text', ts('Footer Text'), array('rows' => 2, 'cols' => 40));
 
-    $types = array_merge(array('Contact', 'Individual', 'Participant'),
-      CRM_Contact_BAO_ContactType::subTypes('Individual')
-    );
+    extract( $this->getProfileSelectorTypes() );
 
-    $profiles = CRM_Core_BAO_UFGroup::getProfiles($types);
+    $form->addProfileSelector( 'custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
+    $form->addProfileSelector( 'custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
 
-    $mainProfiles = array(
-      '' => ts('- select -')) + $profiles;
-    $addtProfiles = array(
-      '' => ts('- same as for main contact -')) + $profiles;
-
-    $form->add('select', 'custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $mainProfiles);
-    $form->add('select', 'custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $mainProfiles);
-
-    $form->add('select', 'additional_custom_pre_id', ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $addtProfiles);
-    // Allow user to NOT provide a bottom profile for Additional Participant registration
-    $form->add('select', 'additional_custom_post_id', ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), array('none' => ts('- no profile -')) + $addtProfiles);
+    $form->addProfileSelector( 'additional_custom_pre_id',  ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntitites);
+    $form->addProfileSelector( 'additional_custom_post_id',  ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntitites);
   }
 
-  function buildMultipleProfileBottom(&$form, $count, $prefix = '', $name = 'Include Profile') {
-    $types = array_merge(array('Contact', 'Individual', 'Participant'),
-      CRM_Contact_BAO_ContactType::subTypes('Individual')
+  /**
+   * Subroutine to insert a Profile Editor widget
+   * depends on getProfileSelectorTypes
+   * 
+   * @param array &$form
+   * @param int $count unique index
+   * @param string $prefix dom element ID prefix
+   * @param string $label Label
+   * @param array $configs Optional, for addProfileSelector(), defaults to using getProfileSelectorTypes()
+   **/
+  function buildMultipleProfileBottom(&$form, $count, $prefix = '', $label = 'Include Profile', $configs = null) {
+    extract( ( is_null($configs) ) ? $this->getProfileSelectorTypes() : $configs ); 
+    $element = $prefix . "custom_post_id_multiple[$count]";
+    $label .= '<br />'.ts('(bottom of page)');
+    $form->addProfileSelector( $element,  $label, $allowCoreTypes, $allowSubTypes, $profileEntitites);
+  }
+
+  /**
+   * Create initializers for addprofileSelector
+   *
+   * @return array( 'allowCoreTypes' => array(), 'allowSubTypes' => array(), 'profileEntities' => array() )
+   **/
+  function getProfileSelectorTypes() {
+    $configs = array(
+      'allowCoreTypes' => array(),
+      'allowSubTypes' => array(),
+      'profileEntities' => array(),
     );
 
-    $profiles = CRM_Core_BAO_UFGroup::getProfiles($types);
+    $configs['allowCoreTypes'][] = 'Contact';
+    $configs['allowCoreTypes'][] = 'Individual';
+    $configs['allowCoreTypes'][] = 'Participant';
 
-    if ($prefix == 'additional_') {
-      $mainProfiles = array(
-        '' => ts('- same as for main contact -'), 'none' => ts('- no profile -')) + $profiles;
-    }
-    else {
-      $mainProfiles = array(
-        '' => ts('- select -')) + $profiles;
-    }
+    $configs['profileEntities'][] = array('entity_name' => 'individual_entity', 'entity_type' => 'IndividualModel');
+    $configs['profileEntities'][] = array('entity_name' => 'participant_entity', 'entity_type' => 'ParticipantModel');
 
-    $element = $prefix . "custom_post_id_multiple[$count]";
-    $form->add('select', $element, $name . '<br />' . ts('(bottom of page)'), $mainProfiles);
+   return $configs;
   }
 
   /**

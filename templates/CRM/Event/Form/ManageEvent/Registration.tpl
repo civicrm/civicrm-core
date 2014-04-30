@@ -24,28 +24,20 @@
  +--------------------------------------------------------------------+
 *}
 {if $addProfileBottomAdd OR $addProfileBottom}
-  {if $addProfileBottomAdd}
-    <tr class="crm-event-manage-registration-form-block-additional_custom_post_{$profileBottomNumAdd}">
-      <td scope="row" class="label" width="20%">{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].label}</td>
-      <td>{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].html}
-          &nbsp;<span class='profile_bottom_add_link_remove'><a href="#" onclick="removeProfileAdd('{$profileBottomNum}'); return false;">{ts}remove profile{/ts}</a></span>&nbsp;&nbsp;<span class='profile_bottom_add_link'>&nbsp;<a href="#" onclick="addProfileBottomAdd(); return false;">{ts}add profile{/ts}</a></span>
+
+      <td scope="row" class="label" width="20%">{if $addProfileBottomAdd }{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].label}
+        {else}{$form.custom_post_id[$profileBottomNum].label}{/if}</td>
+      <td>{if $addProfileBottomAdd }{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].html}{else}{$form.custom_post_id_multiple[$profileBottomNum].html}{/if}
+          &nbsp;<span class='profile_bottom_link_remove'><a href="#" class="crm-hover-button crm-button-rem-profile" data-addtlPartc="{$addProfileBottomAdd}"><span class="icon ui-icon-trash"></span>{ts}remove profile{/ts}</a></span>&nbsp;&nbsp;<span class='profile_bottom_link'>&nbsp;<a href="#" class="crm-hover-button crm-button-add-profile"><span class="icon ui-icon-plus"></span>{ts}add profile{/ts}</a></span>
             <br/>
-            <span class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}</span>
+            {if $addProfileBottomAdd }
+              <span class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}</span>
+            {else}
+              <span class="description">{ts}Include additional fields on this registration form by configuring and selecting a CiviCRM Profile to be included at the bottom of the page.{/ts}</span>
+            {/if}
             <br/><span class="profile-links"></span>
       </td>
-    </tr>
-  {/if}
-  {if $addProfileBottom}
-     <tr class="crm-event-manage-registration-form-block-custom_post_{$profileBottomNum}">
-       <td scope="row" class="label" width="20%">{$form.custom_post_id_multiple[$profileBottomNum].label}</td>
-       <td>{$form.custom_post_id_multiple[$profileBottomNum].html}
-           &nbsp;<span class='profile_bottom_link_remove'><a href="#" onclick="removeProfile('{$profileBottomNum}'); return false;">{ts}remove profile{/ts}</a></span>&nbsp;&nbsp;<span class='profile_bottom_link'><a href="#" onclick="addProfileBottom(); return false;">{ts}add profile{/ts}</a></span>
-           <br/>
-            <span class="description">{ts}Include additional fields on this registration form by configuring and selecting a CiviCRM Profile to be included at the bottom of the page.{/ts}</span>
-           <br/><span class="profile-links"></span>
-       </td>
-     </tr>
-  {/if}
+
 {else}
 {assign var=eventID value=$id}
 <div id="help">
@@ -133,16 +125,14 @@
             <td scope="row" class="label" width="20%">{$form.custom_pre_id.label}</td>
             <td>{$form.custom_pre_id.html}<br />
                 <span class="description">{ts}Include additional fields on this registration form by configuring and selecting a CiviCRM Profile to be included at the top of the page (immediately after the introductory message).{/ts}{help id="event-profile"}</span><br/>
-                <span class="profile-links"></span>
             </td>
       </tr>
          <tr id="profile_post" class="crm-event-manage-registration-form-block-custom_post_id">
             <td scope="row" class="label" width="20%">{$form.custom_post_id.label}</td>
             <td>{$form.custom_post_id.html}
-          &nbsp;<span class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'>&nbsp;<a href="#" onclick="addProfileBottom(); return false;">{ts}add profile{/ts}</a></span>
+          &nbsp;<span class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'>&nbsp;<a href="#" class="crm-hover-button crm-button-add-profile"><span class="icon ui-icon-plus"></span>{ts}add profile{/ts}</a></span>
           <br />
             <span class="description">{ts}Include additional fields on this registration form by configuring and selecting a CiviCRM Profile to be included at the bottom of the page.{/ts}</span>
-                <br/><span class="profile-links"></span>
             </td>
         </tr>
 
@@ -151,9 +141,9 @@
         <tr id="custom_post_id_multiple_{$profilePostNum}_wrapper" class='crm-event-manage-registration-form-block-custom_post_multiple'>
            <td scope="row" class="label" width="20%">{$form.custom_post_id_multiple.$profilePostNum.label}</td>
                <td>{$form.custom_post_id_multiple.$profilePostNum.html}
-             &nbsp;<span class='profile_bottom_link_remove'><a href="#" onclick="removeProfile('{$profilePostNum}'); return false;">{ts}remove profile{/ts}</a></span>
+             &nbsp;<span class='profile_bottom_link_remove'><a href="#" class="crm-hover-button crm-button-rem-profile"><span class="icon ui-icon-trash"></span>{ts}remove profile{/ts}</a></span>
              {if $smarty.foreach.profilePostIdName.last}
-               &nbsp;&nbsp;<span class='profile_bottom_link'><a href="#" onclick="addProfileBottom(); return false;">{ts}add profile{/ts}</a></span>
+               &nbsp;&nbsp;<span class='profile_bottom_link'><a href="#" class="crm-hover-button crm-button-add-profile"><span class="icon ui-icon-plus"></span>{ts}add profile{/ts}</a></span>
                {/if}
                 <br/><span class="profile-links"></span>
          </td>
@@ -172,7 +162,7 @@
         <tr id="additional_profile_post" class="crm-event-manage-registration-form-block-additional_custom_post_id">
              <td scope="row" class="label" width="20%">{$form.additional_custom_post_id.label}</td>
              <td>{$form.additional_custom_post_id.html}
-           &nbsp;<span class='profile_bottom_add_link_main {if $profilePostMultipleAdd}hiddenElement{/if}'><a href="#" onclick="addProfileBottomAdd(); return false;">{ts}add profile{/ts}</a></span>
+           &nbsp;<span class='profile_bottom_add_link_main {if $profilePostMultipleAdd}hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><span class="icon ui-icon-plus"></span>{ts}add profile{/ts}</a></span>
      <br />
                 <span class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}</span>
                <br/><span class="profile-links"></span>
@@ -183,19 +173,15 @@
        <tr id='additional_custom_post_id_multiple_{$profilePostNumA}_wrapper' class='crm-event-manage-registration-form-block-additional_custom_post_multiple'>
                <td scope="row" class="label" width="20%">{$form.additional_custom_post_id_multiple.$profilePostNumA.label}</td>
                <td>{$form.additional_custom_post_id_multiple.$profilePostNumA.html}
-                   &nbsp;<span class='profile_bottom_add_link_remove'><a href="#" onclick="removeProfileAdd('{$profilePostNumA}'); return false;">{ts}remove profile{/ts}</a></span>
+                   &nbsp;<span class='profile_bottom_add_link_remove'><a href="#" class="crm-hover-button crm-button-rem-profile"><span class="icon ui-icon-trash"></span>{ts}remove profile{/ts}</a></span>
              {if $smarty.foreach.profilePostIdAName.last}
-         &nbsp;&nbsp;<span class='profile_bottom_add_link'><a href="#" onclick="addProfileBottomAdd(); return false;">{ts}add profile{/ts}</a></span>
+         &nbsp;&nbsp;<span class='profile_bottom_add_link'><a href="#" class="crm-hover-button crm-button-add-profile"><span class="icon ui-icon-plus"></span>{ts}add profile{/ts}</a></span>
                {/if}
                <br/><span class="profile-links"></span>
          </td>
          </tr>
          {/foreach}
    {/if}
-        <tr class='crm-event-manage-registration-form-block-create-new-profile'>
-            <td class="label"></td>
-            <td><a href="{crmURL p='civicrm/admin/uf/group/add' q='reset=1&action=add'}" target="_blank">{ts}Click here to create a new profile{/ts}</a></td>
-        </tr>
         </table>
         </div>
   </fieldset>
@@ -344,110 +330,108 @@ invert              = 0
 {include file="CRM/common/buildProfileLink.tpl"}
 
 <script type="text/javascript">
-    {literal}
-    cj("#is_multiple_registrations").change( function( ) {
-        if ( !cj(this).prop('checked') ) {
-            cj("#additional_custom_pre_id").val('');
-            cj("#additional_custom_post_id").val('');
-      cj(".crm-event-manage-registration-form-block-additional_custom_post_multiple").hide();
-        } else {
-      cj(".crm-event-manage-registration-form-block-additional_custom_post_multiple").show();
-  }
-    });
+{literal}    (function($, _) { // Generic Closure
 
-    showRuleFields( {/literal}{$ruleFields}{literal} );
-
-    function showRuleFields( ruleFields )
-    {
+    function showRuleFields( ruleFields ) {
         var msg1 = '{/literal}{ts 1="' + ruleFields + '"}Primary participants will be able to register additional participants using the same email address.  The configured "Supervised" Dedupe Rule will use the following fields to prevent duplicate registrations: %1.  First and Last Name will be used to check for matches among multiple participants.{/ts}{literal}';
         var msg2 = '{/literal}{ts escape='js'}Primary participants will be allowed to register for this event multiple times.  No duplicate registration checking will be performed.{/ts}{literal}';
         var msg3 = '{/literal}{ts escape='js'}Primary participants will be able to register additional participants during registration.{/ts}{literal}';
 
         // Display info
-        cj('.ui-notify-message .ui-notify-close').click();
-        if ( cj("#allow_same_participant_emails").prop('checked' ) && cj("#is_multiple_registrations").prop('checked' ) ) {
+        $('.ui-notify-message .ui-notify-close').click();
+        if ( $("#allow_same_participant_emails").prop('checked' ) && cj("#is_multiple_registrations").prop('checked' ) ) {
             CRM.alert( msg1, '', 'info', {expires:0} );
-        } else if ( cj("#allow_same_participant_emails").prop('checked' ) && !cj("#is_multiple_registrations").prop('checked' ) ) {
+        } else if ( $("#allow_same_participant_emails").prop('checked' ) && !cj("#is_multiple_registrations").prop('checked' ) ) {
             CRM.alert( msg2, '', 'info', {expires:0} );
-        } else if ( !cj("#allow_same_participant_emails").prop('checked' ) && cj("#is_multiple_registrations").prop('checked' ) ) {
+        } else if ( !$("#allow_same_participant_emails").prop('checked' ) && cj("#is_multiple_registrations").prop('checked' ) ) {
             CRM.alert( msg3, '', 'info', {expires:0} );
         }
     }
 
     var profileBottomCount = Number({/literal}{$profilePostMultiple|@count}{literal});
-
-    function addProfileBottom( ) {
-      profileBottomCount++;
-      cj('.profile_bottom_link').remove( );
-      cj('.profile_bottom_link_main').hide( );
-      var urlPath = {/literal}"{crmURL p='civicrm/event/manage/registration' h=0 q=$addProfileParams}"{literal};
-      urlPath = urlPath + '&snippet=4&addProfileNum=' + profileBottomCount;
-      cj.ajax({ url     : urlPath,
-                async   : false,
-                global  : false,
-          success : function ( content ) {
-                 cj( "#profile_post" ).parent().append( content );
-                }
-      });
-    }
-
-
     var profileBottomCountAdd = Number({/literal}{$profilePostMultipleAdd|@count}{literal});
-    function addProfileBottomAdd( ) {
-      profileBottomCountAdd++;
-      cj('.profile_bottom_add_link').remove( );
-      cj('.profile_bottom_add_link_main').hide( );
-      var urlPathAdd = {/literal}"{crmURL p='civicrm/event/manage/registration' h=0 q=$addProfileParamsAdd}"{literal};
-      urlPathAdd = urlPathAdd + '&snippet=4&addProfileNumAdd=' + profileBottomCountAdd;
-      cj.ajax({ url     : urlPathAdd,
-                async   : false,
-                global  : false,
-          success : function ( contentAdd ) {
-                 cj( "#additional_profile_post" ).parent().append( contentAdd );
-                }
-      });
+
+    function addBottomProfile( e ) {
+        e.preventDefault();
+
+        var addtlPartc = $(this).data('addtlPartc');
+
+        if (addtlPartc) {
+            profileBottomCount++;
+            urlPath = CRM.url('civicrm/event/manage/registration', { addProfileBottomAdd: 1, addProfileNumAdd: profileBottomCountAdd, snippet: 4 } ) ;
+        } else {
+            profileBottomCountAdd++;
+            urlPath = CRM.url('civicrm/event/manage/registration', { addProfileBottom: 1 , addProfileNum : profileBottomCount, snippet: 4 } ) ;
+        }
+
+        $(this).closest('tbody').append('<tr class="additional_profile"></tr>');
+        var $el = $(this).closest('tbody').find('tr:last');
+        $el.load(urlPath, function() { $(this).trigger('crmLoad') });
     }
 
-    function removeProfile( profileID ) {
-      cj('#custom_post_id_multiple_' + profileID).val('');
-      cj('#custom_post_id_multiple_' + profileID + '_wrapper').remove( );
-      if ( cj('.profile_bottom_link').length < 1 ) {
-        cj('.profile_bottom_link_main').show( );
-      }
+    function removeBottomProfile( e ) {
+        e.preventDefault();
+
+        $(e.target).parents('tr').find('.crm-profile-selector').val('');
+        $(e.target).parents('tr').hide();
     }
 
-    function removeProfileAdd( profileID ) {
-      cj('#additional_custom_post_id_multiple_' + profileID).val('');
-      cj('#additional_custom_post_id_multiple_' + profileID + '_wrapper').remove( );
-      if ( cj('.profile_bottom_add_link').length < 1 ) {
-        cj('.profile_bottom_add_link_main').show( );
-      }
-    }
+    var strSameAs = ' - '+ts('same as for main contact')+' - ';
+    var strSelect = ' - '+ts('select')+' - ';
 
-    //show edit profile field links
-    CRM.$(function($) {
-        // show edit for main profile
-        cj(document).on('change', 'select[id^="custom_p"]', function( event ) {
-            buildLinks( cj(this), cj(this).val());
-        });
-
-        // make sure we set edit links for main contact profile when form loads
-        cj('select[id^="custom_p"]').each( function(e) {
-            buildLinks( cj(this), cj(this).val());
-        });
-
-        //show edit profile field links in additional participant
-      cj(document).on('change', 'select[id^="additional_custom_p"]', function( event ) {
-            buildLinks( cj(this), cj(this).val());
-        });
-
-        // make sure we set edit links for additional profile  when form loads
-        cj('select[id^="additional_custom_p"]').each( function(e) {
-            buildLinks( cj(this), cj(this).val());
+    $('#crm-container').on('crmLoad', function() {
+        var $container = $("[id^='additional_profile_'],.additional_profile").not('.processed').addClass('processed');
+        $container.find(".crm-profile-selector-select select").each( function() {
+            var $select = $(this);
+            var selected = $select.find(':selected').val(); //cache the default 
+            $select.find('option[value=""]').remove();
+            $select.prepend('<option value="">'+strSameAs+'</option>');
+            if ($select.closest('tr').is(':not([id*="_pre"])')) {
+               $select.prepend('<option value="">'+strSelect+'</option>');
+            }
+            $select.find('option[value="'+selected+'"]').attr('selected', 'selected'); //restore default
         });
     });
 
-    {/literal}
+$(function($) {
+
+    showRuleFields( {/literal}{$ruleFields}{literal} );
+
+    var allow_multiple = $("#is_multiple_registrations");
+    if ( !allow_multiple.prop('checked') ) { 
+        $('#additional_profile_pre,#additional_profile_post').hide(); 
+    }
+    allow_multiple.change( function( ) {
+        if ( !$(this).prop('checked') ) {
+            $("#additional_custom_pre_id,#additional_custom_post_id").val('');
+            $(".crm-event-manage-registration-form-block-additional_custom_post_multiple").hide();
+            $('#additional_profile_pre,#additional_profile_post').hide();
+        } else {
+            $(".crm-event-manage-registration-form-block-additional_custom_post_multiple").show();
+            $('#additional_profile_pre,#additional_profile_post').show();
+        }
+
+        showRuleFields({/literal}{$ruleFields}{literal});
+    });
+
+    $('#allow_same_participant_emails').change( function() { showRuleFields({/literal}{$ruleFields}{literal}) });
+
+    $('#registration_blocks').on('click', '.crm-button-add-profile', addBottomProfile);
+    $('#registration_blocks').on('click', '.crm-button-rem-profile', removeBottomProfile);
+
+    $('#crm-container').on('crmLoad', function(e) {
+        $('tr[id^="additional_profile"] input[id^="additional_custom_"]').change(function(e) {
+            $input = $(e.target);
+            if ( $input.val() == '') {
+                $selected = $input.closest('tr').find('.crm-profile-selector-select :selected');
+                if ($selected.text() == strSelect) { $input.val('none'); }
+            }
+        });
+    });
+
+}); // END onReady
+}(CRM.$, CRM._)); //Generic Closure 
+{/literal}
 </script>
 {include file="CRM/common/formNavigate.tpl"}
 {/if}
