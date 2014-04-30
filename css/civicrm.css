@@ -1454,6 +1454,10 @@ editor specific classes
   margin: 0 1em 1em 0;
 }
 
+#crm-container .pcp-image img {
+  max-width: 360px;
+}
+
 #crm-container .ui-draggable {
   background: url("../i/draggable.png") no-repeat left 1px;
   float: left;
