@@ -192,18 +192,18 @@ class CRM_Badge_BAO_Badge {
     }
 
     if (CRM_Utils_Array::value('participant_image', $formattedRow)){
-      $xAlign = 10;
+      $imageAlign = 0;
       switch (CRM_Utils_Array::value('alignment_participant_image', $formattedRow)){
         case 'R':
-          $xAlign = 65;
+          $imageAlign = 68;
           break;
         case 'L':
-          $xAlign = 10;
+          $imageAlign = 0;
           break;
         default:
           break;
       }
-      $this->pdf->Image($formattedRow['participant_image'], $x+$xAlign, $y + 18, CRM_Utils_Array::value('width_participant_image', $formattedRow), CRM_Utils_Array::value('height_participant_image', $formattedRow));
+      $this->pdf->Image($formattedRow['participant_image'], $x+$imageAlign, $y + $startOffset, CRM_Utils_Array::value('width_participant_image', $formattedRow), CRM_Utils_Array::value('height_participant_image', $formattedRow));
       if ($startOffset == NULL && CRM_Utils_Array::value('height_participant_image', $formattedRow)){
         $startOffset = CRM_Utils_Array::value('height_participant_image', $formattedRow);        
       }
@@ -223,20 +223,22 @@ class CRM_Badge_BAO_Badge {
         $value = '';
         if ($formattedRow['token'][$i]['token'] != 'spacer') {
           $value = $formattedRow['token'][$i]['value'];
-        }
+        }        
         
+        $xAlign = $x;
         $rowWidth = $this->pdf->width;
-        $offsetRows = array(1, 2, 3);
-        if (!empty($formattedRow['participant_image']) && !empty($formattedRow['participant_image_width']) && in_array($i, $offsetRows))
+        if (!empty($formattedRow['participant_image']) && !empty($formattedRow['width_participant_image']))
         {
-          $rowWidth = $this->pdf->width - $formattedRow['participant_image_width'];
+          $rowWidth = $this->pdf->width - $formattedRow['width_participant_image'];
+          if ($formattedRow['alignment_participant_image']== 'L')
+            $xAlign = $x + $formattedRow['width_participant_image'] + $imageAlign;
         }
         $offset = $this->pdf->getY() + $startOffset + $cellspacing;
 
         $this->pdf->SetFont($formattedRow['token'][$i]['font_name'], $formattedRow['token'][$i]['font_style'],
           $formattedRow['token'][$i]['font_size']);
         $this->pdf->MultiCell($rowWidth, 0, $value,
-          $this->border, $formattedRow['token'][$i]['text_alignment'], 0, 1, $x, $offset);
+          $this->border, $formattedRow['token'][$i]['text_alignment'], 0, 1, $xAlign, $offset);
 
         // set this to zero so that it is added only for first element
         $startOffset = 0;
