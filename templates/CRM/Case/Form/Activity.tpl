@@ -81,14 +81,17 @@
               <tbody>
                 <tr id="with-clients" class="crm-case-activity-form-block-client_name">
                   <td class="label font-size12pt">{ts}Client{/ts}</td>
-                  <td class="view-value">
+                  <td class="view-value">	
                     <span class="font-size12pt">
-                      {foreach from=$client_names item=client name=clients}
-                        {$client.display_name}{if not $smarty.foreach.clients.last}; &nbsp; {/if}
+                      {foreach from=$client_names item=client name=clients key=id}
+                        {foreach from=$client_names.$id item=client1}
+                          {$client1.display_name}
+                        {/foreach}
+                        {if not $smarty.foreach.clients.last}; &nbsp; {/if}
                       {/foreach}
                     </span>
 
-                   {if $action eq 1 or $action eq 2}
+                    {if $action eq 1 or $action eq 2}
                       <br />
                       <a href="#" class="crm-with-contact">&raquo; {ts}With other contact(s){/ts}</a>
                     {/if}
@@ -201,14 +204,18 @@
                     <th>{ts}Case Role{/ts}</th>
                     <th>{ts}Name{/ts}</th>
                     <th>{ts}Email{/ts}</th>
+                    {if $countId gt 1}<th>{ts}Target Contact{/ts}</th>{/if}
                   </tr>
                   {foreach from=$searchRows item=row key=id}
-                    <tr class="{cycle values="odd-row,even-row"}">
-                      <td class="crm-case-activity-form-block-contact_{$id}">{$form.contact_check[$id].html}</td>
-                      <td class="crm-case-activity-form-block-role">{$row.role}</td>
-                      <td class="crm-case-activity-form-block-display_name">{$row.display_name}</td>
-                      <td class="crm-case-activity-form-block-email">{$row.email}</td>
-                    </tr>
+                    {foreach from=$searchRows.$id item=row1 key=id1}
+                      <tr class="{cycle values="odd-row,even-row"}">
+                        <td class="crm-case-activity-form-block-contact_{$id}">{$form.contact_check[$id].html}</td>
+                        <td class="crm-case-activity-form-block-role">{$row1.role}</td>
+                        <td class="crm-case-activity-form-block-display_name">{$row1.display_name}</td>
+                        <td class="crm-case-activity-form-block-email">{$row1.email}</td>
+                        {if $countId gt 1}<td class="crm-case-activity-form-block-display_name">{$row1.managerOf}</td>{/if}
+                      </tr>
+                    {/foreach}
                   {/foreach}
                 </table>
               {/strip}
