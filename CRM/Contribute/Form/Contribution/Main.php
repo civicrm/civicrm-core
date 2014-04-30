@@ -1311,7 +1311,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   static function preProcessPaymentOptions(&$form, $noFees = FALSE) {
     $form->_snippet = CRM_Utils_Array::value('snippet', $_GET);
-    $form->assign('snippet', $form->_snippet);
 
     $form->_paymentProcessors = $noFees ? array() : $form->get('paymentProcessors');
     $form->_ppType = NULL;
