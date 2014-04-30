@@ -144,7 +144,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       }
 
       $defaults['includeGroups'] = $mailingGroups['civicrm_group']['include'];
-      $defaults['excludeGroups'] = CRM_Utils_Array::value('Exclude', $mailingGroups['civicrm_group']);
+      $defaults['excludeGroups'] = CRM_Utils_Array::value('exclude', $mailingGroups['civicrm_group']);
 
       if (!empty($mailingGroups['civicrm_mailing'])) {
         $defaults['includeMailings'] = CRM_Utils_Array::value('Include', $mailingGroups['civicrm_mailing']);
