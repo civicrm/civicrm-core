@@ -1385,33 +1385,15 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     if (!$contactID && is_array($fields) && $fields) {
 
-      //CRM-6996
-      //as we are allowing w/ same email address,
-      //lets check w/ other contact params.
-      if ($self->_values['event']['allow_same_participant_emails']) {
-        $params = $fields;
-        $level = ($isAdditional) ? 'Supervised' : 'Unsupervised';
+      //CRM-14134 use Unsupervised rule for everyone
+      $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
 
-        $dedupeParams = CRM_Dedupe_Finder::formatParams($params, 'Individual');
+      // disable permission based on cache since event registration is public page/feature.
+      $dedupeParams['check_permission'] = FALSE;
 
-        // disable permission based on cache since event registration is public page/feature.
-        $dedupeParams['check_permission'] = FALSE;
-        $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', $level);
-        $contactID = CRM_Utils_Array::value(0, $ids);
-      }
-      else {
-        foreach ($fields as $fieldname => $fieldvalue) {
-          if (substr($fieldname, 0, 6) == 'email-') {
-            $emailString = trim($fieldvalue);
-            if (!empty($emailString)) {
-              $match = CRM_Contact_BAO_Contact::matchContactOnEmail($emailString, 'Individual');
-              if (!empty($match)) {
-                $contactID = $match->contact_id;
-              }
-            }
-          }
-        }
-      }
+      $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised');
+      $contactID = CRM_Utils_Array::value(0, $ids);
+
     }
 
     if ($returnContactId) {
