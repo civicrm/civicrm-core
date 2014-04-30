@@ -95,6 +95,9 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
         $postUpgradeMessage .= '<br /><br /><strong>' . ts('Your database contains %1 financial transaction records with no payment instrument (Paid By is empty). If you use the Accounting Batches feature this may result in unbalanced transactions. If you do not use this feature, you can ignore the condition (although you will be required to select a Paid By value for new transactions). <a href="%2" target="_blank">You can review steps to correct transactions with missing payment instruments on the wiki.</a>', array(1 => $dao->N, 2 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Transactions+Missing+a+Payment+Instrument+-+4.4.3+Upgrades')) . '</strong>';
       }
     }
+    if ($rev == '4.4.6'){
+     $postUpgradeMessage .= '<br /><br /><strong>'. ts('Your contact image urls have been upgraded. If your contact image urls did not follow the standard format for image Urls they have not been upgraded. Please check the log to see image urls that were not upgraded.'); 
+    }
   }
 
   function upgrade_4_4_alpha1($rev) {
@@ -301,6 +304,60 @@ ALTER TABLE civicrm_dashboard
     $this->addTask(ts('Confirm civicrm_report_instance sql table for upgrades'), 'updateReportInstanceTable');
 
 
+    return TRUE;
+  }
+
+  function upgrade_4_4_6($rev){
+    $minId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(min(id),0) FROM civicrm_contact');
+    $maxId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_contact');
+    for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
+      $endId = $startId + self::BATCH_SIZE - 1;
+      $title = ts('Upgrade image_urls (%1 => %2)', array(1 => $startId, 2 => $endId));
+      $this->addTask($title, 'upgradeImageUrls', $startId, $endId);
+    }
+  }
+
+  static function upgradeImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId){
+    $sql = "CREATE INDEX index_image_url ON civicrm_contact (image_url);";
+    $dao = CRM_Core_DAO::executeQuery($sql);    
+    $sql = "
+SELECT id, image_url
+FROM civicrm_contact
+WHERE 1
+AND id BETWEEN %1 AND %2
+";
+    $params = array(
+      1 => array($startId, 'Integer'),
+      2 => array($endId, 'Integer'),
+    );
+    $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, NULL, FALSE, FALSE);
+    $failures = array();
+    while ($dao->fetch()){
+      $imageURL = $dao->image_url;
+      $baseurl = CIVICRM_UF_BASEURL;
+      $baselen = strlen($baseurl);
+      if (substr($imageURL, 0, $baselen)==$baseurl){
+        $photo = basename($dao->image_url);
+        $config = CRM_Core_Config::singleton();
+        $fullpath = $config->customFileUploadDir.$photo;
+          if (file_exists($fullpath)){
+            $newimageurl =  CRM_Utils_System::url('civicrm/contact/imagefile', 'photo='.$photo, TRUE);
+            $sql = 'UPDATE civicrm_contact SET image_url=%1 WHERE id=%2';
+            $params = array(
+              1 => array($newimageurl, 'String'),
+              2 => array($dao->id, 'Integer'),
+            );
+            $updatedao = CRM_Core_DAO::executeQuery($sql, $params);
+          }
+          else{
+            $failures[$dao->id] = $dao->image_url;
+          }
+        }
+        else{     
+            $failures[$dao->id] = $dao->image_url;
+        }
+      }
+    CRM_Core_Error::debug_var('imageUrlsNotUpgraded', $failures);
     return TRUE;
   }
 

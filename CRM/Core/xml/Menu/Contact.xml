@@ -43,6 +43,12 @@
     <access_arguments>access uploaded files</access_arguments>
   </item>
   <item>
+     <path>civicrm/contact/imagefile</path>
+     <title>Get Image File</title>
+     <page_callback>CRM_Contact_Page_ImageFile</page_callback>
+     <access_arguments>*always allow*</access_arguments>
+  </item>  
+  <item>
      <path>civicrm/contact/search/basic</path>
      <title>Find Contacts</title>
      <page_arguments>mode=256</page_arguments>
