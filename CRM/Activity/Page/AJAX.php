@@ -209,6 +209,7 @@ class CRM_Activity_Page_AJAX {
 
     // move/transform caseRoles array data to caseRelationships
     // for sorting and display
+    // 
     foreach($caseRoles as $id => $value) {
       if ($id != "client") {
         $rel = array();
@@ -217,6 +218,7 @@ class CRM_Activity_Page_AJAX {
         $rel['name'] = '(not assigned)';
         $rel['phone'] = '';
         $rel['email'] = '';
+        $rel['cid']  = '';
         $rel['source'] = 'caseRoles';
         $caseRelationships[] = $rel;
       } else {
@@ -244,7 +246,9 @@ class CRM_Activity_Page_AJAX {
     //limit rows display
     $allCaseRelationships = $caseRelationships;
     $caseRelationships = array_slice($allCaseRelationships, $offset, $rowCount, TRUE);
-
+    echo json_encode($caseRelationships);
+    echo "<h1>end</h1>";
+    CRM_Utils_System::civiExit();
     // set user name, email and edit columns links
     // idx will count number of current row / needed by edit links
     $idx = 1;
@@ -252,7 +256,8 @@ class CRM_Activity_Page_AJAX {
       // Get rid of the "<br />(Case Manager)" from label
       list($typeLabel) = explode('<', $row['relation']);
       // view user links
-      if (array_key_exists("cid",$row)) {
+      //CRM-14466 use array_key_exists to make sure $row[cid] exists
+      if ($row['cid']) {
         $row['name'] = '<a class="view-contact" title="'. ts('View Contact') .'" href='.CRM_Utils_System::url('civicrm/contact/view',
           'action=view&reset=1&cid='.$row['cid']).'>'.$row['name'].'</a>';
       } 
