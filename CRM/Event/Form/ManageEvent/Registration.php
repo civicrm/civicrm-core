@@ -931,41 +931,33 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     switch (self::canProfilesDedupe($profileIds, $rgId)) {
       case 0:
-        $dedupeTitle = 'Duplicate Contact Warning';
+        $dedupeTitle = 'Duplicate Matching Impossible';
         $cantDedupe = ts("The selected profiles do not contain the fields necessary to match registrations with existing contacts.  This means all anonymous registrations will result in a new contact.");
-        $warntype = 'alert';
         break;
       case 1:
         $dedupeTitle = 'Duplicate Contacts Possible';
         $cantDedupe = ts("The selected profiles can collect enough information to match registrations with existing contacts, but not all of the relevant fields are required.  Anonymous registrations may result in duplicate contacts.");
-        $warntype = 'info';
     }
     if (!empty($params['is_multiple_registrations'])) {
       switch(self::canProfilesDedupe($additionalProfileIds, $rgId)) {
         case 0:
-          $dedupeTitle = 'Duplicate Contact Warning';
-          $warntype = 'alert';
+          $dedupeTitle = 'Duplicate Matching Impossible';
           if ($cantDedupe) {
-            $cantDedupe .= ' ' . ts("They also do not contain the fields necessary to match additional participants with existing contacts.  This means all additional participants will result in a new contact.");
+            $cantDedupe = ts("The selected profiles do not contain the fields necessary to match registrations with existing contacts.  This means all anonymous registrations will result in a new contact.");
           }
           else {
             $cantDedupe = ts("The selected profiles do not contain the fields necessary to match additional participants with existing contacts.  This means all additional participants will result in a new contact.");
           }
           break;
         case 1:
-          if ($cantDedupe) {
-            $cantDedupe .= ' ' . ts("Likewise, they can collect enough information to match additional participants with existing contacts, but not all of the relevant fields are required.");
-          }
-          else {
+          if (!$cantDedupe) {
             $dedupeTitle = 'Duplicate Contacts Possible';
-            $warntype = 'info';
             $cantDedupe = ts("The selected profiles can collect enough information to match additional participants with existing contacts, but not all of the relevant fields are required.  This may result in duplicate contacts.");
           }
       }
     }
     if ($cantDedupe) {
-      $warntype .= ' dedupenotify';
-      CRM_Core_Session::setStatus($cantDedupe, $dedupeTitle, $warntype, array('expires' => 0));
+      CRM_Core_Session::setStatus($cantDedupe, $dedupeTitle, 'alert dedupenotify', array('expires' => 0));
     }
 
     // Update tab "disabled" css class
