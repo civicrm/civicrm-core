@@ -28,7 +28,7 @@
 {/if}
 {foreach from=$tagsetInfo.$tagsetType item=tagset}
   <div class="crm-section tag-section {$tagsetType}-tagset {$tagsetType}-tagset-{$tagset.parentID}-section">
-    <div class="crm-clearfix"{if $context EQ "contactTab"} style="margin-top:-15px;"{/if}>
+    <div class="crm-clearfix">
       {assign var="elemName" value=$tagset.tagsetElementName}
       {assign var="parID" value=$tagset.parentID}
       {$form.$elemName.$parID.label}
