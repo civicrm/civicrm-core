@@ -74,6 +74,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    */
   public $_isPending = FALSE;
 
+  protected $unsavedChangesWarn = TRUE;
+
   /**
    * Function to set variables up before form is built
    *
