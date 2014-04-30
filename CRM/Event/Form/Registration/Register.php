@@ -1391,7 +1391,15 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       // disable permission based on cache since event registration is public page/feature.
       $dedupeParams['check_permission'] = FALSE;
 
-      $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised');
+      // find event dedupe rule
+      $defaults = $params = array('id' => $eventId);
+      CRM_Event_BAO_Event::retrieve($params, $defaults);
+      if (CRM_Utils_Array::value('dedupe_rule_group_id', $params, 0) > 0) {
+        $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised', $params['dedupe_rule_group_id']);
+      }
+      else {
+        $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised');
+      }
       $contactID = CRM_Utils_Array::value(0, $ids);
 
     }
