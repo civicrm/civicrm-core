@@ -316,7 +316,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     $this->set('isAdvanced', '2');
     $this->set('isSearchBuilder', '1');
     $this->set('showSearchForm', FALSE);
-
     $params = $this->controller->exportValues($this->_name);
     if (!empty($params)) {
       // Add another block
@@ -347,6 +346,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
           }
         }
       }
+      
 
       if (!$checkEmpty) {
         $this->set('newBlock', 1);
@@ -358,6 +358,18 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     // get it from controller only if form has been submitted, else preProcess has set this
     if (!empty($_POST)) {
       $this->_formValues = $this->controller->exportValues($this->_name);
+      //CRM-14563 Switch IN to RLIKE if custom multi-select fields are used
+      foreach ($this->_formValues['mapper'] as $key => $value){
+        foreach ($value as $k => $v){
+          $operator = $this->_formValues['operator'][$key][$k];
+          if (!empty($v[1])){ 
+            if (strpos($v[1], "custom_") === 0 && $operator === "IN"){
+              $this->_formValues['operator'][$key][$k] = "RLIKE";
+            }
+          }
+          
+        }
+      }
 
       // set the group if group is submitted
       if (!empty($this->_formValues['uf_group_id'])) {
@@ -390,7 +402,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     foreach ($this->_params as $k => $v) {
       $this->_params[$k][2] = self::checkArrayKeyEmpty($v[2]);
     }
-
+    
     parent::postProcess();
   }
 
