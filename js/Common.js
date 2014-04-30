@@ -368,7 +368,7 @@ CRM.validate = CRM.validate || {
             return {id: "0", term: term, label: term + ' (' + ts('new tag') + ')'};
           }
         };
-        selectParams.tokenSeparators = [',', ' '];
+        selectParams.tokenSeparators = [','];
         selectParams.createSearchChoicePosition = 'bottom';
       }
       $el.crmSelect2($.extend(settings, $el.data('select-params'), selectParams))
@@ -383,12 +383,12 @@ CRM.validate = CRM.validate || {
                   data = $el.select2('data'),
                   item = {id: created.id, label: e.object.term};
                 if (val === "0") {
-                  $el.select2('data', item);
+                  $el.select2('data', item, true);
                 }
                 else if ($.isArray(val) && $.inArray("0", val) > -1) {
                   _.remove(data, {id: "0"});
                   data.push(item);
-                  $el.select2('data', data);
+                  $el.select2('data', data, true);
                 }
               });
           }

@@ -112,7 +112,7 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
     CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, $this->_entityTable, $this->_entityID);
 
     if ($this->_action & CRM_Core_Action::BROWSE) {
-      $this->freeze();
+      //$this->freeze();
     }
     else {
       $this->addButtons(array(
