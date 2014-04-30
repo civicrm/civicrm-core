@@ -222,6 +222,7 @@ class CRM_Activity_Page_AJAX {
         $rel['email'] = '';
         $rel['cid'] = '';
         $rel['source'] = 'caseRoles';
+        $rel['actions'] = '';
         $caseRelationships[] = $rel;
       } else {
         foreach($value as $clientRole) {
@@ -232,6 +233,7 @@ class CRM_Activity_Page_AJAX {
           $relClient['email'] = $clientRole['email'];
           $relClient['cid'] = $clientRole['contact_id'];
           $relClient['source'] = 'contact';
+          $relClient['actions'] = '';
           $caseRelationships[] = $relClient;
         }
       }
