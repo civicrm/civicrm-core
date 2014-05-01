@@ -80,6 +80,7 @@ CRM/Core/DAO/PriceSetEntity.php
 CRM/Core/DAO/PrintLabel.php
 CRM/Core/DAO/Setting.php
 CRM/Core/DAO/StateProvince.php
+CRM/Core/DAO/SystemLog.php
 CRM/Core/DAO/Tag.php
 CRM/Core/DAO/Timezone.php
 CRM/Core/DAO/UFField.php
