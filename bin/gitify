@@ -73,22 +73,31 @@ function git_set_remote() {
 }
 
 ###########################################
-## usage: do_svnify <repo-url> <existing-dir>
-function do_svnify() {
-  REPO="$1"
-  TGT="$2"
-  shift 2
+## usage: do_targzify <targz-url> <file-name> <existing-dir>
+## Fetches a tar.gz archive and unpacks it in the current directory
+function do_targzify() {
+  TARGZURL="$1"
+  TARFILE="$2"
+  TGT="$3"
+  shift 3
 
-  if [ -d "$TGT/.svn" ]; then
-    echo "[[Already checked out SVN repo ($TGT) -- skip $REPO]]"
+  if [ -d "$TGT" ]; then
+    echo "[[Already have a copy of the archive ($TGT) -- skip $TARGZURL]]"
     return
   fi
-  [ -d $TGT ] || mkdir -p "$TGT"
-  [ -d $TMP ] && rm -rf "$TMP"
-  echo "[[Checkout $REPO ($TMP)]]"
 
-  echo "[svn co \"$REPO\" \"$TGT\"]"
-  svn co "$REPO" "$TGT"
+  TMP=`mktemp -d`
+
+  echo "[[Downloading $TARGZURL ($TMP)]]"
+  echo "[wget \"$TARGZURL\" -O \"$TMP/$TARFILE\"]"
+
+  pushd "$CIVICRM_ROOT" > /dev/null
+  wget -q "$TARGZURL" -O "$TMP/$TARFILE"
+  tar zxfv "$TMP/$TARFILE"
+  popd
+
+  rm "$TMP/$TARFILE"
+  rmdir "$TMP"
 }
 
 ###########################################
@@ -174,13 +183,13 @@ if [ -z "$CIVICRM_ROOT" -o ! -d "$CIVICRM_ROOT" -o -z "$UPSTREAM_GIT_BASE_URL" -
   echo "  <existing-civicrm-root>: the main directory containing CiviCRM"
   echo "  --upstream <base-url>: specify the base URL for upstream repositories"
   echo "  --fork <base-url>: specify the base URL for your personal fork repositories"
-  echo "  --l10n: optionally fetch localization data; currently requires svn"
+  echo "  --l10n: optionally fetch localization data"
   echo "  --hooks: optionally install recommended git hooks; the hooks are mostly"
   echo "           tested with git CLI under Linux and OSX; they haven't been"
   echo "           tested with git GUIs or Windows"
   echo ""
   echo "Note: If pointing to a pre-existing directory, your local changes may be replaced by"
-  echo "the pristine code from git/svn. If you've made changes, then make sure there's a backup!"
+  echo "the pristine code from git. If you've made changes, then make sure there's a backup!"
   echo ""
   echo "example: $0 Drupal /var/www/drupal7/sites/all/modules/civicrm"
   echo "  (checkout core code plus Drupal 7.x integration code)"
@@ -223,7 +232,7 @@ case "$CIVICRM_CMS" in
 esac
 
 if [ "$CIVICRM_L10N" == "--l10n" ]; then
-  do_svnify "http://svn.civicrm.org/l10n/trunk" "$CIVICRM_ROOT/l10n"
+  do_targzify "https://download.civicrm.org/civicrm-l10n-core/archives/civicrm-l10n-daily.tar.gz" "civicrm-l10n-daily.tar.gz" "$CIVICRM_ROOT/l10n"
 fi
 
 do_gencode "$CIVICRM_ROOT"
