@@ -747,7 +747,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           }
         }
       }
-
       $contactID = CRM_Contact_BAO_Contact::createProfileContact(
         $params,
         $fields,
