@@ -283,7 +283,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   public static function create(&$params) {
     // check required params
     if (!self::dataExists($params)) {
-      CRM_Core_Error::fatal('Not enough data to create activity object,');
+      throw new CRM_Core_Exception('Not enough data to create activity object');
     }
 
     $activity = new CRM_Activity_DAO_Activity();
@@ -494,7 +494,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         $t = array_slice($params['target_contact_id'], 0, 1);
         $recentContactId = $t[0];
       }
-      elseif (isset($params['target_contact_id'])) {
+      //is array check fixes warning without degrading functionality but it seems this bit of code may no longer work
+      // as it may always be an array
+      elseif (isset($params['target_contact_id']) && !is_array($params['target_contact_id'])) {
         $msgs[] = "target={$params['target_contact_id']}";
         // will be used for recently viewed display
         $recentContactId = $params['target_contact_id'];

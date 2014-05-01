@@ -56,7 +56,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    */
   static function create(&$params, $ids = array()) {
     $valid = $invalid = $duplicate = $saved = 0;
-    $relationships = array();
+    $relationships = $relationshipIds = array();
     $relationshipId = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
     //CRM-9015 - the hooks are called here & in add (since add doesn't call create)
     // but in future should be tidied per ticket

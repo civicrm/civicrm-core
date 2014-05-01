@@ -711,7 +711,7 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
     'sort' => CRM_Utils_Rule::string($sort) ? $sort : NULL,
     'limit' => CRM_Utils_Rule::integer($limit) ? $limit : NULL,
     'is_count' => $is_count,
-    'return' => !empty($returnProperties) ? $returnProperties : NULL,
+    'return' => !empty($returnProperties) ? $returnProperties : array(),
   );
 
   if ($options['sort'] && stristr($options['sort'], 'SELECT')) {
@@ -831,15 +831,6 @@ function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, 
   if(isset($dao->count)) {
     return $dao->count;
   }
-  //if custom fields are required we will endeavour to set them . NB passing $entity in might be a bit clunky / unrequired
-  if (!empty($entity) && !empty($params['return']) && is_array($params['return'])) {
-    foreach ($params['return'] as $return) {
-      if (substr($return, 0, 6) == 'custom') {
-        $custom = TRUE;
-      }
-    }
-  }
-
 
   $fields = array_keys(_civicrm_api3_build_fields_array($dao, $uniqueFields));
 
@@ -854,7 +845,8 @@ function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, 
       }
     }
     $result[$dao->id] = $tmp;
-    if (!empty($custom)) {
+
+    if(_civicrm_api3_custom_fields_are_required($entity, $params)) {
       _civicrm_api3_custom_data_get($result[$dao->id], $entity, $dao->id);
     }
   }
@@ -863,6 +855,27 @@ function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, 
   return $result;
 }
 
+/**
+ * We currently retrieve all custom fields or none at this level so if we know the entity
+ * && it can take custom fields & there is the string 'custom' in their return request we get them all, they are filtered on the way out
+ * @todo filter so only required fields are queried
+ *
+ * @param $params
+ * @param string $entity - entity name in CamelCase
+ *
+ * @return bool
+ */
+function _civicrm_api3_custom_fields_are_required($entity, $params) {
+  if (!array_key_exists($entity, CRM_Core_BAO_CustomQuery::$extendsMap)) {
+    return FALSE;
+  }
+  $options = _civicrm_api3_get_options_from_params($params);
+  //we check for possibility of 'custom' => 1 as well as specific custom fields
+  $returnString = implode('', $options['return']) . implode('', array_keys($options['return']));
+  if(stristr($returnString, 'custom')) {
+    return TRUE;
+  }
+}
 /**
  * Converts an object to an array
  *
@@ -908,6 +921,22 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
       );
     }
   }
+}
+
+/**
+ * @param $params
+ * @param $entity
+ */
+function _civicrm_api3_format_params_for_create(&$params, $entity) {
+  $nonGenericEntities = array('Contact', 'Individual', 'Household', 'Organization');
+
+  $customFieldEntities = array_diff_key(CRM_Core_BAO_CustomQuery::$extendsMap, array_fill_keys($nonGenericEntities, 1));
+  if(!array_key_exists($entity, $customFieldEntities)) {
+    return;
+  }
+  $values = array();
+  _civicrm_api3_custom_format_params($params, $values, $entity);
+  $params = array_merge($params, $values);
 }
 
 /**
@@ -993,7 +1022,7 @@ function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $
       return civicrm_api3_create_success(_civicrm_api3_dao_to_array($bao, $params, FALSE, $entity), $params, $entity, 'get');
   }
   else {
-    return _civicrm_api3_dao_to_array($bao, $params, FALSE, $entity);
+    return _civicrm_api3_dao_to_array($bao, $params, FALSE, $entity, 'get');
   }
 }
 
@@ -1005,7 +1034,7 @@ function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $
  * @return array
  */
 function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
-
+  _civicrm_api3_format_params_for_create($params, $entity);
   $args = array(&$params);
   if (!empty($entity)) {
     $ids = array($entity => CRM_Utils_Array::value('id', $params));
@@ -1125,7 +1154,7 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
  * @param string $subName - Subtype of entity
  */
 function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $groupID = NULL, $subType = NULL, $subName = NULL) {
-  $groupTree = &CRM_Core_BAO_CustomGroup::getTree($entity,
+  $groupTree = CRM_Core_BAO_CustomGroup::getTree($entity,
     CRM_Core_DAO::$_nullObject,
     $entity_id,
     $groupID,

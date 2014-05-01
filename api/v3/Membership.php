@@ -200,7 +200,7 @@ function civicrm_api3_membership_get($params) {
   if ($options['is_count']) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
-  $membershipValues = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
+  $membershipValues = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Membership');
 
   $return = $options['return'];
   if(empty($membershipValues) ||
