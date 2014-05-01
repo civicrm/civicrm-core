@@ -194,7 +194,6 @@ function _civicrm_api3_case_delete_spec(&$params) {
  */
 function civicrm_api3_case_get($params) {
   $options = _civicrm_api3_get_options_from_params($params);
-
   //search by client
   if (!empty($params['contact_id'])) {
     $ids = array();

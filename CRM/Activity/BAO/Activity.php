@@ -77,9 +77,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * of time. This is the inverse function of create. It also stores all the retrieved
    * values in the default array
    *
-   * @param array  $params   (reference ) an assoc array of name/value pairs
-   * @param array  $defaults (reference ) an assoc array to hold the flattened values
-   * @param string $activityType activity type
+   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   *
+   * @internal param string $activityType activity type
    *
    * @return object CRM_Core_BAO_Meeting object
    * @access public
@@ -271,14 +272,15 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   /**
    * Function to process the activities
    *
-   * @param object $form         form object
-   * @param array  $params       associated array of the submitted values
-   * @param array  $ids          array of ids
-   * @param string $activityType activity Type
-   * @param boolean $record   true if it is Record Activity
+   * @param array $params associated array of the submitted values
+   *
+   * @internal param object $form form object
+   * @internal param array $ids array of ids
+   * @internal param string $activityType activity Type
+   * @internal param bool $record true if it is Record Activity
    * @access public
    *
-   * @return
+   * @return $this|null|object
    */
   public static function create(&$params) {
     // check required params
@@ -1753,10 +1755,13 @@ WHERE      activity.id IN ($activityIds)";
   /**
    * Function to add activity for Membership/Event/Contribution
    *
-   * @param object  $activity   (reference) particular component object
-   * @param string  $activityType for Membership Signup or Renewal
+   * @param object $activity (reference) particular component object
+   * @param string $activityType for Membership Signup or Renewal
    *
    *
+   * @param null $targetContactID
+   *
+   * @return bool
    * @static
    * @access public
    */

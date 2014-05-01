@@ -1112,8 +1112,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
           }
 
           $values[$rid]['action'] = CRM_Core_Action::formLink(
-            $links, 
-            $mask, 
+            $links,
+            $mask,
             $replace,
             ts('more'),
             FALSE,
