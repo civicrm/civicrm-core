@@ -125,6 +125,23 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * @param $params
+   *
+   * @return mixed
+   */
+  public static function logPaymentNotification($params) {
+    $message = '';
+    if (!empty($params['processor_name'])) {
+      $message = 'processor_name=' . $params['processor_name'];
+    }
+    if (!empty($params['processor_id'])) {
+      $message .= 'processor_id=' . $params['processor_id'];
+    }
+    $log = CRM_Utils_SystemLogger();
+    $log->log('alert', $message, $_REQUEST);
+  }
+
+  /**
    * Setter for the payment form that wants to use the processor
    *
    * @param obj $paymentForm
@@ -215,6 +232,7 @@ abstract class CRM_Core_Payment {
     if (!isset($params['processor_id']) && !isset($params['processor_name'])) {
       CRM_Core_Error::fatal("Either 'processor_id' or 'processor_name' param is required for payment callback");
     }
+    self::logPaymentNotification($params);
 
     // Query db for processor ..
     $mode = @$params['mode'];
