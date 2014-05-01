@@ -425,8 +425,10 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       $addressCustom = TRUE;
       $name = "address_{$name}";
     }
-
-    if (!empty($field->location_type_id)) {
+    if ($field->field_name == 'url') {
+      $name .= "-{$field->website_type_id}";
+    }
+    elseif (!empty($field->location_type_id)) {
       $name .= "-{$field->location_type_id}";
     }
     else {
@@ -459,6 +461,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       'in_selector' => $field->in_selector,
       'rule' => CRM_Utils_Array::value('rule', CRM_Utils_Array::value($field->field_name, $importableFields)),
       'location_type_id' => isset($field->location_type_id) ? $field->location_type_id : NULL,
+      'website_type_id' => isset($field->website_type_id) ? $field->website_type_id : NULL,
       'phone_type_id' => isset($field->phone_type_id) ? $field->phone_type_id : NULL,
       'group_id' => $group->id,
       'add_to_group_id' => isset($group->add_to_group_id) ? $group->add_to_group_id : NULL,
@@ -1999,17 +2002,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       );
 
       $form->addRule($name, ts('Enter a valid Website.'), 'url');
-
-      //Website type select
-      if ($usedFor) {
-        if (substr($name, -1) == ']') {
-          $websiteTypeName = substr($name, 0, -1) . '-website_type_id]';
-        }
-        $form->addElement('select', $websiteTypeName, NULL, CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'));
-      }
-      else {
-        $form->addElement('select', $name . '-website_type_id', NULL, CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'));
-      }
     }
     // Note should be rendered as textarea
     elseif (substr($fieldName, -4) == 'note') {
@@ -2440,13 +2432,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           }
           else {
             if (is_array($details)) {
-              if ($fieldName === 'url') {
-                if (!empty($details['website'])) {
-                  foreach ($details['website'] as $val) {
-                    $defaults[$fldName] = CRM_Utils_Array::value('url', $val);
-                    $defaults[$fldName . '-website_type_id'] = $val['website_type_id'];
-                  }
-                }
+              if ($fieldName === 'url' 
+                && !empty($details['website']) 
+                && !empty($details['website'][$locTypeId])) {
+                $defaults[$fldName] = CRM_Utils_Array::value('url', $details['website'][$locTypeId]);
               }
             }
           }
