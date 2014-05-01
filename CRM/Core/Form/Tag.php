@@ -62,53 +62,30 @@ class CRM_Core_Form_Tag {
     $form->assign("isTagset", FALSE);
     $mode = NULL;
 
-    foreach ($parentNames as & $parentNameItem) {
+    foreach ($parentNames as &$parentNameItem) {
       // get the parent id for tag list input for keyword
       $parentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $parentNameItem, 'id', 'name');
 
       // check if parent exists
       if ($parentId) {
-        $tagsetItem = 'parentId_' . $parentId;
-        $tagset[$tagsetItem]['skipEntityAction'] = $skipEntityAction;
+        $tagsetItem = $tagsetElementName . 'parentId_' . $parentId;
         $tagset[$tagsetItem]['parentID'] = $parentId;
 
-        // Fixme: these 3 variables may be unused
-        $tagset[$tagsetItem]['parentName'] = $parentNameItem;
-        $tagset[$tagsetItem]['entityTable'] = $entityTable;
-        $tagset[$tagsetItem]['skipTagCreate'] = $skipTagCreate;
-
-        switch ($entityTable) {
-          case 'civicrm_activity':
-            $tagsetElementName = "activity_taglist";
-            $mode = 'activity';
-            break;
-
-          case 'civicrm_case':
-            $tagsetElementName = "case_taglist";
-            $mode = 'case';
-            break;
-
-          case 'civicrm_file':
-            $mode = 'attachment';
-            break;
-
-          default:
-            $tagsetElementName = "contact_taglist";
-            $mode = 'contact';
+        list(, $mode) = explode('_', $entityTable);
+        if (!$tagsetElementName) {
+          $tagsetElementName = $mode . "_taglist";
         }
-
         $tagset[$tagsetItem]['tagsetElementName'] = $tagsetElementName;
-        if ($tagsetElementName) {
-          $form->addEntityRef("{$tagsetElementName}[{$parentId}]", $parentNameItem, array(
-            'entity' => 'tag',
-            'multiple' => TRUE,
-            'create' => !$skipTagCreate,
-            'api' => array('params' => array('parent_id' => $parentId)),
-            'data-entity_table' => $entityTable,
-            'data-entity_id' => $entityId,
-            'class' => "crm-$mode-tagset",
-          ));
-        }
+
+        $form->addEntityRef("{$tagsetElementName}[{$parentId}]", $parentNameItem, array(
+          'entity' => 'tag',
+          'multiple' => TRUE,
+          'create' => !$skipTagCreate,
+          'api' => array('params' => array('parent_id' => $parentId)),
+          'data-entity_table' => $entityTable,
+          'data-entity_id' => $entityId,
+          'class' => "crm-$mode-tagset",
+        ));
 
         if ($entityId) {
           $tagset[$tagsetItem]['entityId'] = $entityId;
@@ -120,6 +97,7 @@ class CRM_Core_Form_Tag {
         else {
           $skipEntityAction = TRUE;
         }
+        $tagset[$tagsetItem]['skipEntityAction'] = $skipEntityAction;
       }
     }
 
@@ -127,8 +105,12 @@ class CRM_Core_Form_Tag {
       // assign current tagsets which is used in postProcess
       $form->_tagsetInfo = $tagset;
       $form->assign("tagsetType", $mode);
+      // Merge this tagset info with possibly existing info in the template
       $tagsetInfo = (array) $form->get_template_vars("tagsetInfo");
-      $tagsetInfo[$mode] = $tagset;
+      if (empty($tagsetInfo[$mode])) {
+        $tagsetInfo[$mode] = array();
+      }
+      $tagsetInfo[$mode] = array_merge($tagsetInfo[$mode], $tagset);
       $form->assign("tagsetInfo", $tagsetInfo);
       $form->assign("isTagset", TRUE);
     }
