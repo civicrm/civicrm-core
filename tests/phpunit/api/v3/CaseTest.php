@@ -113,6 +113,8 @@ class api_v3_CaseTest extends CiviUnitTestCase {
 
     $this->quickCleanup($tablesToTruncate);
 
+    $this->loadAllFixtures();
+
     $activityTypes = $this->callAPISuccess('option_value', 'get', array(
       'option_group_id' => 2,
       'name' => 'Follow Up',
@@ -120,79 +122,6 @@ class api_v3_CaseTest extends CiviUnitTestCase {
       'sequential' => 1,
     ));
     $this->followup_activity_type_value = $activityTypes['values'][0]['value'];
-    //  Insert a row in civicrm_contact creating contact 17
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_17.xml'
-      )
-    );
-
-    //Create relationship types
-    $relTypeParams = array(
-      'name_a_b' => 'Case Coordinator is',
-      'label_a_b' => 'Case Coordinator is',
-      'name_b_a' => 'Case Coordinator',
-      'label_b_a' => 'Case Coordinator',
-      'description' => 'Case Coordinator',
-      'contact_type_a' => 'Individual',
-      'contact_type_b' => 'Individual',
-      'is_reserved' => 0,
-      'is_active' => 1,
-    );
-    $this->relationshipTypeCreate($relTypeParams);
-
-    $relTypeParams = array(
-      'name_a_b' => 'Homeless Services Coordinator is',
-      'label_a_b' => 'Homeless Services Coordinator is',
-      'name_b_a' => 'Homeless Services Coordinator',
-      'label_b_a' => 'Homeless Services Coordinator',
-      'description' => 'Homeless Services Coordinator',
-      'contact_type_a' => 'Individual',
-      'contact_type_b' => 'Individual',
-      'is_reserved' => 0,
-      'is_active' => 1,
-    );
-    $this->relationshipTypeCreate($relTypeParams);
-
-    $relTypeParams = array(
-      'name_a_b' => 'Health Services Coordinator is',
-      'label_a_b' => 'Health Services Coordinator is',
-      'name_b_a' => 'Health Services Coordinator',
-      'label_b_a' => 'Health Services Coordinator',
-      'description' => 'Health Services Coordinator',
-      'contact_type_a' => 'Individual',
-      'contact_type_b' => 'Individual',
-      'is_reserved' => 0,
-      'is_active' => 1,
-    );
-    $this->relationshipTypeCreate($relTypeParams);
-
-    $relTypeParams = array(
-      'name_a_b' => 'Senior Services Coordinator is',
-      'label_a_b' => 'Senior Services Coordinator is',
-      'name_b_a' => 'Senior Services Coordinator',
-      'label_b_a' => 'Senior Services Coordinator',
-      'description' => 'Senior Services Coordinator',
-      'contact_type_a' => 'Individual',
-      'contact_type_b' => 'Individual',
-      'is_reserved' => 0,
-      'is_active' => 1,
-    );
-    $this->relationshipTypeCreate($relTypeParams);
-
-    $relTypeParams = array(
-      'name_a_b' => 'Benefits Specialist is',
-      'label_a_b' => 'Benefits Specialist is',
-      'name_b_a' => 'Benefits Specialist',
-      'label_b_a' => 'Benefits Specialist',
-      'description' => 'Benefits Specialist',
-      'contact_type_a' => 'Individual',
-      'contact_type_b' => 'Individual',
-      'is_reserved' => 0,
-      'is_active' => 1,
-    );
-    $this->relationshipTypeCreate($relTypeParams);
 
     // enable the default custom templates for the case type xml files
     $this->customDirectories(array('template_path' => TRUE));
