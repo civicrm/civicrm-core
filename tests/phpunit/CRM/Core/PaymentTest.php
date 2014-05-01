@@ -25,28 +25,30 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
-class CRM_Utils_SystemLogger implements \Psr\Log\LoggerInterface {
-  static public function log($level, $message, array $context = array()) {
-    echo 'k';
-    $rec = new CRM_Core_DAO_SystemLog();
-    $separateFields = array('contact_id', 'hostname');
-    foreach ($separateFields as $separateField) {
-      if (isset($context[$separateField])) {
-        $rec->{$separateField} = $context[$separateField];
-        unset($context[$separateField]);
-      }
+
+require_once 'CiviTest/CiviUnitTestCase.php';
+
+class CRM_Core_PaymentTest extends CiviUnitTestCase {
+  function get_info() {
+    return array(
+      'name' => 'Payment Test',
+      'description' => 'Test Payment methods.',
+      'group' => 'Payment Processor Tests',
+    );
+  }
+
+  /**
+   * test the payment method is adequately logged - we don't expect the processing to succeed
+   */
+  function testHandlePaymentMethodLogging() {
+    $params = array('processor_name' => 'Paypal', 'data' => 'blah');
+    try {
+      CRM_Core_Payment::handlePaymentMethod('method', $params);
     }
-    print_r($rec);
-    $rec->level = $level;
-    $rec->message = $message;
-    $rec->context = json_encode($context);
-    $rec->save();
+    catch (Exception $e) {
+
+    }
+    $log = $this->callAPISuccess('SystemLog', 'get', array());
+    $this->assertEquals('payment_notification processor_name=Paypal', $log['values'][$log->id]['message']);
   }
 }

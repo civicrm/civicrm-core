@@ -19,6 +19,8 @@
 
   <civicrm_preferences_date />
 
+  <civicrm_system_log />
+
   <civicrm_worldregion />
 
   <civicrm_component />
