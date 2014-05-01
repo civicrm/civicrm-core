@@ -197,13 +197,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     );
     $recipientListing->setMultiple(TRUE);
 
-    //token input url
-    $tokenUrl = CRM_Utils_System::url('civicrm/ajax/checkemail',
-      'noemail=1',
-      FALSE, NULL, FALSE
-    );
-    $this->assign('tokenUrl', $tokenUrl);
-    $this->add('text', 'recipient_manual_id', ts('Manual Recipients'));
+    $this->addEntityRef('recipient_manual_id', ts('Manual Recipients'), array('multiple' => true));
 
     $this->add('select', 'group_id', ts('Group'),
       CRM_Core_PseudoConstant::staticGroup(), FALSE, array('class' => 'crm-select2 huge')
