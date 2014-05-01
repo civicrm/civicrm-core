@@ -42,7 +42,6 @@ class CRM_Utils_SystemLogger extends Psr\Log\AbstractLogger implements \Psr\Log\
         unset($context[$separateField]);
       }
     }
-    print_r($rec);
     $rec->level = $level;
     $rec->message = $message;
     $rec->context = json_encode($context);
