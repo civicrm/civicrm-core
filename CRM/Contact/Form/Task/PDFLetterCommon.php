@@ -179,6 +179,16 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
         NULL,
         FALSE
       );
+          
+       if ($form->_caseId) {
+         $ccid = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseContact', $form->_caseId,
+           'contact_id', 'case_id'
+         );
+         $cancelURL = CRM_Utils_System::url('civicrm/contact/view/case',
+           "&reset=1&action=view&cid={$ccid}&id={$form->_caseId}"
+         );
+       }
+ 
       if ($form->get('action') == CRM_Core_Action::VIEW) {
         $form->addButtons(array(
             array(
@@ -435,6 +445,15 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       );
       CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
     }
+       
+    if (isset($form->_caseId) && is_numeric($form->_caseId)) {
+       // if case-id is found the file the activity on the case
+       $caseParams = array(
+         'activity_id' => empty($activity->id) ? $activityIds[$contactId] : $activity->id,
+         'case_id' => $form->_caseId,
+       );
+       CRM_Case_BAO_Case::processCaseActivity($caseParams);
+     }
   }
 
   static function formatMessage(&$message) {
