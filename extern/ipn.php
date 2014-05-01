@@ -39,11 +39,12 @@ require_once '../civicrm.config.php';
 
 $config = CRM_Core_Config::singleton();
 $log = new CRM_Utils_SystemLogger();
-$log->log('alert', 'Paypal IPN', $_REQUEST);
 if (empty($_GET)) {
+  $log->log('alert', 'payment_notification processor_name=PayPal', $_REQUEST);
   $paypalIPN = new CRM_Core_Payment_PayPalProIPN($_REQUEST);
 }
 else {
+  $log->log('alert', 'payment_notification PayPal_Standard', $_REQUEST);
   $paypalIPN = new CRM_Core_Payment_PayPalIPN();
   // @todo upgrade standard per Pro
 }

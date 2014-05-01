@@ -130,9 +130,9 @@ abstract class CRM_Core_Payment {
    * @return mixed
    */
   public static function logPaymentNotification($params) {
-    $message = '';
+    $message = 'payment_notification ';
     if (!empty($params['processor_name'])) {
-      $message = 'processor_name=' . $params['processor_name'];
+      $message .= 'processor_name=' . $params['processor_name'];
     }
     if (!empty($params['processor_id'])) {
       $message .= 'processor_id=' . $params['processor_id'];
