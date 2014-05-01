@@ -93,25 +93,45 @@ var toContact = ccContact = bccContact = '';
 {/if}
 
 {literal}
-cj('#addcc').toggle( function() { cj(this).text('Remove CC');
+CRM.$(function($){
+  cj('#addcc').toggle( function() { cj(this).text('Remove CC');
                                   cj('tr#cc').show().find('ul').find('input').focus();
                    },function() { cj(this).text('Add CC');cj('#cc_id').val('');
                                   cj('tr#cc ul li:not(:last)').remove();cj('#cc').hide();
 });
-cj('#addbcc').toggle( function() { cj(this).text('Remove BCC');
+  cj('#addbcc').toggle( function() { cj(this).text('Remove BCC');
                                    cj('tr#bcc').show().find('ul').find('input').focus();
                     },function() { cj(this).text('Add BCC');cj('#bcc_id').val('');
                                    cj('tr#bcc ul li:not(:last)').remove();cj('#bcc').hide();
 });
 
-var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name or email address of an existing contact.{/ts}{literal}";
-var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1' h=0 }{literal}";
-var toDataUrl     = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1' h=0 }{literal}";
+  var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1' h=0 }{literal}";
 
-cj( "#to"     ).tokenInput( toDataUrl,     { prePopulate: toContact,  theme: 'facebook', hintText: hintText });
-cj( "#cc_id"  ).tokenInput( sourceDataUrl, { prePopulate: ccContact,  theme: 'facebook', hintText: hintText });
-cj( "#bcc_id" ).tokenInput( sourceDataUrl, { prePopulate: bccContact, theme: 'facebook', hintText: hintText });
-cj( 'ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px' );
+  function emailSelect(el){
+    $(el).data('api-entity', 'contact').crmSelect2({
+      minimumInputLength: 1,
+      multiple: true,
+      ajax: {
+        url: sourceDataUrl,
+        data: function(term) {
+          return {
+            name: term,
+          };
+        },
+        results: function(response) {
+          return {
+            results: response,
+          };
+        }
+      }
+    });
+  }
+  emailSelect('#to');
+  emailSelect('#cc_id');
+  emailSelect('#bcc_id');
+});
+
+
 </script>
 {/literal}
 {include file="CRM/common/formNavigate.tpl"}
