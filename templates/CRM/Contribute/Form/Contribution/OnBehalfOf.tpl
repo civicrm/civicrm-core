@@ -104,10 +104,10 @@
         {else}
           <div class="label">{$form.onbehalf.$fieldName.label}</div>
           <div class="content">
-            {$form.onbehalf.$fieldName.html}
-            {if $fieldName eq 'organization_name'}
-              <div id="id-onbehalf-orgname-help" class="description">{ts}Start typing the name of an organization that you have saved previously to use it again. Otherwise click "Enter a new organization" above.{/ts}</div>
+            {if $fieldName eq 'organization_name' and !empty($form.onbehalfof_id)}
+              {$form.onbehalfof_id.html}
             {/if}
+            {$form.onbehalf.$fieldName.html}
             {if !empty($onBehalfOfFields.$fieldName.html_type)  && $onBehalfOfFields.$fieldName.html_type eq 'Autocomplete-Select'}
               {assign var=elementName value=onbehalf[$fieldName]}
             {include file="CRM/Custom/Form/AutoComplete.tpl" element_name=$elementName}
@@ -134,7 +134,6 @@
 {if empty($snippet)}
 {literal}
 <script type="text/javascript">
-  cj( "div#id-onbehalf-orgname-help").hide( );
 
   showOnBehalf({/literal}"{$onBehalfRequired}"{literal});
 
@@ -258,30 +257,23 @@ function setLocationDetails(contactID) {
   });
 }
 
-var orgOption = '';
 cj("input:radio[name='org_option']").click( function( ) {
-  orgOption = cj("input:radio[name='org_option']:checked").val( );
+  var orgOption = cj(this).val();
   selectCreateOrg(orgOption, true);
 });
 
+cj('#onbehalfof_id').change(function() {
+  setLocationDetails(cj(this).val());
+}).change();
+
 function selectCreateOrg( orgOption, reset ) {
   if (orgOption == 0) {
-    cj("div#id-onbehalf-orgname-help").show( );
-    var dataUrl = {/literal}"{$employerDataURL}"{literal};
-    cj('#onbehalf_organization_name').autocomplete( dataUrl,
-      { width         : 180,
-        selectFirst   : false,
-        matchContains : true,
-        max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal}
-      }).result( function( event, data, formatted ) {
-        cj('#onbehalf_organization_name').val( data[0] );
-        cj('#onbehalfof_id').val( data[1] );
-        setLocationDetails( data[1] );
-      });
+    cj("#onbehalfof_id").show().change();
+    cj("input#onbehalf_organization_name").hide()
   }
   else if ( orgOption == 1 ) {
-    cj("input#onbehalf_organization_name").removeClass( 'ac_input' ).unautocomplete( );
-    cj("div#id-onbehalf-orgname-help").hide( );
+    cj("input#onbehalf_organization_name").show();
+    cj("#onbehalfof_id").hide();
   }
 
   if ( reset ) {
