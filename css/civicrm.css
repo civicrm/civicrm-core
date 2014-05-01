@@ -2426,7 +2426,7 @@ div.grippie {
 }
 
 #crm-create-new-list {
-  width: 124px;
+  width: 180px;
 }
 #crm-contact-actions-list .icon {
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
@@ -3754,14 +3754,13 @@ div.m ul#civicrm-menu,
 .crm-participant-list-inner,
 .crm-event-links-list-inner,
 .crm-contribpage-links-list-inner,
-.crm-create-new-list-inner,
 .crm-contact-actions-list-inner {
   background-color: #2f2f2e;
   padding: 4px;
 }
 
 .crm-create-new-list-inner {
-  width: 124px!important;
+  width: 180px!important;
 }
 
 .ac_even {
