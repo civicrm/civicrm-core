@@ -37,7 +37,7 @@ require_once '../civicrm.config.php';
 
 $config = CRM_Core_Config::singleton();
 $log = new CRM_Utils_SystemLogger();
-$log->log('alert', 'payment_notification processor_name=Google_Checkout', $_REQUEST);
+$log->alert('payment_notification processor_name=Google_Checkout', $_REQUEST);
 
 $rawPostData = file_get_contents('php://input');
 CRM_Core_Payment_GoogleIPN::main($rawPostData);
