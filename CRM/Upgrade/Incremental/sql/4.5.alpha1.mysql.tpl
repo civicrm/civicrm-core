@@ -267,7 +267,7 @@ VALUES
 
 -- CRM-14435
 ALTER TABLE `civicrm_mail_settings`
-  ADD CONSTRAINT `FK_civicrm_mail_settings_domain_id` FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain` (`id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `FK_civicrm_mail_settings_domain_id` FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain` (`id`) ON DELETE CASCADE;
 
 -- CRM-14436
 ALTER TABLE `civicrm_mailing`
