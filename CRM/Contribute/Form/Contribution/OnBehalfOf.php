@@ -42,7 +42,7 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
    */
   static function preProcess(&$form) {
     $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
+    $contactID = $form->_contactID;
 
     $ufJoinParams = array(
       'module' => 'onBehalf',
@@ -117,8 +117,7 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
     $form->assign('fieldSetTitle', ts('Organization Details'));
     $form->assign('buildOnBehalfForm', TRUE);
 
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
+    $contactID = $form->_contactID;
 
     if ($contactID && count($form->_employers) >= 1) {
       $form->add('text', 'organization_id', ts('Select an existing related Organization OR enter a new one'));
