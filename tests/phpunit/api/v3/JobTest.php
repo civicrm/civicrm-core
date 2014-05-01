@@ -176,6 +176,40 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => $gt, 'ct' => $ct));
   }
 
+  /**
+   * test the call reminder success sends more than 25 reminders & is not incorrectly limited
+   * Note that this particular test sends the reminders to the additional recipients only
+   * as no real reminder person is configured
+   *
+   * Also note that this is testing a 'job' api so is in this class rather than scheduled_reminder - which
+   * seems a cleaner place to build up a collection of scheduled reminder testing functions. However, it seems
+   * that the api itself would need to be moved to the scheduled_reminder fn to do that  with the job wrapper being respected for legacy functions
+   */
+  public function testCallSendReminderSuccessMoreThanDefaultLimit() {
+    $membershipTypeID = $this->membershipTypeCreate();
+    $createTotal = 30;
+    for($i = 1; $i <= $createTotal; $i++) {
+      $contactID = $this->individualCreate();
+      $groupID = $this->groupCreate(array('name' => $i, 'title' => $i));
+      $result = $this->callAPISuccess('action_schedule', 'create', array(
+        'title' => " job $i",
+        'subject' => "job $i",
+        'entity_value' => $membershipTypeID,
+        'mapping_id' => 4,
+        'start_action_date' => 'membership_join_date',
+        'start_action_offset' => 0,
+        'start_action_condition' => 'before',
+        'start_action_unit' => 'hour',
+        'group_id' => $groupID,
+        'limit_to' => FALSE,
+      ));
+      $this->callAPISuccess('group_contact', 'create', array('contact_id' => $contactID, 'status' => 'Added', 'group_id' => $groupID));
+    }
+    $result = $this->callAPISuccess('job', 'send_reminder', array());
+    $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
+    $this->assertEquals($successfulCronCount, $createTotal);
+  }
+
   public function testCallDisableExpiredRelationships() {
     $individualID = $this->individualCreate();
     $orgID = $this->organizationCreate();
