@@ -224,7 +224,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $defaults['field_name'] = array(
         $defaults['field_type'],
         ($defaults['field_type'] == "Formatting" ? "" : $defaults['field_name']),
-        $defaults['location_type_id'],
+        ($defaults['field_name'] == "url") ? $defaults['website_type_id'] : $defaults['location_type_id'],
         CRM_Utils_Array::value('phone_type_id', $defaults),
       );
       $this->_gid = $defaults['uf_group_id'];
@@ -252,7 +252,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     $fields = CRM_Core_BAO_UFField::getAvailableFields($this->_gid, $defaults);
 
-    $noSearchable = array();
+    $noSearchable = $hasWebsiteTypes = array();
     $addressCustomFields = array_keys(CRM_Core_BAO_CustomField::getFieldsForImport('Address'));
 
     foreach ($fields as $key => $value) {
@@ -270,7 +270,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
           $this->_mapperFields[$key][$key1] = $value1['title'];
         }
         $hasLocationTypes[$key][$key1] = CRM_Utils_Array::value('hasLocationType', $value1);
-
+        $hasWebsiteTypes[$key][$key1] = CRM_Utils_Array::value('hasWebsiteType', $value1);
         // hide the 'is searchable' field for 'File' custom data
         if (isset($value1['data_type']) &&
           isset($value1['html_type']) &&
@@ -288,7 +288,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
-
+    $this->_website_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
+    
     /**
      * FIXME: dirty hack to make the default option show up first.  This
      * avoids a mozilla browser bug with defaults on dynamically constructed
@@ -359,6 +360,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
           foreach ($this->_mapperFields[$k] as $key => $value) {
             if ($hasLocationTypes[$k][$key]) {
               $sel3[$k][$key] = $this->_location_types;
+            }
+            elseif ($hasWebsiteTypes[$k][$key]) {
+              $sel3[$k][$key] = $this->_website_types;
             }
             else {
               $sel3[$key] = NULL;
@@ -498,10 +502,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       );
     }
 
-    if (isset($defaults['field_name']) && CRM_Utils_Array::value(1, $defaults['field_name']) == 'url-1') {
-      $defaults['field_name'][1] = 'url';
-    }
-
     $this->setDefaults($defaults);
   }
 
@@ -549,11 +549,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     //Hack for Formatting Field Name
     if ($params['field_name'][0] == 'Formatting') {
       $params['field_name'][1] = 'formatting_' . rand(1000, 9999);
-    }
-
-    // temporary hack to for website
-    if ($params['field_name'][1] == 'url') {
-      $params['field_name'][1] = 'url-1';
     }
 
     //check for duplicate fields
