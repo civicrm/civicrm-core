@@ -112,8 +112,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public $urlPath = array();
 
-  protected $unsavedWarn;
-
   /**
    * constants for attributes for various form elements
    * attempt to standardize on the number of variations that we

@@ -28,22 +28,24 @@
 {/if}
 {foreach from=$tagsetInfo.$tagsetType item=tagset}
   {assign var="elemName" value=$tagset.tagsetElementName}
-  {assign var="parID" value=$tagset.parentID}
-  {assign var="skipEntityAction" value=$tagset.skipEntityAction}
-  {if $tableLayout}
-    <td class="label">
-      {$form.$elemName.$parID.label}
-    </td>
-    <td class="{$tagsetType}-tagset {$tagsetType}-tagset-{$tagset.parentID}-section">
-        {$form.$elemName.$parID.html}
-    </td>
-  {else}
-    <div class="crm-section tag-section {$tagsetType}-tagset {$tagsetType}-tagset-{$tagset.parentID}-section">
-      <div class="crm-clearfix">
+  {if empty($tagsetElementName) or $tagsetElementName eq $elemName}
+    {assign var="parID" value=$tagset.parentID}
+    {assign var="skipEntityAction" value=$tagset.skipEntityAction}
+    {if $tableLayout}
+      <td class="label">
         {$form.$elemName.$parID.label}
-        {$form.$elemName.$parID.html}
+      </td>
+      <td class="{$tagsetType}-tagset {$tagsetType}-tagset-{$tagset.parentID}-section">
+          {$form.$elemName.$parID.html}
+      </td>
+    {else}
+      <div class="crm-section tag-section {$tagsetType}-tagset {$tagsetType}-tagset-{$tagset.parentID}-section">
+        <div class="crm-clearfix">
+          {$form.$elemName.$parID.label}
+          {$form.$elemName.$parID.html}
+        </div>
       </div>
-    </div>
+    {/if}
   {/if}
 {/foreach}
 
