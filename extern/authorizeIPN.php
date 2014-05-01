@@ -35,6 +35,8 @@ session_start();
 
 require_once '../civicrm.config.php';
 $config = CRM_Core_Config::singleton();
+$log = new CRM_Utils_SystemLogger();
+$log->log('alert', 'Authorize.Net IPN', $_REQUEST);
 
 $authorizeNetIPN = new CRM_Core_Payment_AuthorizeNetIPN();
 $authorizeNetIPN->main();

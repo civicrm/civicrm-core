@@ -38,7 +38,8 @@ require_once '../civicrm.config.php';
 /* Cache the real UF, override it with the SOAP environment */
 
 $config = CRM_Core_Config::singleton();
-
+$log = new CRM_Utils_SystemLogger();
+$log->log('alert', 'Paypal IPN', $_REQUEST);
 if (empty($_GET)) {
   $paypalIPN = new CRM_Core_Payment_PayPalProIPN($_REQUEST);
 }
