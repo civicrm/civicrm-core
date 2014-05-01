@@ -40,8 +40,8 @@
 /**
  * Open a new case, add client and manager roles, and add standard timeline
  *
- * @param  array(
-    //REQUIRED:
+ * @param  array (
+ * //REQUIRED:
  * 'case_type_id' => int OR
  * 'case_type' => str (provide one or the other)
  * 'contact_id' => int // case client
@@ -56,7 +56,8 @@
  * 'duration' => int // in minutes
  * 'details' => str // html format
  *
- * @return sucessfully opened case
+ * @throws API_Exception
+ * @return array api result array
  *
  * @access public
  * {@getfields case_create}
@@ -72,10 +73,10 @@ function civicrm_api3_case_create($params) {
 
   // If format_params didn't find what it was looking for, return error
   if (empty($params['case_type_id'])) {
-    return civicrm_api3_create_error('Invalid case_type. No such case type exists.');
+    throw new API_Exception('Invalid case_type. No such case type exists.');
   }
   if (empty($params['case_type'])) {
-    return civicrm_api3_create_error('Invalid case_type_id. No such case type exists.');
+    throw new API_Exception('Invalid case_type_id. No such case type exists.');
   }
 
   // Fixme: can we safely pass raw params to the BAO?
@@ -91,7 +92,7 @@ function civicrm_api3_case_create($params) {
   $caseBAO = CRM_Case_BAO_Case::create($newParams);
 
   if (!$caseBAO) {
-    return civicrm_api3_create_error('Case not created. Please check input params.');
+    throw new API_Exception('Case not created. Please check input params.');
   }
 
   foreach ((array) $params['contact_id'] as $cid) {
@@ -134,7 +135,6 @@ function civicrm_api3_case_create($params) {
 function _civicrm_api3_case_get_spec(&$params) {
   $params['contact_id']['api.aliases'] = array('client_id');
   $params['contact_id']['title'] = 'Case Client';
-  $params['creator_id']['api.default'] = 'user_contact_id';
 }
 
 /**
@@ -147,6 +147,9 @@ function _civicrm_api3_case_create_spec(&$params) {
   $params['contact_id']['title'] = 'Case Client';
   $params['contact_id']['api.required'] = 1;
   $params['status_id']['api.default'] = 1;
+  $params['creator_id']['api.default'] = 'user_contact_id';
+  $params['creator_id']['type'] = CRM_Utils_Type::T_INT;
+  $params['start_date']['api.default'] = 'now';
   $params['medium_id'] = array(
     'name' => 'medium_id',
     'title' => 'Activity Medium',
@@ -176,8 +179,8 @@ function _civicrm_api3_case_delete_spec(&$params) {
  *
  * Please provide one (and only one) of the four get/search parameters:
  *
- * @param array(
-    'id' => if set, will get all available info about a case, including contacts and activities
+ * @param array (
+ * 'id' => if set, will get all available info about a case, including contacts and activities
  *
  * // if no case_id provided, this function will use one of the following search parameters:
  * 'client_id' => finds all cases with a specific client
@@ -186,8 +189,7 @@ function _civicrm_api3_case_delete_spec(&$params) {
  *
  * {@getfields case_get}
  *
- * @return (get mode, case_id provided): Array with case details, case roles, case activity ids, (search mode, case_id not provided): Array of cases found
- * @access public
+ * @return array (get mode, case_id provided): Array with case details, case roles, case activity ids, (search mode, case_id not provided): Array of cases found@access public
  * @todo Erik Hommel 16 dec 2010 check if all DB fields are returned
  */
 function civicrm_api3_case_get($params) {
@@ -213,7 +215,7 @@ function civicrm_api3_case_get($params) {
   //search by activity
   if (!empty($params['activity_id'])) {
     if (!is_numeric($params['activity_id'])) {
-      return civicrm_api3_create_error('Invalid parameter: activity_id. Must provide a numeric value.');
+      throw new API_Exception('Invalid parameter: activity_id. Must provide a numeric value.');
     }
     $caseId = CRM_Case_BAO_Case::getCaseIdByActivityId($params['activity_id']);
     if (!$caseId) {
@@ -226,7 +228,7 @@ function civicrm_api3_case_get($params) {
   //search by contacts
   if ($contact = CRM_Utils_Array::value('contact_id', $params)) {
     if (!is_numeric($contact)) {
-      return civicrm_api3_create_error('Invalid parameter: contact_id.  Must provide a numeric value.');
+      throw new API_Exception('Invalid parameter: contact_id.  Must provide a numeric value.');
     }
 
     $sql = "
@@ -271,8 +273,8 @@ function civicrm_api3_case_activity_create($params) {
 /**
  * Update a specified case.
  *
- * @param  array(
-    //REQUIRED:
+ * @param  array (
+ * //REQUIRED:
  * 'case_id' => int
  *
  * //OPTIONAL
@@ -280,22 +282,21 @@ function civicrm_api3_case_activity_create($params) {
  * 'start_date' => str datestamp
  * 'contact_id' => int // case client
  *
- * @return Updated case
+ * @throws API_Exception
+ * @return array api result array
  *
  * @access public
- *
  */
 function civicrm_api3_case_update($params) {
   //check parameters
   civicrm_api3_verify_mandatory($params, NULL, array('id'));
 
-  // return error if modifing creator id
+  // return error if modifying creator id
   if (array_key_exists('creator_id', $params)) {
-    return civicrm_api3_create_error(ts('You cannot update creator id'));
+    throw new API_Exception(ts('You cannot update creator id'));
   }
 
-  $mCaseId = array();
-  $origContactIds = array();
+  $mCaseId = $origContactIds = array();
 
   // get original contact id and creator id of case
   if (!empty($params['contact_id'])) {
@@ -306,10 +307,10 @@ function civicrm_api3_case_update($params) {
   if (count($origContactIds) > 1) {
     // check valid orig contact id
     if (!empty($params['orig_contact_id']) && !in_array($params['orig_contact_id'], $origContactIds)) {
-      return civicrm_api3_create_error('Invalid case contact id (orig_contact_id)');
+      throw new API_Exception('Invalid case contact id (orig_contact_id)');
     }
     elseif (empty($params['orig_contact_id'])) {
-      return civicrm_api3_create_error('Case is linked with more than one contact id. Provide the required params orig_contact_id to be replaced');
+      throw new API_Exception('Case is linked with more than one contact id. Provide the required params orig_contact_id to be replaced');
     }
     $origContactId = $params['orig_contact_id'];
   }
@@ -358,7 +359,7 @@ function civicrm_api3_case_delete($params) {
     return civicrm_api3_create_success($params, $params, 'case', 'delete');
   }
   else {
-    return civicrm_api3_create_error('Could not delete case.');
+    throw new API_Exception('Could not delete case.');
   }
 }
 
@@ -373,7 +374,9 @@ function civicrm_api3_case_delete($params) {
  *
  * @param int $caseId
  *
- * @param $params
+ * @param $options
+ *
+ * @internal param $params
  *
  * @internal param $options
  *
