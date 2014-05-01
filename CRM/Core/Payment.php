@@ -130,15 +130,16 @@ abstract class CRM_Core_Payment {
    * @return mixed
    */
   public static function logPaymentNotification($params) {
-    $message = '';
+    $message = 'payment_notification ';
     if (!empty($params['processor_name'])) {
-      $message = 'processor_name=' . $params['processor_name'];
+      $message .= 'processor_name=' . $params['processor_name'];
     }
     if (!empty($params['processor_id'])) {
       $message .= 'processor_id=' . $params['processor_id'];
     }
-    $log = CRM_Utils_SystemLogger();
-    $log->log('alert', $message, $_REQUEST);
+
+    $log = new CRM_Utils_SystemLogger();
+    $log->alert($message, $_REQUEST);
   }
 
   /**
@@ -182,7 +183,7 @@ abstract class CRM_Core_Payment {
   /**
    * This function checks to see if we have the right config values
    *
-   * @param  string $mode the mode we are operating in (live or test)
+   * @internal param string $mode the mode we are operating in (live or test)
    *
    * @return string the error message if any
    * @public
