@@ -711,7 +711,7 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
     'sort' => CRM_Utils_Rule::string($sort) ? $sort : NULL,
     'limit' => CRM_Utils_Rule::integer($limit) ? $limit : NULL,
     'is_count' => $is_count,
-    'return' => !empty($returnProperties) ? $returnProperties : NULL,
+    'return' => !empty($returnProperties) ? $returnProperties : array(),
   );
 
   if ($options['sort'] && stristr($options['sort'], 'SELECT')) {
@@ -993,7 +993,7 @@ function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $
       return civicrm_api3_create_success(_civicrm_api3_dao_to_array($bao, $params, FALSE, $entity), $params, $entity, 'get');
   }
   else {
-    return _civicrm_api3_dao_to_array($bao, $params, FALSE, $entity);
+    return _civicrm_api3_dao_to_array($bao, $params, FALSE, $entity, 'get');
   }
 }
 
@@ -1125,7 +1125,7 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
  * @param string $subName - Subtype of entity
  */
 function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $groupID = NULL, $subType = NULL, $subName = NULL) {
-  $groupTree = &CRM_Core_BAO_CustomGroup::getTree($entity,
+  $groupTree = CRM_Core_BAO_CustomGroup::getTree($entity,
     CRM_Core_DAO::$_nullObject,
     $entity_id,
     $groupID,
