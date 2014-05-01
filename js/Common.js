@@ -238,6 +238,22 @@ CRM.validate = CRM.validate || {
     });
   };
 
+/**
+ * Compare Form Input values against cached initial value.
+ * True if changes have been made.
+ * @returns {Boolean}
+ */
+  CRM.utils.initialValueChanged = function(el) {
+    var isDirty = false
+    $(':input', el).each(function () {
+        if($(this).data('crm-initial-value') !== undefined
+                && $(this).data('crm-initial-value') != $(this).val()){
+            isDirty = true;
+        }
+    });
+    return isDirty;
+  }
+
   /**
    * Wrapper for select2 initialization function; supplies defaults
    * @param options object
@@ -422,6 +438,10 @@ CRM.validate = CRM.validate || {
         .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
       $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
+      // Cache Form Input initial values
+      $('form[data-warn-changes] :input', e.target).each( function() {
+        $(this).data('crm-initial-value', $(e.target).val());
+      });
     })
     .on('dialogopen', function(e) {
       var $el = $(e.target);
