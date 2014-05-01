@@ -82,7 +82,16 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
       }
 
       if ($form->_relatedOrganizationFound) {
-        $locDataURL = CRM_Utils_System::url('civicrm/ajax/permlocation', 'cid=', FALSE, NULL, FALSE);
+        // Related org url - pass checksum if needed
+        $args = array('cid' => '');
+        if (!empty($_GET['cs'])) {
+          $args = array(
+            'uid' => $form->_contactID,
+            'cs' => $_GET['cs'],
+            'cid' => '',
+          );
+        }
+        $locDataURL = CRM_Utils_System::url('civicrm/ajax/permlocation', $args, FALSE, NULL, FALSE);
         $form->assign('locDataURL', $locDataURL);
       }
 
