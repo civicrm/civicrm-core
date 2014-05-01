@@ -134,6 +134,7 @@ function civicrm_api3_case_create($params) {
 function _civicrm_api3_case_get_spec(&$params) {
   $params['contact_id']['api.aliases'] = array('client_id');
   $params['contact_id']['title'] = 'Case Client';
+  $params['creator_id']['api.default'] = 'user_contact_id';
 }
 
 /**
@@ -234,7 +235,7 @@ SELECT DISTINCT case_id
  WHERE (contact_id_a = $contact
     OR contact_id_b = $contact)
    AND case_id IS NOT NULL";
-    $dao = &CRM_Core_DAO::executeQuery($sql);
+    $dao = CRM_Core_DAO::executeQuery($sql);
 
     $cases = array();
     while ($dao->fetch()) {
@@ -372,8 +373,11 @@ function civicrm_api3_case_delete($params) {
  *
  * @param int $caseId
  *
- * @return array (reference) case object
+ * @param $params
  *
+ * @internal param $options
+ *
+ * @return array (reference) case object
  */
 function _civicrm_api3_case_read($caseId, $options) {
   $return = CRM_Utils_Array::value('return', $options, array());
@@ -412,13 +416,6 @@ function _civicrm_api3_case_read($caseId, $options) {
  * Internal function to format create params for processing
  */
 function _civicrm_api3_case_format_params(&$params) {
-  if (!array_key_exists('creator_id', $params)) {
-    $session = CRM_Core_Session::singleton();
-    $params['creator_id'] = $session->get('userID');
-  }
-  if (empty($params['start_date'])) {
-    $params['start_date'] = date('YmdHis');
-  }
   // figure out case type id from case type and vice-versa
   $caseTypes = CRM_Case_PseudoConstant::caseType('label', FALSE);
   if (empty($params['case_type_id'])) {
