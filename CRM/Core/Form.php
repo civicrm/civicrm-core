@@ -416,6 +416,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     CRM_Utils_Hook::buildForm(get_class($this), $this);
 
     $this->addRules();
+
+    //Set html data-attribute to enable warning user of unsaved changes
+    if ($this->unsavedChangesWarn === true
+        || (!isset($this->unsavedChangesWarn)
+           && ($this->_action & CRM_Core_Action::ADD || $this->_action & CRM_Core_Action::UPDATE)
+           )
+        ) {
+          $this->setAttribute('data-warn-changes', 'true');
+    }
   }
 
   /**
