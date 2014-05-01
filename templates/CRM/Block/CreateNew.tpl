@@ -48,10 +48,12 @@
 {literal}
 <script>
 (function ($) {
-  $('#crm-create-new-list > div > ul').menu({ disabled: true });
+  $('#crm-create-new-list > div > ul').menu();
   $('#crm-create-new-link').click(function (event) {
     $('#crm-create-new-list').toggle();
-    $('#crm-create-new-list > div > ul').menu("option", "disabled", false);
+    $('body:not(#crm-create-new-list)').click(function () {
+      $('#crm-create-new-list').hide();
+    });
     event.stopPropagation();
     return false;
   });
