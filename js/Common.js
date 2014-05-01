@@ -477,6 +477,12 @@ CRM.validate = CRM.validate || {
         $('body').css({overflow: ''});
       }
     });
+    
+    window.onbeforeunload = function() {
+      if (CRM.utils.initialValueChanged($('form[data-warn-changes]'))) {
+        return ts('You have unsaved changes.');
+       }
+    };
 
   /**
    * Function to make multiselect boxes behave as fields in small screens
