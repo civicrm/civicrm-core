@@ -384,21 +384,19 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     if (empty($formValues)) {
       for ($k = 1; $k < 4; $k++) {
-        if (!$defaults['field_name'][$k]) {
+        if (!isset($defaults['field_name'][$k])) {
           $js .= "{$formName}['field_name[$k]'].style.display = 'none';\n";
         }
       }
     }
     else {
       if (!empty($formValues['field_name'])) {
-        foreach ($formValues['field_name'] as $value) {
-          for ($k = 1; $k < 4; $k++) {
-            if (!isset($formValues['field_name'][$k]) || !$formValues['field_name'][$k]) {
-              $js .= "{$formName}['field_name[$k]'].style.display = 'none';\n";
-            }
-            else {
-              $js .= "{$formName}['field_name[$k]'].style.display = '';\n";
-            }
+        for ($key = 1; $key < 4; $key++) {
+          if (!isset($formValues['field_name'][$key])) {
+            $js .= "{$formName}['field_name[$key]'].style.display = 'none';\n";
+          }
+          else {
+            $js .= "{$formName}['field_name[$key]'].style.display = '';\n";
           }
         }
       }
