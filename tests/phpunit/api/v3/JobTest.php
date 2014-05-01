@@ -59,6 +59,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   function tearDown() {
     $this->quickCleanup(array('civicrm_job'));
+    $this->quickCleanUpFinancialEntities();
     CRM_Utils_Hook::singleton()->reset();
     parent::tearDown();
   }
@@ -187,6 +188,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testCallSendReminderSuccessMoreThanDefaultLimit() {
     $membershipTypeID = $this->membershipTypeCreate();
+    $this->membershipStatusCreate();
     $createTotal = 30;
     for($i = 1; $i <= $createTotal; $i++) {
       $contactID = $this->individualCreate();

@@ -964,12 +964,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   function membershipTypeCreate($params = array()) {
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Core_Config::clearDBCache();
+    $memberOfOrganization = $this->organizationCreate();
     $params = array_merge(array(
       'name' => 'General',
       'duration_unit' => 'year',
       'duration_interval' => 1,
       'period_type' => 'rolling',
-      'member_of_contact_id' => 1,
+      'member_of_contact_id' => $memberOfOrganization,
       'domain_id' => 1,
       'financial_type_id' => 1,
       'is_active' => 1,
