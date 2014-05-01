@@ -126,8 +126,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    $entities = CRM_Core_BAO_CustomQuery::$extendsMap;
    $customDataEntities = array();
     $invalidEntities = array('Individual', 'Organization', 'Household');
+    $entitiesToFix = array('Case', 'Relationship');
    foreach ($entities as $entityName => $entity ) {
-     if(!in_array($entityName, $invalidEntities)) {
+     if(!in_array($entityName, $invalidEntities)
+       && !in_array($entityName, $entitiesToFix)) {
        $customDataEntities[] = array($entityName );
      }
    }
