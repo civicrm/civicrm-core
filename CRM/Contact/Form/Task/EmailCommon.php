@@ -133,10 +133,13 @@ class CRM_Contact_Form_Task_EmailCommon {
     if (count($form->_contactIds) > 1) {
       $form->_single = FALSE;
     }
-
-    $to  = $form->add('text', 'to', ts('To'), '', TRUE);
-    $cc  = $form->add('text', 'cc_id', ts('CC'));
-    $bcc = $form->add('text', 'bcc_id', ts('BCC'));
+   
+    $emailAttributes = array(
+      'class' => 'huge',
+    );
+    $to  = $form->add('text', 'to', ts('To'), $emailAttributes, TRUE);
+    $cc  = $form->add('text', 'cc_id', ts('CC'), $emailAttributes);
+    $bcc = $form->add('text', 'bcc_id', ts('BCC'), $emailAttributes);
 
     $setDefaults = TRUE;
     if (property_exists($form, '_context') && $form->_context == 'standalone') {
