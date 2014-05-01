@@ -53,53 +53,6 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
-  public function getManagedEntities() {
-    // Use hook_civicrm_caseTypes to build a list of OptionValues
-    // In the long run, we may want more specialized logic for this, but
-    // this design is fairly convenient and will allow us to replace it
-    // without changing the hook_civicrm_caseTypes interface.
-    $entities = array();
-
-    $caseTypes = array();
-    CRM_Utils_Hook::caseTypes($caseTypes);
-
-    $proc = new CRM_Case_XMLProcessor();
-    $caseTypesGroupId = civicrm_api3('OptionGroup', 'getvalue', array('name' => 'case_type', 'return' => 'id'));
-    if (!is_numeric($caseTypesGroupId)) {
-      throw new CRM_Core_Exception("Found invalid ID for OptionGroup (case_type)");
-    }
-    foreach ($caseTypes as $name => $caseType) {
-      $xml = $proc->retrieve($name);
-      if (!$xml) {
-        throw new CRM_Core_Exception("Failed to load XML for case type (" . $name . ")");
-      }
-
-      if (isset($caseType['module'], $caseType['name'], $caseType['file'])) {
-        $entities[] = array(
-          'module' => $caseType['module'],
-          'name' => $caseType['name'],
-          'entity' => 'OptionValue',
-          'params' => array(
-            'version' => 3,
-            'name' => $caseType['name'],
-            'label' => (string) $xml->name,
-            'description' => (string) $xml->description, // CRM_Utils_Array::value('description', $caseType, ''),
-            'option_group_id' => $caseTypesGroupId,
-            'filter' => empty($xml->filter) ? 0 : 1,
-            'grouping' => $xml->grouping,
-            'is_reserved' => 1,
-          ),
-        );
-      }
-      else {
-        throw new CRM_Core_Exception("Invalid case type");
-      }
-    }
-
-    return $entities;
-  }
-
-  // docs inherited from interface
   public function getPermissions($getAllUnconditionally = FALSE) {
     return array(
       'delete in CiviCase',

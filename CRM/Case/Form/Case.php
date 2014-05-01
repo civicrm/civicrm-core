@@ -384,10 +384,8 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     // 2. create/edit case
     if (!empty($params['case_type_id'])) {
-      $caseType = CRM_Case_PseudoConstant::caseType('name');
-      $params['case_type'] = $caseType[$params['case_type_id']];
+      $params['case_type'] = $params['case_type_id'];
       $params['subject'] = $params['activity_subject'];
-      $params['case_type_id'] = CRM_Core_DAO::VALUE_SEPARATOR . $params['case_type_id'] . CRM_Core_DAO::VALUE_SEPARATOR;
     }
     $caseObj = CRM_Case_BAO_Case::create($params);
     $params['case_id'] = $caseObj->id;

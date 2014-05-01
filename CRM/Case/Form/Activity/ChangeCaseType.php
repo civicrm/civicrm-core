@@ -70,13 +70,12 @@ class CRM_Case_Form_Activity_ChangeCaseType {
     $form->removeElement('priority_id');
 
     $form->_caseType = CRM_Case_PseudoConstant::caseType();
-    $caseTypeId = explode(CRM_Case_BAO_Case::VALUE_SEPARATOR, CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case',
-        $form->_caseId,
-        'case_type_id'
-      ));
-    $form->_caseTypeId = $caseTypeId[1];
+    $form->_caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case',
+      $form->_caseId,
+      'case_type_id'
+    );
     if (!in_array($form->_caseTypeId, $form->_caseType)) {
-      $form->_caseType[$form->_caseTypeId] = CRM_Core_OptionGroup::getLabel('case_type', $form->_caseTypeId, FALSE);
+      $form->_caseType[$form->_caseTypeId] = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $form->_caseTypeId, 'label');
     }
 
     $form->add('select', 'case_type_id', ts('New Case Type'),

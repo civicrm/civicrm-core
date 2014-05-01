@@ -75,13 +75,6 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   static $activityTypeList = array();
 
   /**
-   * case type
-   * @var array
-   * @static
-   */
-  static $caseTypePair = array();
-
-  /**
    * Get all the case statues
    *
    * @access public
@@ -141,19 +134,26 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @return array - array reference of all case type
    * @static
    */
-  public static function caseType($column = 'label', $onlyActive = TRUE, $condition = NULL) {
-    $cacheKey = "{$column}_" . (int)$onlyActive;
-    if (!$condition) {
-      $condition = 'AND filter = 0';
+  public static function caseType($column = 'title', $onlyActive = TRUE) {
+    if ($onlyActive) {
+      $condition = " is_active = 1 ";
+    } else {
+      $condition = NULL;
     }
-    if (!isset(self::$caseType[$cacheKey])) {
-      self::$caseType[$cacheKey] = CRM_Core_OptionGroup::values('case_type',
-        FALSE, FALSE, FALSE, $condition,
-        $column, $onlyActive
-      );
-    }
+    $caseType = NULL;
+    // FIXME: deprecated?
+    CRM_Core_PseudoConstant::populate(
+      $caseType,
+      'CRM_Case_DAO_CaseType',
+      TRUE,
+      $column,
+      '',
+      $condition,
+      'weight',
+      'id'
+    );
 
-    return self::$caseType[$cacheKey];
+    return $caseType;
   }
 
   /**
@@ -233,41 +233,6 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
       self::$activityTypeList[$cache] = $activityTypes;
     }
     return self::$activityTypeList[$cache];
-  }
-
-  /**
-   * Get the associated case type name/id, given a case Id
-   *
-   * @access public
-   *
-   * @return array - array reference of all case type name/id
-   * @static
-   */
-  public static function caseTypeName($caseId, $column = 'name') {
-    if (!$caseId) {
-      return FALSE;
-    }
-
-    if (!array_key_exists($caseId, self::$caseTypePair) || empty(self::$caseTypePair[$caseId][$column])) {
-      $caseTypes = self::caseType($column);
-      $caseTypeIds = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case',
-        $caseId,
-        'case_type_id'
-      );
-      $caseTypeId = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        trim($caseTypeIds,
-          CRM_Core_DAO::VALUE_SEPARATOR
-        )
-      );
-      $caseTypeId = $caseTypeId[0];
-
-      self::$caseTypePair[$caseId][$column] = array(
-        'id' => $caseTypeId,
-        'name' => $caseTypes[$caseTypeId],
-      );
-    }
-
-    return self::$caseTypePair[$caseId][$column];
   }
 
   /**
