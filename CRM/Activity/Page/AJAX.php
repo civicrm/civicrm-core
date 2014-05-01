@@ -83,6 +83,8 @@ class CRM_Activity_Page_AJAX {
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
 
     $params = $_POST;
+    //CRM-14466 initialize variable to avoid php notice
+    $sortSQL = "";
     if ($sort && $sortOrder) {
       $sortSQL = $sort .' '.$sortOrder;
     }
@@ -209,6 +211,7 @@ class CRM_Activity_Page_AJAX {
 
     // move/transform caseRoles array data to caseRelationships
     // for sorting and display
+    // CRM-14466 added cid to the non-client array to avoid php notice
     foreach($caseRoles as $id => $value) {
       if ($id != "client") {
         $rel = array();
@@ -217,7 +220,9 @@ class CRM_Activity_Page_AJAX {
         $rel['name'] = '(not assigned)';
         $rel['phone'] = '';
         $rel['email'] = '';
+        $rel['cid'] = '';
         $rel['source'] = 'caseRoles';
+        $rel['actions'] = '';
         $caseRelationships[] = $rel;
       } else {
         foreach($value as $clientRole) {
@@ -228,6 +233,7 @@ class CRM_Activity_Page_AJAX {
           $relClient['email'] = $clientRole['email'];
           $relClient['cid'] = $clientRole['contact_id'];
           $relClient['source'] = 'contact';
+          $relClient['actions'] = '';
           $caseRelationships[] = $relClient;
         }
       }
