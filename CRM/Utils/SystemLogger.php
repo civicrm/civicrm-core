@@ -26,18 +26,28 @@
 */
 
 /**
+ *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
+ *
  */
-
-session_start();
-
-require_once '../civicrm.config.php';
-
-$config = CRM_Core_Config::singleton();
-$log = new CRM_Utils_SystemLogger();
-$log->alert('payment_notification processor_name=Google_Checkout', $_REQUEST);
-
-$rawPostData = file_get_contents('php://input');
-CRM_Core_Payment_GoogleIPN::main($rawPostData);
+class CRM_Utils_SystemLogger extends Psr\Log\AbstractLogger implements \Psr\Log\LoggerInterface {
+  public function log($level, $message, array $context = array()) {
+    if(!isset($context['hostname'])) {
+      $context['hostname'] = CRM_Utils_System::ipAddress();
+    }
+    $rec = new CRM_Core_DAO_SystemLog();
+    $separateFields = array('contact_id', 'hostname');
+    foreach ($separateFields as $separateField) {
+      if (isset($context[$separateField])) {
+        $rec->{$separateField} = $context[$separateField];
+        unset($context[$separateField]);
+      }
+    }
+    $rec->level = $level;
+    $rec->message = $message;
+    $rec->context = json_encode($context);
+    $rec->save();
+  }
+}
