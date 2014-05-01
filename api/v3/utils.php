@@ -804,10 +804,12 @@ function _civicrm_api3_get_unique_name_array(&$bao) {
 /**
  * Converts an DAO object to an array
  *
- * @param  object $dao           (reference )object to convert
+ * @param  object $dao (reference )object to convert
  * @param null $params
  * @param bool $uniqueFields
  * @param string $entity
+ *
+ * @param bool $autoFind
  *
  * @return array
  *
@@ -1562,7 +1564,6 @@ function _civicrm_api3_swap_out_aliases(&$apiRequest, $fields) {
  * @internal param array $fieldinfo array of fields from getfields function
  */
 function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $entity) {
-  //if fieldname exists in params
   if (!empty($params[$fieldName])) {
     // if value = 'user_contact_id' (or similar), replace value with contact id
     if (!is_numeric($params[$fieldName]) && is_scalar($params[$fieldName])) {

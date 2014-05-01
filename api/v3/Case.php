@@ -147,7 +147,8 @@ function _civicrm_api3_case_create_spec(&$params) {
   $params['contact_id']['title'] = 'Case Client';
   $params['contact_id']['api.required'] = 1;
   $params['status_id']['api.default'] = 1;
-  $params['created_id']['api.default'] = 'user_contact_id';
+  $params['creator_id']['api.default'] = 'user_contact_id';
+  $params['creator_id']['type'] = CRM_Utils_Type::T_INT;
   $params['start_date']['api.default'] = 'now';
   $params['medium_id'] = array(
     'name' => 'medium_id',
