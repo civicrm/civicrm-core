@@ -188,6 +188,9 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
                 array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>')
               );
               break;
+
+            case 'entity_reference':
+              $this->addEntityRef($fieldName, $fieldValue['title'], CRM_Utils_Array::value('options', $fieldValue, array()));
           }
         }
 
@@ -264,6 +267,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
           case 'text':
           case 'select':
           case 'radio':
+          case 'entity_reference':
             $this->_config->$settingName = CRM_Utils_Array::value($settingName, $this->_params);
             break;
 
