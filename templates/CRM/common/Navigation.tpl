@@ -108,6 +108,9 @@ $('#civicrm-menu').ready(function() {
           response(ret);
         })
       },
+      focus: function (event, ui){
+        return false;
+      }, 
       select: function (event, ui) {
         document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: ui.item.value});
         return false;
