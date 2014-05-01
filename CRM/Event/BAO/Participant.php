@@ -192,7 +192,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    * @access public
    * @static
    */
-  static function &create(&$params) {
+  static function create(&$params) {
 
     $transaction = new CRM_Core_Transaction();
     $status = NULL;
@@ -209,7 +209,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     }
 
     if ((!CRM_Utils_Array::value('id', $params)) ||
-      ($params['status_id'] != $status)
+      (isset($params['status_id']) && $params['status_id'] != $status)
     ) {
       CRM_Activity_BAO_Activity::addActivity($participant);
     }
