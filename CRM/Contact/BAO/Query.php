@@ -4338,7 +4338,12 @@ civicrm_relationship.is_permission_a_b = 0
         $fieldStr = trim(str_replace('ORDER BY', '', $order));
         $fieldOrder = explode(' ', $fieldStr);
         $field = $fieldOrder[0];
-
+        //CRM-12565 add "`" around $field if it is a pseudo constant
+        foreach($this->_pseudoConstantsSelect as $key => $value ){
+          if($value["element"] == $field ){
+             $order = str_replace($field, "`{$field}`", $order);
+          }
+        }
         if ($field) {
           switch ($field) {
             case 'city':
