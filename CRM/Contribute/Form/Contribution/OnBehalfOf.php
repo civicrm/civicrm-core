@@ -84,9 +84,6 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
       if ($form->_relatedOrganizationFound) {
         $locDataURL = CRM_Utils_System::url('civicrm/ajax/permlocation', 'cid=', FALSE, NULL, FALSE);
         $form->assign('locDataURL', $locDataURL);
-
-        $dataURL = CRM_Utils_System::url('civicrm/ajax/employer', 'cid=' . $contactID, FALSE, NULL, FALSE);
-        $form->assign('employerDataURL', $dataURL);
       }
 
       if ($form->_values['is_for_organization'] != 2) {
@@ -125,7 +122,11 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
 
     if ($contactID && count($form->_employers) >= 1) {
       $form->add('text', 'organization_id', ts('Select an existing related Organization OR enter a new one'));
-      $form->add('hidden', 'onbehalfof_id', '', array('id' => 'onbehalfof_id'));
+      $employers = array();
+      foreach ($form->_employers as $id => $vals) {
+        $employers[$id] = $vals['name'];
+      }
+      $form->add('select', 'onbehalfof_id', 'onbehalfof_id', $employers);
 
       $orgOptions = array(0 => ts('Select an existing organization'),
         1 => ts('Enter a new organization'),
