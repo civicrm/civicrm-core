@@ -62,6 +62,7 @@ class CRM_Admin_Form_Preferences_Multisite extends CRM_Admin_Form_Preferences {
           'html_type' => 'entity_reference',
           'title' => ts('Domain Group'),
           'weight' => 3,
+          'options' => array('entity' => 'group', 'select' => array('minimumInputLength' => 0)),
           'description' => ts('Contacts created on this site are added to this group'),
         ),
         /** Remove this checkbox until some one knows what this setting does
