@@ -25,19 +25,30 @@
  +--------------------------------------------------------------------+
 */
 
-/**
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- */
 
-session_start();
+require_once 'CiviTest/CiviUnitTestCase.php';
 
-require_once '../civicrm.config.php';
+class CRM_Core_PaymentTest extends CiviUnitTestCase {
+  function get_info() {
+    return array(
+      'name' => 'Payment Test',
+      'description' => 'Test Payment methods.',
+      'group' => 'Payment Processor Tests',
+    );
+  }
 
-$config = CRM_Core_Config::singleton();
-$log = new CRM_Utils_SystemLogger();
-$log->log('alert', 'payment_notification processor_name=Google_Checkout', $_REQUEST);
+  /**
+   * test the payment method is adequately logged - we don't expect the processing to succeed
+   */
+  function testHandlePaymentMethodLogging() {
+    $params = array('processor_name' => 'Paypal', 'data' => 'blah');
+    try {
+      CRM_Core_Payment::handlePaymentMethod('method', $params);
+    }
+    catch (Exception $e) {
 
-$rawPostData = file_get_contents('php://input');
-CRM_Core_Payment_GoogleIPN::main($rawPostData);
+    }
+    $log = $this->callAPISuccess('SystemLog', 'get', array());
+    $this->assertEquals('payment_notification processor_name=Paypal', $log['values'][$log->id]['message']);
+  }
+}

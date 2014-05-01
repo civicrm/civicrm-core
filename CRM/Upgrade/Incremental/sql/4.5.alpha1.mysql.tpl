@@ -66,7 +66,7 @@ INSERT INTO civicrm_option_group
 
 SELECT @option_group_id_soft_credit_type := max(id) from civicrm_option_group where name = 'soft_credit_type';
 
-INSERT INTO `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `weight`, `is_default`, `is_active`, `is_reserved`) 
+INSERT INTO `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `weight`, `is_default`, `is_active`, `is_reserved`)
  VALUES
   (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}In Honor of{/ts}'{/localize}, 1, 'in_honor_of', 1, 0, 1, 1),
   (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}In Memory of{/ts}'{/localize}, 2, 'in_memory_of', 2, 0, 1, 1),
@@ -287,3 +287,21 @@ ALTER TABLE `civicrm_option_group`
 	ADD COLUMN `is_locked` int(1) DEFAULT 0 COMMENT 'A lock to remove the ability to add new options via the UI';
 
 UPDATE `civicrm_option_group` SET is_locked = 1 WHERE name IN ('contribution_status','activity_contacts','advanced_search_options','auto_renew_options','contact_autocomplete_options','batch_status','batch_type','batch_mode','contact_edit_options','contact_reference_options','contact_smart_group_display','contact_view_options','financial_item_status','mapping_type','pcp_status','user_dashboard_options','tag_used_for');
+
+-- CRM-14449
+CREATE TABLE `civicrm_system_log` (
+`id` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key: ID.',
+`message` VARCHAR(128) NOT NULL COMMENT 'Standardized message',
+`context` LONGTEXT NULL COMMENT 'JSON encoded data',
+`level` VARCHAR(9)  NOT NULL DEFAULT 'info' COMMENT 'error level per PSR3',
+`timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp of when event occurred.',
+`contact_id` INT(11) NULL DEFAULT NULL COMMENT 'Optional Contact ID that created the log. Not an FK as we keep this regardless',
+ hostname VARCHAR(128) NOT NULL COMMENT 'Optional Name of logging host',
+PRIMARY KEY (`id`),
+INDEX `message` (`message`),
+INDEX `contact_id` (`contact_id`),
+INDEX `level` (`level`)
+)
+COMMENT='Table that contains logs of all system events.'
+COLLATE='utf8_general_ci';
+
