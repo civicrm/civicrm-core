@@ -118,6 +118,22 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return static::entities(static::toBeSkipped_delete(TRUE));
   }
 
+  public static function custom_data_entities_get() {
+    return static::custom_data_entities();
+  }
+
+  public static function custom_data_entities() {
+   $entities = CRM_Core_BAO_CustomQuery::$extendsMap;
+   $customDataEntities = array();
+    $invalidEntities = array('Individual', 'Organization', 'Household');
+   foreach ($entities as $entityName => $entity ) {
+     if(!in_array($entityName, $invalidEntities)) {
+       $customDataEntities[] = array($entityName );
+     }
+   }
+    return $customDataEntities;
+  }
+
   public static function toBeSkipped_get($sequential = FALSE) {
     $entitiesWithoutGet = array('MailingEventSubscribe', 'MailingEventConfirm', 'MailingEventResubscribe', 'MailingEventUnsubscribe', 'MailingGroup', 'Location');
     if ($sequential === TRUE) {
@@ -449,6 +465,26 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $this->assertArrayHasKey('count', $result);
       $this->assertArrayHasKey('values', $result);
     }
+  }
+
+  /**
+   * @dataProvider custom_data_entities_get
+   */
+  public function testCustomDataGet($entityName) {
+    $this->createLoggedInUser();// so subsidiary activities are created
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, $entityName . 'Test.php');
+    $customFieldName = 'custom_' . $ids['custom_field_id'];
+    $objects = $this->getMockableBAOObjects($entityName, 1);
+    $params = array('id' => $objects[0]->id, 'custom_' . $ids['custom_field_id'] => "custom string");
+    $result = $this->callAPISuccess($entityName, 'create', $params);
+
+    $getParams = array('id' => $result['id'], 'return' => array($customFieldName));
+    $check = $this->callAPISuccess($entityName, 'get', $getParams);
+    $this->assertEquals("custom string", $check['values'][$check['id']][$customFieldName]);
+
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
+    $this->callAPISuccess($entityName, 'delete', array('id' => $result['id']));
   }
 
   /**
