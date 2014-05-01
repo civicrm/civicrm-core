@@ -252,6 +252,7 @@ class CRM_Activity_Page_AJAX {
       // Get rid of the "<br />(Case Manager)" from label
       list($typeLabel) = explode('<', $row['relation']);
       // view user links
+      //CRM-14466 Makes sure cid is defined to avoid php notice
       if (array_key_exists("cid",$row)) {
         $row['name'] = '<a class="view-contact" title="'. ts('View Contact') .'" href='.CRM_Utils_System::url('civicrm/contact/view',
           'action=view&reset=1&cid='.$row['cid']).'>'.$row['name'].'</a>';
@@ -284,6 +285,7 @@ class CRM_Activity_Page_AJAX {
         $row['actions'] = '';
       }
       $idx++;
+     //CRM-14466 Makes sure actions is defined before it is passed to encodeDataTableSelector
       if(!array_key_exists('actions', $row)){
         $row['actions'] = '';
       }
