@@ -731,6 +731,17 @@ CRM.validate = CRM.validate || {
     return dialog.dialog(settings).trigger('crmLoad');
   };
 
+  /** eg CRM.translate('org.example.myext', function(ts){ ... });  */
+  CRM.translate = function(domain, callback) {
+    "use strict";
+    var altTs = function(message, options) {
+      options = options || {};
+      options.domain = domain;
+      return ts(message, options);
+    };
+    callback(altTs);
+  };
+
   /**
    * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
