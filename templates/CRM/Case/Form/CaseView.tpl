@@ -440,7 +440,7 @@
     {assign var="tagExits" value=1}
   {/if}
 
-   {foreach from=$tagsetInfo_case item=displayTagset}
+   {foreach from=$tagsetInfo.case item=displayTagset}
      {if $displayTagset.entityTagsArray}
        <div class="crm-block crm-content-block crm-case-caseview-display-tagset">
          &nbsp;&nbsp;{$displayTagset.parentName}:
@@ -469,7 +469,7 @@
   <div class="label">{$form.case_tag.label}</div>
   <div class="view-value"><div class="crm-select-container">{$form.case_tag.html}</div>
     <br/>
-    <div style="text-align:left;">{include file="CRM/common/Tag.tpl" tagsetType='case'}</div>
+    <div style="text-align:left;">{include file="CRM/common/Tagset.tpl" tagsetType='case'}</div>
     <br/>
     <div class="clear"></div>
   </div>

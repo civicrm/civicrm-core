@@ -711,7 +711,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     }
 
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_case');
-    CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_case', NULL, TRUE, FALSE, TRUE);
+    CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_case', NULL, TRUE, FALSE);
 
     if (CRM_Core_Permission::check('administer CiviCRM')) {
       $form->addElement('checkbox', 'case_deleted', ts('Deleted Cases'));

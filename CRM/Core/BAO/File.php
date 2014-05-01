@@ -383,17 +383,15 @@
          'maxfilesize',
          $maxFileSize * 1024 * 1024
        );
-       $form->addElement('text', "attachDesc_$i", ts('Description'), 'size=40 maxlength=255');
+       $form->addElement('text', "attachDesc_$i", NULL, array('size' => 40, 'maxlength' => 255, 'placeholder' => ts('Description')));
 
        if (!empty($tags)) {
          $form->add('select', "tag_$i", ts('Tags'), $tags, FALSE,
-           array('id' => "tags_$i", 'multiple' => 'multiple', 'class' => 'crm-select2')
+           array('id' => "tags_$i", 'multiple' => 'multiple', 'class' => 'huge crm-select2', 'placeholder' => ts('- none -'))
          );
        }
+       CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_file', NULL, FALSE, TRUE, "file_taglist_$i");
      }
-
-     // build tagset widget
-     CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_file', NULL, TRUE, TRUE, FALSE);
    }
 
    /**
@@ -444,7 +442,7 @@
        $attachName = "attachFile_$i";
        $attachDesc = "attachDesc_$i";
        $attachTags = "tag_$i";
-       $attachFreeTags = "attachment_taglist_$i";
+       $attachFreeTags = "file_taglist_$i";
        if (isset($formValues[$attachName]) && !empty($formValues[$attachName])) {
          // add static tags if selects
          $tagParams = array();

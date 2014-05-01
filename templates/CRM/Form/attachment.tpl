@@ -69,12 +69,12 @@
         </tr>
         {if $form.tag_1.html}
           <tr>
-            <td></td>
-            <td><label>{$form.tag_1.label}</label> <div class="crm-select-container crm-attachment-tags">{$form.tag_1.html}</div></td>
+            <td class="label">{$form.tag_1.label}</td>
+            <td><div class="crm-select-container crm-attachment-tags">{$form.tag_1.html}</div></td>
           </tr>
         {/if}
-        {if $tagsetInfo_attachment}
-          <tr><td></td><td>{include file="CRM/common/Tag.tpl" tagsetType='attachment' tagsetNumber=1 }</td></tr>
+        {if $tagsetInfo.file}
+          <tr>{include file="CRM/common/Tagset.tpl" tagsetType='file' tableLayout=true tagsetElementName="file_taglist_1"}</tr>
         {/if}
         {section name=attachLoop start=2 loop=$numAttachments+1}
           {assign var=index value=$smarty.section.attachLoop.index}
@@ -87,11 +87,11 @@
                 <td>{$form.$attachName.html}&nbsp;{$form.$attachDesc.html}<a href="#" class="crm-hover-button" title="{ts}Clear{/ts}" onclick="clearAttachment( '#{$attachName}' ); return false;"><span class="icon close-icon"></span></a></td>
             </tr>
             <tr>
-              <td></td>
-              <td><label>{$form.$tagElement.label}</label> <div class="crm-select-container crm-attachment-tags">{$form.$tagElement.html}</div></td>
+              <td class="label">{$form.$tagElement.label}</td>
+              <td><div class="crm-select-container crm-attachment-tags">{$form.$tagElement.html}</div></td>
             </tr>
-            {if $tagsetInfo_attachment}
-              <tr><td></td><td>{include file="CRM/common/Tag.tpl" tagsetType='attachment' tagsetNumber=$index}</td></tr>
+            {if $tagsetInfo.file}
+              <tr>{include file="CRM/common/Tagset.tpl" tagsetType='file' tableLayout=true tagsetElementName="file_taglist_$index"}</tr>
             {/if}
         {/section}
 
