@@ -104,6 +104,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       FALSE,
       array('onChange' => "selectPaper( this.value ); showUpdateFormatChkBox();")
     );
+    
     $form->add('static', 'paper_dimensions', NULL, ts('Width x Height'));
     $form->add(
       'select',
@@ -149,6 +150,18 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       array('size' => 8, 'maxlength' => 8, 'onkeyup' => "showUpdateFormatChkBox();"),
       TRUE
     );
+    
+    $config = CRM_Core_Config::singleton();
+     if ($config->wkhtmltopdfPath == false) {
+    $form->add(
+      'text',
+      'stationery',
+      ts('Stationery (relative path to PDF you wish to use as the background)'),
+      array('size' => 25, 'maxlength' => 900, 'onkeyup' => "showUpdateFormatChkBox();"),
+      FALSE
+    );
+    }
+    
     $form->add('checkbox', 'bind_format', ts('Always use this Page Format with the selected Template'));
     $form->add('checkbox', 'update_format', ts('Update Page Format (this will affect all templates that use this format)'));
 
@@ -464,4 +477,3 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $message = implode($newLineOperators['p']['oper'], $htmlMsg);
   }
 }
-

@@ -72,6 +72,12 @@
         <td class="label-left">{$form.margin_left.label}</td><td>{$form.margin_left.html}</td>
         <td class="label-left">{$form.margin_right.label}</td><td>{$form.margin_right.html}</td>
       </tr>
+    
+      <tr>
+        <td class="label-left">{$form.stationery.label}</td><td>{$form.stationery.html}</td>
+         <td colspan="2">&nbsp;</td>
+      </tr>
+      
     </table>
         <div id="bindFormat">{$form.bind_format.html}&nbsp;{$form.bind_format.label}</div>
         <div id="updateFormat" style="display: none">{$form.update_format.html}&nbsp;{$form.update_format.label}</div>
@@ -276,4 +282,3 @@ function showSaveDetails(chkbox)  {
 
 </script>
 {/literal}
-

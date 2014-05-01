@@ -53,6 +53,11 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
       'type' => CRM_Utils_Type::T_STRING,
       'default' => 'letter',
     ),
+    'stationery' => array(
+       'name' => 'stationery',
+       'type' =>CRM_Utils_Type::T_STRING,
+       'default' => '',
+    ),
     'orientation' => array(
       'name' => 'orientation',
       'type' => CRM_Utils_Type::T_STRING,
