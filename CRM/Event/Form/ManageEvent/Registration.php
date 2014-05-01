@@ -318,10 +318,16 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    */
   function buildRegistrationBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
+    $attributes['intro_text']['click_wysiwyg'] = true;
     $form->addWysiwyg('intro_text', ts('Introductory Text'), $attributes['intro_text']);
     // FIXME: This hack forces height of editor to 175px. Need to modify QF classes for editors to allow passing
     // explicit height and width.
-    $form->addWysiwyg('footer_text', ts('Footer Text'), array('rows' => 2, 'cols' => 40));
+    $footerAttribs = array(
+      'rows' => 2,
+      'cols' => 40,
+      'click_wysiwyg' => true,
+    );
+    $form->addWysiwyg('footer_text', ts('Footer Text'), $footerAttribs);
 
     extract( self::getProfileSelectorTypes() );
 
@@ -379,11 +385,17 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    */
   function buildConfirmationBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
+    $attributes['confirm_text']['click_wysiwyg'] = true;
     $form->add('text', 'confirm_title', ts('Title'), $attributes['confirm_title']);
     $form->addWysiwyg('confirm_text', ts('Introductory Text'), $attributes['confirm_text']);
     // FIXME: This hack forces height of editor to 175px. Need to modify QF classes for editors to allow passing
     // explicit height and width.
-    $form->addWysiwyg('confirm_footer_text', ts('Footer Text'), array('rows' => 2, 'cols' => 40));
+    $footerAttribs = array(
+      'rows' => 2,
+      'cols' => 40,
+      'click_wysiwyg' => true,
+    );
+    $form->addWysiwyg('confirm_footer_text', ts('Footer Text'), $footerAttribs);
   }
 
   /**
@@ -408,11 +420,17 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
   function buildThankYouBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
+    $attributes['thankyou_text']['click_wysiwyg'] = true;
     $form->add('text', 'thankyou_title', ts('Title'), $attributes['thankyou_title']);
     $form->addWysiwyg('thankyou_text', ts('Introductory Text'), $attributes['thankyou_text']);
     // FIXME: This hack forces height of editor to 175px. Need to modify QF classes for editors to allow passing
     // explicit height and width.
-    $form->addWysiwyg('thankyou_footer_text', ts('Footer Text'), array('rows' => 2, 'cols' => 40));
+    $footerAttribs = array(
+      'rows' => 2,
+      'cols' => 40,
+      'click_wysiwyg' => true,
+    );
+    $form->addWysiwyg('thankyou_footer_text', ts('Footer Text'), $footerAttribs);
   }
 
   /**
