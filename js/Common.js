@@ -240,16 +240,16 @@ CRM.validate = CRM.validate || {
 
 /**
  * Compare Form Input values against cached initial value.
- * True if changes have been made.
- * @returns {Boolean}
+ *
+ * @return {Boolean} true if changes have been made.
  */
   CRM.utils.initialValueChanged = function(el) {
-    var isDirty = false
-    $(':input:visible', el).each(function () {
-        if($(this).data('crm-initial-value') !== undefined
-                && $(this).data('crm-initial-value') != $(this).val()){
-            isDirty = true;
-        }
+    var isDirty = false;
+    $(':input:visible, :input.select2-offscreen', el).each(function () {
+      var initialValue = $(this).data('crm-initial-value');
+      if (initialValue !== undefined && initialValue != $(this).val()) {
+        isDirty = true;
+      }
     });
     return isDirty;
   }
@@ -439,7 +439,7 @@ CRM.validate = CRM.validate || {
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
       $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
       // Cache Form Input initial values
-      $('form[data-warn-changes] :input:visible', e.target).each( function() {
+      $('form[data-warn-changes] :input', e.target).each(function() {
         $(this).data('crm-initial-value', $(this).val());
       });
     })

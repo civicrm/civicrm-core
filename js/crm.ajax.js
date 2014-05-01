@@ -337,12 +337,27 @@
 
     var widget = CRM.loadPage(url, settings).off('.crmForm');
 
+    function cancelAction() {
+      if (CRM.utils.initialValueChanged(widget)) {
+        return confirm(ts('You have unsaved changes.'));
+      }
+      return true;
+    }
+    if (widget.data('uiDialog')) {
+      // This is a bit harsh but we are removing jQuery UI's event handler from the button and adding our own
+      $('.ui-dialog-titlebar-close').first().off().click(function() {
+        if (cancelAction()) {
+          widget.dialog('close');
+        }
+      });
+    }
+
     widget.on('crmFormLoad.crmForm', function(event, data) {
       var $el = $(this);
       var settings = $el.crmSnippet('option', 'crmForm');
       settings.cancelButton && $(settings.cancelButton, this).click(function(event) {
         var returnVal = settings.onCancel.call($el, event);
-        if (returnVal !== false) {
+        if (returnVal !== false && cancelAction()) {
           $el.trigger('crmFormCancel', event);
           if ($el.data('uiDialog') && settings.autoClose) {
             $el.dialog('close');
@@ -350,8 +365,9 @@
           else if (!settings.autoClose) {
             $el.crmSnippet('resetUrl').crmSnippet('refresh');
           }
+        } else {
+          event.preventDefault();
         }
-        return returnVal === false;
       });
       if (settings.validate) {
         $("form", this).validate(typeof(settings.validate) == 'object' ? settings.validate : CRM.validate.params);
