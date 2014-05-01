@@ -38,7 +38,7 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * test the payment method is adequately logged - we don't expect the processing to succeed so we try catch
+   * test the payment method is adequately logged - we don't expect the processing to succeed
    */
   function testHandlePaymentMethodLogging() {
     $params = array('processor_name' => 'Paypal', 'data' => 'blah');
@@ -49,8 +49,6 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
 
     }
     $log = $this->callAPISuccess('SystemLog', 'get', array());
-
-    print_r($log);
-
+    $this->assertEquals('payment_notification processor_name=Paypal', $log['values'][$log->id]['message']);
   }
 }
