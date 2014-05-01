@@ -83,8 +83,11 @@ class CRM_Activity_Page_AJAX {
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
 
     $params = $_POST;
+    //CRM-14466 added else to if statement to make sure sortSQL is defined   
     if ($sort && $sortOrder) {
       $sortSQL = $sort .' '.$sortOrder;
+    } else {
+      $sortSQL = '';
     }
 
     // get the activities related to given case
@@ -252,7 +255,7 @@ class CRM_Activity_Page_AJAX {
       // Get rid of the "<br />(Case Manager)" from label
       list($typeLabel) = explode('<', $row['relation']);
       // view user links
-      //CRM-14466 Makes sure cid is defined to avoid php notice
+      //CRM-14466 Makes sure cid is defined to avoid php 
       if (array_key_exists("cid",$row)) {
         $row['name'] = '<a class="view-contact" title="'. ts('View Contact') .'" href='.CRM_Utils_System::url('civicrm/contact/view',
           'action=view&reset=1&cid='.$row['cid']).'>'.$row['name'].'</a>';
