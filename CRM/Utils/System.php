@@ -58,9 +58,9 @@ class CRM_Utils_System {
    *   (optional) Whether to include the reset GET string (if present).
    * @param bool $includeForce
    *   (optional) Whether to include the force GET string (if present).
-   * @param string $path 
+   * @param string $path
    *   (optional) The path to use for the new url.
-   * @param string $absolute 
+   * @param string $absolute
    *   (optional) Whether to return an absolute URL.
    *
    * @return string
@@ -178,7 +178,7 @@ class CRM_Utils_System {
    *
    * @param string $content
    *   The content that will be themed.
-   * @param bool $print 
+   * @param bool $print
    *   (optional) Are we displaying to the screen or bypassing theming?
    * @param bool $maintenance
    *   (optional) For maintenance mode.
@@ -720,7 +720,7 @@ class CRM_Utils_System {
     return substr_replace($number, $replace, 0, -$keep);
   }
 
-  /** 
+  /**
    * Determine which PHP modules are loaded.
    *
    * @return array
@@ -956,7 +956,7 @@ class CRM_Utils_System {
    * @param int $ver
    *   The major version of PHP that is required.
    * @param bool $abort
-   *   (optional) Whether to fatally abort if the version requirement is not 
+   *   (optional) Whether to fatally abort if the version requirement is not
    *   met. Defaults to TRUE.
    * @return bool
    *   Returns TRUE if the requirement is met, FALSE if the requirement is not
@@ -1173,9 +1173,10 @@ class CRM_Utils_System {
     $address = CRM_Utils_Array::value('REMOTE_ADDR', $_SERVER);
 
     $config = CRM_Core_Config::singleton();
-    if ($config->userSystem->is_drupal) {
-      //drupal function handles the server being behind a proxy securely
-      $address = ip_address();
+    if ($config->userSystem->is_drupal && function_exists('ip_address')) {
+      //drupal function handles the server being behind a proxy securely. We still have legacy ipn methods
+      // that reach this point without bootstrapping hence the check that the fn exists
+        $address = ip_address();
     }
 
     // hack for safari
@@ -1731,7 +1732,7 @@ class CRM_Utils_System {
   // getPluginList()
 
   /**
-   * 
+   *
    */
   static function executeScheduledJobs() {
     $facility = new CRM_Core_JobManager();
