@@ -692,20 +692,9 @@
      <page_callback>CRM_Price_Page_Option</page_callback>
   </item>
   <item>
-       <path>civicrm/ajax/taglist</path>
-       <page_callback>CRM_Admin_Page_AJAX::getTagList</page_callback>
-       <access_arguments>access CiviCRM</access_arguments>
-  </item>
-  <item>
        <path>civicrm/ajax/mergeTagList</path>
        <page_callback>CRM_Admin_Page_AJAX::mergeTagList</page_callback>
        <access_arguments>access CiviCRM</access_arguments>
-  </item>
-  <item>
-       <path>civicrm/ajax/processTags</path>
-       <page_callback>CRM_Admin_Page_AJAX::processTags</page_callback>
-       <access_arguments>access CiviCRM</access_arguments>
-       <page_type>3</page_type>
   </item>
   <item>
      <path>civicrm/admin/tplstrings/add</path>

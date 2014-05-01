@@ -31,10 +31,25 @@
   }
 </style>
 <script type="text/javascript">
-  (function($){{/literal}
+  (function($, _){{/literal}
     var entityID={$entityID};
     var entityTable='{$entityTable}';
     {literal}
+    CRM.updateContactSummaryTags = function() {
+      var tags = [];
+      $('#tagtree input:checkbox:checked+label').each(function() {
+        tags.push($(this).text());
+      });
+      $('input.crm-contact-tagset').each(function() {
+        var setTags = _.pluck($(this).select2('data'), 'label');
+        tags = tags.concat(setTags);
+      });
+      // contact summary tabs and search forms both listen for this event
+      $('#Tag').closest('.crm-ajax-container').trigger('crmFormSuccess', {tabCount: tags.length});
+      // update summary tab
+      $("#contact-summary #tags").html(tags.join(', '));
+    };
+
     $(function() {
       $("#tagtree ul input:checked").each (function(){
         $(this).closest("li").addClass('highlighted');
@@ -61,19 +76,10 @@
         {/literal}
       {/if}
       {literal}
-    });
 
-    CRM.updateContactSummaryTags = function() {
-      var tags = [];
-      $('.tag-section .token-input-token-facebook p, #tagtree input:checkbox:checked+label').each(function() {
-        tags.push($(this).text());
-      });
-      // contact summary tabs and search forms both listen for this event
-      $('#Tag').closest('.crm-ajax-container').trigger('crmFormSuccess', {tabCount: tags.length});
-      // update summary tab
-      $("#contact-summary #tags").html(tags.join(', '));
-    };
-  })(CRM.$);
+      $(document).on('change', 'input.crm-contact-tagset', CRM.updateContactSummaryTags);
+    });
+  })(CRM.$, CRM._);
   {/literal}
 </script>
 <div id="Tag" class="view-content">
@@ -110,5 +116,5 @@
     </ul>
   </div>
   <br />
-{include file="CRM/common/Tag.tpl" context="contactTab"}
+{include file="CRM/common/Tagset.tpl"}
 </div>

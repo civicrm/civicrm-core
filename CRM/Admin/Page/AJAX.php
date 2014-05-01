@@ -252,44 +252,6 @@ class CRM_Admin_Page_AJAX {
     CRM_Core_Page_AJAX::returnJsonResponse($ret);
   }
 
-  static function getTagList() {
-    $name = CRM_Utils_Type::escape($_GET['name'], 'String');
-    $parentId = CRM_Utils_Type::escape($_GET['parentId'], 'Integer');
-
-    $isSearch = NULL;
-    if (isset($_GET['search'])) {
-      $isSearch = CRM_Utils_Type::escape($_GET['search'], 'Integer');
-    }
-
-    $tags = array();
-
-    // always add current search term as possible tag
-    // here we append :::value to determine if existing / new tag should be created
-    if (!$isSearch) {
-      $tags[] = array(
-        'name' => $name,
-        'id' => $name . ":::value",
-      );
-    }
-
-    $query = "SELECT id, name FROM civicrm_tag WHERE parent_id = {$parentId} and name LIKE '%{$name}%'";
-    $dao = CRM_Core_DAO::executeQuery($query);
-
-    while ($dao->fetch()) {
-      // make sure we return tag name entered by user only if it does not exists in db
-      if ($name == $dao->name) {
-        $tags = array();
-      }
-      // escape double quotes, which break results js
-      $tags[] = array('name' => addcslashes($dao->name, '"'),
-        'id' => $dao->id,
-      );
-    }
-
-    echo json_encode($tags);
-    CRM_Utils_System::civiExit();
-  }
-
   static function mergeTagList() {
     $name = CRM_Utils_Type::escape($_GET['term'], 'String');
     $fromId = CRM_Utils_Type::escape($_GET['fromId'], 'Integer');
@@ -336,92 +298,6 @@ LIMIT $limit";
       $result[] = $row;
     }
     print json_encode($result);
-    CRM_Utils_System::civiExit();
-  }
-
-  static function processTags() {
-    $skipTagCreate = $skipEntityAction = $entityId = NULL;
-    $action        = CRM_Utils_Type::escape($_POST['action'], 'String');
-    $parentId      = CRM_Utils_Type::escape($_POST['parentId'], 'Integer');
-    if ($_POST['entityId']) {
-      $entityId = CRM_Utils_Type::escape($_POST['entityId'], 'Integer');
-    }
-
-    $entityTable = CRM_Utils_Type::escape($_POST['entityTable'], 'String');
-
-    if ($_POST['skipTagCreate']) {
-      $skipTagCreate = CRM_Utils_Type::escape($_POST['skipTagCreate'], 'Integer');
-    }
-
-    if ($_POST['skipEntityAction']) {
-      $skipEntityAction = CRM_Utils_Type::escape($_POST['skipEntityAction'], 'Integer');
-    }
-
-    // check if user has selected existing tag or is creating new tag
-    // this is done to allow numeric tags etc.
-    $tagValue = explode(':::', $_POST['tagID']);
-
-    $createNewTag = FALSE;
-    $tagID = $tagValue[0];
-    if (isset($tagValue[1]) && $tagValue[1] == 'value') {
-      $createNewTag = TRUE;
-    }
-
-    $tagInfo = array();
-    // if action is select
-    if ($action == 'select') {
-      // check the value of tagID
-      // if numeric that means existing tag
-      // else create new tag
-      if (!$skipTagCreate && $createNewTag) {
-        $params = array(
-          'name' => $tagID,
-          'parent_id' => $parentId,
-        );
-
-        $tagObject = CRM_Core_BAO_Tag::add($params, CRM_Core_DAO::$_nullArray);
-
-        $tagInfo = array(
-          'name' => $tagID,
-          'id' => $tagObject->id,
-          'action' => $action,
-        );
-        $tagID = $tagObject->id;
-      }
-
-      if (!$skipEntityAction && $entityId) {
-        // save this tag to contact
-        $params = array(
-          'entity_table' => $entityTable,
-          'entity_id' => $entityId,
-          'tag_id' => $tagID,
-        );
-
-        CRM_Core_BAO_EntityTag::add($params);
-      }
-      // if action is delete
-    }
-    elseif ($action == 'delete') {
-      if (!is_numeric($tagID)) {
-        $tagID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $tagID, 'id', 'name');
-      }
-      if (!$skipEntityAction && $entityId) {
-        // delete this tag entry for the entity
-        $params = array(
-          'entity_table' => $entityTable,
-          'entity_id' => $entityId,
-          'tag_id' => $tagID,
-        );
-
-        CRM_Core_BAO_EntityTag::del($params);
-      }
-      $tagInfo = array(
-        'id' => $tagID,
-        'action' => $action,
-      );
-    }
-
-    echo json_encode($tagInfo);
     CRM_Utils_System::civiExit();
   }
 
