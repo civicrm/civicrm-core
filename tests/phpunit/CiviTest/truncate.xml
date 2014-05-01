@@ -93,6 +93,8 @@
 
   <civicrm_case_contact />
 
+  <civicrm_case_type />
+
   <civicrm_grant />
 
   <civicrm_tell_friend />

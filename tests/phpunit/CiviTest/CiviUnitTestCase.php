@@ -83,6 +83,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   static protected $_dbName;
 
   /**
+   * Track tables we have modified during a test
+   */
+  protected $_tablesToTruncate = array();
+
+  /**
    * @var array of temporary directory names
    */
   protected $tempDirs;
@@ -366,6 +371,33 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     else {
       error_reporting(E_ALL & ~E_NOTICE);
     }
+  }
+
+  /**
+   * Read everything from the datasets directory and insert into the db
+   */
+  public function loadAllFixtures() {
+    $fixturesDir = __DIR__ . '/../../fixtures';
+
+    $this->getConnection()->getConnection()->query("SET FOREIGN_KEY_CHECKS = 0;");
+
+    $xmlFiles = glob($fixturesDir . '/*.xml');
+    foreach ($xmlFiles as $xmlFixture) {
+      $op = new PHPUnit_Extensions_Database_Operation_Insert();
+      $dataset = new PHPUnit_Extensions_Database_DataSet_XMLDataSet($xmlFixture);
+      $this->_tablesToTruncate = array_merge($this->_tablesToTruncate, $dataset->getTableNames());
+      $op->execute($this->_dbconn, $dataset);
+    }
+
+    $yamlFiles = glob($fixturesDir . '/*.yaml');
+    foreach ($yamlFiles as $yamlFixture) {
+      $op = new PHPUnit_Extensions_Database_Operation_Insert();
+      $dataset = new PHPUnit_Extensions_Database_DataSet_YamlDataSet($yamlFixture);
+      $this->_tablesToTruncate = array_merge($this->_tablesToTruncate, $dataset->getTableNames());
+      $op->execute($this->_dbconn, $dataset);
+    }
+
+    $this->getConnection()->getConnection()->query("SET FOREIGN_KEY_CHECKS = 1;");
   }
 
   /**
@@ -2091,6 +2123,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       $tablesToTruncate[] = 'civicrm_custom_group';
       $tablesToTruncate[] = 'civicrm_custom_field';
     }
+
+    $tablesToTruncate = array_unique(array_merge($this->_tablesToTruncate, $tablesToTruncate));
 
     CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
     foreach ($tablesToTruncate as $table) {

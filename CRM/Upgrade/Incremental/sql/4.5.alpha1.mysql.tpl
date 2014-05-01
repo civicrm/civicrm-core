@@ -309,3 +309,48 @@ INDEX `level` (`level`)
 COMMENT='Table that contains logs of all system events.'
 COLLATE='utf8_general_ci';
 
+-- CRM-14473 civicrm_case_type table creation and migration
+CREATE TABLE IF NOT EXISTS `civicrm_case_type` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Autoincremented type id',
+  `name` varchar(64) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Machine name for Case Type',
+  `title` varchar(64) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Natural language name for Case Type',
+  `description` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Description of the Case Type',
+  `is_active` tinyint(4) DEFAULT NULL COMMENT 'Is this entry active?',
+  `is_reserved` tinyint(4) DEFAULT NULL COMMENT 'Is this case type a predefined system type?',
+  `weight` int(11) NOT NULL DEFAULT '1' COMMENT 'Ordering of the case types',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `case_type_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
+
+SELECT @option_group_id_case_type := max(id) from civicrm_option_group where name = 'case_type';
+
+INSERT IGNORE INTO civicrm_case_type
+  (name, title, description, is_active, is_reserved, weight)
+  SELECT
+    name,
+    label,
+    description,
+    is_active,
+    is_reserved,
+    weight
+  FROM civicrm_option_value
+  WHERE
+    option_group_id = @option_group_id_case_type;
+
+-- Replace the pseudo-fk to ov.value with a reference to civicrm_case_type.id
+UPDATE civicrm_case
+  SET case_type_id = (
+    SELECT civicrm_case_type.id FROM civicrm_case_type
+    JOIN civicrm_option_value
+      ON civicrm_option_value.name = civicrm_case_type.name
+    WHERE
+      civicrm_option_value.option_group_id = @option_group_id_case_type
+      AND civicrm_option_value.value = replace(civicrm_case.case_type_id, 0x01, '')
+  );
+
+ALTER TABLE civicrm_case
+  MODIFY case_type_id int(10) unsigned COLLATE utf8_unicode_ci NOT NULL COMMENT 'FK to civicrm_case_type.name';
+
+DELETE FROM civicrm_option_value WHERE option_group_id = @option_group_id_case_type;
+
+DELETE FROM civicrm_option_group WHERE id = @option_group_id_case_type;
