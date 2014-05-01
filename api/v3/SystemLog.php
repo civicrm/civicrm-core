@@ -1,4 +1,5 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.5                                                |
@@ -23,21 +24,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
  */
 
-session_start();
+/**
+ * File for the CiviCRM APIv3 SystemLog functions
+ *
+ * @package CiviCRM_APIv3
+ * @subpackage API_SystemLog
+ *
+ * @copyright CiviCRM LLC (c) 2004-2014
+ * @version $Id: SystemLog.php 30171 2010-10-14 09:11:27Z mover $
+ *
+ */
 
-require_once '../civicrm.config.php';
+function civicrm_api3_system_log_get($params) {
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, True, 'SystemLog');
+}
 
-$config = CRM_Core_Config::singleton();
-$log = new CRM_Utils_SystemLogger();
-$log->alert('payment_notification processor_name=Google_Checkout', $_REQUEST);
-
-$rawPostData = file_get_contents('php://input');
-CRM_Core_Payment_GoogleIPN::main($rawPostData);

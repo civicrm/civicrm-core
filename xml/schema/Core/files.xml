@@ -35,6 +35,7 @@
   <xi:include href="Phone.xml"                parse="xml" />
   <xi:include href="PreferencesDate.xml"      parse="xml" />
   <xi:include href="StateProvince.xml"        parse="xml" />
+  <xi:include href="SystemLog.xml"            parse="xml" />
   <xi:include href="Tag.xml"                  parse="xml" />
   <xi:include href="UFGroup.xml"              parse="xml" />
   <xi:include href="UFField.xml"              parse="xml" />
