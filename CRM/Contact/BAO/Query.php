@@ -4357,6 +4357,14 @@ civicrm_relationship.is_permission_a_b = 0
               $this->_whereTables["civicrm_email"] = 1;
               $order = str_replace($field, "civicrm_email.{$field}", $order);
               break;
+
+            default:
+              //CRM-12565 add "`" around $field if it is a pseudo constant
+              foreach ($this->_pseudoConstantsSelect as $key => $value) {
+                if (!empty($value['element']) && $value['element'] == $field) {
+                  $order = str_replace($field, "`{$field}`", $order);
+                }
+              }
           }
           $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
           $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
