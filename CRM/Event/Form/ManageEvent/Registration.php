@@ -335,7 +335,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Subroutine to insert a Profile Editor widget
    * depends on getProfileSelectorTypes
-   * 
+   *
    * @param array &$form
    * @param int $count unique index
    * @param string $prefix dom element ID prefix
