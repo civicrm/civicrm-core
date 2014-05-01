@@ -125,7 +125,7 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
 SELECT module,is_reserved
   FROM civicrm_uf_group
   LEFT JOIN civicrm_uf_join ON uf_group_id = civicrm_uf_group.id
-   WHERE civicrm_uf_group.id = %1
+   WHERE civicrm_uf_group.id = %1 AND module = 'Profile'
 ";
       $params = array(1 => array($this->_gid, 'Integer'));
       $dao = CRM_Core_DAO::executeQuery($query, $params);
