@@ -39,7 +39,7 @@
     <comment>error level per PSR3</comment>
     <type>varchar</type>
     <length>9</length>
-    <default>info</default>
+    <default>'info'</default>
     <add>4.5</add>
   </field>
   <field>
