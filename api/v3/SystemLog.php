@@ -1,4 +1,5 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.5                                                |
@@ -23,29 +24,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
+ * File for the CiviCRM APIv3 SystemLog functions
  *
- * @package CRM
+ * @package CiviCRM_APIv3
+ * @subpackage API_SystemLog
+ *
  * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
+ * @version $Id: SystemLog.php 30171 2010-10-14 09:11:27Z mover $
  *
  */
-class CRM_Utils_SystemLogger extends Psr\Log\AbstractLogger implements \Psr\Log\LoggerInterface {
-  public function log($level, $message, array $context = array()) {
-    $rec = new CRM_Core_DAO_SystemLog();
-    $separateFields = array('contact_id', 'hostname');
-    foreach ($separateFields as $separateField) {
-      if (isset($context[$separateField])) {
-        $rec->{$separateField} = $context[$separateField];
-        unset($context[$separateField]);
-      }
-    }
-    print_r($rec);
-    $rec->level = $level;
-    $rec->message = $message;
-    $rec->context = json_encode($context);
-    $rec->save();
-  }
+
+function civicrm_api3_system_log_get($params) {
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, True, 'SystemLog');
 }
+
