@@ -602,8 +602,6 @@ class CRM_Core_Resources {
 
       "packages/jquery/plugins/DataTables/media/js/jquery.dataTables$min.js",
 
-      "packages/jquery/plugins/jquery.FormNavigate$min.js",
-
       "packages/jquery/plugins/jquery.validate$min.js",
       "packages/jquery/plugins/jquery.ui.datepicker.validation.pack.js",
 
