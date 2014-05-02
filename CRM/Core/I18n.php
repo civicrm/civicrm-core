@@ -78,10 +78,20 @@ class CRM_Core_I18n {
       }
 
       // Otherwise, use PHP-gettext
+      // we support both the old file hierarchy format and the new:
+      // pre-4.5:  civicrm/l10n/xx_XX/civicrm.mo
+      // post-4.5: civicrm/l10n/xx_XX/LC_MESSAGES/civicrm.mo
       require_once 'PHPgettext/streams.php';
       require_once 'PHPgettext/gettext.php';
 
-      $streamer = new FileReader($config->gettextResourceDir . $locale . DIRECTORY_SEPARATOR . 'civicrm.mo');
+      $mo_file = $config->gettextResourceDir . $locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
+
+      if (! file_exists($mo_file)) {
+        // fallback to pre-4.5 mode
+        $mo_file = $config->gettextResourceDir . $locale . DIRECTORY_SEPARATOR . 'civicrm.mo';
+      }
+
+      $streamer = new FileReader($mo_file);
       $this->_phpgettext = new gettext_reader($streamer);
     }
   }
