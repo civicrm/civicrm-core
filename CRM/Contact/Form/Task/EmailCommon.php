@@ -133,7 +133,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     if (count($form->_contactIds) > 1) {
       $form->_single = FALSE;
     }
-   
+
     $emailAttributes = array(
       'class' => 'huge',
     );
@@ -224,19 +224,19 @@ class CRM_Contact_Form_Task_EmailCommon {
           if (in_array($contactId, $form->_toContactIds)) {
             $form->_toContactDetails[$contactId] = $form->_contactDetails[$contactId];
             $toArray[] = array(
-              'name' => '"' . $value['sort_name'] . '" &lt;' . $email . '&gt;',
+              'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
               'id' => "$contactId::{$email}",
             );
           }
           elseif (in_array($contactId, $form->_ccContactIds)) {
             $ccArray[] = array(
-              'name' => '"' . $value['sort_name'] . '" &lt;' . $email . '&gt;',
+              'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
               'id' => "$contactId::{$email}",
             );
           }
           elseif (in_array($contactId, $form->_bccContactIds)) {
             $bccArray[] = array(
-              'name' => '"' . $value['sort_name'] . '" &lt;' . $email . '&gt;',
+              'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
               'id' => "$contactId::{$email}",
             );
           }

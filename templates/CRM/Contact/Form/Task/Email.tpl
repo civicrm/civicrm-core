@@ -107,7 +107,7 @@ CRM.$(function($){
 
   var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1' h=0 }{literal}";
 
-  function emailSelect(el){
+  function emailSelect(el, prepopulate){
     $(el).data('api-entity', 'contact').crmSelect2({
       minimumInputLength: 1,
       multiple: true,
@@ -124,11 +124,11 @@ CRM.$(function($){
           };
         }
       }
-    });
+    }).select2('data', prepopulate);
   }
-  emailSelect('#to');
-  emailSelect('#cc_id');
-  emailSelect('#bcc_id');
+  emailSelect('#to', toContact);
+  emailSelect('#cc_id', ccContact);
+  emailSelect('#bcc_id', bccContact);
 });
 
 
