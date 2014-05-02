@@ -203,6 +203,11 @@ class CRM_Core_Page_AJAX_Location {
               $elements["onbehalf_{$key}"]['value'] = $defaults[$key];
               $elements["onbehalf_{$key}"]['id'] = $defaults["{$key}_id"];
             }
+            elseif ($htmlType == 'Select Date') {
+              $elements["onbehalf_{$key}"]['type'] = $htmlType;
+              $elements["onbehalf_{$key}"]['value'] = $defaults[$key];
+              $elements["onbehalf_{$key}_display"]['value'] = $defaults[$key];
+            }
             else {
               $elements["onbehalf_{$key}"]['type'] = $htmlType;
               $elements["onbehalf_{$key}"]['value'] = $defaults[$key];
