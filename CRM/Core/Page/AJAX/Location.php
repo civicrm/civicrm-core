@@ -50,12 +50,9 @@ class CRM_Core_Page_AJAX_Location {
     $ufId = CRM_Utils_Request::retrieve('ufId', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
 
     // Verify user id
-    $user = CRM_Core_Session::singleton()->get('userID');
-    if (!$user) {
-      $user = CRM_Utils_Request::retrieve('uid', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
-      if (!CRM_Contact_BAO_Contact_Permission::validateOnlyChecksum($user, CRM_Core_DAO::$_nullObject)) {
-        CRM_Utils_System::civiExit();
-      }
+    $user = CRM_Utils_Request::retrieve('uid', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, CRM_Core_Session::singleton()->get('userID'));
+    if (!$user || !CRM_Contact_BAO_Contact_Permission::validateChecksumContact($user, CRM_Core_DAO::$_nullObject, FALSE)) {
+      CRM_Utils_System::civiExit();
     }
 
     // Verify user permission on related contact
