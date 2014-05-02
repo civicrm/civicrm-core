@@ -59,15 +59,12 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     // Justification for this instance: FIXME
     sleep(3);
     $this->select("group_id", "label=Case Resources");
-    $this->clickLink("_qf_GroupContact_next", "xpath=//form[@id='GroupContact']//div[@class='view-content']//div[@class='dataTables_wrapper']/table/tbody/tr/td[4]/a");
-    $this->click("xpath=//form[@id='GroupContact']//div[@class='view-content']//div[@class='dataTables_wrapper']/table/tbody/tr/td[4]/a");
+    $this->clickLink("_qf_GroupContact_next", "xpath=//form[@id='GroupContact']//div[@class='view-content view-contact-groups']//div[@class='dataTables_wrapper']/table/tbody/tr/td[4]/a", FALSE);
+    $this->click("xpath=//form[@id='GroupContact']//div[@class='view-content view-contact-groups']//div[@class='dataTables_wrapper']/table/tbody/tr/td[4]/a");
 
     // Check confirmation alert.
-    $this->assertTrue((bool)preg_match("/^Are you sure you want to remove/",
-        $this->getConfirmation()
-      ));
-    $this->chooseOkOnNextConfirmation();
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText("xpath=//div[@class='crm-confirm-dialog ui-dialog-content ui-widget-content modal-dialog']", "Remove $firstName $lastName from Case Resources?");
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button//span[text()='Continue']");
 
     //tag addition
     $this->waitForElementPresent("xpath=//li[@id='tab_tag']/a");
@@ -90,7 +87,7 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
     sleep(3);
-    $this->click("xpath=//div[@id='Notes']//div[@class='action-link']/a");
+    $this->click("xpath=//div[@class='view-content']//div[@class='action-link']/a");
 
     $this->waitForElementPresent("_qf_Note_upload-top");
     $noteSubject = "test note" . substr(sha1(rand()), 0, 7);
@@ -104,16 +101,13 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Note_upload-top");
     $this->type('subject', $noteSubject . "_edited");
     $this->type('note', $noteText . "_edited");
-    $this->clickLink("_qf_Note_upload-top", "xpath=//div[@class='crm-results-block']/div[@id='notes']/div/table/tbody/tr//td/span[2]/ul/li[2]/a[text()='Delete']");
+    $this->clickLink("_qf_Note_upload-top", "xpath=//div[@class='crm-results-block']/div[@id='notes']/div/table/tbody/tr//td/span[2]/ul/li[2]/a[text()='Delete']", FALSE);
 
     $this->click("xpath=//div[@class='crm-results-block']/div[@id='notes']/div/table/tbody/tr//td/span[2]/ul/li[2]/a[text()='Delete']");
     // Check confirmation alert.
-    $this->assertTrue((bool)preg_match("/^Are you sure you want to delete this note/",
-        $this->getConfirmation()
-      ));
-    $this->chooseOkOnNextConfirmation();
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForText('crm-notification-container', "deleted successfully");
+    $this->waitForText("xpath=//form[@id='Note']/div[@class='view-content']/fieldset/div[@class='status']", "Are you sure you want to delete the note ''?");
+    $this->click("xpath=//input[@id='_qf_Note_next']");
+    $this->waitForText('crm-notification-container', "Selected Note has been deleted successfully.");
 
     //add new relationship , disable it , delete it
     $this->waitForElementPresent("xpath=//li[@id='tab_rel']/a");
@@ -122,22 +116,17 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->click("link=Add Relationship");
     $this->waitForElementPresent("_qf_Relationship_cancel");
     $this->select("relationship_type_id", "label=Employee of");
-    $this->webtestFillAutocomplete("Default");
-    $this->waitForElementPresent("quick-save");
-    $this->clickLink("quick-save", "xpath=//div[@id='current-relationships']//a[text()='Disable']");
-    $this->click("xpath=//div[@id='current-relationships']//a[text()='Disable']");
-    $this->assertTrue((bool)preg_match("/^Are you sure you want to disable this relationship/",
-      $this->getConfirmation()
-    ));
-    $this->chooseOkOnNextConfirmation();
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForElementPresent(" xpath=//div[@id='inactive-relationships']//a[text()='Delete']");
-    $this->click("xpath=//div[@id='inactive-relationships']//a[text()='Delete']");
-    $this->assertTrue((bool)preg_match("/^Are you sure you want to delete this relationship/",
-      $this->getConfirmation()
-    ));
-    $this->chooseOkOnNextConfirmation();
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->select2('related_contact_id', 'Default', TRUE);
+    $this->click('_qf_Relationship_upload-bottom');
+    $this->waitForElementPresent("xpath=//div[@id='crm-contact-relationship-selector-current_wrapper']//table/tbody//tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Disable']");
+    $this->click("xpath=//div[@id='crm-contact-relationship-selector-current_wrapper']//table/tbody//tr/td[9]/span[2][text()='more']/ul/li[1]/a[text()='Disable']");
+    $this->waitForText("xpath=//div[@class='crm-confirm-dialog ui-dialog-content ui-widget-content modal-dialog']", 'Are you sure you want to disable this record?');
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button//span[text()='Disable']");
+    $this->waitForElementPresent("xpath=//div[@id='crm-contact-relationship-selector-past_wrapper']//table/tbody//tr/td[9]/span[2][text()='more']/ul/li[2]/a[text()='Delete']");
+    $this->click("xpath=//div[@id='crm-contact-relationship-selector-past_wrapper']//table/tbody//tr/td[9]/span[2][text()='more']/ul/li[2]/a[text()='Delete']");
+    $this->waitForText("xpath=//form[@id='Relationship']/div[@class='status']", "Are you sure you want to delete this Relationship?");
+    $this->click("_qf_Relationship_next-bottom");
+    $this->waitForElementPresent("link=Add Relationship");
 
     //update existing contact
     $this->click("xpath=//ul[@id='actions']/li[2]/a");
@@ -151,29 +140,33 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->click("xpath=//li[@id='tab_activity']/a");
     $this->waitForElementPresent("other_activity");
     $this->select("other_activity", "label=Interview");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("_qf_Activity_cancel-bottom");
     $this->click('_qf_Activity_upload-bottom');
     $this->waitForElementPresent("xpath=//table[@id='contact-activity-selector-activity']/tbody/tr/td[8]/span/a[2]");
-    sleep(10);
     $this->click("xpath=//table[@id='contact-activity-selector-activity']/tbody/tr/td[8]/span/a[2]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("_qf_Activity_cancel-bottom");
     $this->select("status_id","value=2");
     $this->click('_qf_Activity_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText("crm-notification-container", "Activity has been saved.");
+    $this->waitForElementPresent("xpath=//table[@id='contact-activity-selector-activity']/tbody/tr/td[7][text()='Completed']");
 
     //add a case
     $this->click("xpath=//li[@id='tab_case']/a");
-    $this->waitForElementPresent("xpath=//div[@id='Cases']//div[@class='action-link']/a");
-    $this->click("xpath=//div[@id='Cases']//div[@class='action-link']/a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//div[@class='action-link']/a");
+    $this->click("xpath=//div[@class='view-content']//div[@class='action-link']/a");
+    $this->waitForElementPresent("_qf_Case_cancel-bottom");
     $this->type('activity_subject',"subject".rand());
     $this->select('case_type_id','value=1');
     $this->click('_qf_Case_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@class='view-content']/table[@class='caseSelector']/tbody/tr[2]/td[9]//span//a[text()='Manage']");
+    $this->click("xpath=//div[@class='view-content']/table[@class='caseSelector']/tbody/tr[2]/td[9]//span//a[text()='Manage']");
+    $this->waitForElementPresent("xpath=//form[@id='CaseView']/div[2]/table/tbody/tr/td[4]/a");
     $this->click("xpath=//form[@id='CaseView']/div[2]/table/tbody/tr/td[4]/a");
     $this->waitForElementPresent("_qf_Activity_cancel-bottom");
     $this->select("case_status_id","value=2");
     $this->click("_qf_Activity_upload-top");
+    $this->waitForElementPresent("_qf_CaseView_cancel-bottom");
+    $this->click("_qf_CaseView_cancel-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //visit the logging contact summary report
