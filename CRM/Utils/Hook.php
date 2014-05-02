@@ -1463,14 +1463,15 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is invoked when building a CiviCRM name badge.
    *
+   * @param string $labelName string referencing name of badge format
    * @param object $label    reference to the label object
    * @param array  $format   array of format data
    * @param array  $participant array of participant values
    *
    * @return null the return value is ignored
    */
-  static function alterBadge($participant_number, &$label, &$format, &$participant) {
-    return self::singleton()->invoke(4, $participant_number, $label, $format, $participant, self::$_nullObject, self::$_nullObject, 'civicrm_alterBadge');
+  static function alterBadge($labelName, &$label, &$format, &$participant) {
+    return self::singleton()->invoke(4, $labelName, $label, $format, $participant, self::$_nullObject, self::$_nullObject, 'civicrm_alterBadge');
   }
 
 
