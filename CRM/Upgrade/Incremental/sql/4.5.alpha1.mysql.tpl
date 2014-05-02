@@ -313,8 +313,8 @@ COLLATE='utf8_general_ci';
 CREATE TABLE IF NOT EXISTS `civicrm_case_type` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Autoincremented type id',
   `name` varchar(64) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Machine name for Case Type',
-  `title` varchar(64) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Natural language name for Case Type',
-  `description` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Description of the Case Type',
+  {localize field='title'}title varchar(64) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Natural language name for Case Type'{/localize},
+  {localize field='description'}description varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Description of the Case Type'{/localize},
   `is_active` tinyint(4) DEFAULT NULL COMMENT 'Is this entry active?',
   `is_reserved` tinyint(4) DEFAULT NULL COMMENT 'Is this case type a predefined system type?',
   `weight` int(11) NOT NULL DEFAULT '1' COMMENT 'Ordering of the case types',
@@ -325,11 +325,11 @@ CREATE TABLE IF NOT EXISTS `civicrm_case_type` (
 SELECT @option_group_id_case_type := max(id) from civicrm_option_group where name = 'case_type';
 
 INSERT IGNORE INTO civicrm_case_type
-  (name, title, description, is_active, is_reserved, weight)
+  (name, {localize field='title'}title{/localize}, {localize field='description'}description{/localize}, is_active, is_reserved, weight)
   SELECT
     name,
-    label,
-    description,
+    {localize field='label'}label{/localize},
+    {localize field='description'}description{/localize},
     is_active,
     is_reserved,
     weight
