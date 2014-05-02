@@ -86,7 +86,9 @@ class CRM_Campaign_BAO_Query {
       }
     }
     // CRM-13810 Translate campaign_id to label for search builder
-    if (is_array($query->_select)) {
+    // CRM-14238 Only translate when we are in contact mode
+    // Other modes need the untranslated data for export and other functions
+    if (is_array($query->_select)  && $query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
       foreach($query->_select as $field => $queryString) {
         if (substr($field, -11) == 'campaign_id') {
           $query->_pseudoConstantsSelect[$field] = array(
