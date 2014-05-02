@@ -106,8 +106,8 @@ class CRM_Contact_Form_Task_SMSCommon {
       $form->_contactIds = array($cid);
     }
 
-    $to = $form->add('text', 'to', ts('To'), '', TRUE);
-    $form->add('text', 'activity_subject', ts('Name The SMS'), '', TRUE);
+    $to = $form->add('text', 'to', ts('To'), array('class' => 'huge'), TRUE);
+    $form->add('text', 'activity_subject', ts('Name The SMS'), array('class' => 'huge'), TRUE);
 
     $toSetDefault = TRUE;
     if (property_exists($form, '_context') && $form->_context == 'standalone') {
@@ -246,7 +246,7 @@ class CRM_Contact_Form_Task_SMSCommon {
 
         if ($phone) {
           $toArray[] = array(
-            'name' => '"' . $value['sort_name'] . '" &lt;' . $phone . '&gt;',
+            'text' => '"' . $value['sort_name'] . '" (' . $phone . ')',
             'id' => "$contactId::{$phone}",
           );
         }
