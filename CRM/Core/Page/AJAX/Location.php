@@ -203,6 +203,10 @@ class CRM_Core_Page_AJAX_Location {
               $elements["onbehalf_{$key}"]['value'] = $defaults[$key];
               $elements["onbehalf_{$key}"]['id'] = $defaults["{$key}_id"];
             }
+            elseif ($htmlType == 'File') {
+              $elements["onbehalf_{$key}"]['type'] = $htmlType;
+              $elements["onbehalf_{$key}"]['value'] = '';
+            }
             else {
               $elements["onbehalf_{$key}"]['type'] = $htmlType;
               $elements["onbehalf_{$key}"]['value'] = $defaults[$key];
