@@ -205,32 +205,34 @@
       skipPaymentMethod();
     });
 
+    // Called from display() in Calculate.tpl, depends on display() having been called
     function skipPaymentMethod() {
       var symbol = '{/literal}{$currencySymbol}{literal}';
       var isMultiple = '{/literal}{$event.is_multiple_registrations}{literal}';
 
       var flag = 1;
-      if (isMultiple && cj("#additional_participants").val()) {
+      var payment_options = cj(".payment_options-group");
+      var payment_processor = cj("div.payment_processor-section");
+      var payment_information = cj("div#payment_information");
+
+      if ((isMultiple && cj("#additional_participants").val()) ||
+          !(payment_options.length && payment_processor.length && payment_information.length)) {
         flag = 0;
       }
 
       if ((cj('#pricevalue').text() == symbol + " 0.00") && flag) {
-        cj(".payment_options-group").hide();
-        cj("div.payment_processor-section").hide();
-        cj("div#payment_information").hide();
+        payment_options.hide();
+        payment_processor.hide();
+        payment_information.hide();
         // also unset selected payment methods
         cj('input[name="payment_processor"]').removeProp('checked');
       }
       else {
-        cj(".payment_options-group").show();
-        cj("div.payment_processor-section").show();
-        cj("div#payment_information").show();
+        payment_options.show();
+        payment_processor.show();
+        payment_information.show();
       }
     }
-
-    cj('#priceset input, #priceset select').change(function () {
-      skipPaymentMethod();
-    });
 
     {/literal}
   </script>

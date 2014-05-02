@@ -214,7 +214,9 @@ function display( totalfee ) {
     cj('#total_amount').val( totalfee );
 
     ( totalfee < 0 ) ? cj('table#pricelabel').addClass('disabled') : cj('table#pricelabel').removeClass('disabled');
-
+    if (typeof skipPaymentMethod == 'function') {
+      skipPaymentMethod();
+    }
 }
 {/literal}
 {/if}
