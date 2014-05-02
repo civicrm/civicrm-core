@@ -346,11 +346,11 @@
       widget.data('hasUnsavedChanges', dirty).dialog('close');
       if (dirty) {
         var id = widget.attr('id') + '-unsaved-alert',
-          alert = CRM.alert('<p>' + ts('%1 has not been saved.', {1: title}) + '</p><p><a href="#" id="' + id + '">' + ts('Restore') + '</a></p>', ts('Unsaved Changes'), alert, {expires: });
-        $('#' + id).button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}}).click(function() {
+          alert = CRM.alert('<p>' + ts('%1 has not been saved.', {1: title}) + '</p><p><a href="#" id="' + id + '">' + ts('Restore') + '</a></p>', ts('Unsaved Changes'), alert, {expires: 60000});
+        $('#' + id).button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}}).click(function(e) {
           widget.dialog('open');
           alert.close();
-          return false;
+          e.preventDefault();
         });
       }
     }
