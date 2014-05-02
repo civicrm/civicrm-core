@@ -379,6 +379,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    */
   function buildConfirmationBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
+    
+    // CRM-11182 - Optional confirmation page for free events
+    $form->addYesNo('is_confirm_enabled', ts('Use a confirmation screen?'), NULL, NULL, array('onclick' => "return showHideByValue('is_confirm_enabled','','confirm_screen_settings','block','radio',false);"));
+
     $form->add('text', 'confirm_title', ts('Title'), $attributes['confirm_title']);
     $form->addWysiwyg('confirm_text', ts('Introductory Text'), $attributes['confirm_text']);
     // FIXME: This hack forces height of editor to 175px. Need to modify QF classes for editors to allow passing
@@ -695,8 +699,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     $params['id'] = $this->_id;
 
-    //format params
+    // format params
     $params['is_online_registration'] = CRM_Utils_Array::value('is_online_registration', $params, FALSE);
+    $params['is_confirm_enabled'] = CRM_Utils_Array::value('is_confirm_enabled', $params, FALSE); // CRM-11182
     $params['is_multiple_registrations'] = CRM_Utils_Array::value('is_multiple_registrations', $params, FALSE);
     $params['allow_same_participant_emails'] = CRM_Utils_Array::value('allow_same_participant_emails', $params, FALSE);
     $params['requires_approval'] = CRM_Utils_Array::value('requires_approval', $params, FALSE);

@@ -508,10 +508,22 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       if (empty($this->_values['event']['is_monetary'])) {
         $js = array('onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');");
       }
+      
+      // CRM-11182 - Optional confirmation screen
+      // Change button label depending on whether the next action is confirm or register
+      if (
+        !$this->_values['event']['is_multiple_registrations']
+        && !$this->_values['event']['is_confirm_enabled']
+      ) {
+        $buttonLabel = ts('Register >>');
+      } else {
+        $buttonLabel = ts('Continue >>');
+      }
+      
       $this->addButtons(array(
           array(
             'type' => 'upload',
-            'name' => ts('Continue >>'),
+            'name' => $buttonLabel,
             'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
             'isDefault' => TRUE,
             'js' => $js,
@@ -1161,7 +1173,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->_params[] = $params;
       $this->set('params', $this->_params);
 
-      if (empty($params['additional_participants'])) {
+      if (
+        empty($params['additional_participants'])
+        && !$this->_values['event']['is_confirm_enabled'] // CRM-11182 - Optional confirmation screen
+      ) {
         self::processRegistration($this->_params);
       }
     }

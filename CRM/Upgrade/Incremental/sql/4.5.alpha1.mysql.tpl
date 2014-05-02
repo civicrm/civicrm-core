@@ -368,3 +368,14 @@ DELETE FROM civicrm_option_group WHERE id = @option_group_id_case_type;
   ALTER TABLE civicrm_survey DROP title;
   ALTER TABLE civicrm_survey DROP instructions;
 {/if}
+
+-- CRM-11182 -- Make event confirmation page optional
+ ALTER TABLE civicrm_event
+   ADD COLUMN is_confirm_enabled tinyint(4) DEFAULT '1';
+
+ UPDATE civicrm_event
+   SET is_confirm_enabled = 1
+   WHERE is_monetary = 1;
+
+ UPDATE civicrm_event
+   SET is_confirm_enabled = 0
