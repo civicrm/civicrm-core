@@ -402,6 +402,30 @@ class CiviCRM_For_WordPress {
 
   }
 
+/**
+ * Detect Ajax, snippet, or file requests
+ *
+ * @return boolean
+ */
+  public function isNotPageRequest() {
+    $argString = NULL;
+    $args = array();
+    if (isset( $_GET['q'])) {
+      $argString = trim($_GET['q']);
+      $args = explode('/', $argString);
+    }
+    $args = array_pad($args, 2, '');
+
+    if (CRM_Utils_Array::value('HTTP_X_REQUESTED_WITH', $_SERVER) == 'XMLHttpRequest'
+        || in_array($args[1], array('ajax', 'file'))
+        || !empty($_REQUEST['snippet'])
+      ) {
+      return true;
+    }
+    else {
+      return FALSE;
+    }
+  }
 
   /**
    * @description: invoke CiviCRM in a WordPress context
@@ -410,10 +434,6 @@ class CiviCRM_For_WordPress {
    * Also called by add_shortcode_includes() and _civicrm_update_user()
    */
   public function invoke() {
-  
-    if ( !in_the_loop() && !is_admin() && empty($_REQUEST['snippet']) ) {
-      return;
-    }
 
     static $alreadyInvoked = FALSE;
     if ( $alreadyInvoked ) {
@@ -478,6 +498,10 @@ class CiviCRM_For_WordPress {
     do_action( 'civicrm_invoked' );
 
   }
+
+    if ( !$this->isNotPageRequest() && !in_the_loop() && !is_admin() ) {
+      return;
+    }
 
 
   /**
