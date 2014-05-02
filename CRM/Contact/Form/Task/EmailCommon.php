@@ -134,9 +134,12 @@ class CRM_Contact_Form_Task_EmailCommon {
       $form->_single = FALSE;
     }
 
-    $to  = $form->add('text', 'to', ts('To'), '', TRUE);
-    $cc  = $form->add('text', 'cc_id', ts('CC'));
-    $bcc = $form->add('text', 'bcc_id', ts('BCC'));
+    $emailAttributes = array(
+      'class' => 'huge',
+    );
+    $to  = $form->add('text', 'to', ts('To'), $emailAttributes, TRUE);
+    $cc  = $form->add('text', 'cc_id', ts('CC'), $emailAttributes);
+    $bcc = $form->add('text', 'bcc_id', ts('BCC'), $emailAttributes);
 
     $setDefaults = TRUE;
     if (property_exists($form, '_context') && $form->_context == 'standalone') {
@@ -221,19 +224,19 @@ class CRM_Contact_Form_Task_EmailCommon {
           if (in_array($contactId, $form->_toContactIds)) {
             $form->_toContactDetails[$contactId] = $form->_contactDetails[$contactId];
             $toArray[] = array(
-              'name' => '"' . $value['sort_name'] . '" &lt;' . $email . '&gt;',
+              'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
               'id' => "$contactId::{$email}",
             );
           }
           elseif (in_array($contactId, $form->_ccContactIds)) {
             $ccArray[] = array(
-              'name' => '"' . $value['sort_name'] . '" &lt;' . $email . '&gt;',
+              'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
               'id' => "$contactId::{$email}",
             );
           }
           elseif (in_array($contactId, $form->_bccContactIds)) {
             $bccArray[] = array(
-              'name' => '"' . $value['sort_name'] . '" &lt;' . $email . '&gt;',
+              'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
               'id' => "$contactId::{$email}",
             );
           }
