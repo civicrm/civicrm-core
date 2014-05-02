@@ -354,3 +354,17 @@ ALTER TABLE civicrm_case
 DELETE FROM civicrm_option_value WHERE option_group_id = @option_group_id_case_type;
 
 DELETE FROM civicrm_option_group WHERE id = @option_group_id_case_type;
+
+-- CRM-14611
+{if $multilingual}
+  {foreach from=$locales item=locale}
+      ALTER TABLE civicrm_survey ADD title_{$locale} varchar(255);
+      UPDATE civicrm_survey SET title_{$locale} = title;
+
+      ALTER TABLE civicrm_survey ADD instructions_{$locale} TEXT;
+      UPDATE civicrm_survey SET instructions_{$locale} = instructions;
+  {/foreach}
+
+  ALTER TABLE civicrm_survey DROP title;
+  ALTER TABLE civicrm_survey DROP instructions;
+{/if}
