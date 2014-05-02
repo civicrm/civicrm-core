@@ -164,22 +164,9 @@ function showOnBehalf(onBehalfRequired) {
   }
 }
 
-function resetValues( filter ) {
-  if (filter) {
-    cj("#select_org div").find( 'input[type=text], select, textarea' ).each(function( ) {
-      if ( cj(this).attr('name') != 'onbehalf[organization_name]' ) {
-        cj(this).val('');
-      }
-    });
-  }
-  else {
-    cj("#select_org div").find( 'input[type=text], select, textarea' ).each(function( ) {
-      cj(this).val( '' );
-    });
-  }
-  cj("#select_org tr td").find( 'input[type=radio], input[type=checkbox]' ).each(function( ) {
-    cj(this).attr('checked', false);
-  });
+function resetValues() {
+  cj('input[type=text], select, textarea', "#select_org div").not('#onbehalfof_id').val('');
+  cj('input[type=radio], input[type=checkbox]', "#select_org tr td").prop('checked', false);
 }
 
 function createNew( ) {
@@ -187,7 +174,7 @@ function createNew( ) {
     var textMessage = ' {/literal}{ts escape="js"}Use existing organization{/ts}{literal} ';
     cj("#onbehalf_organization_name").removeAttr('readonly');
     cj("#mode").removeAttr('checked');
-    resetValues( false );
+    resetValues();
   }
   else {
     var textMessage = ' {/literal}{ts escape="js"}Enter a new organization{/ts}{literal} ';
@@ -207,7 +194,7 @@ function setOrgName( ) {
 
 
 function setLocationDetails(contactID) {
-  resetValues(true);
+  resetValues();
   var locationUrl = {/literal}"{$locDataURL}"{literal} + contactID + "&ufId=" + {/literal}"{$profileId}"{literal};
   cj.ajax({
     url         : locationUrl,
@@ -277,7 +264,7 @@ function selectCreateOrg( orgOption, reset ) {
   }
 
   if ( reset ) {
-    resetValues( false );
+    resetValues();
   }
 }
 
