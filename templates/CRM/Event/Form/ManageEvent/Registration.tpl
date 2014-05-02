@@ -162,7 +162,7 @@
         <tr id="additional_profile_post" class="crm-event-manage-registration-form-block-additional_custom_post_id">
              <td scope="row" class="label" width="20%">{$form.additional_custom_post_id.label}</td>
              <td>{$form.additional_custom_post_id.html}
-           &nbsp;<span class='profile_bottom_add_link_main {if $profilePostMultipleAdd}hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><span class="icon ui-icon-plus"></span>{ts}add profile{/ts}</a></span>
+           &nbsp;<span class='profile_bottom_add_link_main{if $profilePostMultipleAdd} hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><span class="icon ui-icon-plus"></span>{ts}add profile{/ts}</a></span>
      <br />
                 <span class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}</span>
                <br/><span class="profile-links"></span>
@@ -367,6 +367,8 @@ invert              = 0
         $(this).closest('tbody').append('<tr class="additional_profile"></tr>');
         var $el = $(this).closest('tbody').find('tr:last');
         $el.load(urlPath, function() { $(this).trigger('crmLoad') });
+        $(this).closest(".profile_bottom_link_main, .profile_bottom_link, .profile_bottom_add_link_main").hide();
+        $el.find(".profile_bottom_link_main, .profile_bottom_link, .profile_bottom_add_link_main").show();
     }
 
     function removeBottomProfile( e ) {
@@ -374,6 +376,7 @@ invert              = 0
 
         $(e.target).parents('tr').find('.crm-profile-selector').val('');
         $(e.target).parents('tr').hide();
+        $(e.target).parents('tbody').find('tr:visible:last .profile_bottom_link_main, tr:visible:last .profile_bottom_link, tr:visible:last .profile_bottom_add_link_main').show();
     }
 
     var strSameAs = ' - '+ts('same as for main contact')+' - ';
@@ -383,7 +386,7 @@ invert              = 0
         var $container = $("[id^='additional_profile_'],.additional_profile").not('.processed').addClass('processed');
         $container.find(".crm-profile-selector-select select").each( function() {
             var $select = $(this);
-            var selected = $select.find(':selected').val(); //cache the default 
+            var selected = $select.find(':selected').val(); //cache the default
             $select.find('option[value=""]').remove();
             $select.prepend('<option value="">'+strSameAs+'</option>');
             if ($select.closest('tr').is(':not([id*="_pre"])')) {
@@ -398,8 +401,8 @@ $(function($) {
     showRuleFields( {/literal}{$ruleFields}{literal} );
 
     var allow_multiple = $("#is_multiple_registrations");
-    if ( !allow_multiple.prop('checked') ) { 
-        $('#additional_profile_pre,#additional_profile_post').hide(); 
+    if ( !allow_multiple.prop('checked') ) {
+        $('#additional_profile_pre,#additional_profile_post').hide();
     }
     allow_multiple.change( function( ) {
         if ( !$(this).prop('checked') ) {
@@ -430,7 +433,7 @@ $(function($) {
     });
 
 }); // END onReady
-}(CRM.$, CRM._)); //Generic Closure 
+}(CRM.$, CRM._)); //Generic Closure
 {/literal}
 </script>
 {include file="CRM/common/formNavigate.tpl"}
