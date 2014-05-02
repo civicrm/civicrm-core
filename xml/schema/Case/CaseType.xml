@@ -36,6 +36,7 @@
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
+    <localizable>true</localizable>
     <comment>Natural language name for Case Type</comment>
     <add>4.5</add>
   </field>
@@ -43,6 +44,7 @@
     <name>description</name>
     <type>varchar</type>
     <length>255</length>
+    <localizable>true</localizable>
     <comment>Description of the Case Type</comment>
     <add>4.5</add>
   </field>
