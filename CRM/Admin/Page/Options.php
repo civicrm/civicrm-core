@@ -143,7 +143,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
           'communication_style',
           'case_status', 'encounter_medium',
           'case_type', 'payment_instrument',
-          'soft_credit_type'
+          'soft_credit_type', 'website_type'
         )
       )) {
       $this->assign('showIsDefault', TRUE);

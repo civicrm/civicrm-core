@@ -140,7 +140,12 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     $ufField->uf_group_id = CRM_Utils_Array::value('uf_group', $ids);
     $ufField->field_type = $params['field_name'][0];
     $ufField->field_name = $params['field_name'][1];
-    $ufField->location_type_id = (CRM_Utils_Array::value(2, $params['field_name'])) ? $params['field_name'][2] : 'NULL';
+    if ($params['field_name'][1] == 'url') {
+      $ufField->website_type_id = CRM_Utils_Array::value(2, $params['field_name'], NULL);
+    } 
+    else {
+      $ufField->location_type_id = (CRM_Utils_Array::value(2, $params['field_name'])) ? $params['field_name'][2] : 'NULL';
+    }
     $ufField->phone_type_id = CRM_Utils_Array::value(3, $params['field_name']);
 
     if (!empty($ids['uf_field'])) {
@@ -211,7 +216,14 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     $ufField->field_name = $params['field_name'][1];
 
     //should not set location type id for Primary
-    $locationTypeId = CRM_Utils_Array::value(2, $params['field_name']);
+    $locationTypeId = NULL;
+    if ($params['field_name'][1] == 'url') {
+      $ufField->website_type_id = CRM_Utils_Array::value(2, $params['field_name']);
+    } 
+    else {
+      $locationTypeId = CRM_Utils_Array::value(2, $params['field_name']);
+      $ufField->website_type_id = NULL;
+    }
     if ($locationTypeId) {
       $ufField->location_type_id = $locationTypeId;
     }
