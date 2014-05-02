@@ -379,3 +379,8 @@ DELETE FROM civicrm_option_group WHERE id = @option_group_id_case_type;
 
  UPDATE civicrm_event
    SET is_confirm_enabled = 0
+
+-- CRM-11182
+ALTER TABLE civicrm_event
+  ADD COLUMN dedupe_rule_group_id int(10) unsigned DEFAULT NULL COMMENT 'Rule to use when matching registrations for this event',
+  ADD CONSTRAINT `FK_civicrm_event_dedupe_rule_group_id` FOREIGN KEY (`dedupe_rule_group_id`) REFERENCES `civicrm_dedupe_rule_group` (`id`);
