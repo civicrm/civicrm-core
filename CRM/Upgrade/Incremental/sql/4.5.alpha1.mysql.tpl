@@ -386,3 +386,46 @@ DELETE FROM civicrm_option_group WHERE id = @option_group_id_case_type;
 ALTER TABLE civicrm_event
   ADD COLUMN dedupe_rule_group_id int(10) unsigned DEFAULT NULL COMMENT 'Rule to use when matching registrations for this event',
   ADD CONSTRAINT `FK_civicrm_event_dedupe_rule_group_id` FOREIGN KEY (`dedupe_rule_group_id`) REFERENCES `civicrm_dedupe_rule_group` (`id`);
+
+-- CRM-9288
+SELECT @option_web_id := id  FROM civicrm_option_group WHERE name = 'website_type';
+
+SELECT @website_default := value FROM civicrm_option_value WHERE option_group_id = @option_web_id and is_default = 1;
+
+SELECT @website_work := value FROM civicrm_option_value WHERE option_group_id = @option_web_id and name= 'Work';
+
+UPDATE civicrm_option_value
+SET is_default = 1 WHERE option_group_id = @option_web_id and value = IFNULL(@website_default , @website_work);
+
+SELECT @website_default := value FROM civicrm_option_value WHERE option_group_id = @option_web_id and is_default = 1;
+
+ALTER TABLE civicrm_uf_field
+  ADD COLUMN `website_type_id` int(10) unsigned DEFAULT NULL COMMENT 'Website Type Id, if required' AFTER phone_type_id,
+  ADD INDEX `IX_website_type_id` (`website_type_id`);
+
+UPDATE civicrm_uf_field
+SET website_type_id = @website_default,
+field_name = 'url' WHERE field_name LIKE 'url%';
+
+SELECT @website_value := max(cast(value as UNSIGNED)) FROM civicrm_option_value WHERE option_group_id = @option_web_id;
+SELECT @website_weight := max(weight) FROM civicrm_option_value WHERE option_group_id = @option_web_id;
+
+INSERT INTO civicrm_option_value(option_group_id, {localize field='label'}label{/localize}, name, value, weight)
+SELECT @option_web_id, {localize}website{/localize}, website, (@website_value := @website_value + 1), (@website_weight := @website_weight + 1) FROM (
+SELECT 'Google+' AS website
+    UNION ALL
+SELECT 'Instagram' AS website
+    UNION ALL
+SELECT 'LinkedIn' AS website
+    UNION ALL
+SELECT 'Pinterest' AS website
+    UNION ALL
+SELECT 'Tumblr' AS website
+    UNION ALL
+SELECT 'SnapChat' AS website
+    UNION ALL
+SELECT 'Vine' AS website
+) AS temp
+LEFT JOIN civicrm_option_value co ON LOWER(co.name) = LOWER(temp.website)
+AND option_group_id = @option_web_id
+WHERE co.id IS NULL;
