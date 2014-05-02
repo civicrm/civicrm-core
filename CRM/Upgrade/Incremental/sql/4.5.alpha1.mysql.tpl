@@ -349,7 +349,8 @@ UPDATE civicrm_case
   );
 
 ALTER TABLE civicrm_case
-  MODIFY case_type_id int(10) unsigned COLLATE utf8_unicode_ci NOT NULL COMMENT 'FK to civicrm_case_type.name';
+  MODIFY case_type_id int(10) unsigned COLLATE utf8_unicode_ci NULL COMMENT 'FK to civicrm_case_type.id',
+  ADD CONSTRAINT FK_civicrm_case_case_type_id FOREIGN KEY (case_type_id) REFERENCES civicrm_case_type (id) ON DELETE SET NULL;
 
 DELETE FROM civicrm_option_value WHERE option_group_id = @option_group_id_case_type;
 
