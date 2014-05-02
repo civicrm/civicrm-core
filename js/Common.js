@@ -476,7 +476,12 @@ CRM.validate = CRM.validate || {
       if ($('.ui-dialog .modal-dialog').not(e.target).length < 1) {
         $('body').css({overflow: ''});
       }
-    });
+    })
+    .on('submit', function(e) {
+      // CRM-14353 - disable changes warn when submitting the form
+      $(this).removeAttr('data-warn-changes');
+    })
+    ;
     
     window.onbeforeunload = function() {
       if (CRM.utils.initialValueChanged($('form[data-warn-changes]'))) {
