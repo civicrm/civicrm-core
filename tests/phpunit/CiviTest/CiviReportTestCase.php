@@ -38,6 +38,8 @@ class CiviReportTestCase extends CiviUnitTestCase {
     // Note that MySQL doesn't provide a way to list them, so we would need
     // to keep track ourselves (eg CRM_Core_TemporaryTableManager) or reset
     // the MySQL connection between test runs.
+
+    $this->quickCleanup($this->_tablesToTruncate);
     parent::tearDown();
   }
 
