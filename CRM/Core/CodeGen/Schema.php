@@ -89,6 +89,8 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
       'civicrm_acl.tpl',
     );
     $template->runConcat($sections, $this->config->sqlCodePath . 'civicrm_sample.mysql');
+
+    $template->run('case_sample.tpl', $this->config->sqlCodePath . 'case_sample.mysql');
   }
 
   function findLocales() {

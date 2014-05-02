@@ -56,7 +56,7 @@
        <add>2.0</add>
   </index>
   <foreignKey>
-       <name>case_type</name>
+       <name>case_type_id</name>
        <table>civicrm_case_type</table>
        <key>id</key>
        <add>4.5</add>
