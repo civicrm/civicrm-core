@@ -433,5 +433,4 @@ $(function($) {
 }(CRM.$, CRM._)); //Generic Closure 
 {/literal}
 </script>
-{include file="CRM/common/formNavigate.tpl"}
 {/if}

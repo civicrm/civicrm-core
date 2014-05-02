@@ -131,6 +131,8 @@
       // format date according to display field
       displayDateValue = cj.datepicker.formatDate( date_format, displayDateValue );
       cj( element_date).val( displayDateValue );
+      //support unsaved-changes warning: CRM-14353
+      cj( element_date).data('crm-initial-value', displayDateValue);
 
       cj(element_date).click( function( ) {
           hideYear( this );

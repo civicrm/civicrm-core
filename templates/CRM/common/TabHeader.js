@@ -10,9 +10,8 @@ CRM.$(function($) {
   $("#mainTabContainer")
     .on('tabsbeforeactivate', function(e, ui) {
       // Warn of unsaved changes - requires formNavigate.tpl to be included in each tab
-      if (!global_formNavigate) {
+      if (CRM.utils.initialValueChanged(ui.oldPanel)) {
         CRM.alert(ts('Your changes in the <em>%1</em> tab have not been saved.', {1: ui.oldTab.text()}), ts('Unsaved Changes'), 'warning');
-        global_formNavigate = true;
       }
     })
     .on('tabsbeforeload', function(e, ui) {

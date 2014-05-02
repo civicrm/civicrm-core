@@ -303,8 +303,5 @@
     </script>
     {/literal}
   {/if}
-  {if ! $form.case_select}
-  {include file="CRM/common/formNavigate.tpl"}
-  {/if}
   </div>{* end of form block*}
 {/if} {* end of snippet if*}

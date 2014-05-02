@@ -238,6 +238,22 @@ CRM.validate = CRM.validate || {
     });
   };
 
+/**
+ * Compare Form Input values against cached initial value.
+ *
+ * @return {Boolean} true if changes have been made.
+ */
+  CRM.utils.initialValueChanged = function(el) {
+    var isDirty = false;
+    $(':input:visible, :input.select2-offscreen', el).each(function () {
+      var initialValue = $(this).data('crm-initial-value');
+      if (initialValue !== undefined && initialValue != $(this).val()) {
+        isDirty = true;
+      }
+    });
+    return isDirty;
+  }
+
   /**
    * Wrapper for select2 initialization function; supplies defaults
    * @param options object
@@ -453,6 +469,10 @@ CRM.validate = CRM.validate || {
         .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
       $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
+      // Cache Form Input initial values
+      $('form[data-warn-changes] :input', e.target).each(function() {
+        $(this).data('crm-initial-value', $(this).val());
+      });
     })
     .on('dialogopen', function(e) {
       var $el = $(e.target);
@@ -487,7 +507,18 @@ CRM.validate = CRM.validate || {
       if ($('.ui-dialog .modal-dialog').not(e.target).length < 1) {
         $('body').css({overflow: ''});
       }
-    });
+    })
+    .on('submit', function(e) {
+      // CRM-14353 - disable changes warn when submitting the form
+      $(this).removeAttr('data-warn-changes');
+    })
+    ;
+    
+    window.onbeforeunload = function() {
+      if (CRM.utils.initialValueChanged($('form[data-warn-changes]'))) {
+        return ts('You have unsaved changes.');
+       }
+    };
 
   /**
    * Function to make multiselect boxes behave as fields in small screens

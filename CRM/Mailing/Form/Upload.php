@@ -37,6 +37,7 @@
  * This file is used to build the form configuring mailing details
  */
 class CRM_Mailing_Form_Upload extends CRM_Core_Form {
+
   public $_mailingID;
 
   function preProcess() {
