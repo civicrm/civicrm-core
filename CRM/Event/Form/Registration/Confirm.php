@@ -225,7 +225,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    */
   public function buildQuickForm() {
     $this->assignToTemplate();
-    if ($this->_params[0]['amount'] || $this->_params[0]['amount'] == 0) {
+
+    if ($this->_values['event']['is_monetary'] &&
+      ($this->_params[0]['amount'] || $this->_params[0]['amount'] == 0)
+    ) {
       $this->_amount = array();
 
       foreach ($this->_params as $k => $v) {
@@ -410,7 +413,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $cancelledIds = $this->_additionalParticipantIds;
 
     $params = $this->_params;
-    $this->set('finalAmount', $this->_amount);
+    if ($this->_values['event']['is_monetary']) {
+      $this->set('finalAmount', $this->_amount);
+    }
     $participantCount = array();
 
     //unset the skip participant from params.
@@ -607,14 +612,17 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $value['currencyID'] = $primaryCurrencyID;
       }
 
-      if (!$pending && !empty($value['is_primary']) &&
-        !$this->_allowWaitlist && !$this->_requireApproval
-      ) {
-        // transactionID & receive date required while building email template
-        $this->assign('trxn_id', $value['trxn_id']);
-        $this->assign('receive_date', CRM_Utils_Date::mysqlToIso($value['receive_date']));
-        $this->set('receiveDate', CRM_Utils_Date::mysqlToIso($value['receive_date']));
-        $this->set('trxnId', CRM_Utils_Array::value('trxn_id', $value));
+      // CRM-11182 - Confirmation page might not be monetary
+      if ($this->_values['event']['is_monetary']) {
+        if (!$pending && !empty($value['is_primary']) &&
+          !$this->_allowWaitlist && !$this->_requireApproval
+        ) {
+          // transactionID & receive date required while building email template
+          $this->assign('trxn_id', $value['trxn_id']);
+          $this->assign('receive_date', CRM_Utils_Date::mysqlToIso($value['receive_date']));
+          $this->set('receiveDate', CRM_Utils_Date::mysqlToIso($value['receive_date']));
+          $this->set('trxnId', CRM_Utils_Array::value('trxn_id', $value));
+        }
       }
 
       $value['fee_amount'] = CRM_Utils_Array::value('amount', $value);
@@ -778,7 +786,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $this->assign('isPrimary', 0);
           $this->assign('customProfile', NULL);
           //Additional Participant should get only it's payment information
-          if ($this->_amount) {
+          if (!empty($this->_amount)) {
             $amount = array();
             $params = $this->get('params');
             $amount[$participantNum]['label'] = preg_replace('//', '', $params[$participantNum]['amount_level']);

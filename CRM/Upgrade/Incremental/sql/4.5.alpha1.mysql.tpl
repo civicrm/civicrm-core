@@ -287,3 +287,15 @@ ALTER TABLE `civicrm_option_group`
 	ADD COLUMN `is_locked` int(1) DEFAULT 0 COMMENT 'A lock to remove the ability to add new options via the UI';
 
 UPDATE `civicrm_option_group` SET is_locked = 1 WHERE name IN ('contribution_status','activity_contacts','advanced_search_options','auto_renew_options','contact_autocomplete_options','batch_status','batch_type','batch_mode','contact_edit_options','contact_reference_options','contact_smart_group_display','contact_view_options','financial_item_status','mapping_type','pcp_status','user_dashboard_options','tag_used_for');
+
+-- CRM-11182 -- Make event confirmation page optional
+ALTER TABLE civicrm_event
+  ADD COLUMN is_confirm_enabled tinyint(4) DEFAULT '1';
+
+UPDATE civicrm_event
+  SET is_confirm_enabled = 1
+  WHERE is_monetary = 1;
+
+UPDATE civicrm_event
+  SET is_confirm_enabled = 0
+  WHERE is_monetary = 0;
