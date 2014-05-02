@@ -101,4 +101,3 @@ cj( "#to"     ).tokenInput( toDataUrl,     { prePopulate: toContact,  theme: 'fa
 cj( 'ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px' );
 </script>
 {/literal}
-{include file="CRM/common/formNavigate.tpl"}

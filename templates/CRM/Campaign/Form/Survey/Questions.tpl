@@ -39,5 +39,4 @@
   </table>
 
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-  {include file="CRM/common/formNavigate.tpl"}
 </div>
