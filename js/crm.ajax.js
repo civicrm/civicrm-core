@@ -291,7 +291,9 @@
       }
       $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
       $(settings.target).on('dialogclose', function() {
-        $(this).crmSnippet('destroy').dialog('destroy').remove();
+        if (!$(this).data('hasUnsavedChanges')) {
+          $(this).crmSnippet('destroy').dialog('destroy').remove();
+        }
       });
     }
     if (settings.dialog && !settings.dialog.title) {
@@ -338,35 +340,39 @@
     var widget = CRM.loadPage(url, settings).off('.crmForm');
 
     function cancelAction() {
-      if (CRM.utils.initialValueChanged(widget)) {
-        return confirm(ts('You have unsaved changes.'));
+      var dirty = CRM.utils.initialValueChanged(widget),
+        title = widget.dialog('option', 'title');
+      widget.data('hasUnsavedChanges', dirty).dialog('close');
+      if (dirty) {
+        var id = widget.attr('id') + '-unsaved-alert',
+          alert = CRM.alert('<p>' + ts('%1 has not been saved.', {1: title}) + '</p><p><a href="#" id="' + id + '">' + ts('Restore') + '</a></p>', ts('Unsaved Changes'), alert, {expires: });
+        $('#' + id).button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}}).click(function() {
+          widget.dialog('open');
+          alert.close();
+          return false;
+        });
       }
-      return true;
     }
     if (widget.data('uiDialog')) {
-      // This is a bit harsh but we are removing jQuery UI's event handler from the button and adding our own
-      $('.ui-dialog-titlebar-close').first().off().click(function() {
-        if (cancelAction()) {
-          widget.dialog('close');
-        }
-      });
+      // This is a bit harsh but we are removing jQuery UI's event handler from the close button and adding our own
+      $('.ui-dialog-titlebar-close').first().off().click(cancelAction);
     }
 
     widget.on('crmFormLoad.crmForm', function(event, data) {
-      var $el = $(this);
+      var $el = $(this)
+        .data('hasUnsavedChanges', false);
       var settings = $el.crmSnippet('option', 'crmForm');
-      settings.cancelButton && $(settings.cancelButton, this).click(function(event) {
-        var returnVal = settings.onCancel.call($el, event);
-        if (returnVal !== false && cancelAction()) {
-          $el.trigger('crmFormCancel', event);
+      settings.cancelButton && $(settings.cancelButton, this).click(function(e) {
+        e.preventDefault();
+        var returnVal = settings.onCancel.call($el, e);
+        if (returnVal !== false) {
+          $el.trigger('crmFormCancel', e);
           if ($el.data('uiDialog') && settings.autoClose) {
-            $el.dialog('close');
+            cancelAction();
           }
           else if (!settings.autoClose) {
             $el.crmSnippet('resetUrl').crmSnippet('refresh');
           }
-        } else {
-          event.preventDefault();
         }
       });
       if (settings.validate) {

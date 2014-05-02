@@ -4341,6 +4341,10 @@ div.m ul#civicrm-menu,
 .crm-container div.ui-notify-message-style a:focus {
   color: #B2B8FF;
 }
+.crm-container div.ui-notify-message-style .ui-button .ui-button-text {
+  color: #2F2F2F;
+  text-decoration: none;
+}
 #crm-notification-container .ui-notify-message .ui-notify-close {
   cursor: pointer;
 }
