@@ -1491,8 +1491,8 @@ class CRM_Utils_Token {
   /**
    * Replace Contribution tokens in html
    *
-   * @param unknown $str
-   * @param unknown $contribution
+   * @param string $str
+   * @param array $contribution
    * @param bool|string $html
    * @param string $knownTokens
    * @param bool|string $escapeSmarty
