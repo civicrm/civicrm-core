@@ -379,6 +379,7 @@ DELETE FROM civicrm_option_group WHERE id = @option_group_id_case_type;
 
  UPDATE civicrm_event
    SET is_confirm_enabled = 0
+   WHERE is_monetary = 0;
 
 -- CRM-11182
 ALTER TABLE civicrm_event
