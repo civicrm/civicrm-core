@@ -40,7 +40,6 @@
   <field>
        <name>case_type_id</name>
        <type>int unsigned</type>
-       <required>true</required>
        <import>true</import>
        <export>false</export>
        <title>Case Type</title>
@@ -60,7 +59,7 @@
        <table>civicrm_case_type</table>
        <key>id</key>
        <add>4.5</add>
-       <onDelete>CASCADE</onDelete>
+       <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
        <name>casetag1_id</name>
