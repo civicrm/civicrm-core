@@ -258,8 +258,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
             if ($field == 'url') {
               $blockName     = 'website';
-              $locationType  = 'website_type_id';
-              $locationValue = CRM_Utils_Array::value("{$loc}-website_type_id", $this->_params['onbehalf']);
+              $locationType = 'website_type_id';
+              list($field, $locationValue) = explode('-', $loc);
             }
             elseif ($field == 'im') {
               $fieldName = 'name';
