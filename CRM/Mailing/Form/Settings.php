@@ -91,6 +91,10 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
       $dao->override_verp = !$dao->override_verp;
       $dao->storeValues($dao, $defaults);
       $defaults['visibility'] = $dao->visibility;
+      
+      crm_core_error::debug('$dao->visibility', $dao->visibility);
+      exit();
+      
     }
     return $defaults;
   }
