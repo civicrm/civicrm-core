@@ -1092,12 +1092,12 @@ LEFT JOIN {$reminderJoinClause}
         $insertAdditionalSql ="
 INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
 {$addSelect}
-FROM ({$contactTable}, {$table})
+FROM ({$contactTable})
 LEFT JOIN {$additionReminderClause}
 {$addGroup}
-{$additionWhere} c.is_deleted = 0 AND c.is_deceased = 0
+WHERE c.is_deleted = 0 AND c.is_deceased = 0
 {$addWhereClause}
-AND {$dateClause}
+
 AND c.id NOT IN (
      SELECT rem.contact_id
      FROM civicrm_action_log rem INNER JOIN {$mapping->entity} e ON rem.entity_id = e.id
