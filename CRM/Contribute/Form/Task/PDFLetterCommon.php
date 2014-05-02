@@ -238,10 +238,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    */
   static function combineContributions($existing, $contribution, $separator) {
     foreach ($contribution as $field => $value) {
-      if(!isset($existing[$field])) {
-        $existing[$field] = '';
-      }
-      $existing[$field] .= $separator . $value;
+      $existing[$field] = isset($existing[$field]) ? $existing[$field] . $separator : '';
+      $existing[$field]  .= $value;
     }
     return $existing;
   }
