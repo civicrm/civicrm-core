@@ -305,6 +305,12 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
           'qs' => 'eid=%%pcpId%%&blockId=%%pcpBlock%%&reset=1&pcomponent=pcp&component=%%pageComponent%%',
           'title' => ts('Tell Friends'),
         ),
+        CRM_Core_Action::VIEW => array(
+          'name' => ts('URL for this Page'),
+          'url' => 'civicrm/pcp/info',
+          'qs' => 'reset=1&id=%%pcpId%%&component=%%pageComponent%%',
+          'title' => ts('URL for this Page'),
+        ),
         CRM_Core_Action::BROWSE => array(
           'name' => ts('Update Contact Information'),
           'url' => 'civicrm/pcp/info',
