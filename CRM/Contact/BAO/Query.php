@@ -5239,6 +5239,7 @@ AND   displayRelType.is_active = 1
       return;
     }
     $values = array();
+    $sep = CRM_Core_DAO::VALUE_SEPARATOR;
     foreach ($this->_pseudoConstantsSelect as $key => $value) {
       if (!empty($this->_pseudoConstantsSelect[$key]['sorting'])) {
         continue;
@@ -5258,6 +5259,13 @@ AND   displayRelType.is_active = 1
         }
         elseif ($value['pseudoField'] == 'state_province_abbreviation') {
           $dao->$key = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);
+        }
+        elseif ($value['pseudoField'] == 'participant_role') {
+          $viewRoles = array();
+          foreach (explode($sep, $val) as $k => $v) {
+            $viewRoles[] = CRM_Event_PseudoConstant::participantRole($v);
+          }
+          $dao->$key = implode(', ', $viewRoles);
         }
         else {
           $labels = CRM_Core_OptionGroup::values($value['pseudoField']);
