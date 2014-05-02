@@ -91,7 +91,7 @@ class CRM_Event_StateMachine_Registration extends CRM_Core_StateMachine {
     $pages = array_merge($pages, $additionalPages);
     
     // CRM-11182 - Optional confirmation screen
-    if (!$is_confirm_enabled) {
+    if (!$is_confirm_enabled  && !$is_monetary) {
       unset($pages['CRM_Event_Form_Registration_Confirm']);
     }
 
