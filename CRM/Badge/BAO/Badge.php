@@ -64,12 +64,9 @@ class CRM_Badge_BAO_Badge {
       $this->border = "LTRB";
     }
 
-    $order = 1;
     foreach ($participants as $participant) {
-      CRM_Utils_Hook::alterBadge($order, $this, $layoutInfo, $participant);
       $formattedRow = self::formatLabel($participant, $layoutInfo);
       $this->pdf->AddPdfLabel($formattedRow);
-      $order + 1;
     }
 
     $this->pdf->Output(CRM_Utils_String::munge($layoutInfo['title'], '_', 64) . '.pdf', 'D');
@@ -156,6 +153,9 @@ class CRM_Badge_BAO_Badge {
   }
 
   public function labelCreator(&$formattedRow, $cellspacing = 0) {
+    //call hook alterBadge
+    CRM_Utils_Hook::alterBadge($formattedRow['labelFormat'], $this, $formattedRow,$formattedRow['values']);
+
     $this->lMarginLogo = 18;
     $this->tMarginName = 20;
 
