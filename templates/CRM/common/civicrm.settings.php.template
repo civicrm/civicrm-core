@@ -252,6 +252,20 @@ define( 'CIVICRM_MEMCACHE_PREFIX', '' );
 // define('CIVICRM_LANGUAGE_MAPPING_ZH', 'zh_TW');
 
 /**
+ * Native gettext improves performance of localized CiviCRM installations
+ * significantly. However, your host must enable the locale (language).
+ * On most GNU/Linux, Unix or MacOSX systems, you may view them with
+ * the command line by typing: "locale -a".
+ *
+ * On Debian or Ubuntu, you may reconfigure locales with:
+ * # dpkg-reconfigure locales
+ *
+ * For more information:
+ * http://wiki.civicrm.org/confluence/x/YABFBQ
+ */
+// define('CIVICRM_GETTEXT_NATIVE', 1);
+
+/**
  * Configure MySQL to throw more errors when encountering unusual SQL expressions.
  *
  * If undefined, the value is determined automatically. For CiviCRM tarballs, it defaults
