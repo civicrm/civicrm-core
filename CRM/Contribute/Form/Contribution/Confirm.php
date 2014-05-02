@@ -1499,7 +1499,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $recurParams['start_date'] = $params['receive_date'];
     }
     $recurParams['invoice_id'] = CRM_Utils_Array::value('invoiceID', $params);
-    $recurParams['contribution_status_id'] = 2;
+    $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $recurParams['payment_processor_id'] = CRM_Utils_Array::value('payment_processor_id', $params);
     $recurParams['is_email_receipt'] = CRM_Utils_Array::value('is_email_receipt', $params);
     // we need to add a unique trxn_id to avoid a unique key error
@@ -1521,10 +1521,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $recurring = CRM_Contribute_BAO_ContributionRecur::add($recurParams);
     if (is_a($recurring, 'CRM_Core_Error')) {
-      CRM_Core_Error::displaySessionError($result);
+      CRM_Core_Error::displaySessionError($recurring);
       $urlString = 'civicrm/contribute/transact';
       $urlParams = '_qf_Main_display=true';
-      if ($className == 'CRM_Contribute_Form_Contribution') {
+      if (get_class($form) == 'CRM_Contribute_Form_Contribution') {
         $urlString = 'civicrm/contact/view/contribution';
         $urlParams = "action=add&cid={$form->_contactID}";
         if ($form->_mode) {

@@ -298,8 +298,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
       // check if pending was set to true by payment processor
       $pending = FALSE;
-      if (!empty($form->_params
-['contribution_status_pending'])) {
+      if (!empty($form->_params['contribution_status_pending'])) {
         $pending = TRUE;
       }
       if (!(!empty($paymentParams['is_recur']) && $form->_contributeMode == 'direct')) {
