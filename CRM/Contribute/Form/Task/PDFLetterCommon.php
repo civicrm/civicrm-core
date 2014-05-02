@@ -209,7 +209,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         $groupByID = empty($contribution[$groupBy]) ? 0 : $contribution[$groupBy];
 
         $contacts[$contactID]['contribution_ids'][$groupBy][$groupByID][$contributionId] = TRUE;
-        if(!isset($contacts[$contactID]['combined'][$groupBy]) || isset($contacts[$contactID]['combined'][$groupByID])) {
+        if(!isset($contacts[$contactID]['combined'][$groupBy]) || !isset($contacts[$contactID]['combined'][$groupBy][$groupByID])) {
           $contacts[$contactID]['combined'][$groupBy][$groupByID] = $contribution;
           $contacts[$contactID]['aggregates'][$groupBy][$groupByID] = $contribution['total_amount'];
         }
