@@ -11,6 +11,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function postProcess(&$form) {
@@ -126,7 +128,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
 
  /**
   *
-  * @param unknown $html_message
+  * @param string $html_message
   * @param array $contact
   * @param array $contribution
   * @param array $messageToken
@@ -166,6 +168,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * @param unknown $skipDeceased
    * @param unknown $messageToken
    * @param unknown $task
+   * @param $separator
+   *
    * @return multitype:Ambigous <boolean, multitype:> multitype:unknown  multitype:
    */
   static function buildContributionArray($groupBy, $form, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator) {
@@ -231,9 +235,12 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * We combine the contributions by adding the contribution to each field with the separator in
    * between the existing value and the new one. We put the separator there even if empty so it is clear what the
    * value for previous contributions was
+   *
    * @param unknown $existing
    * @param unknown $contribution
    * @param unknown $separator
+   *
+   * @return \unknown
    */
   static function combineContributions($existing, $contribution, $separator) {
     foreach ($contribution as $field => $value) {
@@ -248,8 +255,11 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
   /**
    * We are going to retrieve the combined contribution and if smarty mail is enabled we
    * will also assign an array of contributions for this contact to the smarty template
+   *
    * @param array $contact
    * @param array $contributions
+   * @param $groupBy
+   * @param $groupByID
    */
   static function assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID) {
     if (!defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY) {
@@ -263,8 +273,15 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
 
   /**
    * Send pdf by email
+   *
    * @param array $contact
    * @param string $html
+   *
+   * @param $is_pdf
+   * @param array $format
+   * @param array $params
+   *
+   * @return bool
    */
   static function emailLetter($contact, $html, $is_pdf, $format = array(), $params = array()) {
     try {
