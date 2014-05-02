@@ -78,18 +78,18 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
 
     CRM_Utils_System::setTitle(ts('Please Confirm Your Unsubscribe from this Mailing/Group'));
 
-    $this->add('text', 'email_confirm', ts('Verify Email address to unsubscribe:'));
-    $this->addRule('email_confirm', ts('Email address required to unsubscribe'), 'required');
+    $this->add('text', 'email_confirm', ts('Verify email address to unsubscribe:'));
+    $this->addRule('email_confirm', ts('Email address is required to unsubscribe.'), 'required');
 
     $buttons = array(
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ),
       array(
         'type' => 'next',
         'name' => 'Unsubscribe',
         'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
       ),
     );
 
@@ -121,7 +121,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
         CRM_Mailing_Event_BAO_Unsubscribe::send_unsub_response($queue_id, $groups, FALSE, $job_id);
       }
 
-      $statusMsg = ts('Email: %1 has been successfully unsubscribed from this Mailing/Group',
+      $statusMsg = ts('Email: %1 has been successfully unsubscribed from this Mailing List/Group.',
         array(1 => $values['email_confirm'])
       );
 
@@ -130,7 +130,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     else if ($result == FALSE) {
       // Email address not verified
 
-      $statusMsg = ts('Email: %1 you have entered does not match the Email address associated with this unsubscribe',
+      $statusMsg = ts('The email address: %1 you have entered does not match the email associated with this unsubscribe request.',
         array(1 => $values['email_confirm'])
       );
 
