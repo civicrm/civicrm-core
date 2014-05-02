@@ -120,7 +120,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    */
   public function testAll($fv, $count, $ids, $full) {
     // Truncate affected tables
-    $this->quickCleanup(self::$_tablesToTruncate);
+    $this->quickCleanup($this->_tablesToTruncate);
 
     // echo "testAll\n";
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -151,7 +151,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    */
   public function testContactIDs($fv, $count, $ids, $full) {
     // Truncate affected tables
-    $this->quickCleanup(self::$_tablesToTruncate);
+    $this->quickCleanup($this->tablesToTruncate);
 
     // echo "testContactIDs\n";
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
