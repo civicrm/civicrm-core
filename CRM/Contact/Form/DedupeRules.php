@@ -196,7 +196,7 @@ UPDATE civicrm_dedupe_rule_group
    AND used = %2";
       $queryParams = array(
         1 => array($this->_contactType, 'String'),
-        2 => array($this->_options[$used], 'String'),
+        2 => array($values['used'], 'String'),
       );
 
       CRM_Core_DAO::executeQuery($query, $queryParams);
