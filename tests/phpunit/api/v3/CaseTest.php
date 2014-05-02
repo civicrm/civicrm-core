@@ -102,6 +102,8 @@ class api_v3_CaseTest extends CiviUnitTestCase {
 
     $this->loadAllFixtures();
 
+    $this->loadAllFixtures();
+
     $activityTypes = $this->callAPISuccess('option_value', 'get', array(
       'option_group_id' => 2,
       'name' => 'Follow Up',
