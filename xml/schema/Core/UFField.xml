@@ -171,6 +171,12 @@
        <add>2.2</add>
   </field>
   <field>
+    <name>website_type_id</name>
+    <type>int unsigned</type>
+    <comment>Website Type Id, if required</comment>
+    <add>4.5</add>
+  </field>
+  <field>
        <name>label</name>
        <type>varchar</type>
        <length>255</length>
@@ -199,4 +205,9 @@
     <comment>Include in multi-record listing?</comment>
     <add>4.3</add>
   </field>
+  <index>
+    <name>IX_website_type_id</name>
+    <fieldName>website_type_id</fieldName>
+    <add>4.5</add>
+  </index>
 </table>
