@@ -123,6 +123,7 @@ packages/doc
 packages/temp
 packages/test
 settings_location.php
+sql/case_sample.mysql
 sql/civicrm.mysql
 sql/civicrm_acl.??_??.mysql
 sql/civicrm_acl.mysql
