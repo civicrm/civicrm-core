@@ -661,10 +661,9 @@ ORDER BY sort_name ";
 
       if ($queryString) {
         $offset = CRM_Utils_Array::value('offset', $_GET, 0);
-        $rowCount = CRM_Utils_Array::value('rowcount', $_GET, 20);
+        $rowCount = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
 
         $offset = CRM_Utils_Type::escape($offset, 'Int');
-        $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
 
         // add acl clause here
         list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
@@ -691,8 +690,8 @@ LIMIT {$offset}, {$rowCount}
           $dao = CRM_Core_DAO::executeQuery($query);
           while ($dao->fetch()) {
             $result[] = array(
-              'name' => $dao->name,
               'id' => $dao->id,
+              'text' => $dao->name,
             );
           }
         }
@@ -717,13 +716,13 @@ LIMIT {$offset}, {$rowCount}
           $dao = CRM_Core_DAO::executeQuery($query);
 
           while ($dao->fetch()) {
+              //working here
             $result[] = array(
-              'name' => '"' . $dao->name . '" &lt;' . $dao->email . '&gt;',
+              'text' => '"' . $dao->name . '" <' . $dao->email . '>',
               'id' => (CRM_Utils_Array::value('id', $_GET)) ? "{$dao->id}::{$dao->email}" : '"' . $dao->name . '" <' . $dao->email . '>',
             );
           }
         }
-
         if ($result) {
           echo json_encode($result);
         }
@@ -789,7 +788,7 @@ LIMIT {$offset}, {$rowCount}
 
       while ($dao->fetch()) {
         $result[] = array(
-          'name' => '"' . $dao->name . '" &lt;' . $dao->phone . '&gt;',
+          'text' => '"' . $dao->name . '" (' . $dao->phone . ')',
           'id' => (CRM_Utils_Array::value('id', $_GET)) ? "{$dao->id}::{$dao->phone}" : '"' . $dao->name . '" <' . $dao->phone . '>',
         );
       }

@@ -617,10 +617,6 @@ class CRM_Core_Resources {
       $items[] = "packages/jquery/plugins/jquery.blockUI$min.js";
       $items[] = "packages/jquery/plugins/jquery.notify$min.js";
       $items[] = "js/jquery/jquery.crmeditable.js";
-
-      // TODO: tokeninput is deprecated in favor of select2 and will be removed soon
-      $items[] = "packages/jquery/plugins/jquery.tokeninput$min.js";
-      $items[] = "packages/jquery/css/token-input-facebook.css";
     }
 
     // Enable administrators to edit option lists in a dialog
