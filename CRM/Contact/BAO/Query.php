@@ -5239,7 +5239,6 @@ AND   displayRelType.is_active = 1
       return;
     }
     $values = array();
-    $sep = CRM_Core_DAO::VALUE_SEPARATOR;
     foreach ($this->_pseudoConstantsSelect as $key => $value) {
       if (!empty($this->_pseudoConstantsSelect[$key]['sorting'])) {
         continue;
@@ -5260,9 +5259,11 @@ AND   displayRelType.is_active = 1
         elseif ($value['pseudoField'] == 'state_province_abbreviation') {
           $dao->$key = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);
         }
+        // FIX ME: we should potentially move this to component Query and write a wrapper function that
+        // handles pseudoconstant fixes for all component
         elseif ($value['pseudoField'] == 'participant_role') {
           $viewRoles = array();
-          foreach (explode($sep, $val) as $k => $v) {
+          foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, $val) as $k => $v) {
             $viewRoles[] = CRM_Event_PseudoConstant::participantRole($v);
           }
           $dao->$key = implode(', ', $viewRoles);
