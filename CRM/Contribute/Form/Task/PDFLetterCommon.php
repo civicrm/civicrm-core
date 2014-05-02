@@ -120,12 +120,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     }
   }
 
-/**
- * @param contact
- * @param smarty
- * @param html
- *
-
  /**
   *
   * @param string $html_message
@@ -163,10 +157,10 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    *
    * @param unknown $groupBy
    * @param unknown $form
-   * @param unknown $returnProperties
-   * @param unknown $skipOnHold
-   * @param unknown $skipDeceased
-   * @param unknown $messageToken
+   * @param array $returnProperties
+   * @param boolean $skipOnHold
+   * @param boolean $skipDeceased
+   * @param array $messageToken
    * @param unknown $task
    * @param $separator
    *
@@ -319,4 +313,3 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     }
   }
 }
-
