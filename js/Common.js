@@ -510,12 +510,12 @@ CRM.validate = CRM.validate || {
     })
     .on('submit', function(e) {
       // CRM-14353 - disable changes warn when submitting the form
-      $(this).removeAttr('data-warn-changes');
+      $('[data-warn-changes]').removeAttr('data-warn-changes');
     })
     ;
     
     window.onbeforeunload = function() {
-      if (CRM.utils.initialValueChanged($('form[data-warn-changes]'))) {
+      if (CRM.utils.initialValueChanged($('form[data-warn-changes=true]'))) {
         return ts('You have unsaved changes.');
        }
     };
