@@ -360,15 +360,6 @@ DELETE membership1.* FROM civicrm_membership membership1
              AND membership1.contact_id = {$mainId}
              AND membership2.contact_id = {$otherId} ";
       }
-      if ($mode == 'payment') {
-        $sqls[] = "
-DELETE contribution.* FROM civicrm_contribution contribution
-INNER JOIN  civicrm_membership_payment payment ON payment.contribution_id = contribution.id
-INNER JOIN  civicrm_membership membership1 ON membership1.id = payment.membership_id
-            AND membership1.contact_id = {$mainId}
-INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = membership2.membership_type_id
-            AND membership2.contact_id = {$otherId}";
-      }
       break;
 
       case 'civicrm_uf_match':
