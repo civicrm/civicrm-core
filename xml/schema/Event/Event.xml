@@ -777,6 +777,17 @@
     </html>
   </field>
   <field>
+    <name>is_confirm_enabled</name>
+    <title>Is the booking confirmation screen enabled?</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>If false, the event booking confirmation screen gets skipped</comment>
+    <add>4.5</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
     <name>parent_event_id</name>
     <type>int unsigned</type>
     <title>Parent Event ID</title>
