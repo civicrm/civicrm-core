@@ -716,7 +716,7 @@ LIMIT {$offset}, {$rowCount}
           $dao = CRM_Core_DAO::executeQuery($query);
 
           while ($dao->fetch()) {
-              //working here 
+              //working here
             $result[] = array(
               'text' => '"' . $dao->name . '" <' . $dao->email . '>',
               'id' => (CRM_Utils_Array::value('id', $_GET)) ? "{$dao->id}::{$dao->email}" : '"' . $dao->name . '" <' . $dao->email . '>',
@@ -788,7 +788,7 @@ LIMIT {$offset}, {$rowCount}
 
       while ($dao->fetch()) {
         $result[] = array(
-          'name' => '"' . $dao->name . '" &lt;' . $dao->phone . '&gt;',
+          'text' => '"' . $dao->name . '" (' . $dao->phone . ')',
           'id' => (CRM_Utils_Array::value('id', $_GET)) ? "{$dao->id}::{$dao->phone}" : '"' . $dao->name . '" <' . $dao->phone . '>',
         );
       }
