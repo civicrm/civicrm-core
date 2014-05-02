@@ -130,13 +130,11 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
 
     if ($contactID && count($form->_employers) >= 1) {
       $form->add('text', 'organization_id', ts('Select an existing related Organization OR enter a new one'));
-      $employers = array();
-      foreach ($form->_employers as $id => $vals) {
-        $employers[$id] = $vals['name'];
-      }
-      $form->add('select', 'onbehalfof_id', 'onbehalfof_id', $employers);
 
-      $orgOptions = array(0 => ts('Select an existing organization'),
+      $form->add('select', 'onbehalfof_id', '', CRM_Utils_Array::collect('name', $form->_employers));
+
+      $orgOptions = array(
+        0 => ts('Select an existing organization'),
         1 => ts('Enter a new organization'),
       );
 
