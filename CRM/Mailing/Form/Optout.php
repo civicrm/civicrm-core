@@ -67,18 +67,18 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
 
     CRM_Utils_System::setTitle(ts('Please Confirm Your Opt Out'));
 
-    $this->add('text', 'email_confirm', ts('Verify Email address to opt out:'));
-    $this->addRule('email_confirm', ts('Email address required to opt out'), 'required');
+    $this->add('text', 'email_confirm', ts('Verify email address to opt out:'));
+    $this->addRule('email_confirm', ts('Email address is required to opt out.'), 'required');
 
     $buttons = array(
       array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
+        'type' => 'next',
+        'name' => 'Opt Out',
+        'isDefault' => TRUE,
       ),
       array(
-        'type' => 'next',
-        'name' => 'Unsubscribe',
-        'isDefault' => TRUE,
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
       ),
     );
 
@@ -117,7 +117,7 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
     else if ($result == FALSE) {
       // Email address not verified
 
-      $statusMsg = ts('Email: %1 you have entered does not match the Email address associated with this opt out',
+      $statusMsg = ts('The email address: %1 you have entered does not match the email associated with this opt out request.',
         array(1 => $values['email_confirm'])
       );
 
