@@ -1170,19 +1170,23 @@ function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $grou
   $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, CRM_Core_DAO::$_nullObject);
   $customValues = array();
   CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $customValues);
+  $fieldInfo = array();
+  foreach ($groupTree as $set) {
+    $fieldInfo += $set['fields'];
+  }
   if (!empty($customValues)) {
     foreach ($customValues as $key => $val) {
-      if (strstr($key, '_id')) {
-        $idkey = substr($key, 0, -3);
-        $returnArray['custom_' . (CRM_Core_BAO_CustomField::getKeyID($idkey) . "_id")] = $val;
-        $returnArray[$key] = $val;
-      }
-      else {
-        // per standard - return custom_fieldID
-        $returnArray['custom_' . (CRM_Core_BAO_CustomField::getKeyID($key))] = $val;
+      // per standard - return custom_fieldID
+      $id = CRM_Core_BAO_CustomField::getKeyID($key);
+      $returnArray['custom_' . $id] = $val;
 
-        //not standard - but some api did this so guess we should keep - cheap as chips
-        $returnArray[$key] = $val;
+      //not standard - but some api did this so guess we should keep - cheap as chips
+      $returnArray[$key] = $val;
+
+      // Shim to restore legacy behavior of ContactReference custom fields
+      if (!empty($fieldInfo[$id]) && $fieldInfo[$id]['data_type'] == 'ContactReference') {
+        $returnArray['custom_' . $id . '_id'] = $returnArray[$key . '_id'] = $val;
+        $returnArray['custom_' . $id] = $returnArray[$key] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $val, 'sort_name');
       }
     }
   }
