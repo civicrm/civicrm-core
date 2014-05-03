@@ -216,9 +216,13 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
   /**
    * takes an associative array and creates a membership object
    *
-   * @param array    $params      (reference ) an assoc array of name/value pairs
-   * @param array    $ids         the array that holds all the db ids
-   * @param boolean  $callFromAPI Is this function called from API?
+   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $ids the array that holds all the db ids
+   * @param bool $skipRedirect
+   * @param string $activityType
+   *
+   * @throws CRM_Core_Exception
+   * @internal param bool $callFromAPI Is this function called from API?
    *
    * @return object CRM_Member_BAO_Membership object
    * @access public
@@ -270,7 +274,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     //    CRM_Contact_BAO_Relationship::relatedMemberships()
     if (isset($params['owner_membership_id'])) {
       unset($params['max_related']);
-    } else {
+    }
+    else {
       // if membership allows related, default max_related to value in membership_type
       if (!array_key_exists('max_related', $params) && !empty($params['membership_type_id'])) {
         $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($params['membership_type_id']);
@@ -413,7 +418,9 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * Function to check the membership extended through relationship
    *
    * @param int $membershipId membership id
-   * @param int $contactId    contact id
+   * @param int $contactId contact id
+   *
+   * @param const $action
    *
    * @return Array    array of contact_id of all related contacts.
    * @static
@@ -477,10 +484,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * full featured over a period of time. This is the inverse function of
    * create.  It also stores all the retrieved values in the default array
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
+   * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the name / value pairs
    *                        in a hierarchical manner
-   * @param array $ids      (reference) the array that holds all the db ids
+   *
+   * @internal param array $ids (reference) the array that holds all the db ids
    *
    * @return object CRM_Member_BAO_Membership object
    * @access public
@@ -2010,8 +2018,10 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * function to create memberships for related contacts
    * takes into account the maximum related memberships
    *
-   * @param  array      $params       array of key - value pairs
-   * @param  object     $membership   membership object
+   * @param  array $params array of key - value pairs
+   * @param $dao
+   *
+   * @internal param object $membership membership object
    *
    * @return null|relatedMembership     array of memberships if created
    * @static
@@ -2144,7 +2154,8 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         if (($params['status_id'] == $deceasedStatusId) || ($params['status_id'] == $expiredStatusId)) {
           // related membership is not active so does not count towards maximum
           CRM_Member_BAO_Membership::create($params, $relMemIds);
-        } else {
+        }
+        else {
           // related membership already exists, so this is just an update
           if (isset($params['id'])) {
             if ($available > 0) {

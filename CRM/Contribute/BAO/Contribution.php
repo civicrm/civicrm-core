@@ -491,6 +491,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * scheme. Adding weight is super important and should be done in the
    * next week or so, before this can be called complete.
    *
+   * @param string $contactType
+   * @param bool $status
+   *
    * @return array array of importable Fields
    * @access public
    * @static
@@ -690,8 +693,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   /**
    * Delete the indirect records associated with this contribution first
    *
-   * @return $results no of deleted Contribution on success, false otherwise
-   * @access public
+   * @param $id
+   *
+   * @return mixed|null $results no of deleted Contribution on success, false otherwise@access public
    * @static
    */
   static function deleteContribution($id) {

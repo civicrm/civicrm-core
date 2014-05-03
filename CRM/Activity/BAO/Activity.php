@@ -148,11 +148,12 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   /**
    * Function to delete the activity
    *
-   * @param array  $params  associated array
+   * @param array $params associated array
+   *
+   * @param bool $moveToTrash
    *
    * @return void
    * @access public
-   *
    */
   public static function deleteActivity(&$params, $moveToTrash = FALSE) {
     // CRM-9137
@@ -255,7 +256,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   /**
    * Delete activity assignment record
    *
-   * @param int    $id  activity id
+   * @param $activityId
+   * @param null $recordTypeID
+   *
+   * @internal param int $id activity id
    *
    * @return null
    * @access public
@@ -274,6 +278,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *
    * @param array $params associated array of the submitted values
    *
+   * @throws CRM_Core_Exception
    * @internal param object $form form object
    * @internal param array $ids array of ids
    * @internal param string $activityType activity Type
@@ -537,7 +542,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         );
       }
       else {
-        $q = "action=view&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid={$params['source_contact_id']}&context=home";
+        $q = "action=view&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid={" . CRM_Utils_Array::value('source_contact_id', $params) . "}&context=home";
         if ($activity->activity_type_id != CRM_Core_OptionGroup::getValue('activity_type', 'Email', 'name')) {
           $url = CRM_Utils_System::url('civicrm/activity', $q);
           if ($activity->activity_type_id == CRM_Core_OptionGroup::getValue('activity_type', 'Print PDF Letter', 'name')) {
@@ -547,13 +552,13 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           }
           else {
             $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/activity/add',
-              "action=update&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid={$params['source_contact_id']}&context=home"
+              "action=update&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . CRM_Utils_Array::value('source_contact_id', $params) . "&context=home"
             );
           }
 
           if (CRM_Core_Permission::check("delete activities")) {
             $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/activity',
-              "action=delete&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid={$params['source_contact_id']}&context=home"
+              "action=delete&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid=" . CRM_Utils_Array::value('source_contact_id', $params) . "&context=home"
             );
           }
         }
@@ -561,7 +566,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           $url = CRM_Utils_System::url('civicrm/activity/view', $q);
           if (CRM_Core_Permission::check('delete activities')) {
             $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/activity',
-              "action=delete&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid={$params['source_contact_id']}&context=home"
+              "action=delete&reset=1&id={$activity->id}&atype={$activity->activity_type_id}&cid={" . CRM_Utils_Array::value('source_contact_id', $params) . "}&context=home"
             );
           }
         }
