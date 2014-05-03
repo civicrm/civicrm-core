@@ -488,6 +488,10 @@ ORDER BY  modified_date desc";
         $tree[$note->id]['createdById'] = $createdById;
         $tree[$note->id]['modified_date'] = CRM_Utils_Date::customFormat($tree[$note->id]['modified_date']);
 
+        // paper icon view for attachments part
+        $paperIconAttachmentInfo = CRM_Core_BAO_File::paperIconAttachment('civicrm_note', $note->id);
+        $tree[$note->id]['attachment'] = $paperIconAttachmentInfo;
+
         if ($snippet) {
           $tree[$note->id]['note'] = nl2br($tree[$note->id]['note']);
           $tree[$note->id]['note'] = smarty_modifier_mb_truncate(
