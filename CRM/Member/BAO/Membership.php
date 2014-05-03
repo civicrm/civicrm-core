@@ -418,7 +418,9 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * Function to check the membership extended through relationship
    *
    * @param int $membershipId membership id
-   * @param int $contactId    contact id
+   * @param int $contactId contact id
+   *
+   * @param const $action
    *
    * @return Array    array of contact_id of all related contacts.
    * @static
