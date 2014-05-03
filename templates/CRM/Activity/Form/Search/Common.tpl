@@ -43,7 +43,7 @@
   {else}
     <td>&nbsp;</td>
   {/if}
-  {if $form.activity_survey_id || $buildEngagementLevel || $isFollowUp}
+  {if $form.activity_survey_id || $buildEngagementLevel}
     <td>
       {if $form.activity_survey_id}
         <label>{$form.activity_survey_id.label}</label>
