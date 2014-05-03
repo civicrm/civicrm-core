@@ -2426,7 +2426,7 @@ div.grippie {
 }
 
 #crm-create-new-list {
-  width: 180px;
+  width: 160px;
 }
 #crm-contact-actions-list .icon {
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
@@ -3759,8 +3759,8 @@ div.m ul#civicrm-menu,
   padding: 4px;
 }
 
-.crm-create-new-list-inner {
-  width: 180px!important;
+.crm-create-new-list-inner, .crm-create-new-list-inner ul {
+  width: 160px!important;
 }
 
 .ac_even {
