@@ -43,7 +43,7 @@
   {else}
     <td>&nbsp;</td>
   {/if}
-  {if $form.activity_survey_id || $buildEngagementLevel}
+  {if $form.activity_survey_id || $buildEngagementLevel || $isFollowUp}
     <td>
       {if $form.activity_survey_id}
         <label>{$form.activity_survey_id.label}</label>
@@ -61,6 +61,24 @@
     </td>
   {/if}
 
+  <td>
+    <table>
+      <tr><td>
+        {if $form.parent_id}
+      	  <label>{ts}Has a Followup Activity?{/ts}</label>
+      	  <br/>
+      	  {$form.parent_id.html}
+        {/if}
+      </td></tr>
+      <tr><td>
+    	{if $form.followup_parent_id}
+      	  <label>{ts}Is a Followup Activity?{/ts}</label>
+      	  <br/>
+      	  {$form.followup_parent_id.html}
+        {/if}
+      </td></tr>
+    </table>
+  </td>
   {if $form.activity_tags}
     <td><label>{ts}Activity Tag(s){/ts}</label>
       <div id="Tags" class="listing-box">
