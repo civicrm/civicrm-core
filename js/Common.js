@@ -731,15 +731,14 @@ CRM.validate = CRM.validate || {
     return dialog.dialog(settings).trigger('crmLoad');
   };
 
-  /** eg CRM.translate('org.example.myext', function(ts){ ... });  */
-  CRM.translate = function(domain, callback) {
-    "use strict";
-    var altTs = function(message, options) {
-      options = options || {};
-      options.domain = domain;
+  /** provides a local copy of ts for a domain */
+  CRM.ts = function(domain) {
+    return function(message, options) {
+      if (domain) {
+        options = $.extend(options || {}, {domain: domain});
+      }
       return ts(message, options);
     };
-    callback(altTs);
   };
 
   /**
