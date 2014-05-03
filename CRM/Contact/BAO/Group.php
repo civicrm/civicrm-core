@@ -154,8 +154,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Get the count of a members in a group with the specific status
    *
-   * @param int $id      group id
-   * @param enum $status status of members in group
+   * @param int $id group id
+   * @param \enum|string $status status of members in group
+   *
+   * @param bool $countChildGroups
    *
    * @return int count of members in the group with above status
    * @access public
@@ -199,7 +201,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Get the list of member for a group id
    *
-   * @param int $lngGroupId this is group id
+   * @param $groupID
+   * @param bool $useCache
+   *
+   * @internal param int $lngGroupId this is group id
    *
    * @return array $aMembers this arrray contains the list of members for this group id
    * @access public
@@ -221,11 +226,16 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Returns array of group object(s) matching a set of one or Group properties.
    *
-   * @param array       $param             Array of one or more valid property_name=>value pairs.
-   *                                       Limits the set of groups returned.
-   * @param array       $returnProperties  Which properties should be included in the returned group objects.
+   * @param null $params
+   * @param array $returnProperties Which properties should be included in the returned group objects.
    *                                       (member_count should be last element.)
    *
+   * @param null $sort
+   * @param null $offset
+   * @param null $rowCount
+   *
+   * @internal param array $param Array of one or more valid property_name=>value pairs.
+   *                                       Limits the set of groups returned.
    * @return  An array of group objects.
    *
    * @access public
@@ -561,8 +571,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * build the condition to retrieve groups.
    *
-   * @param string  $groupType type of group(Access/Mailing) OR the key of the group
-   * @param boolen  $excludeHidden exclude hidden groups.
+   * @param string $groupType type of group(Access/Mailing) OR the key of the group
+   * @param bool|\boolen $excludeHidden exclude hidden groups.
    *
    * @return string $condition
    * @static
@@ -742,7 +752,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * This function to get list of groups
    *
-   * @param  array   $params associated array for params
+   * @param  array $params associated array for params
+   *
+   * @return array
    * @access public
    */
   static function getGroupList(&$params) {
@@ -925,8 +937,13 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * This function to get hierarchical list of groups (parent followed by children)
    *
-   * @param  array   $groupIDs array of group ids
+   * @param  array $groupIDs array of group ids
    *
+   * @param null $parents
+   * @param string $spacer
+   * @param bool $titleOnly
+   *
+   * @return array
    * @access public
    */
   static function getGroupsHierarchy(
