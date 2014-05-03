@@ -11,18 +11,19 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Contribute_Form_Task $form
    *
    * @return void
    */
   static function postProcess(&$form) {
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);
+    $isPDF = FALSE;
+    $emailParams = array();
     if(!empty($formValues['email_options'])) {
       $returnProperties['email'] = $returnProperties['on_hold'] = $returnProperties['is_deceased'] = $returnProperties['do_not_email'] = 1;
       $emailParams = array(
         'subject'   => $formValues['subject']
       );
-      $isPDF = FALSE;
       if(stristr($formValues['email_options'], 'pdfemail')) {
         $isPDF = TRUE;
       }
@@ -70,7 +71,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
           CRM_Core_Session::setStatus(ts('You have selected the table cell separator but the token field is not inside a table cell. This would result in invalid html so comma separator has been used'));
         }
         $validated = TRUE;
-        $html[$contributionId] = str_replace($separator, $realSeparator, self::resolveTokens($html_message, $contact, $contribution, $messageToken, $html, $categories, $grouped, $separator));
+        $html[$contributionId] = str_replace($separator, $realSeparator, self::resolveTokens($html_message, $contact, $contribution, $messageToken, $categories, $grouped, $separator));
         $contact['is_sent'][$groupBy][$groupByID] = TRUE;
         if(!empty($formValues['email_options'])) {
           if(self::emailLetter($contact, $html[$contributionId], $isPDF, $formValues, $emailParams)) {
@@ -175,13 +176,12 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
   * @param array $contact
   * @param array $contribution
   * @param array $messageToken
-  * @param string $html
   * @param array $categories
   * @param bool $grouped Does this letter represent more than one contribution
   * @param string $separator What is the preferred letter separator
   * @return string
   */
- private static function resolveTokens($html_message, $contact, $contribution, $messageToken, $html, $categories, $grouped, $separator) {
+ private static function resolveTokens($html_message, $contact, $contribution, $messageToken, $categories, $grouped, $separator) {
    $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact, TRUE, $messageToken);
    if($grouped) {
      $tokenHtml = CRM_Utils_Token::replaceMultipleContributionTokens($separator, $tokenHtml, $contribution, TRUE, $messageToken);
@@ -213,7 +213,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * @param string $task
    * @param string $separator
    *
-   * @return multitype:Ambigous <boolean, multitype:> multitype:unknown  multitype:
+   * @return array:
    */
   static function buildContributionArray($groupBy, $form, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator) {
     $contributions = $contacts = $notSent = array();
@@ -225,7 +225,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     foreach ($contributionIDs as $item => $contributionId) {
       try {
         // get contribution information
-        $params = array('contribution_id' => $contributionId);
         $contribution = CRM_Utils_Token::getContributionTokenDetails(array('contribution_id' => $contributionId),
           $returnProperties,
           NULL,
