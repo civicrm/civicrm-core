@@ -277,6 +277,12 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $_havingClauses = array();
 
   /**
+   * dashBoardRowCount Dashboard row count 
+   * @var Integer
+   */
+  public $_dashBoardRowCount;
+
+  /**
    * Is this being called without a form controller (ie. the report is being render outside the normal form
    * - e.g the api is retrieving the rows
    * @var boolean
@@ -343,6 +349,13 @@ class CRM_Report_Form extends CRM_Core_Form {
       CRM_Utils_Request::retrieve(
         'force',
         'Boolean',
+        CRM_Core_DAO::$_nullObject
+      );
+    
+    $this->_dashBoardRowCount =
+      CRM_Utils_Request::retrieve(
+        'rowCount',
+        'Integer',
         CRM_Core_DAO::$_nullObject
       );
 
@@ -2680,6 +2693,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   function limit($rowCount = self::ROW_COUNT_LIMIT) {
     // lets do the pager if in html mode
     $this->_limit = NULL;
+    
+    // CRM-14115, over-ride row count if rowCount is specified in URL
+    if ($this->_dashBoardRowCount) {
+      $rowCount = $this->_dashBoardRowCount;
+    }
     if ($this->_outputMode == 'html' || $this->_outputMode == 'group') {
       $this->_select = str_ireplace('SELECT ', 'SELECT SQL_CALC_FOUND_ROWS ', $this->_select);
 
@@ -2716,6 +2734,12 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   function setPager($rowCount = self::ROW_COUNT_LIMIT) {
+
+    // CRM-14115, over-ride row count if rowCount is specified in URL
+    if ($this->_dashBoardRowCount) {
+      $rowCount = $this->_dashBoardRowCount;
+    }
+
     if ($this->_limit && ($this->_limit != '')) {
       $sql              = "SELECT FOUND_ROWS();";
       $this->_rowsFound = CRM_Core_DAO::singleValueQuery($sql);
