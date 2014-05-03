@@ -52,7 +52,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
 
-    list($notSent, $contributions, $contacts) = self::buildContributionArray($groupBy, $form, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator);
+    list($contributions, $contacts) = self::buildContributionArray($groupBy, $form, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator);
     $html = array();
     foreach ($contributions as $contributionId => $contribution) {
       $contact = &$contacts[$contribution['contact_id']];
@@ -223,55 +223,50 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       $contributionIDs = $form->getVar('_contributionContactIds');
     }
     foreach ($contributionIDs as $item => $contributionId) {
-      try {
-        // get contribution information
-        $contribution = CRM_Utils_Token::getContributionTokenDetails(array('contribution_id' => $contributionId),
+      // get contribution information
+      $contribution = CRM_Utils_Token::getContributionTokenDetails(array('contribution_id' => $contributionId),
+        $returnProperties,
+        NULL,
+        $messageToken,
+        $task
+      );
+      $contribution = $contributions[$contributionId] = $contribution[$contributionId];
+      if ($form->_includesSoftCredits) {
+        //@todo find out why this happens & add comments
+        list($contactID) = explode('-', $item);
+        $contactID = (int) $contactID;
+       }
+      else {
+         $contactID = $contribution['contact_id'];
+      }
+      if(!isset($contacts[$contactID])) {
+        list($contact) = CRM_Utils_Token::getTokenDetails(array('contact_id' => $contactID),
           $returnProperties,
+          $skipOnHold,
+          $skipDeceased,
           NULL,
           $messageToken,
           $task
         );
-        $contribution = $contributions[$contributionId] = $contribution[$contributionId];
-        if ($form->_includesSoftCredits) {
-          //@todo find out why this happens & add comments
-          list($contactID) = explode('-', $item);
-          $contactID = (int) $contactID;
-         }
-        else {
-           $contactID = $contribution['contact_id'];
-        }
-        if(!isset($contacts[$contactID])) {
-          list($contact) = CRM_Utils_Token::getTokenDetails(array('contact_id' => $contactID),
-            $returnProperties,
-            $skipOnHold,
-            $skipDeceased,
-            NULL,
-            $messageToken,
-            $task
-          );
-          $contacts[$contactID] = $contact[$contactID];
-          $contacts[$contactID]['contact_aggregate'] = 0;
-          $contacts[$contactID]['combined'] = $contacts[$contactID]['contribution_ids'] = array();
-        }
-
-        $contacts[$contactID]['contact_aggregate'] += $contribution['total_amount'];
-        $groupByID = empty($contribution[$groupBy]) ? 0 : $contribution[$groupBy];
-
-        $contacts[$contactID]['contribution_ids'][$groupBy][$groupByID][$contributionId] = TRUE;
-        if(!isset($contacts[$contactID]['combined'][$groupBy]) || !isset($contacts[$contactID]['combined'][$groupBy][$groupByID])) {
-          $contacts[$contactID]['combined'][$groupBy][$groupByID] = $contribution;
-          $contacts[$contactID]['aggregates'][$groupBy][$groupByID] = $contribution['total_amount'];
-        }
-        else {
-          $contacts[$contactID]['combined'][$groupBy][$groupByID] = self::combineContributions($contacts[$contactID]['combined'][$groupBy][$groupByID], $contribution, $separator);
-          $contacts[$contactID]['aggregates'][$groupBy][$groupByID] += $contribution['total_amount'];
-        }
+        $contacts[$contactID] = $contact[$contactID];
+        $contacts[$contactID]['contact_aggregate'] = 0;
+        $contacts[$contactID]['combined'] = $contacts[$contactID]['contribution_ids'] = array();
       }
-      catch(Exception $e) {
-        $notSent[] = $contributionId;
+
+      $contacts[$contactID]['contact_aggregate'] += $contribution['total_amount'];
+      $groupByID = empty($contribution[$groupBy]) ? 0 : $contribution[$groupBy];
+
+      $contacts[$contactID]['contribution_ids'][$groupBy][$groupByID][$contributionId] = TRUE;
+      if(!isset($contacts[$contactID]['combined'][$groupBy]) || !isset($contacts[$contactID]['combined'][$groupBy][$groupByID])) {
+        $contacts[$contactID]['combined'][$groupBy][$groupByID] = $contribution;
+        $contacts[$contactID]['aggregates'][$groupBy][$groupByID] = $contribution['total_amount'];
+      }
+      else {
+        $contacts[$contactID]['combined'][$groupBy][$groupByID] = self::combineContributions($contacts[$contactID]['combined'][$groupBy][$groupByID], $contribution, $separator);
+        $contacts[$contactID]['aggregates'][$groupBy][$groupByID] += $contribution['total_amount'];
       }
     }
-    return array($notSent, $contributions, $contacts);
+    return array($contributions, $contacts);
   }
 
   /**
