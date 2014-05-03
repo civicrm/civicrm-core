@@ -150,6 +150,12 @@ class CRM_Activity_BAO_Query {
       $query->_element['result'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
+    
+    if (CRM_Utils_Array::value('parent_id', $query->_returnProperties)) {
+      $query->_tables['parent_id'] = 1;
+      $query->_whereTables['parent_id'] = 1;
+      $query->_element['parent_id'] = 1;
+    }
   }
 
   /**
@@ -357,6 +363,28 @@ class CRM_Activity_BAO_Query {
           $query->_qill[$grouping][] = ts("Activity Result - %1", array(1 => implode(' or ', $safe)));
         }
         break;
+
+      case 'parent_id':
+        if ($value == 1) {
+          $query->_where[$grouping][] = "parent_id.parent_id IS NOT NULL";
+          $query->_qill[$grouping][] = ts('Activities which have Followup Activities');
+        }
+        elseif ($value == 2) {
+          $query->_where[$grouping][] = "parent_id.parent_id IS NULL";
+          $query->_qill[$grouping][] = ts('Activities without Followup Activities');
+        }
+        break;
+        
+      case 'followup_parent_id':
+        if ($value == 1) {
+          $query->_where[$grouping][] = "civicrm_activity.parent_id IS NOT NULL";
+          $query->_qill[$grouping][] = ts('Activities which are Followup Activities');
+        }
+        elseif ($value == 2) {
+          $query->_where[$grouping][] = "civicrm_activity.parent_id IS NULL";
+         $query->_qill[$grouping][] = ts('Activities which are not Followup Activities');
+        }
+        break;
     }
   }
 
@@ -401,6 +429,10 @@ class CRM_Activity_BAO_Query {
                       ON ( ac.activity_id = civicrm_activity_contact.activity_id AND ac.record_type_id = {$sourceID})
         INNER JOIN civicrm_contact source_contact ON (ac.contact_id = source_contact.id)";
         break;
+      
+      case 'parent_id':
+        $from = "$side JOIN civicrm_activity AS parent_id ON civicrm_activity.id = parent_id.parent_id";
+        break;
     }
 
     return $from;
@@ -440,7 +472,12 @@ class CRM_Activity_BAO_Query {
     }
 
     CRM_Core_Form_Date::buildDateRange($form, 'activity_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
-
+    $followUpActivity = array(
+      1 => ts('Yes'),
+      2 => ts('No'),
+    );
+    $form->addRadio('parent_id', NULL, $followUpActivity, array('allowClear' => TRUE));
+    $form->addRadio('followup_parent_id', NULL, $followUpActivity, array('allowClear' => TRUE));
     $activityRoles = array(
       3 => ts('With'),
       2 => ts('Assigned to'),
@@ -552,6 +589,7 @@ class CRM_Activity_BAO_Query {
         'activity_campaign_id' => 1,
         'result' => 1,
         'activity_engagement_level' => 1,
+        'parent_id' => 1,
       );
 
       if ($includeCustomFields) {
