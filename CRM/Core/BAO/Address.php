@@ -41,15 +41,17 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   /**
    * takes an associative array and creates a address
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
-   * @param boolean  $fixAddress   true if you need to fix (format) address values
+   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param boolean $fixAddress true if you need to fix (format) address values
    *                               before inserting in db
+   *
+   * @param null $entity
    *
    * @return array $blocks array of created address
    * @access public
    * @static
    */
-  static function create(&$params, $fixAddress, $entity = NULL) {
+  static function create(&$params, $fixAddress = TRUE, $entity = NULL) {
     if (!isset($params['address']) || !is_array($params['address'])) {
       return;
     }
@@ -453,9 +455,9 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array   $entityBlock   associated array of fields
-   * @param boolean $microformat   if microformat output is required
-   * @param int     $fieldName     conditional field name
+   * @param array $entityBlock associated array of fields
+   * @param boolean $microformat if microformat output is required
+   * @param int|string $fieldName conditional field name
    *
    * @return array  $addresses     array with address fields
    * @access public

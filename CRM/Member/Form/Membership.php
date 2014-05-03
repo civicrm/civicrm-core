@@ -978,9 +978,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
               'is_current_member' => 0,
             ));
             $tmp_statuses = $result['values'];
-            $status_ids = array(); 
+            $status_ids = array();
       	    foreach($tmp_statuses as $cur_stat) {
-              $status_ids[] = $cur_stat['id']; 
+              $status_ids[] = $cur_stat['id'];
             }
             if (empty($params['status_id']) || in_array( $params['status_id'] , $status_ids) == false) {
               $errors['status_id'] = ts('Please enter a status that does NOT represent a current membership status.');
@@ -1736,10 +1736,11 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
   /**
    * Function to send email receipt
    *
-   * @param object $form   form object
-   * @param array $values submitted values
+   * @param object $form form object
+   * @param $formValues
    * @param object $membership object
    *
+   * @internal param array $values submitted values
    * @return boolean true if mail was sent successfully
    * @static
    */
