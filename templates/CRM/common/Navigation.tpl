@@ -89,7 +89,7 @@ $('#civicrm-menu').ready(function() {
   });
 
   $('#sort_name_navigation')
-    .crmAutocomplete({
+    .autocomplete({
       source: function(request, response) {
         var
           option = $('input[name=quickSearchField]:checked'),
@@ -117,7 +117,7 @@ $('#civicrm-menu').ready(function() {
       },
       create: function() {
         // Place menu in front
-        $(this).crmAutocomplete('widget').css('z-index', $('#civicrm-menu').css('z-index'));
+        $(this).autocomplete('widget').css('z-index', $('#civicrm-menu').css('z-index'));
       }
     })
     .keydown(function() {
@@ -147,7 +147,7 @@ $('#civicrm-menu').ready(function() {
   });
   // redirect to view page if there is only one contact
   $('#id_search_block').on('submit', function() {
-    var $menu = $('#sort_name_navigation').crmAutocomplete('widget');
+    var $menu = $('#sort_name_navigation').autocomplete('widget');
     if ($('li.ui-menu-item', $menu).length === 1) {
       var cid = $('li.ui-menu-item', $menu).data('ui-autocomplete-item').value;
       document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: cid});
