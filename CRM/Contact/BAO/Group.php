@@ -155,7 +155,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * Get the count of a members in a group with the specific status
    *
    * @param int $id group id
-   * @param \enum|string $status status of members in group
+   * @param enum|string $status status of members in group
    *
    * @param bool $countChildGroups
    *
@@ -615,17 +615,22 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *
    * @internal param $clauses
    *
+   * @param bool $force
+   *
    * @return array
    */
-  public static function getPermissionClause() {
-    static $clause;
+  public static function getPermissionClause($force = FALSE) {
+    static $clause = 1;
     static $retrieved = FALSE;
-    if (!$retrieved && !CRM_Core_Permission::check('view all contacts')) {
+    if ((!$retrieved || $force ) && !CRM_Core_Permission::check('view all contacts') && !CRM_Core_Permission::check('edit all contacts')) {
       //get the allowed groups for the current user
       $groups = CRM_ACL_API::group(CRM_ACL_API::VIEW);
       if (!empty($groups)) {
         $groupList = implode(', ', array_values($groups));
         $clause = "groups.id IN ( $groupList ) ";
+      }
+      else {
+        $clause = '1 = 0';
       }
     }
     $retrieved = TRUE;
@@ -1194,9 +1199,7 @@ WHERE {$whereClause}";
       $clauses[] = 'groups.is_hidden = 0';
     }
     ;
-    if(($permissionClause = self::getPermissionClause($clauses)) == TRUE) {
-      $clauses[] = $permissionClause;
-    }
+    $clauses[] = self::getPermissionClause();
 
 
     return implode(' AND ', $clauses);
