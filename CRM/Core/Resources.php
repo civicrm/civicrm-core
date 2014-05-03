@@ -588,10 +588,6 @@ class CRM_Core_Resources {
       "packages/jquery/plugins/select2/select2.js", // No mini until release of select2 3.4.6
       "packages/jquery/plugins/select2/select2.css",
 
-      // TODO: Remove before 4.5 release
-      "packages/jquery/plugins/jquery.autocomplete.js",
-      "packages/jquery/css/jquery.autocomplete.css",
-
       "packages/jquery/plugins/jquery.tableHeader.js",
 
       "packages/jquery/plugins/jquery.textarearesizer.js",
