@@ -531,12 +531,16 @@ class CRM_Core_PseudoConstant {
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @param array   $var        the associative array we will fill
-   * @param string  $name       the name of the DAO
-   * @param boolean $all        get all objects. default is to get only active ones.
-   * @param string  $retrieve   the field that we are interested in (normally name, differs in some objects)
-   * @param string  $filter     the field that we want to filter the result set with
-   * @param string  $condition  the condition that gets passed to the final query as the WHERE clause
+   * @param array $var the associative array we will fill
+   * @param string $name the name of the DAO
+   * @param boolean $all get all objects. default is to get only active ones.
+   * @param string $retrieve the field that we are interested in (normally name, differs in some objects)
+   * @param string $filter the field that we want to filter the result set with
+   * @param string $condition the condition that gets passed to the final query as the WHERE clause
+   *
+   * @param null $orderby
+   * @param string $key
+   * @param null $force
    *
    * @return void
    * @access public
