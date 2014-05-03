@@ -672,7 +672,7 @@ class CRM_Utils_String {
    */
   public static function compareStr($strOne, $strTwo, $case) {
     if ($case == TRUE) {
-      // convert to lowercase and strip of empty white spaces
+      // Convert to lowercase and trim white spaces
       if (strtolower(trim($strOne)) == strtolower(trim($strTwo))) {
         // yes - they are identical
         return TRUE;
@@ -683,7 +683,7 @@ class CRM_Utils_String {
       }
     }
     if ($case == FALSE) {
-      // convert to lowercase and strip of empty white spaces
+      // Trim white spaces
       if (trim($strOne) == trim($strTwo)) {
         // yes - they are identical
         return TRUE;
