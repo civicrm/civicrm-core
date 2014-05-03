@@ -407,7 +407,7 @@ class CiviCRM_For_WordPress {
  *
  * @return boolean
  */
-  public function isNotPageRequest() {
+  public function isPageRequest() {
     $argString = NULL;
     $args = array();
     if (isset( $_GET['q'])) {
@@ -417,13 +417,14 @@ class CiviCRM_For_WordPress {
     $args = array_pad($args, 2, '');
 
     if (CRM_Utils_Array::value('HTTP_X_REQUESTED_WITH', $_SERVER) == 'XMLHttpRequest'
-        || in_array($args[1], array('ajax', 'file'))
+        || ($args[0] == 'civicrm' && in_array($args[1], array('ajax', 'file')) )
         || !empty($_REQUEST['snippet'])
+        || strpos($argString, 'civicrm/event/ical') === 0 && empty($_GET['html'])
       ) {
-      return true;
+      return FALSE;
     }
     else {
-      return FALSE;
+      return TRUE;
     }
   }
 
@@ -486,6 +487,10 @@ class CiviCRM_For_WordPress {
       CRM_Core_BAO_UFMatch::synchronize( $current_user, FALSE, 'WordPress', 'Individual', TRUE );
     }
 
+    if ( $this->isPageRequest() && !in_the_loop() && !is_admin() ) {
+      return;
+    }
+
     // do the business
     CRM_Core_Invoke::invoke($args);
 
@@ -498,11 +503,6 @@ class CiviCRM_For_WordPress {
     do_action( 'civicrm_invoked' );
 
   }
-
-    if ( !$this->isNotPageRequest() && !in_the_loop() && !is_admin() ) {
-      return;
-    }
-
 
   /**
    * @description: load translation files
@@ -526,7 +526,6 @@ class CiviCRM_For_WordPress {
     );
 
   }
-
 
   /**
    * @description: Adds menu items to WordPress admin menu
@@ -691,7 +690,6 @@ class CiviCRM_For_WordPress {
     // kick out if not CiviCRM
     if ( ! $this->initialize() ) { return; }
 
-
     // add CiviCRM core resources
     CRM_Core_Resources::singleton()->addCoreResources();
 
@@ -734,11 +732,9 @@ class CiviCRM_For_WordPress {
     // output civicrm html only in a few cases and skip the WP header
     if (
       // snippet is set - i.e. ajax call
-      !empty($_GET['snippet']) ||
       // ical feed (unless 'html' is specified)
-      (strpos($argString, 'civicrm/event/ical') === 0 && empty($_GET['html'])) ||
       // ajax and file download urls
-      ($args[0]) == 'civicrm' && in_array($args[1], array('ajax', 'file'))
+      ! $this->isPageRequest()
     ) {
       // from my limited understanding, putting this in the init hook allows civi to
       // echo all output and exit before the theme code outputs anything - lobo
