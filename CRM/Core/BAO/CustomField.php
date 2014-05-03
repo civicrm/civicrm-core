@@ -1738,7 +1738,7 @@ SELECT id
       // rename this file to go into the secure directory
       if (!rename($fName, $config->customFileUploadDir . $filename)) {
         CRM_Core_Error::statusBounce(ts('Could not move custom file to custom upload directory'));
-        break;
+        return;
       }
 
       if ($customValueId) {
