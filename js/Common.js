@@ -850,12 +850,6 @@ CRM.validate = CRM.validate || {
     catch (e) {}
   });
 
-  /**
-   * Temporary stub to get around name conflict with legacy jQuery.autocomplete plugin
-   * FIXME: Remove this before 4.5 release
-   */
-  $.widget('civi.crmAutocomplete', $.ui.autocomplete, {});
-
   $(function () {
     // Trigger crmLoad on initial content for consistency. It will also be triggered for ajax-loaded content.
     $('.crm-container').trigger('crmLoad');

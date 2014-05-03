@@ -674,13 +674,8 @@ SELECT count(*)
             if (strpos($fields['filter'], 'entity=') !== FALSE) {
               $errors['filter'] = ts("Please do not include entity parameter (entity is always 'contact')");
             }
-            elseif (strpos($fields['filter'], 'action=') === FALSE) {
-              $errors['filter'] = ts("Please specify 'action' parameter, it should be 'lookup' or 'get'");
-            }
-            elseif (strpos($fields['filter'], 'action=get') === FALSE &&
-              strpos($fields['filter'], 'action=lookup') === FALSE
-            ) {
-              $errors['filter'] = ts("Only 'get' and 'lookup' actions are supported.");
+            elseif (strpos($fields['filter'], 'action=get') === FALSE) {
+              $errors['filter'] = ts("Only 'get' action is supported.");
             }
           }
           $self->setDefaults(array('filter_selected', $fields['filter_selected']));
