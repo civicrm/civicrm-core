@@ -43,6 +43,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       }
     }
     $separator = '****~~~~';// a placeholder in case the separator is common in the string - e.g ', '
+    $validated = FALSE;
 
     $groupBy = $formValues['group_by'];
 
@@ -64,6 +65,10 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       self::assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID);
 
       if(empty($groupBy) || empty($contact['is_sent'][$groupBy][$groupByID])) {
+        if(!$validated && $realSeparator == '</td><td>' && !self::validateHTMLForTableSeparator($messageToken, $html_message)) {
+          $realSeparator = ', ';
+        }
+        $validated = TRUE;
         $html[$contributionId] = str_replace($separator, $realSeparator, self::resolveTokens($html_message, $contact, $contribution, $messageToken, $html, $categories, $grouped, $separator));
         $contact['is_sent'][$groupBy][$groupByID] = TRUE;
         if(!empty($formValues['email_options'])) {
@@ -120,6 +125,41 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     }
   }
 
+  /**
+   * Check whether any of the tokens exist in the html outside a table cell.
+   * If they do the table cell separator is not supported (return false)
+   * At this stage we are only anticipating contributions passed in this way but
+   * it would be easy to add others
+   * @param $tokens
+   * @param $html
+   *
+   * @return bool
+   */
+  function isValidHTMLWithTableSeparator($tokens, $html) {
+    $relevantEntities = array('contribution');
+    foreach ($relevantEntities as $entity) {
+      if (isset($tokens[$entity]) && !is_array($tokens[$entity])) {
+        foreach ($tokens[$entity] as $token) {
+          if(!self::isHtmlTokenInTable($token, $entity, $html)) {
+            return FALSE;
+          }
+        }
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * check that the token only appears in a table cell. The '</td><td>' separator cannot otherwise work
+   * @param $token
+   * @param $entity
+   * @param $html
+   */
+  function isHtmlTokenInTableCell($token, $entity, $html) {
+    $token = '{' . $entity . '.' . $token . '}';
+    //do regex here
+  }
+
  /**
   *
   * @param string $html_message
@@ -161,7 +201,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * @param boolean $skipOnHold
    * @param boolean $skipDeceased
    * @param array $messageToken
-   * @param unknown $task
+   * @param string $task
    * @param $separator
    *
    * @return multitype:Ambigous <boolean, multitype:> multitype:unknown  multitype:
