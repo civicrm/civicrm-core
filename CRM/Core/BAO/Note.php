@@ -490,7 +490,7 @@ ORDER BY  modified_date desc";
 
         // paper icon view for attachments part
         $paperIconAttachmentInfo = CRM_Core_BAO_File::paperIconAttachment('civicrm_note', $note->id);
-        $tree[$note->id]['attachment'] = $paperIconAttachmentInfo;
+        $tree[$note->id]['attachment'] = implode('', $paperIconAttachmentInfo);
 
         if ($snippet) {
           $tree[$note->id]['note'] = nl2br($tree[$note->id]['note']);
