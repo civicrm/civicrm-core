@@ -607,6 +607,31 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     return $condition;
   }
 
+  /**
+   * get permission relevant clauses
+   * CRM-12209
+   *
+   * @internal param $existingClauses
+   *
+   * @internal param $clauses
+   *
+   * @return array
+   */
+  public static function getPermissionClause() {
+    static $clause;
+    static $retrieved = FALSE;
+    if (!$retrieved && !CRM_Core_Permission::check('view all contacts')) {
+      //get the allowed groups for the current user
+      $groups = CRM_ACL_API::group(CRM_ACL_API::VIEW);
+      if (!empty($groups)) {
+        $groupList = implode(', ', array_values($groups));
+        $clause = "groups.id IN ( $groupList ) ";
+      }
+    }
+    $retrieved = TRUE;
+    return $clause;
+  }
+
   public function __toString() {
     return $this->title;
   }
@@ -1083,10 +1108,16 @@ WHERE {$whereClause}";
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
+  /**
+   * Generate permissioned where clause for group search
+   * @param $params
+   * @param bool $sortBy
+   * @param bool $excludeHidden
+   *
+   * @return string
+   */
   static function whereClause(&$params, $sortBy = TRUE, $excludeHidden = TRUE) {
     $values = array();
-    $clauses = array();
-
     $title = CRM_Utils_Array::value('title', $params);
     if ($title) {
       $clauses[] = "groups.title LIKE %1";
@@ -1155,27 +1186,6 @@ WHERE {$whereClause}";
       }
     }
 
-    /*
-      if ( $sortBy &&
-      $this->_sortByCharacter !== null ) {
-      $clauses[] =
-      "groups.title LIKE '" .
-      strtolower(CRM_Core_DAO::escapeWildCardString($this->_sortByCharacter)) .
-      "%'";
-      }
-
-      // dont do a the below assignement when doing a
-      // AtoZ pager clause
-      if ( $sortBy ) {
-      if ( count( $clauses ) > 1 ) {
-      $this->assign( 'isSearch', 1 );
-      } else {
-      $this->assign( 'isSearch', 0 );
-      }
-      }
-    */
-
-
     if (empty($clauses)) {
       $clauses[] = 'groups.is_active = 1';
     }
@@ -1183,15 +1193,11 @@ WHERE {$whereClause}";
     if ($excludeHidden) {
       $clauses[] = 'groups.is_hidden = 0';
     }
-    //CRM-12209
-    if (!CRM_Core_Permission::check('view all contacts')) {
-      //get the allowed groups for the current user
-      $groups = CRM_ACL_API::group(CRM_ACL_API::VIEW);
-      if (!empty( $groups)) {
-        $groupList = implode( ', ', array_values( $groups ) );
-        $clauses[] = "groups.id IN ( $groupList ) ";
-      }
+    ;
+    if(($permissionClause = self::getPermissionClause($clauses)) == TRUE) {
+      $clauses[] = $permissionClause;
     }
+
 
     return implode(' AND ', $clauses);
   }
