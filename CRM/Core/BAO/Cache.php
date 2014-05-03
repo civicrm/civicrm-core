@@ -189,8 +189,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * delete the entire cache if group is not specified
    *
    * @param string $group The group name of the entries to be deleted
-   * @param string $path  path of the item that needs to be deleted
-   * @param booleab $clearAll clear all caches
+   * @param string $path path of the item that needs to be deleted
+   * @param bool|\booleab $clearAll clear all caches
    *
    * @return void
    * @static
@@ -302,6 +302,10 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   /**
    * Do periodic cleanup of the CiviCRM session table. Also delete all session cache entries
    * which are a couple of days old. This keeps the session cache to a manageable size
+   *
+   * @param bool $session
+   * @param bool $table
+   * @param bool $prevNext
    *
    * @return void
    * @static
