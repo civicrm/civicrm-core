@@ -183,12 +183,6 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
         $formValues[$key] = '%' . $formValues[$key] . '%';
       }
 
-      $dataType = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_CustomField',
-        substr($key, 7), 'data_type'
-      );
-      if (($dataType == 'ContactReference') && ($htmlType == 'Autocomplete-Select')) {
-        $formValues[$key] = $formValues[$key . '_id'];
-      }
     }
   }
 

@@ -1321,22 +1321,6 @@ ORDER BY civicrm_custom_group.weight,
             }
             break;
 
-          case 'Autocomplete-Select':
-            $hiddenEleName = $elementName . '_id';
-            if (substr($elementName, -1) == ']') {
-              $hiddenEleName = substr($elementName, 0, -1) . '_id]';
-            }
-            if ($field['data_type'] == "ContactReference") {
-              if (is_numeric($value)) {
-                $defaults[$hiddenEleName] = $value;
-                $defaults[$elementName] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $value, 'sort_name');
-              }
-            }
-            else {
-              $defaults[$elementName] = $value;
-            }
-            break;
-
           default:
             if ($field['data_type'] == "Float") {
               $defaults[$elementName] = (float)$value;
