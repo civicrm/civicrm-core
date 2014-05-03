@@ -292,7 +292,7 @@
       }
       $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
       $(settings.target).on('dialogclose', function() {
-        if (!$(this).data('hasUnsavedChanges')) {
+        if ($(this).attr('data-unsaved-changes') !== 'true') {
           $(this).crmSnippet('destroy').dialog('destroy').remove();
         }
       });
@@ -343,13 +343,12 @@
     function cancelAction() {
       var dirty = CRM.utils.initialValueChanged(widget),
         title = widget.dialog('option', 'title');
-      widget.data('hasUnsavedChanges', dirty).dialog('close');
+      widget.attr('data-unsaved-changes', dirty ? 'true' : 'false').dialog('close');
       if (dirty) {
         var id = widget.attr('id') + '-unsaved-alert',
-          alert = CRM.alert('<p>' + ts('%1 has not been saved.', {1: title}) + '</p><p><a href="#" id="' + id + '">' + ts('Restore') + '</a></p>', ts('Unsaved Changes'), alert, {expires: 60000});
+          alert = CRM.alert('<p>' + ts('%1 has not been saved.', {1: title}) + '</p><p><a href="#" id="' + id + '">' + ts('Restore') + '</a></p>', ts('Unsaved Changes'), 'alert unsaved-dialog', {expires: 60000});
         $('#' + id).button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}}).click(function(e) {
-          widget.dialog('open');
-          alert.close();
+          widget.attr('data-unsaved-changes', 'false').dialog('open');
           e.preventDefault();
         });
       }
@@ -361,7 +360,7 @@
 
     widget.on('crmFormLoad.crmForm', function(event, data) {
       var $el = $(this)
-        .data('hasUnsavedChanges', false);
+        .attr('data-unsaved-changes', 'false');
       var settings = $el.crmSnippet('option', 'crmForm');
       settings.cancelButton && $(settings.cancelButton, this).click(function(e) {
         e.preventDefault();
@@ -490,7 +489,16 @@
   };
 
   $(function($) {
-    $('body').on('click', 'a.crm-popup', CRM.popup);
+    $('body')
+      .on('click', 'a.crm-popup', CRM.popup)
+      // Close unsaved dialog messages
+      .on('dialogopen', function(e) {
+        $('.alert.unsaved-dialog .ui-notify-cross', '#crm-notification-container').click();
+      })
+      // Destroy old unsaved dialog
+      .on('dialogcreate', function(e) {
+        $('.ui-dialog-content.crm-ajax-container:hidden[data-unsaved-changes=true]').crmSnippet('destroy').dialog('destroy').remove();
+      });
   });
 
 }(jQuery, CRM));
