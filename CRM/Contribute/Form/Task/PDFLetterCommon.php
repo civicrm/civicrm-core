@@ -65,8 +65,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       self::assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID);
 
       if(empty($groupBy) || empty($contact['is_sent'][$groupBy][$groupByID])) {
-        if(!$validated && $realSeparator == '</td><td>' && !self::validateHTMLForTableSeparator($messageToken, $html_message)) {
+        if(!$validated && $realSeparator == '</td><td>' && !self::isValidHTMLWithTableSeparator($messageToken, $html_message)) {
           $realSeparator = ', ';
+          CRM_Core_Session::setStatus(ts('You have selected the table cell separator but the token field is not inside a table cell. This would result in invalid html so comma separator has been used'));
         }
         $validated = TRUE;
         $html[$contributionId] = str_replace($separator, $realSeparator, self::resolveTokens($html_message, $contact, $contribution, $messageToken, $html, $categories, $grouped, $separator));
@@ -135,12 +136,12 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    *
    * @return bool
    */
-  function isValidHTMLWithTableSeparator($tokens, $html) {
+  static function isValidHTMLWithTableSeparator($tokens, $html) {
     $relevantEntities = array('contribution');
     foreach ($relevantEntities as $entity) {
-      if (isset($tokens[$entity]) && !is_array($tokens[$entity])) {
+      if (isset($tokens[$entity]) && is_array($tokens[$entity])) {
         foreach ($tokens[$entity] as $token) {
-          if(!self::isHtmlTokenInTable($token, $entity, $html)) {
+          if(!self::isHtmlTokenInTableCell($token, $entity, $html)) {;
             return FALSE;
           }
         }
@@ -151,13 +152,21 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
 
   /**
    * check that the token only appears in a table cell. The '</td><td>' separator cannot otherwise work
+   * Calculate the number of times it appears IN the cell & the number of times it appears - should be the same!
+   *
    * @param $token
    * @param $entity
-   * @param $html
+   * @param $textToSearch
+   *
+   * @internal param $html
+   *
+   * @return bool
    */
-  function isHtmlTokenInTableCell($token, $entity, $html) {
-    $token = '{' . $entity . '.' . $token . '}';
-    //do regex here
+  static function isHtmlTokenInTableCell($token, $entity, $textToSearch) {
+    $tokenToMatch = $entity . '.' . $token;
+    $within = preg_match_all("|<td.+?{".$tokenToMatch."}.+?</td|si", $textToSearch);
+    $total = preg_match_all("|{".$tokenToMatch."}|", $textToSearch);
+    return ($within == $total);
   }
 
  /**
@@ -195,14 +204,14 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * Generate the contribution array from the form, we fill in the contact details and determine any aggregation
    * around contact_id of contribution_recur_id
    *
-   * @param unknown $groupBy
-   * @param unknown $form
+   * @param string $groupBy
+   * @param CRM_Contribute_Form_Task $form
    * @param array $returnProperties
    * @param boolean $skipOnHold
    * @param boolean $skipDeceased
    * @param array $messageToken
    * @param string $task
-   * @param $separator
+   * @param string $separator
    *
    * @return multitype:Ambigous <boolean, multitype:> multitype:unknown  multitype:
    */
@@ -227,8 +236,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         if ($form->_includesSoftCredits) {
           //@todo find out why this happens & add comments
           list($contactID) = explode('-', $item);
-          $contactID = (int) $contactId;
-         } else {
+          $contactID = (int) $contactID;
+         }
+        else {
            $contactID = $contribution['contact_id'];
         }
         if(!isset($contacts[$contactID])) {
@@ -270,11 +280,11 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * between the existing value and the new one. We put the separator there even if empty so it is clear what the
    * value for previous contributions was
    *
-   * @param unknown $existing
-   * @param unknown $contribution
-   * @param unknown $separator
+   * @param array $existing
+   * @param array $contribution
+   * @param string $separator
    *
-   * @return \unknown
+   * @return array
    */
   static function combineContributions($existing, $contribution, $separator) {
     foreach ($contribution as $field => $value) {
