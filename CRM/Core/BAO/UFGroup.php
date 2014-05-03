@@ -2312,18 +2312,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                 }
                 break;
 
-              case 'Autocomplete-Select':
-                if ($customFields[$customFieldId]['data_type'] == 'ContactReference') {
-                  if (is_numeric($details[$name])) {
-                    $defaults[$fldName . '_id'] = $details[$name];
-                    $defaults[$fldName] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $details[$name], 'sort_name');
-                  }
-                }
-                else {
-                  $defaults[$fldName] = $details[$name];
-                }
-                break;
-
               case 'Select Date':
                 // CRM-6681, set defult values according to date and time format (if any).
                 $dateFormat = NULL;

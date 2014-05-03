@@ -202,6 +202,7 @@ class CRM_Core_Page_AJAX {
    * @param array $results - If nested array, also provide:
    * @param string $val - array key to use as the value
    * @param string $key - array key to use as the key
+   * @deprecated
    */
   static function autocompleteResults($results, $val='label', $key='id') {
     $output = array();
