@@ -121,7 +121,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         'is_enabled'
       )) {
       // clear any descendant groups cache if exists
-      $finalGroups = CRM_Core_BAO_Cache::deleteGroup('descendant groups for an org');
+      CRM_Core_BAO_Cache::deleteGroup('descendant groups for an org');
     }
 
     // delete from group table
