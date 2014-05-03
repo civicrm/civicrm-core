@@ -46,6 +46,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /** This test case doesn't require DB reset */
   public $DBResetRequired = FALSE;
 
+  protected $_entity;
+
   /* they are two types of missing APIs:
        - Those that are to be implemented
          (in some future version when someone steps in -hint hint-). List the entities in toBeImplemented[ {$action} ]
@@ -561,7 +563,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * sense for which entities support createTestObject
    *
    * @dataProvider entities_getlimit
-   * @param string $entity
+   *
+   * @param $entityName
+   *
+   * @internal param string $entity
    */
   function testLimit($entityName) {
     $cases = array(); // each case is array(0 => $inputtedApiOptions, 1 => $expectedResultCount)
@@ -1026,9 +1031,15 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     );
   }
 
-/**
- * @param entityName
- */private function getMockableBAOObjects($entityName, $count = 2) {
+  /**
+   * @param $entityName
+   * @param int $count
+   *
+   * @internal param $entityName
+   *
+   * @return array
+   */
+  private function getMockableBAOObjects($entityName, $count = 2) {
     $baoString = _civicrm_api3_get_DAO($entityName);
     if (empty($baoString)) {
       $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
