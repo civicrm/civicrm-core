@@ -551,7 +551,8 @@ class CiviCRM_For_WordPress {
         'access_civicrm',
         'CiviCRM',
         array( $this, 'invoke' ),
-        $civilogo
+        $civilogo,
+        1
       );
 
     } else {
