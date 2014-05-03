@@ -4,8 +4,8 @@ test('ts()', function() {
   equal(ts('One, two, three'), "Un, deux, trois", "We expect translations to work");
 });
 
-test('CRM.translate()', function() {
-  CRM.translate('org.example.foo', function(ts){
+test('CRM.ts()', function() {
+  (function (ts) {
     equal(ts('One, two, three'), "Un, deux, trois", "We expect translations to work");
-  });
+  }(CRM.ts('org.example.foo')));
 });
