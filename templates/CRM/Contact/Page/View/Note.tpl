@@ -166,8 +166,6 @@
                         commentRows['cnote_'+ noteId][response['values'][i].id] ) {
                         continue;
                     }
-                    for (var j in response['values'][i].attachment) {
-                    }
                     str = '<tr id="cnote_'+ response['values'][i].id +'" class="'+ rowClassOddEven +' note-comment_'+ noteId +'">'
                         + '<td></td>'
                         + '<td style="padding-left: 2em">'
@@ -179,7 +177,7 @@
                         + '</td><td>'
                         + '<a href="'+ urlTemplate + response['values'][i].createdById +'">'+ response['values'][i].createdBy +'</a>'
                         + '</td><td>'
-                        + response['values'][i].attachment[j]
+                        + response['values'][i].attachment
                         + '</td><td>'+ commentAction.replace(/{cid}/g, response['values'][i].createdById).replace(/{id}/g, response['values'][i].id) +'</td></tr>'
 
                     commentRows['cnote_'+ noteId][response['values'][i].id] = str;
