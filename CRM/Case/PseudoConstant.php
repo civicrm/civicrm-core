@@ -131,6 +131,9 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param string $column
+   * @param bool $onlyActive
+   *
    * @return array - array reference of all case type
    * @static
    */
@@ -161,6 +164,9 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param string $column
+   * @param bool $onlyActive
+   *
    * @return array - array reference of all Encounter Medium.
    * @static
    */
@@ -183,6 +189,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param boolean $indexName - true return activity name in array
    * key else activity id as array key.
+   *
+   * @param bool $all
    *
    * @access public
    * @static

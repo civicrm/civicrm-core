@@ -126,7 +126,7 @@ function civicrm_api3_system_log($params) {
  * Metadata for log function
  * @param $params
  */
-function _civicrm_api3_system_log_spec($params) {
+function _civicrm_api3_system_log_spec(&$params) {
   $params['level'] = array(
     'title' => 'Log Level',
     'description' => 'Log level as described in PSR3 (info, debug, warning etc)',
