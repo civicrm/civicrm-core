@@ -37,6 +37,29 @@
  *
  */
 
+/**
+ * @param $params
+ *
+ * @return array
+ */
+function civicrm_api3_system_log_delete($params) {
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, True, 'SystemLog');
+}
+
+/**
+ * @param $params
+ *
+ * @return array
+ */
+function civicrm_api3_system_log_create($params) {
+  return civicrm_api3('system', 'log', $params);
+}
+
+/**
+ * @param $params
+ *
+ * @return array
+ */
 function civicrm_api3_system_log_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, True, 'SystemLog');
 }
