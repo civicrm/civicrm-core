@@ -397,6 +397,11 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
   function limit($rowCount = CRM_Report_Form::ROW_COUNT_LIMIT) {
     // lets do the pager if in html mode
     $this->_limit = NULL;
+    
+    // CRM-14115, over-ride row count if rowCount is specified in URL
+    if ($this->_dashBoardRowCount) {
+      $rowCount = $this->_dashBoardRowCount;
+    }
     if ($this->_outputMode == 'html' || $this->_outputMode == 'group') {
       //replace only first occurence of SELECT
       $this->_select = preg_replace('/SELECT/', 'SELECT SQL_CALC_FOUND_ROWS ', $this->_select, 1);

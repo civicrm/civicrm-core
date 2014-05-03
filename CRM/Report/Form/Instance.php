@@ -80,7 +80,15 @@ class CRM_Report_Form_Instance {
       ts('CC'),
       $attributes['email_subject']
     );
-
+    
+    $form->add('text',
+      'row_count',
+      ts('Limit Dashboard Results'),
+      array('maxlength' => 64,
+        'size' => 5
+      )         
+    );
+    
     $form->add('textarea',
       'report_header',
       ts('Report Header'),
@@ -97,7 +105,8 @@ class CRM_Report_Form_Instance {
       array('onclick' => "return showHideByValue('is_navigation','','navigation_menu','table-row','radio',false);")
     );
 
-    $form->addElement('checkbox', 'addToDashboard', ts('Available for Dashboard?'));
+    $form->addElement('checkbox', 'addToDashboard', ts('Available for Dashboard?'), NULL,
+      array('onclick' => "return showHideByValue('addToDashboard','','limit_result','table-row','radio',false);"));
     $form->addElement('checkbox', 'is_reserved', ts('Reserved Report?'));
     if (!CRM_Core_Permission::check('administer reserved reports')) {
       $form->freeze('is_reserved');
