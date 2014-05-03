@@ -13,6 +13,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    */
   protected $_permissionedDisabledGroup;
 
+  protected $hookClass;
+
   function get_info() {
     return array(
       'name' => 'Contact BAOs',
