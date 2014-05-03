@@ -19,6 +19,7 @@ class CRM_Case_PseudoConstantTest extends CiviUnitTestCase {
   }
 
   function testCaseType() {
+    CRM_Core_PseudoConstant::flush();
     $caseTypes = CRM_Case_PseudoConstant::caseType();
     $expectedTypes = array(
         1 => 'Housing Support',

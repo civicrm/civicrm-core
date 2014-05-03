@@ -79,6 +79,11 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param string $column
+   * @param bool $onlyActive
+   * @param null $condition
+   * @param bool $fresh
+   *
    * @return array - array reference of all case statues
    * @static
    */
@@ -102,6 +107,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * Get all the redaction rules
    *
    * @access public
+   *
+   * @param null $filter
    *
    * @return array - array reference of all redaction rules
    * @static
@@ -250,8 +257,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param boolean $name pseudoconstant to be flushed
-   *
+   * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'cache') {
    if (isset(self::$$name)) {
