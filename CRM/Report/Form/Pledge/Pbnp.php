@@ -127,8 +127,8 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
         'dao' => 'CRM_Pledge_DAO_PledgePayment',
         'fields' =>
         array(
-          'scheduled_date' =>
-          array('title' => ts('Next Payment Due'),
+          'scheduled_date' => array(
+            'title' => ts('Next Payment Due'),
             'type' => CRM_Utils_Type::T_DATE,
             'required' => TRUE,
           ),
@@ -139,6 +139,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
           array(
             'title' => ts('Next Payment Due'),
             'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
         ),
         'grouping' => 'pledge-fields',
