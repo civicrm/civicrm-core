@@ -440,6 +440,23 @@
     }
     cj('#priceset input[type="radio"]').change(updatePriceSetHighlight);
     updatePriceSetHighlight();
+    
+    function toggleBillingBlockIfFree(){
+    var total_amount_tmp =  $(this).data('raw-total'); 
+    
+    // Hide billing questions if this is free
+    if(  total_amount_tmp == 0 ){
+        cj("#billing-payment-block").hide(); 
+    }else{
+    	cj("#billing-payment-block").show(); 
+    }
+  }
+    
+     CRM.$('#pricevalue').each( toggleBillingBlockIfFree);
+    
+    $('#priceset input').on('change', function() {
+      CRM.$('#pricevalue').each( toggleBillingBlockIfFree);
+    });
   });
   {/literal}
 </script>
