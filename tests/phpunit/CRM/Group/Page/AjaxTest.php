@@ -13,6 +13,10 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    */
   protected $_permissionedDisabledGroup;
 
+  protected $hookClass;
+
+  protected $_params = array();
+
   function get_info() {
     return array(
       'name' => 'Contact BAOs',
@@ -49,12 +53,31 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
+   * @param $permission
+   */
+  function setPermissionAndRequest($permission) {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array($permission);
+    CRM_Contact_BAO_Group::getPermissionClause(TRUE);
+    global $_REQUEST;
+    $_REQUEST = $this->_params;
+  }
+
+  /**
+   * @param $permission
+   * @param $hook
+   */
+  function setHookAndRequest($permission, $hook) {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array($permission);
+    $this->hookClass->setHook('civicrm_aclGroup', array($this, $hook));
+    CRM_Contact_BAO_Group::getPermissionClause(TRUE);
+    global $_REQUEST;
+    $_REQUEST = $this->_params;
+  }
+  /**
    * retrieve groups as 'view all contacts'
    */
   function testGroupListViewAllContacts() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('view all contacts');
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
+    $this->setPermissionAndRequest('view all contacts');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, $total);
     $this->assertEquals('pick-me-active', $groups[2]['group_name']);
@@ -67,10 +90,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * (if you do set default it is enabled only)
    */
   function testGroupListViewAllContactsFoundTitle() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('view all contacts');
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['title'] = 'p';
+    $this->_params['title'] = 'p';
+    $this->setPermissionAndRequest('view all contacts');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, $total);
     $this->assertEquals('pick-me-active', $groups[2]['group_name']);
@@ -81,10 +102,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * retrieve groups as 'view all contacts'
    */
   function testGroupListViewAllContactsNotFoundTitle() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('view all contacts');
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['title'] = 'z';
+    $this->_params['title'] = 'z';
+    $this->setPermissionAndRequest('view all contacts');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, $total);
   }
@@ -92,9 +111,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * retrieve groups as 'edit all contacts'
    */
   function testGroupListEditAllContacts() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('view all contacts');
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
+    $this->setPermissionAndRequest('edit all contacts');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, $total);
     $this->assertEquals('pick-me-active', $groups[2]['group_name']);
@@ -105,10 +122,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * retrieve groups as 'view all contacts'
    */
   function testGroupListViewAllContactsEnabled() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('view all contacts');
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 1;
+    $this->_params['status'] = 1;
+    $this->setPermissionAndRequest('view all contacts');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, $total);
     $this->assertEquals('pick-me-active', $groups[2]['group_name']);
@@ -119,10 +134,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * retrieve groups as 'view all contacts'
    */
   function testGroupListViewAllContactsDisabled() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('view all contacts');
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 2;
+    $this->_params['status'] = 2;
+    $this->setPermissionAndRequest('view all contacts');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, $total);
     $this->assertEquals('pick-me-disabled', $groups[1]['group_name']);
@@ -133,11 +146,9 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * retrieve groups as 'view all contacts'
    */
   function testGroupListViewAllContactsDisabledNotFoundTitle() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('view all contacts');
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 2;
-    $_REQUEST['title'] = 'n';
+    $this->_params['status'] = 2;
+    $this->_params['title'] = 'n';
+    $this->setPermissionAndRequest('view all contacts');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, $total);
     $this->assertEquals('not-me-disabled', $groups[3]['group_name']);
@@ -147,11 +158,9 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * retrieve groups as 'view all contacts'
    */
   function testGroupListViewAllContactsDisabledFoundTitle() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('view all contacts');
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 2;
-    $_REQUEST['title'] = 'p';
+    $this->_params['status'] = 2;
+    $this->_params['title'] = 'p';
+    $this->setPermissionAndRequest('view all contacts');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, $total);
     $this->assertEquals('pick-me-disabled', $groups[1]['group_name']);
@@ -161,10 +170,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * retrieve groups as 'view all contacts'
    */
   function testGroupListViewAllContactsAll() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('view all contacts');
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 3;
+    $this->_params['status'] = 3;
+    $this->setPermissionAndRequest('view all contacts');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(4, $total);
     $this->assertEquals('pick-me-disabled', $groups[1]['group_name']);
@@ -178,38 +185,31 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * retrieve groups as 'view all contacts'
    */
   function testGroupListAccessCiviCRM() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
+    $this->setPermissionAndRequest('access CiviCRM');
+    $permissionClause = CRM_Contact_BAO_Group::getPermissionClause(TRUE);
+    $this->assertEquals('1 = 0', $permissionClause);
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, count($groups));
-    $this->markTestIncomplete('The AJAX function returns an incorrect result - needs fixing');
     $this->assertEquals(0, $total, 'Total returned should be accurate based on permissions');
   }
   /**
    * retrieve groups as 'view all contacts'
    */
   function testGroupListAccessCiviCRMEnabled() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 1;
+    $this->_params['status'] = 1;
+    $this->setPermissionAndRequest('access CiviCRM');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, count($groups));
-    $this->markTestIncomplete('The AJAX function returns an incorrect result - needs fixing');
     $this->assertEquals(0, $total, 'Total returned should be accurate based on permissions');
   }
   /**
    * retrieve groups as 'view all contacts'
    */
   function testGroupListAccessCiviCRMDisabled() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 2;
+    $this->_params['status'] = 2;
+    $this->setPermissionAndRequest('access CiviCRM');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, count($groups));
-    $this->markTestIncomplete('The AJAX function returns an incorrect result - needs fixing');
     $this->assertEquals(0, $total, 'Total returned should be accurate based on permissions');
   }
 
@@ -217,13 +217,10 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * retrieve groups as 'view all contacts'
    */
   function testGroupListAccessCiviCRMAll() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 2;
+    $this->_params['status'] = 2;
+    $this->setPermissionAndRequest('access CiviCRM');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, count($groups));
-    $this->markTestIncomplete('The AJAX function returns an incorrect result - needs fixing');
     $this->assertEquals(0, $total, 'Total returned should be accurate based on permissions');
   }
 
@@ -231,10 +228,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * retrieve groups as 'view all contacts'
    */
   function testGroupListAccessCiviCRMFound() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['title'] = 'p';
+    $this->_params['title'] = 'p';
+    $this->setPermissionAndRequest('access CiviCRM');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, count($groups));
     $this->assertEquals(0, $total, 'Total returned should be accurate based on permissions');
@@ -244,10 +239,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * retrieve groups as 'view all contacts'
    */
   function testGroupListAccessCiviCRMNotFound() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['title'] = 'z';
+    $this->_params['title'] = 'z';
+    $this->setPermissionAndRequest('access CiviCRM');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, count($groups));
     $this->assertEquals(0, $total, 'Total returned should be accurate based on permissions');
@@ -255,8 +248,6 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
 
   function testTraditionalACL () {
     $this->setupACL();
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
@@ -264,20 +255,16 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   function testTraditionalACLNotFoundTitle () {
+    $this->_params['title'] = 'n';
     $this->setupACL();
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['title'] = 'n';
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(0, $total, 'Total needs to be set correctly');
   }
 
   function testTraditionalACLFoundTitle () {
+    $this->_params['title'] = 'p';
     $this->setupACL();
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['title'] = 'p';
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(2, $total, 'Total needs to be set correctly');
@@ -286,10 +273,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   function testTraditionalACLDisabled () {
+    $this->_params['status'] = 2;
     $this->setupACL();
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 2;
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
@@ -297,11 +282,9 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   function testTraditionalACLDisabledFoundTitle () {
+    $this->_params['status'] = 2;
+    $this->_params['title'] = 'p';
     $this->setupACL();
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 2;
-    $_REQUEST['title'] = 'p';
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
@@ -309,21 +292,17 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   function testTraditionalACLDisabledNotFoundTitle () {
+    $this->_params['status'] = 2;
+    $this->_params['title'] = 'n';
     $this->setupACL();
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 2;
-    $_REQUEST['title'] = 'n';
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(0, $total, 'Total needs to be set correctly');
   }
 
   function testTraditionalACLEnabled () {
+    $this->_params['status'] = 1;
     $this->setupACL();
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 1;
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
@@ -331,10 +310,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   function testTraditionalACLAll () {
+    $this->_params['status'] = 3;
     $this->setupACL();
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 3;
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(2, $total, 'Total needs to be set correctly');
@@ -346,11 +323,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * ACL Group hook
    */
   function testGroupListAclGroupHookDisabled() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    $this->hookClass->setHook('civicrm_aclGroup', array($this, 'hook_civicrm_aclGroup'));
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 2;
+    $this->_params['status'] = 2;
+    $this->setHookAndRequest('access CiviCRM', 'hook_civicrm_aclGroup');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
@@ -361,12 +335,9 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * ACL Group hook
    */
   function testGroupListAclGroupHookDisabledFound() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    $this->hookClass->setHook('civicrm_aclGroup', array($this, 'hook_civicrm_aclGroup'));
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 2;
-    $_REQUEST['title'] = 'p';
+    $this->_params['status'] = 2;
+    $this->_params['title'] = 'p';
+    $this->setHookAndRequest('access CiviCRM', 'hook_civicrm_aclGroup');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
@@ -377,12 +348,9 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * ACL Group hook
    */
   function testGroupListAclGroupHookDisabledNotFound() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    $this->hookClass->setHook('civicrm_aclGroup', array($this, 'hook_civicrm_aclGroup'));
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 2;
-    $_REQUEST['title'] = 'n';
+    $this->_params['status'] = 2;
+    $this->_params['title'] = 'n';
+    $this->setHookAndRequest('access CiviCRM', 'hook_civicrm_aclGroup');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(0, $total, 'Total needs to be set correctly');
@@ -393,10 +361,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * ACL Group hook
    */
   function testGroupListAclGroupHook() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    $this->hookClass->setHook('civicrm_aclGroup', array($this, 'hook_civicrm_aclGroup'));
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
+    $this->setHookAndRequest('access CiviCRM', 'hook_civicrm_aclGroup');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
@@ -407,11 +372,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * ACL Group hook
    */
   function testGroupListAclGroupHookTitleNotFound() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    $this->hookClass->setHook('civicrm_aclGroup', array($this, 'hook_civicrm_aclGroup'));
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['title'] = 'n';
+    $this->_params['title'] = 'n';
+    $this->setHookAndRequest('access CiviCRM', 'hook_civicrm_aclGroup');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, $total, 'Total needs to be set correctly');
     $this->assertEquals(0, count($groups), 'Returned groups should exclude disabled by default');
@@ -421,11 +383,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * ACL Group hook
    */
   function testGroupListAclGroupHookTitleFound() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    $this->hookClass->setHook('civicrm_aclGroup', array($this, 'hook_civicrm_aclGroup'));
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['title'] = 'p';
+    $this->_params['title'] = 'p';
+    $this->setHookAndRequest('access CiviCRM', 'hook_civicrm_aclGroup');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(2, $total, 'Total needs to be set correctly');
@@ -437,11 +396,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * ACL Group hook
    */
   function testGroupListAclGroupHookAll() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    $this->hookClass->setHook('civicrm_aclGroup', array($this, 'hook_civicrm_aclGroup'));
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 3;
+    $this->_params['status'] = 3;
+    $this->setHookAndRequest('access CiviCRM', 'hook_civicrm_aclGroup');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(2, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(2, $total, 'Total needs to be set correctly');
@@ -453,11 +409,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * ACL Group hook
    */
   function testGroupListAclGroupHookEnabled() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    $this->hookClass->setHook('civicrm_aclGroup', array($this, 'hook_civicrm_aclGroup'));
-    global $_REQUEST;
-    $_REQUEST = $this->_params;
-    $_REQUEST['status'] = 1;
+    $this->_params['status'] = 1;
+    $this->setHookAndRequest('access CiviCRM', 'hook_civicrm_aclGroup');
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(1, count($groups), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $total, 'Total needs to be set correctly');
@@ -474,7 +427,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   * @param array $currentGroups
   */
   function hook_civicrm_aclGroup($type, $contactID, $tableName, &$allGroups, &$currentGroups) {
-    //dont use api - you will get a loop
+    //don't use api - you will get a loop
     $sql = " SELECT * FROM civicrm_group WHERE name LIKE '%pick%'";
     $groups = array();
     $dao = CRM_Core_DAO::executeQuery($sql);

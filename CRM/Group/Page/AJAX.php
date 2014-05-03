@@ -39,7 +39,7 @@ class CRM_Group_Page_AJAX {
   static function getGroupList() {
     $params = $_REQUEST;
 
-    if ( isset($params['parent_id']) ) {
+    if (isset($params['parent_id'])) {
       // requesting child groups for a given parent
       $params['page'] = 1;
       $params['rp']   = 25;
