@@ -168,29 +168,6 @@ eval('tableId =[' + tableId + ']');
     }
     var object;
 
-    if ( !useAjax ) {
-    cj('a.action-item').click( function(){
-        object = cj(this);
-        cj('table.display').one( 'mouseover', function() {
-            var nNodes     = oTable.fnGetNodes( );
-            var tdSelected = cj(object).closest('td');
-            var closestEle = cj(object).closest('tr').attr('id');
-            cj.each( nNodes, function(i,n) {
-                //operation on selected row element.
-                if ( closestEle == n.id ){
-                    var col = 0;
-                    cj('tr#' + closestEle + ' td:not(.hiddenElement)').each( function() {
-                        if ( tdSelected.get(0) !== cj(this).get(0)  ){
-                            oTable.fnUpdate( cj(this).html() , i, col );
-                        }
-                        col++;
-                    });
-                }
-            });
-        });
-    });
-    }
-
     });
 });
 
