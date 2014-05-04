@@ -509,16 +509,23 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
     foreach ($contactTypes as $key => $value) {
       if ($key) {
         $typeValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $key);
-        $typeUrl = 'ct=' . CRM_Utils_Array::value('0', $typeValue);
+        $cType = CRM_Utils_Array::value('0', $typeValue);
+        $typeUrl = 'ct=' . $cType;
         if ($csType = CRM_Utils_Array::value('1', $typeValue)) {
           $typeUrl .= "&cst=$csType";
         }
-        $shortCuts[] = array(
+        $shortCut = array(
           'path' => 'civicrm/contact/add',
           'query' => "$typeUrl&reset=1",
           'ref' => "new-$value",
           'title' => $value,
         );
+        if ($csType = CRM_Utils_Array::value('1', $typeValue)) {
+          $shortCuts[$cType]['shortCuts'][] = $shortCut;
+        }
+        else {
+          $shortCuts[$cType] = $shortCut;
+        }
       }
     }
     return $shortCuts;

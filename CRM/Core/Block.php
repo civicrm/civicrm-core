@@ -401,17 +401,8 @@ class CRM_Core_Block {
     }
 
     $values = array();
-    foreach ($shortCuts as $short) {
-      $value = array();
-      if (isset($short['url'])) {
-        $value['url'] = $short['url'];
-      }
-      else {
-        $value['url'] = CRM_Utils_System::url($short['path'], $short['query'], FALSE);
-      }
-      $value['title'] = $short['title'];
-      $value['ref']   = $short['ref'];
-      $values[]       = $value;
+    foreach ($shortCuts as $key => $short) {
+      $values[$key] = self::setShortCutValues($short);
     }
 
     // call links hook to add user defined links
@@ -430,6 +421,24 @@ class CRM_Core_Block {
     }
 
     self::setProperty(self::CREATE_NEW, 'templateValues', array('shortCuts' => $values));
+  }
+
+  private static function setShortcutValues($short) {
+    $value = array();
+    if (isset($short['url'])) {
+      $value['url'] = $short['url'];
+    }
+    elseif (isset($short['path'])) {
+      $value['url'] = CRM_Utils_System::url($short['path'], $short['query'], FALSE);
+    }
+    $value['title'] = $short['title'];
+    $value['ref']   = $short['ref'];
+    if (!empty($short['shortCuts'])) {
+      foreach ($short['shortCuts'] as $shortCut) {
+        $value['shortCuts'][] = self::setShortcutValues($shortCut);
+      }
+    }
+    return $value;
   }
 
   /**

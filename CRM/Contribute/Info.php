@@ -103,21 +103,22 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
     if (CRM_Core_Permission::check('access CiviContribute') &&
       CRM_Core_Permission::check('edit contributions')
     ) {
-      $shortCuts = array_merge($shortCuts, array(
-        array('path' => 'civicrm/contribute/add',
-            'query' => "reset=1&action=add&context=standalone",
-            'ref' => 'new-contribution',
-            'title' => ts('Contribution'),
-          )));
+      $shortCut[] = array(
+        'path' => 'civicrm/contribute/add',
+        'query' => "reset=1&action=add&context=standalone",
+        'ref' => 'new-contribution',
+        'title' => ts('Contribution'),
+      );
       if ($newCredit) {
         $title = ts('Contribution') . '<br />&nbsp;&nbsp;(' . ts('credit card') . ')';
-        $shortCuts = array_merge($shortCuts, array(
-          array('path' => 'civicrm/contribute/add',
-              'query' => "reset=1&action=add&context=standalone&mode=live",
-              'ref' => 'new-contribution-cc',
-              'title' => $title,
-            )));
+        $shortCut[0]['shortCuts'][] = array(
+          'path' => 'civicrm/contribute/add',
+          'query' => "reset=1&action=add&context=standalone&mode=live",
+          'ref' => 'new-contribution-cc',
+          'title' => $title,
+        );
       }
+      $shortCuts = array_merge($shortCuts, $shortCut);
     }
   }
 }
