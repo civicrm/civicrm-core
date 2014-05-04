@@ -584,7 +584,7 @@ class CRM_Core_Resources {
 
       "packages/jquery/plugins/jquery.mousewheel$min.js",
 
-      "packages/jquery/plugins/select2/select2.js", // No mini until release of select2 3.4.6
+      "packages/jquery/plugins/select2/select2$min.js",
       "packages/jquery/plugins/select2/select2.css",
 
       "packages/jquery/plugins/jquery.tableHeader.js",
