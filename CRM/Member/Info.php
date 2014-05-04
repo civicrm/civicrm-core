@@ -98,21 +98,22 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
     if (CRM_Core_Permission::check('access CiviMember') &&
       CRM_Core_Permission::check('edit memberships')
     ) {
-      $shortCuts = array_merge($shortCuts, array(
-        array('path' => 'civicrm/member/add',
-            'query' => "reset=1&action=add&context=standalone",
-            'ref' => 'new-membership',
-            'title' => ts('Membership'),
-          )));
+      $shortCut[] = array(
+        'path' => 'civicrm/member/add',
+        'query' => "reset=1&action=add&context=standalone",
+        'ref' => 'new-membership',
+        'title' => ts('Membership'),
+      );
       if ($newCredit) {
         $title = ts('Membership') . '<br />&nbsp;&nbsp;(' . ts('credit card') . ')';
-        $shortCuts = array_merge($shortCuts, array(
-          array('path' => 'civicrm/member/add',
-              'query' => "reset=1&action=add&context=standalone&mode=live",
-              'ref' => 'new-membership-cc',
-              'title' => $title,
-            )));
+        $shortCut[0]['shortCuts'][] = array(
+          'path' => 'civicrm/member/add',
+          'query' => "reset=1&action=add&context=standalone&mode=live",
+          'ref' => 'new-membership-cc',
+          'title' => $title,
+        );
       }
+      $shortCuts = array_merge($shortCuts, $shortCut);
     }
   }
 }
