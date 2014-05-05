@@ -348,7 +348,7 @@ AND image_URL IS NOT NULL
         $config = CRM_Core_Config::singleton();
         $fullpath = $config->customFileUploadDir.$photo;
           if (file_exists($fullpath)){
-            $newimageurl =  CRM_Utils_System::url('civicrm/contact/imagefile', 'photo='.$photo, TRUE);
+            $newimageurl =  CRM_Utils_System::url('civicrm/contact/imagefile', 'photo='.$photo);
             $sql = 'UPDATE civicrm_contact SET image_url=%1 WHERE id=%2';
             $params = array(
               1 => array($newimageurl, 'String'),
