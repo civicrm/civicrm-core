@@ -88,7 +88,9 @@ function civicrm_api3_job_get($params) {
 /**
  * Delete a job
  *
- * @param int $id
+ * @param $params
+ *
+ * @internal param int $id
  *
  * @return array API Result Array
  * {@getfields Job_delete}
