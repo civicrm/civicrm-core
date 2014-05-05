@@ -393,7 +393,6 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
     $entryFound   = FALSE;
     $checkList    = array();
     $display_flag = $prev_cid = $cid = 0;
-    crm_Core_error::Debug('$rows', $rows);
     foreach ($rows as $rowNum => $row) {
 
       // convert display name to links
