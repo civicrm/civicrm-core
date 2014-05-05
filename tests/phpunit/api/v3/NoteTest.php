@@ -153,8 +153,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$result['id']]['note'], 'Hello!!! m testing Note', 'in line ' . __LINE__);
     $this->assertEquals(date('Y-m-d', strtotime($this->_params['modified_date'])), date('Y-m-d', strtotime($result['values'][$result['id']]['modified_date'])), 'in line ' . __LINE__);
 
-    $this->assertArrayHasKey('id', $result, 'in line ' . __LINE__);
-    $this->assertAPISuccess($result, 'in line ' . __LINE__);
+    $this->assertArrayHasKey('id', $result);
     $note = array(
       'id' => $result['id'],    );
     $this->noteDelete($note);

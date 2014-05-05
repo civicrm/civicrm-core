@@ -64,7 +64,8 @@ function civicrm_api3_system_log_create($params) {
  * @return array
  */
 function _civicrm_api3_system_log_create_spec(&$params) {
-  return _civicrm_api3_system_log_spec($params);
+  require_once('api/v3/System.php');
+   _civicrm_api3_system_log_spec($params);
 }
 
 /**
