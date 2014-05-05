@@ -326,7 +326,10 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
     $form->add('text', 'city', ts('City'), $attributes['city']);
     $form->add('text', 'postal_code', ts('Zip / Postal Code'), $attributes['postal_code']);
 
-    $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements();
+    //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
+    // this is loaded onto then replace with something like '__' & test
+    $separator = CRM_Core_DAO::VALUE_SEPARATOR;
+    $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, $separator);
     $form->add('select', 'contact_type', ts('Contact Type(s)'), $contactTypes, FALSE,
       array('id' => 'contact_type', 'multiple' => 'multiple', 'class' => 'crm-select2')
     );
