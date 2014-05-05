@@ -1896,4 +1896,16 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->clickAt("//*[@class='select2-result-label']");
     }
   }
+
+  /**
+   * function to select multiple options
+   */
+  function multiselect2($fieldid, $params) {
+    foreach($params as $value) {
+      $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
+      $this->waitForElementPresent("xpath=//ul[@class='select2-results']");
+      $this->clickAt("xpath=//ul[@class='select2-results']//li/div[text()='$value']");
+      $this->waitForText("xpath=//*[@id='$fieldid']/../div", $value);
+    }
+  }
 }
