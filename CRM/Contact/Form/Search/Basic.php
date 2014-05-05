@@ -69,8 +69,12 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
       'advanced_search_options'
     );
 
+    $shortCuts = array();
+    //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
+    // this is loaded onto then replace with something like '__' & test
+    $separator = CRM_Core_DAO::VALUE_SEPARATOR;
     if (!empty($searchOptions['contactType'])) {
-      $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements();
+      $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, $separator);
       $this->add('select', 'contact_type',
         ts('is...'),
         $contactTypes,
