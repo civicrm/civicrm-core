@@ -98,15 +98,7 @@ function civicrm_api3_job_get($params) {
  * @access public
  */
 function civicrm_api3_job_delete($params) {
-  if ($params['id'] != NULL && !CRM_Utils_Rule::integer($params['id'])) {
-    return civicrm_api3_create_error('Invalid value for job ID');
-  }
-
-  $result = CRM_Core_BAO_Job::del($params['id']);
-  if (!$result) {
-    return civicrm_api3_create_error('Could not delete job');
-  }
-  return civicrm_api3_create_success($result, $params, 'job', 'delete');
+  _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**

@@ -271,6 +271,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailSettings',
       'Setting',
       'MailingContact',
+      'SystemLog' //skip this because it doesn't make sense to update logs
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;
