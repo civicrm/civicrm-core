@@ -88,7 +88,9 @@ class api_v3_SystemTest extends CiviUnitTestCase {
    *
    * @access protected
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+    $this->quickCleanup(array('civicrm_system_log'));
+  }
 
   ///////////////// civicrm_domain_get methods
 
@@ -121,5 +123,16 @@ class api_v3_SystemTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('SystemLog', 'getsingle', array('sequential' => 1, 'message' => array('LIKE' => '%Chris%')));
     $this->assertEquals($result['message'], 'We wish you a merry Christmas');
     $this->assertEquals($result['level'], 'info');
+  }
+
+  /**
+   * Test system log function
+   */
+  function testSystemLogNoLevel() {
+    $this->callAPISuccess('system', 'log', array( 'message' => 'We wish you a merry Christmas'));
+    $result = $this->callAPISuccess('SystemLog', 'getsingle', array('sequential' => 1, 'message' => array('LIKE' => '%Chris%')));
+    $this->assertEquals($result['message'], 'We wish you a merry Christmas');
+    $this->assertEquals($result['level'], 'info');
+    $this->callAPISuccess('system_log', 'create', array('message' => 'msg'));
   }
 }

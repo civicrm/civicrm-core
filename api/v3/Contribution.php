@@ -40,8 +40,9 @@
 /**
  * Add or update a contribution
  *
- * @param  array   $params           (reference ) input parameters
+ * @param  array $params (reference ) input parameters
  *
+ * @throws API_Exception
  * @return array  Api result array
  * @static void
  * @access public
@@ -162,8 +163,9 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
 /**
  * Retrieve a set of contributions, given a set of input params
  *
- * @param  array   $params           (reference ) input parameters
- * @param array    $returnProperties Which properties should be included in the
+ * @param  array $params (reference ) input parameters
+ *
+ * @internal param array $returnProperties Which properties should be included in the
  * returned Contribution object. If NULL, the default
  * set of properties will be included.
  *
@@ -224,10 +226,12 @@ function _civicrm_api3_contribution_get_spec(&$params) {
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params Associative array of property name/value
  * pairs to insert in new contact.
- * @param array  $values       The reformatted properties that we can use internally
+ * @param array $values The reformatted properties that we can use internally
  * '
+ *
+ * @param bool $create
  *
  * @return array|CRM_Error
  * @access public
@@ -298,16 +302,19 @@ function civicrm_api3_contribution_transact($params) {
 
   return civicrm_api('contribution', 'create', $params);
 }
+
 /**
  * Send a contribution confirmation (receipt or invoice)
  * The appropriate online template will be used (the existence of related objects
  * (e.g. memberships ) will affect this selection
+ *
  * @param array $params input parameters
  * {@getfields Contribution_sendconfirmation}
+ *
+ * @throws Exception
  * @return array  Api result array
  * @static void
  * @access public
- *
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
   $contribution = new CRM_Contribute_BAO_Contribution();
@@ -358,10 +365,11 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
  *
  * @param array $params input parameters
  * {@getfields Contribution_completetransaction}
+ *
+ * @throws API_Exception
  * @return array  Api result array
  * @static void
  * @access public
- *
  */
 function civicrm_api3_contribution_completetransaction(&$params) {
 
