@@ -194,11 +194,13 @@
     }
 
     function drawCommentRows(rowId) {
+      if (rowId) {
         row = cj('tr#'+ rowId)
         for (i in commentRows[rowId]) {
             row.after(commentRows[rowId][i]);
             row = cj('tr#cnote_'+ i);
         }
+      }
     }
 
     {/literal}
