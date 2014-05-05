@@ -129,10 +129,9 @@ class api_v3_SystemTest extends CiviUnitTestCase {
    * Test system log function
    */
   function testSystemLogNoLevel() {
-    $this->callAPISuccess('system', 'log', array( 'message' => 'We wish you a merry Christmas'));
+    $this->callAPISuccess('system', 'log', array( 'message' => 'We wish you a merry Christmas', 'level' => 'alert'));
     $result = $this->callAPISuccess('SystemLog', 'getsingle', array('sequential' => 1, 'message' => array('LIKE' => '%Chris%')));
     $this->assertEquals($result['message'], 'We wish you a merry Christmas');
-    $this->assertEquals($result['level'], 'info');
-    $this->callAPIFailure('system_log', 'create', array('message' => 'msg'));
+    $this->assertEquals($result['level'], 'alert');
   }
 }
