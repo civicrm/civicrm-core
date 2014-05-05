@@ -1952,10 +1952,10 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     $pendngRefundStatusId = array_search('Pending refund', $contributionStatuses);
 
     if ($balanceAmt) {
-      if ($balanceAmt > 0) {
+      if ($balanceAmt > 0 && $paidAmount != 0) {
         $contributionStatusVal = $partiallyPaidStatusId;
       }
-      elseif ($balanceAmt < 0) {
+      elseif ($balanceAmt < 0 && $paidAmount != 0) {
         $contributionStatusVal = $pendngRefundStatusId;
       }
 
