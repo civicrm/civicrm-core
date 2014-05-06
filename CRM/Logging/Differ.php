@@ -261,7 +261,7 @@ WHERE lt.log_conn_id = %1 AND
           'suffix_id' => CRM_Contact_BAO_Contact::buildOptions('suffix_id'),
           'website_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'),
           'activity_type_id' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
-          'case_type_id' => CRM_Case_PseudoConstant::caseType('label', FALSE),
+          'case_type_id' => CRM_Case_PseudoConstant::caseType('title', FALSE),
           'priority_id'  => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
         );
 
