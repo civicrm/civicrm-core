@@ -248,7 +248,8 @@ class CRM_Utils_REST {
     if (!empty($r)) {
       $q = $r;
     }
-    if (!empty($q)) {
+    $entity = CRM_Utils_array::value('entity', $requestParams);
+    if ( empty($entity) && !empty($q)) {
       $args = explode('/', $q);
       // If the function isn't in the civicrm namespace, reject the request.
       if ($args[0] != 'civicrm') {
