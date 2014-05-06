@@ -55,7 +55,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->_testAddTellAFriend($subject, $thankYouMsg, $eventTitle);
 
     // get the url for registration
-    $this->waitForElementPresent("xpath=//div[@id='event_status_id']//div[@class='dataTables_wrapper']/table/tbody//tr/td[1]/a[text()='$eventTitle']");
+    $this->waitForElementPresent("xpath=//div[@id='event_status_id']//div[@id='option11_wrapper']/table/tbody//tr/td[1]/a[text()='$eventTitle']");
     $this->click("link=$eventTitle");
     $this->waitForElementPresent("link=Register Now");
     $this->click("link=Register Now");
@@ -77,6 +77,8 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->type('last_name', "$lastName");
     $this->type('email-Primary', "$firstName@$lastName.com");
     $this->click('_qf_Register_upload-bottom');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click('_qf_Confirm_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("css=div.crm-event-thankyou-form-block div#tell-a-friend a");
     $this->waitForElementPresent('_qf_Form_cancel');
@@ -250,7 +252,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->type('tf_thankyou_text', $thankYouMsg);
 
     $this->click('_qf_Event_upload_done-bottom');
-    $this->waitForElementPresent("xpath=//div[@id='event_status_id']//div[@class='dataTables_wrapper']/table/tbody//tr/td[1]/a[text()='$eventTitle']");
+    $this->waitForElementPresent("xpath=//div[@id='event_status_id']//div[@id='option11_wrapper']/table/tbody//tr/td[1]/a[text()='$eventTitle']");
   }
 }
 
