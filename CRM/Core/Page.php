@@ -233,9 +233,9 @@ class CRM_Core_Page {
 
     $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'mailing_backend');
 
-    // Outbound email msg once per hour
+    // Outbound email msg once every 2 hours if outbound email is redirected or disabled
     if (($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB
-        || (defined('CIVICRM_MAILER_SPOOL') && CIVICRM_MAILER_SPOOL)
+        || (defined('CIVICRM_MAIL_LOG') && CIVICRM_MAIL_LOG)
         || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED
         || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_MOCK)
         && CRM_Core_Permission::check('administer CiviCRM') && CRM_Core_Session::singleton()->timer('outboundEmail_alert', 7200))
