@@ -767,13 +767,13 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       ts('Financial Type'),
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType()
     );
-    if ($this->_context != 'standalone') {
-      //CRM-10223 - allow contribution to be recorded against different contact
-      // causes a conflict in standalone mode so skip in standalone for now
-      $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different Contact?'));
-      $this->addSelect('soft_credit_type_id', array('entity' => 'contribution_soft'));
-      $this->addEntityRef('soft_credit_contact_id', ts('Payment From'), array('create' => TRUE));
-    }
+
+    //CRM-10223 - allow contribution to be recorded against different contact
+    // causes a conflict in standalone mode so skip in standalone for now
+    $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different Contact?'));
+    $this->addSelect('soft_credit_type_id', array('entity' => 'contribution_soft'));
+    $this->addEntityRef('soft_credit_contact_id', ts('Payment From'), array('create' => TRUE));
+
 
     $this->addElement('checkbox',
       'send_receipt',
@@ -933,8 +933,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       if (empty($params['soft_credit_type_id'])) {
         $errors['soft_credit_type_id'] = ts('Please Select a Soft Credit Type');
       }
-      if (empty($params['contribution_contact'][1])) {
-        $errors['contribution_contact[1]'] = ts('Please select a contact');
+      if (empty($params['soft_credit_contact_id'])) {
+        $errors['soft_credit_contact_id'] = ts('Please select a contact');
       }
     }
 
@@ -1262,12 +1262,11 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     // Retrieve the name and email of the current user - this will be the FROM for the receipt email
     list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($ids['userId']);
 
-    //CRM-10223 - allow contribution to be recorded against different contact
+    //CRM-13981, allow different person as a soft-contributor of chosen type
     if ($this->_contributorContactID != $this->_contactID) {
-      $params['contribution_contact_id'] = $this->_contributorContactID;
       if (!empty($this->_params['soft_credit_type_id'])) {
         $softParams['soft_credit_type_id'] = $this->_params['soft_credit_type_id'];
-        $softParams['contact_id'] = $params['contact_id'];
+        $softParams['contact_id'] = $this->_contributorContactID;
       }
     }
     if (!empty($formValues['record_contribution'])) {
@@ -1631,6 +1630,11 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             }
             $membershipParams['init_amount'] = $init_amount;
           }
+
+          if (!empty($softParams)) {
+            $membershipParams['soft_credit'] = $softParams;
+          }
+
           $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
 
           $this->_membershipIDs[] = $membership->id;
