@@ -59,9 +59,6 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
       'Organization Details',
       'Other Amount',
       'I pledge to contribute this amount every',
-      "Honoree Section Title $hash",
-      "Honoree Introductory Message $hash",
-      'In Honor of',
       'Name and Address',
       'Summary Overlay',
     );
@@ -69,7 +66,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
     }
   }
-
+  
   // CRM-12510 Test copy contribution page
   function testContributionPageCopy() {
     // open browser, login
@@ -117,9 +114,6 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
       'Organization Details',
       'Other Amount',
       'I pledge to contribute this amount every',
-      "Honoree Section Title $hash",
-      "Honoree Introductory Message $hash",
-      'In Honor of',
       'Name and Address',
       'Summary Overlay',
     );
@@ -165,9 +159,6 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
       'Organization Details',
       'Other Amount',
       'I pledge to contribute this amount every',
-      "Honoree Section Title $hash",
-      "Honoree Introductory Message $hash",
-      'In Honor of',
       'Name and Address',
       'Summary Overlay',
     );
@@ -301,7 +292,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->select('financial_type_id', "label=Donation");
 
     $this->click('is_organization');
-    $this->select('onbehalf_profile_id', 'label=On Behalf Of Organization');
+    $this->select("xpath=//*[@class='crm-contribution-onbehalf_profile_id']//span[@class='crm-profile-selector-select']//select", 'label=On Behalf Of Organization');
     $this->type('for_organization', "On behalf $hash");
     // make onBehalf optional
     $this->click('CIVICRM_QFID_1_2');
