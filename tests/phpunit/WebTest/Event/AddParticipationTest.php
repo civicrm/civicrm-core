@@ -51,7 +51,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->select2('event_id', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select role
-    $this->click('role_id[2]');
+    $this->multiselect2('role_id', array('Volunteer'));
 
     // Choose Registration Date.
     // Using helper webtestFillDate function.
@@ -243,8 +243,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->select2('event_id', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select roles
-    $this->click('role_id[2]');
-    $this->click('role_id[3]');
+    $this->multiselect2('role_id', array('Volunteer', 'Host'));
 
     $this->waitForElementPresent("xpath=//*[@id='2_chk']//div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper collapsed']");
     $this->click("xpath=//*[@id='2_chk']/div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper collapsed']//div[1]");
@@ -408,13 +407,13 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->select2('event_id', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select role.
-    $this->click('role_id[2]');
+    $this->multiselect2('role_id', array('Volunteer'));
 
     foreach($return as $values) {
       foreach ($values as $entityType => $customData) {
         //checking for duplicate custom data present or not
-        $this->assertElementPresent("xpath=//*[@id='customData']/div[@class='custom-group custom-group-{$customData['cgtitle']} crm-accordion-wrapper ']");
-        $this->assertEquals(1, $this->getXpathCount("//*[@id='customData']/div[@class='custom-group custom-group-{$customData['cgtitle']} crm-accordion-wrapper ']"));
+        $this->assertElementPresent("xpath=//*[@class='crm-customData-block']/div[@class='custom-group custom-group-{$customData['cgtitle']} crm-accordion-wrapper ']");
+        $this->assertEquals(1, $this->getXpathCount("//*[@class='crm-customData-block']/div[@class='custom-group custom-group-{$customData['cgtitle']} crm-accordion-wrapper ']"));
       }
     }
   }
