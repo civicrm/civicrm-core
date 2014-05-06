@@ -673,7 +673,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     $configured = CRM_Case_BAO_Case::isCaseConfigured();
     $form->assign('notConfigured', !$configured['configured']);
 
-    $caseTypes = CRM_Case_PseudoConstant::caseType('label', FALSE);
+    $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
     foreach ($caseTypes as $id => $name) {
       $form->addElement('checkbox', "case_type_id[$id]", NULL, $name);
     }
