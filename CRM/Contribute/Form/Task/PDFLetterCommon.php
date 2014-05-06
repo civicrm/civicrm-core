@@ -24,6 +24,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       $emailParams = array(
         'subject'   => $formValues['subject']
       );
+      // We need display_name for emailLetter() so add to returnProperties here
+      $returnProperties['display_name'] = 1;
       if(stristr($formValues['email_options'], 'pdfemail')) {
         $isPDF = TRUE;
       }
