@@ -114,8 +114,8 @@ class CRM_Case_Form_Activity_OpenCase {
     // set default case type passed in url
     if ($form->_caseTypeId) {
       $caseType = $form->_caseTypeId;
+      $defaults['case_type_id'] = $caseType;
     }
-    $defaults['case_type_id'] = $caseType;
 
     $medium = CRM_Core_OptionGroup::values('encounter_medium', FALSE, FALSE, FALSE, 'AND is_default = 1');
     if (count($medium) == 1) {
@@ -146,10 +146,10 @@ class CRM_Case_Form_Activity_OpenCase {
       $form->addEntityRef('client_id', ts('Client'), array('create' => TRUE, 'multiple' => $form->_allowMultiClient), TRUE);
     }
 
-    $element = $form->addSelect(
-      'case_type_id',
-      array('onchange' => "CRM.buildCustomData('Case', this.value);"),
-      TRUE
+    $caseTypes = CRM_Case_PseudoConstant::caseType();
+    $element = $form->add('select',
+      'case_type_id', ts('Case Type'), $caseTypes,
+      TRUE, array('onchange' => "CRM.buildCustomData('Case', this.value);")
     );
 
     if ($form->_caseTypeId) {
