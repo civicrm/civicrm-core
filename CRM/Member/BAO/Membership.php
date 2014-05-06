@@ -2689,8 +2689,8 @@ WHERE      civicrm_membership.is_test = 0";
     $contributionParams['currency'] = $config->defaultCurrency;
     $contributionParams['receipt_date'] = (CRM_Utils_Array::value('receipt_date', $params)) ? $params['receipt_date'] : 'null';
     $contributionParams['source'] = CRM_Utils_Array::value('contribution_source', $params);
-    $contributionParams['soft_credit'] = CRM_Utils_Array::value('soft_credit', $params);
     $contributionParams['non_deductible_amount'] = 'null';
+    $contributionSoftParams = CRM_Utils_Array::value('soft_credit', $params);
     $recordContribution = array(
       'contact_id', 'total_amount', 'receive_date', 'financial_type_id',
       'payment_instrument_id', 'trxn_id', 'invoice_id', 'is_test',
@@ -2705,11 +2705,6 @@ WHERE      civicrm_membership.is_test = 0";
       $contributionParams['batch_id'] = $params['batch_id'];
     }
 
-    if (!empty($params['contribution_contact_id'])) {
-      // deal with possibility of a different person paying for contribution
-      $contributionParams['contact_id'] = $params['contribution_contact_id'];
-    }
-
     if (!empty($params['processPriceSet']) &&
       !empty($params['lineItems'])
     ) {
@@ -2717,6 +2712,14 @@ WHERE      civicrm_membership.is_test = 0";
     }
 
     $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams, $ids);
+
+    //CRM-13981, create new soft-credit record as to record payment from differnt person for this membership
+    if (!empty($contributionSoftParams)) {
+      $contributionSoftParams['contribution_id'] = $contribution->id;
+      $contributionSoftParams['currency'] = $contribution->currency;
+      $contributionSoftParams['amount'] = $contribution->total_amount;
+      CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
+    }
 
     // store contribution id
     $params['contribution_id'] = $contribution->id;
