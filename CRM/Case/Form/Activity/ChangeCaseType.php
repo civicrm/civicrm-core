@@ -135,7 +135,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
     }
 
     $caseTypes = CRM_Case_PseudoConstant::caseType('name');
-    $allCaseTypes = CRM_Case_PseudoConstant::caseType('label', FALSE);
+    $allCaseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
 
     if (!empty($caseTypes[$params['case_type_id']])) {
       $caseType = $caseTypes[$params['case_type_id']];

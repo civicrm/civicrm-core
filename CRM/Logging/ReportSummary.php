@@ -165,7 +165,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
           ),
           'bracket_info' => array(
             'entity_column' => 'case_type_id',
-            'options' => CRM_Case_PseudoConstant::caseType('label', FALSE)
+            'options' => CRM_Case_PseudoConstant::caseType('title', FALSE)
           ),
         ),
       );
@@ -181,7 +181,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     // build _logTables for address custom tables
     $customTables = $logging->entityCustomDataLogTables('Address');
     foreach ($customTables as $table) {
-      $this->_logTables[$table] = 
+      $this->_logTables[$table] =
         array(
           'fk' => 'contact_id',// for join of fk_table with contact table
           'joins' => array(
@@ -223,7 +223,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
   function where() {
     // reset where clause as its called multiple times, every time insert sql is built.
     $this->_whereClauses = array();
-    
+
     parent::where();
     $this->_where .= " AND (entity_log_civireport.log_action != 'Initialization')";
   }
