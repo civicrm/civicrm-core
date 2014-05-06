@@ -226,7 +226,7 @@ class CRM_Core_Page {
     CRM_Utils_Check::singleton()->showPeriodicAlerts();
 
     // Debug msg once per hour
-    if ($config->debug && CRM_Core_Permission::check('administer CiviCRM') && CRM_Core_Session::singleton()->timer('debug_alert', 3600)) {
+    if ($config->debug && CRM_Core_Permission::check('administer CiviCRM') && CRM_Core_Session::singleton()->timer('debug_alert', 7200)) {
       $msg = ts('Warning: Debug is enabled in <a href="%1">system settings</a>. This should not be enabled on production servers.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/debug', 'reset=1')));
       CRM_Core_Session::setStatus($msg, ts('Debug Mode'));
     }
@@ -238,7 +238,7 @@ class CRM_Core_Page {
         || (defined('CIVICRM_MAILER_SPOOL') && CIVICRM_MAILER_SPOOL)
         || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED
         || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_MOCK)
-        && CRM_Core_Permission::check('administer CiviCRM') && CRM_Core_Session::singleton()->timer('outboundEmail_alert', 3600))
+        && CRM_Core_Permission::check('administer CiviCRM') && CRM_Core_Session::singleton()->timer('outboundEmail_alert', 7200))
     {
       $msg = ts('Warning: Outbound email is disabled in <a href="%1">system settings</a>. Proper settings should be enabled on production servers.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')));
       CRM_Core_Session::setStatus($msg, ts('Outbound Email Settings'));
