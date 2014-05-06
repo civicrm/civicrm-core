@@ -384,7 +384,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     // 2. create/edit case
     if (!empty($params['case_type_id'])) {
-      $params['case_type'] = $params['case_type_id'];
+      $params['case_type'] = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $params['case_type_id'], 'name', 'id');
       $params['subject'] = $params['activity_subject'];
     }
     $caseObj = CRM_Case_BAO_Case::create($params);

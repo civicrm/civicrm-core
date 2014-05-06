@@ -75,7 +75,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
       'case_type_id'
     );
     if (!in_array($form->_caseTypeId, $form->_caseType)) {
-      $form->_caseType[$form->_caseTypeId] = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $form->_caseTypeId, 'label');
+      $form->_caseType[$form->_caseTypeId] = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $form->_caseTypeId, 'title');
     }
 
     $form->add('select', 'case_type_id', ts('New Case Type'),
