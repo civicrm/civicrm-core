@@ -3088,7 +3088,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     $configured['configured'] = ($allCasesCount) ? TRUE : FALSE;
     if (!$configured['configured']) {
       //do check for case type and case status.
-      $caseTypes = CRM_Case_PseudoConstant::caseType('label', FALSE);
+      $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
       if (!empty($caseTypes)) {
         $configured['configured'] = TRUE;
         if (!$configured['configured']) {
