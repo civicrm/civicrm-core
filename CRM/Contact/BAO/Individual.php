@@ -148,7 +148,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
             $params[$dbName] = $value;
             $contact->$dbName = $value;
             if ($value) {
-              $$name = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $name, $value);
+              $$name = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $dbName, $value);
             }
             else {
               $$name = NULL;
@@ -161,7 +161,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
             }
           }
           elseif ($value) {
-            $$name = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $name, $value);
+            $$name = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $dbName, $value);
           }
         }
 
