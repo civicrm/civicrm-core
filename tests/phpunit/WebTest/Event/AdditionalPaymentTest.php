@@ -49,7 +49,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->select2('event_id', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select role
-    $this->click('role_id[2]');
+    $this->select('role_id', "value=2");
 
     // Choose Registration Date.
     // Using helper webtestFillDate function.
@@ -114,7 +114,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData(
       array(
         'Event' => 'Rain-forest Cup Youth Soccer Tournament',
-        'Participant Role' => 'Attendee',
+        'Participant Role' => 'Volunteer',
         'Status' => 'Partially paid',
         'Event Source' => 'Event Partially Paid Webtest',
       )
@@ -149,17 +149,15 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
 
     $this->click("xpath=id('ParticipantView')//div[@class='action-link']/div/a/span[contains(text(), 'Edit')]");
     $this->waitForElementPresent("xpath=id('Participant')");
-    $this->assertElementPresent("xpath=id('Participant')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]");
+    $this->assertElementPresent("xpath=id('Participant')//td[@id='payment-info']//a/span[contains(text(), 'Record Payment')]");
     $location = $this->getAttribute("xpath=id('Participant')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]/../@href");
 
     $this->open($location);
     $this->waitForElementPresent("xpath=id('AdditionalPayment')");
     $this->assertElementContainsText("xpath=id('AdditionalPayment')/h3", 'New Event Payment');
 
-    // input data
-    $this->select('financial_type_id', 'label=Donation');
     // verify balance
-    $text = $this->getText("xpath=id('AdditionalPayment')/div[2]/table/tbody/tr[4]/td[2]");
+    $text = $this->getText("xpath=id('AdditionalPayment')/div[2]//table/tbody/tr[3]/td[2]");
     $this->assertTrue((bool)preg_match("/{$balance}/", $text));
 
     // check form rule error
@@ -179,7 +177,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData(
       array(
         'Event' => 'Rain-forest Cup Youth Soccer Tournament',
-        'Participant Role' => 'Attendee',
+        'Participant Role' => 'Volunteer',
         'Status' => 'Registered',
         'Event Source' => 'Event Partially Paid Webtest',
       )
@@ -188,7 +186,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->_checkPaymentInfoTable(800.00, 800.00);
 
     // check for not apprence of record payment button
-    $this->assertFalse($this->isElementPresent("xpath=id('ParticipantView')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]"));
+    $this->assertFalse($this->isElementPresent("xpath=id('ParticipantView')//td[@id='payment-info']//a/span[contains(text(), 'Record Payment')]"));
 
     $this->click("xpath=id('ParticipantView')/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
