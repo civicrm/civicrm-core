@@ -1149,8 +1149,8 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
       $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $fields, $this->_contactId, NULL, NULL, $ctype);
     }
 
-    if ($this->_params['participant_role_id']) {
-      foreach ($this->_params['participant_role_id'] as $rkey) {
+    if ($this->_params['role_id']) {
+      foreach ($this->_params['role_id'] as $rkey) {
         $customFieldsRole = CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, $rkey, $this->_roleCustomDataTypeID);
         $customFieldsEvent = CRM_Core_BAO_CustomField::getFields('Participant',
           FALSE,
@@ -1183,7 +1183,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     }
 
     if ($this->_mode) {
-      // add all the additioanl payment params we need
+      // add all the additional payment params we need
       $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
       $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
 
@@ -1245,9 +1245,9 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
 
       // add participant record
       $participants = array();
-      if (!empty($this->_params['participant_role_id']) && is_array($this->_params['participant_role_id'])) {
-        $this->_params['participant_role_id'] = implode(CRM_Core_DAO::VALUE_SEPARATOR,
-          $this->_params['participant_role_id']
+      if (!empty($this->_params['role_id']) && is_array($this->_params['role_id'])) {
+        $this->_params['role_id'] = implode(CRM_Core_DAO::VALUE_SEPARATOR,
+          $this->_params['role_id']
         );
       }
       $participants[] = CRM_Event_Form_Registration::addParticipant($this->_params, $contactID);
@@ -1285,7 +1285,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           $commonParams = $params;
           $commonParams['contact_id'] = $contactID;
           if ($commonParams['role_id']) {
-            $commonParams['participant_role_id'] = $commonParams['role_id'] = str_replace(',', CRM_Core_DAO::VALUE_SEPARATOR, $params['role_id']);
+            $commonParams['role_id'] = $commonParams['role_id'] = str_replace(',', CRM_Core_DAO::VALUE_SEPARATOR, $params['role_id']);
           }
           else {
             $commonParams['role_id'] = 'NULL';
