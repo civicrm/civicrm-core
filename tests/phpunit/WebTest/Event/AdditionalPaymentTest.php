@@ -49,7 +49,6 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->select2('event_id', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select role
-    //$this->click('role_id[2]');
     $this->select('role_id', "value=2");
 
     // Choose Registration Date.
@@ -146,7 +145,6 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->assertElementPresent("xpath=id('Search')/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span[2]/ul/li[2]/a[text()='Record Payment']");
     $this->click("xpath=id('Search')/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent("xpath=id('ParticipantView')");
-    //$this->assertElementPresent("xpath=id('ParticipantView')//td[@id='payment-info']//a/span[contains(text(), 'Record Payment')]");
     $this->assertElementPresent("xpath=id('ParticipantView')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]");
 
     $this->click("xpath=id('ParticipantView')//div[@class='action-link']/div/a/span[contains(text(), 'Edit')]");
@@ -158,8 +156,6 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=id('AdditionalPayment')");
     $this->assertElementContainsText("xpath=id('AdditionalPayment')/h3", 'New Event Payment');
 
-    // input data
-    //$this->select('financial_type_id', 'label=Donation');
     // verify balance
     $text = $this->getText("xpath=id('AdditionalPayment')/div[2]//table/tbody/tr[3]/td[2]");
     $this->assertTrue((bool)preg_match("/{$balance}/", $text));
@@ -220,4 +216,3 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td[2]", "$ {$amtPaid}", 'Missing text: appropriate fee amount');
   }
 }
-
