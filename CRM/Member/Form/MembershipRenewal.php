@@ -770,12 +770,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       //assign contribution contact id to the field expected by recordMembershipContribution
       if($this->_contributorContactID != $this->_contactID){
-        $formValues['contribution_contact_id'] = $this->_contributorContactID;
         if (!empty($this->_params['soft_credit_type_id'])){
-          $formValues['soft_credit'][] = array(
+          $formValues['soft_credit'] = array(
             'soft_credit_type_id' => $this->_params['soft_credit_type_id'],
-            'contact_id' => $this->_contactID,
-            'amount' => $formValues['total_amount'],
+            'contact_id' => $this->_contributorContactID,
           );
         }
       }
