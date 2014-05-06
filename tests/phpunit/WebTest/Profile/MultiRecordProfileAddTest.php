@@ -72,6 +72,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $profileTitle = 'profile_' . substr(sha1(rand()), 0, 7);
     $this->type('title', $profileTitle);
 
+    $this->click('uf_group_type_Profile');
     //profile Used for
     $this->click('uf_group_type_User Account');
 
@@ -103,7 +104,6 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
 
     //click on save
     $this->click('_qf_Group_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check for  profile create
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
@@ -183,7 +183,8 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     //click on save
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->click('link=Use (create mode)');
+    $uselink = explode('?', $this->getAttribute("xpath=//*[@id='field_page']/div[1]/a[4]@href"));
+    $this->openCiviPage('profile/create', "$uselink[1]", '_qf_Edit_cancel');
     $recordNew = $this->_addRecords('Create');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $elements = $this->parseURL();
@@ -210,15 +211,21 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     }
     $this->waitForElementPresent("//a/span[contains(text(), 'Add New Record')]");
     $this->click("//a/span[contains(text(), 'Add New Record')]");
+    $this->waitForElementPresent("_qf_Edit_cancel");
     $record1 = $this->_addRecords();
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->verifyText("//div[@id='browseValues']/div/div/table/thead/tr/th[1]", preg_quote($params['textFieldLabel']));
-    $this->verifyText("//div[@id='browseValues']/div/div/table/tbody/tr[2]/td[1]", preg_quote($record1['text']));
-    $this->openCiviPage('profile/edit', "reset=1&id=$id&gid=$gid", "//a/span[contains(text(), 'Add New Record')]");
+    $this->waitForElementPresent("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[2]/td[1]");
+    $alertText = $this->getAlert();
+    $this->assertEquals("Thank you. Your information has been saved.", $alertText);
+    $this->waitForElementPresent("//a/span[contains(text(), 'Add New Record')]");
+    $this->verifyText("//div[@id='custom--table-wrapper']/div/div/table/thead/tr/th[1]", preg_quote($params['textFieldLabel']));
+    $this->verifyText("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[2]/td[1]", preg_quote($record1['text']));
     $this->click("//a/span[contains(text(), 'Add New Record')]");
     $record2 = $this->_addRecords();
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->verifyText("//div[@id='browseValues']/div/div/table/tbody/tr[3]/td[1]", preg_quote($record2['text']));
+    $this->waitForElementPresent("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[3]/td[1]");
+    $alertText = $this->getAlert();
+    $this->assertEquals("Thank you. Your information has been saved.", $alertText);
+    $this->waitForElementPresent("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[3]/td[1]");
+    $this->verifyText("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[3]/td[1]", preg_quote($record2['text']));
 
     // Check Max Record Limit
     $this->verifyElementNotPresent("//a/span[contains(text(), 'Add New Record')]");
@@ -228,33 +235,36 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
     sleep(3);
-    $this->click("//div[@id='browseValues']/div/div/table/tbody/tr/td[3]/span/a[text()='Edit']");
-    $this->waitForElementPresent("//html/body/div[5]");
-    $this->verifyText("//div[@id='browseValues']/div/div/table/thead/tr/th[1]", preg_quote($params['textFieldLabel']));
-    $this->type("//div[@id='profile-dialog']/div/form/div[2]/div/div[2]/input", $recordNew['text'].'edit');
-    $this->click("//div[@id='profile-dialog']/div/form/div[3]/span/input[@id='_qf_Edit_next']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->verifyText("//div[@id='browseValues']/div/div/table/tbody/tr[1]/td[1]", preg_quote($recordNew['text'].'edit'));
+    $this->click("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr/td[3]/span/a[text()='Edit']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']/form/div[2]//div[@id='crm-profile-block']//div[@class='crm-submit-buttons']/span/input[@class='validate form-submit default crm-form-submit']");
+    $this->verifyText("//div[@id='custom--table-wrapper']/div/div/table/thead/tr/th[1]", preg_quote($params['textFieldLabel']));
+    $this->type("//div[@id='crm-profile-block']/div/div[2]/input[@class='crm-form-text required']", $recordNew['text'].'edit');
+    $this->click("xpath=//div[@class='ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']/form/div[2]//div[@id='crm-profile-block']//div[@class='crm-submit-buttons']/span/input[@class='validate form-submit default crm-form-submit']");
+    $this->waitForText("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[1]/td[1]", $recordNew['text'].'edit');
+    $editalertText = $this->getAlert();
+    $this->assertEquals("Thank you. Your information has been saved.", $editalertText);
+    $this->verifyText("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[1]/td[1]", preg_quote($recordNew['text'].'edit'));
 
     // Check the delete functionality
-    $this->click("//div[@id='browseValues']/div/div/table/tbody/tr/td[3]/span/a[text()='Delete']");
-    $this->waitForElementPresent("//html/body/div[5]");
+    $this->click("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr/td[3]/span/a[text()='Delete']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']/form/div[2]/div");
+    $this->assertElementContainsText("xpath=//div[@class='ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']/form/div[2]/div", 'Are you sure you want to delete this record?');
+    $this->click('_qf_Edit_upload_delete');
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
     sleep(3);
-    $this->assertElementContainsText('profile-dialog', 'Are you sure you want to delete this record?');
-    $this->click('_qf_Edit_upload_delete');
 
+    $delText = $this->getAlert();
+    $this->assertEquals("Deleted Your record has been deleted.", $delText);
     // Check the view functionality
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
     sleep(3);
-    $this->click("//div[@id='browseValues']/div/div/table/tbody/tr/td[3]/span/a[text()='View']");
-    $this->waitForElementPresent("//html/body/div[5]");
-    $this->assertElementContainsText('ui-id-1', 'View '.$params['customGroupTitle']);
-    $this->assertElementContainsText('crm-container', $params['textFieldLabel']);
+    $this->click("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr/td[3]/span/a[text()='View']");
+    $this->waitForText("xpath=//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']", 'View '.$params['customGroupTitle']);
+    $this->assertElementContainsText("xpath=//div[@class='ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']", $params['textFieldLabel']);
     if ($checkSearchable) {
       $this->verifyElementNotPresent("//div[@id='profile-dialog']/div/div/div/div/div[1]/div[2]/a");
       return array($gid, $profileTitle);
@@ -262,7 +272,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
 
     // Check Search Functionality
     if (!$userCheck) {
-      $this->click("//div[@id='profile-dialog']/div/div/div/div/div/div[2]/a");
+      $this->click("//div[@class='ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']/div/div/div/div/div[2]/a");
       $this->waitForElementPresent("//form[@id='Search']");
       $this->verifyText("//form[@id='Search']/div[2]/div[2]/div[2]/table/tbody/tr[2]/td[2]", preg_quote($recordNew['firstname']));
       $this->openCiviPage('profile/view', "reset=1&id=$id&gid=$gid", "//div[@id='row-first_name']/div[2]/a");
@@ -343,20 +353,17 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->click("is_searchable");
 
     //clicking save
-    $this->click("_qf_Field_next_new-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("_qf_Field_next-bottom");
 
     //Is custom field created?
-    $this->assertElementContainsText('crm-container', $params['selectFieldLabel']);
+    $this->waitForText('crm-notification-container', $params['selectFieldLabel']);
     return $params;
   }
 
-  function _addRecords($context = 'Edit', $waitAtStart = TRUE, $parentElement = '//') {
-    if ($waitAtStart) {
-      $this->waitForPageToLoad($this->getTimeoutMsec());
-    }
+  function _addRecords($context = 'Edit', $parentElement = '//') {
     $params['text'] = 'text' . substr(sha1(rand()), 0, 3);
-    $this->type("//div[@id='crm-profile-block']/div/div[2]/input[@type='text']", $params['text']);
+    $this->waitForElementPresent("//div[@id='crm-profile-block']/div/div[2]/input[@class='crm-form-text required']");
+    $this->type("//div[@id='crm-profile-block']/div/div[2]/input[@class='crm-form-text required']", $params['text']);
     if ($context == 'Create') {
       $params['firstname'] = 'John' . substr(sha1(rand()), 0, 3);
       $this->type('first_name', $params['firstname']);
@@ -364,10 +371,15 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $this->type('last_name', $params['lastname']);
       $params['email'] =  $params['firstname'].$params['lastname'].'@exa.com';
       $this->type('email-Primary', $params['email']);
+      $this->waitForElementPresent("//div[@id='crm-profile-block']//div/div[2]/select");
+      $this->select("//div[@id='crm-profile-block']//div/div[2]/select",'value=1');
+      $this->click("xpath=//div[@id='crm-profile-block']//div[@class='crm-submit-buttons']/span/input[@class='validate form-submit default crm-form-submit']");
     }
-    $this->waitForElementPresent("//div[@id='crm-profile-block']//div/div[2]/select");
-    $this->select("//div[@id='crm-profile-block']//div/div[2]/select",'value=1');
-    $this->click('_qf_Edit_next');
+    else {
+      $this->waitForElementPresent("//div[@id='crm-profile-block']//div/div[2]/select");
+      $this->select("//div[@id='crm-profile-block']//div/div[2]/select",'value=1');
+      $this->click("xpath=//div[@class='ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']/form/div[2]//div[@id='crm-profile-block']//div[@class='crm-submit-buttons']/span/input[@class='validate form-submit default crm-form-submit']");
+    }
     return $params;
   }
 }
