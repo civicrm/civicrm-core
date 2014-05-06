@@ -849,7 +849,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     if ($onBehalf) {
       $this->click('is_organization');
-      $this->select('onbehalf_profile_id', 'label=On Behalf Of Organization');
+      $this->select("xpath=//*[@class='crm-contribution-onbehalf_profile_id']//span[@class='crm-profile-selector-select']//select", 'label=On Behalf Of Organization');
       $this->type('for_organization', "On behalf $hash");
 
       if ($onBehalf == 'required') {
