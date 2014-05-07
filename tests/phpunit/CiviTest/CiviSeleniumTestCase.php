@@ -1864,7 +1864,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * function to type and select first occurance of autocomplete
    */
-  function select2($fieldName,$label, $multiple = FALSE) {
+  function select2($fieldName,$label, $multiple = FALSE, $xpath=FALSE) {
     if ($multiple) {
       $this->clickAt("//*[@id='$fieldName']/../div/ul/li[1]");
       $this->keyDown("//*[@id='$fieldName']/../div/ul/li[1]/input", " ");
@@ -1874,13 +1874,16 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->clickAt("//*[@class='select2-results']/li[1]/div");
     }
     else {
-      $this->clickAt("//*[@id='$fieldName']/../div/a");
+      if ($xpath) 
+	$this->clickAt($fieldName);
+      else
+	$this->clickAt("//*[@id='$fieldName']/../div/a");
       $this->waitForElementPresent("//*[@id='select2-drop']/div/input");
       $this->keyDown("//*[@id='select2-drop']/div/input", " ");
       $this->type("//*[@id='select2-drop']/div/input", $label);
       $this->typeKeys("//*[@id='select2-drop']/div/input", $label);
       $this->waitForElementPresent("//*[@class='select2-result-label']");
-      $this->clickAt("//*[@class='select2-result-label']");
+      $this->clickAt("//*[contains(@class,'select2-result-selectable ')]/div[contains(@class, 'select2-result-label')]");
     }
   }
 
