@@ -20,8 +20,9 @@ Required vars: caseType
       {{ activityType.max_instances }}
     </td>
     <td>
-      <a class="ui-icon ui-icon-trash" title="Remove"
-         ng-click="removeItem(caseType.definition.activityTypes, activityType)"></a>
+      <a class="crm-hover-button" ng-click="removeItem(caseType.definition.activityTypes, activityType)">
+        <span class="icon delete-icon" title="Remove"></span>
+      </a>
     </td>
   </tr>
   </tbody>

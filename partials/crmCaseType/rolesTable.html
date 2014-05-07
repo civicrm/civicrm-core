@@ -17,8 +17,9 @@ Required vars: caseType
     <td><input type="checkbox" ng-model="relType.creator" ng-true-value="1" ng-false-value="0"/></td>
     <td><input type="radio" ng-model="relType.manager" value="1" ng-change="onManagerChange(relType)"/></td>
     <td>
-      <a class="ui-icon ui-icon-trash" title="Remove"
-         ng-click="removeItem(caseType.definition.caseRoles, relType)"></a>
+      <a class="crm-hover-button" ng-click="removeItem(caseType.definition.caseRoles,relType)">
+        <span class="icon delete-icon" title="Remove"></span>
+      </a>
     </td>
   </tr>
   </tbody>
