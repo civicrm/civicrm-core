@@ -26,7 +26,7 @@
 {* relationship selector *}
 
 <div class="crm-contact-relationship-{$context}">
-  <table id="crm-contact-relationship-selector-{$context}">
+  <table class="crm-contact-relationship-selector-{$context}">
     <thead>
     <tr>
       <th class='crm-contact-relationship-type'>{ts}Relationship{/ts}</th>
@@ -65,7 +65,7 @@
       var ZeroRecordText = {/literal}'{ts escape="js"}There are no relationships entered for this contact.{/ts}'{literal};
     }
 
-    {/literal}{$context}{literal}oTable = cj('#crm-contact-relationship-selector-' + context).dataTable({
+    {/literal}{$context}{literal}oTable = cj('.crm-contact-relationship-selector-' + context).dataTable({
       "bFilter": false,
       "bAutoWidth": false,
       "aaSorting": [],

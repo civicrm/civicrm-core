@@ -66,7 +66,7 @@
   <p></p>
   <div class="form-item">
   {strip}
-    <table id="crm-transaction-selector-assign" cellpadding="0" cellspacing="0" border="0">
+    <table id="crm-transaction-selector-assign-{$entityID}" cellpadding="0" cellspacing="0" border="0">
       <thead>
       <tr>
         <th class="crm-transaction-checkbox">{if $statusID eq 1}{$form.toggleSelect.html}{/if}</th>
@@ -111,17 +111,17 @@ CRM.$(function($) {
 
     cj("#trans_assign").prop('disabled',true);
     cj("#trans_remove").prop('disabled',true);
-    cj('#crm-transaction-selector-assign #toggleSelect').click( function() {
+    cj('#crm-transaction-selector-assign-{/literal}{$entityID}{literal} #toggleSelect').click( function() {
       enableActions('x');
     });
-    cj('#crm-transaction-selector-remove #toggleSelects').click( function() {
+    cj('#crm-transaction-selector-remove-{/literal}{$entityID}{literal} #toggleSelects').click( function() {
       enableActions('y');
     });
     cj('#Go').click( function() {
-      return selectAction("trans_assign","toggleSelect", "crm-transaction-selector-assign input[id^='mark_x_']");
+      return selectAction("trans_assign","toggleSelect", "crm-transaction-selector-assign-{/literal}{$entityID}{literal} input[id^='mark_x_']");
     });
     cj('#GoRemove').click( function() {
-      return selectAction("trans_remove","toggleSelects", "crm-transaction-selector-remove input[id^='mark_y_']");
+      return selectAction("trans_remove","toggleSelects", "crm-transaction-selector-remove-{/literal}{$entityID}{literal} input[id^='mark_y_']");
     });
     cj('#Go').click( function() {
       if (cj("#trans_assign" ).val() != "" && cj("input[id^='mark_x_']").is(':checked')) {
@@ -135,27 +135,27 @@ CRM.$(function($) {
       }
       return false;
     });
-    cj("#crm-transaction-selector-assign input[id^='mark_x_']").click( function() {
+    cj("#crm-transaction-selector-assign-{/literal}{$entityID}{literal} input[id^='mark_x_']").click( function() {
       enableActions('x');
     });
-    cj("#crm-transaction-selector-remove input[id^='mark_y_']").click( function() {
+    cj("#crm-transaction-selector-remove-{/literal}{$entityID}{literal} input[id^='mark_y_']").click( function() {
       enableActions('y');
     });
 
-    cj("#crm-transaction-selector-assign #toggleSelect").click( function() {
-      if (cj("#crm-transaction-selector-assign #toggleSelect").is(':checked')) {
-        cj("#crm-transaction-selector-assign input[id^='mark_x_']").prop('checked',true);
+    cj("#crm-transaction-selector-assign-{/literal}{$entityID}{literal} #toggleSelect").click( function() {
+      if (cj("#crm-transaction-selector-assign-{/literal}{$entityID}{literal} #toggleSelect").is(':checked')) {
+        cj("#crm-transaction-selector-assign-{/literal}{$entityID}{literal} input[id^='mark_x_']").prop('checked',true);
       }
       else {
-        cj("#crm-transaction-selector-assign input[id^='mark_x_']").prop('checked',false);
+        cj("#crm-transaction-selector-assign-{/literal}{$entityID}{literal} input[id^='mark_x_']").prop('checked',false);
       }
     });
-    cj("#crm-transaction-selector-remove #toggleSelects").click( function() {
-      if (cj("#crm-transaction-selector-remove #toggleSelects").is(':checked')) {
-        cj("#crm-transaction-selector-remove input[id^='mark_y_']").prop('checked',true);
+    cj("#crm-transaction-selector-remove-{/literal}{$entityID}{literal} #toggleSelects").click( function() {
+      if (cj("#crm-transaction-selector-remove-{/literal}{$entityID}{literal} #toggleSelects").is(':checked')) {
+        cj("#crm-transaction-selector-remove-{/literal}{$entityID}{literal} input[id^='mark_y_']").prop('checked',true);
       }
       else {
-        cj("#crm-transaction-selector-remove input[id^='mark_y_']").prop('checked',false);
+        cj("#crm-transaction-selector-remove-{/literal}{$entityID}{literal} input[id^='mark_y_']").prop('checked',false);
       }
     });
   }
@@ -181,7 +181,7 @@ function buildTransactionSelectorAssign(filterSearch) {
     var ZeroRecordText = '<div class="status messages">{/literal}{ts escape="js"}No Contributions found for your search criteria.{/ts}{literal}</li></ul></div>';
   }
 
-  crmBatchSelector1 = cj('#crm-transaction-selector-assign').dataTable({
+  crmBatchSelector1 = cj('#crm-transaction-selector-assign-{/literal}{$entityID}{literal}').dataTable({
   "bDestroy"   : true,
   "bFilter"    : false,
   "bAutoWidth" : false,
@@ -251,7 +251,7 @@ function buildTransactionSelectorRemove( ) {
   var columns = '';
   var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Financial_Page_AJAX&fnName=getFinancialTransactionsList&snippet=4&context=financialBatch&entityID=$entityID&statusID=$statusID"}'{literal};
 
-  crmBatchSelector = cj('#crm-transaction-selector-remove').dataTable({
+  crmBatchSelector = cj('#crm-transaction-selector-remove-{/literal}{$entityID}{literal}').dataTable({
   "bDestroy"   : true,
   "bFilter"    : false,
   "bAutoWidth" : false,

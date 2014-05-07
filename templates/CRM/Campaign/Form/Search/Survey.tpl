@@ -51,7 +51,7 @@
   </script>
   {/literal}
 
-  <table id="surveys">
+  <table class="surveys">
     <thead>
     <tr class="columnheader">
       <th class="hiddenElement">{ts}Survey ID{/ts}</th>
@@ -183,7 +183,7 @@ function loadSurveyList( )
      }
      noRecordFoundMsg += searchQill.join( '<span class="font-italic"> ...AND... </span></div><div class="qill">' );
 
-     cj( '#surveys' ).dataTable({
+     cj( '.surveys' ).dataTable({
              "bFilter"    : false,
              "bAutoWidth" : false,
              "bProcessing": false,

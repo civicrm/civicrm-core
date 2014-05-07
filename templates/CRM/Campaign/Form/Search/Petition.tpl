@@ -52,7 +52,7 @@
        </script>
        {/literal}
 
-       <table id="petitions">
+       <table class="petitions">
            <thead>
               <tr class="columnheader">
             <th class="hiddenElement">{ts}Petition ID{/ts}</th>
@@ -173,7 +173,7 @@ function loadPetitionList( )
      }
      noRecordFoundMsg += searchQill.join( '<span class="font-italic"> ...AND... </span></div><div class="qill">' );
 
-     cj( '#petitions' ).dataTable({
+     cj( '.petitions' ).dataTable({
              "bFilter"    : false,
              "bAutoWidth" : false,
              "bProcessing": false,

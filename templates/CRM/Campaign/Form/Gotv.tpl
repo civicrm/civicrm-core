@@ -47,7 +47,7 @@
        </script>
        {/literal}
 
-       <table id="gotvVoterRecords">
+       <table class="gotvVoterRecords">
            <thead>
               <tr class="columnheader">
             <th></th>
@@ -121,7 +121,7 @@ function loadVoterList( )
 
      var searchVoterFor = {/literal}'{$searchVoterFor}'{literal};
 
-     cj( '#gotvVoterRecords' ).dataTable({
+     cj( '.gotvVoterRecords' ).dataTable({
                "bFilter"    : false,
     "bAutoWidth" : false,
         "bProcessing": true,
