@@ -489,7 +489,7 @@ GROUP BY  currency
    *
    * @return void.
    */
-  function sendAcknowledgment(&$form, $params) {
+  static function sendAcknowledgment(&$form, $params) {
     //handle Acknowledgment.
     $allPayments = $payments = array();
 
