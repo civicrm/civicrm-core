@@ -36,27 +36,46 @@
 <div class="crm-actions-ribbon crm-event-manage-tab-actions-ribbon">
   <ul id="actions">
 {if call_user_func(array('CRM_Core_Permission','check'), 'edit all events')}
-
-  <li><div id="crm-event-links-wrapper">
-        <div id="crm-event-configure-link"><span title="{ts}Configure this event.{/ts}"><div class="icon settings-icon"></div></span></div>
-        <div class="ac_results" id="crm-event-links-list" style="margin-left: -25px;">
-             <div class="crm-event-links-list-inner">
-               <ul>
-                <li><a title="{ts}Info and Settings{/ts}" href="{crmURL p='civicrm/event/manage/settings' q="reset=1&action=update&id=`$event.id`"}">{ts}Info and Settings{/ts}</a></li>
-                <li><a title="{ts}Location{/ts}" href="{crmURL p='civicrm/event/manage/location' q="reset=1&action=update&id=`$event.id`"}">{ts}Location{/ts}</a></li>
-                <li><a title="{ts}Fees{/ts}" href="{crmURL p='civicrm/event/manage/fee' q="reset=1&action=update&id=`$event.id`"}">{ts}Fees{/ts}</a></li>
-                <li><a title="{ts}Online Registration{/ts}" href="{crmURL p='civicrm/event/manage/registration' q="reset=1&action=update&id=`$event.id`"}">{ts}Online Registration{/ts}</a></li>
-                <li><a title="{ts}Schedule Reminders{/ts}" href="{crmURL p='civicrm/event/manage/reminder' q="reset=1&action=update&id=`$event.id`"}">{ts}Schedule Reminders{/ts}</a></li>
-                    {if $eventCartEnabled}
-                    <li><a title="{ts}Conference Slots{/ts}" href="{crmURL p='civicrm/event/manage/conference' q="reset=1&action=update&id=`$event.id`"}">{ts}Conference Slots{/ts}</a></li>
-                    {/if}
-                    <li><a title="{ts}Tell a Friend{/ts}" href="{crmURL p='civicrm/event/manage/friend' q="reset=1&action=update&id=`$event.id`"}">{ts}Tell a Friend{/ts}</a></li>
-                    <li><a title="{ts}Personal Campaign Pages{/ts}" href="{crmURL p='civicrm/event/manage/pcp' q="reset=1&action=update&id=`$event.id`"}">{ts}Personal Campaign Pages{/ts}</a></li>
-                </ul>
-             </div>
+  <li>
+    <div id="crm-event-links-wrapper">
+      <div id="crm-event-configure-link"><span title="{ts}Configure this event.{/ts}"><div
+            class="icon settings-icon"></div></span></div>
+      <div class="ac_results" id="crm-event-links-list" style="margin-left: -25px;">
+        <div class="crm-event-links-list-inner">
+          <ul>
+            <li><a title="{ts}Info and Settings{/ts}"
+                   href="{crmURL p='civicrm/event/manage/settings' q="reset=1&action=update&id=`$event.id`"}">{ts}Info and Settings{/ts}</a>
+            </li>
+            <li><a title="{ts}Location{/ts}"
+                   href="{crmURL p='civicrm/event/manage/location' q="reset=1&action=update&id=`$event.id`"}">{ts}Location{/ts}</a>
+            </li>
+            <li><a title="{ts}Fees{/ts}"
+                   href="{crmURL p='civicrm/event/manage/fee' q="reset=1&action=update&id=`$event.id`"}">{ts}Fees{/ts}</a>
+            </li>
+            <li><a title="{ts}Online Registration{/ts}"
+                   href="{crmURL p='civicrm/event/manage/registration' q="reset=1&action=update&id=`$event.id`"}">{ts}Online Registration{/ts}</a>
+            </li>
+            {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
+              <li><a title="{ts}11Schedule Reminders{/ts}"
+                     href="{crmURL p='civicrm/event/manage/reminder' q="reset=1&action=update&id=`$event.id`"}">{ts}Schedule Reminders{/ts}</a>
+              </li>
+            {/if}
+            {if $eventCartEnabled}
+              <li><a title="{ts}Conference Slots{/ts}"
+                     href="{crmURL p='civicrm/event/manage/conference' q="reset=1&action=update&id=`$event.id`"}">{ts}Conference Slots{/ts}</a>
+              </li>
+            {/if}
+            <li><a title="{ts}Tell a Friend{/ts}"
+                   href="{crmURL p='civicrm/event/manage/friend' q="reset=1&action=update&id=`$event.id`"}">{ts}Tell a Friend{/ts}</a>
+            </li>
+            <li><a title="{ts}Personal Campaign Pages{/ts}"
+                   href="{crmURL p='civicrm/event/manage/pcp' q="reset=1&action=update&id=`$event.id`"}">{ts}Personal Campaign Pages{/ts}</a>
+            </li>
+          </ul>
         </div>
-    </div></li>
-
+      </div>
+    </div>
+  </li>
 {/if}
 <li><div id="crm-participant-wrapper">
         <div id="crm-participant-links"><span title="{ts}Participant listing links.{/ts}"><div class="icon search-icon"></div></div>
