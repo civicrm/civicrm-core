@@ -40,7 +40,7 @@
       </div>
     </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
-  <table id="contact-activity-selector-{$context}">
+  <table class="contact-activity-selector-{$context}">
     <thead>
     <tr>
       <th class='crm-contact-activity-activity_type'>{ts}Type{/ts}</th>
@@ -95,7 +95,7 @@ function buildContactActivities{/literal}{$context}{literal}( filterSearch ) {
     ZeroRecordText += '.';
   }
 
-  {/literal}{$context}{literal}oTable = cj('#contact-activity-selector-' + context ).dataTable({
+  {/literal}{$context}{literal}oTable = cj('.contact-activity-selector-' + context ).dataTable({
     "bFilter"    : false,
     "bAutoWidth" : false,
     "aaSorting"  : [],
@@ -158,7 +158,7 @@ function buildContactActivities{/literal}{$context}{literal}( filterSearch ) {
 }
 
 function setSelectorClass{/literal}{$context}{literal}( context ) {
-  cj('#contact-activity-selector-' + context + ' td:last-child').each( function( ) {
+  cj('.contact-activity-selector-' + context + ' td:last-child').each( function( ) {
     cj(this).parent().addClass(cj(this).text() );
   });
 }

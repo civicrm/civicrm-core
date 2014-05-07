@@ -118,7 +118,7 @@
       </script>
     </div>
 
-    <table id="voterRecords" class="display crm-copy-fields">
+    <table id="voterRecords-{$instanceId}" class="display crm-copy-fields">
       <thead>
       <tr class="columnheader">
         {foreach from=$readOnlyFields item=fTitle key=fName}
@@ -212,7 +212,7 @@ var updateVoteforall = "{/literal}{ts escape='js'}Update Responses for All{/ts}{
 CRM.$(function($) {
   var count = 0; var columns='';
 
-  cj('#voterRecords th').each( function( ) {
+  cj('#voterRecords-{/literal}{$instanceId}{literal} th').each( function( ) {
     if ( cj(this).attr('class') == 'contact_details' ) {
       columns += '{"sClass": "contact_details"},';
     }
@@ -226,7 +226,7 @@ CRM.$(function($) {
   eval('columns =[' + columns + ']');
 
   //load jQuery data table.
-  cj('#voterRecords').dataTable( {
+  cj('#voterRecords-{/literal}{$instanceId}{literal}').dataTable( {
     "sPaginationType": "full_numbers",
     "bJQueryUI"  : true,
     "aoColumns"  : columns

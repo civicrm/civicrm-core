@@ -48,7 +48,7 @@
       });
     </script>
   {/literal}
-  <table id="campaigns">
+  <table class="campaigns">
     <thead>
     <tr class="columnheader">
       <th class="hiddenElement">{ts}Campaign ID{/ts}</th>
@@ -196,7 +196,7 @@
     }
     noRecordFoundMsg += searchQill.join('<span class="font-italic"> ...AND... </span></div><div class="qill">');
 
-    cj('#campaigns').dataTable({
+    cj('.campaigns').dataTable({
       "bFilter": false,
       "bAutoWidth": false,
       "bProcessing": false,

@@ -40,7 +40,7 @@
 <div class="crm-submit-buttons">
   <a accesskey="N" href="{crmURL p='civicrm/batch/add' q='reset=1&action=add'}" id="newBatch" class="button"><span><div class="icon add-icon"></div>{ts}New Data Entry Batch{/ts}</span></a><br/>
 </div>
-<table id="crm-batch-selector">
+<table class="crm-batch-selector">
   <thead>
   <tr>
     <th class="crm-batch-name">{ts}Batch Name{/ts}</th>
@@ -79,7 +79,7 @@ function buildBatchSelector( filterSearch ) {
   var columns = '';
   var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/batchlist" h=0 q="snippet=4"}'{literal};
 
-  crmBatchSelector = cj('#crm-batch-selector').dataTable({
+  crmBatchSelector = cj('.crm-batch-selector').dataTable({
   "bFilter"    : false,
   "bAutoWidth" : false,
   "aaSorting"  : [],

@@ -67,7 +67,7 @@
 </table>
 </div>
 <br/>
-<table id="crm-group-selector">
+<table class="crm-group-selector">
   <thead>
     <tr>
       <th class='crm-group-name'>{ts}Name{/ts}</th>
@@ -105,7 +105,7 @@ CRM.$(function($) {
     .on('click', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', CRM.popup)
     .on('crmPopupFormSuccess', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', function() {
         // Refresh datatable when form completes
-        $('#crm-group-selector').dataTable().fnDraw();
+        $('.crm-group-selector').dataTable().fnDraw();
     });
 });
 
@@ -130,7 +130,7 @@ function buildGroupSelector( filterSearch, parentsOnlyArg ) {
     var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal};
     var showOrgInfo = {/literal}"{$showOrgInfo}"{literal};
 
-    crmGroupSelector = cj('#crm-group-selector').dataTable({
+    crmGroupSelector = cj('.crm-group-selector').dataTable({
         "bFilter"    : false,
         "bAutoWidth" : false,
         "aaSorting"  : [],
@@ -230,7 +230,7 @@ function buildGroupSelector( filterSearch, parentsOnlyArg ) {
 }
 
 function setSelectorClass( parentsOnly, showOrgInfo ) {
-  cj('#crm-group-selector tr').each( function( ) {
+  cj('.crm-group-selector tr').each( function( ) {
     var className = cj(this).find('td:last-child').text();
     cj(this).addClass( className );
     var rowID = cj(this).find('td:nth-child(2)').text();
@@ -244,7 +244,7 @@ function setSelectorClass( parentsOnly, showOrgInfo ) {
 }
 
 // show hide children
-cj('#crm-group-selector').on( 'click', 'span.show-children', function(){
+cj('.crm-group-selector').on( 'click', 'span.show-children', function(){
   var showOrgInfo = {/literal}"{$showOrgInfo}"{literal};
   var rowID = cj(this).parents('tr').prop('id');
   var parentRow = rowID.split('_');

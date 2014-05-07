@@ -52,7 +52,7 @@
   <p></p>
   <div class="form-item">
   {strip}
-    <table id="crm-transaction-selector-remove" cellpadding="0" cellspacing="0" border="0">
+    <table id="crm-transaction-selector-remove-{$entityID}" cellpadding="0" cellspacing="0" border="0">
       <thead>
         <tr>
           <th class="crm-transaction-checkbox">{if $statusID eq 1}{$form.toggleSelects.html}{/if}</th>
