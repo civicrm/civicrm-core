@@ -52,7 +52,7 @@
 function civicrm_api3_case_type_create($params) {
   civicrm_api3_verify_mandatory($params, _civicrm_api3_get_DAO(__FUNCTION__), array('name'));
 
-  if (!array_key_exists('is_active', $params) && !empty($params['id'])) {
+  if (!array_key_exists('is_active', $params) && empty($params['id'])) {
     $params['is_active'] = TRUE;
   }
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'CaseType');
