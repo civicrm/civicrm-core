@@ -494,7 +494,10 @@ ORDER BY parent_id, weight";
       if (substr($url, 0, 4) !== 'http') {
         //CRM-7656 --make sure to separate out url path from url params,
         //as we'r going to validate url path across cross-site scripting.
-        $urlParam = CRM_Utils_System::explode('&', str_replace('?', '&', $url), 2);
+        $urlParam = explode('?', $url);
+        if (empty($urlParam[1])) {
+          $urlParam[1] = NULL;
+        }
         $url = CRM_Utils_System::url($urlParam[0], $urlParam[1], FALSE, NULL, TRUE);
       }
       $makeLink = TRUE;
@@ -584,7 +587,7 @@ ORDER BY parent_id, weight";
       $homeIcon = '<img src="' . $config->userFrameworkResourceURL . 'i/logo16px.png" style="vertical-align:middle;" />';
       self::retrieve($homeParams, $homeNav);
       if ($homeNav) {
-        list($path, $q) = explode('&', $homeNav['url']);
+        list($path, $q) = explode('?', $homeNav['url']);
         $homeURL = CRM_Utils_System::url($path, $q);
         $homeLabel = $homeNav['label'];
         // CRM-6804 (we need to special-case this as we don’t ts()-tag variables)
