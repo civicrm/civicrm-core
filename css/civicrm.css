@@ -1728,6 +1728,7 @@ editor specific classes
   color: #2786C2;
 }
 .crm-container .crm-hover-button .icon {
+  cursor: pointer;
   margin-left: 3px;
   position: relative;
   top: 2px;
