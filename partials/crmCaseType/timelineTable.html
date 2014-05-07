@@ -32,8 +32,9 @@ Required vars: activitySet
       {{ activity.reference_select }}
     </td>
     <td>
-      <a class="ui-icon ui-icon-trash" title="Remove"
-         ng-click="removeItem(activitySet.activityTypes, activity)"></a>
+      <a class="crm-hover-button" ng-click="removeItem(activitySet.activityTypes, activity)">
+        <span class="icon delete-icon" title="Remove"></span>
+      </a>
     </td>
   </tr>
   </tbody>

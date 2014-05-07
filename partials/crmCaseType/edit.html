@@ -17,7 +17,12 @@ Required vars: caseType
       <li ng-repeat="activitySet in caseType.definition.activitySets">
         <a href="#acttab-{{$index}}">{{ activitySet.label }}</a>
         <span class="ui-icon ui-icon-trash" title="Remove"
-           ng-click="removeItem(caseType.definition.activitySets, activitySet)">Remove</span>
+          ng-click="removeItem(caseType.definition.activitySets, activitySet)">Remove</span>
+        <!-- Weird spacing:
+        <a class="crm-hover-button" ng-click="removeItem(caseType.definition.activitySets, activitySet)">
+          <span class="ui-icon delete-icon" title="Remove">Remove</span>
+        </a>
+        -->
       </li>
       <select ng-model="newActivitySetWorkflow" ng-change="addActivitySet(newActivitySetWorkflow); newActivitySetWorkflow='';">
         <option value="">(Add)</option>
@@ -33,9 +38,9 @@ Required vars: caseType
     <div ng-repeat="activitySet in caseType.definition.activitySets" id="acttab-{{$index}}">
       <div ng-include="activityTableTemplate(activitySet)"></div>
 
-      <div ui-jq="accordion" ui-options="{collapsible: true, active: false, heightStyle: 'fill'}">
-        <h3>Advanced</h3>
-        <div ng-include="partialUrl('activitySetDetails.html')" style="display:none;"></div>
+      <div class="crm-accordion-wrapper">
+        <h3 class="crm-accordion-header">Advanced</h3>
+        <div class="crm-accordion-body" ng-include="partialUrl('activitySetDetails.html')"></div>
       </div>
     </div>
   </div>
