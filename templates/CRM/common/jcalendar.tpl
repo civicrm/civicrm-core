@@ -43,7 +43,9 @@
       &nbsp;&nbsp;{$form.$blockSection.$blockId.$tElement.html|crmAddClass:six}
     {/if}
 {else}
-    {assign var='elementId'   value=$form.$elementName.id}
+    {if !$elementId}
+      {assign var='elementId'   value=$form.$elementName.id}
+    {/if}
     {assign var="timeElement" value=$elementName|cat:'_time'}
     {$form.$elementName.html}
 {/if}
