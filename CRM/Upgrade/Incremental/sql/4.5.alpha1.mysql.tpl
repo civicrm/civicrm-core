@@ -429,3 +429,8 @@ SELECT 'Vine' AS website
 LEFT JOIN civicrm_option_value co ON LOWER(co.name) = LOWER(temp.website)
 AND option_group_id = @option_web_id
 WHERE co.id IS NULL;
+
+-- CRM-14627 civicrm navigation inconsistent
+UPDATE civicrm_navigation
+SET civicrm_navigation.url = CONCAT(SUBSTRING(url FROM 1 FOR LOCATE('&', url) - 1), '?', SUBSTRING(url FROM LOCATE('&', url) + 1))
+WHERE civicrm_navigation.url LIKE "%&%" AND civicrm_navigation.url NOT LIKE "%?%";
