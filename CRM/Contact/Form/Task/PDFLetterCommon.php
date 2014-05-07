@@ -257,6 +257,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    *
    * @access protected
    *
+   * @param $form
+   *
    * @return array( $categories, $html_message, $messageToken, $returnProperties )
    */
   static protected function processMessageTemplate(&$form) {
@@ -329,6 +331,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * process the form after the input has been submitted and validated
    *
    * @access public
+   *
+   * @param $form
    *
    * @return void
    */
