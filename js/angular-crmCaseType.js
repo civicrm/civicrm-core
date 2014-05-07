@@ -96,6 +96,18 @@
       }
     };
 
+    $scope.isNewActivitySetAllowed = function(workflow) {
+      switch (workflow) {
+        case 'timeline':
+          return true;
+        case 'pipeline':
+          return 0 == _.where($scope.caseType.definition.activitySets, {pipeline: '1'}).length;
+        default:
+          if (console && console.log) console.log('Denied access to unrecognized workflow: (' + workflow + ')');
+          return false;
+      }
+    };
+
     $scope.getWorkflowName = function(activitySet) {
       var result = 'Unknown';
       _.each($scope.workflows, function(value, key) {

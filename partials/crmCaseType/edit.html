@@ -26,8 +26,8 @@ Required vars: caseType
       </li>
       <select ng-model="newActivitySetWorkflow" ng-change="addActivitySet(newActivitySetWorkflow); newActivitySetWorkflow='';">
         <option value="">(Add)</option>
-        <option value="timeline">Timeline</option>
-        <option value="pipeline">Sequence</option>
+        <option value="timeline" ng-show="isNewActivitySetAllowed('timeline')">Timeline</option>
+        <option value="pipeline" ng-show="isNewActivitySetAllowed('pipeline')">Sequence</option>
       </select>
     </ul>
 
