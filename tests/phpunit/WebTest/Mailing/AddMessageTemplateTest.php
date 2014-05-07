@@ -43,27 +43,12 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->type("msg_title", $msgTitle);
     if ($useTokens) {
       //Add Tokens
-      $this->click("css=#msg_subject + a");
-      $this->waitForElementPresent("css=#tokenSubject + .ui-dialog-buttonpane button");
-      $this->type("filter3", "display");
-      $this->addSelection("token3", "label=Display Name");
-      $this->type("filter3", "contact");
-      $this->addSelection("token3", "label=Contact Type");
-      $this->click("css=#tokenSubject + .ui-dialog-buttonpane button");
-      $this->click("//span[@id='helptext']/a/label");
-      $this->waitForElementPresent("css=#tokenText + .ui-dialog-buttonpane button");
-      $this->type("filter1", "display");
-      $this->addSelection("token1", "label=Display Name");
-      $this->type("filter1", "contact");
-      $this->addSelection("token1", "label=Contact Type");
-      $this->click("css=#tokenText + .ui-dialog-buttonpane button");
-      $this->click("//span[@id='helphtml']/a/label");
-      $this->waitForElementPresent("css=#tokenHtml + .ui-dialog-buttonpane button");
-      $this->type("filter2", "display");
-      $this->addSelection("token2", "label=Display Name");
-      $this->type("filter2", "contact");
-      $this->addSelection("token2", "label=Contact Type");
-      $this->click("css=#tokenHtml + .ui-dialog-buttonpane button");
+      $this->select2("msg_subject", "Display Name");
+      $this->select2("msg_subject", "Contact Type");
+      $this->select2("xpath=//*[contains(@data-field,'msg_text')]/../div/a", "Display Name", FALSE, TRUE);
+      $this->select2("xpath=//*[contains(@data-field,'msg_text')]/../div/a", "Contact Type", FALSE, TRUE);
+      $this->select2("xpath=//*[contains(@data-field,'html_message')]/../div/a", "Display Name", FALSE, TRUE);
+      $this->select2("xpath=//*[contains(@data-field,'html_message')]/../div/a", "Contact Type", FALSE, TRUE);
     }
     else {
       // Fill message subject.
@@ -171,8 +156,8 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
-    $this->assertElementContainsText('page-title', "Scheduled and Sent Mailings");
-    $this->assertElementContainsText("xpath=//table[@class='selector']/tbody//tr//td", "Mailing $mailingName Webtest");
+    $this->assertElementContainsText('page-title', "Find Mailings");
+    $this->isTextPresent("Mailing $mailingName Webtest");
     $this->openCiviPage('mailing/queue', 'reset=1');
 
     // verify status
