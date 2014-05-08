@@ -104,8 +104,8 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
 
     $this->waitForText('crm-notification-container', "Campaign $title");
 
-    $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
-    $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $this->waitForElementPresent("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $id = (int) $this->getText("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
     $this->activityAddTest($campaignTitle, $id);
   }
 
@@ -196,7 +196,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
 
     // verify Activity created
-    $this->verifyText("xpath=id('Activity')/div[2]/table[1]/tbody/tr[5]/td[2]", preg_quote($campaignTitle));
+    $this->verifyText("xpath=id('Activity')/div[2]/table[1]/tbody/tr[5]/td[2]/span", preg_quote($campaignTitle));
   }
 }
 
