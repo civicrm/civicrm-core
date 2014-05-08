@@ -15,6 +15,20 @@
     }
   ]);
 
+  // Add a new record by name.
+  // Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
+  crmCaseType.directive('crmAddName', function(){
+    return {
+      restrict: 'AE',
+      scope: {
+        crmOptions: '=',
+        crmVar: '=',
+        crmOnAdd: '&'
+      },
+      templateUrl: partialUrl('addName.html')
+    };
+  });
+
   crmCaseType.controller('CaseTypeCtrl', function($scope) {
     $scope.partialUrl = partialUrl;
 

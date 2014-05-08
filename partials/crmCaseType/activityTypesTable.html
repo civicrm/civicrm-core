@@ -27,19 +27,11 @@ Required vars: caseType
   </tr>
   <tr class="addRow">
     <td colspan="3">
-      Add:
-        <input
-                ui-jq="autocomplete"
-                ui-options="{source:activityTypeNames}"
-                ng-model="newTimelineActivity"
-                class="add-activity"
-                />
-        <button
-                ng-class="{disabled: (newTimelineActivity == '' || newTimelineActivity == null)}"
-                ng-disabled="newTimelineActivity == '' || newTimelineActivity == null"
-                ng-click="addActivityType(newTimelineActivity); newTimelineActivity = ''"
-                >Add</button>
-      <!-- ng-click="addActivity(activitySet, newTimelineActivity); newTimelineActivity = ''" -->
+      <div crm-add-name
+           crm-options="activityTypeNames"
+           crm-var="newActivity"
+           crm-on-add="addActivityType(newActivity)"
+              />
     </td>
   </tr>
   </tbody>
