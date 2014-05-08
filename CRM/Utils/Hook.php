@@ -814,6 +814,8 @@ abstract class CRM_Utils_Hook {
    * - 'exclude_is_admin'
    * - 'membership_type_id'
    * @param array $membership membership details from the calling function
+   *
+   * @return mixed
    */
   static function alterCalculatedMembershipStatus(&$membershipStatus, $arguments, $membership) {
     return self::singleton()->invoke(3, $membershipStatus, $arguments,
@@ -956,8 +958,9 @@ abstract class CRM_Utils_Hook {
    *
    * @param string $obj object of rulegroup class
    * @param string $type type of queries e.g table / threshold
-   * @param array  $query set of queries
+   * @param array $query set of queries
    *
+   * @return mixed
    * @access public
    */
   static function dupeQuery($obj, $type, &$query) {
@@ -970,12 +973,13 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called AFTER EACH email has been processed by the script bin/EmailProcessor.php
    *
-   * @param string  $type    type of mail processed: 'activity' OR 'mailing'
-   * @param array  &$params  the params that were sent to the CiviCRM API function
-   * @param object  $mail    the mail object which is an ezcMail class
-   * @param array  &$result  the result returned by the api call
-   * @param string  $action  (optional ) the requested action to be performed if the types was 'mailing'
+   * @param string $type type of mail processed: 'activity' OR 'mailing'
+   * @param array &$params the params that were sent to the CiviCRM API function
+   * @param object $mail the mail object which is an ezcMail class
+   * @param array &$result the result returned by the api call
+   * @param string $action (optional ) the requested action to be performed if the types was 'mailing'
    *
+   * @return mixed
    * @access public
    */
   static function emailProcessor($type, &$params, $mail, &$result, $action = NULL) {
@@ -1011,10 +1015,13 @@ abstract class CRM_Utils_Hook {
    * This hook is called when API permissions are checked (cf. civicrm_api3_api_check_permission()
    * in api/v3/utils.php and _civicrm_api3_permissions() in CRM/Core/DAO/permissions.php).
    *
-   * @param string $entity       the API entity (like contact)
-   * @param string $action       the API action (like get)
-   * @param array &$params       the API parameters
-   * @param array &$permisisons  the associative permissions array (probably to be altered by this hook)
+   * @param string $entity the API entity (like contact)
+   * @param string $action the API action (like get)
+   * @param array &$params the API parameters
+   * @param $permissions
+   *
+   * @return mixed
+   * @internal param array $permisisons the associative permissions array (probably to be altered by this hook)
    */
   static function alterAPIPermissions($entity, $action, &$params, &$permissions) {
     return self::singleton()->invoke(4, $entity, $action, $params, $permissions,
@@ -1034,8 +1041,10 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook allows user to customize context menu Actions on contact summary page.
    *
-   * @param array $actions       Array of all Actions in contextmenu.
-   * @param int   $contactID     ContactID for the summary page
+   * @param array $actions Array of all Actions in contextmenu.
+   * @param int $contactID ContactID for the summary page
+   *
+   * @return mixed
    */
   static function summaryActions(&$actions, $contactID = NULL) {
     return self::singleton()->invoke(2, $actions, $contactID,
@@ -1056,9 +1065,11 @@ abstract class CRM_Utils_Hook {
    *
    * @param string $objectName the component name that we are doing the search
    *                           activity, campaign, case, contact, contribution, event, grant, membership, and pledge
-   * @param array  &$headers   the list of column headers, an associative array with keys: ( name, sort, order )
-   * @param array  &$rows      the list of values, an associate array with fields that are displayed for that component
-   * @param array  &$seletor   the selector object. Allows you access to the context of the search
+   * @param array &$headers the list of column headers, an associative array with keys: ( name, sort, order )
+   * @param array &$rows the list of values, an associate array with fields that are displayed for that component
+   * @param $selector
+   *
+   * @internal param array $seletor the selector object. Allows you access to the context of the search
    *
    * @return void  modify the header and values object to pass the data u need
    */
@@ -1138,6 +1149,7 @@ abstract class CRM_Utils_Hook {
    *   float $maxh maximum height. It should be >= $h and less then remaining space to the bottom of the page,
    *               or 0 for disable this feature. This feature works only when $ishtml=false.
    *
+   * @return mixed
    */
   static function alterMailingLabelParams(&$args) {
     return self::singleton()->invoke(1, $args,
@@ -1155,6 +1167,7 @@ abstract class CRM_Utils_Hook {
    * @param $tplName  the file name of the tpl
    * @param $object   a reference to the page or form object
    *
+   * @return mixed
    * @access public
    */
   static function alterContent(&$content, $context, $tplName, &$object) {
@@ -1173,6 +1186,7 @@ abstract class CRM_Utils_Hook {
    * @param $context  context of content - page or form
    * @param $tplName reference the file name of the tpl
    *
+   * @return mixed
    * @access public
    */
   static function alterTemplateFile($formName, &$form, $context, &$tplName) {
@@ -1181,10 +1195,14 @@ abstract class CRM_Utils_Hook {
       'civicrm_alterTemplateFile'
     );
   }
+
   /**
    * This hook collects the trigger definition from all components
    *
-   * @param $triggerInfo reference to an array of trigger information
+   * @param $info
+   * @param string $tableName (optional) the name of the table that we are interested in only
+   *
+   * @internal param \reference $triggerInfo to an array of trigger information
    *   each element has 4 fields:
    *     table - array of tableName
    *     when  - BEFORE or AFTER
@@ -1193,7 +1211,7 @@ abstract class CRM_Utils_Hook {
    *             a statement can use the tokes {tableName} and {eventName}
    *             to do token replacement with the table / event. This allows
    *             templatizing logging and other hooks
-   * @param string $tableName (optional) the name of the table that we are interested in only
+   * @return mixed
    */
   static function triggerInfo(&$info, $tableName = NULL) {
     return self::singleton()->invoke(2, $info, $tableName,
@@ -1536,21 +1554,22 @@ abstract class CRM_Utils_Hook {
 
   /**
    * This hook is called before a case merge (or a case reassign)
-   * 
+   *
    * @param type $mainContactId
    * @param type $mainCaseId
    * @param type $otherContactId
    * @param type $otherCaseId
-   * @param type $changeClient
+   * @param bool|\type $changeClient
+   *
    * @return void
    */
   static function pre_case_merge($mainContactId, $mainCaseId = NULL, $otherContactId = NULL, $otherCaseId = NULL, $changeClient = FALSE) {
     return self::singleton()->invoke(5, $mainContactId, $mainCaseId, $otherContactId, $otherCaseId, $changeClient, 'civicrm_pre_case_merge');
   }
-  
+
   /**
    * This hook is called after a case merge (or a case reassign)
-   * 
+   *
    * @param type $mainContactId
    * @param type $mainCaseId
    * @param type $otherContactId
@@ -1567,9 +1586,12 @@ abstract class CRM_Utils_Hook {
    * Add a hook for altering the display name
    *
    * hook_civicrm_contact_get_displayname(&$display_name, $objContact)
+   *
    * @param string $displayName
    * @param int $contactId
    * @param object $dao the contact object
+   *
+   * @return mixed
    */
   static function alterDisplayName($displayName, $contactId, $dao) {
     return self::singleton()->invoke(3,

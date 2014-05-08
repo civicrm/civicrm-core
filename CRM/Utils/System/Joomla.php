@@ -91,7 +91,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     return $ufID;
   }
 
-  /*
+  /**
    *  Change user name in host CMS
    *
    *  @param integer $ufID User ID in CMS
@@ -116,6 +116,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @params $params    array   array of name and mail values
    * @params $errors    array   array of errors
    * @params $emailName string  field label for the 'email'
+   *
+   * @param $params
+   * @param $errors
+   * @param string $emailName
    *
    * @return void
    */
@@ -191,8 +195,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb
    *
-   * @param string $title
-   * @param string $url
+   * @param $breadCrumbs
+   *
+   * @internal param string $title
+   * @internal param string $url
    *
    * @return void
    * @access public
@@ -224,7 +230,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Reset an additional breadcrumb tag to the existing breadcrumb
    *
-   * @param string $bc the new breadcrumb to be appended
+   * @internal param string $bc the new breadcrumb to be appended
    *
    * @return void
    * @access public
@@ -236,7 +242,9 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Append a string to the head of the html file
    *
-   * @param string $head the new string to be appended
+   * @param null $string
+   *
+   * @internal param string $head the new string to be appended
    *
    * @return void
    * @access public
@@ -334,9 +342,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @param $htmlize  boolean  whether to convert to html eqivalant
    * @param $frontend boolean  a gross joomla hack
    *
+   * @param bool $forceBackend
+   *
    * @return string            an HTML string containing a link to the given path.
    * @access public
-   *
    */
   function url($path = NULL, $query = NULL, $absolute = TRUE,
     $fragment = NULL, $htmlize = TRUE,
@@ -603,12 +612,16 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
   }
 
-  /*
+  /**
    * load joomla bootstrap
    *
    * @param $params array with uid or name and password
    * @param $loadUser boolean load cms user?
-   * @param $throwError throw error on failure?
+   * @param bool|\throw $throwError throw error on failure?
+   * @param null $realPath
+   * @param bool $loadDefines
+   *
+   * @return bool
    */
   function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL, $loadDefines = TRUE) {
     // Setup the base path related constant.
@@ -647,7 +660,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     jimport('joomla.application.cli');
-    
+
     // CRM-14281 Joomla wasn't available during bootstrap, so hook_civicrm_config never executes.
     $config = CRM_Core_Config::singleton();
     CRM_Utils_Hook::config($config);
@@ -748,6 +761,9 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
   /**
    * Return default Site Settings
+   *
+   * @param $dir
+   *
    * @return array array
    * - $url, (Joomla - non admin url)
    * - $siteName,

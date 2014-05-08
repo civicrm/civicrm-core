@@ -49,7 +49,7 @@ class CRM_Utils_REST {
    * Class constructor.  This caches the real user framework class locally,
    * so we can use it for authentication and validation.
    *
-   * @param  string $uf       The userframework class
+   * @internal param string $uf The userframework class
    */
   public function __construct() {
     // any external program which call Rest Server is responsible for

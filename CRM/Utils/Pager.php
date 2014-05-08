@@ -64,18 +64,17 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * We have embedded some html in this class. Need to figure out how to export this
    * to the top level at some point in time
    *
-   * @param int     total        the total count of items to be displayed
-   * @param int     currentPage  the page currently being displayed
-   * @param string  status       the status message to be displayed. It embeds a token
+   * @param $params
+   *
+   * @internal param \total $int the total count of items to be displayed
+   * @internal param \currentPage $int the page currently being displayed
+   * @internal param \status $string the status message to be displayed. It embeds a token
    *                             %%statusMessage%% that will be replaced with which items
    *                             are currently being displayed
-   * @param string  csvString    the title of the link to be displayed for the export
-   * @param int     perPage      the number of items displayed per page
+   * @internal param \csvString $string the title of the link to be displayed for the export
+   * @internal param \perPage $int the number of items displayed per page
    *
-   * @return object              the newly created and initialized pager object
-   *
-   * @access public
-   *
+   * @return \CRM_Utils_Pager the newly created and initialized pager object@access public
    */
   function __construct($params) {
     if ($params['status'] === NULL) {
@@ -187,11 +186,12 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * POST over-rides a GET, a POST at the top overrides
    * a POST at the bottom (of the page)
    *
-   * @param int defaultPageId   current pageId
+   * @param int $defaultPageId defaultPageId   current pageId
+   *
+   * @param $params
    *
    * @return int                new pageId to display to the user
    * @access public
-   *
    */
   function getPageID($defaultPageId = 1, &$params) {
     // POST has higher priority than GET vars

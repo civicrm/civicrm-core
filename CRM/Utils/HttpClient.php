@@ -145,7 +145,9 @@ class CRM_Utils_HttpClient {
    * Send an HTTP POST for a remote resource
    *
    * @param string $remoteFile URL of a .zip file
-   * @param string $localFile path at which to store the .zip file
+   * @param $params
+   *
+   * @internal param string $localFile path at which to store the .zip file
    * @return array array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
    */
   public function post($remoteFile, $params) {

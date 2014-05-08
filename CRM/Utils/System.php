@@ -60,7 +60,7 @@ class CRM_Utils_System {
    *   (optional) Whether to include the force GET string (if present).
    * @param string $path
    *   (optional) The path to use for the new url.
-   * @param string $absolute
+   * @param bool|string $absolute
    *   (optional) Whether to return an absolute URL.
    *
    * @return string
@@ -585,6 +585,13 @@ class CRM_Utils_System {
   }
 
   /**
+   * @param bool $abort
+   * @param null $name
+   * @param null $pass
+   * @param bool $storeInSession
+   * @param bool $loadCMSBootstrap
+   * @param bool $requireKey
+   *
    * @return bool
    */
   static function authenticateScript($abort = TRUE, $name = NULL, $pass = NULL, $storeInSession = TRUE, $loadCMSBootstrap = TRUE, $requireKey = TRUE) {
@@ -769,6 +776,8 @@ class CRM_Utils_System {
   /**
    * @param $title
    *   (optional)
+   *
+   * @return mixed|string
    */
   static function memory($title = NULL) {
     static $pid = NULL;
@@ -790,6 +799,7 @@ class CRM_Utils_System {
    * @param $buffer
    * @param string $ext
    * @param bool $output
+   * @param string $disposition
    */
   static function download($name, $mimeType, &$buffer,
     $ext = NULL,
@@ -934,6 +944,8 @@ class CRM_Utils_System {
    *   The URL to check.
    * @param bool $addCookie
    *   (optional)
+   *
+   * @return mixed
    */
   static function checkURL($url, $addCookie = FALSE) {
     // make a GET request to $url
@@ -978,6 +990,9 @@ class CRM_Utils_System {
   }
 
   /**
+   * @param $string
+   * @param bool $encode
+   *
    * @return string
    */
   static function formatWikiURL($string, $encode = FALSE) {
@@ -996,6 +1011,8 @@ class CRM_Utils_System {
 
   /**
    * @param string $url
+   *
+   * @return null|string
    */
   static function urlEncode($url) {
     $items = parse_url($url);
@@ -1247,6 +1264,8 @@ class CRM_Utils_System {
    *   (optional) Tooltip text for HTML link (no effect if $URLonly = false)
    * @param string $style
    *   (optional) Style attribute value for HTML link (no effect if $URLonly = false)
+   *
+   * @param null $resource
    *
    * @return string
    *   URL or link to documentation page, based on provided parameters.
@@ -1573,7 +1592,9 @@ class CRM_Utils_System {
    * Produce an absolute URL from a possibly-relative URL.
    *
    * @param string $url
-   * @param bool $remoteLanguagePart
+   * @param bool $removeLanguagePart
+   *
+   * @internal param bool $remoteLanguagePart
    * @return string
    */
   static function absoluteURL($url, $removeLanguagePart = FALSE) {
@@ -1617,6 +1638,9 @@ class CRM_Utils_System {
    * Format the url as per language Negotiation.
    *
    * @param string $url
+   *
+   * @param bool $addLanguagePart
+   * @param bool $removeLanguagePart
    *
    * @return string $url, formatted url.
    */
