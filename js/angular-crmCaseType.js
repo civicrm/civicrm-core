@@ -20,6 +20,7 @@
 
     $scope.activityStatuses = CRM.crmCaseType.actStatuses;
     $scope.activityTypes = CRM.crmCaseType.actTypes;
+    $scope.activityTypeNames = _.pluck(CRM.crmCaseType.actTypes, 'name');
 
     $scope.workflows = {
       'timeline': 'Timeline',
@@ -83,6 +84,23 @@
       _.defer(function() {
         $('.crmCaseType-acttab').tabs('refresh').tabs({active: -1});
       });
+    };
+
+    /// Add a new activity entry to an activity-set
+    $scope.addActivity = function(activitySet, activityType) {
+      activitySet.activityTypes.push({
+        name: activityType
+      });
+    };
+
+    /// Add a new top-level activity-type entry
+    $scope.addActivityType = function(activityType) {
+      var names = _.pluck($scope.caseType.definition.activityTypes, 'name');
+      if (!_.contains(names, activityType)) {
+        $scope.caseType.definition.activityTypes.push({
+          name: activityType
+        });
+      }
     };
 
     $scope.onManagerChange = function(managerRole) {
