@@ -61,7 +61,7 @@ class WebTest_Admin_Form_ScheduleReminderTest extends CiviSeleniumTestCase {
     $this->click('_qf_ScheduleReminders_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->click("//div[@id='reminder']//div[@class='dataTables_wrapper']/table/tbody//tr/td[1][text()='{$title}']/../td[7]/span/a[text()='Edit']");
+    $this->click("//div[@id='reminder']//div[@id='option11_wrapper']/table/tbody//tr/td[1][text()='{$title}']/../td[7]/span/a[text()='Edit']");
     $this->waitForElementPresent('_qf_ScheduleReminders_cancel-bottom');
 
     $this->assertEquals($title, $this->getValue('id=title'));

@@ -137,7 +137,7 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->click("xpath=id('Search')/div[3]/div/div[2]/table/tbody/tr[3]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_Activity_cancel-bottom");
 
-    $this->webtestVerifyTabularData(
+    $this->VerifyTabularData(
       array(
         'Subject' => $subject,
         'Location' => $location,
@@ -151,7 +151,7 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
       "/label"
     );
 
-    $this->webtestVerifyTabularData(
+    $this->VerifyTabularData(
       array(
         'With Contact' => "Anderson, {$firstName1}",
         'Assigned To' => "Summerson, {$firstName2}",
@@ -170,5 +170,12 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
 
     $pageUrl = array('url' => 'activity', 'args' => 'reset=1&action=add&context=standalone');
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
+  }
+
+  function VerifyTabularData($expected, $xpathPrefix = NULL) {
+    foreach ($expected as $label => $value) {
+        $this->waitForElementPresent("xpath=//table/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td/span");
+        $this->verifyText("xpath=//table/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td/span", preg_quote($value), 'In line ' . __LINE__);
+    }
   }
 }

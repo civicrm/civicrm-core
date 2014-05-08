@@ -232,6 +232,7 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
 
     //Is custom field created
     $this->waitForText("crm-notification-container", "Custom field '$radioFieldLabel' has been saved.");
+    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$radioFieldLabel']/parent::td/parent::tr/td[8]/span/a");
     $radioFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$radioFieldLabel']/../../td[8]/span/a@href"));
     $radioFieldId = $radioFieldId[1];
 
@@ -270,7 +271,8 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
     $this->click('_qf_Field_next-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText("crm-notification-container", "Custom field '{$multiSelectLabel}' has been saved.");
-    $multiSelectFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$multiSelectLabel']/../../td[8]/span/a@href"));
+    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$multiSelectLabel']/parent::td/parent::tr/");
+    $multiSelectFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$multiSelectLabel']/parent::td/parent::tr/td[8]/span/a@href"));
     $multiSelectFieldId = $multiSelectFieldId[1];
 
     // create another custom field - contact reference
@@ -295,7 +297,7 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
     $this->waitForElementPresent('newCustomField');
 
     $this->waitForText("crm-notification-container", "Custom field '{$contactReferenceLabel}' has been saved.");
-    $contactReferenceFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$contactReferenceLabel']/../../td[8]/span/a@href"));
+    $contactReferenceFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$contactReferenceLabel']/parent::td/parent::tr/td[8]/span/a@href"));
     $contactReferenceFieldId = $contactReferenceFieldId[1];
 
     $customDataParams = array(
