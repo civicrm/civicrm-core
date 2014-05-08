@@ -55,11 +55,9 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
     $this->click('css=li#tab_member a');
 
     $this->waitForElementPresent('link=Submit Credit Card Membership');
-    $this->click('link=Submit Credit Card Membership');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // since we don't have live credentials we will switch to test mode
-    $url = $this->getLocation();
+    $url = $this->getAttribute("xpath=//div[@class='view-content']//div[@class='action-link']/a[2]@href");
     $url = str_replace('mode=live', 'mode=test', $url);
     $this->open($url);
     $this->waitForPageToLoad($this->getTimeoutMsec());

@@ -838,7 +838,8 @@ AND civicrm_case.status_id != $closedId";
         }
       }
       //CRM-4510.
-      $caseManagerContact = self::getCaseManagerContact($result->case_type_name, $result->case_id);
+      $caseTypes = CRM_Case_PseudoConstant::caseType('name');
+      $caseManagerContact = self::getCaseManagerContact($caseTypes[$result->case_type_id], $result->case_id);
       if (!empty($caseManagerContact)) {
         $casesList[$result->case_id]['casemanager_id'] = CRM_Utils_Array::value('casemanager_id', $caseManagerContact);
         $casesList[$result->case_id]['casemanager'] = CRM_Utils_Array::value('casemanager', $caseManagerContact);
@@ -3088,7 +3089,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     $configured['configured'] = ($allCasesCount) ? TRUE : FALSE;
     if (!$configured['configured']) {
       //do check for case type and case status.
-      $caseTypes = CRM_Case_PseudoConstant::caseType('label', FALSE);
+      $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
       if (!empty($caseTypes)) {
         $configured['configured'] = TRUE;
         if (!$configured['configured']) {

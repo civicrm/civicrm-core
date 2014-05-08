@@ -849,7 +849,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     if ($onBehalf) {
       $this->click('is_organization');
-      $this->select('onbehalf_profile_id', 'label=On Behalf Of Organization');
+      $this->select("xpath=//*[@class='crm-contribution-onbehalf_profile_id']//span[@class='crm-profile-selector-select']//select", 'label=On Behalf Of Organization');
       $this->type('for_organization', "On behalf $hash");
 
       if ($onBehalf == 'required') {
@@ -1275,25 +1275,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->select("other_activity", "label=Meeting");
 
     $this->waitForElementPresent("_qf_Activity_upload-bottom");
+    $this->waitForElementPresent("s2id_target_contact_id");
 
     $this->assertTrue($this->isTextPresent("Anderson, " . $firstName2), "Contact not found in line " . __LINE__);
 
     // Typing contact's name into the field (using typeKeys(), not type()!)...
-    $this->click("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id");
-    $this->type("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id", $firstName1);
-    $this->typeKeys("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id", $firstName1);
-
-    // ...waiting for drop down with results to show up...
-    $this->waitForElementPresent("css=div.token-input-dropdown-facebook");
-    $this->waitForElementPresent("css=li.token-input-input-token-facebook");
-
-    //.need to use mouseDown on first result (which is a li element), click does not work
-    // Note that if you are using firebug this appears at the bottom of the html source, before the closing </body> tag, not where the <li> referred to above is, which is a different <li>.
-    $this->waitForElementPresent("css=div.token-input-dropdown-facebook li");
-    $this->mouseDown("css=div.token-input-dropdown-facebook li");
-
-    // ...again, waiting for the box with contact name to show up...
-    $this->waitForElementPresent("css=tr.crm-activity-form-block-assignee_contact_id td ul li span.token-input-delete-token-facebook");
+    $this->select2("assignee_contact_id", $firstName1, TRUE);
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertTrue($this->isTextPresent("Summerson, " . $firstName1), "Contact not found in line " . __LINE__);
@@ -1326,15 +1313,15 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     // Clicking save.
     $this->click("_qf_Activity_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@id='crm-notification-container']");
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("Activity '$subject' has been saved."), "Status message didn't show up after saving!");
+    $this->waitForText('crm-notification-container', "Activity '$subject' has been saved.");
 
-    $this->waitForElementPresent("xpath=//div[@id='Activities']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
 
     // click through to the Activity view screen
-    $this->click("xpath=//div[@id='Activities']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
 
     // parse URL to grab the activity id
@@ -1877,7 +1864,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * function to type and select first occurance of autocomplete
    */
-  function select2($fieldName,$label, $multiple = FALSE) {
+  function select2($fieldName,$label, $multiple = FALSE, $xpath=FALSE) {
     if ($multiple) {
       $this->clickAt("//*[@id='$fieldName']/../div/ul/li[1]");
       $this->keyDown("//*[@id='$fieldName']/../div/ul/li[1]/input", " ");
@@ -1887,13 +1874,28 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->clickAt("//*[@class='select2-results']/li[1]/div");
     }
     else {
-      $this->clickAt("//*[@id='$fieldName']/../div/a");
+      if ($xpath) 
+	$this->clickAt($fieldName);
+      else
+	$this->clickAt("//*[@id='$fieldName']/../div/a");
       $this->waitForElementPresent("//*[@id='select2-drop']/div/input");
       $this->keyDown("//*[@id='select2-drop']/div/input", " ");
       $this->type("//*[@id='select2-drop']/div/input", $label);
       $this->typeKeys("//*[@id='select2-drop']/div/input", $label);
       $this->waitForElementPresent("//*[@class='select2-result-label']");
-      $this->clickAt("//*[@class='select2-result-label']");
+      $this->clickAt("//*[contains(@class,'select2-result-selectable ')]/div[contains(@class, 'select2-result-label')]");
+    }
+  }
+
+  /**
+   * function to select multiple options
+   */
+  function multiselect2($fieldid, $params) {
+    foreach($params as $value) {
+      $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
+      $this->waitForElementPresent("xpath=//ul[@class='select2-results']");
+      $this->clickAt("xpath=//ul[@class='select2-results']//li/div[text()='$value']");
+      $this->waitForText("xpath=//*[@id='$fieldid']/../div", $value);
     }
   }
 }

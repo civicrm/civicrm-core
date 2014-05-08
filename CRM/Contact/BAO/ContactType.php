@@ -339,9 +339,21 @@ WHERE  type.name IS NOT NULL
     return !$delimiter ? $pairs : implode($delimiter, $pairs);
   }
 
-  static function &getSelectElements($all = FALSE,
-    $isSeperator = TRUE,
-    $seperator = CRM_Core_DAO::VALUE_SEPARATOR
+  /**
+   * Get a list of elements for select box
+   * Note that this used to default to using the hex(01) character - which results in an invalid character being used in form fields
+   * which was not handled well be anything that loaded & resaved the html (outside core)
+   * The use of this separator is now explicit in the calling functions as a step towards it's removal
+   *
+   * @param bool $all
+   * @param bool $isSeparator
+   * @param string $separator
+   *
+   * @return mixed
+   */
+  static function getSelectElements($all = FALSE,
+    $isSeparator = TRUE,
+    $separator = '__'
   ) {
     static $_cache = NULL;
 
@@ -350,7 +362,7 @@ WHERE  type.name IS NOT NULL
     }
 
     $argString = $all ? 'CRM_CT_GSE_1' : 'CRM_CT_GSE_0';
-    $argString .= $isSeperator ? '_1' : '_0';
+    $argString .= $isSeparator ? '_1' : '_0';
     if (!array_key_exists($argString, $_cache)) {
       $cache = CRM_Utils_Cache::singleton();
       $_cache[$argString] = $cache->get($argString);
@@ -378,7 +390,7 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
         $dao = CRM_Core_DAO::executeQuery($sql);
         while ($dao->fetch()) {
           if (!empty($dao->parent_id)) {
-            $key   = $isSeperator ? $dao->parent_name . $seperator . $dao->child_name : $dao->child_name;
+            $key   = $isSeparator ? $dao->parent_name . $separator . $dao->child_name : $dao->child_name;
             $label = "-&nbsp;{$dao->child_label}";
             $pName = $dao->parent_name;
           }
@@ -505,7 +517,10 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
    */
   static function getCreateNewList() {
     $shortCuts = array();
-    $contactTypes = self::getSelectElements();
+    //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
+    // this is loaded onto then replace with something like '__' & test
+    $separator = CRM_Core_DAO::VALUE_SEPARATOR;
+    $contactTypes = self::getSelectElements(FALSE, TRUE, $separator);
     foreach ($contactTypes as $key => $value) {
       if ($key) {
         $typeValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $key);

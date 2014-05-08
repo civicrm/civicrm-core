@@ -61,8 +61,8 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("xpath=//div[@id='contributionSearch']/table[@class='selector']/tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("xpath=//div[@id='contributionSearch']/table[@class='selector row-highlight']/tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
     $expected = array(
       'Received Into' => "Deposit Bank Account",
       'Contribution Status' => "Completed",
@@ -91,12 +91,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->openCiviPage("event/search", "reset=1", '_qf_Search_refresh');
 
     $eventName = 'Rain';
-    $this->click("event_name");
-    $this->type("event_name", $eventName);
-    $this->typeKeys("event_name", $eventName);
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
-    $this->assertContains($eventName, $this->getValue("event_name"), "autocomplete expected $eventName but didn’t find it in " . $this->getValue("event_name"));
+    $this->select2("event_id", $eventName);
     $this->click('_qf_Search_refresh');
 
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
@@ -123,7 +118,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("xpath=//div[@id='contributionSearch']/table[@class='selector']/tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->click("xpath=//div[@id='contributionSearch']/table[@class='selector row-highlight']/tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $expected = array(
       'Received Into'        => "Deposit Bank Account",
@@ -141,10 +136,10 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->webtestFillAutocomplete($firstName);
 
     // Select event. Based on label for now.
-    $this->select('event_id', "label=regexp:Rain-forest Cup Youth Soccer Tournament.");
+    $this->select2('event_id', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select role
-    $this->click('role_id[2]');
+    $this->multiselect2('role_id', array('Volunteer'));
 
     // Select participant status
     $this->select('status_id', 'value=1');
@@ -158,7 +153,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     // Select an event fee
     $this->waitForElementPresent('priceset');
 
-    $this->click("xpath=//input[@class='form-radio']");
+    $this->click("xpath=//input[@class='crm-form-radio']");
 
     // Enter amount to be paid (note: this should default to selected fee level amount, s/b fixed during 3.2 cycle)
     $this->type('total_amount', '800');
@@ -170,13 +165,11 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("Event registration for $firstName Anderson has been added"),
-      "Status message didn't show up after saving!"
-    );
+    $this->waitForText("crm-notification-container", "Event registration for $firstName Anderson has been added");
 
-    $this->waitForElementPresent("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->click("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -185,7 +178,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
         'Participant Role' => 'Attendee',
         'Status' => 'Registered',
         'Event Source' => 'Event StandaloneAddTest Webtest',
-        'Event Fees' => '$ 800.00',
+        'Fees' => '$ 800.00',
       )
     );
   }
@@ -217,10 +210,10 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->assertTrue($this->isTextPresent("The contribution record has been saved."), "Status message didn't show up after saving!");
 
     // verify if Membership is created
-    $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[2]//tbody/tr[1]/td[8]/span/a[text()='View']");
 
     //click through to the Membership view screen
-    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table[2]/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
 
     $expected = array(

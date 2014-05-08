@@ -80,12 +80,12 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=li#widget-2 a.fullscreen-icon");
     $this->click("css=li#widget-2 a.fullscreen-icon");
     $this->waitForElementPresent("ui-id-1");
-    $this->assertTrue($this->isTextPresent($widgetTitle));
+    $this->waitForTextPresent("$widgetTitle");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
     sleep(5);
-    $this->click("link=close");
+    $this->click("xpath=//*[@class='ui-button-text'][contains(text(), 'close')]");
   }
 
   function _testRemoveDashboardElement($widgetConfigureID, $widgetEnabledSelector) {

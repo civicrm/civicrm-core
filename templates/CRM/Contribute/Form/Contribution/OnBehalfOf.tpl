@@ -117,6 +117,10 @@
               {if $form.onbehalf.$phone_ext_field.html}
                 &nbsp;{$form.onbehalf.$phone_ext_field.html}
               {/if}
+            {/if} 
+	    {if $onBehalfOfFields.$fieldName.data_type eq 'Date'}
+            {assign var=elementName value=onbehalf[$fieldName]}
+	       {include file="CRM/common/jcalendar.tpl" elementName=$elementName elementId=onbehalf_$fieldName}
             {/if}
             {if $onBehalfOfFields.$fieldName.help_post}
               <br /><span class='description'>{$onBehalfOfFields.$fieldName.help_post}</span>

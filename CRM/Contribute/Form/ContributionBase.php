@@ -196,6 +196,17 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_honor_block_is_active = FALSE;
 
   /**
+   * Contribution mode e.g express for payment express, notify for off-site + notification back to CiviCRM
+   * @var string
+   */
+  public $_contributeMode;
+
+  /**
+   * contribution page supports memberships
+   * @var boolean
+   */
+  public $_useForMember;
+  /**
    * Function to set variables up before form is built
    *
    * @return void

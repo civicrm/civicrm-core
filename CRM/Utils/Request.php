@@ -60,14 +60,13 @@ class CRM_Utils_Request {
    * @param $name    name of the variable to be retrieved
    * @param $type    type of the variable (see CRM_Utils_Type for details)
    * @param $store   session scope where variable is stored
-   * @param $abort   is this variable required
+   * @param bool|\is $abort is this variable required
    * @param $default default value of the variable if not present
-   * @param $method  where should we look for the variable
+   * @param string|\where $method where should we look for the variable
    *
    * @return mixed the value of the variable
    * @access public
    * @static
-   *
    */
   static function retrieve($name, $type, &$store = NULL, $abort = FALSE, $default = NULL, $method = 'REQUEST') {
 
@@ -126,9 +125,8 @@ class CRM_Utils_Request {
    * This is a replacement for $_REQUEST which includes $_GET/$_POST
    * but excludes $_COOKIE / $_ENV / $_SERVER.
    *
-   * @param string $method
+   * @internal param string $method
    * @return array
-   * @throws CRM_Core_Exception
    */
   static function exportValues() {
     // For more discussion of default $_REQUEST handling, see:

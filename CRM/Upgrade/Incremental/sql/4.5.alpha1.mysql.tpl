@@ -429,3 +429,76 @@ SELECT 'Vine' AS website
 LEFT JOIN civicrm_option_value co ON LOWER(co.name) = LOWER(temp.website)
 AND option_group_id = @option_web_id
 WHERE co.id IS NULL;
+
+-- CRM-14627 civicrm navigation inconsistent
+UPDATE civicrm_navigation
+SET civicrm_navigation.url = CONCAT(SUBSTRING(url FROM 1 FOR LOCATE('&', url) - 1), '?', SUBSTRING(url FROM LOCATE('&', url) + 1))
+WHERE civicrm_navigation.url LIKE "%&%" AND civicrm_navigation.url NOT LIKE "%?%";
+
+-- CRM-14639
+
+SELECT @option_grant_status := id  FROM civicrm_option_group WHERE name = 'grant_status';
+UPDATE civicrm_option_value 
+SET
+{if !$multilingual}
+  label = 
+    CASE 
+      WHEN lower(name) = 'granted'
+      THEN 'Paid'
+      WHEN lower(name) = 'approved'
+      THEN 'Eligible'
+      WHEN lower(name) = 'rejected'
+      THEN 'Ineligible'
+      ELSE 'Submitted'
+    END,  
+{else}
+  {foreach from=$locales item=locale}
+    label_{$locale} = 
+      CASE 
+        WHEN lower(name) = 'granted'
+      	THEN 'Paid'
+      	WHEN lower(name) = 'approved'
+      	THEN 'Eligible'
+      	WHEN lower(name) = 'rejected'
+      	THEN 'Ineligible'
+      	ELSE 'Submitted'
+      END,
+  {/foreach}
+{/if}
+name = 
+CASE 
+  WHEN lower(name) = 'granted'
+   THEN 'Paid'
+  WHEN lower(name) = 'approved'
+   THEN 'Eligible'
+  WHEN lower(name) = 'rejected'
+   THEN 'Ineligible'
+  ELSE 'Submitted'
+END
+WHERE option_group_id = @option_grant_status and LOWER(name) IN ('granted', 'pending', 'approved', 'rejected');
+
+SELECT @grant_value := max(cast(value as UNSIGNED)) FROM civicrm_option_value WHERE option_group_id = @option_grant_status;
+SELECT @grant_weight := max(weight) FROM civicrm_option_value WHERE option_group_id = @option_grant_status;
+
+INSERT INTO civicrm_option_value(option_group_id, {localize field='label'}label{/localize}, name, value, weight)
+SELECT @option_grant_status, {localize}grantstatus{/localize}, grantstatus, @grant_value := @grant_value 1, @grant_weight := @grant_weight 1 FROM (
+SELECT 'Submitted' AS grantstatus
+    UNION ALL
+SELECT 'Approved for Payment' AS grantstatus
+    UNION ALL
+SELECT 'Eligible' AS grantstatus
+    UNION ALL
+SELECT 'Awaiting Information' AS grantstatus
+    UNION ALL
+SELECT 'Withdrawn' AS grantstatus
+) AS temp
+LEFT JOIN civicrm_option_value co ON LOWER(co.name) = LOWER(temp.grantstatus)
+AND option_group_id = @option_grant_status
+WHERE co.id IS NULL;
+
+-- Fix trailing single quote in grant status label
+UPDATE civicrm_option_value v
+	INNER JOIN civicrm_option_group g
+	ON v.option_group_id=g.id AND g.name='grant_status'
+	SET label='Awaiting Information'
+	WHERE v.label='Awaiting Information\'' and v.name='Awaiting Information'; 
