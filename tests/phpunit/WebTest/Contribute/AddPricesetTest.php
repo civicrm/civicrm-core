@@ -576,7 +576,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     // select price set items
     $this->select('price_set_id', "label=$setTitle");
-    $this->type("xpath=//input[@class='four crm-form-text required']", "2");
+    $this->type("xpath=//input[@class='four crm-form-text required']", "1");
     $this->click("xpath=//input[@class='crm-form-radio']");
     $this->click("xpath=//input[@class='crm-form-checkbox']");
     // select payment instrument type = Check and enter chk number
@@ -588,7 +588,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     $this->webtestFillAutocomplete("{$lastNameSoft}, {$firstNameSoft}", 'soft_credit_contact_id_1');
 
-    $this->type('soft_credit_amount_1', "1");
+    $this->type('soft_credit_amount_1', "65");
     //Additional Detail section
     $this->click('AdditionalDetail');
     $this->waitForElementPresent('thankyou_date');
