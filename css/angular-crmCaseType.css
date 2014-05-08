@@ -10,3 +10,17 @@
 .crmCaseType .ui-tabs-nav select {
     float: right;
 }
+
+.crmCaseType tr.addRow td {
+    background: #ddddff;
+    padding: 0.5em 1em;
+    text-align: center;
+}
+
+.crmCaseType input[type=number] {
+    width: 3.5em;
+}
+
+.crmCaseType .add-activity {
+    width: 50%;
+}
