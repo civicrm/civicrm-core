@@ -104,10 +104,12 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Function to send the emails
    *
-   * @param int     $contactID         contact id
-   * @param array   $values            associated array of fields
-   * @param boolean $isTest            if in test mode
+   * @param int $contactID contact id
+   * @param array $values associated array of fields
+   * @param boolean $isTest if in test mode
    * @param boolean $returnMessageText return the message text instead of sending the mail
+   *
+   * @param null $fieldTypes
    *
    * @return void
    * @access public
@@ -269,6 +271,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       if ($preID = CRM_Utils_Array::value('custom_pre_id', $values)) {
         if (!empty($values['related_contact'])) {
           $preProfileTypes = CRM_Core_BAO_UFGroup::profileGroups($preID);
+          //@todo - following line should not refer to undefined $postProfileTypes? figure out way to test
           if (in_array('Individual', $preProfileTypes) || in_array('Contact', $postProfileTypes)) {
             //Take Individual contact ID
             $userID = CRM_Utils_Array::value('related_contact', $values);

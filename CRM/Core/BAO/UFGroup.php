@@ -2420,8 +2420,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           }
           else {
             if (is_array($details)) {
-              if ($fieldName === 'url' 
-                && !empty($details['website']) 
+              if ($fieldName === 'url'
+                && !empty($details['website'])
                 && !empty($details['website'][$locTypeId])) {
                 $defaults[$fldName] = CRM_Utils_Array::value('url', $details['website'][$locTypeId]);
               }
@@ -2642,6 +2642,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @params int     $contactId      contact id
    * @params array   $values         associative array of name/value pair
    *
+   * @param $contactID
+   * @param $values
+   *
    * @return void
    * @access public
    */
@@ -2702,6 +2705,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @params $cid      contact id
    * @params $params   associative array
    *
+   * @param $gid
+   * @param $cid
+   * @param $params
+   * @param bool $skipCheck
+   *
    * @return array
    * @access public
    */
@@ -2735,6 +2743,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @params int     $gid      group id
    * @params array   $values   associative array of fields
    *
+   * @param $gid
+   * @param $values
+   * @param $template
+   *
    * @return void
    * @access public
    */
@@ -2750,6 +2762,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * Format fields for dupe Contact Matching
    *
    * @param array $params associated array
+   *
+   * @param null $contactId
    *
    * @return array $data assoicated formatted array
    * @access public
@@ -2882,9 +2896,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   /**
    * calculate the profile type 'group_type' as per profile fields.
    *
-   * @param int $gid           profile id
+   * @param $gId
+   * @param bool $includeTypeValues
    * @param int $ignoreFieldId ignore particular profile field
    *
+   * @internal param int $gid profile id
    * @return array list of calculated group type
    */
   static function calculateGroupType($gId, $includeTypeValues = FALSE, $ignoreFieldId = NULL) {
@@ -2896,9 +2912,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   /**
    * calculate the profile type 'group_type' as per profile fields.
    *
-   * @param int $gid           profile id
+   * @param $ufFields
+   * @param bool $includeTypeValues
    * @param int $ignoreFieldId ignore perticular profile field
    *
+   * @internal param int $gid profile id
    * @return array list of calculated group type
    */
   static function _calculateGroupType($ufFields, $includeTypeValues = FALSE, $ignoreFieldId = NULL) {
@@ -2964,9 +2982,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * BirthDate + SurveyOrPhoneField + SurveyOnlyField         Individual,Activity\0ActivityType:2:28
    * BirthDate + StudentField + Subject + SurveyOnlyField     Individual,Activity,Student\0ActivityType:28
    *
-   * @param  Integer $gid         profile id
-   * @param  Array   $groupTypes  With key having group type names
+   * @param $gId
+   * @param  Array $groupTypes With key having group type names
    *
+   * @internal param int $gid profile id
    * @return Boolean
    */
   static function updateGroupTypes($gId, $groupTypes = array(
@@ -3032,6 +3051,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param array $coreTypes e.g. array('Individual','Contact','Student')
    * @param array $subTypes e.g. array('ActivityType' => array(7, 11))
    * @param string $delim
+   *
+   * @return string
    * @throws CRM_Core_Exception
    */
   static function encodeGroupType($coreTypes, $subTypes, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
@@ -3053,10 +3074,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   /**
    * This function is used to setDefault componet specific profile fields.
    *
-   * @param array  $fields      profile fields.
-   * @param int    $componentId componetID
-   * @param string $component   component name
-   * @param array  $defaults    an array of default values.
+   * @param array $fields profile fields.
+   * @param int $componentId componetID
+   * @param string $component component name
+   * @param array $defaults an array of default values.
+   *
+   * @param bool $isStandalone
    *
    * @return void.
    */
@@ -3186,6 +3209,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   /**
    * @param array|string $profiles - name of profile(s) to create links for
    * @param array $appendProfiles - name of profile(s) to append to each link
+   *
+   * @return array
    */
   static function getCreateLinks($profiles = '', $appendProfiles = array()) {
     // Default to contact profiles
@@ -3398,6 +3423,9 @@ SELECT  group_id
    * @params Integer $profileId       Profile Id
    * @params String  $groupType       Group Type
    *
+   * @param $profileId
+   * @param null $groupType
+   *
    * @return Array   group type values
    * @static
    * @access public
@@ -3481,6 +3509,14 @@ SELECT  group_id
     return $profileIds;
   }
 
+  /**
+   * @todo what do I do?
+   * @param $source
+   * @param $destination
+   * @param bool $returnMultiSummaryFields
+   *
+   * @return array|null
+   */
   static function shiftMultiRecordFields(&$source, &$destination, $returnMultiSummaryFields = FALSE) {
     $multiSummaryFields = $returnMultiSummaryFields ? array( ) : NULL;
     foreach ($source as $field => $properties) {

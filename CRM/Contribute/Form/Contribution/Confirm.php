@@ -167,7 +167,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
               $this->_params['selectMembership'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
                 $this->_params["price_{$priceField->id}"], 'membership_type_id');
             }
-          } // if seperate payment we set contribution amount to be null, so that it will not show contribution amount same as membership amount.
+          } // if separate payment we set contribution amount to be null, so that it will not show contribution amount same as membership amount.
           elseif ((CRM_Utils_Array::value('is_separate_payment', $this->_membershipBlock)) && !empty($this->_values['fee'][$priceField->id]) && ($this->_values['fee'][$priceField->id]['name'] == "other_amount")
               && CRM_Utils_Array::value("price_{$contriPriceId}", $this->_params) < 1 && empty($this->_params["price_{$priceField->id}"])) {
               $this->_params['amount'] = null;
@@ -570,7 +570,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @access public
    */
   public function postProcess() {
-    $config = CRM_Core_Config::singleton();
     $contactID = $this->getContactID();
 
     // add a description field at the very beginning
@@ -582,7 +581,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     );
 
     // fix currency ID
-    $this->_params['currencyID'] = $config->defaultCurrency;
+    $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
     $premiumParams = $membershipParams = $tempParams = $params = $this->_params;
 
@@ -777,13 +776,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->_contactID = $contactID;
 
     //get email primary first if exist
-    $subscribtionEmail = array('email' => CRM_Utils_Array::value('email-Primary', $params));
-    if (!$subscribtionEmail['email']) {
-      $subscribtionEmail['email'] = CRM_Utils_Array::value("email-{$this->_bltID}", $params);
+    $subscriptionEmail = array('email' => CRM_Utils_Array::value('email-Primary', $params));
+    if (!$subscriptionEmail['email']) {
+      $subscriptionEmail['email'] = CRM_Utils_Array::value("email-{$this->_bltID}", $params);
     }
     // subscribing contact to groups
-    if (!empty($subscribeGroupIds) && $subscribtionEmail['email']) {
-      CRM_Mailing_Event_BAO_Subscribe::commonSubscribe($subscribeGroupIds, $subscribtionEmail, $contactID);
+    if (!empty($subscribeGroupIds) && $subscriptionEmail['email']) {
+      CRM_Mailing_Event_BAO_Subscribe::commonSubscribe($subscribeGroupIds, $subscriptionEmail, $contactID);
     }
 
     // If onbehalf-of-organization contribution / signup, add organization
@@ -889,6 +888,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         foreach ($priceFieldIds as $priceFieldId) {
           if ($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) {
             $membershipTypeIds[] = $id;
+            //@todo the value for $term is immediately overwritten. It is unclear from the code whether it was intentional to
+            // do this or a double = was intended (this ambiguity is the reason many IDEs complain about 'assignment in condition'
             $term = 1;
             if ($term = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_num_terms')) {
               $membershipTypeTerms[$id] = ($term > 1) ? $term : 1;
@@ -1120,7 +1121,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $contributionType, $online);
 
-    $config = CRM_Core_Config::singleton();
     // CRM-11885
     // if non_deductible_amount exists i.e. Additional Details fieldset was opened [and staff typed something] -> keep it.
     if (isset($params['non_deductible_amount']) && (!empty($params['non_deductible_amount']))) {
@@ -1171,7 +1171,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     //get the contrib page id.
-    $campaignId = $contributionPageId = NULL;
+    $contributionPageId = NULL;
     if ($online) {
       $contributionPageId = $form->_id;
       $campaignId = CRM_Utils_Array::value('campaign_id', $params);
@@ -1468,9 +1468,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       return NULL;
     }
 
-    $recurParams = array();
-    $config = CRM_Core_Config::singleton();
-    $recurParams['contact_id'] = $contactID;
+    $recurParams = array('contact_id' => $contactID);
     $recurParams['amount'] = CRM_Utils_Array::value('amount', $params);
     $recurParams['auto_renew'] = CRM_Utils_Array::value('auto_renew', $params);
     $recurParams['frequency_unit'] = CRM_Utils_Array::value('frequency_unit', $params);
@@ -1553,6 +1551,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   static function processOnBehalfOrganization(&$behalfOrganization, &$contactID, &$values, &$params, $fields = NULL) {
     $isCurrentEmployer = FALSE;
+    $dupeIDs = array();
     $orgID = NULL;
     if (!empty($behalfOrganization['organization_id']) && !empty($behalfOrganization['org_option'])) {
       $orgID = $behalfOrganization['organization_id'];
@@ -1659,23 +1658,23 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   static function processPcpSoft(&$params, &$contribution) {
     //add soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
     if (!empty($params['soft_credit_to'])) {
-      $contribSoftParams = array();
+      $contributionSoftParams = array();
       foreach (array(
         'pcp_display_in_roll', 'pcp_roll_nickname', 'pcp_personal_note', 'amount') as $val) {
         if (!empty($params[$val])) {
-          $contribSoftParams[$val] = $params[$val];
+          $contributionSoftParams[$val] = $params[$val];
         }
       }
 
-      $contribSoftParams['contact_id'] = $params['soft_credit_to'];
+      $contributionSoftParams['contact_id'] = $params['soft_credit_to'];
       // add contribution id
-      $contribSoftParams['contribution_id'] = $contribution->id;
+      $contributionSoftParams['contribution_id'] = $contribution->id;
       // add pcp id
-      $contribSoftParams['pcp_id'] = $params['pcp_made_through_id'];
+      $contributionSoftParams['pcp_id'] = $params['pcp_made_through_id'];
 
-      $contribSoftParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
+      $contributionSoftParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
 
-      $softContribution = CRM_Contribute_BAO_ContributionSoft::add($contribSoftParams);
+      CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
     }
   }
 
