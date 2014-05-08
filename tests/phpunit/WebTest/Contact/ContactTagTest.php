@@ -112,30 +112,29 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=div#tagtree");
 
     //add Tagset to contact
-    $this->click("//div[@id='Tag']/div[2]/div[1]/span/ul/li[1]/input");
-    $this->type("//div[@id='Tag']/div[2]/div[1]/span/ul/li[1]/input", 'tagset1');
-    $this->typeKeys("//div[@id='Tag']/div[2]/div[1]/span/ul/li[1]/input", 'tagset1');
+    $this->click("xpath=//div[@id='Tag']/div[2]/div/div/ul/li/input");
+    $this->keyDown("xpath=//div[@id='Tag']/div[2]/div/div/ul/li/input", " ");
+    $this->type("xpath=//div[@id='Tag']/div[2]/div/div/ul/li/input", 'tagset1');
+    $this->typeKeys("xpath=//div[@id='Tag']/div[2]/div/div/ul/li/input", 'tagset1');
 
     // ...waiting for drop down with results to show up...
-    $this->waitForElementPresent("css=div.token-input-dropdown-facebook");
-    $this->waitForElementPresent("css=li.token-input-dropdown-item2-facebook");
+    $this->waitForElementPresent("xpath=//div[@class='select2-result-label']");
 
     // ...need to use mouseDownAt on first result (which is a li element), click does not work
-    $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
-
-    //$this->waitForElementPresent("//div[@id='Tag']/div[3]/div[1]/ul/li[1]/span");
-    $this->click("//div[@id='Tag']/div[2]/div[1]/span/ul/li[2]/input");
-    $this->type("//div[@id='Tag']/div[2]/div[1]/span/ul/li[2]/input", 'tagset2');
-    $this->typeKeys("//div[@id='Tag']/div[2]/div[1]/span/ul/li[2]/input", 'tagset2');
+    $this->clickAt("xpath=//div[@class='select2-result-label']");
+    sleep(2);
+    $this->waitForElementPresent("//div[@id='Tag']/div[2]/div/div/ul/li/div[text()='tagset1']");
+    $this->click("xpath=//div[@id='Tag']/div[2]/div/div/ul/li[2]/input");
+    $this->keyDown("xpath=//div[@id='Tag']/div[2]/div/div/ul/li[2]/input", " ");
+    $this->type("xpath=//div[@id='Tag']/div[2]/div/div/ul/li[2]/input", 'tagset2');
+    $this->typeKeys("xpath=//div[@id='Tag']/div[2]/div/div/ul/li[2]/input", 'tagset2');
 
     // ...waiting for drop down with results to show up...
-    $this->waitForElementPresent("css=div.token-input-dropdown-facebook");
-    $this->waitForElementPresent("css=li.token-input-dropdown-item2-facebook");
+    $this->waitForElementPresent("xpath=//div[@class='select2-result-label']");
 
     // ...need to use mouseDownAt on first result (which is a li element), click does not work
-    $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
+    $this->clickAt("xpath=//div[@class='select2-result-label']");
 
-    $this->click("//div[@id='Tag']/div[2]/div[1]/span/ul/li");
 
     // Type search name in autocomplete.
     $this->click("css=input#sort_name_navigation");
@@ -143,10 +142,10 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     $this->typeKeys("css=input#sort_name_navigation", $firstName);
 
     // Wait for result list.
-    $this->waitForElementPresent("//*[@id='ui-id-1']/li[1]/a");
+    $this->waitForElementPresent("css=ul.ui-autocomplete li");
 
     // Visit contact summary page.
-    $this->click("//*[@id='ui-id-1']/li[1]/a");
+    $this->click("css=ul.ui-autocomplete li");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('tags', "tagset1, tagset2");
   }
