@@ -83,6 +83,9 @@ class CRM_Badge_BAO_Badge {
    */
   static function formatLabel(&$row, &$layout) {
     $formattedRow = array('labelFormat' => $layout['label_format_name']);
+    $formattedRow['labelTitle'] = $layout['title'];
+    $formattedRow['labelId'] = $layout['id'];
+
 
     if (!empty($layout['data']['rowElements'])) {
       foreach ($layout['data']['rowElements'] as $key => $element) {
@@ -153,11 +156,15 @@ class CRM_Badge_BAO_Badge {
   }
 
   public function labelCreator(&$formattedRow, $cellspacing = 0) {
+
     $this->lMarginLogo = 18;
     $this->tMarginName = 20;
 
     $x = $this->pdf->GetAbsX();
     $y = $this->pdf->getY();
+
+    //call hook alterBadge
+    CRM_Utils_Hook::alterBadge($formattedRow['labelTitle'], $this, $formattedRow,$formattedRow['values']);
 
     $startOffset = 0;
     if (!empty($formattedRow['image_1'])) {
