@@ -53,6 +53,8 @@ class CRM_Utils_String {
    *
    * @param  name    Name of the string
    *
+   * @param int $maxLength
+   *
    * @return string  An equivalent variable name
    *
    * @access public
@@ -121,7 +123,7 @@ class CRM_Utils_String {
    * useful while converting file names to class names etc
    *
    * @param string $string the input string
-   * @param char   $char   the character used to demarcate the componets
+   * @param \char|string $char $char   the character used to demarcate the componets
    *
    * @access public
    *
@@ -594,6 +596,8 @@ class CRM_Utils_String {
    *
    * @param string $string
    * @param int $maxLen
+   *
+   * @return string
    */
   static function ellipsify($string, $maxLen) {
     $len = strlen($string);
@@ -626,7 +630,10 @@ class CRM_Utils_String {
    * "admin foo" => array(NULL,"admin foo")
    * "cms:admin foo" => array("cms", "admin foo")
    *
+   * @param $delim
    * @param string $string e.g. "view all contacts". Syntax: "[prefix:]name"
+   * @param null $defaultPrefix
+   *
    * @return array (0 => string|NULL $prefix, 1 => string $value)
    */
   public static function parsePrefix($delim, $string, $defaultPrefix = NULL) {

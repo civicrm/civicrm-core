@@ -48,6 +48,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * sets the title of the page
    *
    * @param string $title title  for page
+   * @param $pageTitle
+   *
    * @paqram string $pageTitle
    *
    * @return void
@@ -191,6 +193,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    *
    * @param string $destination - if present, add destination to querystring (works for Drupal only)
    *
+   * @throws Exception
    * @return string - loginURL for the current CMS
    * @static
    */

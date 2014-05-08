@@ -41,6 +41,8 @@ class CRM_Utils_Zip {
   /**
    * Given a zip file which contains a single root directory, determine the root's name.
    *
+   * @param ZipArchive $zip
+   *
    * @return mixed; FALSE if #root level items !=1; otherwise, the name of base dir
    */
   static public function findBaseDirName(ZipArchive $zip) {
@@ -69,6 +71,8 @@ class CRM_Utils_Zip {
   /**
    * Given a zip file, find all directory names in the root
    *
+   * @param ZipArchive $zip
+   *
    * @return array(string), no trailing /
    */
   static public function findBaseDirs(ZipArchive $zip) {
@@ -88,6 +92,9 @@ class CRM_Utils_Zip {
 
   /**
    * Determine the name of the folder within a zip
+   *
+   * @param ZipArchive $zip
+   * @param $expected
    *
    * @return string or FALSE
    */

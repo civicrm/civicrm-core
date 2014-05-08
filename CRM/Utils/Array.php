@@ -198,7 +198,7 @@ class CRM_Utils_Array {
    *             [1] => baz
    *             [2] => 42
    *         )
-   * 
+   *
    *     [asdf] => Array
    *         (
    *             [merp] => bleep
@@ -208,12 +208,12 @@ class CRM_Utils_Array {
    *                     [1] => 2
    *                     [2] => 3
    *                 )
-   * 
+   *
    *         )
-   * 
+   *
    *     [quux] => 999
    * )
-   * 
+   *
    * Corresponding flattened array:
    * Array
    * (
@@ -380,6 +380,10 @@ class CRM_Utils_Array {
    *   (optional) Recursion depth limit.
    * @params int $depth
    *   (optional) Current recursion depth.
+   *
+   * @param $array
+   * @param int $maxdepth
+   * @param int $depth
    *
    * @return array
    *   The new copy of $array.
@@ -603,7 +607,7 @@ class CRM_Utils_Array {
    * @param string $field
    *   Name of the attribute used for sorting.
    *
-   * @return array 
+   * @return array
    *   Sorted array
    */
   static function crmArraySortByField($array, $field) {
@@ -618,7 +622,7 @@ class CRM_Utils_Array {
    * @param array $array
    *   The input array possibly containing duplicate values.
    *
-   * @return array 
+   * @return array
    *   The input array with duplicate values removed.
    */
   static function crmArrayUnique($array) {
@@ -642,7 +646,7 @@ class CRM_Utils_Array {
    * @param array $array
    *   (optional) Array to be sorted.
    *
-   * @return array 
+   * @return array
    *   Sorted array.
    */
   static function asort($array = array()) {
@@ -665,8 +669,8 @@ class CRM_Utils_Array {
    *
    * @param array $items
    *   The array from which to remove items.
-   * @param string[]|string $key,...
-   *   When passed a string, unsets $items[$key].
+   *
+   * @internal param string|\string[] $key When passed a string, unsets $items[$key].*   When passed a string, unsets $items[$key].
    *   When passed an array of strings, unsets $items[$k] for each string $k
    *   in the array.
    */

@@ -664,6 +664,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Function to add the custom fields
    *
+   * @param $id
+   * @param $name
+   * @param bool $viewOnly
+   * @param null $profileContactType
+   * @param null $fieldTypes
+   *
    * @return void
    * @access public
    */
@@ -806,6 +812,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Check template file exists
+   * @param null $suffix
+   *
+   * @return null|string
+   */
   function checkTemplateFileExists($suffix = NULL) {
     if ($this->_id) {
       $templateFile = "CRM/Contribute/Form/Contribution/{$this->_id}/{$this->_name}.{$suffix}tpl";

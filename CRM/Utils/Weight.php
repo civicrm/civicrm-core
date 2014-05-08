@@ -81,6 +81,7 @@ class CRM_Utils_Weight {
    *
    * @param string $daoName full name of the DAO
    * $param integer $weight the weight to be removed
+   * @param $fieldID
    * @param array $fieldValues field => value to be used in the WHERE
    * @param string $weightField field which contains the weight value,
    * defaults to 'weight'
@@ -255,7 +256,10 @@ class CRM_Utils_Weight {
    * @param string $daoName full name of the DAO
    * @param array $fieldValues field => value to be used in the WHERE
    * @param string $queryData data to be used, dependent on the query type
+   * @param null $additionalWhere
    * @param string $orderBy optional ORDER BY field
+   *
+   * @param null $groupBy
    *
    * @return Object CRM_Core_DAO objet that holds the results of the query
    */
@@ -457,7 +461,7 @@ class CRM_Utils_Weight {
 
     self::fixOrderOutput($url);
   }
-  
+
   static function fixOrderOutput($url) {
     if (empty($_GET['snippet']) || $_GET['snippet'] !== 'json') {
       CRM_Utils_System::redirect($url);
