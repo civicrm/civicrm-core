@@ -50,9 +50,9 @@ class CRM_Utils_Cache {
   /**
    * Constructor
    *
-   * @param array   $config  an array of configuration params
+   * @param array $config an array of configuration params
    *
-   * @return void
+   * @return \CRM_Utils_Cache
    */
   function __construct(&$config) {
     CRM_Core_Error::fatal(ts('this is just an interface and should not be called directly'));

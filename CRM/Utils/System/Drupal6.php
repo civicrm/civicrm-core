@@ -142,6 +142,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @params $errors    array   array of errors
    * @params $emailName string  field label for the 'email'
    *
+   * @param $params
+   * @param $errors
+   * @param string $emailName
+   *
    * @return void
    */
   function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
@@ -206,7 +210,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     }
   }
 
-  /*
+  /**
    * Function to get the drupal destination string. When this is passed in the
    * URL the user will be directed to it after filling in the drupal form
    *
@@ -248,6 +252,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * sets the title of the page
    *
    * @param string $title
+   * @param null $pageTitle
+   *
    * @paqram string $pageTitle
    *
    * @return void
@@ -266,8 +272,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb
    *
-   * @param string $title
-   * @param string $url
+   * @param $breadCrumbs
+   *
+   * @internal param string $title
+   * @internal param string $url
    *
    * @return void
    * @access public
@@ -497,7 +505,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     return FALSE;
   }
 
-  /*
+  /**
    * Load user into session
    */
   function loadUser($username) {
@@ -608,6 +616,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param boolean $loadUser boolean Require CMS user load.
    * @param boolean $throwError If true, print error on failure and exit.
    * @param boolean|string $realPath path to script
+   *
+   * @return bool
    */
   function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     //take the cms root path.
@@ -794,6 +804,9 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Format the url as per language Negotiation.
    *
    * @param string $url
+   *
+   * @param bool $addLanguagePart
+   * @param bool $removeLanguagePart
    *
    * @return string $url, formatted url.
    * @static

@@ -202,11 +202,14 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    *
    *function to  retrieve all subtypes
    *
-   *@param array $contactType.
-   *@return  list of all subtypes OR list of subtypes associated to
-   *a given basic contact type
-   *@static
+   * @param array $contactType .
+   * @param bool $all
+   * @param string $columnName
+   * @param bool $ignoreCache
    *
+   * @return  array of all subtypes OR list of subtypes associated to
+   *a given basic contact type
+   * @static
    */
   static function subTypes($contactType = NULL, $all = FALSE, $columnName = 'name', $ignoreCache = FALSE) {
     if ($columnName == 'name') {
@@ -221,10 +224,13 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    *
    *function to retrieve subtype pairs with name as 'subtype-name' and 'label' as value
    *
-   *@param array $contactType.
-   *@return list of subtypes with name as 'subtype-name' and 'label' as value
-   *@static
+   * @param array $contactType .
+   * @param bool $all
+   * @param string $labelPrefix
+   * @param bool $ignoreCache
    *
+   * @return list of subtypes with name as 'subtype-name' and 'label' as value
+   * @static
    */
   static function subTypePairs($contactType = NULL, $all = FALSE, $labelPrefix = '- ', $ignoreCache = FALSE) {
     $subtypes = self::subTypeInfo($contactType, $all, $ignoreCache);
@@ -240,9 +246,10 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    *
    *function to retrieve list of all types i.e basic + subtypes.
    *
-   *@return  array of basic types + all subtypes.
-   *@static
+   * @param bool $all
    *
+   * @return  array of basic types + all subtypes.
+   * @static
    */
   static function contactTypes($all = FALSE) {
     return array_keys(self::contactTypeInfo($all));
@@ -252,9 +259,11 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    *
    *function to retrieve info array about all types i.e basic + subtypes.
    *
-   *@return  array of basic types + all subtypes.
-   *@static
+   * @param bool $all
+   * @param bool $reset
    *
+   * @return  array of basic types + all subtypes.
+   * @static
    */
   static function contactTypeInfo($all = FALSE, $reset = FALSE) {
     static $_cache = NULL;
@@ -310,10 +319,13 @@ WHERE  type.name IS NOT NULL
    *
    *function to retrieve basic type pairs with name as 'built-in name' and 'label' as value
    *
-   *@param array $contactType.
-   *@return list of basictypes with name as 'built-in name' and 'label' as value
-   *@static
+   * @param bool $all
+   * @param null $typeName
+   * @param null $delimiter
    *
+   * @internal param array $contactType .
+   * @return list of basictypes with name as 'built-in name' and 'label' as value
+   * @static
    */
   static function contactTypePairs($all = FALSE, $typeName = NULL, $delimiter = NULL) {
     $types = self::contactTypeInfo($all);
@@ -423,10 +435,11 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
   /**
    * function to check if a given type is a subtype
    *
-   *@param string $subType contact subType.
-   *@return  boolean true if subType, false otherwise.
-   *@static
+   * @param string $subType contact subType.
+   * @param bool $ignoreCache
    *
+   * @return  boolean true if subType, false otherwise.
+   * @static
    */
   static function isaSubType($subType, $ignoreCache = FALSE) {
     return in_array($subType, self::subTypes(NULL, TRUE, 'name', $ignoreCache));
@@ -478,10 +491,12 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
    *
    *function to suppress all subtypes present in given array.
    *
-   *@param array $subType contact subType.
-   *@return array of suppresssubTypes .
-   *@static
+   * @param $subTypes
+   * @param bool $ignoreCache
    *
+   * @internal param array $subType contact subType.
+   * @return array of suppresssubTypes .
+   * @static
    */
   static function suppressSubTypes(&$subTypes, $ignoreCache = FALSE) {
     $subTypes = array_diff($subTypes, self::subTypes(NULL, TRUE, 'name', $ignoreCache));
@@ -492,11 +507,13 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
    *
    *function to verify if a given subtype is associated with a given basic contact type.
    *
-   *@param  string  $subType contact subType
-   *@param  string  $contactType contact Type
-   *@return boolean true if contact extends, false otherwise.
-   *@static
+   * @param  string $subType contact subType
+   * @param  string $contactType contact Type
+   * @param bool $ignoreCache
+   * @param string $columnName
    *
+   * @return boolean true if contact extends, false otherwise.
+   * @static
    */
   static function isExtendsContactType($subType, $contactType, $ignoreCache = FALSE, $columnName = 'name') {
     if (!is_array($subType)) {
@@ -549,8 +566,9 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
   /**
    * Function to delete Contact SubTypes
    *
-   * @param  int  $contactTypeId     ID of the Contact Subtype to be deleted.
+   * @param  int $contactTypeId ID of the Contact Subtype to be deleted.
    *
+   * @return bool
    * @access public
    * @static
    */
@@ -755,6 +773,13 @@ WHERE name = %1";
     return FALSE;
   }
 
+  /**
+   * @todo what does this function do?
+   * @param $contactId
+   * @param $contactType
+   *
+   * @return bool
+   */
   static function hasRelationships($contactId, $contactType) {
     $subTypeClause = NULL;
     if (self::isaSubType($contactType)) {
@@ -784,6 +809,13 @@ LIMIT 1";
     return FALSE;
   }
 
+  /**
+   * @todo what does this function do?
+   * @param $contactType
+   * @param array $subtypeSet
+   *
+   * @return array
+   */
   static function getSubtypeCustomPair($contactType, $subtypeSet = array(
     )) {
     if (empty($subtypeSet)) {
@@ -806,6 +838,17 @@ WHERE extends = %1 AND " . implode(" OR ", $subTypeClause);
     return array_unique($customSet);
   }
 
+  /**
+   * Function that does something
+   * @todo what does this function do?
+   *
+   * @param $contactID
+   * @param $contactType
+   * @param array $oldSubtypeSet
+   * @param array $newSubtypeSet
+   *
+   * @return bool
+   */
   static function deleteCustomSetForSubtypeMigration($contactID,
     $contactType,
     $oldSubtypeSet = array(),

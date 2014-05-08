@@ -45,6 +45,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * sets the title of the page
    *
    * @param string $title
+   * @param null $pageTitle
+   *
    * @paqram string $pageTitle
    *
    * @return void
@@ -65,8 +67,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb
    *
-   * @param string $title
-   * @param string $url
+   * @param $breadCrumbs
+   *
+   * @internal param string $title
+   * @internal param string $url
    *
    * @return void
    * @access public
@@ -245,9 +249,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @param $htmlize  boolean  whether to convert to html eqivalant
    * @param $frontend boolean  a gross joomla hack
    *
+   * @param bool $forceBackend
+   *
    * @return string            an HTML string containing a link to the given path.
    * @access public
-   *
    */
   function url(
     $path = NULL,
@@ -349,12 +354,15 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Authenticate the user against the wordpress db
    *
-   * @param string $name     the user name
+   * @param string $name the user name
    * @param string $password the password for the above user name
+   *
+   * @param bool $loadCMSBootstrap
+   * @param null $realPath
    *
    * @return mixed false if no auth
    *               array(
-      contactID, ufID, unique string ) if success
+   * contactID, ufID, unique string ) if success
    * @access public
    * @static
    */
@@ -435,6 +443,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *
    * @param $name string  optional username for login
    * @param $pass string  optional password for login
+   *
+   * @return bool
    */
   function loadBootStrap($name = NULL, $pass = NULL) {
     global $wp, $wp_rewrite, $wp_the_query, $wp_query, $wpdb;
@@ -528,7 +538,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     return $uid;
   }
 
-  /*
+  /**
    * Change user name in host CMS
    *
    * @param integer $ufID User ID in CMS
