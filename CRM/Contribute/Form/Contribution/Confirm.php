@@ -776,13 +776,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->_contactID = $contactID;
 
     //get email primary first if exist
-    $subscribtionEmail = array('email' => CRM_Utils_Array::value('email-Primary', $params));
-    if (!$subscribtionEmail['email']) {
-      $subscribtionEmail['email'] = CRM_Utils_Array::value("email-{$this->_bltID}", $params);
+    $subscriptionEmail = array('email' => CRM_Utils_Array::value('email-Primary', $params));
+    if (!$subscriptionEmail['email']) {
+      $subscriptionEmail['email'] = CRM_Utils_Array::value("email-{$this->_bltID}", $params);
     }
     // subscribing contact to groups
-    if (!empty($subscribeGroupIds) && $subscribtionEmail['email']) {
-      CRM_Mailing_Event_BAO_Subscribe::commonSubscribe($subscribeGroupIds, $subscribtionEmail, $contactID);
+    if (!empty($subscribeGroupIds) && $subscriptionEmail['email']) {
+      CRM_Mailing_Event_BAO_Subscribe::commonSubscribe($subscribeGroupIds, $subscriptionEmail, $contactID);
     }
 
     // If onbehalf-of-organization contribution / signup, add organization
