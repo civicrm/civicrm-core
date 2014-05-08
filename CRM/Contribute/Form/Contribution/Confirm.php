@@ -167,7 +167,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
               $this->_params['selectMembership'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
                 $this->_params["price_{$priceField->id}"], 'membership_type_id');
             }
-          } // if seperate payment we set contribution amount to be null, so that it will not show contribution amount same as membership amount.
+          } // if separate payment we set contribution amount to be null, so that it will not show contribution amount same as membership amount.
           elseif ((CRM_Utils_Array::value('is_separate_payment', $this->_membershipBlock)) && !empty($this->_values['fee'][$priceField->id]) && ($this->_values['fee'][$priceField->id]['name'] == "other_amount")
               && CRM_Utils_Array::value("price_{$contriPriceId}", $this->_params) < 1 && empty($this->_params["price_{$priceField->id}"])) {
               $this->_params['amount'] = null;
