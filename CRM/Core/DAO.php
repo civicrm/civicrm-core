@@ -318,7 +318,23 @@ class CRM_Core_DAO extends DB_DataObject {
       $query = CRM_Core_I18n_Schema::rewriteQuery($query);
     }
 
-    return parent::query($query);
+    $timeBegan = microtime(TRUE);
+    CRM_Core_Error::debug_query($query);
+
+    $result = parent::query($query);
+
+    $elapsedSeconds = sprintf("%0.6f", microtime(TRUE) - $timeBegan);
+    if (defined('CIVICRM_DEBUG_LOG_QUERY')) {
+      if (CIVICRM_DEBUG_LOG_QUERY) {
+        $msg = "Query took {$elapsedSeconds} sec.";
+        if ($this->getDatabaseResult()) {
+          $msg .= " result is {$this->getDatabaseResult()->numRows()} rows by {$this->getDatabaseResult()->numCols()} columns.";
+        }
+        CRM_Core_Error::debug_log_message($msg);
+      }
+    }
+
+    return $result;
   }
 
   /**
