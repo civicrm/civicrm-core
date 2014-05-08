@@ -36,6 +36,8 @@ class CRM_Utils_XML {
   /**
    * Read a well-formed XML file
    *
+   * @param $file
+   *
    * @return array (0 => SimpleXMLElement|FALSE, 1 => errorMessage|FALSE)
    */
   public static function parseFile($file) {
@@ -63,6 +65,8 @@ class CRM_Utils_XML {
 
   /**
    * Read a well-formed XML file
+   *
+   * @param $string
    *
    * @return array (0 => SimpleXMLElement|FALSE, 1 => errorMessage|FALSE)
    */
@@ -111,6 +115,8 @@ class CRM_Utils_XML {
    * Convert an XML element to an array
    *
    * @pararm $obj SimpleXMLElement
+   * @param $obj
+   *
    * @return array
    */
   public static function xmlObjToArray($obj) {

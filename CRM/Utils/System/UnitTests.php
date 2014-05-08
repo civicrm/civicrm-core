@@ -167,6 +167,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    *
    * @param string $destination - if present, add destination to querystring (works for Drupal only)
    *
+   * @throws Exception
    * @return string - loginURL for the current CMS
    * @static
    */

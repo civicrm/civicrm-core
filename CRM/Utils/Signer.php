@@ -107,6 +107,8 @@ class CRM_Utils_Signer {
    *
    * @param $token string, the full public token representing the signature
    * @param $params array, key-value pairs
+   *
+   * @throws Exception
    * @return bool, TRUE iff all $paramNames for the submitted validate($params) and the original sign($params)
    */
   function validate($token, $params) {

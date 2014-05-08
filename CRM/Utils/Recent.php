@@ -86,11 +86,16 @@ class CRM_Utils_Recent {
   /**
    * add an item to the recent stack
    *
-   * @param string $title  the title to display
-   * @param string $url    the link for the above title
-   * @param string $icon   a link to a graphical image
-   * @param string $id     object id
+   * @param string $title the title to display
+   * @param string $url the link for the above title
+   * @param string $id object id
    *
+   * @param $type
+   * @param $contactId
+   * @param $contactName
+   * @param array $others
+   *
+   * @internal param string $icon a link to a graphical image
    * @return void
    * @access public
    * @static

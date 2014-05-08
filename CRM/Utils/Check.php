@@ -88,6 +88,8 @@ class CRM_Utils_Check {
    * Throw an exception if any of the checks fail
    *
    * @param array|NULL $messages list of CRM_Utils_Check_Message; or NULL if the default list should be fetched
+   *
+   * @throws Exception
    */
   public function assertValid($messages = NULL) {
     if ($messages === NULL) {
