@@ -20,16 +20,23 @@ Required vars: activitySet
       {{ activity.name }}
     </td>
     <td>
-      {{ activity.status }}
+      <!-- <select ng-model="activity.status" ng-options="value for (key,value) in activityStatuses|orderBy:'value'"> -->
+      <select ng-model="activity.status" ng-options="actStatus.name as actStatus.name for actStatus in activityStatuses|orderBy:'name'">
+        <option value=""></option>
+      </select>
     </td>
     <td>
-      {{ activity.reference_activity }}
+      <select ng-model="activity.reference_activity" ng-options="actType.name as actType.name for actType in activityTypes|orderBy:'name'">
+        <option value=""></option>
+      </select>
     </td>
     <td>
-      {{ activity.reference_offset }}
+      <input type="number" ng-model="activity.reference_offset" />
     </td>
     <td>
-      {{ activity.reference_select }}
+      <select ng-model="activity.reference_select" ng-options="key as value for (key,value) in {newest: 'Newest', oldest: 'Oldest'}">
+        <option value=""></option>
+      </select>
     </td>
     <td>
       <a class="crm-hover-button" ng-click="removeItem(activitySet.activityTypes, activity)">
