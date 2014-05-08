@@ -37,16 +37,14 @@ class CRM_Contribute_BAO_Contribution_Utils {
   /**
    * Function to process payment after confirmation
    *
-   * @param object $form form object
-   * @param array $paymentParams array with payment related key
+   * @param object  $form   form object
+   * @param array   $paymentParams   array with payment related key
    * value pairs
-   * @param array $premiumParams array with premium related key
+   * @param array   $premiumParams   array with premium related key
    * value pairs
-   * @param int $contactID contact id
-   * @param int $contributionTypeId financial type id
-   * @param int|string $component component id
-   *
-   * @param null $fieldTypes
+   * @param int     $contactID       contact id
+     * @param int     $contributionTypeId   financial type id
+   * @param int     $component   component id
    *
    * @return array associated array
    *
