@@ -104,10 +104,12 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Function to send the emails
    *
-   * @param int     $contactID         contact id
-   * @param array   $values            associated array of fields
-   * @param boolean $isTest            if in test mode
+   * @param int $contactID contact id
+   * @param array $values associated array of fields
+   * @param boolean $isTest if in test mode
    * @param boolean $returnMessageText return the message text instead of sending the mail
+   *
+   * @param null $fieldTypes
    *
    * @return void
    * @access public
