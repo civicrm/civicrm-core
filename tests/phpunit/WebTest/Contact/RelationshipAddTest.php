@@ -187,7 +187,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
 
     //test for individual contact and household subtype contact
     //relationship
-    $typeb = "Household" . CRM_Core_DAO::VALUE_SEPARATOR . $householdSubtypeName;
+    $typeb = "Household__". $householdSubtypeName;
 
     //create a relationship type between different contact types
     $params = array(
@@ -206,7 +206,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $this->select('contact_types_b', "value={$params['contact_type_b']}");
     $this->type('description', $params['description']);
 
-    $params['contact_type_b'] = preg_replace('/' . CRM_Core_DAO::VALUE_SEPARATOR . '/', ' - ', $params['contact_type_b']);
+    $params['contact_type_b'] = preg_replace('/__/', ' - ', $params['contact_type_b']);
 
     //save the data.
     $this->click('_qf_RelationshipType_next-bottom');

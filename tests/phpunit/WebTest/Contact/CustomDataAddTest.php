@@ -322,9 +322,9 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("css=#tab_log a");
 
     //check the changed log
-    $this->waitForElementPresent("xpath=//div[@id='changeLog']/div[2]/div/form/div[2]/table/tbody/tr[1]/td[4]/a[contains(text(), '$firstName $lastName')]");
-    $this->waitForElementPresent("xpath=//div[@id='changeLog']/div[2]/div/form/div[2]/table/tbody/tr[1]/td/a[2]");
-    $this->click("xpath=//div[@id='changeLog']/div[2]/div/form/div[2]/table/tbody/tr[1]/td/a[2]");
+    $this->waitForElementPresent("xpath=//div[@id='changeLog']/div[2]/form/div[2]/table/tbody/tr[1]/td[4]/a[contains(text(), '$firstName $lastName')]");
+    $this->waitForElementPresent("xpath=//div[@id='changeLog']/div[2]/form/div[2]/table/tbody/tr[1]/td/a[2]");
+    $this->click("xpath=//div[@id='changeLog']/div[2]/form/div[2]/table/tbody/tr[1]/td/a[2]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='LoggingDetail']/div[2]/table/tbody/tr/td[2][contains(text(), '$value')]"));
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='LoggingDetail']/div[2]/table/tbody/tr/td[3][contains(text(), '$value1')]"));
