@@ -18,6 +18,9 @@
   crmCaseType.controller('CaseTypeCtrl', function($scope) {
     $scope.partialUrl = partialUrl;
 
+    $scope.activityStatuses = CRM.crmCaseType.actStatuses;
+    $scope.activityTypes = CRM.crmCaseType.actTypes;
+
     $scope.workflows = {
       'timeline': 'Timeline',
       'pipeline': 'Sequence'
@@ -63,6 +66,7 @@
         ]
       }
     };
+    window.ct = $scope.caseType;
 
     $scope.addActivitySet = function(workflow) {
       var activitySet = {};
