@@ -94,7 +94,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     if (!in_array($params['currencyID'], explode(',', self::CURRENCIES))) {
       return self::error('Invalid currency selection, must be one of ' . self::CURRENCIES);
     }
-    $isRecur = $params['is_recur'];
+    $isRecur = CRM_Utils_Array::value('is_recur', $params, FALSE);
     // AgentCode = $this->_paymentProcessor['signature'];
     // Password  = $this->_paymentProcessor['password' ];
     // beginning of modified sample code from IATS php api include IATS supplied api library
