@@ -46,7 +46,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->type("sort_name", "$lastName, $firstName");
    $this->click("_qf_Search_refresh");
 
-   $this->waitForElementPresent("xpath=//div[@class='crm-content-block']//div[@id='contributionSearch']");
+   $this->waitForElementPresent("xpath=//*[@id='Search']//div[@id='contributionSearch']");
    $contriIDOff = explode('&', $this->getAttribute("xpath=//div[@id='contributionSearch']//table[@class='selector row-highlight']/tbody/tr[1]/td[11]/span/a[1]@href"));
    if (!empty($contriIDOff)) {
      $contriIDOff = substr($contriIDOff[1], (strrpos($contriIDOff[1], '=') + 1));
@@ -54,7 +54,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
    $this->clickLink("xpath=//tr[@id='rowid{$contriIDOff}']/td[11]/span/a[2]", "total_amount", FALSE);
    $this->type("total_amount", "90");
-   $this->clickLink('_qf_Contribution_upload');
+   $this->clickLink('_qf_Contribution_upload','',FALSE);
 
    // Is status message correct?
    $this->waitForText('crm-notification-container', "The contribution record has been saved.");
