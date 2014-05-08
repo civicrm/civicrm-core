@@ -495,3 +495,10 @@ SELECT 'Withdrawn' AS grantstatus
 LEFT JOIN civicrm_option_value co ON LOWER(co.name) = LOWER(temp.grantstatus)
 AND option_group_id = @option_grant_status
 WHERE co.id IS NULL;
+
+-- Fix trailing single quote in grant status label
+UPDATE civicrm_option_value v
+	INNER JOIN civicrm_option_group g
+	ON v.option_group_id=g.id AND g.name='grant_status'
+	SET label='Awaiting Information'
+	WHERE v.label='Awaiting Information\'' and v.name='Awaiting Information'; 
