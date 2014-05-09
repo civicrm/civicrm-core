@@ -178,7 +178,9 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   /**
    * Return an item that could not be processed
    *
-   * @param $dao object The item returned by claimItem
+   * @param The $item
+   *
+   * @internal param object $dao The item returned by claimItem
    *
    * @return bool
    */

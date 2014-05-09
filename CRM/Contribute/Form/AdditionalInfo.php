@@ -165,8 +165,9 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
-   * @return void
+   * @param $form
    *
+   * @return void
    */
   static function buildPaymentReminders(&$form) {
     //PaymentReminders section
@@ -184,6 +185,10 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
+   * @param $params
+   * @param $contributionID
+   * @param null $premiumID
+   * @param null $options
    * @return void
    */
   static function processPremium(&$params, $contributionID, $premiumID = NULL, &$options = NULL) {
@@ -268,6 +273,9 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
+   * @param $params
+   * @param $formatted
+   * @param $form
    * @return void
    */
   static function postProcessCommon(&$params, &$formatted, &$form) {
@@ -316,8 +324,10 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @form object  of Contribution form.
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs.
+   * @param $form
+   * @param array $params (reference ) an assoc array of name/value pairs.
    * @$ccContribution boolen,  is it credit card contribution.
+   * @param bool $ccContribution
    * @access public.
    *
    * @return void.

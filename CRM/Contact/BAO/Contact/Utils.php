@@ -275,8 +275,11 @@ UNION
   /**
    * Create Current employer relationship for a individual
    *
-   * @param int    $contactID        contact id of the individual
-   * @param string $organization     it can be name or id of organization
+   * @param int $contactID contact id of the individual
+   * @param $organizationId
+   * @param null $previousEmployerID
+   *
+   * @internal param string $organization it can be name or id of organization
    *
    * @access public
    * @static

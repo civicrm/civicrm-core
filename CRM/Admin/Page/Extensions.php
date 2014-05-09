@@ -285,6 +285,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    *
    * The result format resembles the old CRM_Core_Extensions_Extension.
    *
+   * @param CRM_Extension_Info $obj
+   *
    * @return array
    */
   public static function createExtendedInfo(CRM_Extension_Info $obj) {

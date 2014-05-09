@@ -128,8 +128,10 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   /**
    * get all the registration fields
    *
-   * @param int $action   what action are we doing
-   * @param int $mode     mode
+   * @param int $action what action are we doing
+   * @param int $mode mode
+   *
+   * @param null $ctype
    *
    * @return array the fields that are needed for registration
    * @static
@@ -181,12 +183,15 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   /**
    * get all the listing fields
    *
-   * @param int     $action            what action are we doing
-   * @param int     $visibility        visibility of fields we are interested in
-   * @param bool    $considerSelector  whether to consider the in_selector parameter
-   * @param array   $ufGroupIds
+   * @param int $action what action are we doing
+   * @param int $visibility visibility of fields we are interested in
+   * @param bool $considerSelector whether to consider the in_selector parameter
+   * @param array $ufGroupIds
    * @param boolean $searchable
    *
+   * @param null $restrict
+   * @param bool $skipPermission
+   * @param int $permissionType
    * @return array   the fields that are listings related
    * @static
    * @access public

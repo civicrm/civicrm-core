@@ -186,6 +186,9 @@ class CRM_Extension_Downloader {
   /**
    * Validate that $extractedZipPath contains valid for extension $key
    *
+   * @param $key
+   * @param $extractedZipPath
+   *
    * @return bool
    */
   function validateFiles($key, $extractedZipPath) {

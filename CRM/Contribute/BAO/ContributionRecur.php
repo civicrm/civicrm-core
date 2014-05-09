@@ -201,6 +201,8 @@ SELECT r.payment_processor_id
   /**
    * Delete Recurring contribution.
    *
+   * @param $recurId
+   *
    * @return true / false.
    * @access public
    * @static

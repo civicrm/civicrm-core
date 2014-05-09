@@ -162,7 +162,10 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
+   * @param array $fields the input form values
+   *
+   * @param $files
+   * @param $contributionPageId
    *
    * @return true if no errors, else array of errors
    * @access public

@@ -212,9 +212,12 @@ class CRM_Core_BAO_Block {
   /**
    * takes an associative array and creates a block
    *
-   * @param string $blockName      block name
-   * @param array  $params         (reference ) an assoc array of name/value pairs
-   * @param array  $requiredFields fields that's are required in a block
+   * @param string $blockName block name
+   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param null $entity
+   * @param null $contactId
+   *
+   * @internal param array $requiredFields fields that's are required in a block
    *
    * @return object       CRM_Core_BAO_Block object on success, null otherwise
    * @access public

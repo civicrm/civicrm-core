@@ -176,6 +176,8 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Factory method to instantiate a new object from a table name.
    *
+   * @param string $table
+   *
    * @return void
    * @access public
    */

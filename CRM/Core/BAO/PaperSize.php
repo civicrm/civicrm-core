@@ -199,9 +199,11 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Get Paper Size field from associative array
    *
-   * @param string              $field         name of a Paper Size field
-   * @param array (reference)   $values        associative array of name/value pairs containing
+   * @param string $field name of a Paper Size field
+   * @param array (reference) $values associative array of name/value pairs containing
    *                                           Paper Size field selections
+   *
+   * @param null $default
    *
    * @return value
    * @access public

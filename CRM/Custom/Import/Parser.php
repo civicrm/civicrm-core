@@ -320,6 +320,8 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
    *
    * @param CRM_Core_Session $store
    *
+   * @param int $mode
+   *
    * @return void
    * @access public
    */

@@ -272,6 +272,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @param  int $contactId contact id
    *
+   * @param bool $visibility
+   *
    * @access public
    *
    * @return array $values this array has key-> group id and value group title

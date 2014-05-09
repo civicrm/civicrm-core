@@ -163,6 +163,7 @@ WHERE  v.option_group_id = g.id
    * @param $condition
    * @param $labelColumnName
    * @param $onlyActive
+   * @param string $keyColumnName
    */
   protected static function flushValues($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName = 'value') {
     $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName);
@@ -188,6 +189,9 @@ WHERE  v.option_group_id = g.id
    * @param $grouping   boolean if true, return the value in 'grouping' column
    * @param $localize   boolean if true, localize the results before returning
    * @param $labelColumnName string the column to use for 'label'
+   *
+   * @param bool $onlyActive
+   * @param bool $fresh
    *
    * @return array      the values as specified by the above params
    * @static

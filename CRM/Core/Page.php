@@ -312,9 +312,10 @@ class CRM_Core_Page {
   /**
    * assign value to name in template by reference
    *
-   * @param array|string $name  name  of variable
+   * @param $var
    * @param mixed $value (reference) value of varaible
    *
+   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */

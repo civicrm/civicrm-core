@@ -178,6 +178,8 @@ ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
    * @param array $entityElements the array containing entity_id and
    * entity_table name
    *
+   * @param null $type
+   *
    * @return array  the array of phone ids which are potential numbers
    * @access public
    * @static

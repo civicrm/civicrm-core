@@ -194,11 +194,15 @@ class CRM_Core_Action {
    * given a set of links and a mask, return the html action string for
    * the links associated with the mask
    *
-   * @param array $links  the set of link items
-   * @param int   $mask   the mask to be used. a null mask means all items
+   * @param array $links the set of link items
+   * @param int $mask the mask to be used. a null mask means all items
    * @param array $values the array of values for parameter substitution in the link items
-   * @param string  $extraULName            enclosed extra links in this UL.
-   * @param boolean $enclosedAllInSingleUL  force to enclosed all links in single UL.
+   * @param string $extraULName enclosed extra links in this UL.
+   * @param boolean $enclosedAllInSingleUL force to enclosed all links in single UL.
+   *
+   * @param null $op
+   * @param null $objectName
+   * @param null $objectId
    *
    * @return string       the html string
    * @access public

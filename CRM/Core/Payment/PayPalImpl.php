@@ -181,7 +181,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   /**
    * do the express checkout at paypal. Check PayPal documentation for more information
    *
-   * @param  string $token the key associated with this transaction
+   * @param $params
+   *
+   * @internal param string $token the key associated with this transaction
    *
    * @return array the result in an nice formatted array (or an error object)
    * @public
@@ -290,6 +292,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *
    * @param  array $params assoc array of input parameters for this transaction
    *
+   * @param string $component
    * @return array the result in an nice formatted array (or an error object)
    * @public
    */
