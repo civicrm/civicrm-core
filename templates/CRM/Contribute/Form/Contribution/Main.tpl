@@ -340,10 +340,6 @@
   {elseif $onBehalfRequired}
     showOnBehalf(true);
   {/if}
-
-  {if $honor_block_is_active AND $form.soft_credit_type_id.html}
-    enableHonorType();
-  {/if}
   {literal}
 
 	cj('input[name="soft_credit_type_id"]').on('change', function() {
@@ -351,21 +347,12 @@
 	});
 	
   function enableHonorType( ) {
-    var element = document.getElementsByName("soft_credit_type_id");
-    for (var i = 0; i < element.length; i++ ) {
-      var isHonor = false;
-      if ( element[i].checked == true ) {
-        var isHonor = true;
-        break;
-      }
-    }
-    if ( isHonor ) {
+    var selectedValue = cj('input[name="soft_credit_type_id"]:checked'); 
+    if ( selectedValue.val() > 0) {
       cj('#honorType').show();
-      cj('#honorTypeEmail').show();
     }
     else {
       cj('#honorType').hide();
-      cj('#honorTypeEmail').hide();
     }
   }
 
@@ -423,6 +410,7 @@
 
   CRM.$(function($) {
     toggleConfirmButton();
+		enableHonorType();
   });
 
   function showHidePayPalExpressOption() {
