@@ -14,9 +14,10 @@ Required vars: activitySet
   </tr>
   </thead>
 
-  <tbody>
+  <tbody ui-sortable ng-model="activitySet.activityTypes">
   <tr ng-repeat="activity in activitySet.activityTypes">
     <td>
+      <span class="icon ui-icon-grip-dotted-vertical"></span>
       {{ activity.name }}
     </td>
     <td>
@@ -44,6 +45,9 @@ Required vars: activitySet
       </a>
     </td>
   </tr>
+  </tbody>
+
+  <tfoot>
   <tr class="addRow">
     <td colspan="6">
       <div crm-add-name
@@ -53,5 +57,5 @@ Required vars: activitySet
               />
     </td>
   </tr>
-  </tbody>
+  </tfoot>
 </table>
