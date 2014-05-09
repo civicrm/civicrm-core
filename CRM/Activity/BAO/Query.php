@@ -458,7 +458,7 @@ class CRM_Activity_BAO_Query {
     foreach ($activityStatus as $activityStatusID => $activityStatusName) {
       $activity_status[] = $form->createElement('checkbox', $activityStatusID, NULL, $activityStatusName);
     }
-    $form->addGroup($activity_status, 'activity_status', ts('Activity Status'), TRUE);
+    $form->addGroup($activity_status, 'activity_status', ts('Activity Status'));
     $form->setDefaults(array('activity_status[1]' => 1, 'activity_status[2]' => 1));
     $form->addElement('text', 'activity_subject', ts('Subject'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
     $form->addYesNo('activity_test', ts('Activity is a Test?'));
