@@ -69,8 +69,12 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * @param int $contactId - contact whose activities we want to display
    * @param int $permission - the permission we have for this contact
    *
-   * @return CRM_Contact_Selector_Activity
-   * @access public
+   * @param bool $admin
+   * @param string $context
+   * @param null $activityTypeIDs
+   *
+   * @return \CRM_Activity_Selector_Activity
+  @access public
    */
   function __construct($contactId,
                        $permission,

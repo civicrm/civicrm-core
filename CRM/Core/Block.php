@@ -280,6 +280,8 @@ class CRM_Core_Block {
    * php is lame and u cannot call functions from static initializers
    * hence this hack
    *
+   * @param $id
+   *
    * @return void
    * @access private
    */

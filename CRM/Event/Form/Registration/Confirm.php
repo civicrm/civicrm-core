@@ -821,6 +821,13 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Process the contribution
    *
+   * @param $form
+   * @param $params
+   * @param $result
+   * @param $contactID
+   * @param bool $pending
+   * @param bool $isAdditionalAmount
+   *
    * @return void
    * @access public
    */
@@ -934,6 +941,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Fix the Location Fields
    *
+   * @param $params
+   * @param $fields
+   * @param $form
+   *
    * @return void
    * @access public
    */
@@ -977,6 +988,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
   /**
    * function to update contact fields
+   *
+   * @param $contactID
+   * @param $params
+   * @param $fields
+   * @param $form
    *
    * @return void
    * @access public

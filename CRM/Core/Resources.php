@@ -128,6 +128,8 @@ class CRM_Core_Resources {
    * Construct a resource manager
    *
    * @param CRM_Extension_Mapper $extMapper Map extension names to their base path or URLs.
+   * @param $cache
+   * @param null $cacheCodeKey
    */
   public function __construct($extMapper, $cache, $cacheCodeKey = NULL) {
     $this->extMapper = $extMapper;
@@ -545,7 +547,7 @@ class CRM_Core_Resources {
    */
   function addLocalization(&$js) {
     $config = CRM_Core_Config::singleton();
-    
+
     // Localize select2 strings
     $contactSearch = json_encode($config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...'));
     $otherSearch = json_encode(ts('Enter search term...'));

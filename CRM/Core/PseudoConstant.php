@@ -819,10 +819,11 @@ WHERE  id = %1";
    * @access public
    * @static
    *
-   * @param int $id - Optional id to return
+   * @param bool|int $id - Optional id to return
+   *
+   * @param bool $applyLimit
    *
    * @return array - array reference of all countries.
-   *
    */
   public static function country($id = FALSE, $applyLimit = TRUE) {
     if (($id && !CRM_Utils_Array::value($id, self::$country)) || !self::$country || !$id) {
@@ -961,8 +962,9 @@ WHERE  id = %1";
    * @access public
    * @static
    *
-   * @return mixed - instance of CRM_Contact_BAO_GroupNesting
+   * @param bool $styledLabels
    *
+   * @return mixed - instance of CRM_Contact_BAO_GroupNesting
    */
   public static function &groupIterator($styledLabels = FALSE) {
     if (!self::$groupIterator) {
@@ -986,14 +988,13 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @param string $groupType     type of group(Access/Mailing)
-   * @param boolen $excludeHidden exclude hidden groups.
-
+   * @param string $groupType type of group(Access/Mailing)
+   * @param bool|\boolen $excludeHidden exclude hidden groups.
+   *
    * @access public
    * @static
    *
    * @return array - array reference of all groups.
-   *
    */
   public static function group($groupType = NULL, $excludeHidden = TRUE) {
     return CRM_Core_Permission::group($groupType, $excludeHidden);
@@ -1011,8 +1012,11 @@ WHERE  id = %1";
    * @access public
    * @static
    *
-   * @return array - array reference of all groups.
+   * @param bool $onlyPublic
+   * @param null $groupType
+   * @param bool $excludeHidden
    *
+   * @return array - array reference of all groups.
    */
   public static function &staticGroup($onlyPublic = FALSE, $groupType = NULL, $excludeHidden = TRUE) {
     if (!self::$staticGroup) {

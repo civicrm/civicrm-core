@@ -133,10 +133,13 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * Given an entity_id and entity_table, check for corresponding entity_financial_trxn and financial_trxn record.
    * NOTE: This should be moved to separate BAO for EntityFinancialTrxn when we start adding more code for that object.
    *
-   * @param string $entityTable name of the entity table usually 'civicrm_contact'
-   * @param int $entityID id of the entity usually the contactID.
-   * @param string  $orderBy to get single trxn id for a entity table i.e last or first.
+   * @param $entity_id
+   * @param string $orderBy to get single trxn id for a entity table i.e last or first.
    *
+   * @param bool $newTrxn
+   *
+   * @internal param string $entityTable name of the entity table usually 'civicrm_contact'
+   * @internal param int $entityID id of the entity usually the contactID.
    * @return array( ) reference $tag array of catagory id's the contact belongs to.
    *
    * @access public

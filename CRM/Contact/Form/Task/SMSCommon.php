@@ -84,6 +84,8 @@ class CRM_Contact_Form_Task_SMSCommon {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function buildQuickForm(&$form) {

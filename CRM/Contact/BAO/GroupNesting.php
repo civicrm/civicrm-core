@@ -280,9 +280,9 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * identified by $groupId; does not delete child group, just the
    * association between the two
    *
-   * @param            $parentID         The id of the group to remove the child from
    * @param            $childID          The id of the child group being removed
    *
+   * @internal param \The $parentID id of the group to remove the child from
    * @return           void
    *
    * @access public

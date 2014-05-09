@@ -40,13 +40,13 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
   /**
    * Connect to the supplied IMAP server and make sure the two mailboxes exist
    *
-   * @param string $host      host to connect to
-   * @param string $username  authentication username
-   * @param string $password  authentication password
-   * @param bool   $ssl       whether to use IMAP or IMAPS
-   * @param string $folder    name of the inbox folder
+   * @param string $host host to connect to
+   * @param string $username authentication username
+   * @param string $password authentication password
+   * @param bool $ssl whether to use IMAP or IMAPS
+   * @param string $folder name of the inbox folder
    *
-   * @return void
+   * @return \CRM_Mailing_MailStore_Imap
    */
   function __construct($host, $username, $password, $ssl = TRUE, $folder = 'INBOX') {
     // default to INBOX if an empty string

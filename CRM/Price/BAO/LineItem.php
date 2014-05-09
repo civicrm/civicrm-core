@@ -109,6 +109,9 @@ AND li.entity_id = {$entityId}
    * @param $entityId  int    participant/contribution id
    * @param $entity    string participant/contribution.
    *
+   * @param null $isQuick
+   * @param bool $isQtyZero
+   *
    * @return array of line items
    */
   static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL , $isQtyZero = TRUE) {
@@ -277,12 +280,16 @@ AND li.entity_id = {$entityId}
 
   /**
    * Function to process price set and line items.
-   * @param int $contributionId contribution id
+   *
+   * @param $entityId
    * @param array $lineItem line item array
    * @param object $contributionDetails
-   * @param decimal $initAmount amount
    * @param string $entityTable entity table
    *
+   * @param bool $update
+   *
+   * @internal param int $contributionId contribution id
+   * @internal param \decimal $initAmount amount
    * @access public
    * @return void
    * @static

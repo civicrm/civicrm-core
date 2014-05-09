@@ -90,6 +90,8 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
   /**
    * Browse all jobs.
    *
+   * @param null $action
+   *
    * @return void
    * @access public
    * @static

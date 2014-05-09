@@ -338,7 +338,8 @@ class CRM_Badge_BAO_Badge {
   /**
    * function to build badges parameters before actually creating badges.
    *
-   * @param  array  $params associated array of submitted values
+   * @param  array $params associated array of submitted values
+   * @param $form
    * @params object $form form/controller object
    *
    * @return void

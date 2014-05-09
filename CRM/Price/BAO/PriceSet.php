@@ -788,6 +788,8 @@ WHERE  id = %1";
   /**
    * Function to build the price set form.
    *
+   * @param $form
+   *
    * @return void
    * @access public
    */

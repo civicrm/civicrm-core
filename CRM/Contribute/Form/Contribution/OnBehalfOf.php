@@ -37,6 +37,8 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
   /**
    * Function to set variables up before form is built
    *
+   * @param $form
+   *
    * @return void
    * @access public
    */

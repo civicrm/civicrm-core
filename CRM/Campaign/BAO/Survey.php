@@ -1033,6 +1033,8 @@ INNER JOIN  civicrm_survey survey ON ( activity.source_record_id = survey.id )
   /**
    * Check and update the survey respondents.
    *
+   * @param $params
+   *
    * @return array success message
    */
   public function releaseRespondent($params) {

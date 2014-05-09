@@ -125,6 +125,10 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    *
    * @access public
    *
+   * @param $form
+   * @param $params
+   * @param $activity
+   *
    * @return void
    */
   static function endPostProcess(&$form, &$params, $activity) {
