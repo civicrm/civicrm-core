@@ -89,6 +89,8 @@ class Container {
 
   /**
    * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
+   * @param $magicFunctionProvider
+   *
    * @return \Civi\API\Kernel
    */
   public function createApiKernel($dispatcher, $magicFunctionProvider) {

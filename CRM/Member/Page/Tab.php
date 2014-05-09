@@ -376,7 +376,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
           $urlParams .= "&qfKey=$qfKey";
         }
         $form->assign('searchKey', $qfKey);
-        
+
         if ($searchContext) {
           $url = CRM_Utils_System::url("civicrm/$searchContext/search", $urlParams);
         }
@@ -434,6 +434,12 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
   /**
    * Get action links
+   *
+   * @param string $status
+   * @param null $isPaymentProcessor
+   * @param null $accessContribution
+   * @param bool $isCancelSupported
+   * @param bool $isUpdateBilling
    *
    * @return array (reference) of action links
    * @static

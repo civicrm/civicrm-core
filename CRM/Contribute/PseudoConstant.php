@@ -346,6 +346,9 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param null $pageType
+   * @param null $id
+   *
    * @return array - array reference of all pcp if any
    * @static
    */
@@ -378,6 +381,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
+   * @param string $column
    * @return array - array reference of all PCP activity statuses
    */
   public static function &pcpStatus($column = 'label') {
@@ -402,6 +406,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
+   * @param $financialTypeId
+   * @param null $relationTypeId
    * @return array - array reference of all financial accounts for a Financial type
    */
   public static function financialAccountType($financialTypeId, $relationTypeId = NULL) {
@@ -431,6 +437,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param null $id
    * @return array - array reference of all batches if any
    * @static
    */

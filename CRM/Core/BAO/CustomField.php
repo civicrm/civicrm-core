@@ -585,11 +585,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   /**
    * Return the field ids and names (with groups) for import purpose.
    *
-   * @param int      $contactType     Contact type
-   * @param boolean  $showAll         If true returns all fields (includes disabled fields)
-   * @param boolean  $onlyParent      return fields ONLY related to basic types
-   * @param boolean  $search          when called from search and multiple records need to be returned
-   * @param boolean  $checkPermission if false, do not include permissioning clause
+   * @param int|string $contactType Contact type
+   * @param boolean $showAll If true returns all fields (includes disabled fields)
+   * @param boolean $onlyParent return fields ONLY related to basic types
+   * @param boolean $search when called from search and multiple records need to be returned
+   * @param boolean $checkPermission if false, do not include permissioning clause
+   *
+   * @param bool $withMultiple
    *
    * @return array   $fields -
    *
@@ -654,8 +656,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   /**
    * Get the field id from an import key
    *
-   * @param string $key       The key to parse
+   * @param string $key The key to parse
    *
+   * @param bool $all
    * @return int|null         The id (if exists)
    * @access public
    * @static
@@ -714,13 +717,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   /**
    * This function for building custom fields
    *
-   * @param CRM_Core_Form  $qf             form object (reference)
-   * @param string  $elementName    name of the custom field
+   * @param CRM_Core_Form $qf form object (reference)
+   * @param string $elementName name of the custom field
+   * @param $fieldId
    * @param boolean $inactiveNeeded
-   * @param boolean $userRequired   true if required else false
-   * @param boolean $search         true if used for search else false
-   * @param string  $label          label for custom field
+   * @param bool $useRequired
+   * @param boolean $search true if used for search else false
+   * @param string $label label for custom field
    *
+   * @internal param bool $userRequired true if required else false
    * @access public
    * @static
    */

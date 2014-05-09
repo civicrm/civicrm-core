@@ -381,6 +381,9 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param $component
+   * @param $paymentProcessor
+   *
    * @return object
    * @static
    */
@@ -413,11 +416,13 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   /**
    * The function returns the component(Event/Contribute..), given the google-order-no and merchant-private-data
    *
-   * @param xml     $xml_response   response send by google in xml format
-   * @param array   $privateData    contains the name value pair of <merchant-private-data>
-   * @param int     $orderNo        <order-total> send by google
-   * @param string  $root           root of xml-response
+   * @param array $privateData contains the name value pair of <merchant-private-data>
+   * @param int $orderNo <order-total> send by google
+   * @param string $root root of xml-response
    *
+   * @param $response
+   * @param $serial
+   * @internal param \xml $xml_response response send by google in xml format
    * @return array context of this call (test, module, payment processor id)
    * @static
    */

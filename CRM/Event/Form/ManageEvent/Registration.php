@@ -383,7 +383,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Function to build Confirmation Block
    *
-   * @param int $pageId
+   * @param $form
+   *
+   * @internal param int $pageId
    * @static
    */
   function buildConfirmationBlock(&$form) {
@@ -405,7 +407,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Function to build Email Block
    *
-   * @param int $pageId
+   * @param $form
+   *
+   * @internal param int $pageId
    * @static
    */
   function buildMailBlock(&$form) {
@@ -448,7 +452,11 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param $values
+   * @param $files
+   * @param $form
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -638,6 +646,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Collect all email fields for an array of profile ids
    *
+   * @param $profileIds
    * @return boolean
    */
   static function getEmailFields($profileIds) {
@@ -658,6 +667,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Check if a profile contains required fields
    *
+   * @param $profileIds
    * @return boolean
    */
   static function isProfileComplete($profileIds) {
@@ -691,6 +701,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Check if the profiles collect enough information to dedupe
    *
+   * @param $profileIds
+   * @param int $rgId
    * @return boolean
    */
 

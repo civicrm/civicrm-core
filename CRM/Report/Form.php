@@ -782,7 +782,10 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Setter for $_id
-   * @param integer $id
+   *
+   * @param $instanceid
+   *
+   * @internal param int $id
    */
   function setID($instanceid) {
     $this->_id = $instanceid;
@@ -790,8 +793,9 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Setter for $_force
-   * @param boolean $force
-   */
+   * @param $isForce
+   * @internal param bool $force
+*/
   function setForce($isForce) {
     $this->_force = $isForce;
   }

@@ -673,6 +673,8 @@ WHERE  civicrm_pledge_payment.id = {$paymentId}
    *
    * @param int $pledgeID pledge id
    *
+   * @param int $limit
+   *
    * @return array associated array of pledge details
    * @static
    */

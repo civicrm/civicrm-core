@@ -765,9 +765,12 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   /**
    * Check if there is a contribution with the same trxn_id or invoice_id
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
-   * @param array  $duplicates (reference ) store ids of duplicate contribs
+   * @param $input
+   * @param array $duplicates (reference ) store ids of duplicate contribs
    *
+   * @param null $id
+   *
+   * @internal param array $params (reference ) an assoc array of name/value pairs
    * @return boolean true if duplicate, false otherwise
    * @access public
    * static

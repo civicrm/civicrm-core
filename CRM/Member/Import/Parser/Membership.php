@@ -583,11 +583,13 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
   /**
    *  to calculate join, start and end dates
    *
-   *  @param Array $calcDates array of dates returned by getDatesForMembershipType()
+   * @param Array $calcDates array of dates returned by getDatesForMembershipType()
    *
-   *  @return Array formatted containing date values
+   * @param $formatted
    *
-   *  @access public
+   * @return Array formatted containing date values
+   *
+   * @access public
    */
   function formattedDates($calcDates, &$formatted) {
     $dates = array(

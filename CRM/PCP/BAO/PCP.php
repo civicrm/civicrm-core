@@ -613,14 +613,16 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * 1. when their PCP status is changed by site admin.
    * 2. when supporter initially creates a Personal Campaign Page ($isInitial set to true).
    *
-   * @param int $pcpId      campaign page id
-   * @param int $newStatus  pcp status id
-   * @param int $isInitial  is it the first time, campaign page has been created by the user
+   * @param int $pcpId campaign page id
+   * @param int $newStatus pcp status id
+   * @param bool|int $isInitial is it the first time, campaign page has been created by the user
    *
+   * @param string $component
+   *
+   * @throws Exception
    * @return null
    * @access public
    * @static
-   *
    */
   static function sendStatusUpdate($pcpId, $newStatus, $isInitial = FALSE, $component = 'contribute') {
     $pcpStatus = CRM_Core_OptionGroup::values("pcp_status");
@@ -709,10 +711,10 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *
    * @param int $id campaign page id
    *
+   * @param $is_active
    * @return null
    * @access public
    * @static
-   *
    */
   static function setDisable($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_PCP_DAO_PCP', $id, 'is_active', $is_active);
@@ -721,12 +723,13 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Function to get pcp block is active
    *
-   * @param int $id campaign page id
+   * @param $pcpId
+   * @param $component
+   * @internal param int $id campaign page id
    *
    * @return int
    * @access public
    * @static
-   *
    */
   static function getStatus($pcpId, $component) {
     $query = "
@@ -745,12 +748,13 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Function to get pcp block is enabled for component page
    *
-   * @param int $id contribution page id
+   * @param $pageId
+   * @param $component
+   * @internal param int $id contribution page id
    *
    * @return String
    * @access public
    * @static
-   *
    */
   static function getPcpBlockStatus($pageId, $component) {
     $query = "
@@ -877,12 +881,13 @@ WHERE pcp.id = %1";
   /**
    * Function to get pcp entity table given a component.
    *
-   * @param int $id campaign page id
+   * @param $component
+   *
+   * @internal param int $id campaign page id
    *
    * @return String
    * @access public
    * @static
-   *
    */
   static function getPcpEntityTable($component) {
     $entity_table_map = array(

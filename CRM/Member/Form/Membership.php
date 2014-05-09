@@ -838,6 +838,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
+   * @param $files
+   * @param $self
+   *
+   * @throws CiviCRM_API3_Exception
    * @return mixed true or array of errors
    * @access public
    * @static

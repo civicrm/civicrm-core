@@ -386,7 +386,7 @@ class CRM_Core_Resources {
    * @param $ext string, extension name; use 'civicrm' for core
    * @param $file string, file path -- relative to the extension base dir
    *
-   * @return (string|bool), full file path or FALSE if not found
+   * @return bool|string (string|bool), full file path or FALSE if not found
    */
   public function getPath($ext, $file) {
     // TODO consider caching results
@@ -402,6 +402,8 @@ class CRM_Core_Resources {
    *
    * @param $ext string, extension name; use 'civicrm' for core
    * @param $file string, file path -- relative to the extension base dir
+   * @param bool $addCacheCode
+   *
    * @return string, URL
    */
   public function getUrl($ext, $file = NULL, $addCacheCode = FALSE) {
@@ -437,6 +439,7 @@ class CRM_Core_Resources {
    * TODO: Separate the functional code (like addStyle/addScript) from the policy code
    * (like addCoreResources/addCoreStyles).
    *
+   * @param string $region
    * @return CRM_Core_Resources
    * @access public
    */

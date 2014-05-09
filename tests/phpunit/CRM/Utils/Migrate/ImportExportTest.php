@@ -172,9 +172,14 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $customGroupParams
-   * @param $fieldParams
-   * @param $expectedXmlFilePath
+   * @param $expectCustomGroup
+   * @param $expectCustomField
+   * @param $inputXmlFilePath
+   *
+   * @throws CRM_Core_Exception
+   * @internal param $customGroupParams
+   * @internal param $fieldParams
+   * @internal param $expectedXmlFilePath
    * @dataProvider basicXmlTestCases
    */
   function testBasicXMLImports($expectCustomGroup, $expectCustomField, $inputXmlFilePath) {

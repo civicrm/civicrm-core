@@ -406,15 +406,21 @@ class CRM_Contact_BAO_Query {
   /**
    * class constructor which also does all the work
    *
-   * @param array   $params
-   * @param array   $returnProperties
-   * @param array   $fields
+   * @param array $params
+   * @param array $returnProperties
+   * @param array $fields
    * @param boolean $includeContactIds
    * @param boolean $strict
-   * @param boolean $mode - mode the search is operating on
+   * @param bool|int $mode - mode the search is operating on
    *
-   * @return Object
-   * @access public
+   * @param bool $skipPermission
+   * @param bool $searchDescendentGroups
+   * @param bool $smartGroupCache
+   * @param null $displayRelationshipType
+   * @param string $operator
+   *
+   * @return \CRM_Contact_BAO_Query
+  @access public
    */
   function __construct(
     $params = NULL, $returnProperties = NULL, $fields = NULL,

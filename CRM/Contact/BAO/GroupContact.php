@@ -501,7 +501,10 @@ SELECT    *
    *
    *
    * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $contactId    contact id
+   * @param array $contactId contact id
+   *
+   * @param bool $visibility
+   * @param string $method
    *
    * @return void
    * @access public
@@ -685,8 +688,13 @@ AND       group_id IN ( $groupIDString )
   /**
    * Given an array of contact ids, add all the contacts to the group
    *
-   * @param array  $contactIds (reference ) the array of contact ids to be added
-   * @param int    $groupId    the id of the group
+   * @param $contactIDs
+   * @param $groupID
+   * @param string $method
+   * @param string $status
+   * @param null $tracking
+   * @internal param array $contactIds (reference ) the array of contact ids to be added
+   * @internal param int $groupId the id of the group
    *
    * @return array             (total, added, notAdded) count of contacts added to group
    * @access public

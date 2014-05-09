@@ -344,6 +344,8 @@ SELECT  id, html_type
   /**
    * Function to build the form
    *
+   * @param $form
+   *
    * @return void
    * @access public
    */

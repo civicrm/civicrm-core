@@ -786,7 +786,9 @@ GROUP BY  currency
   /**
    * Function to get pledge record count for a Contact
    *
-   * @param int $contactId Contact ID
+   * @param $contactID
+   *
+   * @internal param int $contactId Contact ID
    *
    * @return int count of pledge records
    * @access public

@@ -625,7 +625,9 @@ LIMIT      0, 10
   /**
    * function to get the information to map a event
    *
-   * @param  array  $ids    the list of ids for which we want map info
+   * @param $id
+   *
+   * @internal param array $ids the list of ids for which we want map info
    *
    * @return null|string     title of the event
    * @static
@@ -871,9 +873,12 @@ WHERE civicrm_event.is_active = 1
    * This function is to make a copy of a Event, including
    * all the fields in the event Wizard
    *
-   * @param int     $id          the event id to copy
+   * @param int $id the event id to copy
    *        obj     $newEvent    object of CRM_Event_DAO_Event
    *        boolean $afterCreate call to copy after the create function
+   * @param null $newEvent
+   * @param bool $afterCreate
+   *
    * @return void
    * @access public
    */

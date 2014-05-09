@@ -215,6 +215,8 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
   /**
    * @param string $entity
    * @param string $action
+   * @param $version
+   *
    * @return string
    */
   protected function getFunctionName($entity, $action, $version) {

@@ -588,6 +588,10 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   /**
    * Function to build the petition profile form
    *
+   * @param $id
+   * @param $name
+   * @param bool $viewOnly
+   *
    * @return void
    * @access public
    */
