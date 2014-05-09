@@ -11,9 +11,10 @@ Required vars: caseType
   </tr>
   </thead>
 
-  <tbody>
+  <tbody ui-sortable ng-model="caseType.definition.activityTypes">
   <tr ng-repeat="activityType in caseType.definition.activityTypes">
     <td>
+      <span class="icon ui-icon-grip-dotted-vertical"></span>
       {{ activityType.name }}
     </td>
     <td>
@@ -25,6 +26,9 @@ Required vars: caseType
       </a>
     </td>
   </tr>
+  </tbody>
+
+  <tfoot>
   <tr class="addRow">
     <td colspan="3">
       <div crm-add-name
@@ -34,5 +38,5 @@ Required vars: caseType
               />
     </td>
   </tr>
-  </tbody>
+  </tfoot>
 </table>

@@ -54,6 +54,8 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
   public static function getAngularModules() {
     $angularModules = array();
     $angularModules['ui.utils'] = array('ext' => 'civicrm', 'js' => array('packages/bower_components/angular-ui-utils/ui-utils.min.js'));
+    $angularModules['ui.sortable'] = array('ext' => 'civicrm', 'js' => array('packages/bower_components/angular-ui-sortable/sortable.min.js'));
+
     foreach (CRM_Core_Component::getEnabledComponents() as $component) {
       $angularModules = array_merge($angularModules, $component->getAngularModules());
     }
