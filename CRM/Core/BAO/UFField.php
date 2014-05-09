@@ -142,7 +142,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     $ufField->field_name = $params['field_name'][1];
     if ($params['field_name'][1] == 'url') {
       $ufField->website_type_id = CRM_Utils_Array::value(2, $params['field_name'], NULL);
-    } 
+    }
     else {
       $ufField->location_type_id = (CRM_Utils_Array::value(2, $params['field_name'])) ? $params['field_name'][2] : 'NULL';
     }
@@ -219,7 +219,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     $locationTypeId = NULL;
     if ($params['field_name'][1] == 'url') {
       $ufField->website_type_id = CRM_Utils_Array::value(2, $params['field_name']);
-    } 
+    }
     else {
       $locationTypeId = CRM_Utils_Array::value(2, $params['field_name']);
       $ufField->website_type_id = NULL;
@@ -929,12 +929,7 @@ SELECT  id
           'name' => 'contribution_note',
           'title' => ts('Contribution Note'),
         );
-        if ($gid && CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gid, 'name') == 'contribution_batch_entry') {
-          $fields['Contribution'] = array_merge($contribFields, self::getContribBatchEntryFields());
-        }
-        else {
-          $fields['Contribution'] = $contribFields;
-        }
+        $fields['Contribution'] = array_merge($contribFields, self::getContribBatchEntryFields());
       }
     }
 
@@ -1093,6 +1088,10 @@ SELECT  id
         'soft_credit' => array(
           'name' => 'soft_credit',
           'title' => ts('Soft Credit'),
+        ),
+        'soft_credit_type' => array(
+          'name' => 'soft_credit_type',
+          'title' => ts('Soft Credit Type'),
         ),
         'product_name' => array(
           'name' => 'product_name',
