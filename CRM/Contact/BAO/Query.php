@@ -2231,6 +2231,7 @@ class CRM_Contact_BAO_Query {
    * @param array $params
    * @param array $fields
    * @param array $tables
+   * @param $whereTables
    * @param boolean $strict
    *
    * @return string
@@ -2253,8 +2254,11 @@ class CRM_Contact_BAO_Query {
    *
    * @param array $tables tables that need to be included in this from clause
    *                      if null, return mimimal from clause (i.e. civicrm_contact)
-   * @param array $inner  tables that should be inner-joined
-   * @param array $right  tables that should be right-joined
+   * @param array $inner tables that should be inner-joined
+   * @param array $right tables that should be right-joined
+   *
+   * @param bool $primaryLocation
+   * @param int $mode
    *
    * @return string the from clause
    * @access public
@@ -2482,6 +2486,8 @@ class CRM_Contact_BAO_Query {
   /**
    * WHERE / QILL clause for deleted_contacts
    *
+   * @param $values
+   *
    * @return void
    */
   function deletedContacts($values) {
@@ -2494,6 +2500,8 @@ class CRM_Contact_BAO_Query {
 
   /**
    * where / qill clause for contact_type
+   *
+   * @param $values
    *
    * @return void
    * @access public
@@ -2561,6 +2569,8 @@ class CRM_Contact_BAO_Query {
   /**
    * where / qill clause for contact_sub_type
    *
+   * @param $values
+   *
    * @return void
    * @access public
    */
@@ -2593,6 +2603,8 @@ class CRM_Contact_BAO_Query {
 
   /**
    * where / qill clause for groups
+   *
+   * @param $values
    *
    * @return void
    * @access public
@@ -2701,6 +2713,8 @@ class CRM_Contact_BAO_Query {
   /**
    * where / qill clause for smart groups
    *
+   * @param $values
+   *
    * @return void
    * @access public
    */
@@ -2765,6 +2779,8 @@ WHERE  id IN ( $groupIDs )
   /**
    * where / qill clause for cms users
    *
+   * @param $values
+   *
    * @return void
    * @access public
    */
@@ -2786,6 +2802,8 @@ WHERE  id IN ( $groupIDs )
 
   /**
    * all tag search specific
+   *
+   * @param $values
    *
    * @return void
    * @access public
@@ -2852,6 +2870,8 @@ WHERE  id IN ( $groupIDs )
 
   /**
    * where / qill clause for tag
+   *
+   * @param $values
    *
    * @return void
    * @access public
@@ -2938,6 +2958,8 @@ WHERE  id IN ( $groupIDs )
   /**
    * where/qill clause for notes
    *
+   * @param $values
+   *
    * @return void
    * @access public
    */
@@ -3006,6 +3028,8 @@ WHERE  id IN ( $groupIDs )
 
   /**
    * where / qill clause for sort_name
+   *
+   * @param $values
    *
    * @return void
    * @access public
@@ -3164,6 +3188,8 @@ WHERE  id IN ( $groupIDs )
   /**
    * where / qill clause for email
    *
+   * @param $values
+   *
    * @return void
    * @access public
    */
@@ -3205,6 +3231,8 @@ WHERE  id IN ( $groupIDs )
   /**
    * where / qill clause for phone number
    *
+   * @param $values
+   *
    * @return void
    * @access public
    */
@@ -3226,6 +3254,8 @@ WHERE  id IN ( $groupIDs )
   /**
    * where / qill clause for phone type/location
    *
+   * @param $values
+   *
    * @return void
    * @access public
    */
@@ -3241,6 +3271,8 @@ WHERE  id IN ( $groupIDs )
 
   /**
    * where / qill clause for street_address
+   *
+   * @param $values
    *
    * @return void
    * @access public
@@ -3275,6 +3307,8 @@ WHERE  id IN ( $groupIDs )
   /**
    * where / qill clause for street_unit
    *
+   * @param $values
+   *
    * @return void
    * @access public
    */
@@ -3307,6 +3341,8 @@ WHERE  id IN ( $groupIDs )
 
   /**
    * where / qill clause for sorting by character
+   *
+   * @param $values
    *
    * @return void
    * @access public
@@ -3344,6 +3380,8 @@ WHERE  id IN ( $groupIDs )
 
   /**
    * where / qill clause for postal code
+   *
+   * @param $values
    *
    * @return void
    * @access public
@@ -3384,6 +3422,9 @@ WHERE  id IN ( $groupIDs )
 
   /**
    * where / qill clause for location type
+   *
+   * @param $values
+   * @param null $status
    *
    * @return void
    * @access public
@@ -3496,6 +3537,9 @@ WHERE  id IN ( $groupIDs )
   /**
    * where / qill clause for county (if present)
    *
+   * @param $values
+   * @param null $status
+   *
    * @return void
    * @access public
    */
@@ -3561,6 +3605,9 @@ WHERE  id IN ( $groupIDs )
 
   /**
    * where / qill clause for state/province AND country (if present)
+   *
+   * @param $values
+   * @param null $status
    *
    * @return void
    * @access public
@@ -3654,6 +3701,8 @@ WHERE  id IN ( $groupIDs )
 
   /**
    * where / qill clause for change log
+   *
+   * @param $values
    *
    * @return void
    * @access public
@@ -3818,6 +3867,8 @@ WHERE  id IN ( $groupIDs )
 
   /**
    * where / qill clause for relationship
+   *
+   * @param $values
    *
    * @return void
    * @access public
@@ -4014,8 +4065,11 @@ civicrm_relationship.is_permission_a_b = 0
       }
     }
   }
+
   /**
    * default set of return properties
+   *
+   * @param int $mode
    *
    * @return void
    * @access public
@@ -4231,16 +4285,19 @@ civicrm_relationship.is_permission_a_b = 0
   /**
    * create and query the db for an contact search
    *
-   * @param int      $offset   the offset for the query
-   * @param int      $rowCount the number of rows to return
-   * @param string   $sort     the order by string
-   * @param boolean  $count    is this a count only query ?
-   * @param boolean  $includeContactIds should we include contact ids?
-   * @param boolean  $sortByChar if true returns the distinct array of first characters for search results
-   * @param boolean  $groupContacts if true, return only the contact ids
-   * @param boolean  $returnQuery   should we return the query as a string
-   * @param string   $additionalWhereClause if the caller wants to further restrict the search (used for components)
-   * @param string   $additionalFromClause should be clause with proper joins, effective to reduce where clause load.
+   * @param int $offset the offset for the query
+   * @param int $rowCount the number of rows to return
+   * @param string $sort the order by string
+   * @param boolean $count is this a count only query ?
+   * @param boolean $includeContactIds should we include contact ids?
+   * @param boolean $sortByChar if true returns the distinct array of first characters for search results
+   * @param boolean $groupContacts if true, return only the contact ids
+   * @param boolean $returnQuery should we return the query as a string
+   * @param string $additionalWhereClause if the caller wants to further restrict the search (used for components)
+   * @param null $sortOrder
+   * @param string $additionalFromClause should be clause with proper joins, effective to reduce where clause load.
+   *
+   * @param bool $skipOrderAndLimit
    *
    * @return CRM_Contact_DAO_Contact
    * @access public

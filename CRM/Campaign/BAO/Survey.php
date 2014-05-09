@@ -49,7 +49,11 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
   /**
    * The action links that we need to display for the browse screen
    *
-   * @var array
+   * @param $params
+   * @param $defaults
+   *
+   * @return \CRM_Campaign_DAO_Survey|null
+   * @internal param array $
    */
   static function retrieve(&$params, &$defaults) {
     $dao = new CRM_Campaign_DAO_Survey();
@@ -69,6 +73,8 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
    * the function extract all the params it needs to initialize the create a
    * survey object.
    *
+   *
+   * @param $params
    *
    * @return object CRM_Survey_DAO_Survey object
    * @access public
@@ -326,6 +332,7 @@ SELECT  survey.id    as id,
    *
    * @param $surveyTypes array an array of survey type id.
    *
+   * @return array
    * @static
    */
   static function getSurveyCustomGroups($surveyTypes = array(
@@ -379,6 +386,7 @@ SELECT  survey.id    as id,
    *
    * @param int $id survey id
    *
+   * @return mixed|null
    * @access public
    * @static
    *
@@ -533,7 +541,7 @@ INNER JOIN  civicrm_activity_contact activityAssignment
     }
     $query .= "AND  activityTarget.contact_id IN {$targetContactIds}
             $whereClause";
-    $activity = CRM_Core_DAO::executeQuery($query, $params); 
+    $activity = CRM_Core_DAO::executeQuery($query, $params);
     while ($activity->fetch()) {
       $activityDetails[$activity->voter_id] = array(
         'voter_id' => $activity->voter_id,

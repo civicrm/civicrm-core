@@ -34,9 +34,12 @@ class CRM_Core_Report_Excel {
    * Outputs a result set with a given header
    * in the string buffer result
    *
-   * @param   string   $header (reference ) column headers
-   * @param   string   $rows   (reference ) result set rows
-   * @param   boolean  $print should the output be printed
+   * @param   string $header (reference ) column headers
+   * @param   string $rows (reference ) result set rows
+   * @param null $titleHeader
+   * @param   boolean $print should the output be printed
+   *
+   * @param bool $outputHeader
    *
    * @return  mixed    empty if output is printed, else output
    *

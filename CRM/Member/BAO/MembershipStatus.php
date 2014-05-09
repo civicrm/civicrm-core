@@ -178,7 +178,9 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * Function to delete membership Types
    *
    * @param int $membershipStatusId
-   * @param
+   *
+   * @throws CRM_Core_Exception
+   * @internal param $
    * @static
    */
   static function del($membershipStatusId) {
@@ -365,8 +367,8 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   /**
    * Function that return the status ids whose is_current_member is set
    *
-   * @return
-   * @static
+   * @return array
+  @static
    */
   public static function getMembershipStatusCurrent() {
     $statusIds = array();

@@ -41,9 +41,10 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param object $paymentProcessor
+   *
    * @return object
    * @static
-   *
    */
    static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];

@@ -50,6 +50,8 @@ class CRM_Mailing_BAO_Query {
   /**
    * if mailings are involved, add the specific Mailing fields
    *
+   * @param $query
+   *
    * @return void
    * @access public
    */
@@ -413,6 +415,8 @@ class CRM_Mailing_BAO_Query {
    * @param $tableName
    * @param $fieldName
    * @param $fieldTitle
+   *
+   * @param $valueTitles
    *
    * @return void
    */

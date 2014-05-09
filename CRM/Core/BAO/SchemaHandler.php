@@ -64,8 +64,10 @@ class CRM_Core_BAO_SchemaHandler {
   /**
    * Function for creating a civiCRM-table
    *
-   * @param  String  $tableName        name of the table to be created.
-   * @param  Array   $tableAttributes  array containing atrributes for the table that needs to be created
+   * @param $params
+   *
+   * @internal param String $tableName name of the table to be created.
+   * @internal param Array $tableAttributes array containing atrributes for the table that needs to be created
    *
    * @return true if successfully created, false otherwise
    *

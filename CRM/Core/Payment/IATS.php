@@ -53,7 +53,9 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_IATS
    */
   function __construct($mode, &$paymentProcessor) {
     $this->_paymentProcessor = $paymentProcessor;

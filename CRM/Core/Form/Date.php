@@ -73,6 +73,7 @@ Class CRM_Core_Form_Date {
   /**
    * This function is to retrieve the date range - relative or absolute
    * and assign it to the form
+   *
    * @param object $form - the form the dates should be added to
    * @param string $fieldName
    * @param integer $count
@@ -82,7 +83,7 @@ Class CRM_Core_Form_Date {
    * @param boolean $required
    * @param array $operators Additional value pairs to add
    * @param string $dateFormat
-   * @param string $displayTime
+   * @param bool|string $displayTime
    *
    *
    * @static

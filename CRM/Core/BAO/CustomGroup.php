@@ -250,6 +250,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param string $extends e.g. "Individual", "Activity"
    * @param int $columnId e.g. custom-group matching mechanism (usu NULL for matching on sub type-id); see extends_entity_column_id
    * @param string $columnValue e.g. "Student" or "3" or "3\05"; see extends_entity_column_value
+   *
+   * @return bool
    */
   public static function hasCustomGroup($extends, $columnId, $columnValue) {
     $dao = new CRM_Core_DAO_CustomGroup();
@@ -1760,9 +1762,15 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
 
   /**
    * Build custom data view
-   *  @param object  $form page object
-   *  @param array   $groupTree associated array
-   *  @param boolean $returnCount true if customValue count needs to be returned
+   *
+   * @param object $form page object
+   * @param array $groupTree associated array
+   * @param boolean $returnCount true if customValue count needs to be returned
+   * @param null $gID
+   * @param null $prefix
+   * @param null $customValueId
+   *
+   * @return array|int
    */
   static function buildCustomDataView(&$form, &$groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL, $customValueId = NULL) {
     $details = array();
@@ -1845,6 +1853,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * @param array $field associated array
    * @param boolean $dncOptionPerLine true if optionPerLine should not be consider
    *
+   * @return array|null|string
    */
   static function formatCustomValues(&$values, &$field, $dncOptionPerLine = FALSE) {
     $value = $values['data'];

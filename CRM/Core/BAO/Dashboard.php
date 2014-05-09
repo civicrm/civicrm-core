@@ -79,6 +79,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *
    * @param boolean $flatFormat this is true if you want simple associated array of contact dashlets
    *
+   * @param null $contactID
+   *
    * @return array $dashlets array of dashlets
    * @access public
    * @static
@@ -299,6 +301,9 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *
    * @param array $columns associated array
    *
+   * @param null $contactID
+   *
+   * @throws RuntimeException
    * @return void
    * @access public
    * @static

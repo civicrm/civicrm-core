@@ -5,7 +5,9 @@
  *
  * FIXME This is a bare-minimum placeholder
  *
- * @param  array  $ params input parameters
+ * @param $params
+ *
+ * @internal param $array $ params input parameters
  *
  * {@example OptionValueGet.php 0}
  * @example OptionValueGet.php
@@ -28,6 +30,8 @@ function civicrm_api3_report_template_get($params) {
  * Allowed @params array keys are:
  *
  * {@example OptionValueCreate.php}
+ *
+ * @param $params
  *
  * @return array of newly created option_value property values.
  * {@getfields OptionValue_create}

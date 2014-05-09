@@ -41,6 +41,8 @@ class CRM_Contact_Form_Edit_CustomData {
   /**
    * build all the data structures needed to build the form
    *
+   * @param $form
+   *
    * @return void
    * @access public
    */
@@ -104,6 +106,9 @@ class CRM_Contact_Form_Edit_CustomData {
    * the default values are retrieved from the database
    *
    * @access public
+   *
+   * @param $form
+   * @param $defaults
    *
    * @return void
    */

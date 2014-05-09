@@ -43,6 +43,8 @@ class CRM_Grant_BAO_Query {
   /**
    * build select for CiviGrant
    *
+   * @param $query
+   *
    * @return void
    * @access public
    */
@@ -293,6 +295,8 @@ class CRM_Grant_BAO_Query {
    * add all the elements shared between grant search and advanaced search
    *
    * @access public
+   *
+   * @param $form
    *
    * @return void
    * @static

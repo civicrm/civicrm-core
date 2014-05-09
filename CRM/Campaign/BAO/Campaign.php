@@ -102,6 +102,8 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * function to delete the campaign
    *
    * @param  int $id id of the campaign
+   *
+   * @return bool|mixed
    */
   public static function del($id) {
     if (!$id) {
@@ -117,9 +119,10 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * retrieves the relevant objects. Typically the valid params are only
    * campaign_id.
    *
-   * @param array  $params   (reference ) an assoc array of name/value pairs
-   * @param array  $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
+   * @return \CRM_Campaign_DAO_Campaign|null
    * @access public
    */
   public function retrieve(&$params, &$defaults) {
@@ -464,6 +467,7 @@ SELECT  campaign.id               as id,
    *
    * @param int $campaignId campaign id
    *
+   * @return array
    * @static
    */
   static function getCampaignGroups($campaignId) {

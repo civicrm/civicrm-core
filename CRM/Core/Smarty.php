@@ -189,6 +189,8 @@ class CRM_Core_Smarty extends Smarty {
    * @param string $cache_id
    * @param string $compile_id
    * @param boolean $display
+   *
+   * @return bool|mixed|string
    */
   function fetch($resource_name, $cache_id = NULL, $compile_id = NULL, $display = FALSE) {
     if (preg_match( '/^(\s+)?string:/', $resource_name)) {

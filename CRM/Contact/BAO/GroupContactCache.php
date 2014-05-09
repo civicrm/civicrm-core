@@ -40,7 +40,9 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * Check to see if we have cache entries for this group
    * if not, regenerate, else return
    *
-   * @param int $groupID groupID of group that we are checking against
+   * @param $groupIDs
+   *
+   * @internal param int $groupID groupID of group that we are checking against
    *
    * @return boolean true if we did not regenerate, false if we did
    */

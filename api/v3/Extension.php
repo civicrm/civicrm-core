@@ -145,15 +145,15 @@ function civicrm_api3_extension_uninstall($params) {
 /**
  * Download and install an extension
  *
- * @param  array       $params input parameters
+ * @param  array $params input parameters
  *                          - key: string, eg "com.example.myextension"
  *                          - url: string eg "http://repo.com/myextension-1.0.zip"
  *
+ * @throws API_Exception
  * @return array API result
  * @static void
  * @access public
  * @example ExtensionDownload.php
- *
  */
 function civicrm_api3_extension_download($params) {
   if (! array_key_exists('key', $params)) {
@@ -230,11 +230,12 @@ function civicrm_api3_extension_refresh($params) {
 /**
  * Get a list of available extensions
  *
+ * @param $params
+ *
  * @return array API result
  * @static void
  * @access public
  * @example ExtensionGet.php
- *
  */
 function civicrm_api3_extension_get($params) {
   $statuses = CRM_Extension_System::singleton()->getManager()->getStatuses();

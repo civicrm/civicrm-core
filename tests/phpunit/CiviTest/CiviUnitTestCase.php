@@ -727,6 +727,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * This function exists to wrap api functions
    * so we can ensure they succeed & throw exceptions without litterering the test with checks
+   *
    * @param string $entity
    * @param string $action
    * @param array $params
@@ -734,6 +735,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *   getcount, getsingle. Note that for getvalue the type is checked rather than the value
    *   for getsingle the array is compared against an array passed in - the id is not compared (for
    *   better or worse )
+   *
+   * @return array|int
    */
   function callAPISuccess($entity, $action, $params, $checkAgainst = NULL) {
     $params = array_merge(array(
@@ -759,6 +762,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * This function exists to wrap api getValue function & check the result
    * so we can ensure they succeed & throw exceptions without litterering the test with checks
    * There is a type check in this
+   *
    * @param string $entity
    * @param array $params
    * @param string $type - per http://php.net/manual/en/function.gettype.php possible types
@@ -768,6 +772,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * - string
    * - array
    * - object
+   *
+   * @return array|int
    */
   function callAPISuccessGetValue($entity, $params, $type = NULL) {
     $params += array(
@@ -1223,7 +1229,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Add entity(s) to the tag
    *
-   * @param  array  $params
+   * @param  array $params
+   *
+   * @return bool
    */
   function entityTagAdd($params) {
     $result = $this->callAPISuccess('entity_tag', 'create', $params);
@@ -1233,8 +1241,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create contribution
    *
-   * @param int $cID      contact_id
-   * @param int $cTypeID  id of financial type
+   * @param int $cID contact_id
+   *
+   * @internal param int $cTypeID id of financial type
    *
    * @return int id of created contribution
    */
@@ -2072,8 +2081,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create custom field with Option Values
    *
-   * @param array    $customGroup
-   * @param string $name  name of custom field
+   * @param array $customGroup
+   * @param string $name name of custom field
+   *
+   * @return array|int
    */
   function customFieldOptionValueCreate($customGroup, $name) {
     $fieldParams = array(

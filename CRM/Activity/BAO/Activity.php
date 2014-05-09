@@ -1483,9 +1483,13 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   /**
    * send the sms message to a specific contact
    *
-   * @param int    $toID              the contact id of the recipient
-   * @param int    $activityID        the activity ID that tracks the message
-   * @param array  $smsParams         the params used for sending sms
+   * @param int $toID the contact id of the recipient
+   * @param $tokenText
+   * @param $tokenHtml
+   * @param array $smsParams the params used for sending sms
+   *
+   * @param int $activityID the activity ID that tracks the message
+   * @param null $userID
    *
    * @return mixed                    true on success or PEAR_Error object
    * @access public
@@ -1555,13 +1559,20 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   /**
    * send the message to a specific contact
    *
-   * @param string $from         the name and email of the sender
-   * @param int    $toID         the contact id of the recipient
-   * @param string $subject      the subject of the message
-   * @param string $message      the message contents
+   * @param string $from the name and email of the sender
+   * @param $fromID
+   * @param int $toID the contact id of the recipient
+   * @param string $subject the subject of the message
+   * @param $text_message
+   * @param $html_message
    * @param string $emailAddress use this 'to' email address instead of the default Primary address
-   * @param int    $activityID   the activity ID that tracks the message
+   * @param int $activityID the activity ID that tracks the message
    *
+   * @param null $attachments
+   * @param null $cc
+   * @param null $bcc
+   *
+   * @internal param string $message the message contents
    * @return boolean             true if successfull else false.
    * @access public
    * @static
@@ -1903,7 +1914,9 @@ SELECT  display_name
   /**
    * Function to get total count of prior revision of currently viewd activity
    *
-   * @param int  $activityId   current activity id
+   * @param $activityID
+   *
+   * @internal param int $activityId current activity id
    *
    * @return int $params  count of prior activities otherwise false.
    * @access public
@@ -1941,7 +1954,10 @@ AND id < {$activityID}
    * Function to get all prior activities of currently viewe
    * d activity
    *
-   * @param int  $activityId   current activity id
+   * @param $activityID
+   * @param bool $onlyPriorRevisions
+   *
+   * @internal param int $activityId current activity id
    *
    * @return array $result  prior activities info.
    * @access public
@@ -1990,7 +2006,9 @@ AND cl.modified_id  = c.id
   /**
    * Function to find the latest revision of a given activity
    *
-   * @param int  $activityId    prior activity id
+   * @param $activityID
+   *
+   * @internal param int $activityId prior activity id
    *
    * @return int $params  current activity id.
    * @access public
@@ -2024,7 +2042,11 @@ AND cl.modified_id  = c.id
    *
    * @activityId int activity id of parent activity
    *
-   * @param array  $activity details
+   * @param $activityId
+   * @param $params
+   *
+   * @return $this|null|object
+   * @internal param array $activity details
    *
    * @access public
    */
@@ -2061,7 +2083,9 @@ AND cl.modified_id  = c.id
   /**
    * Function to get Activity specific File according activity type Id.
    *
-   * @param int  $activityTypeId  activity id
+   * @param int $activityTypeId activity id
+   *
+   * @param string $crmDir
    *
    * @return if file exists returns $activityTypeFile activity filename otherwise false.
    *

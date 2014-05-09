@@ -37,7 +37,10 @@ class CRM_Contact_BAO_Contact_Location {
   /**
    * function to get the display name, primary email, location type and location id of a contact
    *
-   * @param  int    $id id of the contact
+   * @param  int $id id of the contact
+   *
+   * @param bool $isPrimary
+   * @param null $locationTypeID
    *
    * @return array  of display_name, email, location type and location id if found, or (null,null,null, null)
    * @static

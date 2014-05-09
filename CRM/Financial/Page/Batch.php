@@ -92,7 +92,7 @@ class CRM_Financial_Page_Batch extends CRM_Core_Page_Basic {
   /**
    * browse all entities.
    *
-   * @param int $action
+   * @internal param int $action
    *
    * @return void
    * @access public

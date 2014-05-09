@@ -63,6 +63,8 @@ class CRM_Extension_Info {
    * Load extension info a string
    *
    * @param string $string XML content
+   *
+   * @throws CRM_Extension_Exception_ParseException
    * @return CRM_Extension_Info
    */
   public static function loadFromString($string) {

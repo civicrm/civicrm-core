@@ -52,6 +52,8 @@ class CRM_Core_Payment_Form {
   /**
    * create all common fields needed for a credit card or direct debit transaction
    *
+   * @param $form
+   *
    * @return void
    * @access protected
    */
@@ -370,6 +372,11 @@ class CRM_Core_Payment_Form {
 
   /**
    * function to map address fields
+   *
+   * @param $id
+   * @param $src
+   * @param $dst
+   * @param bool $reverse
    *
    * @return void
    * @static

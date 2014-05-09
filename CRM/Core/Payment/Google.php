@@ -60,7 +60,9 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_Google
    */
   function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
@@ -73,9 +75,10 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param object $paymentProcessor
+   *
    * @return object
    * @static
-   *
    */
   static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];

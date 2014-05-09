@@ -33,9 +33,12 @@ class CRM_Upgrade_Headless {
   /**
    * Perform an upgrade without using the web-frontend
    *
+   * @param bool $enablePrint
+   *
+   * @throws
+   * @throws Exception
    * @return array, with keys:
    *   - message: string, HTML-ish blob
-   * @throws Exception
    */
   function run($enablePrint = TRUE) {
     // lets get around the time limit issue if possible for upgrades

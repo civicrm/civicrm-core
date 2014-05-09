@@ -72,7 +72,10 @@ class CRM_Core_Key {
    * Generate a form key based on form name, the current user session
    * and a private key. Modelled after drupal's form API
    *
-   * @param string  $value       name of the form
+   * @param $name
+   * @param bool $addSequence
+   *
+   * @internal param string $value name of the form
    * @paeam boolean $addSequence should we add a unique sequence number to the end of the key
    *
    * @return string       valid formID
@@ -95,9 +98,12 @@ class CRM_Core_Key {
   /**
    * Validate a form key based on the form name
    *
-   * @param string $formKey
+   * @param $key
    * @param string $name
    *
+   * @param bool $addSequence
+   *
+   * @internal param string $formKey
    * @return string $formKey if valid, else null
    * @static
    * @acess public

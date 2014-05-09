@@ -341,11 +341,13 @@ WHERE  cacheKey LIKE %1 AND is_selected = 1
   /**
    * function to get the selections
    *
-   * @param string $cacheKey     cache key
-   * @param string $action       action
+   * @param string $cacheKey cache key
+   * @param string $action action
    *  $action : get - get only selection records
    *            getall - get all the records of the specified cache key
    * @param string $entity_table entity table
+   *
+   * @return array
    */
   static function getSelection($cacheKey, $action = 'get', $entity_table = 'civicrm_contact') {
     if (!$cacheKey) {

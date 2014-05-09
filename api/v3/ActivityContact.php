@@ -43,6 +43,8 @@
  *
  * @example ActivityContact.php
  *
+ * @param $params
+ *
  * @return array of newly created activity contact records.
  * @access public
  */
@@ -67,7 +69,7 @@ function _civicrm_api3_activity_contact_create_spec(&$params) {
  * @param  array  $params
  *
  * @return array Api Result
- * 
+ *
  * @example ActivityContact.php
  * @access public
  */

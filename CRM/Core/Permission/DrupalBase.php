@@ -65,13 +65,12 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * Get all groups from database, filtered by permissions
    * for this user
    *
-   * @param string $groupType     type of group(Access/Mailing)
-   * @param boolen $excludeHidden exclude hidden groups.
+   * @param string $groupType type of group(Access/Mailing)
+   * @param bool|\boolen $excludeHidden exclude hidden groups.
    *
    * @access public
    *
    * @return array - array reference of all groups.
-   *
    */
   public function group($groupType = NULL, $excludeHidden = TRUE) {
     if (!isset($this->_viewPermissionedGroups)) {

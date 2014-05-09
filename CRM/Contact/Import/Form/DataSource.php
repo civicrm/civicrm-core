@@ -351,6 +351,9 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    * Add a PK and status column to the import table so we can track our progress
    * Returns the name of the primary key and status columns
    *
+   * @param $db
+   * @param $importTableName
+   *
    * @return array
    * @access private
    */

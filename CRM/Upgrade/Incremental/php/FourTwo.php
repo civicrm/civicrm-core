@@ -47,8 +47,11 @@ class CRM_Upgrade_Incremental_php_FourTwo {
    * Note: This function is called iteratively for each upcoming
    * revision to the database.
    *
-   * @param $postUpgradeMessage string, alterable
+   * @param $preUpgradeMessage
    * @param $rev string, a version number, e.g. '4.2.alpha1', '4.2.beta3', '4.2.0'
+   * @param null $currentVer
+   *
+   * @internal param string $postUpgradeMessage , alterable
    * @return void
    */
   function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
@@ -558,8 +561,11 @@ WHERE     cpse.price_set_id IS NULL";
    * Find any contribution records and create corresponding line-item
    * records.
    *
+   * @param CRM_Queue_TaskContext $ctx
    * @param $startId int, the first/lowest contribution ID to convert
    * @param $endId int, the last/highest contribution ID to convert
+   *
+   * @return bool
    */
   static function task_4_2_alpha1_convertContributions(CRM_Queue_TaskContext $ctx, $startId, $endId) {
     $upgrade = new CRM_Upgrade_Form();
@@ -701,8 +707,11 @@ WHERE     cpf.price_set_id = %1
    * Find any participant records and create corresponding line-item
    * records.
    *
+   * @param CRM_Queue_TaskContext $ctx
    * @param $startId int, the first/lowest participant ID to convert
    * @param $endId int, the last/highest participant ID to convert
+   *
+   * @return bool
    */
   static function task_4_2_alpha1_convertParticipants(CRM_Queue_TaskContext $ctx, $startId, $endId) {
     $upgrade = new CRM_Upgrade_Form();

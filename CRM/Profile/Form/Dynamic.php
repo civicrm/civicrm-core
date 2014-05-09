@@ -98,8 +98,10 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
    * global form rule
    *
    * @param array $fields the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $files the uploaded files if any
+   * @param object $form
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public

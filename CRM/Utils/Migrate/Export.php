@@ -541,6 +541,8 @@ class CRM_Utils_Migrate_Export {
    * @param string $name tag name
    * @param string $value text
    * @param string $prefix
+   *
+   * @throws Exception
    * @return string XML
    */
   function renderTextTag($name, $value, $prefix = '') {

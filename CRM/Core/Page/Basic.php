@@ -363,6 +363,9 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * @param int $mode - what mode for the form ?
    * @param int $id - id of the entity (for update, view operations)
    *
+   * @param bool $imageUpload
+   * @param bool $pushUserContext
+   *
    * @return void
    */
   function edit($mode, $id = NULL, $imageUpload = FALSE, $pushUserContext = TRUE) {

@@ -46,9 +46,11 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   /**
    * Function to create various elements of location block
    *
-   * @param array    $params       (reference ) an assoc array of name/value pairs
-   * @param boolean  $fixAddress   true if you need to fix (format) address values
+   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param boolean $fixAddress true if you need to fix (format) address values
    *                               before inserting in db
+   *
+   * @param null $entity
    *
    * @return array   $location
    * @access public

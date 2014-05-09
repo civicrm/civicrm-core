@@ -316,7 +316,9 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
   /**
    * Preview price field
    *
-   * @param int  $id    price field id
+   * @param $fid
+   *
+   * @internal param int $id price field id
    *
    * @return void
    * @access public

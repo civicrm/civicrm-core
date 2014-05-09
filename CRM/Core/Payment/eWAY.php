@@ -472,13 +472,15 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    * NOTE: Called by Events and Contribute to check config params are set prior to trying
    *       register any credit card details
    *
-   * @param string $mode the mode we are operating in (live or test) - not used but could be
+   * @return null|string
+   * @internal param string $mode the mode we are operating in (live or test) - not used but could be
    * to check that the 'test' mode CustomerID was equal to '87654321' and that the URL was
    * set to https://www.eway.com.au/gateway_cvn/xmltest/TestPage.asp
    *
    * returns string $errorMsg if any errors found - null if OK
    *
-   ********************************************************************************************/
+   ******************************************************************************************
+   */
   //function checkConfig( $mode )          // CiviCRM V1.9 Declaration
   // CiviCRM V2.0 Declaration
   function checkConfig() {

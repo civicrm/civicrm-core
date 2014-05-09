@@ -253,6 +253,8 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
    *
    * @param int $id the id of the saved search
    *
+   * @param string $value
+   *
    * @return string the name of the saved search
    * @access public
    * @static

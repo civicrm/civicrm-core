@@ -82,7 +82,8 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * Function to add a name label
    *
    * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   *
+   * @internal param array $ids reference array contains the id
    *
    * @access public
    * @static

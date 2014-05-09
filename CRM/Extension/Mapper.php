@@ -163,6 +163,10 @@ class CRM_Extension_Mapper {
 
   /**
    * @param string $key extension fully-qualified-name
+   * @param bool $fresh
+   *
+   * @throws CRM_Extension_Exception
+   * @throws Exception
    * @return object CRM_Extension_Info
    */
   public function keyToInfo($key, $fresh = FALSE) {

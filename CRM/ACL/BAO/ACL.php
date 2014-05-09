@@ -83,13 +83,14 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * Construct a WHERE clause to handle permissions to $object_*
    *
-   * @param array ref $tables -   Any tables that may be needed in the FROM
+   * @param $tables
    * @param string $operation -   The operation being attempted
    * @param string $object_table -    The table of the object in question
-   * @param int $object_id    -   The ID of the object in question
-   * @param int $acl_id   -       If it's a grant/revoke operation, the ACL ID
+   * @param int $object_id -   The ID of the object in question
+   * @param int $acl_id -       If it's a grant/revoke operation, the ACL ID
    * @param boolean $acl_role -  For grant operations, this flag determines if we're granting a single acl (false) or an entire group.
    *
+   * @internal param \ref $array $tables -   Any tables that may be needed in the FROM
    * @return string           -   The WHERE clause, or 0 on failure
    * @access public
    * @static
@@ -319,11 +320,13 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    * Given a table and id pair, return the filter clause
    *
    * @param string $table -   The table owning the object
-   * @param int $id   -       The ID of the object
-   * @param array ref $tables - Tables that will be needed in the FROM
+   * @param int $id -       The ID of the object
+   * @param $tables
+   *
+   * @internal param \ref $array $tables - Tables that will be needed in the FROM
    *
    * @return string|null  -   WHERE-style clause to filter results,
-   or null if $table or $id is null
+   * or null if $table or $id is null
    * @access public
    * @static
    */

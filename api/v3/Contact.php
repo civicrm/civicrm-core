@@ -40,12 +40,13 @@
 /**
  * Create or update a contact (note you should always call this via civicrm_api() & never directly)
  *
- * @param  array   $params   input parameters
+ * @param  array $params input parameters
  *
  * Allowed @params array keys are:
  * {@getfields contact_create}
  *
  *
+ * @throws API_Exception
  * @example ContactCreate.php Example of Create Call
  *
  * @return array  API Result Array
@@ -398,6 +399,7 @@ function _civicrm_api3_contact_update($params, $contactID = NULL) {
  * @param  $params                   Associative array of property name/value
  *                                   pairs to insert in new contact.
  *
+ * @throws API_Exception
  * @return array (reference )        null on success, error message otherwise
  *
  * @access public

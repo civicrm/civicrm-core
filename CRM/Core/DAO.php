@@ -75,8 +75,8 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Class constructor
    *
-   * @return object
-   * @access public
+   * @return \CRM_Core_DAO
+  @access public
    */
   function __construct() {
     $this->initialize();
@@ -1545,13 +1545,15 @@ SELECT contact_id
     }
   }
 
-   /**
-    * Build a list of triggers via hook and add them to (err, reconcile them
-    * with) the database.
-    *
-    * @param $tableName string the specific table requiring a rebuild; or NULL to rebuild all tables
-    * @see CRM-9716
-    */
+  /**
+   * Build a list of triggers via hook and add them to (err, reconcile them
+   * with) the database.
+   *
+   * @param $tableName string the specific table requiring a rebuild; or NULL to rebuild all tables
+   * @param bool $force
+   *
+   * @see CRM-9716
+   */
   static function triggerRebuild($tableName = NULL, $force = FALSE) {
     $info = array();
 
@@ -1842,6 +1844,9 @@ EOS;
    * Provides documentation and validation for the buildOptions $context param
    *
    * @param String $context
+   *
+   * @throws Exception
+   * @return array
    */
   public static function buildOptionsContext($context = NULL) {
     $contexts = array(

@@ -97,6 +97,10 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param null $id
+   * @param bool $all
+   * @param null $condition
+   *
    * @return array - array of all events if any
    * @static
    */
@@ -207,6 +211,8 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param null $id
+   *
    * @return array - array reference of all participant listings if any
    * @static
    */
@@ -246,6 +252,8 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
    * get event template titles
+   *
+   * @param null $id
    *
    * @return array  of event id → template title pairs
    */

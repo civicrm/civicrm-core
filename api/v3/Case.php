@@ -189,6 +189,7 @@ function _civicrm_api3_case_delete_spec(&$params) {
  *
  * {@getfields case_get}
  *
+ * @throws API_Exception
  * @return array (get mode, case_id provided): Array with case details, case roles, case activity ids, (search mode, case_id not provided): Array of cases found@access public
  * @todo Erik Hommel 16 dec 2010 check if all DB fields are returned
  */
@@ -339,13 +340,14 @@ function civicrm_api3_case_update($params) {
 /**
  * Delete a specified case.
  *
- * @param  array(
-    //REQUIRED:
+ * @param  array (
+ * //REQUIRED:
  * 'id' => int
  *
  * //OPTIONAL
  * 'move_to_trash' => bool (defaults to false)
  *
+ * @throws API_Exception
  * @return boolean: true if success, else false
  * {@getfields case_delete}
  * @access public

@@ -137,14 +137,16 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   /**
    * Class constructor
    *
-   * @param array   $queryParams array of parameters for query
-   * @param int     $action - action of search basic or advanced.
-   * @param string  $grantClause if the caller wants to further restrict the search
+   * @param array $queryParams array of parameters for query
+   * @param \const|int $action - action of search basic or advanced.
+   * @param string $grantClause if the caller wants to further restrict the search
    * @param boolean $single are we dealing only with one contact?
-   * @param int     $limit  how many participations do we want returned
+   * @param int $limit how many participations do we want returned
    *
-   * @return CRM_Contact_Selector
-   * @access public
+   * @param string $context
+   *
+   * @return \CRM_Grant_Selector_Search
+  @access public
    */
   function __construct(&$queryParams,
     $action      = CRM_Core_Action::NONE,
@@ -181,9 +183,10 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    * - View
    * - Edit
    *
+   * @param null $key
+   *
    * @return array
    * @access public
-   *
    */
   static function &links($key = NULL) {
     $cid = CRM_Utils_Request::retrieve('cid', 'Integer', $this);
@@ -226,7 +229,10 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {

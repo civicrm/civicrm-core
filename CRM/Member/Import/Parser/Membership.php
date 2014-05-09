@@ -607,19 +607,21 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       }
     }
   }
+
   /**
    * @deprecated - this function formats params according to v2 standards but
    * need to be sure about the impact of not calling it so retaining on the import class
    * take the input parameter list as specified in the data model and
    * convert it into the same format that we use in QF and BAO object
    *
-   * @param array  $params       Associative array of property name/value
+   * @param array $params Associative array of property name/value
    *                             pairs to insert in new contact.
-   * @param array  $values       The reformatted properties that we can use internally
+   * @param array $values The reformatted properties that we can use internally
    *
-   * @param array  $create       Is the formatted Values array going to
+   * @param array|bool $create Is the formatted Values array going to
    *                             be used for CRM_Member_BAO_Membership:create()
    *
+   * @throws Exception
    * @return array|error
    * @access public
    */

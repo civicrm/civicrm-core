@@ -845,6 +845,8 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    *
    * @params array $params contains form values
    *
+   * @param $testParams
+   *
    * @return void
    * @access public
    */
@@ -951,12 +953,12 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * static wrapper for getting verp and urls
    *
-   * @param int $job_id           ID of the Job associated with this message
-   * @param int $event_queue_id   ID of the EventQueue
-   * @param string $hash          Hash of the EventQueue
-   * @param string $email         Destination address
+   * @param int $job_id ID of the Job associated with this message
+   * @param int $event_queue_id ID of the EventQueue
+   * @param string $hash Hash of the EventQueue
+   * @param string $email Destination address
    *
-   * @return (reference) array    array ref that hold array refs to the verp info and urls
+   * @return array (reference) array    array ref that hold array refs to the verp info and urls
    */
   static function getVerpAndUrls($job_id, $event_queue_id, $hash, $email) {
     // create a skeleton object and set its properties that are required by getVerpAndUrlsAndHeaders()
@@ -973,13 +975,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * get verp, urls and headers
    *
-   * @param int $job_id           ID of the Job associated with this message
-   * @param int $event_queue_id   ID of the EventQueue
-   * @param string $hash          Hash of the EventQueue
-   * @param string $email         Destination address
+   * @param int $job_id ID of the Job associated with this message
+   * @param int $event_queue_id ID of the EventQueue
+   * @param string $hash Hash of the EventQueue
+   * @param string $email Destination address
    *
-   * @return (reference) array    array ref that hold array refs to the verp info, urls, and headers
-   * @access private
+   * @param bool $isForward
+   *
+   * @return array (reference) array    array ref that hold array refs to the verp info, urls, and headers@access private
    */
   private function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email, $isForward = FALSE) {
     $config = CRM_Core_Config::singleton();
@@ -1064,15 +1067,19 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * Compose a message
    *
-   * @param int $job_id           ID of the Job associated with this message
-   * @param int $event_queue_id   ID of the EventQueue
-   * @param string $hash          Hash of the EventQueue
-   * @param string $contactId     ID of the Contact
-   * @param string $email         Destination address
-   * @param string $recipient     To: of the recipient
-   * @param boolean $test         Is this mailing a test?
-   * @param boolean $isForward    Is this mailing compose for forward?
-   * @param string  $fromEmail    email address of who is forwardinf it.
+   * @param int $job_id ID of the Job associated with this message
+   * @param int $event_queue_id ID of the EventQueue
+   * @param string $hash Hash of the EventQueue
+   * @param string $contactId ID of the Contact
+   * @param string $email Destination address
+   * @param string $recipient To: of the recipient
+   * @param boolean $test Is this mailing a test?
+   * @param $contactDetails
+   * @param $attachments
+   * @param boolean $isForward Is this mailing compose for forward?
+   * @param string $fromEmail email address of who is forwardinf it.
+   *
+   * @param null $replyToEmail
    *
    * @return object               The mail object
    * @access public
@@ -1643,8 +1650,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * Generate a report.  Fetch event count information, mailing data, and job
    * status.
    *
-   * @param int     $id          The mailing id to report
+   * @param int $id The mailing id to report
    * @param boolean $skipDetails whether return all detailed report
+   *
+   * @param bool $isSMS
    *
    * @return array        Associative array of reporting data
    * @access public
@@ -2217,9 +2226,12 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   /**
    * Get the rows for a browse operation
    *
-   * @param int $offset       The row number to start from
-   * @param int $rowCount     The nmber of rows to return
-   * @param string $sort      The sql string that describes the sort order
+   * @param int $offset The row number to start from
+   * @param int $rowCount The nmber of rows to return
+   * @param string $sort The sql string that describes the sort order
+   *
+   * @param null $additionalClause
+   * @param null $additionalParams
    *
    * @return array            The rows
    * @access public
@@ -2310,6 +2322,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    *
    * @param int $id
    *
+   * @return string
    * @static
    * @access public
    */
@@ -2556,8 +2569,9 @@ SELECT  $mailing.id as mailing_id
    *
    * @param $form reference of this
    *
-   * @return $report array content/component.
-   * @access public
+   * @param bool $isSMS
+   *
+   * @return array $report array content/component.@access public
    */
   static function getMailingContent(&$report, &$form, $isSMS = FALSE) {
     $htmlHeader = $textHeader = NULL;

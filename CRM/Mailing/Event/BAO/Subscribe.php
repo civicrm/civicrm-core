@@ -361,7 +361,13 @@ SELECT     civicrm_email.id as email_id
    * @params  int    $contactId  Currently used during event registration/contribution.
    *                             Specifically to avoid linking group to wrong duplicate contact
    *                             during event registration.
+   *
    * @public
+   *
+   * @param $groups
+   * @param $params
+   * @param null $contactId
+   * @param null $context
    *
    * @return void
    * @static
