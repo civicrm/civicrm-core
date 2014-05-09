@@ -386,6 +386,8 @@ AND         cp.page_type = 'contribute'
   /**
    * Browse all contribution pages
    *
+   * @param null $action
+   *
    * @return void
    * @access public
    * @static

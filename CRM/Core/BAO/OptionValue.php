@@ -418,9 +418,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   /**
    * updates options values weights.
    *
-   * @param int   $opGroupIde option group id.
-   * @param array $opWeights  options value , weight pair
+   * @param $opGroupId
+   * @param array $opWeights options value , weight pair
    *
+   * @internal param int $opGroupIde option group id.
    * @return void
    * @access public
    * @static

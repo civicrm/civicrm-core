@@ -739,6 +739,8 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   /**
    * check whether call current participant is last one
    *
+   * @param bool $isButtonJs
+   *
    * @return boolean ture on success.
    * @access public
    */

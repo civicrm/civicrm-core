@@ -521,6 +521,9 @@ LIKE %1
    *
    * @param string $tableName
    *
+   * @param int $maxTablesToCheck
+   * @param string $fieldName
+   *
    * @return array
    * @static
    */
@@ -599,7 +602,10 @@ LIKE %1
   /**
    * Checks if CONSTRAINT keyword exists for a specified table.
    *
-   * @param string $tableName
+   * @param array $tables
+   *
+   * @throws Exception
+   * @internal param string $tableName
    *
    * @return boolean true if CONSTRAINT keyword exists, false otherwise
    */
@@ -879,6 +885,13 @@ FROM   civicrm_domain
    * execute a query
    *
    * @param string $query query to be executed
+   *
+   * @param array $params
+   * @param bool $abort
+   * @param null $daoName
+   * @param bool $freeDAO
+   * @param bool $i18nRewrite
+   * @param bool $trapException
    *
    * @return Object CRM_Core_DAO object that holds the results of the query
    * @static

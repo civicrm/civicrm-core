@@ -543,12 +543,13 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   /**
    * Add the formatted address to $this-> display
    *
-   * @param NULL
+   * @param bool $microformat
+   *
+   * @internal param $NULL
    *
    * @return void
    *
    * @access public
-   *
    */
   function addDisplay($microformat = FALSE) {
     $fields = array(
@@ -583,6 +584,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * Get all the addresses for a specified contact_id, with the primary address being first
    *
    * @param int $id the contact id
+   *
+   * @param bool $updateBlankLocInfo
    *
    * @return array  the array of adrress data
    * @access public

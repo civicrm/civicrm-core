@@ -463,7 +463,11 @@ WHERE     ct.id = cp.financial_type_id AND
    *
    * An array containing price set details (including price fields) is returned
    *
-   * @param int $setId - price set id whose details are needed
+   * @param $setID
+   * @param bool $required
+   * @param bool $validOnly
+   *
+   * @internal param int $setId - price set id whose details are needed
    *
    * @return array $setTree - array consisting of field details
    */

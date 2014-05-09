@@ -34,6 +34,10 @@ class ExportCiviSeleniumTestCase extends CiviSeleniumTestCase {
    * @params sting  $fileName file name to be download.
    * @params string $downloadDir download dir.
    *
+   * @param $selector
+   * @param string $fileName
+   * @param string $downloadDir
+   *
    * @return string downloaded file path.
    */
   function downloadCSV($selector, $fileName = 'CiviCRM_Contact_Search.csv', $downloadDir = '/tmp') {

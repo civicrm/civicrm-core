@@ -500,9 +500,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @param int $id relationship id
    *
+   * @param $action
+   *
    * @return null
    * @access public
-
    * @static
    */
   static function disableEnableRelationship($id, $action) {
@@ -625,12 +626,12 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   /**
    * this function does the validtion for valid relationship
    *
-   * @param array   $params     this array contains the values there are subitted by the form
-   * @param array   $ids        the array that holds all the db ids
-   * @param integer $contactId  this is contact id for adding relationship
+   * @param array $params this array contains the values there are subitted by the form
+   * @param array $ids the array that holds all the db ids
+   * @param integer $contactId this is contact id for adding relationship
    *
-   * @return
-   * @access public
+   * @return string
+  @access public
    * @static
    */
   static function checkValidRelationship(&$params, &$ids, $contactId) {
@@ -763,9 +764,9 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $params        input parameters to find object
-   * @param array $values        output values of the object
-   * @param array $ids           the array that holds all the db ids
+   * @param array $params input parameters to find object
+   * @param array $values output values of the object
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return array (reference)   the values that could be potentially assigned to smarty
    * @access public

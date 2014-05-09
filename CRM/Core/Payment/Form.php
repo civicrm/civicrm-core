@@ -426,6 +426,8 @@ class CRM_Core_Payment_Form {
    * The date format for this field should typically be "M Y" (ex: Feb 2011) or "m Y" (02 2011)
    * See CRM-9017
    *
+   * @param $src
+   *
    * @return int
    * @static
    */
@@ -441,6 +443,8 @@ class CRM_Core_Payment_Form {
    * function to get the credit card expiration year
    * The date format for this field should typically be "M Y" (ex: Feb 2011) or "m Y" (02 2011)
    * This function exists only to make it consistant with getCreditCardExpirationMonth
+   *
+   * @param $src
    *
    * @return int
    * @static

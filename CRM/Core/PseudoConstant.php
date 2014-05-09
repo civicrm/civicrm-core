@@ -599,8 +599,7 @@ class CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param boolean $name pseudoconstant to be flushed
-   *
+   * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'cache') {
     if (isset(self::$$name)) {
@@ -618,7 +617,7 @@ class CRM_Core_PseudoConstant {
    *
    * The static array activityType is returned
    *
-   * @param boolean $all - get All Activity  types - default is to get only active ones.
+   * @internal param bool $all - get All Activity  types - default is to get only active ones.
    *
    * @access public
    * @static
@@ -698,10 +697,11 @@ class CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param int $id -  Optional id to return
+   * @param bool|int $id -  Optional id to return
+   *
+   * @param bool $limit
    *
    * @return array - array reference of all State/Provinces.
-   *
    */
   public static function &stateProvince($id = FALSE, $limit = TRUE) {
     if (($id && !CRM_Utils_Array::value($id, self::$stateProvince)) || !self::$stateProvince || !$id) {
@@ -753,7 +753,9 @@ class CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param int $id  -     Optional id to return
+   * @param bool|int $id -     Optional id to return
+   *
+   * @param bool $limit
    *
    * @return array - array reference of all State/Province abbreviations.
    */

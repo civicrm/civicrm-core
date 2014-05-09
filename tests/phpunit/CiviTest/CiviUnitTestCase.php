@@ -667,8 +667,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * check that api returned 'is_error' => 1
    * else provide full message
+   *
    * @param array $apiResult api result
    * @param string $prefix extra test to add to message
+   * @param null $expectedError
    */
   function assertAPIFailure($apiResult, $prefix = '', $expectedError = NULL) {
     if (!empty($prefix)) {
@@ -696,8 +698,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * check that api returned 'is_error' => 1
    * else provide full message
-   * @param array $apiResult api result
+   * @param $result
+   * @param $expected
+   * @param array $valuesToExclude
    * @param string $prefix extra test to add to message
+   * @internal param array $apiResult api result
    */
   function assertAPIArrayComparison($result, $expected, $valuesToExclude = array(), $prefix = '') {
     $valuesToExclude = array_merge($valuesToExclude, array('debug', 'xdebug', 'sequential'));
@@ -821,13 +826,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
     return $result;
   }
+
   /**
    * This function exists to wrap api getValue function & check the result
    * so we can ensure they succeed & throw exceptions without litterering the test with checks
    * There is a type check in this
    * @param string $entity
    * @param array $params
-   * @param string $type - per http://php.net/manual/en/function.gettype.php possible types
+   * @param null $count
+   * @throws Exception
+   * @return array|int
+   * @internal param string $type - per http://php.net/manual/en/function.gettype.php possible types
    * - boolean
    * - integer
    * - double
@@ -878,6 +887,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $action
    * @param array $params
    * @param string $expectedErrorMessage error
+   * @param null $extraOutput
+   * @return array|int
    */
   function callAPIFailure($entity, $action, $params, $expectedErrorMessage = NULL, $extraOutput = NULL) {
     if (is_array($params)) {
@@ -1045,7 +1056,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to delete Membership Type
    *
-   * @param int $membershipTypeID
+   * @param $params
+   * @internal param int $membershipTypeID
    */
   function membershipTypeDelete($params) {
     $result = $this->callAPISuccess('MembershipType', 'Delete', $params);
@@ -1178,6 +1190,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create contribution page
    *
+   * @param $params
    * @return object of contribution page
    */
   function contributionPageCreate($params) {
@@ -1199,6 +1212,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create Tag
    *
+   * @param array $params
    * @return array result of created tag
    */
   function tagCreate($params = array()) {
@@ -1270,7 +1284,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to delete contribution
    *
-   * @param int $contributionId
+   * @param $pledgeId
+   * @internal param int $contributionId
    */
   function pledgeDelete($pledgeId) {
     $params = array(
@@ -1282,9 +1297,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create contribution
    *
-   * @param int $cID      contact_id
-   * @param int $cTypeID  id of financial type
+   * @param int $cID contact_id
+   * @param int $cTypeID id of financial type
    *
+   * @param int $invoiceID
+   * @param int $trxnID
+   * @param int $paymentInstrumentID
+   * @param bool $isFee
    * @return int id of created contribution
    */
   function contributionCreate($cID, $cTypeID = 1, $invoiceID = 67890, $trxnID = 12345, $paymentInstrumentID = 1, $isFee = TRUE) {
@@ -1315,8 +1334,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create online contribution
    *
-   * @param int $financialType  id of financial type
+   * @param $params
+   * @param int $financialType id of financial type
    *
+   * @param int $invoiceID
+   * @param int $trxnID
    * @return int id of created contribution
    */
   function onlineContributionCreate($params, $financialType, $invoiceID = 67890, $trxnID = 12345) {
@@ -1415,6 +1437,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create participant payment
    *
+   * @param $participantID
+   * @param null $contributionID
    * @return int $id of created payment
    */
   function participantPaymentCreate($participantID, $contributionID = NULL) {
@@ -1443,6 +1467,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to add a Location
    *
+   * @param $contactID
    * @return int location id of created location
    */
   function locationAdd($contactID) {
@@ -1482,6 +1507,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to add a Location Type
    *
+   * @param null $params
    * @return int location id of created location
    */
   function locationTypeCreate($params = NULL) {
@@ -1519,8 +1545,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @params array to add group
    *
+   * @param array $params
    * @return int groupId of created group
-   *
    */
   function groupCreate($params = array()) {
     $params = array_merge(array(
@@ -1543,7 +1569,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to delete a Group
    *
-   * @param int $id
+   * @param $gid
+   * @internal param int $id
    */
   function groupDelete($gid) {
 
@@ -1572,9 +1599,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     ), $params);
     $this->callAPISuccess('uf_field', 'create', $params);
   }
+
   /**
    * Function to add a UF Join Entry
    *
+   * @param null $params
    * @return int $id of created UF Join
    */
   function ufjoinCreate($params = NULL) {
@@ -1629,7 +1658,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to delete Group for a contact
    *
-   * @param array $params
+   * @param $contactId
+   * @internal param array $params
    */
   function contactGroupDelete($contactId) {
     $params = array(
@@ -1642,7 +1672,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create Activity
    *
-   * @param int $contactId
+   * @param null $params
+   * @return array|int
+   * @internal param int $contactId
    */
   function activityCreate($params = NULL) {
 
@@ -1705,8 +1737,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to create custom group
    *
-   * @param string $className
-   * @param string $title  name of custom group
+   * @param array $params
+   * @return array|int
+   * @internal param string $className
+   * @internal param string $title name of custom group
    */
   function customGroupCreate($params = array()) {
     $defaults = array(
@@ -1784,10 +1818,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * participant:testCreateWithCustom for how to use this
    *
    * @param string $function __FUNCTION__
-   * @param string $file __FILE__
+   * @param $filename
+   * @internal param string $file __FILE__
    *
    * @return array $ids ids of created objects
-   *
    */
   function entityCustomGroupWithSingleFieldCreate($function, $filename) {
     $params = array('title' => $function);
@@ -1814,8 +1848,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Function to create custom field
    *
    * @param array $params (custom_group_id) is required
-   * @param string $name  name of custom field
-   * @param int $apiversion API  version to use
+   * @return array|int
+   * @internal param string $name name of custom field
+   * @internal param int $apiversion API  version to use
    */
   function customFieldCreate($params) {
     $params = array_merge(array(
@@ -1853,6 +1888,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @params array $params  name-value pair for an event
    *
+   * @param $cId
    * @return array $note
    */
   function noteCreate($cId) {
@@ -1995,7 +2031,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Tidy up examples array so that fields that change often ..don't
    * and debug related fields are unset
-   * @param array $params
+   *
+   * @param $result
+   *
+   * @internal param array $params
    */
   function tidyExampleResult(&$result){
     if(!is_array($result)) {
@@ -2330,7 +2369,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   /**
    * Generate a temporary folder
    *
-   * @return $string
+   * @param string $prefix
+   * @return string $string
    */
   function createTempDir($prefix = 'test-') {
     $tempDir = CRM_Utils_File::tempdir($prefix);

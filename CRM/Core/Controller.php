@@ -425,13 +425,12 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * add pages to the controller. Note that the controller does not really care
    * the order in which the pages are added
    *
-   * @param object $stateMachine  the state machine object
-   * @param int    $action        the mode in which the state machine is operating
+   * @param object $stateMachine the state machine object
+   * @param \const|int $action the mode in which the state machine is operating
    *                              typicaly this will be add/view/edit
    *
    * @return void
    * @access public
-   *
    */
   function addPages(&$stateMachine, $action = CRM_Core_Action::NONE) {
     $pages = $stateMachine->getPages();
@@ -638,7 +637,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Returns an array containing template variables
    *
    * @param string $name
-   * @param string $type
+   *
+   * @internal param string $type
    * @return array
    */
   function get_template_vars($name=null) {

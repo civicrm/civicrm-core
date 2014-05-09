@@ -373,6 +373,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
   /**
    * Generate a mock HTTP client with the expectation that it is called once.
    *
+   * @param $response
+   *
    * @return CRM_Utils_HttpClient|PHPUnit_Framework_MockObject_MockObject
    */
   protected function expectOneHttpRequest($response) {

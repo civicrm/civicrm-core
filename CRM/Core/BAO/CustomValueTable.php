@@ -473,6 +473,9 @@ AND    $cond
    *
    * @array $params
    *
+   * @param $params
+   *
+   * @throws Exception
    * @return array
    * @static
    */
@@ -611,6 +614,9 @@ AND    cf.id IN ( $fieldIDList )
    *
    * @array $params
    *
+   * @param $params
+   *
+   * @throws Exception
    * @return array
    * @static
    */

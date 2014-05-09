@@ -442,6 +442,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param int $onDuplicate the code for what action to take on duplicates
    * @param array $values the array of values belonging to this line
    *
+   * @param bool $doGeocodeAddress
+   *
    * @return boolean      the result of this processing
    * @access public
    */

@@ -80,7 +80,9 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
+   * @param $paymentProcessor
+   *
+   * @return \org_civicrm_payment_googlecheckout_GoogleIPN
    */
   function __construct($mode, &$paymentProcessor) {
     parent::__construct();
@@ -92,11 +94,11 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
   /**
    * The function gets called when a new order takes place.
    *
-   * @param xml   $dataRoot    response send by google in xml format
+   * @param xml $dataRoot response send by google in xml format
    * @param array $privateData contains the name value pair of <merchant-private-data>
    *
+   * @param $component
    * @return void
-   *
    */
   function newOrderNotify($dataRoot, $privateData, $component) {
     $ids = $input = $params = array();
@@ -179,11 +181,12 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
   /**
    * The function gets called when the state(CHARGED, CANCELLED..) changes for an order
    *
-   * @param string $status      status of the transaction send by google
-   * @param array  $privateData contains the name value pair of <merchant-private-data>
+   * @param string $status status of the transaction send by google
+   * @param $dataRoot
+   * @param $component
+   * @internal param array $privateData contains the name value pair of <merchant-private-data>
    *
    * @return void
-   *
    */
   function orderStateChange($status, $dataRoot, $component) {
     $input = $objects = $ids = array();
@@ -260,6 +263,8 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param $component
+   * @param $paymentProcessor
    * @return object
    * @static
    */

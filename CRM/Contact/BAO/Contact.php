@@ -854,7 +854,9 @@ WHERE id={$id}; ";
    * function to return relative path
    * @todo make this a method of $config->userSystem (i.e. UF classes) rather than a static function
    *
-   * @param String $absPath absolute path
+   * @param $absolutePath
+   *
+   * @internal param String $absPath absolute path
    *
    * @return String $relativePath Relative url of uploaded image
    */

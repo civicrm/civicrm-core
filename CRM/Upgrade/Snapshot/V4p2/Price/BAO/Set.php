@@ -858,12 +858,15 @@ return FALSE;
 }
 }
 
-/**
- * Function to set daefult the price set fields.
- *
- * @return array $defaults
- * @access public
- */
+  /**
+   * Function to set daefult the price set fields.
+   *
+   * @param $form
+   * @param $defaults
+   *
+   * @return array $defaults
+   * @access public
+   */
 static function setDefaultPriceSet(&$form, &$defaults) {
 if (!isset($form->_priceSet) || empty($form->_priceSet['fields'])) {
 return $defaults;

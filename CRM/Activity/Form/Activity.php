@@ -801,9 +801,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $self
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -850,6 +852,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    *
    * @access public
    *
+   * @param null $params
    * @return void
    */
   public function postProcess($params = NULL) {
