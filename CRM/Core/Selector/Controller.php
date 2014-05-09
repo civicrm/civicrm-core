@@ -184,16 +184,20 @@ class CRM_Core_Selector_Controller {
   /**
    * Class constructor
    *
-   * @param CRM_Core_Selector_API $object  an object that implements the selector API
-   * @param int               $pageID  default pageID
-   * @param int               $sortID  default sortID
-   * @param int               $action  the actions to potentially support
-   * @param CRM_Core_Page|CRM_Core_Form $store   place in session to store some values
-   * @param int               $output  what do we so with the output, session/template//both
+   * @param CRM_Core_Selector_API $object an object that implements the selector API
+   * @param int $pageID default pageID
+   * @param int $sortID default sortID
+   * @param int $action the actions to potentially support
+   * @param CRM_Core_Page|CRM_Core_Form $store place in session to store some values
+   * @param int $output what do we so with the output, session/template//both
    *
-   * @return Object
-   * @access public
-   */ function __construct($object, $pageID, $sortID, $action, $store = NULL, $output = self::TEMPLATE, $prefix = NULL, $case = NULL) {
+   * @param null $prefix
+   * @param null $case
+   *
+   * @return \CRM_Core_Selector_Controller
+  @access public
+   */
+  function __construct($object, $pageID, $sortID, $action, $store = NULL, $output = self::TEMPLATE, $prefix = NULL, $case = NULL) {
 
     $this->_object = $object;
     $this->_pageID = $pageID ? $pageID : 1;

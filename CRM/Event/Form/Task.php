@@ -156,7 +156,11 @@ class CRM_Event_Form_Task extends CRM_Core_Form {
    * the form with a customized title for the main Submit
    *
    * @param string $title title of the main button
-   * @param string $type  button type for the form after processing
+   * @param string $nextType
+   * @param string $backType
+   * @param bool $submitOnce
+   *
+   * @internal param string $type button type for the form after processing
    *
    * @return void
    * @access public

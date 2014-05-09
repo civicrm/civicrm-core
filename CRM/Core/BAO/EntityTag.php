@@ -136,8 +136,9 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * Given an array of entity ids and entity table, add all the entity to the tags
    *
-   * @param array  $entityIds (reference ) the array of entity ids to be added
-   * @param int    $tagId the id of the tag
+   * @param array $entityIds (reference ) the array of entity ids to be added
+   * @param int $tagId the id of the tag
+   * @param string $entityTable
    * @params string $entityTable name of entity table default:civicrm_contact
    *
    * @return array             (total, added, notAdded) count of enities added to tag
@@ -179,8 +180,9 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * Given an array of entity ids and entity table, remove entity(s) tags
    *
-   * @param array  $entityIds (reference ) the array of entity ids to be removed
-   * @param int    $tagId the id of the tag
+   * @param array $entityIds (reference ) the array of entity ids to be removed
+   * @param int $tagId the id of the tag
+   * @param string $entityTable
    * @params string $entityTable name of entity table default:civicrm_contact
    *
    * @return array             (total, removed, notRemoved) count of entities removed from tags

@@ -117,7 +117,10 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {

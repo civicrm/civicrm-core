@@ -115,9 +115,10 @@ WHERE  parent_id IS NULL
    *
    *function to  retrieve  all basic contact types.
    *
-   *@return  array of basic contact types
-   *@static
+   * @param bool $all
    *
+   * @return  array of basic contact types
+   * @static
    */
   static function basicTypes($all = FALSE) {
     return array_keys(self::basicTypeInfo($all));

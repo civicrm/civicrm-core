@@ -119,6 +119,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param null $id
+   *
    * @return array - array reference of all financial types if any
    * @static
    */
@@ -190,8 +192,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param boolean $name pseudoconstant to be flushed
-   *
+   * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'cache') {
    if (isset(self::$$name)) {
@@ -272,6 +273,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param null $pageID
    * @return array - array of all Premiums if any
    * @static
    */
@@ -319,6 +321,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param null $id
+   * @param string $columnName
    * @return array - array reference of all contribution statuses
    * @static
    */

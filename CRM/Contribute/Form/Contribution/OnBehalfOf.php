@@ -119,8 +119,9 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
    * Function to build form for related contacts / on behalf of organization.
    *
    * @param $form              object  invoking Object
-   * @param $contactType       string  contact type
-   * @param $title             string  fieldset title
+   *
+   * @internal param string $contactType contact type
+   * @internal param string $title fieldset title
    *
    * @static
    */

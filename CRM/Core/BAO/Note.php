@@ -282,12 +282,10 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   /**
    * Function to delete the notes
    *
-   * @param int $id  note id
+   * @param int $id note id
    * @param boolean $showStatus do we need to set status or not
    *
-   * @return $return no of deleted notes on success, false otherwise
-   *
-   * @access public
+   * @return mixed|null $return no of deleted notes on success, false otherwise@access public
    * @static
    */
   static function del($id, $showStatus = TRUE) {

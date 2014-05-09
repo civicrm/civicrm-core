@@ -193,6 +193,8 @@ class CRM_Core_Payment_Form {
   /**
    * create all fields needed for direct debit transaction
    *
+   * @param $form
+   *
    * @return void
    * @access public
    */
@@ -313,6 +315,8 @@ class CRM_Core_Payment_Form {
   /**
    * Function to add all the direct debit fields
    *
+   * @param $form
+   * @param bool $useRequired
    * @return void
    * @access public
    */

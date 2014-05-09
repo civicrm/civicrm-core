@@ -152,8 +152,8 @@ ON DUPLICATE KEY UPDATE
   /**
    * Function to check if there are any contacts in cache table
    *
-   * @param string  $type      the type of operation (view|edit)
-   * @param int     $contactID contact id
+   * @param int|string $type the type of operation (view|edit)
+   * @param int $contactID contact id
    *
    * @return boolean
    * @access public

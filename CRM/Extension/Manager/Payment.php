@@ -176,7 +176,9 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
    * Function to run hooks in the payment processor class
    * Load requested payment processor and call the method specified.
    *
+   * @param CRM_Extension_Info $info
    * @param string $method - the method to call in the payment processor class
+   *
    * @private
    */
   private function _runPaymentHook(CRM_Extension_Info $info, $method) {

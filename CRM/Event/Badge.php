@@ -153,8 +153,10 @@ class CRM_Event_Badge {
   /**
    * function to create labels (pdf)
    *
-   * @param   array    $contactRows   assciated array of contact data
-   * @param   string   $format   format in which labels needs to be printed
+   * @param $participants
+   *
+   * @internal param array $contactRows assciated array of contact data
+   * @internal param string $format format in which labels needs to be printed
    *
    * @return  null
    * @access  public

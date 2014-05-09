@@ -157,7 +157,10 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   /**
    * Function to check dashlet permission for current user
    *
-   * @param string permission string
+   * @param $permission
+   * @param $operator
+   *
+   * @internal param \permission $string string
    *
    * @return boolean true if use has permission else false
    */

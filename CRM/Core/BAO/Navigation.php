@@ -154,8 +154,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    * @param $parentID parent_id of a menu
    * @param $menuID  menu id
    *
-   * @return $weight string
-   * @static
+   * @return int $weight string@static
    */
   static function calculateWeight($parentID = NULL, $menuID = NULL) {
     $domainID = CRM_Core_Config::domainID();

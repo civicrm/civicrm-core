@@ -142,6 +142,8 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
   /**
    * Browse all jobs.
    *
+   * @param null $action
+   *
    * @return void
    * @access public
    * @static

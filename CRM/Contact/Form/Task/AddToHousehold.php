@@ -178,12 +178,12 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
   /**
    * This function is to get the result of the search for Add to * forms
    *
-   * @param  array $params  This contains elements for search criteria
+   * @param $form
+   * @param  array $params This contains elements for search criteria
    *
    * @access public
    *
    * @return void
-   *
    */
   function search(&$form, &$params) {
     //max records that will be listed

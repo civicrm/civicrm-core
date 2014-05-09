@@ -179,11 +179,12 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * Retrieve the value of a setting from the DB table
    *
    * @param string $group (required) The group name of the item
-   * @param string $name  (required) The name under which this item is stored
-   * @param int    $componentID The optional component ID (so componenets can share the same name space)
+   * @param string $name (required) The name under which this item is stored
+   * @param int $componentID The optional component ID (so componenets can share the same name space)
    * @param string $defaultValue The default value to return for this setting if not present in DB
-   * @param int    $contactID    If set, this is a contactID specific setting, else its a global setting
-
+   * @param int $contactID If set, this is a contactID specific setting, else its a global setting
+   *
+   * @param null $domainID
    *
    * @return object The data if present in the setting table, else null
    * @static

@@ -142,13 +142,16 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    * Class constructor
    *
    * @param array $queryParams array of parameters for query
-   * @param int   $action - action of search basic or advanced.
-   * @param string   $mailingClause if the caller wants to further restrict the search
+   * @param \const|int $action - action of search basic or advanced.
+   * @param string $mailingClause if the caller wants to further restrict the search
    * @param boolean $single are we dealing only with one contact?
-   * @param int     $limit  how many mailing do we want returned
+   * @param int $limit how many mailing do we want returned
    *
-   * @return CRM_Contact_Selector
-   * @access public
+   * @param string $context
+   * @param null $compContext
+   *
+   * @return \CRM_Mailing_Selector_Search
+  @access public
    */
   function __construct(&$queryParams,
     $action = CRM_Core_Action::NONE,

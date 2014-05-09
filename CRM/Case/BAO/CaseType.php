@@ -138,10 +138,11 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * full featured over a period of time. This is the inverse function of
    * create.  It also stores all the retrieved values in the default array
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
+   * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the name / value pairs
    *                        in a hierarchical manner
-   * @param array $ids      (reference) the array that holds all the db ids
+   *
+   * @internal param array $ids (reference) the array that holds all the db ids
    *
    * @return object CRM_Case_BAO_CaseType object
    * @access public

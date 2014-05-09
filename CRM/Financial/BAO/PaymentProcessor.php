@@ -273,10 +273,11 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Function to retrieve payment processor id / info/ object based on component-id.
    *
-   * @param int    $componentID id of a component
-   * @param string $component   component
-   * @param string $type        type of payment information to be retrieved
+   * @param $entityID
+   * @param string $component component
+   * @param string $type type of payment information to be retrieved
    *
+   * @internal param int $componentID id of a component
    * @return id / array / object based on type
    * @static
    * @access public

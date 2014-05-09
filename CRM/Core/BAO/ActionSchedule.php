@@ -275,7 +275,10 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   /**
    * Retrieve list of Scheduled Reminders
    *
-   * @param bool    $namesOnly    return simple list of names
+   * @param bool $namesOnly return simple list of names
+   *
+   * @param null $entityValue
+   * @param null $id
    *
    * @return array  (reference)   reminder list
    * @static
