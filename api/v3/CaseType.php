@@ -62,9 +62,10 @@ function civicrm_api3_case_type_create($params) {
 /**
  * Function to retrieve case types
  *
+ * @param $params
+ *
  * @return array $caseTypes case types keyed by id
  * @access public
- *
  */
 function civicrm_api3_case_type_get($params) {
   civicrm_api3_verify_mandatory($params);

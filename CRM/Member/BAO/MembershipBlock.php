@@ -63,6 +63,8 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
    * Function to delete membership Blocks
    *
    * @param int $id
+   *
+   * @return bool
    * @static
    */
   static function del($id) {

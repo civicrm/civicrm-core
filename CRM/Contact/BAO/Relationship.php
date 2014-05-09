@@ -562,6 +562,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param int $id relationship id
    *
    * $returns  returns the contact ids in the realtionship
+   *
+   * @return \CRM_Contact_DAO_Relationship
    * @access public
    * @static
    */
@@ -724,9 +726,10 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
   /**
    * update the is_active flag in the db
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id id of the database record
+   * @param boolean $is_active value we want to set the is_active field
    *
+   * @throws CiviCRM_API3_Exception
    * @return Object             DAO object on success, null otherwise
    * @static
    */
@@ -796,10 +799,13 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
    * @param int $numRelationship no of relationships to display (limit)
    * @param int $count get the no of relationships
    * $param int $relationshipId relationship id
-   * @param string $direction   the direction we are interested in a_b or b_a
+   * @param $relationshipId
+   * @param string $direction the direction we are interested in a_b or b_a
    * @param array $params array of extra values including relationship_type_id per api spec
    *
    * return string the query for this diretion
+   *
+   * @return array
    * @static
    * @access public
    */
@@ -940,6 +946,13 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * $param boolean $permissionedContact to return only permissioned Contact
    * $param array $params array of variables consistent with filters supported by the api
    * return array $values relationship records
+   * @param int $relationshipId
+   * @param null $links
+   * @param null $permissionMask
+   * @param bool $permissionedContact
+   * @param array $params
+   *
+   * @return array|int
    * @static
    * @access public
    */
@@ -1416,10 +1429,7 @@ SELECT count(*)
    *
    * @param $contactIds       Contact Ids
    *
-   * @return $currentEmployer array of the current employer
-   *
-   * @static
-   *
+   * @return array $currentEmployer array of the current employer@static
    */
   static function getCurrentEmployer($contactIds) {
     $contacts = implode(',', $contactIds);
@@ -1574,6 +1584,9 @@ AND cc.sort_name LIKE '%$name%'";
    * (as opposed to those who inherit a particular membership
    *
    * @param array $params api input array
+   * @param null $direction
+   *
+   * @return array
    */
   static function membershipTypeToRelationshipTypes(&$params, $direction = NULL) {
     $membershipType = civicrm_api3('membership_type', 'getsingle', array('id' => $params['membership_type_id'], 'return' => 'relationship_type_id, relationship_direction'));

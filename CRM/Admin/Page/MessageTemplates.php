@@ -208,6 +208,8 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
   /**
    * Get user context.
    *
+   * @param null $mode
+   *
    * @return string user context.
    */
   function userContext($mode = NULL) {
@@ -217,7 +219,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
   /**
    * browse all entities.
    *
-   * @param int $action
+   * @internal param int $action
    *
    * @return void
    * @access public

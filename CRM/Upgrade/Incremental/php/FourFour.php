@@ -99,7 +99,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
       }
     }
     if ($rev == '4.4.6'){
-     $postUpgradeMessage .= '<br /><br /><strong>'. ts('Your contact image urls have been upgraded. If your contact image urls did not follow the standard format for image Urls they have not been upgraded. Please check the log to see image urls that were not upgraded.'); 
+     $postUpgradeMessage .= '<br /><br /><strong>'. ts('Your contact image urls have been upgraded. If your contact image urls did not follow the standard format for image Urls they have not been upgraded. Please check the log to see image urls that were not upgraded.');
     }
   }
 
@@ -322,7 +322,7 @@ ALTER TABLE civicrm_dashboard
 
   static function upgradeImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId){
     $sql = "CREATE INDEX index_image_url ON civicrm_contact (image_url);";
-    $dao = CRM_Core_DAO::executeQuery($sql);    
+    $dao = CRM_Core_DAO::executeQuery($sql);
     $sql = "
 SELECT id, image_url
 FROM civicrm_contact
@@ -356,7 +356,7 @@ AND id BETWEEN %1 AND %2
             $failures[$dao->id] = $dao->image_url;
           }
         }
-        else{     
+        else{
             $failures[$dao->id] = $dao->image_url;
         }
       }
@@ -366,6 +366,8 @@ AND id BETWEEN %1 AND %2
 
   /**
    * Update activity contacts CRM-12274
+   *
+   * @param CRM_Queue_TaskContext $ctx
    *
    * @return bool TRUE for success
    */

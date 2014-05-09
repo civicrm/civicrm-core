@@ -51,6 +51,8 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function setDefaultValues(&$form) {
@@ -116,6 +118,10 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    * Function to process the form
    *
    * @access public
+   *
+   * @param $form
+   * @param $params
+   * @param $activity
    *
    * @return void
    */

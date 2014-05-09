@@ -70,7 +70,9 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
   }
 
   /**
-   * @param string $name e.g. "administer CiviCRM", "cms:access user record", "Drupal:administer content", "Joomla:example.action:com_some_asset"
+   * @param $perm
+   *
+   * @internal param string $name e.g. "administer CiviCRM", "cms:access user record", "Drupal:administer content", "Joomla:example.action:com_some_asset"
    * @return ALWAYS_DENY_PERMISSION|ALWAYS_ALLOW_PERMISSION|array(0 => $joomlaAction, 1 => $joomlaAsset)
    */
   function translateJoomlaPermission($perm) {

@@ -263,9 +263,14 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * display an error page with an error message describing what happened
    *
-   * @param string message  the error message
-   * @param string code     the error code if any
-   * @param string email    the email address to notify of this situation
+   * @param null $message
+   * @param null $code
+   * @param null $email
+   *
+   * @throws Exception
+   * @internal param \message $string the error message
+   * @internal param \code $string the error code if any
+   * @internal param \email $string the email address to notify of this situation
    *
    * @return void
    * @static
@@ -575,6 +580,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
   /**
    * Obtain a reference to the error log
+   *
+   * @param string $comp
    *
    * @return Log
    */

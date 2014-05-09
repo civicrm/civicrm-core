@@ -180,8 +180,9 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   /**
    * Function to delete the event
    *
-   * @param int $id  event id
+   * @param int $id event id
    *
+   * @return mixed|null
    * @access public
    * @static
    *
@@ -257,10 +258,11 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @param $all              int     0 returns current and future events
    *                                  1 if events all are required
    *                                  2 returns events since 3 months ago
-   * @param $id               int     id of a specific event to return
+   * @param bool|int $id int     id of a specific event to return
    * @param $isActive         boolean true if you need only active events
    * @param $checkPermission  boolean true if you need to check permission else false
    *
+   * @return array
    * @static
    */
   static function getEvents($all = 0,
@@ -557,12 +559,14 @@ LIMIT      0, 10
   /**
    * Function to get participant count
    *
+   * @param $eventId
    * @param  boolean $considerStatus consider status for participant count.
-   * @param  boolean $status         consider counted participant.
-   * @param  boolean $considerRole   consider role for participant count.
-   * @param  boolean $role           consider counted( is filter role) participant.
-   * @param  array   $eventIds       consider participants from given events.
-   * @param  boolean $countWithStatus  retrieve participant count w/ each participant status.
+   * @param  boolean $status consider counted participant.
+   * @param  boolean $considerRole consider role for participant count.
+   * @param  boolean $role consider counted( is filter role) participant.
+   *
+   * @internal param array $eventIds consider participants from given events.
+   * @internal param bool $countWithStatus retrieve participant count w/ each participant status.
    *
    * @access public
    *
@@ -1358,6 +1362,8 @@ WHERE civicrm_event.is_active = 1
    * @param array $groupTitle Profile Group Title.
    * @param array $values formatted array of key value
    *
+   * @param array $profileFields
+   *
    * @return void
    * @access public
    * @static
@@ -1615,14 +1621,16 @@ WHERE  id = $cfID
   /**
    * Function to build the array for Additional participant's information  array of priamry and additional Ids
    *
-   *@param int $participantId id of Primary participant
-   *@param array $values key/value event info
-   *@param int $contactId contact id of Primary participant
-   *@param boolean $isTest whether test or live transaction
-   *@param boolean $isIdsArray to return an array of Ids
+   * @param int $participantId id of Primary participant
+   * @param array $values key/value event info
+   * @param int $contactId contact id of Primary participant
+   * @param boolean $isTest whether test or live transaction
+   * @param boolean $isIdsArray to return an array of Ids
    *
-   *@return array $customProfile array of Additional participant's info OR array of Ids.
-   *@access public
+   * @param bool $skipCancel
+   *
+   * @return array $customProfile array of Additional participant's info OR array of Ids.
+   * @access public
    */
   static function buildCustomProfile($participantId,
     $values,
@@ -1861,8 +1869,11 @@ WHERE  ce.loc_block_id = $locBlockId";
   /**
    * make sure that the user has permission to access this event
    *
-   * @param int $id   the id of the event
-   * @param int $name the name or title of the event
+   * @param null $eventId
+   * @param int $type
+   *
+   * @internal param int $id the id of the event
+   * @internal param int $name the name or title of the event
    *
    * @return string   the permission that the user has (or null)
    * @access public

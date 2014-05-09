@@ -41,14 +41,19 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
   /**
    * constructor
    *
+   * @param null $path
+   * @param bool $title
    * @param string  path        the class Path of the form being implemented
-   * @param string  title       the descriptive name for the page
-   * @param int     mode        the mode that the form will operate on
-   * @param boolean addSequence should we add a unique sequence number to the end of the key
-   * @param boolean ignoreKey    should we not set a qfKey for this controller (for standalone forms)
+   * @param bool $imageUpload
+   * @param bool $addSequence
+   * @param bool $ignoreKey
+   * @param bool $attachUpload
    *
-   * @return object
-   * @access public
+   * @internal param \addSequence $boolean should we add a unique sequence number to the end of the key
+   * @internal param \ignoreKey $boolean should we not set a qfKey for this controller (for standalone forms)
+   *
+   * @return \CRM_Core_Controller_Simple
+  @access public
    */
   function __construct(
     $path,

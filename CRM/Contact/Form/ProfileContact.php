@@ -39,6 +39,8 @@ class CRM_Contact_Form_ProfileContact {
   /**
    * Function to set variables up before form is built
    *
+   * @param $form
+   *
    * @return void
    * @access public
    */
@@ -76,8 +78,9 @@ class CRM_Contact_Form_ProfileContact {
    * Function to build form for honoree contact / on behalf of organization.
    *
    * @param $form              object  invoking Object
-   * @param $contactType       string  contact type
-   * @param $title             string  fieldset title
+   *
+   * @internal param string $contactType contact type
+   * @internal param string $title fieldset title
    *
    * @static
    */

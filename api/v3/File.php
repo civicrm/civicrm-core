@@ -128,11 +128,12 @@ function &civicrm_api3_file_update($params) {
  * This API is used for deleting a file
  * Required parameters : id of a file
  *
- * @param  Int  $fileId  Id of the file to be deleted
+ * @param $params
+ *
+ * @internal param Int $fileId Id of the file to be deleted
  *
  * @return null if successfull, object of CRM_Core_Error otherwise
  * @access public
-
  */
 function civicrm_api3_file_delete($params) {
 

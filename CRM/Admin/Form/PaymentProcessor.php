@@ -349,6 +349,10 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   /**
    * Save a payment processor
    *
+   * @param $values
+   * @param $domainID
+   * @param $test
+   *
    * @return Void
    */
   function updatePaymentProcessor(&$values, $domainID, $test) {

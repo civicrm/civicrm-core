@@ -43,6 +43,8 @@
  *
  * @example EmailCreate.php Standard Create Example
  *
+ * @param $params
+ *
  * @return array API result array
  * {@getfields email_create}
  * @access public

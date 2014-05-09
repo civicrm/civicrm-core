@@ -368,10 +368,11 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
   /**
    * To find fields related to a rule group.
    *
-   * @param array contains the rule group property to identify rule group
+   * @param $params
    *
-   * @return (rule field => weight) array and threshold associated to rule group
-   * @access public
+   * @internal param \contains $array the rule group property to identify rule group
+   *
+   * @return array (rule field => weight) array and threshold associated to rule group@access public
    */
   static function dedupeRuleFieldsWeight($params) {
     $rgBao               = new CRM_Dedupe_BAO_RuleGroup();

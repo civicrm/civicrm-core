@@ -578,9 +578,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *
    * @param             $groupIds               An array of valid group ids (passed by reference)
    *
-   * @return            $groupIdArray         List of groupIds that represent the requested group and its parents
-   *
-   * @access public
+   * @return array $groupIdArray         List of groupIds that represent the requested group and its parents@access public
    */
   static function getParentGroupIds($groupIds) {
     if (!is_array($groupIds)) {

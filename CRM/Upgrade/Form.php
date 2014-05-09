@@ -367,6 +367,9 @@ SET    version = '$version'
   /**
    * Determine if $currentVer can be upgraded to $latestVer
    *
+   * @param $currentVer
+   * @param $latestVer
+   *
    * @return mixed, a string error message or boolean 'false' if OK
    */
   function checkUpgradeableVersion($currentVer, $latestVer) {
@@ -417,6 +420,9 @@ SET    version = '$version'
 
   /**
    * Determine if $currentver already matches $latestVer
+   *
+   * @param $currentVer
+   * @param $latestVer
    *
    * @return mixed, a string error message or boolean 'false' if OK
    */
@@ -503,10 +509,13 @@ SET    version = '$version'
   /**
    * Perform an incremental version update
    *
+   * @param CRM_Queue_TaskContext $ctx
    * @param $rev string, the target (intermediate) revision e.g '3.2.alpha1'
-   * @param $currentVer string, the original revision
-   * @param $latestVer string, the target (final) revision
-   * @param $postUpgradeMessageFile string, path of a modifiable file which lists the post-upgrade messages
+   *
+   * @return bool
+   * @internal param string $currentVer , the original revision
+   * @internal param string $latestVer , the target (final) revision
+   * @internal param string $postUpgradeMessageFile , path of a modifiable file which lists the post-upgrade messages
    */
   static function doIncrementalUpgradeStart(CRM_Queue_TaskContext $ctx, $rev) {
     $upgrade = new CRM_Upgrade_Form();
@@ -521,10 +530,13 @@ SET    version = '$version'
   /**
    * Perform an incremental version update
    *
+   * @param CRM_Queue_TaskContext $ctx
    * @param $rev string, the target (intermediate) revision e.g '3.2.alpha1'
    * @param $currentVer string, the original revision
    * @param $latestVer string, the target (final) revision
    * @param $postUpgradeMessageFile string, path of a modifiable file which lists the post-upgrade messages
+   *
+   * @return bool
    */
   static function doIncrementalUpgradeStep(CRM_Queue_TaskContext$ctx, $rev, $currentVer, $latestVer, $postUpgradeMessageFile) {
     $upgrade = new CRM_Upgrade_Form();
@@ -593,10 +605,13 @@ SET    version = '$version'
   /**
    * Perform an incremental version update
    *
+   * @param CRM_Queue_TaskContext $ctx
    * @param $rev string, the target (intermediate) revision e.g '3.2.alpha1'
    * @param $currentVer string, the original revision
    * @param $latestVer string, the target (final) revision
    * @param $postUpgradeMessageFile string, path of a modifiable file which lists the post-upgrade messages
+   *
+   * @return bool
    */
   static function doIncrementalUpgradeFinish(CRM_Queue_TaskContext $ctx, $rev, $currentVer, $latestVer, $postUpgradeMessageFile) {
     $upgrade = new CRM_Upgrade_Form();
@@ -639,6 +654,8 @@ SET    version = '$version'
    * object.
    *
    * @param $preUpgradeMessage string, alterable
+   * @param $currentVer
+   * @param $latestVer
    */
   function setPreUpgradeMessage(&$preUpgradeMessage, $currentVer, $latestVer) {
     CRM_Upgrade_Incremental_Legacy::setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);

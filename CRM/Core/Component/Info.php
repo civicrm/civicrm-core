@@ -360,9 +360,10 @@ abstract class CRM_Core_Component_Info {
   /**
    * Helper for instantiating component's elements.
    *
+   * @param $cl
+   *
    * @return mixed component's element as class instance
    * @access private
-   *
    */
   private function _instantiate($cl) {
     $className = $this->namespace . '_' . $cl;

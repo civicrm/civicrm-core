@@ -149,8 +149,9 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   /**
    * Function to delete the pledgeBlock
    *
-   * @param int $id  pledgeBlock id
+   * @param int $id pledgeBlock id
    *
+   * @return mixed|null
    * @access public
    * @static
    */
@@ -175,7 +176,10 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   /**
    * Function to return Pledge  Block info in Contribution Pages
    *
-   * @param int $pageId contribution page id
+   * @param $pageID
+   *
+   * @return array
+   * @internal param int $pageId contribution page id
    *
    * @static
    */

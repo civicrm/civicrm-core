@@ -74,7 +74,9 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_PaymentExpressIPN
    */
   function __construct($mode, &$paymentProcessor) {
     parent::__construct();

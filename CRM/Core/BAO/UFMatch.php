@@ -63,9 +63,12 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * object for this user. If the user has new values, we need
    * to update the CRM DB with the new values
    *
-   * @param Object  $user    the drupal user object
-   * @param boolean $update  has the user object been edited
-   * @param         $uf
+   * @param Object $user the drupal user object
+   * @param boolean $update has the user object been edited
+   * @param $uf
+   *
+   * @param $ctype
+   * @param bool $isLogin
    *
    * @return void
    * @access public
@@ -599,10 +602,13 @@ AND    domain_id    = %4
   /**
    * Get uf match values for given uf id or logged in user.
    *
-   * @param int    $ufID uf id.
+   * @param int $ufID uf id.
    *
    * return array  $ufValues uf values.
-   **/
+   **
+   *
+   * @return array
+   */
   static function getUFValues($ufID = NULL) {
     if (!$ufID) {
       //get logged in user uf id.

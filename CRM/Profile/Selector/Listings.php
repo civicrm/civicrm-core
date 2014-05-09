@@ -132,13 +132,20 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   protected $_profileIds = array();
 
   protected $_multiRecordTableName = NULL;
+
   /**
    * Class constructor
    *
+   * @param $params
+   * @param $customFields
    * @param string params the params for the where clause
    *
-   * @return CRM_Contact_Selector_Profile
-   * @access public
+   * @param bool $map
+   * @param bool $editLink
+   * @param bool $linkToUF
+   *
+   * @return \CRM_Profile_Selector_Listings
+  @access public
    */
   function __construct(
     &$params,
@@ -207,9 +214,13 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   /**
    * This method returns the links that are given for each search row.
    *
+   * @param bool $map
+   * @param bool $editLink
+   * @param bool $ufLink
+   * @param null $gids
+   *
    * @return array
    * @access public
-   *
    */
   static function &links($map = FALSE, $editLink = FALSE, $ufLink = FALSE, $gids = NULL) {
     if (!self::$_links) {
@@ -270,7 +281,10 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {

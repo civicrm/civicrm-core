@@ -805,6 +805,8 @@ class CRM_GCD {
    *
    * @param $cid int: contact id
    * @param $masterContactId int: set if this is a shared address
+   *
+   * @return array
    */
   private function _addAddress($cid, $masterContactId = NULL) {
 
@@ -862,6 +864,8 @@ class CRM_GCD {
    * Add a phone number for a contact
    *
    * @param $cid int: contact id
+   *
+   * @return array
    */
   private function _addPhone($cid) {
     $area = $this->probability(.5) ? '' : mt_rand(201, 899);
@@ -882,6 +886,10 @@ class CRM_GCD {
    * Add an email for a contact
    *
    * @param $cid int: contact id
+   * @param $email
+   * @param $locationType
+   *
+   * @return array
    */
   private function _addEmail($cid, $email, $locationType) {
     $params = array(
@@ -899,6 +907,8 @@ class CRM_GCD {
    *
    * @param $cid int: contact id
    * @param $name str: contact name
+   *
+   * @return array
    */
   private function _addWebsite($cid, $name) {
     $part = array_pad(split(' ', strtolower($name)), 3, '');
@@ -933,8 +943,11 @@ class CRM_GCD {
   /**
    * Create an email address based on a person's name
    * Using common naming patterns
+   *
    * @param $contact obj: individual contact record
    * @param $domain str: supply a domain (i.e. for a work address)
+   *
+   * @return string
    */
   private function _individualEmail($contact, $domain = NULL) {
     $first = $contact->first_name;

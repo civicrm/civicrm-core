@@ -63,7 +63,9 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * process website
    *
    * @param array $params associated array
-   * @param int   $contactID contact id
+   * @param int $contactID contact id
+   *
+   * @param $skipDelete
    *
    * @return void
    * @access public

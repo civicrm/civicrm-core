@@ -12,6 +12,12 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
    * in fixing the existing pdfLetter classes to be suitably generic
    * @access public
    *
+   * @param $form
+   * @param $membershipIDs
+   * @param $skipOnHold
+   * @param $skipDeceased
+   * @param $contactIDs
+   *
    * @return void
    */
   static function postProcessMembers(&$form, $membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {

@@ -70,8 +70,11 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
    * function exists to get the values from the rp_invoice_id string
+   *
    * @param string $name e.g. i, values are stored in the string with letter codes
    * @param boolean $abort fatal if not found?
+   *
+   * @throws CRM_Core_Exception
    * @return unknown
    */
   function getValue($name, $abort = TRUE) {
@@ -123,6 +126,8 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    *   - Integer
    * @param string $location - deprecated
    * @param boolean $abort abort if empty
+   *
+   * @throws CRM_Core_Exception
    * @return Ambigous <mixed, NULL, value, unknown, array, number>
    */
   function retrieve($name, $type, $location = 'POST', $abort = TRUE) {

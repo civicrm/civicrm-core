@@ -955,6 +955,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * Process activity creation
    *
    * @param array $params associated array of submitted values
+   *
+   * @return $this|null|object
    * @access protected
    */
   protected function processActivity(&$params) {
@@ -1050,7 +1052,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           $mailStatus .= ts("A copy of the activity has also been sent to assignee contacts(s).");
         }
       }
-      
+
       // Also send email to follow-up activity assignees if set
       if ($followupActivity) {
         $mailToFollowupContacts = array();

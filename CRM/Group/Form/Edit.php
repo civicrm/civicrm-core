@@ -306,6 +306,9 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    *
    * @param array $fields posted values of the form
    *
+   * @param $fileParams
+   * @param $options
+   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public

@@ -220,7 +220,9 @@ WHERE     pledge_id = %1
   /**
    * Delete pledge payment
    *
-   * @param array $params associate array of field
+   * @param $id
+   *
+   * @internal param array $params associate array of field
    *
    * @return pledge payment id
    * @static
@@ -247,8 +249,9 @@ WHERE     pledge_id = %1
   /**
    * Function to delete all pledge payments
    *
-   * @param int $id  pledge id
+   * @param int $id pledge id
    *
+   * @return bool
    * @access public
    * @static
    *
@@ -281,8 +284,9 @@ WHERE     pledge_id = %1
   /**
    * On delete contribution record update associated pledge payment and pledge.
    *
-   * @param int $contributionID  contribution id
+   * @param int $contributionID contribution id
    *
+   * @return bool
    * @access public
    * @static
    */
@@ -604,11 +608,12 @@ WHERE  civicrm_pledge.id = %2
    * Function to update pledge payment table
    *
    * @param int $pledgeId pledge id
-   * @param array $paymentIds payment ids to be updated
    * @param int $paymentStatusId payment status id to set
-   * @param float $actualAmount, actual amount being paid
-   * @param int $contributionId, Id of associated contribution when payment is recorded
-   * @param bool $isScriptUpdate, is function being called from bin script?
+   * @param array $paymentIds payment ids to be updated
+   * @param float|int $actualAmount , actual amount being paid
+   * @param int $contributionId , Id of associated contribution when payment is recorded
+   * @param bool $isScriptUpdate , is function being called from bin script?
+   *
    * @static
    */
   static function updatePledgePayments($pledgeId,

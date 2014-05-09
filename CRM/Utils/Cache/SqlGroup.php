@@ -60,12 +60,13 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   /**
    * Constructor
    *
-   * @param array   $config  an array of configuration params
+   * @param array $config an array of configuration params
    *   - group: string
    *   - componentID: int
    *   - prefetch: bool, whether to preemptively read the entire cache group; default: TRUE
    *
-   * @return void
+   * @throws RuntimeException
+   * @return \CRM_Utils_Cache_SqlGroup
    */
   function __construct($config) {
     if (isset($config['group'])) {

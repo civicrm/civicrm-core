@@ -129,6 +129,9 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * Function to delete membership Types
    *
    * @param int $membershipTypeId
+   *
+   * @throws CRM_Core_Exception
+   * @return bool|mixed
    * @static
    */
   static function del($membershipTypeId) {
@@ -223,7 +226,10 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   /**
    * Function to get membership Types
    *
-   * @param int $membershipTypeId
+   * @param bool $public
+   *
+   * @return array
+   * @internal param int $membershipTypeId
    * @static
    */
   static function getMembershipTypes($public = TRUE) {
@@ -246,6 +252,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * Function to get membership Type Details
    *
    * @param int $membershipTypeId
+   *
+   * @return array|null
    * @static
    */
   static function getMembershipTypeDetails($membershipTypeId) {
@@ -592,10 +600,14 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     return $memTypeOrgs;
   }
 
-  /** The function returns all the Organization for  all membershiptypes .
-   *  @param  array      $allmembershipTypes       array of allMembershipTypes
-   *  with organization id Key - value pairs.
+  /**
+   * The function returns all the Organization for  all membershiptypes .
    *
+   * @param null $membershipTypeId
+   *
+   * @return array
+   * @internal param array $allmembershipTypes array of allMembershipTypes
+   *  with organization id Key - value pairs.
    */
   static function getMembershipTypeOrganization($membershipTypeId = NULL) {
     $allmembershipTypes = array();

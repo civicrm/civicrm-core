@@ -45,6 +45,8 @@ class CRM_Custom_Form_CustomData {
    * @param null|int $groupCount
    * @param null|String $type
    * @param null|int $entityID
+   * @param null $onlySubType
+   *
    * @return void
    */
   static function preProcess(&$form, $subName = NULL, $subType = NULL,

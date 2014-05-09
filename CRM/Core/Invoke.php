@@ -342,6 +342,9 @@ class CRM_Core_Invoke {
    *
    * @param $action
    *
+   * @param $contact_type
+   * @param $contact_sub_type
+   *
    * @static
    * @access public
    */

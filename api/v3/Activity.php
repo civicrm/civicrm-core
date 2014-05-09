@@ -41,16 +41,16 @@
 /**
  * Creates or updates an Activity. See the example for usage
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params Associative array of property name/value
  *                             pairs for the activity.
  * {@getfields activity_create}
  *
+ * @throws API_Exception
  * @return array Array containing 'is_error' to denote success or failure and details of the created activity
  *
  * @example ActivityCreate.php Standard create example
  * @example Activity/ContactRefCustomField.php Create example including setting a contact reference custom field
  * {@example ActivityCreate.php 0}
- *
  */
 function civicrm_api3_activity_create($params) {
 

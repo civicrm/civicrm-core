@@ -252,9 +252,12 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
 
   /**
    * Check contents of mail log
+   *
    * @param array $strings strings that should be included
    * @param array $absentStrings strings that should not be included
+   * @param string $prefix
    *
+   * @return \ezcMail|string
    */
   function checkMailLog($strings, $absentStrings = array(), $prefix = '') {
     $mail = $this->getMostRecentEmail('raw');

@@ -66,10 +66,13 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * Checks whether an item is present in the in-memory cache table
    *
    * @param string $group (required) The group name of the item
-   * @param string $name  (required) The name of the setting
-   * @param int    $componentID The optional component ID (so componenets can share the same name space)
-   * @param int    $contactID    If set, this is a contactID specific setting, else its a global setting
-   * @param int    $load  if true, load from local cache (typically memcache)
+   * @param string $name (required) The name of the setting
+   * @param int $componentID The optional component ID (so componenets can share the same name space)
+   * @param int $contactID If set, this is a contactID specific setting, else its a global setting
+   * @param bool|int $load if true, load from local cache (typically memcache)
+   *
+   * @param null $domainID
+   * @param bool $force
    *
    * @return boolean true if item is already in cache
    * @static
@@ -475,10 +478,12 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * gets metadata about the settings fields (from getfields) based on the fields being passed in
    *
    * This function filters on the fields like 'version' & 'debug' that are not settings
+   *
    * @param array $params Parameters as passed into API
    * @param array $fields empty array to be populated with fields metadata
    * @param bool $createMode
    *
+   * @throws api_Exception
    * @return array $fieldstoset name => value array of the fields to be set (with extraneous removed)
    */
   static function validateSettingsInput($params, &$fields, $createMode = TRUE) {
