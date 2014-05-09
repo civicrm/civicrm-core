@@ -346,6 +346,10 @@
   {/if}
   {literal}
 
+	cj('input[name="soft_credit_type_id"]').on('change', function() {
+		enableHonorType();
+	});
+	
   function enableHonorType( ) {
     var element = document.getElementsByName("soft_credit_type_id");
     for (var i = 0; i < element.length; i++ ) {
