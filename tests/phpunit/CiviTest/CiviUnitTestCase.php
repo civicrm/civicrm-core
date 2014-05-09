@@ -313,7 +313,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = array();
 
     $env = new CRM_Utils_Check_Env();
-    CRM_Utils_Check::singleton()->assertValid($env->checkAll());
+    CRM_Utils_Check::singleton()->assertValid($env->checkMysqlTime());
   }
 
   /**
