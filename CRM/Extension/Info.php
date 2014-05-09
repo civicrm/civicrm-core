@@ -44,9 +44,11 @@ class CRM_Extension_Info {
   /**
    * Load extension info an XML file
    *
-   * @param string $string XML content
+   * @param $file
+   *
+   * @throws CRM_Extension_Exception_ParseException
+   * @internal param string $string XML content
    * @return CRM_Extension_Info
-   * @throws CRM_Extension_Exception
    */
   public static function loadFromFile($file) {
     list ($xml, $error) = CRM_Utils_XML::parseFile($file);

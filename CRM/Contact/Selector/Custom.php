@@ -109,12 +109,19 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   /**
    * Class constructor
    *
+   * @param $customSearchClass
    * @param array $formValues array of form values imported
-   * @param array $params     array of parameters for query
-   * @param int   $action - action of search basic or advanced.
+   * @param array $params array of parameters for query
+   * @param null $returnProperties
+   * @param \const|int $action - action of search basic or advanced.
    *
-   * @return CRM_Contact_Selector
-   * @access public
+   * @param bool $includeContactIds
+   * @param bool $searchChildGroups
+   * @param string $searchContext
+   * @param null $contextMenu
+   *
+   * @return \CRM_Contact_Selector_Custom
+  @access public
    */
   function __construct(
     $customSearchClass,

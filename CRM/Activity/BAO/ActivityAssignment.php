@@ -70,12 +70,13 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
   /**
    * Retrieve assignee_id by activity_id
    *
-   * @param int    $id  ID of the activity
+   * @param $activity_id
+   *
+   * @internal param int $id ID of the activity
    *
    * @return void
    *
    * @access public
-   *
    */
   static function retrieveAssigneeIdsByActivityId($activity_id) {
     $assigneeArray = array();

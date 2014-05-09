@@ -101,7 +101,10 @@ class CRM_Extension_Manager {
   public $statuses;
 
   /**
+   * @param CRM_Extension_Container_Interface $fullContainer
    * @param CRM_Extension_Container_Basic|FALSE $defaultContainer
+   * @param CRM_Extension_Mapper $mapper
+   * @param $typeManagers
    */
   function __construct(CRM_Extension_Container_Interface $fullContainer, $defaultContainer, CRM_Extension_Mapper $mapper, $typeManagers) {
     $this->fullContainer = $fullContainer;

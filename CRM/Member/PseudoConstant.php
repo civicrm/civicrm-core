@@ -58,6 +58,9 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param null $id
+   * @param bool $force
+   *
    * @return array - array reference of all membership types if any
    * @static
    */
@@ -84,6 +87,11 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
    * Get all the membership statuss
    *
    * @access public
+   *
+   * @param null $id
+   * @param null $cond
+   * @param string $column
+   * @param bool $force
    *
    * @return array - array reference of all membership statuss if any
    * @static

@@ -42,10 +42,11 @@ class CRM_Contribute_StateMachine_ContributionPage extends CRM_Core_StateMachine
   /**
    * class constructor
    *
-   * @param object  CRM_Contribute_Controller_ContributionPage
-   * @param int     $action
+   * @param object $controller
+   * @param \const|int $action
    *
-   * @return object CRM_Contribute_StateMachine_ContributionPage
+   * @internal param \CRM_Contribute_Controller_ContributionPage $object
+   * @return \CRM_Contribute_StateMachine_ContributionPage CRM_Contribute_StateMachine_ContributionPage
    */
   function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);

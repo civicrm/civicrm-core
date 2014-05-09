@@ -68,13 +68,16 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
   /**
    * function to retrieve names of contact by activity_id
    *
-   * @param int    $id   ID of the activity
-   * @param string $type type of interaction
+   * @param $activityID
+   * @param $recordTypeID
+   * @param bool $alsoIDs
+   *
+   * @internal param int $id ID of the activity
+   * @internal param string $type type of interaction
    *
    * @return array
    *
    * @access public
-   *
    */
   static function getNames($activityID, $recordTypeID, $alsoIDs = FALSE) {
     $names = array();

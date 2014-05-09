@@ -122,6 +122,8 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    *
    * Redirect to civicrm home page when clicked on cancel button
    *
+   * @param null $mode
+   *
    * @return string user context.
    */
   function userContext($mode = null) {

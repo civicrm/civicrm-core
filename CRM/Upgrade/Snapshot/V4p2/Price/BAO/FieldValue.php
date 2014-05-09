@@ -44,6 +44,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *
    * @param array $params (reference), array $ids
    *
+   * @param $ids
+   *
    * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
    * @access public
    * @static
@@ -70,6 +72,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * Creates a new entry in the database.
    *
    * @param array $params (reference), array $ids
+   *
+   * @param $ids
    *
    * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
    * @access public

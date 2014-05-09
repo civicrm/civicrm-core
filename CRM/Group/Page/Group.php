@@ -104,8 +104,10 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   /**
    * make sure that the user has permission to access this group
    *
-   * @param int $id   the id of the object
-   * @param int $name the name or title of the object
+   * @param int $id the id of the object
+   * @param int $title
+   *
+   * @internal param int $name the name or title of the object
    *
    * @return string   the permission that the user has (or null)
    * @access public

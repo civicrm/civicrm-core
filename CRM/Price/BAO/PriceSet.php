@@ -85,8 +85,10 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   /**
    * update the is_active flag in the db
    *
-   * @param  int      $id         id of the database record
-   * @param  boolean  $is_active  value we want to set the is_active field
+   * @param  int $id id of the database record
+   * @param $isActive
+   *
+   * @internal param bool $is_active value we want to set the is_active field
    *
    * @return Object             DAO object on sucess, null otherwise
    * @static

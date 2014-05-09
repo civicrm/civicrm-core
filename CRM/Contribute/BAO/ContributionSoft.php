@@ -89,7 +89,9 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   /**
    * Function to delete soft credits
    *
-   * @param int $contributionTypeId
+   * @param $params
+   *
+   * @internal param int $contributionTypeId
    * @static
    */
   static function del($params) {
