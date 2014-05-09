@@ -182,7 +182,9 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
   /**
    * global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param $params
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static

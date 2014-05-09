@@ -196,6 +196,8 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    * Get the permissions defined in the hook_civicrm_permission implementation
    * of the given module.
    *
+   * @param $module
+   *
    * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
   static function getModulePermissions($module) {

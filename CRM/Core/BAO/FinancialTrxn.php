@@ -181,8 +181,10 @@ LIMIT 1;";
    * Given an entity_id and entity_table, check for corresponding entity_financial_trxn and financial_trxn record.
    * NOTE: This should be moved to separate BAO for EntityFinancialTrxn when we start adding more code for that object.
    *
-   * @param string $entityTable name of the entity table usually 'civicrm_contact'
-   * @param int $entityID id of the entity usually the contactID.
+   * @param $entity_id
+   *
+   * @internal param string $entityTable name of the entity table usually 'civicrm_contact'
+   * @internal param int $entityID id of the entity usually the contactID.
    *
    * @return array( ) reference $tag array of catagory id's the contact belongs to.
    *
@@ -290,6 +292,7 @@ WHERE lt.entity_id = %1 ";
   /**
    * Delete financial transaction
    *
+   * @param $entity_id
    * @return true on success, false otherwise
    * @access public
    * @static

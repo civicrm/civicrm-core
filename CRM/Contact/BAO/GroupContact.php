@@ -169,8 +169,12 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   /**
    * Given an array of contact ids, remove all the contacts from the group
    *
-   * @param array  $contactIds (reference ) the array of contact ids to be removed
-   * @param int    $groupId    the id of the group
+   * @param array $contactIds (reference ) the array of contact ids to be removed
+   * @param int $groupId the id of the group
+   *
+   * @param string $method
+   * @param string $status
+   * @param null $tracking
    *
    * @return array             (total, removed, notRemoved) count of contacts removed to group
    * @access public
@@ -268,6 +272,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @param  int $contactId contact id
    *
+   * @param bool $visibility
+   *
    * @access public
    *
    * @return array $values this array has key-> group id and value group title
@@ -307,14 +313,16 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   /**
    * Function to get the list of groups for contact based on status of group membership
    *
-   * @param int     $contactId         contact id
-   * @param string  $status            state of membership
-   * @param int     $numGroupContact   number of groups for a contact that should be shown
-   * @param boolean $count             true if we are interested only in the count
-   * @param boolean $ignorePermission  true if we should ignore permissions for the current user
+   * @param int $contactId contact id
+   * @param string $status state of membership
+   * @param int $numGroupContact number of groups for a contact that should be shown
+   * @param boolean $count true if we are interested only in the count
+   * @param boolean $ignorePermission true if we should ignore permissions for the current user
    *                                   useful in profile where permissions are limited for the user. If left
    *                                   at false only groups viewable by the current user are returned
-   * @param boolean $onlyPublicGroups  true if we want to hide system groups
+   * @param boolean $onlyPublicGroups true if we want to hide system groups
+   *
+   * @param bool $excludeHidden
    *
    * @return array (reference )|int $values the relevant data object values for the contact or
    *                                 the total count when $count is true

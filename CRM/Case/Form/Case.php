@@ -316,6 +316,9 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    *
    * @param array $values posted values of the form
    *
+   * @param $files
+   * @param $form
+   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public

@@ -240,6 +240,8 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
+   * @param $declarations
+   *
    * @return mixed string on error, or FALSE
    */
   protected static function validate($declarations) {

@@ -140,12 +140,15 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
   /**
    * Return the all eligible campaigns w/ cache.
    *
-   * @param int      $includeId  lets inlcude this campaign by force.
-   * @param int      $excludeId  do not include this campaign.
-   * @param boolean  $onlyActive consider only active campaigns.
+   * @param int $includeId lets inlcude this campaign by force.
+   * @param int $excludeId do not include this campaign.
+   * @param boolean $onlyActive consider only active campaigns.
    *
-   * @return $campaigns a set of campaigns.
-   * @access public
+   * @param bool $onlyCurrent
+   * @param bool $appendDatesToTitle
+   * @param bool $forceAll
+   *
+   * @return mixed $campaigns a set of campaigns.@access public
    */
   public static function getCampaigns(
     $includeId = NULL,

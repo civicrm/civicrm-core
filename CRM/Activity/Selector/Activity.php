@@ -276,7 +276,10 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -317,6 +320,8 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * Returns total number of rows for the query.
    *
    * @param string $action - action being performed
+   *
+   * @param null $case
    *
    * @return int Total number of rows
    * @access public

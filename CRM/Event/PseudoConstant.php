@@ -134,7 +134,11 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param  string - $retColumn  tells populate() whether to return 'name' (default) or 'label' values
+   * @param null $id
+   * @param null $cond
+   * @param string $retColumn
+   *
+   * @internal param $string - $retColumn  tells populate() whether to return 'name' (default) or 'label' values
    *
    * @return array  - array reference of all participant statuses if any
    * @static
@@ -180,6 +184,9 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * Get all the n participant roles
    *
    * @access public
+   *
+   * @param null $id
+   * @param null $cond
    *
    * @return array - array reference of all participant roles if any
    * @static
@@ -234,6 +241,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param null $id
    * @return array - array reference of all event types.
    * @static
    */
@@ -280,8 +288,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param boolean $name pseudoconstant to be flushed
-   *
+   * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'cache') {
    if (isset(self::$$name)) {
@@ -294,6 +301,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param null $id
    * @return array - array reference of all pcp if any
    * @static
    */

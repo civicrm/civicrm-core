@@ -47,11 +47,15 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
 
   /**
    * generate htmlfor pdf letters
+   *
    * @param unknown_type $membershipIDs
    * @param unknown_type $returnProperties
    * @param unknown_type $skipOnHold
    * @param unknown_type $skipDeceased
    * @param unknown_type $messageToken
+   * @param $html_message
+   * @param $categories
+   *
    * @return unknown
    */
   static function generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories) {

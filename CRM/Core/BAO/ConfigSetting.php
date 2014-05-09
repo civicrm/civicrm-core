@@ -204,6 +204,8 @@ class CRM_Core_BAO_ConfigSetting {
   /**
    * Function to retrieve the settings values from db
    *
+   * @param $defaults
+   *
    * @return array $defaults
    * @static
    */

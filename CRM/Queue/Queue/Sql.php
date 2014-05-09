@@ -165,7 +165,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
   /**
    * Get the next item, even if there's an active lease
    *
-   * @param $lease_time seconds
+   * @param int|\seconds $lease_time seconds
    *
    * @return object with key 'data' that matches the inputted data
    */

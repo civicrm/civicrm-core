@@ -185,9 +185,11 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    * - View
    * - Edit
    *
+   * @param bool $isDeleted
+   * @param null $key
+   *
    * @return array
    * @access public
-   *
    */
   static
   function &links($isDeleted = FALSE, $key = NULL) {
@@ -249,7 +251,10 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {

@@ -157,6 +157,8 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
    *
    * @access protected
    *
+   * @param $form
+   *
    * @return array the default array reference
    */
   function setDefaultValues($form) {

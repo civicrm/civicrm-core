@@ -322,14 +322,15 @@ WHERE     pledge_id = %1
   /**
    * update Pledge Payment Status
    *
-   * @param int $pledgeID, id of pledge
-   * @param array $paymentIDs, ids of pledge payment(s) to update
-   * @param int $paymentStatusID, payment status to set
-   * @param int $pledgeStatus, pledge status to change (if needed)
-   * @param float $actualAmount, actual amount being paid
-   * @param bool $adjustTotalAmount, is amount being paid different from scheduled amount?
-   * @param bool $isScriptUpdate, is function being called from bin script?
+   * @param int $pledgeID , id of pledge
+   * @param array $paymentIDs , ids of pledge payment(s) to update
+   * @param int $paymentStatusID , payment status to set
+   * @param null $pledgeStatusID
+   * @param float|int $actualAmount , actual amount being paid
+   * @param bool $adjustTotalAmount , is amount being paid different from scheduled amount?
+   * @param bool $isScriptUpdate , is function being called from bin script?
    *
+   * @internal param int $pledgeStatus , pledge status to change (if needed)
    * @return int $newStatus, updated status id (or 0)
    */
   static function updatePledgePaymentStatus(

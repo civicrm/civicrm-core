@@ -256,9 +256,11 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get PDF Page Format field from associative array
    *
-   * @param string              $field         name of a PDF Page Format field
-   * @param array (reference)   $values        associative array of name/value pairs containing
+   * @param string $field name of a PDF Page Format field
+   * @param array (reference) $values associative array of name/value pairs containing
    *                                           PDF Page Format field selections
+   *
+   * @param null $default
    *
    * @return value
    * @access public

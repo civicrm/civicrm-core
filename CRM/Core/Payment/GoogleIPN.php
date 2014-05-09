@@ -232,11 +232,13 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * The function gets called when the state(CHARGED, CANCELLED..) changes for an order
    *
-   * @param string $status      status of the transaction send by google
-   * @param array  $privateData contains the name value pair of <merchant-private-data>
+   * @param string $status status of the transaction send by google
+   * @param $dataRoot
+   * @param array $privateData contains the name value pair of <merchant-private-data>
+   *
+   * @param $component
    *
    * @return void
-   *
    */
   function orderStateChange($status, $dataRoot, $privateData, $component) {
     $input = $objects = $ids = array();

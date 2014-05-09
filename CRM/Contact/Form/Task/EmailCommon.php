@@ -120,6 +120,8 @@ class CRM_Contact_Form_Task_EmailCommon {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function buildQuickForm(&$form) {
@@ -329,6 +331,8 @@ class CRM_Contact_Form_Task_EmailCommon {
    * process the form after the input has been submitted and validated
    *
    * @access public
+   *
+   * @param $form
    *
    * @return void
    */

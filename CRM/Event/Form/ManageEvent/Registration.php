@@ -320,7 +320,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Function to build Registration Block
    *
-   * @param int $pageId
+   * @param $form
+   *
+   * @internal param int $pageId
    * @static
    */
   function buildRegistrationBlock(&$form) {

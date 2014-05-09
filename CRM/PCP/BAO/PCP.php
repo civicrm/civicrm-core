@@ -897,7 +897,10 @@ WHERE pcp.id = %1";
   /**
    * Function to get supporter profile id
    *
-   * @param int $contributionPageId contribution page id
+   * @param $component_id
+   * @param string $component
+   *
+   * @internal param int $contributionPageId contribution page id
    *
    * @return int
    * @access public
