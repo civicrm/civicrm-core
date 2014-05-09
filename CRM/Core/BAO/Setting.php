@@ -421,6 +421,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * _setItem() is the common logic shared by setItem() and setItems().
    *
    * @param array $params (required) An api formatted array of keys and values
+   * @param null $domains
+   *
+   * @throws api_Exception
    * @domains array an array of domains to get settings for. Default is the current domain
    * @return void
    * @static
@@ -621,6 +624,11 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @params string $name Name of specific setting e.g customCSSURL
    * @params integer $componentID id of relevant component.
+   *
+   * @param null $componentID
+   * @param array $filters
+   * @param null $domainID
+   * @param null $profile
    *
    * @return array $result - the following information as appropriate for each setting
    * - name

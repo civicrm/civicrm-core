@@ -230,6 +230,9 @@ class ExtdirQueryHelper {
    * @parm $entityAliases array($niceName => $sqlIdExpression) list of entities
    *   which are (mentally) part of the query -- and the SQL expressions which
    *   identify them
+   * @param $entityAliases
+   *
+   * @return \ExtdirQueryHelper
    */
   function create($query, $entityAliases) {
     return new ExtdirQueryHelper($query, $entityAliases);

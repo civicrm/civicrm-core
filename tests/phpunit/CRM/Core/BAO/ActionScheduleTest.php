@@ -473,7 +473,9 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Run a series of cron jobs and make an assertion about email deliveries
    *
-   * @param $jobSchedule array specifying when to run cron and what messages to expect; each item is an array with keys:
+   * @param $cronRuns
+   *
+   * @internal param array $jobSchedule specifying when to run cron and what messages to expect; each item is an array with keys:
    *  - time: string, e.g. '2012-06-15 21:00:01'
    *  - recipients: array(array(string)), list of email addresses which should receive messages
    */

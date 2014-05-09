@@ -517,6 +517,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   /**
    * Delete Dashlet
    *
+   * @param $dashletID
+   *
    * @return void
    * @static
    */

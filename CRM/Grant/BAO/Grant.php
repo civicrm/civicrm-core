@@ -420,7 +420,9 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Function to get grant record count for a Contact
    *
-   * @param int $contactId Contact ID
+   * @param $contactID
+   *
+   * @internal param int $contactId Contact ID
    *
    * @return int count of grant records
    * @access public

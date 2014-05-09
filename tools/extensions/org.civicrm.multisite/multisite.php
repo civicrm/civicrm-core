@@ -240,6 +240,8 @@ AND    id IN ";
 
 /**
  *
+ * @param int $permission
+ *
  * @return NULL|integer $groupID
  */
 function _multisite_get_domain_group($permission = 1) {

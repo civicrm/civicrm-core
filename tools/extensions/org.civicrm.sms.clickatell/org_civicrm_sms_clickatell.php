@@ -109,7 +109,10 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
    *
    * Create and auth a Clickatell session.
    *
-   * @return void
+   * @param array $provider
+   * @param bool $skipAuth
+   *
+   * @return \org_civicrm_sms_clickatell
    */
   function __construct($provider = array( ), $skipAuth = FALSE) {
     // initialize vars
@@ -146,9 +149,10 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
   /**
    * singleton function used to manage this object
    *
+   * @param array $providerParams
+   * @param bool $force
    * @return object
    * @static
-   *
    */
   static function &singleton($providerParams = array(
     ), $force = FALSE) {
@@ -219,7 +223,12 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
   /**
    * Send an SMS Message via the Clickatell API Server
    *
-   * @param array the message with a to/from/text
+   * @param $recipients
+   * @param $header
+   * @param $message
+   * @param null $jobID
+   * @param null $userID
+   * @internal param \the $array message with a to/from/text
    *
    * @return mixed true on sucess or PEAR_Error object
    * @access public

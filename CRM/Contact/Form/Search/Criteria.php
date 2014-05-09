@@ -520,6 +520,8 @@ class CRM_Contact_Form_Search_Criteria {
    *
    * @access private
    *
+   * @param $form
+   *
    * @return void
    */
   static function custom(&$form) {

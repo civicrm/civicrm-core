@@ -388,7 +388,9 @@ ORDER BY  modified_date desc";
   /**
    * Function to get log record count for a Contact
    *
-   * @param int $contactId Contact ID
+   * @param $contactID
+   *
+   * @internal param int $contactId Contact ID
    *
    * @return int $count count of log records
    *
@@ -542,7 +544,8 @@ ORDER BY  modified_date desc";
    * function to delete all note related to contact when contact is deleted
    *
    * @param int $contactID contact id whose notes to be deleted
-   * @param array $deleteNoteID to store all deleted note ids
+   *
+   * @internal param array $deleteNoteID to store all deleted note ids
    *
    * @return void
    * @static

@@ -529,8 +529,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return
-   * @access public
+   * @param $sendEmailMode
+   *
+   * @throws Exception
+   * @return void
+  @access public
    * @static
    */
   public static function sendEmail($params, $sendEmailMode) {

@@ -392,9 +392,11 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get Label Format field from associative array
    *
-   * @param string              $field         name of a label format field
-   * @param array (reference)   $values        associative array of name/value pairs containing
+   * @param string $field name of a label format field
+   * @param array (reference) $values associative array of name/value pairs containing
    *                                           label format field selections
+   *
+   * @param null $default
    *
    * @return value
    * @access public

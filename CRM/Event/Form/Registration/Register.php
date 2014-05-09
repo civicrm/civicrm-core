@@ -508,7 +508,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       if (empty($this->_values['event']['is_monetary'])) {
         $js = array('onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');");
       }
-      
+
       // CRM-11182 - Optional confirmation screen
       // Change button label depending on whether the next action is confirm or register
       if (
@@ -520,7 +520,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       } else {
         $buttonLabel = ts('Continue >>');
       }
-      
+
       $this->addButtons(array(
           array(
             'type' => 'upload',
@@ -611,7 +611,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
       $adminFieldVisible = false;
       if (CRM_Core_Permission::check('administer CiviCRM')) {
-        $adminFieldVisible = true; 
+        $adminFieldVisible = true;
       }
 
       foreach ($form->_feeBlock as $field) {
@@ -781,9 +781,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $self
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public

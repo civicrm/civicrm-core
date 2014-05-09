@@ -405,7 +405,7 @@ WHERE  v.option_group_id = g.id
    * not messed up. Currently deletes the old group
    *
    * @param string $groupName the name of the option group - make sure there is no conflict
-   * @param array  $values    the associative array that has information on the option values
+   * @param array $values the associative array that has information on the option values
    *                          the keys of this array are:
    *                          string 'title'       (required)
    *                          string 'value'       (required)
@@ -414,14 +414,15 @@ WHERE  v.option_group_id = g.id
    *                          int    'weight'      (optional) - the order in which the value are displayed
    *                          bool   'is_default'  (optional) - is this the default one to display when rendered in form
    *                          bool   'is_active'   (optional) - should this element be rendered
-   * @param int    $defaultID (reference) - the option value ID of the default element (if set) is returned else 'null'
-   * @param string $groupLabel            - the optional label of the option group else set to group name
+   * @param int $defaultID (reference) - the option value ID of the default element (if set) is returned else 'null'
+   * @param null $groupTitle
+   *
+   * @internal param string $groupLabel - the optional label of the option group else set to group name
    *
    * @access public
    * @static
    *
    * @return int   the option group ID
-   *
    */
   static function createAssoc($groupName, &$values, &$defaultID, $groupTitle = NULL) {
     self::deleteAssoc($groupName);

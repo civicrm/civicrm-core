@@ -218,6 +218,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
    * Click on an inline-edit block and wait for it to open
    *
    * @param $block string selector
+   * @param bool $wait
    */
   private function openInlineForm($block, $wait = TRUE) {
     $this->mouseDown($block);
@@ -232,7 +233,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
    *
    * @param $block string selector
    * @param $params array
-   * @param $valid str: submit behavior
+   * @param \str|string $valid str: submit behavior
    *   'error' if we are expecting a form validation error,
    *   're_open' (default) after saving, opens the form and validate inputs
    *   'keep_open' same as 're_open' but doesn't automatically cancel at the end

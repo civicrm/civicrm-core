@@ -733,6 +733,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Function to handle  process after the confirmation of payment by User
    *
+   * @param null $contactID
+   * @param null $contribution
+   * @param null $payment
+   *
    * @return void
    * @access public
    */

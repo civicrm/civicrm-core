@@ -343,11 +343,13 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   /**
    * returns all the rows in the given offset and rowCount
    *
-   * @param enum   $action   the action being performed
-   * @param int    $offset   the row number to start from
-   * @param int    $rowCount the number of rows to return
-   * @param string $sort     the sql string that describes the sort order
-   * @param enum   $output   what should the result set include (web/email/csv)
+   * @param enum $action the action being performed
+   * @param int $offset the row number to start from
+   * @param int $rowCount the number of rows to return
+   * @param string $sort the sql string that describes the sort order
+   * @param enum $output what should the result set include (web/email/csv)
+   *
+   * @param null $case
    *
    * @return int   the total number of rows for this action
    */

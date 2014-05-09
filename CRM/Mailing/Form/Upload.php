@@ -505,6 +505,9 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
+   * @param $files
+   * @param $self
+   *
    * @return mixed true or array of errors
    * @access public
    * @static

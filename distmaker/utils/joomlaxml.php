@@ -42,8 +42,9 @@ generateJoomlaConfig($version);
  * This function creates destination directory
  *
  * @param $dir directory name to be created
- * @param $peram mode for that directory
+ * @param int $perm
  *
+ * @internal param \mode $peram for that directory
  */
 function createDir($dir, $perm = 0755) {
   if (!is_dir($dir)) {

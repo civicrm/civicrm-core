@@ -444,8 +444,10 @@ class CRM_Utils_Migrate_Export {
   }
 
   /**
-   * @param CRM_Core_DAO $object
    * @param string $objectName business-entity/xml-tag name
+   * @param CRM_Core_DAO $object
+   * @param $mappedFields
+   *
    * @return array
    */
   function exportDAO($objectName, $object, $mappedFields) {
@@ -525,7 +527,8 @@ class CRM_Utils_Migrate_Export {
   /**
    * @param string $tagName
    * @param array $keyValues
-   * @param string $additional XML
+   * @throws Exception
+   * @internal param string $additional XML
    * @return string XML
    */
   public function renderKeyValueXML($tagName, $keyValues) {
