@@ -160,14 +160,10 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     CRM_Utils_System::appendBreadCrumb(array(array('title' => ts('View Contact'), 'url' => $path,)));
 
     if ($image_URL = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'image_URL')) {
-      //CRM-7265 --time being fix.
       $config = CRM_Core_Config::singleton();
-      $image_URL = str_replace('https://', 'http://', $image_URL);
-      if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enableSSL')) {
-        $image_URL = str_replace('http://', 'https://', $image_URL);
-      }
-
-      list($imageWidth, $imageHeight) = getimagesize($image_URL);
+      $parts = explode('=', $image_URL);
+      $image_path = $config->customFileUploadDir . $parts[1];
+      list($imageWidth, $imageHeight) = getimagesize($image_path);
       list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
       $this->assign("imageWidth", $imageWidth);
       $this->assign("imageHeight", $imageHeight);
