@@ -360,6 +360,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
 
+    //set Soft Credit Type to Gift by default
+    $scTypes = CRM_Core_OptionGroup::values("soft_credit_type");
+    $defaults['soft_credit_type_id'] = CRM_Utils_Array::value(ts('Gift'), array_flip($scTypes));
+
     if (!empty($defaults['record_contribution']) && !$this->_mode) {
       $contributionParams = array('id' => $defaults['record_contribution']);
       $contributionIds = array();
@@ -1268,9 +1272,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     //CRM-13981, allow different person as a soft-contributor of chosen type
     if ($this->_contributorContactID != $this->_contactID) {
+      $params['contribution_contact_id'] = $this->_contributorContactID;
       if (!empty($this->_params['soft_credit_type_id'])) {
         $softParams['soft_credit_type_id'] = $this->_params['soft_credit_type_id'];
-        $softParams['contact_id'] = $this->_contributorContactID;
+        $softParams['contact_id'] = $this->_contactID;
       }
     }
     if (!empty($formValues['record_contribution'])) {

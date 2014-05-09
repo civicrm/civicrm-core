@@ -260,6 +260,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $defaults['num_terms'] = 1;
     $defaults['send_receipt'] = 0;
 
+    //set Soft Credit Type to Gift by default
+    $scTypes = CRM_Core_OptionGroup::values("soft_credit_type");
+    $defaults['soft_credit_type_id'] = CRM_Utils_Array::value(ts('Gift'), array_flip($scTypes));
+
     $renewalDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('renewal_date', $defaults),
       NULL, NULL, 'Y-m-d'
     );
@@ -770,10 +774,11 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       //assign contribution contact id to the field expected by recordMembershipContribution
       if($this->_contributorContactID != $this->_contactID){
+        $formValues['contribution_contact_id'] = $this->_contributorContactID;
         if (!empty($this->_params['soft_credit_type_id'])){
           $formValues['soft_credit'] = array(
             'soft_credit_type_id' => $this->_params['soft_credit_type_id'],
-            'contact_id' => $this->_contributorContactID,
+            'contact_id' => $this->_contactID,
           );
         }
       }
