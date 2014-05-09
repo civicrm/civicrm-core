@@ -7,8 +7,10 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   /**
-   * @return array
+   * @var array(string $shortName => CRM_Core_Module $module)
    */
+  protected $modules;
+
   function get_info() {
     return array(
       'name'    => 'ManagedEntities',

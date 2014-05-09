@@ -24,6 +24,7 @@ class CRM_Core_ManagedEntities {
     if ($fresh || !$singleton) {
       $declarations = array();
       foreach (CRM_Core_Component::getEnabledComponents() as $component) {
+        /** @var CRM_Core_Component_Info $component */
         $declarations = array_merge($declarations, $component->getManagedEntities());
       }
       CRM_Utils_Hook::managed($declarations);
@@ -33,8 +34,8 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param $modules array CRM_Core_Module
-   * @param $declarations array per hook_civicrm_managed
+   * @param array $modules CRM_Core_Module
+   * @param array $declarations per hook_civicrm_managed
    */
   public function __construct($modules, $declarations) {
     $this->moduleIndex = self::createModuleIndex($modules);
@@ -52,6 +53,7 @@ class CRM_Core_ManagedEntities {
       $params = array(
         'id' => $dao->entity_id,
       );
+      $result = NULL;
       try {
         $result = civicrm_api3($dao->entity_type, 'getsingle', $params);
       }
@@ -114,18 +116,7 @@ class CRM_Core_ManagedEntities {
         unset($todos[$dao->name]);
       } else {
         // remove stale entity; not in $todos
-        $params = array(
-          'version' => 3,
-          'id' => $dao->entity_id,
-        );
-        $result = civicrm_api($dao->entity_type, 'delete', $params);
-        if ($result['is_error']) {
-          $this->onApiError($params, $result);
-        }
-
-        CRM_Core_DAO::executeQuery('DELETE FROM civicrm_managed WHERE id = %1', array(
-          1 => array($dao->id, 'Integer')
-        ));
+        $this->removeStaleEntity($dao);
       }
     }
 
@@ -188,19 +179,28 @@ class CRM_Core_ManagedEntities {
     }
     $dao->find();
     while ($dao->fetch()) {
-      $params = array(
-        'version' => 3,
-        'id' => $dao->entity_id,
-      );
-      $result = civicrm_api($dao->entity_type, 'delete', $params);
-      if ($result['is_error']) {
-        $this->onApiError($params, $result);
-      }
-
-      CRM_Core_DAO::executeQuery('DELETE FROM civicrm_managed WHERE id = %1', array(
-        1 => array($dao->id, 'Integer')
-      ));
+      $this->removeStaleEntity($dao);
     }
+  }
+
+  /**
+   * Remove a stale entity (if policy allows)
+   *
+   * @param CRM_Core_DAO_Managed $dao
+   */
+  public function removeStaleEntity($dao) {
+    $params = array(
+      'version' => 3,
+      'id' => $dao->entity_id,
+    );
+    $result = civicrm_api($dao->entity_type, 'delete', $params);
+    if ($result['is_error']) {
+      $this->onApiError($params, $result);
+    }
+
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_managed WHERE id = %1', array(
+      1 => array($dao->id, 'Integer')
+    ));
   }
 
   /**
