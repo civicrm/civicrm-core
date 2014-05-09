@@ -77,6 +77,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     // billing address
     $this->webtestAddBillingDetails($firstName, $middleName, $lastName);
     $this->click('_qf_Contribution_upload-bottom');
+    
     $this->waitForElementPresent('link=Edit');
     $this->waitForText('crm-notification-container', "The contribution record has been processed.");
     // Use Find Contributions to make sure test recurring contribution exists
