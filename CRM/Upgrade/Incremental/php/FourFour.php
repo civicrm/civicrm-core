@@ -318,8 +318,6 @@ ALTER TABLE civicrm_dashboard
   }
 
   static function upgradeImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId){
-    $sql = "CREATE INDEX index_image_url ON civicrm_contact (image_url);";
-    $dao = CRM_Core_DAO::executeQuery($sql);    
     $sql = "
 SELECT id, image_url
 FROM civicrm_contact
