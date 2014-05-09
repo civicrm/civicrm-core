@@ -11,6 +11,8 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    */
   protected $modules;
 
+  protected $fixtures;
+
   function get_info() {
     return array(
       'name'    => 'ManagedEntities',
@@ -27,6 +29,27 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     );
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_managed');
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name like "CRM_Example_%"');
+
+    $this->fixtures['com.example.one-foo'] = array(
+      'module' => 'com.example.one',
+      'name' => 'foo',
+      'entity' => 'CustomSearch',
+      'params' => array(
+        'version' => 3,
+        'class_name' => 'CRM_Example_One_Foo',
+        'is_reserved' => 1,
+      ),
+    );
+    $this->fixtures['com.example.one-bar'] = array(
+      'module' => 'com.example.one',
+      'name' => 'bar',
+      'entity' => 'CustomSearch',
+      'params' => array(
+        'version' => 3,
+        'class_name' => 'CRM_Example_One_Bar',
+        'is_reserved' => 1,
+      ),
+    );
   }
 
   function tearDown() {
@@ -44,16 +67,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $decls = array();
 
     // create first managed entity ('foo')
-    $decls[] = array(
-      'module' => 'com.example.one',
-      'name' => 'foo',
-      'entity' => 'CustomSearch',
-      'params' => array(
-        'version' => 3,
-        'class_name' => 'CRM_Example_One_Foo',
-        'is_reserved' => 1,
-      ),
-    );
+    $decls[] = $this->fixtures['com.example.one-foo'];
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
     $foo = $me->get('com.example.one', 'foo');
@@ -61,16 +75,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
     // later on, hook returns an extra managed entity ('bar')
-    $decls[] = array(
-      'module' => 'com.example.one',
-      'name' => 'bar',
-      'entity' => 'CustomSearch',
-      'params' => array(
-        'version' => 3,
-        'class_name' => 'CRM_Example_One_Bar',
-        'is_reserved' => 1,
-      ),
-    );
+    $decls[] = $this->fixtures['com.example.one-bar'];
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
     $foo = $me->get('com.example.one', 'foo');
@@ -111,16 +116,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $decls = array();
 
     // create first managed entity ('foo')
-    $decls[] = array(
-      'module' => 'com.example.one',
-      'name' => 'foo',
-      'entity' => 'CustomSearch',
-      'params' => array(
-        'version' => 3,
-        'class_name' => 'CRM_Example_One_Foo',
-        'is_reserved' => 1,
-      ),
-    );
+    $decls[] = $this->fixtures['com.example.one-foo'];
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
     $foo = $me->get('com.example.one', 'foo');
@@ -220,16 +216,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   function testDeactivateReactivateModule() {
     // create first managed entity ('foo')
     $decls = array();
-    $decls[] = array(
-      'module' => 'com.example.one',
-      'name' => 'foo',
-      'entity' => 'CustomSearch',
-      'params' => array(
-        'version' => 3,
-        'class_name' => 'CRM_Example_One_Foo',
-        'is_reserved' => 1,
-      ),
-    );
+    $decls[] = $this->fixtures['com.example.one-foo'];
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
     $foo = $me->get('com.example.one', 'foo');
@@ -263,16 +250,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   function testUninstallModule() {
     // create first managed entity ('foo')
     $decls = array();
-    $decls[] = array(
-      'module' => 'com.example.one',
-      'name' => 'foo',
-      'entity' => 'CustomSearch',
-      'params' => array(
-        'version' => 3,
-        'class_name' => 'CRM_Example_One_Foo',
-        'is_reserved' => 1,
-      ),
-    );
+    $decls[] = $this->fixtures['com.example.one-foo'];
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
     $foo = $me->get('com.example.one', 'foo');
