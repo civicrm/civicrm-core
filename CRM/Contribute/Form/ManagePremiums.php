@@ -377,6 +377,11 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    *
    * @access private
    *
+   * @param $filename
+   * @param $resizedName
+   * @param $width
+   * @param $height
+   *
    * @return Path to image
    */
   private function _resizeImage($filename, $resizedName, $width, $height) {

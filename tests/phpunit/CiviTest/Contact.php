@@ -4,7 +4,9 @@ class Contact extends CiviUnitTestCase {
    * Helper function to create
    * a contact
    *
-   * @return $contactID id of created contact
+   * @param $params
+   *
+   * @return int $contactID id of created contact
    */
   static function create($params) {
     require_once "CRM/Contact/BAO/Contact.php";
@@ -16,7 +18,8 @@ class Contact extends CiviUnitTestCase {
    * Helper function to create
    * a contact of type Individual
    *
-   * @return $contactID id of created Individual
+   * @param null $params
+   * @return int $contactID id of created Individual
    */
   static function createIndividual($params = NULL) {
     //compose the params, when not passed
@@ -37,7 +40,8 @@ class Contact extends CiviUnitTestCase {
    * Helper function to create
    * a contact of type Household
    *
-   * @return $contactID id of created Household
+   * @param null $params
+   * @return mixed $contactID id of created Household
    */
   static function createHousehold($params = NULL) {
     //compose the params, when not passed
@@ -57,7 +61,8 @@ class Contact extends CiviUnitTestCase {
    * Helper function to create
    * a contact of type Organisation
    *
-   * @return $contactID id of created Organisation
+   * @param null $params
+   * @return mixed $contactID id of created Organisation
    */
   static function createOrganisation($params = NULL) {
     //compose the params, when not passed

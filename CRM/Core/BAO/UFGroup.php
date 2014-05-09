@@ -679,11 +679,12 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   /**
    * check the data validity
    *
-   * @param int    $userID    the user id that we are actually editing
-   * @param string $title     the title of the group we are interested in
-   * @pram  boolean $register is this the registrtion form
-   * @param int    $action  the action of the form
+   * @param int $userID the user id that we are actually editing
+   * @param string $title the title of the group we are interested in
+   * @param bool $register
+   * @param int $action the action of the form
    *
+   * @pram  boolean $register is this the registrtion form
    * @return boolean   true if form is valid
    * @static
    * @access public
@@ -720,12 +721,15 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   /**
    * get the html for the form that represents this particular group
    *
-   * @param int     $userID    the user id that we are actually editing
-   * @param string  $title     the title of the group we are interested in
-   * @param int     $action    the action of the form
-   * @param boolean $register  is this the registration form
-   * @param boolean $reset     should we reset the form?
-   * @param int     $profileID do we have the profile ID?
+   * @param int $userID the user id that we are actually editing
+   * @param string $title the title of the group we are interested in
+   * @param int $action the action of the form
+   * @param boolean $register is this the registration form
+   * @param boolean $reset should we reset the form?
+   * @param int $profileID do we have the profile ID?
+   *
+   * @param bool $doNotProcess
+   * @param null $ctype
    *
    * @return string       the html for the form on success, otherwise empty string
    * @static
@@ -870,8 +874,10 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * searches for a contact in the db with similar attributes
    *
    * @param array $params the list of values to be used in the where clause
-   * @param int    $id          the current contact id (hence excluded from matching)
-   * @param boolean $flatten should we flatten the input params
+   * @param int $id the current contact id (hence excluded from matching)
+   * @param string $contactType
+   *
+   * @internal param bool $flatten should we flatten the input params
    *
    * @return contact_id if found, null otherwise
    * @access public
@@ -893,13 +899,16 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * Given a contact id and a field set, return the values from the db
    * for this contact
    *
-   * @param int     $id             the contact id
-   * @param array   $fields         the profile fields of interest
-   * @param array   $values         the values for the above fields
-   * @param boolean $searchable     searchable or not
-   * @param array   $componentWhere component condition
-   * @param boolean $absolute       return urls in absolute form (useful when sending an email)
+   * @param $cid
+   * @param array $fields the profile fields of interest
+   * @param array $values the values for the above fields
+   * @param boolean $searchable searchable or not
+   * @param array $componentWhere component condition
+   * @param boolean $absolute return urls in absolute form (useful when sending an email)
    *
+   * @param null $additionalWhereClause
+   *
+   * @internal param int $id the contact id
    * @return void
    * @access public
    * @static

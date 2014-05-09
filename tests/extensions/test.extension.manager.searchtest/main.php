@@ -116,6 +116,8 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   /**
    * Construct a SQL WHERE clause
    *
+   * @param bool $includeContactIDs
+   *
    * @return string, sql fragment with conditional expressions
    */
   function where($includeContactIDs = FALSE) {

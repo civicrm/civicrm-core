@@ -608,6 +608,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    *
    * @param CRM_Core_Session $store
    *
+   * @param int $mode
+   *
    * @return void
    * @access public
    */
@@ -669,10 +671,11 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   /**
    * Export data to a CSV file
    *
-   * @param string $filename
+   * @param $fileName
    * @param array $header
    * @param data $data
    *
+   * @internal param string $filename
    * @return void
    * @access public
    */

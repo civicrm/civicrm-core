@@ -409,7 +409,9 @@ AND    domain_id    = %4
    * Update the email value for the contact and user profile
    *
    * @param  $contactId  Int     Contact ID of the user
-   * @param  $email      String  email to be modified for the user
+   * @param $emailAddress
+   *
+   * @internal param String $email email to be modified for the user
    *
    * @return void
    * @access public
@@ -552,6 +554,8 @@ AND    domain_id    = %4
   /**
    * see if this user exists, and if so, if they're allowed to login
    *
+   *
+   * @param $openId
    *
    * @return bool     true if allowed to login, false otherwise
    * @access public

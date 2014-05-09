@@ -455,7 +455,9 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   /**
    * Send the mailing
    *
-   * @param object $mailer        A Mail object to send the messages
+   * @param object $mailer A Mail object to send the messages
+   *
+   * @param null $testParams
    *
    * @return void
    * @access public

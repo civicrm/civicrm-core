@@ -617,6 +617,8 @@ ORDER BY civicrm_custom_group.weight,
    * @param integer $entityID id of entity for whom we are checking data for
    * @param string $table table that we are checking
    *
+   * @param bool $getCount
+   *
    * @return boolean does this entity have data in this custom table
    */
   static public function customGroupDataExistsForEntity($entityID, $table, $getCount = FALSE){

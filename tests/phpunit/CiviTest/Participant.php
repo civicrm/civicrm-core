@@ -3,7 +3,10 @@ class Participant extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to create a Participant
    *
-   * @return $participant id of created Participant
+   * @param $contactId
+   * @param $eventId
+   *
+   * @return mixed $participant id of created Participant
    */
   static function create($contactId, $eventId) {
     $params = array(
@@ -26,7 +29,8 @@ class Participant extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to delete a participant
    *
-   * @param  int  $participantID   id of the participant to delete
+   * @param $participantId
+   * @internal param int $participantID id of the participant to delete
    * @return boolean true if participant deleted, false otherwise
    */
   static function delete($participantId) {

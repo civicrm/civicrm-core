@@ -327,11 +327,14 @@ UNION
   /**
    * create related memberships for current employer
    *
-   * @param int     $contactID          contact id of the individual
-   * @param int     $employerID         contact id of the organization.
-   * @param array   $relationshipParams relationship params.
-   * @param boolean $duplicate          are we triggered existing relationship.
+   * @param int $contactID contact id of the individual
+   * @param int $employerID contact id of the organization.
+   * @param array $relationshipParams relationship params.
+   * @param boolean $duplicate are we triggered existing relationship.
    *
+   * @param null $previousEmpID
+   *
+   * @throws CiviCRM_API3_Exception
    * @access public
    * @static
    */
@@ -444,11 +447,13 @@ WHERE id={$contactId}; ";
    *
    * @param $form              object  invoking Object
    * @param $contactType       string  contact type
+   * @param $countryID
+   * @param $stateID
    * @param $title             string  fieldset title
-   * @param $maxLocationBlocks int     number of location blocks
+   *
+   * @internal param int $maxLocationBlocks number of location blocks
    *
    * @static
-   *
    */
   static function buildOnBehalfForm(&$form, $contactType, $countryID, $stateID, $title) {
 
@@ -543,6 +548,8 @@ UPDATE civicrm_contact
    * Given an array of contact ids this function will return array with links to view contact page
    *
    * @param array $contactIDs associated contact id's
+   * @param bool $addViewLink
+   * @param bool $addEditLink
    * @param int $originalId associated with the contact which is edited
    *
    *
@@ -647,11 +654,11 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
   /**
    * This function retrieve component related contact information.
    *
-   * @param array  $componentIds     array of component Ids.
-   * @param array  $returnProperties array of return elements.
+   * @param array $componentIds array of component Ids.
+   * @param $componentName
+   * @param array $returnProperties array of return elements.
    *
-   * @return $contactDetails array of contact info.
-   * @static
+   * @return array $contactDetails array of contact info.@static
    */
   static function contactDetails($componentIds, $componentName, $returnProperties = array(
     )) {
@@ -828,8 +835,7 @@ Group By  componentId";
    *
    * @param array $addresses associated array of
    *
-   * @return $contactNames associated array of contact names
-   * @static
+   * @return array $contactNames associated array of contact names@static
    */
   static function getAddressShareContactNames(&$addresses) {
     $contactNames = array();
@@ -1059,6 +1065,10 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    * before Smarty is invoked.
    *
    * @param string $templateString the greeting template string with contact tokens + Smarty syntax
+   *
+   * @param $contactDetails
+   * @param $contactID
+   * @param $className
    *
    * @return void
    * @static

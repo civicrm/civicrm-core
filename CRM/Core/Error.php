@@ -494,10 +494,15 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Similar to the function debug. Only difference is
    * in the formatting of the output.
    *
-   * @param  string variable name
-   * @param  mixed  reference to variables that we need a trace of
-   * @param  bool   should we use print_r ? (else we use var_dump)
-   * @param  bool   should we log or return the output
+   * @param $variable_name
+   * @param $variable
+   * @param bool $print
+   * @param bool $log
+   * @param string $comp variable name
+   *
+   * @internal param \reference $mixed to variables that we need a trace of
+   * @internal param \should $bool we use print_r ? (else we use var_dump)
+   * @internal param \should $bool we log or return the output
    *
    * @return string the generated output
    *
@@ -542,9 +547,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * display the error message on terminal
    *
-   * @param  string message to be output
-   * @param  bool   should we log or return the output
+   * @param $message
+   * @param bool $out should we log or return the output
    *
+   * @param string $comp message to be output
    * @return string format of the backtrace
    *
    * @access public
@@ -778,8 +784,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Set a status message in the session, then bounce back to the referrer.
    *
-   * @param string $status        The status message to set
+   * @param string $status The status message to set
    *
+   * @param null $redirect
+   * @param string $title
    * @return void
    * @access public
    * @static

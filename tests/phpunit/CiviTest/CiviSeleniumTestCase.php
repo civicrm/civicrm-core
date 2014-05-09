@@ -60,8 +60,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *  of that class to decide how to set up the test.
    *
    * @param  string $name
-   * @param  array  $data
+   * @param  array $data
    * @param  string $dataName
+   * @param array $browser
    */
   function __construct($name = NULL, array$data = array(), $dataName = '', array$browser = array()) {
     parent::__construct($name, $data, $dataName, $browser);
@@ -298,7 +299,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @param string $fname contact’s first name
    * @param string $lname contact’s last name
-   * @param mixed  $email contact’s email (when string) or random email (when true) or no email (when null)
+   * @param mixed $email contact’s email (when string) or random email (when true) or no email (when null)
+   *
+   * @param null $contactSubtype
    *
    * @return mixed either a string with the (either generated or provided) email or null (if no email)
    */
@@ -544,6 +547,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @strings  array    array of strings or a single string
    *
+   * @param $strings
    * @return   void
    */
   function assertStringsPresent($strings) {
@@ -557,10 +561,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @url      string url to parse or retrieve current url if null
    *
+   * @param null $url
    * @return   array  returns an associative array containing any of the various components
    *                  of the URL that are present. Querystring elements are returned in sub-array (elements.queryString)
    *                  http://php.net/manual/en/function.parse-url.php
-   *
    */
   function parseURL($url = NULL) {
     if (!$url) {
@@ -589,8 +593,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @param string $processorName Name assigned to new processor
    * @param string $processorType Name for processor type (e.g. PayPal, Dummy, etc.)
-   * @param array  $processorSettings Array of fieldname => value for required settings for the processor
+   * @param array $processorSettings Array of fieldname => value for required settings for the processor
    *
+   * @param string $financialAccount
+   * @throws PHPUnit_Framework_AssertionFailedError
    * @return void
    */
 
@@ -789,9 +795,35 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * Create new online contribution page w/ user specified params or defaults.
    * FIXME: this function take an absurd number of params - very unwieldy :(
    *
-   * @param User can define pageTitle, hash and rand values for later data verification
+   * @param null $hash
+   * @param null $rand
+   * @param null $pageTitle
+   * @param array $processor
+   * @param bool $amountSection
+   * @param bool $payLater
+   * @param bool $onBehalf
+   * @param bool $pledges
+   * @param bool $recurring
+   * @param bool $membershipTypes
+   * @param null $memPriceSetId
+   * @param bool $friend
+   * @param int $profilePreId
+   * @param int $profilePostId
+   * @param bool $premiums
+   * @param bool $widget
+   * @param bool $pcp
+   * @param bool $isAddPaymentProcessor
+   * @param bool $isPcpApprovalNeeded
+   * @param bool $isSeparatePayment
+   * @param bool $honoreeSection
+   * @param bool $allowOtherAmmount
+   * @param bool $isConfirmEnabled
+   * @param string $financialType
+   * @param bool $fixedAmount
+   * @param bool $membershipsRequired
+   * @internal param \can $User define pageTitle, hash and rand values for later data verification
    *
-   * @return $pageId of newly created online contribution page.
+   * @return null $pageId of newly created online contribution page.
    */
   function webtestAddContributionPage($hash = NULL,
                                       $rand = NULL,
@@ -1110,8 +1142,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * Function to update default strict rule.
    *
    * @params  string   $contactType  Contact type
-   * @param   array    $fields       Fields to be set for strict rule
-   * @param   Integer  $threshold    Rule's threshold value
+   * @param string $contactType
+   * @param   array $fields Fields to be set for strict rule
+   * @param   Integer $threshold Rule's threshold value
    */
   function webtestStrictDedupeRuleDefault($contactType = 'Individual', $fields = array(), $threshold = 10) {
     // set default strict rule.
@@ -1874,7 +1907,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->clickAt("//*[@class='select2-results']/li[1]/div");
     }
     else {
-      if ($xpath) 
+      if ($xpath)
 	$this->clickAt($fieldName);
       else
 	$this->clickAt("//*[@id='$fieldName']/../div/a");

@@ -347,6 +347,8 @@ class CRM_Core_OptionValue {
   /**
    * build select query in case of option-values
    *
+   * @param $query
+   *
    * @return void
    * @access public
    */

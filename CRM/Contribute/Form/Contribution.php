@@ -852,9 +852,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $self
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public

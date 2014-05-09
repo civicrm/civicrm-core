@@ -167,6 +167,9 @@ class CRM_Auction_BAO_Auction extends CRM_Auction_DAO_Auction {
    *
    * @param $all boolean true if auctions all are required else returns current and future auctions
    *
+   * @param bool $id
+   *
+   * @return array
    * @static
    */
   static

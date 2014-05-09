@@ -4,6 +4,11 @@ class Custom extends CiviUnitTestCase {
    * Helper function to create Custom Group
    *
    * @deprecated - use functions on test case parent class
+   *
+   * @param $group
+   * @param null $extends
+   * @param bool $isMultiple
+   *
    * @return object of created group
    */
   static function createGroup($group, $extends = NULL, $isMultiple = FALSE) {
@@ -52,8 +57,10 @@ class Custom extends CiviUnitTestCase {
   /**
    * Helper function to create Custom Field
    * @deprecated use parent object create fn
+   * @param $params
+   * @param null $fields
    * @return object of created field
-   */
+*/
   static function createField($params, $fields = NULL) {
     if (empty($params)) {
       $params = array(

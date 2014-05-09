@@ -392,6 +392,8 @@ class CRM_Core_Selector_Controller {
   /**
    * function to retrieve rows.
    *
+   * @param $form
+   *
    * @return array of rows
    * @access public
    */
