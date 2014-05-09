@@ -48,8 +48,10 @@ class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
    * Register a subscription event.  Create a new contact if one does not
    * already exist.
    *
-   * @param int $group_id         The group id to subscribe to
-   * @param string $email         The email address of the (new) contact
+   * @param int $group_id The group id to subscribe to
+   * @param string $email The email address of the (new) contact
+   * @param null $contactId
+   * @param null $context
    * @params int $contactId       Currently used during event registration/contribution.
    *                              Specifically to avoid linking group to wrong duplicate contact
    *                              during event registration.

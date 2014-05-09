@@ -76,6 +76,8 @@ class CRM_Contact_Form_Location {
   /**
    * Function to build the form
    *
+   * @param $form
+   *
    * @return void
    * @access public
    */

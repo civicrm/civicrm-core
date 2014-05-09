@@ -77,6 +77,9 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
    *
    * @access public
    *
+   * @param $form
+   * @param $proxSearch
+   *
    * @return void
    */
   function buildQuickForm($form, $proxSearch) {

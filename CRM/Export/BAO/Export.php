@@ -46,17 +46,20 @@ class CRM_Export_BAO_Export {
   /**
    * Function to get the list the export fields
    *
-   * @param int    $selectAll user preference while export
-   * @param array  $ids  contact ids
-   * @param array  $params associated array of fields
+   * @param int $selectAll user preference while export
+   * @param array $ids contact ids
+   * @param array $params associated array of fields
    * @param string $order order by clause
-   * @param array  $fields associated array of fields
-   * @param array  $moreReturnProperties additional return fields
-   * @param int    $exportMode export mode
+   * @param array $fields associated array of fields
+   * @param array $moreReturnProperties additional return fields
+   * @param int $exportMode export mode
    * @param string $componentClause component clause
    * @param string $componentTable component table
-   * @param bool   $mergeSameAddress merge records if they have same address
-   * @param bool   $mergeSameHousehold merge records if they belong to the same household
+   * @param bool $mergeSameAddress merge records if they have same address
+   * @param bool $mergeSameHousehold merge records if they belong to the same household
+   *
+   * @param array $exportParams
+   * @param string $queryOperator
    *
    * @static
    * @access public
@@ -310,9 +313,9 @@ class CRM_Export_BAO_Export {
         $componentReturnProperties = CRM_Contact_BAO_Query::defaultReturnProperties($queryMode);
         if ($queryMode == CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
           // soft credit columns are not automatically populated, because contribution search doesn't require them by default
-          $componentReturnProperties = 
+          $componentReturnProperties =
             array_merge(
-              $componentReturnProperties, 
+              $componentReturnProperties,
               CRM_Contribute_BAO_Query::softCreditReturnProperties(TRUE));
         }
         $returnProperties = array_merge($returnProperties, $componentReturnProperties);

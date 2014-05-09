@@ -100,6 +100,8 @@ class CRM_Grant_BAO_Query {
    * Given a list of conditions in params generate the required
    * where clause
    *
+   * @param $query
+   *
    * @return void
    * @access public
    */
