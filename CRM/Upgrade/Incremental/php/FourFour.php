@@ -308,8 +308,16 @@ ALTER TABLE civicrm_dashboard
   }
 
   function upgrade_4_4_6($rev){
-    $minId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(min(id),0) FROM civicrm_contact');
-    $maxId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_contact');
+    $sql = "SELECT count(*) AS count FROM INFORMATION_SCHEMA.STATISTICS where ".
+      "INDEX_NAME = 'index_image_url' AND TABLE_NAME = 'civicrm_contact';";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $dao->fetch();
+    if($dao->count < 1) {
+      $sql = "CREATE INDEX index_image_url ON civicrm_contact (image_url);";
+      $dao = CRM_Core_DAO::executeQuery($sql);
+    }
+    $minId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(min(id),0) FROM civicrm_contact WHERE image_URL IS NOT NULL');
+    $maxId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_contact WHERE image_URL IS NOT NULL');
     for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
       $endId = $startId + self::BATCH_SIZE - 1;
       $title = ts('Upgrade image_urls (%1 => %2)', array(1 => $startId, 2 => $endId));
@@ -318,13 +326,12 @@ ALTER TABLE civicrm_dashboard
   }
 
   static function upgradeImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId){
-    $sql = "CREATE INDEX index_image_url ON civicrm_contact (image_url);";
-    $dao = CRM_Core_DAO::executeQuery($sql);    
     $sql = "
 SELECT id, image_url
 FROM civicrm_contact
 WHERE 1
 AND id BETWEEN %1 AND %2
+AND image_URL IS NOT NULL
 ";
     $params = array(
       1 => array($startId, 'Integer'),
