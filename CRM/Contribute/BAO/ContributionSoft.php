@@ -138,11 +138,13 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
 
   /**
    *  Function to retrieve soft contributions for contribution record.
-   *  @param array $params an associated array
-   *  @param boolean $all include PCP data
    *
-   *  @return array of soft contribution ids, amounts, and associated contact ids
-   *  @static
+   * @param $contributionID
+   * @param boolean $all include PCP data
+   *
+   * @internal param array $params an associated array
+   * @return array of soft contribution ids, amounts, and associated contact ids
+   * @static
    */
   static function getSoftContribution($contributionID, $all = FALSE) {
     $pcpFields = array(
@@ -222,10 +224,13 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
 
   /**
    *  Function to retrieve the list of soft contributions for given contact.
-   *  @param int $contact_id contact id
    *
-   *  @return array
-   *  @static
+   * @param int $contact_id contact id
+   *
+   * @param int $isTest
+   *
+   * @return array
+   * @static
    */
   static function getSoftContributionList($contact_id, $isTest = 0) {
     $query = '

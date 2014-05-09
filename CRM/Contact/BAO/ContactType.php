@@ -68,9 +68,10 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    *
    *function to retrieve basic contact type information.
    *
-   *@return  array of basic contact types information.
-   *@static
+   * @param bool $all
    *
+   * @return  array of basic contact types information.
+   * @static
    */
   static function &basicTypeInfo($all = FALSE) {
     static $_cache = NULL;

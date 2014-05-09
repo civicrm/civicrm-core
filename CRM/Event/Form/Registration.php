@@ -832,6 +832,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Process the participant
    *
+   * @param $params
+   * @param $contactID
+   *
    * @return void
    * @access public
    */

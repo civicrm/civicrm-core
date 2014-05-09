@@ -149,6 +149,8 @@ class CRM_Core_Session {
    *
    * @access public
    *
+   * @param int $all
+   *
    * @return void
    */
   function reset($all = 1) {

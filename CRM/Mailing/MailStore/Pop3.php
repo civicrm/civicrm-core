@@ -40,12 +40,12 @@ class CRM_Mailing_MailStore_Pop3 extends CRM_Mailing_MailStore {
   /**
    * Connect to the supplied POP3 server and make sure the two mail dirs exist
    *
-   * @param string $host      host to connect to
-   * @param string $username  authentication username
-   * @param string $password  authentication password
-   * @param bool   $ssl       whether to use POP3 or POP3S
+   * @param string $host host to connect to
+   * @param string $username authentication username
+   * @param string $password authentication password
+   * @param bool $ssl whether to use POP3 or POP3S
    *
-   * @return void
+   * @return \CRM_Mailing_MailStore_Pop3
    */
   function __construct($host, $username, $password, $ssl = TRUE) {
     if ($this->_debug) {

@@ -40,9 +40,9 @@ class CRM_Mailing_MailStore_Localdir extends CRM_Mailing_MailStore {
   /**
    * Connect to the supplied dir and make sure the two mail dirs exist
    *
-   * @param string $dir  dir to operate upon
+   * @param string $dir dir to operate upon
    *
-   * @return void
+   * @return \CRM_Mailing_MailStore_Localdir
    */
   function __construct($dir) {
     $this->_dir = $dir;

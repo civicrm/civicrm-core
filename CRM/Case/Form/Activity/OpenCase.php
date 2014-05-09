@@ -89,6 +89,8 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function setDefaultValues(&$form) {

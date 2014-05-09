@@ -231,12 +231,14 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * Function to delete the location block associated with an event,
    * if not being used by any other event.
    *
-   * @param int $loc_block_id    location block id to be deleted
-   * @param int $eventid         event id with which loc block is associated
+   * @param $locBlockId
+   * @param null $eventId
+   *
+   * @internal param int $loc_block_id location block id to be deleted
+   * @internal param int $eventid event id with which loc block is associated
    *
    * @access public
    * @static
-   *
    */
   static function deleteEventLocBlock($locBlockId, $eventId = NULL) {
     $query = "SELECT count(ce.id) FROM civicrm_event ce WHERE ce.loc_block_id = $locBlockId";
@@ -1016,6 +1018,12 @@ WHERE civicrm_event.is_active = 1
   /**
    * Process that send e-mails
    *
+   * @param $contactID
+   * @param $values
+   * @param $participantId
+   * @param bool $isTest
+   * @param bool $returnMessageText
+   *
    * @return void
    * @access public
    */
@@ -1181,6 +1189,15 @@ WHERE civicrm_event.is_active = 1
   /**
    * Function to add the custom fields OR array of participant's
    * profile info
+   *
+   * @param $id
+   * @param $name
+   * @param $cid
+   * @param $template
+   * @param $participantId
+   * @param $isTest
+   * @param bool $isCustomProfile
+   * @param array $participantParams
    *
    * @return void
    * @access public

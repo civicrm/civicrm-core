@@ -971,6 +971,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * format custom field name.
    * combine group and field name to avoid conflict.
    *
+   * @param $fields
+   *
    * @return void
    * @access public
    */

@@ -39,6 +39,8 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function buildPremium(&$form) {

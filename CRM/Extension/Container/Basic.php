@@ -231,7 +231,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   /**
    * Scan $basedir for a list of extension-keys
    *
-   * @param string $dirSep the local system's directory separator
+   * @internal param string $dirSep the local system's directory separator
    * @return array($key => $relUrl)
    */
   protected function getRelUrls() {

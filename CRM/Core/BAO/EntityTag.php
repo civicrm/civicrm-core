@@ -103,6 +103,8 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *
    * @params array  $params         (reference ) an assoc array of name/value pairs
    *
+   * @param $params
+   *
    * @return boolean
    * @access public
    * @static
@@ -221,7 +223,10 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * takes an associative array and creates tag entity record for all tag entities
    *
    * @param array $params (reference )  an assoc array of name/value pairs
-   * @param array $contactId            contact id
+   * @param $entityTable
+   * @param $entityID
+   *
+   * @internal param array $contactId contact id
    *
    * @return void
    * @access public

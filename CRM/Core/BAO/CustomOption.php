@@ -114,6 +114,7 @@ class CRM_Core_BAO_CustomOption {
    *
    * @param $fieldId  int    the custom field ID
    * @pram  $value    string the value (typically from the DB) of this custom field
+   * @param $value
    * @param $htmlType string the html type of the field (optional)
    * @param $dataType string the data type of the field (optional)
    *

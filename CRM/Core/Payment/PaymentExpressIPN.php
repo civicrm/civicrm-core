@@ -90,6 +90,10 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param $paymentProcessor
+   * @param null $paymentForm
+   * @param bool $force
+   *
    * @return object
    * @static
    */
@@ -103,11 +107,15 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * The function gets called when a new order takes place.
    *
-   * @param xml   $dataRoot    response send by google in xml format
+   * @param $success
    * @param array $privateData contains the name value pair of <merchant-private-data>
    *
-   * @return void
+   * @param $component
+   * @param $amount
+   * @param $transactionReference
    *
+   * @internal param \xml $dataRoot response send by google in xml format
+   * @return void
    */
   function newOrderNotify($success, $privateData, $component, $amount, $transactionReference) {
     $ids = $input = $params = array();
