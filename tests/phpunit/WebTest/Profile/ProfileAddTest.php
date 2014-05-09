@@ -190,8 +190,8 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $groupName);
     $this->click('_qf_Search_refresh');
-    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(., '$groupName')]/following-sibling::td[@class='crm-group-group_links']/span/a");
-    $this->clickLink("xpath=//table[@id='crm-group-selector']/tbody/tr/td[1][contains(., '$groupName')]/following-sibling::td[@class='crm-group-group_links']/span/a");
+    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td/span[text() = '$groupName']/parent::td/following-sibling::td[@class=' crm-group-group_links']/span/a");
+    $this->clickLink("xpath=//table[@id='crm-group-selector']/tbody/tr/td[1]/span[text() = '$groupName']/parent::td/following-sibling::td[@class=' crm-group-group_links']/span/a");
     $contactEmails = array(
       1 => "$lastName1, $firstName1",
       2 => "$lastName2, $firstName2"
@@ -294,11 +294,12 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->assertEquals($this->getValue('description'), $profileDescription);
 
     // click on save button
-    $this->clickLink('_qf_Group_next-bottom');
+    $this->clickLink('_qf_Group_next-bottom', "xpath=//div[@id='field_page']/div[3]/a[2]", FALSE);
 
     // Wait for "saved" status msg
     $this->waitForText('crm-notification-container', 'Profile Saved');
   
+    $this->clickLink("xpath=//div[@id='breadcrumb']/div//a[text()='Profiles']");
     $this->waitForElementPresent("xpath=//div[@class='crm-submit-buttons']/a[@id='newCiviCRMProfile-bottom']");
     $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody/tr[@id='UFGroup-$id']/td[2]/a");
     $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody/tr[@id='UFGroup-$id']/td[3]");

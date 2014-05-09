@@ -445,9 +445,9 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->webtestFillAutocomplete($firstName);
 
     // Select event. Based on label for now.
-    $this->select2('s2id_event_id', "$eventTitle");
+    $this->select2('event_id', "$eventTitle");
     // Select role
-    $this->click('role_id[2]');
+    $this->multiselect2('role_id', array('Volunteer'));
 
     $this->click("xpath=//input[@class='crm-form-radio']");
     $this->click("xpath=//input[@class='crm-form-checkbox']");
@@ -464,7 +464,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->click('_qf_Participant_upload-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     // Is status message correct?
-    $this->assertElementContainsText("css=#crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
+    $this->waitForText("crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
 
     $this->waitForElementPresent("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
 
@@ -560,7 +560,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->webtestFillAutocomplete($firstName);
     $this->select2('event_id', $eventTitle);
     // Select role
-    $this->click('role_id[2]');
+    $this->multiselect2('role_id', array('Volunteer'));
 
     // Choose Registration Date.
     // Using helper webtestFillDate function.
@@ -605,9 +605,10 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         'Participant Role' => 'Attendee',
         'Status' => 'Registered',
         'Event Source' => 'Event StandaloneAddTest Webtest',
-        'Fees' => 'Total Fee(s) Total Paid Balance $ 2,705.00',
       )
     );
+    $this->waitForElementPresent("xpath=//table/tbody/tr/td[text()='Fees']/following-sibling::td");
+    $this->verifyText("xpath=//table/tbody/tr/td[text()='Fees']/following-sibling::td/table/tbody/tr[2]/td", preg_quote('$ 2,705.00'), 'In line ' . __LINE__);
     $expectedLineItems = array(
       2 => array(
         1 => 'Full Conference',
