@@ -1148,18 +1148,20 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * send the message to all the contacts and also insert a
    * contact activity in each contacts record
    *
-   * @param array  $contactDetails the array of contact details to send the email
-   * @param string $subject      the subject of the message
-   * @param string $message      the message contents
+   * @param array $contactDetails the array of contact details to send the email
+   * @param string $subject the subject of the message
+   * @param $text
+   * @param $html
    * @param string $emailAddress use this 'to' email address instead of the default Primary address
-   * @param int    $userID       use this userID if set
+   * @param int $userID use this userID if set
    * @param string $from
-   * @param array  $attachments  the array of attachments if any
-   * @param string $cc           cc recipient
-   * @param string $bcc          bcc recipient
-   * @param array $contactIds    contact ids
+   * @param array $attachments the array of attachments if any
+   * @param string $cc cc recipient
+   * @param string $bcc bcc recipient
+   * @param array $contactIds contact ids
    * @param string $additionalDetails the additional information of CC and BCC appended to the activity Details
    *
+   * @internal param string $message the message contents
    * @return array               ( sent, activityId) if any email is sent and activityId
    * @access public
    * @static

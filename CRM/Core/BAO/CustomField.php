@@ -1143,9 +1143,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * Given a custom field value, its id and the set of options
    * find the display value for this field
    *
-   * @param mixed  $value     the custom field value
-   * @param int    $id        the custom field id
-   * @param int    $options   the assoc array of option name/value pairs
+   * @param mixed $value the custom field value
+   * @param int $id the custom field id
+   * @param int $options the assoc array of option name/value pairs
+   *
+   * @param null $contactID
+   * @param null $fieldID
    *
    * @return  string   the display value
    *

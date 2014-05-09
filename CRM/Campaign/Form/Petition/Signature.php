@@ -322,6 +322,10 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    * This function is used to add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
+   * @param $fields
+   * @param $files
+   * @param $errors
+   *
    * @return void
    * @access public
    * @see valid_date

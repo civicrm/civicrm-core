@@ -185,6 +185,9 @@ class CRM_Core_Block {
    * @params int    $id        one of the class constants (ADD, SEARCH, etc.)
    * @params string $property  the desired property
    *
+   * @param $id
+   * @param $property
+   *
    * @return string  the value of the desired property
    */
   static function getProperty($id, $property) {
@@ -201,6 +204,9 @@ class CRM_Core_Block {
    * @params string $property  the desired property
    * @params string $value     the value of the desired property
    *
+   * @param $id
+   * @param $property
+   * @param $value
    * @return void
    */
   static function setProperty($id, $property, $value) {

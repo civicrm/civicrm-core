@@ -135,7 +135,10 @@ class CRM_Core_BAO_CustomQuery {
    * Takes in a set of custom field ids andsets up the data structures to
    * generate a query
    *
-   * @param  array  $ids     the set of custom field ids
+   * @param  array $ids the set of custom field ids
+   *
+   * @param bool $contactSearch
+   * @param array $locationSpecificFields
    *
    * @access public
    */

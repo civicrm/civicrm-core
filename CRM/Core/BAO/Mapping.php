@@ -205,8 +205,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @params $mapTypeId string mapping Type
    *
-   * @return boolean
+   * @param $nameField
+   * @param $mapTypeId
    *
+   * @return boolean
    */
   static function checkMapping($nameField, $mapTypeId) {
     $mapping = new CRM_Core_DAO_Mapping();

@@ -157,6 +157,8 @@ class CRM_Core_I18n_Schema {
    * @param $table  string  the table containing the column
    * @param $class  string  schema structure class to use to recreate indices
    *
+   * @param array $triggers
+   *
    * @return void
    */
   static function makeSinglelingualTable(

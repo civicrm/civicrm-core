@@ -1107,14 +1107,16 @@ ORDER BY civicrm_custom_group.weight,
    * Add the whereAdd clause for the DAO depending on the type of entity
    * the custom group is extending.
    *
+   * @param $customGroupDAO
+   * @param string $entityType - what entity are we extending here ?
+   *
    * @param object CRM_Core_DAO_CustomGroup (reference) - Custom Group DAO.
-   * @param string $entityType    - what entity are we extending here ?
+   * @param bool $allSubtypes
    *
    * @return void
    *
    * @access private
    * @static
-   *
    */
   private static function _addWhereAdd(&$customGroupDAO, $entityType, $entityID = NULL, $allSubtypes = FALSE) {
     $addSubtypeClause = FALSE;

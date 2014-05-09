@@ -141,10 +141,13 @@ WHERE  id IN ( $idString )
   /**
    * Generate a checksum for a $entityId of type $entityType
    *
-   * @param int    $entityId
-   * @param int    $ts         timestamp that checksum was generated
-   * @param int    $live       life of this checksum in hours/ 'inf' for infinite
-   * @param string $hash       contact hash, if sent, prevents a query in inner loop
+   * @param int $entityId
+   * @param int $ts timestamp that checksum was generated
+   * @param int $live life of this checksum in hours/ 'inf' for infinite
+   * @param string $hash contact hash, if sent, prevents a query in inner loop
+   *
+   * @param string $entityType
+   * @param null $hashSize
    *
    * @return array ( $cs, $ts, $live )
    * @static
@@ -272,8 +275,11 @@ UNION
   /**
    * Create Current employer relationship for a individual
    *
-   * @param int    $contactID        contact id of the individual
-   * @param string $organization     it can be name or id of organization
+   * @param int $contactID contact id of the individual
+   * @param $organizationId
+   * @param null $previousEmployerID
+   *
+   * @internal param string $organization it can be name or id of organization
    *
    * @access public
    * @static

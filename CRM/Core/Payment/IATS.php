@@ -309,7 +309,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
   /**
    * This function checks to see if we have the right config values
    *
-   * @param  string $mode the mode we are operating in (live or test)
+   * @internal param string $mode the mode we are operating in (live or test)
    *
    * @return string the error message if any
    * @public

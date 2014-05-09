@@ -303,7 +303,13 @@ class CRM_Badge_BAO_Badge {
 
   /**
    * Helper function to print images
+   *
    * @param string $img image url
+   *
+   * @param string $x
+   * @param string $y
+   * @param null $w
+   * @param null $h
    *
    * @return void
    * @access public

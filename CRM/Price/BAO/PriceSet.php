@@ -157,8 +157,8 @@ WHERE       ps.name = '{$entityName}'
   /**
    * Return a list of all forms which use this price set.
    *
-   * @param int  $id id of price set
-   * @param str  $simpleReturn - get raw data. Possible values: 'entity', 'table'
+   * @param int $id id of price set
+   * @param bool|\str $simpleReturn - get raw data. Possible values: 'entity', 'table'
    *
    * @return array
    */
@@ -906,6 +906,9 @@ WHERE  id = %1";
 
   /**
    * Function to set daefult the price set fields.
+   *
+   * @param $form
+   * @param $defaults
    *
    * @return array $defaults
    * @access public

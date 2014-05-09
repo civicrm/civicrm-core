@@ -199,6 +199,9 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
+   * @param $files
+   * @param $self
+   *
    * @return mixed true or array of errors
    * @access public
    * @static

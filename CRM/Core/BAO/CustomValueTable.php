@@ -250,6 +250,8 @@ class CRM_Core_BAO_CustomValueTable {
    *
    * @param string $type the civicrm type string
    *
+   * @param int $maxLength
+   *
    * @return the mysql data store placeholder
    * @access public
    * @static

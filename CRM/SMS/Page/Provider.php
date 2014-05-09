@@ -126,6 +126,8 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
   /**
    * Browse all Providers.
    *
+   * @param null $action
+   *
    * @return void
    * @access public
    * @static
@@ -179,6 +181,8 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
 
   /**
    * Get user context.
+   *
+   * @param null $mode
    *
    * @return string user context.
    */

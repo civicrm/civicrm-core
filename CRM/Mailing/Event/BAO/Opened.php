@@ -205,12 +205,14 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
   /**
    * Get rows for the event browser
    *
-   * @param int $mailing_id       ID of the mailing
-   * @param int $job_id           optional ID of the job
-   * @param boolean $is_distinct  Group by queue id?
-   * @param int $offset           Offset
-   * @param int $rowCount         Number of rows
-   * @param array $sort           sort array
+   * @param int $mailing_id ID of the mailing
+   * @param int $job_id optional ID of the job
+   * @param boolean $is_distinct Group by queue id?
+   * @param int $offset Offset
+   * @param int $rowCount Number of rows
+   * @param array $sort sort array
+   *
+   * @param null $contact_id
    *
    * @return array                Result set
    * @access public

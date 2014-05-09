@@ -204,7 +204,10 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {

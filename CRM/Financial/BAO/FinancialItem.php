@@ -175,9 +175,11 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * retrive entity financial trxn details
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @param boolean $maxID to retrive max id
+   * @param bool $maxId
+   *
+   * @internal param bool $maxID to retrive max id
    *
    * @return array
    * @access public

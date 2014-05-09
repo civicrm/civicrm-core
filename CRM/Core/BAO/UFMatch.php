@@ -167,11 +167,14 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * Synchronize the object with the UF Match entry. Can be called stand-alone from
    * the drupalUsers script
    *
-   * @param Object  $user    the drupal user object
-   * @param string  $userKey the id of the user from the uf object
-   * @param string  $uniqId    the OpenID of the user
-   * @param string  $uf      the name of the user framework
-   * @param integer $status  returns the status if user created or already exits (used for CMS sync)
+   * @param Object $user the drupal user object
+   * @param string $userKey the id of the user from the uf object
+   * @param string $uniqId the OpenID of the user
+   * @param string $uf the name of the user framework
+   * @param integer $status returns the status if user created or already exits (used for CMS sync)
+   *
+   * @param null $ctype
+   * @param bool $isLogin
    *
    * @return the ufmatch object that was found or created
    * @access public

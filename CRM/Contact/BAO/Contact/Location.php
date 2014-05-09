@@ -116,8 +116,11 @@ LEFT JOIN civicrm_phone ON ( civicrm_phone.contact_id = civicrm_contact.id )
   /**
    * function to get the information to map a contact
    *
-   * @param  array  $ids    the list of ids for which we want map info
+   * @param  array $ids the list of ids for which we want map info
    * $param  int    $locationTypeID
+   *
+   * @param null $locationTypeID
+   * @param bool $imageUrlOnly
    *
    * @return null|string     display name of the contact if found
    * @static

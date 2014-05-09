@@ -152,8 +152,8 @@ ON DUPLICATE KEY UPDATE
   /**
    * Function to check if there are any contacts in cache table
    *
-   * @param string  $type      the type of operation (view|edit)
-   * @param int     $contactID contact id
+   * @param int|string $type the type of operation (view|edit)
+   * @param int $contactID contact id
    *
    * @return boolean
    * @access public
@@ -237,8 +237,11 @@ AND    $operationClause LIMIT 1";
   /**
    * Function to get the permission base on its relationship
    *
-   * @param int $selectedContactId contact id of selected contact
-   * @param int $contactId contact id of the current contact
+   * @param $selectedContactID
+   * @param null $contactID
+   *
+   * @internal param int $selectedContactId contact id of selected contact
+   * @internal param int $contactId contact id of the current contact
    *
    * @return booleab true if logged in user has permission to view
    * selected contact record else false
