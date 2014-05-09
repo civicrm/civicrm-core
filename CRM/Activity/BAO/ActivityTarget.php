@@ -69,12 +69,13 @@ class CRM_Activity_BAO_ActivityTarget extends CRM_Activity_DAO_ActivityContact {
   /**
    * function to retrieve id of target contact by activity_id
    *
-   * @param int    $id  ID of the activity
+   * @param $activity_id
+   *
+   * @internal param int $id ID of the activity
    *
    * @return mixed
    *
    * @access public
-   *
    */
   static function retrieveTargetIdsByActivityId($activity_id) {
     $targetArray = array();

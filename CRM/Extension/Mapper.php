@@ -120,7 +120,9 @@ class CRM_Extension_Mapper {
    *
    * @access public
    *
-   * @param string $key extension key
+   * @param $clazz
+   *
+   * @internal param string $key extension key
    *
    * @return string full path the extension .php file
    */

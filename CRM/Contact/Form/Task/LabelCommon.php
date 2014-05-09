@@ -89,9 +89,13 @@ class CRM_Contact_Form_Task_LabelCommon {
   /**
    * function to get the rows for the labels
    *
-   * @param array $contactIds Contact IDS to do labels for
+   * @param $contactIDs
    * @param integer $locationTypeID
    * @param boolean $respectDoNotMail
+   * @param $mergeSameAddress
+   * @param $mergeSameHousehold
+   *
+   * @internal param array $contactIds Contact IDS to do labels for
    * @return array of rows for labels
    * @access  public
    */

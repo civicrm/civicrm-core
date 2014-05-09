@@ -42,7 +42,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   /**
    * class constructor
    *
-   * @return object CRM_Contact_BAO_SavedSearch
+   * @return \CRM_Contact_BAO_SavedSearch CRM_Contact_BAO_SavedSearch
    */
   function __construct() {
     parent::__construct();

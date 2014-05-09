@@ -53,6 +53,8 @@ class CRM_Extension_System {
   private $_repoUrl = NULL;
 
   /**
+   * @param bool $fresh
+   *
    * @return CRM_Extension_System
    */
   public static function singleton($fresh = FALSE) {

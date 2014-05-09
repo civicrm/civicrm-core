@@ -42,6 +42,8 @@ class CRM_Member_BAO_Query {
   /**
    * if membership are involved, add the specific membership fields
    *
+   * @param $query
+   *
    * @return void
    * @access public
    */

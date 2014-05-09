@@ -78,7 +78,9 @@ WHERE     civicrm_contact.id = %1";
   /**
    * function to get the sms number and display name of a contact
    *
-   * @param  int    $id id of the contact
+   * @param  int $id id of the contact
+   *
+   * @param null $type
    *
    * @return array    tuple of display_name and sms if found, or (null,null)
    * @static

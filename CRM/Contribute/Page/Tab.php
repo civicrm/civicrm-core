@@ -55,9 +55,11 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * - Edit
    * - Cancel
    *
+   * @param bool $recurID
+   * @param string $context
+   *
    * @return array
    * @access public
-   *
    */
   static function &recurLinks($recurID = FALSE, $context = 'contribution') {
     if (!(self::$_links)) {
