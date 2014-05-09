@@ -374,8 +374,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $configs['allowCoreTypes'][] = 'Individual';
     $configs['allowCoreTypes'][] = 'Participant';
 
-    $configs['profileEntities'][] = array('entity_name' => 'individual_entity', 'entity_type' => 'IndividualModel');
-    $configs['profileEntities'][] = array('entity_name' => 'participant_entity', 'entity_type' => 'ParticipantModel');
+    $configs['profileEntities'][] = array('entity_name' => 'individual_1', 'entity_type' => 'IndividualModel');
+    $configs['profileEntities'][] = array('entity_name' => 'participant_1', 'entity_type' => 'ParticipantModel');
 
    return $configs;
   }
