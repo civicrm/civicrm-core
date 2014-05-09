@@ -253,9 +253,11 @@ class CRM_Core_BAO_CMSUser {
   /**
    * Function to create Form for CMS user using Profile
    *
-   * @param object  $form
+   * @param object $form
    * @param integer $gid id of group of profile
    * @param bool $emailPresent true if the profile field has email(primary)
+   * @param const $action
+   *
    * @return FALSE|void WTF
    *
    * @access public

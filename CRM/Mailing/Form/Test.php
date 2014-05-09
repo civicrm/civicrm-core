@@ -172,10 +172,11 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
   /**
    * Form rule to send out a test mailing.
    *
-   * @param array $params     Array of the form values
-   * @param array $files      Any files posted to the form
-   * @param array $self       an current this object
+   * @param $testParams
+   * @param array $files Any files posted to the form
+   * @param array $self an current this object
    *
+   * @internal param array $params Array of the form values
    * @return boolean          true on successful SMTP handoff
    * @access public
    */

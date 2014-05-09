@@ -138,10 +138,13 @@ WHERE  parent_id IS NULL
    *
    *function to retrieve all subtypes Information.
    *
-   *@param array $contactType.
-   *@return  array of sub type information
-   *@static
+   * @param array $contactType .
+   * @param bool $all
+   * @param bool $ignoreCache
+   * @param bool $reset
    *
+   * @return  array of sub type information
+   * @static
    */
   static function &subTypeInfo($contactType = NULL, $all = FALSE, $ignoreCache = FALSE, $reset = FALSE) {
     static $_cache = NULL;

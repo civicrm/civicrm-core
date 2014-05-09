@@ -169,8 +169,10 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   /**
    * Determine the relative path of an extension directory
    *
+   * @param $key
+   *
+   * @throws CRM_Extension_Exception_MissingException
    * @return string
-   * @throws CRM_Extension_Exception
    */
   protected function getRelPath($key) {
     $keypaths = $this->getRelPaths();
@@ -217,8 +219,10 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   /**
    * Determine the relative path of an extension directory
    *
+   * @param $key
+   *
+   * @throws CRM_Extension_Exception_MissingException
    * @return string
-   * @throws CRM_Extension_Exception
    */
   protected function getRelUrl($key) {
     $relUrls = $this->getRelUrls();

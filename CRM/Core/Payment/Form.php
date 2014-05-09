@@ -241,6 +241,9 @@ class CRM_Core_Payment_Form {
   /**
    * Function to add all the credit card fields
    *
+   * @param $form
+   * @param bool $useRequired
+   *
    * @return void
    * @access public
    */

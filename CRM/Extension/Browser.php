@@ -132,6 +132,8 @@ class CRM_Extension_Browser {
   /**
    * Get a description of a particular extension
    *
+   * @param $key
+   *
    * @return CRM_Extension_Info|NULL
    */
   public function getExtension($key) {

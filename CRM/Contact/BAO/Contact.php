@@ -919,11 +919,14 @@ WHERE id={$id}; ";
   /**
    * function to validate type of contact image
    *
-   * @param  Array  $param      array of contact/profile field to be edited/added
-   *
+   * @param $params
    * @param  String $imageIndex index of image field
    *
-   * @param  String $statusMsg  status message to be set after operation
+   * @param  String $statusMsg status message to be set after operation
+   *
+   * @param string $opType
+   *
+   * @internal param Array $param array of contact/profile field to be edited/added
    *
    * @opType String $opType     type of operation like fatal, bounce etc
    *

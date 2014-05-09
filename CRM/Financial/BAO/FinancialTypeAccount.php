@@ -108,7 +108,10 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   /**
    * Function to delete financial Types
    *
-   * @param int $contributionTypeId
+   * @param $financialTypeAccountId
+   * @param null $accountId
+   *
+   * @internal param int $contributionTypeId
    * @static
    */
   static function del($financialTypeAccountId, $accountId = null) {

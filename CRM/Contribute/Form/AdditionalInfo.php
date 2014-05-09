@@ -240,6 +240,11 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
+   * @param $params
+   * @param $contactID
+   * @param $contributionID
+   * @param null $contributionNoteID
+   *
    * @return void
    */
   static function processNote(&$params, $contactID, $contributionID, $contributionNoteID = NULL) {

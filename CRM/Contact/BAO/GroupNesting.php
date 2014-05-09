@@ -243,8 +243,11 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Adds a new child group identified by $childGroupId to the group
    * identified by $groupId
    *
-   * @param            $groupId               The id of the group to add the child to
-   * @param            $childGroupId          The id of the new child group
+   * @param $parentID
+   * @param $childID
+   *
+   * @internal param \The $groupId id of the group to add the child to
+   * @internal param \The $childGroupId id of the new child group
    *
    * @return           void
    *

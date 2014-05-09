@@ -237,8 +237,11 @@ AND    $operationClause LIMIT 1";
   /**
    * Function to get the permission base on its relationship
    *
-   * @param int $selectedContactId contact id of selected contact
-   * @param int $contactId contact id of the current contact
+   * @param $selectedContactID
+   * @param null $contactID
+   *
+   * @internal param int $selectedContactId contact id of selected contact
+   * @internal param int $contactId contact id of the current contact
    *
    * @return booleab true if logged in user has permission to view
    * selected contact record else false

@@ -883,9 +883,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * the form with a customized title for the main Submit
    *
    * @param string $title title of the main button
-   * @param string $type  button type for the form after processing
-   * @param string $submitOnce If true, add javascript to next button submit which prevents it from being clicked more than once
+   * @param string $nextType
+   * @param string $backType
+   * @param bool|string $submitOnce If true, add javascript to next button submit which prevents it from being clicked more than once
    *
+   * @internal param string $type button type for the form after processing
    * @return void
    * @access public
    */

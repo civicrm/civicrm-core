@@ -237,11 +237,11 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $params        input parameters to find object
-   * @param array $values        output values of the object
-   * @param array $ids           the array that holds all the db ids
-   * @param int   $numNotes      the maximum number of notes to return (0 if all)
+   * @param array $params input parameters to find object
+   * @param array $values output values of the object
+   * @param int $numNotes the maximum number of notes to return (0 if all)
    *
+   * @internal param array $ids the array that holds all the db ids
    * @return object $notes  Object of CRM_Core_BAO_Note
    * @access public
    * @static

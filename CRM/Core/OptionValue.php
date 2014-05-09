@@ -172,11 +172,12 @@ class CRM_Core_OptionValue {
   /**
    * Function to add/edit option-value of a particular group
    *
-   * @param  array     $params           Array containing exported values from the invoking form.
-   * @param  array     $groupParams      Array containing group fields whose option-values is to retrieved/saved.
-   * @param  string    $orderBy          for orderBy clause
-   * @param  integer   $optionValueID    has the id of the optionValue being edited, disabled ..etc
+   * @param  array $params Array containing exported values from the invoking form.
+   * @param  array $groupParams Array containing group fields whose option-values is to retrieved/saved.
+   * @param $action
+   * @param  integer $optionValueID has the id of the optionValue being edited, disabled ..etc
    *
+   * @internal param string $orderBy for orderBy clause
    * @return array of option-values
    *
    * @access public

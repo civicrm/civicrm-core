@@ -1120,7 +1120,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * function to check if an error in custom data
    *
-   * @param String   $errorMessage   A string containing all the error-fields.
+   * @param $params
+   * @param String $errorMessage A string containing all the error-fields.
+   *
+   * @param null $csType
+   * @param null $relationships
    *
    * @access public
    */

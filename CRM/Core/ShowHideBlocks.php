@@ -174,10 +174,12 @@ class CRM_Core_ShowHideBlocks {
   /**
    * Create links that we can use in the form
    *
-   * @param CRM_Core_Form $form          the form object
-   * @param string        $prefix        the attribute that we are referencing
-   * @param string        $showLinkText  the text to be shown for the show link
-   * @param string        $hideLinkText  the text to be shown for the hide link
+   * @param CRM_Core_Form $form the form object
+   * @param string $prefix the attribute that we are referencing
+   * @param string $showLinkText the text to be shown for the show link
+   * @param string $hideLinkText the text to be shown for the hide link
+   *
+   * @param bool $assign
    *
    * @static
    *

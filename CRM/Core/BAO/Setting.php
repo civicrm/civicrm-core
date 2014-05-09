@@ -302,9 +302,12 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @param object $value (required) The value that will be serialized and stored
    * @param string $group (required) The group name of the item
-   * @param string $name  (required) The name of the setting
-   * @param int    $componentID The optional component ID (so componenets can share the same name space)
-   * @param int    $createdID   An optional ID to assign the creator to. If not set, retrieved from session
+   * @param string $name (required) The name of the setting
+   * @param int $componentID The optional component ID (so componenets can share the same name space)
+   * @param null $contactID
+   * @param int $createdID An optional ID to assign the creator to. If not set, retrieved from session
+   *
+   * @param null $domainID
    *
    * @return void
    * @static

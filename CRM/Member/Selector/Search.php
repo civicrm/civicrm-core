@@ -137,15 +137,18 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * Class constructor
    *
-   * @param array   $queryParams array of parameters for query
-   * @param int     $action - action of search basic or advanced.
-   * @param string  $memberClause if the caller wants to further restrict the search (used in memberships)
+   * @param array $queryParams array of parameters for query
+   * @param \const|int $action - action of search basic or advanced.
+   * @param string $memberClause if the caller wants to further restrict the search (used in memberships)
    * @param boolean $single are we dealing only with one contact?
-   * @param int     $limit  how many memberships do we want returned
+   * @param int $limit how many memberships do we want returned
    *
-   * @return CRM_Contact_Selector
-   * @access public
-   */ function __construct(&$queryParams,
+   * @param string $context
+   *
+   * @return \CRM_Member_Selector_Search
+  @access public
+   */
+  function __construct(&$queryParams,
     $action       = CRM_Core_Action::NONE,
     $memberClause = NULL,
     $single       = FALSE,
