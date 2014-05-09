@@ -1174,10 +1174,11 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * @param $contactId  Int     contact id
    * @param $params     array   array of values submitted by POST
    * @param $ids        array   array of ids
-   * @param $action             which action called this function
+   * @param \const|\which $action which action called this function
+   *
+   * @param bool $active
    *
    * @static
-   *
    */
   static function relatedMemberships($contactId, &$params, $ids, $action = CRM_Core_Action::ADD, $active = TRUE) {
     // Check the end date and set the status of the relationship

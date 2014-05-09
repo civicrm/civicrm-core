@@ -102,6 +102,8 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   /**
    * Create a new WordReplacement
    *
+   * @param $params
+   *
    * @return WordReplacement array
    * @access public
    */

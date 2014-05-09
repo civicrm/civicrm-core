@@ -1643,7 +1643,9 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    * scheme. Adding weight is super important and should be done in the
    * next week or so, before this can be called complete.
    *
-   * @param NULL
+   * @param bool $status
+   *
+   * @internal param $NULL
    *
    * @return array    array of importable Fields
    * @access public

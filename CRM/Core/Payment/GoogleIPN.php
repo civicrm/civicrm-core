@@ -91,11 +91,12 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * The function gets called when a new order takes place.
    *
-   * @param xml   $dataRoot    response send by google in xml format
+   * @param xml $dataRoot response send by google in xml format
    * @param array $privateData contains the name value pair of <merchant-private-data>
    *
-   * @return void
+   * @param $component
    *
+   * @return void
    */
   function newOrderNotify($dataRoot, $privateData, $component) {
     $ids = $input = $params = array();

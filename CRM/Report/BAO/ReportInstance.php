@@ -231,9 +231,9 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
   /**
    * Delete the instance of the Report
    *
-   * @return $results no of deleted Instance on success, false otherwise
-   * @access public
+   * @param null $id
    *
+   * @return mixed $results no of deleted Instance on success, false otherwise@access public
    */
   static function del($id = NULL) {
     $dao = new CRM_Report_DAO_ReportInstance();

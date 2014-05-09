@@ -112,11 +112,14 @@ class CRM_Core_Payment_BaseIPN {
    * Load objects related to contribution
    *
    * @input array information from Payment processor
+   *
+   * @param $input
    * @param array $ids
    * @param array $objects
    * @param boolean $required
    * @param integer $paymentProcessorID
    * @param array $error_handling
+   *
    * @return multitype:number NULL |boolean
    */
   function loadObjects(&$input, &$ids, &$objects, $required, $paymentProcessorID, $error_handling = NULL) {

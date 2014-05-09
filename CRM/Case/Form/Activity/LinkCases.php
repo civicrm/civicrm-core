@@ -111,6 +111,9 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @access public
    *
+   * @param $form
+   * @param $params
+   *
    * @return void
    */
   static function beginPostProcess(&$form, &$params) {}

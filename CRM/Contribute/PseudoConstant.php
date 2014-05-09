@@ -148,6 +148,12 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * Get all the financial Accounts
    *
    * @access public
+   *
+   * @param null $id
+   * @param null $financialAccountTypeId
+   * @param string $retrieveColumn
+   * @param string $key
+   *
    * @return array - array reference of all financial accounts if any
    * @static
    */

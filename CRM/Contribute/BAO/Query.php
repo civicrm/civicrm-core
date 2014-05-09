@@ -66,6 +66,8 @@ class CRM_Contribute_BAO_Query {
   /**
    * if contributions are involved, add the specific contribute fields
    *
+   * @param $query
+   *
    * @return void
    * @access public
    */

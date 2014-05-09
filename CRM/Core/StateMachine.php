@@ -87,8 +87,10 @@ class CRM_Core_StateMachine {
    *
    * @param object $controller the controller for this state machine
    *
-   * @return object
-   * @access public
+   * @param const $action
+   *
+   * @return \CRM_Core_StateMachine
+  @access public
    */
   function __construct(&$controller, $action = CRM_Core_Action::NONE) {
     $this->_controller = &$controller;

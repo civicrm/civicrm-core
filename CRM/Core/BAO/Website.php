@@ -129,7 +129,10 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array entityBlock input parameters to find object
+   * @param $params
+   * @param $values
+   *
+   * @internal param \entityBlock $array input parameters to find object
    *
    * @return boolean
    * @access public

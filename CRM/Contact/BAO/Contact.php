@@ -1035,12 +1035,13 @@ WHERE id={$id}; ";
    *
    * @param int $id - id of the contact whose contact sub type is needed
    *
+   * @param null $implodeDelimiter
+   *
    * @return string contact_sub_type if $id found else null ""
    *
    * @access public
    *
    * @static
-   *
    */
   public static function getContactSubType($id, $implodeDelimiter = NULL) {
     $subtype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $id, 'contact_sub_type');
@@ -1096,11 +1097,13 @@ WHERE id={$id}; ";
    * The ordering is important, since currently we do not have a weight
    * scheme. Adding weight is super important
    *
-   * @param int     $contactType     contact Type
-   * @param boolean $status          status is used to manipulate first title
-   * @param boolean $showAll         if true returns all fields (includes disabled fields)
-   * @param boolean $isProfile       if its profile mode
+   * @param int|string $contactType contact Type
+   * @param boolean $status status is used to manipulate first title
+   * @param boolean $showAll if true returns all fields (includes disabled fields)
+   * @param boolean $isProfile if its profile mode
    * @param boolean $checkPermission if false, do not include permissioning clause (for custom data)
+   *
+   * @param bool $withMultiCustomFields
    *
    * @return array array of importable Fields
    * @access public

@@ -128,6 +128,8 @@ WHERE  contact_id = {$params['contact_id']}
    *
    * @param int $id the contact id
    *
+   * @param bool $updateBlankLocInfo
+   *
    * @return array  the array of email id's
    * @access public
    * @static

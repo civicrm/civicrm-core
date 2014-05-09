@@ -231,6 +231,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
+   * @param $files
+   *
    * @return mixed true or array of errors
    * @access public
    * @static

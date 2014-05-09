@@ -66,9 +66,11 @@ class CRM_Contact_Form_Inline_Lock {
   /**
    * Ensure that oplock_ts hasn't changed in the underlying DB
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param null $contactID
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public

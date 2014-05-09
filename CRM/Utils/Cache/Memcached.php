@@ -81,8 +81,9 @@ class CRM_Utils_Cache_Memcached {
   /**
    * Constructor
    *
-   * @param array   $config  an array of configuration params
-   * @return void
+   * @param array $config an array of configuration params
+   *
+   * @return \CRM_Utils_Cache_Memcached
    */
   function __construct($config) {
     if (isset($config['host'])) {

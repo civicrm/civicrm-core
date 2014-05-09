@@ -227,7 +227,10 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -308,7 +311,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
 
       $row['action'] = CRM_Core_Action::formLink(
         self::links($qfKey, $this->_context),
-        $mask, 
+        $mask,
         $actions,
         ts('more'),
         FALSE,

@@ -121,6 +121,8 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
   /**
    * Browse all Label Format settings.
    *
+   * @param null $action
+   *
    * @return void
    * @access public
    * @static

@@ -233,6 +233,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * Store multiple items in the setting table
    *
    * @param array $params (required) An api formatted array of keys and values
+   * @param null $domains
+   * @param $settingsToReturn
+   *
    * @domains array an array of domains to get settings for. Default is the current domain
    * @return void
    * @static
@@ -1031,6 +1034,10 @@ AND domain_id = %3
   /**
    * Determine what, if any, overrides have been provided
    * for a setting.
+   *
+   * @param $group
+   * @param $name
+   * @param $default
    *
    * @return mixed, NULL or an overriden value
    */
