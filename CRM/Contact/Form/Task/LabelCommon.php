@@ -41,9 +41,12 @@
 class CRM_Contact_Form_Task_LabelCommon {
   /**
    * Check for presence of tokens to be swapped out
+   *
    * @param array $contact
    * @param array $mailingFormatProperties
    * @param array $tokenFields
+   *
+   * @return bool
    */
   function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
     foreach (array_merge($mailingFormatProperties, array_fill_keys($tokenFields, 1)) as $key => $dontCare) {

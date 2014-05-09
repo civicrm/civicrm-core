@@ -197,10 +197,13 @@ WHERE ft.entity_table = 'civicrm_contribution' AND ft.entity_id = %1
     return  CRM_Core_DAO::singleValueQuery($query, $sqlParams);
 
   }
+
   /**
    * Given an financial_trxn_id  check for previous entity_financial_trxn.
    *
-   * @param int $financialTrxn_id id of the latest payment.
+   * @param $financial_trxn_id
+   *
+   * @internal param int $financialTrxn_id id of the latest payment.
    *
    * @return array( ) $payment array of previous payments
    *
@@ -251,8 +254,11 @@ WHERE  ef2.financial_trxn_id =%1
    * Given an entity_id and entity_table, check for corresponding entity_financial_trxn and financial_trxn record.
    * NOTE: This should be moved to separate BAO for EntityFinancialTrxn when we start adding more code for that object.
    *
-   * @param string $entityTable name of the entity table usually 'civicrm_contact'
-   * @param int $entityID id of the entity usually the contactID.
+   * @param $entity_id
+   * @param string $entity_table
+   *
+   * @internal param string $entityTable name of the entity table usually 'civicrm_contact'
+   * @internal param int $entityID id of the entity usually the contactID.
    *
    * @return array(  ) reference $tag array of catagory id's the contact belongs to.
    *

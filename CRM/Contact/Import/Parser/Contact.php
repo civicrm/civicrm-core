@@ -1303,6 +1303,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param string $gender check this value across gender values.
    *
    * retunr gender value / false
+   *
+   * @return bool
    * @access public
    */
   public function checkGender($gender) {
@@ -1330,7 +1332,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * function to check if an error in Core( non-custom fields ) field
    *
-   * @param String   $errorMessage   A string containing all the error-fields.
+   * @param $params
+   * @param String $errorMessage A string containing all the error-fields.
    *
    * @access public
    */
@@ -1599,6 +1602,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
   /**
    * function to ckeck a value present or not in a array
+   *
+   * @param $value
+   * @param $valueArray
    *
    * @return ture if value present in array or retun false
    *
@@ -2039,9 +2045,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Function to generate status and error message for unparsed street address records.
    *
-   * @param array  $values           the array of values belonging to each row
-   * @param array  $statusFieldName  store formatted date in this array
-
+   * @param array $values the array of values belonging to each row
+   * @param array $statusFieldName store formatted date in this array
+   * @param $returnCode
+   *
+   * @return int
    * @access public
    */
   function processMessage(&$values, $statusFieldName, $returnCode) {

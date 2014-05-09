@@ -137,6 +137,8 @@ class CRM_Core_Page_AJAX {
    * @param string $type 'method'|'class'|''
    * @param string $className 'Class_Name'
    * @param string $fnName method name
+   *
+   * @return bool
    */
   static function checkAuthz($type, $className, $fnName = null) {
     switch ($type) {

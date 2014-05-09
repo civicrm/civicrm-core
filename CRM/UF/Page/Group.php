@@ -380,6 +380,8 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    *
    * @param int $id uf group id
    *
+   * @param $action
+   *
    * @return void
    * @access public
    */

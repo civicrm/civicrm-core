@@ -356,7 +356,9 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   /**
    * retrieve all records for this entity-id
    *
-   * @param int  $id ID of the relationship for which records needs to be retrieved.
+   * @param int $id ID of the relationship for which records needs to be retrieved.
+   *
+   * @param string $entityTable
    *
    * @return array $viewNote array of note properties
    *

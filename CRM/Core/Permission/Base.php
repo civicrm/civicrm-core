@@ -41,9 +41,11 @@ class CRM_Core_Permission_Base {
   /**
    * Translate permission
    *
-   * @param string $name e.g. "administer CiviCRM", "cms:access user record", "Drupal:administer content", "Joomla:action:com_asset"
+   * @param $perm
    * @param string $nativePrefix
    * @param array $map array($portableName => $nativeName)
+   *
+   * @internal param string $name e.g. "administer CiviCRM", "cms:access user record", "Drupal:administer content", "Joomla:action:com_asset"
    * @return NULL|string a permission name
    */
   public function translatePermission($perm, $nativePrefix, $map) {
@@ -96,17 +98,17 @@ class CRM_Core_Permission_Base {
     $this->group();
     return $this->groupClause($type, $tables, $whereTables);
   }
+
   /**
    * Get all groups from database, filtered by permissions
    * for this user
    *
-   * @param string $groupType     type of group(Access/Mailing)
-   * @param boolen $excludeHidden exclude hidden groups.
+   * @param string $groupType type of group(Access/Mailing)
+   * @param bool|\boolen $excludeHidden exclude hidden groups.
    *
    * @access public
    *
    * @return array - array reference of all groups.
-   *
    */
   public function group($groupType = NULL, $excludeHidden = TRUE) {
     return CRM_Core_PseudoConstant::allGroup($groupType, $excludeHidden);
@@ -192,6 +194,8 @@ class CRM_Core_Permission_Base {
    * version has removed permission that were defined in the older version.
    *
    * @param array $permissions same format as CRM_Core_Permission::getCorePermissions().
+   *
+   * @throws CRM_Core_Exception
    * @see CRM_Core_Permission::getCorePermissions
    */
   function upgradePermissions($permissions) {
@@ -204,6 +208,8 @@ class CRM_Core_Permission_Base {
    *
    * Note: At time of writing, this is only used with native extension-modules, so
    * there's one, predictable calling convention (regardless of CMS).
+   *
+   * @param $module
    *
    * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    * @see CRM_Core_Permission::getCorePermissions

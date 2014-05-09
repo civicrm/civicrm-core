@@ -43,6 +43,8 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
    * has more business logic
    *
    * @param array $params input parameters
+   *
+   * @return object
    */
   static function create($params) {
     // if id is set & is_primary isn't we can assume no change

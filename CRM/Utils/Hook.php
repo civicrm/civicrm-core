@@ -1574,7 +1574,8 @@ abstract class CRM_Utils_Hook {
    * @param type $mainCaseId
    * @param type $otherContactId
    * @param type $otherCaseId
-   * @param type $changeClient
+   * @param bool|\type $changeClient
+   *
    * @return void
    */
   static function post_case_merge($mainContactId, $mainCaseId = NULL, $otherContactId = NULL, $otherCaseId = NULL, $changeClient = FALSE) {

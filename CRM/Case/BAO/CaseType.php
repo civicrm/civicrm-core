@@ -55,7 +55,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * pairs
    *
    * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $ids    the array that holds all the db ids
+   *
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return object CRM_Case_BAO_CaseType object
    * @access public
@@ -73,7 +74,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *
    * @param array $params input parameters to find object
    * @param array $values output values of the object
-   * @param array $ids    the array that holds all the db ids
+   *
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return CRM_Case_BAO_CaseType|null the found object or null
    * @access public
@@ -95,7 +97,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * takes an associative array and creates a case type object
    *
    * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $ids    the array that holds all the db ids
+   *
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return object CRM_Case_BAO_CaseType object
    * @access public

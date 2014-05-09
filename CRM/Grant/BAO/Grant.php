@@ -53,6 +53,8 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *
    * @static
    *
+   * @param bool $admin
+   *
    * @return array Array of event summary values
    */
   static function getGrantSummary($admin = FALSE) {
@@ -248,8 +250,9 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * function to create the event
    *
    * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @param array $ids reference array contains the id
    *
+   * @return object
    * @access public
    * @static
    *
@@ -309,11 +312,13 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Function to delete the Contact
    *
-   * @param int $cid  contact id
+   * @param $id
+   *
+   * @return bool
+   * @internal param int $cid contact id
    *
    * @access public
    * @static
-   *
    */
   static function deleteContact($id) {
     $grant = new CRM_Grant_DAO_Grant();
@@ -325,8 +330,9 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Function to delete the grant
    *
-   * @param int $id  grant id
+   * @param int $id grant id
    *
+   * @return bool|mixed
    * @access public
    * @static
    *

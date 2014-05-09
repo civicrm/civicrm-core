@@ -206,8 +206,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Fix what blocks to show/hide based on the default values set
    *
-   * @param array   $defaults the array of default values
-   * @param boolean $force    should we set show hide based on input defaults
+   * @param array $defaults the array of default values
+   *
+   * @internal param bool $force should we set show hide based on input defaults
    *
    * @return void
    */

@@ -79,7 +79,7 @@ class CRM_Core_Session {
    * This constructor is invoked whenever any module requests an instance of
    * the session and one is not available.
    *
-   * @return void
+   * @return \CRM_Core_Session
    */
   function __construct() {
     $this->_session = null;

@@ -58,7 +58,10 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
   /**
    * Function to delete membership log record
    *
-   * @param int $membershipTypeId
+   * @param $membershipID
+   *
+   * @return mixed
+   * @internal param int $membershipTypeId
    * @static
    */
 

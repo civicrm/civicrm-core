@@ -91,6 +91,8 @@ class CRM_Contact_Form_Inline_Lock {
   /**
    * Return any post-save data
    *
+   * @param $contactID
+   *
    * @return array extra options to return in JSON
    */
   static function getResponse($contactID) {

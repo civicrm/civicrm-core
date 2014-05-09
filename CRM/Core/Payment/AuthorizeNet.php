@@ -42,7 +42,9 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_AuthorizeNet
    */
   function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;

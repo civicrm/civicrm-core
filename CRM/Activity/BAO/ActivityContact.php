@@ -109,12 +109,14 @@ AND        contact_a.is_deleted = 0
   /**
    * function to retrieve id of target contact by activity_id
    *
-   * @param int    $id  ID of the activity
+   * @param $activityID
+   * @param $recordTypeID
+   *
+   * @internal param int $id ID of the activity
    *
    * @return mixed
    *
    * @access public
-   *
    */
   static function retrieveContactIdsByActivityId($activityID, $recordTypeID) {
     $activityContact = array();

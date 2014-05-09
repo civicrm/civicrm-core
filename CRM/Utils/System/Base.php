@@ -82,6 +82,9 @@ abstract class CRM_Utils_System_Base {
    *
    * @param string $url
    *
+   * @param bool $addLanguagePart
+   * @param bool $removeLanguagePart
+   *
    * @return string $url, formatted url.
    * @static
    */

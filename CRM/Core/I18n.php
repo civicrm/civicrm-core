@@ -50,7 +50,7 @@ class CRM_Core_I18n {
    *
    * @param  $locale string  the base of this certain object's existence
    *
-   * @return         void
+   * @return \CRM_Core_I18n
    */
   function __construct($locale) {
     if ($locale != '' and $locale != 'en_US') {

@@ -67,7 +67,10 @@ class CRM_Admin_Form_CaseType extends CRM_Admin_Form {
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
+   * @param array $fields the input form values
+   *
+   * @param $files
+   * @param $self
    *
    * @return true if no errors, else array of errors
    * @access public

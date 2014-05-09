@@ -60,6 +60,8 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   /**
    * Get the domain BAO
    *
+   * @param null $reset
+   *
    * @return null|object CRM_Core_BAO_WordRepalcement
    * @access public
    * @static
@@ -79,6 +81,9 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
 
   /**
    * Save the values of a WordReplacement
+   *
+   * @param $params
+   * @param $id
    *
    * @return WordReplacement array
    * @access public

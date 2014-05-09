@@ -40,15 +40,15 @@
 /**
  * Add or update a relationship
  *
- * @param  array   $params  input parameters
+ * @param  array $params input parameters
  *
+ * @throws API_Exception
  * @example RelationshipCreate.php Std Create example
  *
  * @return array API Result Array
  * {@getfields relationship_create}
  * @static void
  * @access public
- *
  */
 function civicrm_api3_relationship_create($params) {
 
@@ -171,11 +171,12 @@ function civicrm_api3_relationship_get($params) {
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params Associative array of property name/value
  *                             pairs to insert in new contact.
- * @param array  $values       The reformatted properties that we can use internally
+ * @param array $values The reformatted properties that we can use internally
  *                            '
  *
+ * @throws Exception
  * @return array|CRM_Error
  * @access public
  */

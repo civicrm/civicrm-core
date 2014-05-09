@@ -91,8 +91,9 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
   /**
    * Fetch the specified message to the local ignore folder
    *
-   * @param integer $file  file location of the message to fetch
+   * @param integer $file file location of the message to fetch
    *
+   * @throws Exception
    * @return void
    */
   function markIgnored($file) {
@@ -108,8 +109,9 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
   /**
    * Fetch the specified message to the local processed folder
    *
-   * @param integer $file  file location of the message to fetch
+   * @param integer $file file location of the message to fetch
    *
+   * @throws Exception
    * @return void
    */
   function markProcessed($file) {

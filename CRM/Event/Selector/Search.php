@@ -211,9 +211,12 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    * - View
    * - Edit
    *
+   * @param null $qfKey
+   * @param null $context
+   * @param null $compContext
+   *
    * @return array
    * @access public
-   *
    */
   static function &links($qfKey = NULL, $context = NULL, $compContext = NULL) {
     $extraParams = NULL;

@@ -165,6 +165,8 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    * @param string $entityTable
    *
    * @param string $columnName Column to fetch
+   *
+   * @return null|string
    * @static
    */
   static function getFinancialAccount($entityId, $entityTable, $columnName = 'name') {
@@ -188,6 +190,7 @@ AND entity_id = %2";
    *
    * @param int $paymentInstrumentValue payment instrument value
    *
+   * @return array|null|string
    * @static
    */
   static function getInstrumentFinancialAccount($paymentInstrumentValue = NULL) {
@@ -219,7 +222,10 @@ WHERE cog.name = 'payment_instrument' ";
    * for financial type
    * CRM-12470
    *
-   * @param int $financialTypeId financial type id
+   * @param $financialType
+   *
+   * @return array
+   * @internal param int $financialTypeId financial type id
    *
    * @static
    */

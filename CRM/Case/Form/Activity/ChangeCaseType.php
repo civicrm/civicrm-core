@@ -51,6 +51,8 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function setDefaultValues(&$form) {
@@ -91,6 +93,9 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    * global validation rules for the form
    *
    * @param array $values posted values of the form
+   *
+   * @param $files
+   * @param $form
    *
    * @return array list of errors to be posted back to the form
    * @static

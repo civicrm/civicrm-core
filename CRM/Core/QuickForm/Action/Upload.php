@@ -51,12 +51,13 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
    * class constructor
    *
    * @param object $stateMachine reference to state machine object
-   * @param string $uploadDir    directory to store the uploaded files
-   * @param array  $uploadNames  element names of the various uploadable files
+   * @param string $uploadDir directory to store the uploaded files
+   * @param array $uploadNames element names of the various uploadable files
    *
-   * @return object
-   * @access public
-   */ function __construct(&$stateMachine, $uploadDir, $uploadNames) {
+   * @return \CRM_Core_QuickForm_Action_Upload
+  @access public
+   */
+  function __construct(&$stateMachine, $uploadDir, $uploadNames) {
     parent::__construct($stateMachine);
 
     $this->_uploadDir = $uploadDir;

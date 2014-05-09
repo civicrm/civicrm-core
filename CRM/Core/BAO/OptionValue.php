@@ -40,12 +40,15 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   function __construct() {
     parent::__construct();
   }
+
   /**
    * Create option value - note that the create function calls 'add' but
-  * has more business logic
-  *
-  * @param array $params input parameters
-  */
+   * has more business logic
+   *
+   * @param array $params input parameters
+   *
+   * @return object
+   */
   static function create($params) {
     if (empty($params['id'])){
       self::setDefaults($params);
@@ -84,12 +87,16 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $params['value'] = self::getDefaultValue($params);
     }
   }
+
   /**
    * Get next available value
    * We will take the highest numeric value (or 0 if no numeric values exist)
    * and add one. The calling function is responsible for any
    * more complex decision making
+   *
    * @param array $params
+   *
+   * @return int
    */
   static function getDefaultWeight($params){
     return (int) CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',

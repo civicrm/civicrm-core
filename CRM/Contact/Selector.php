@@ -134,9 +134,16 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   /**
    * Class constructor
    *
+   * @param $customSearchClass
    * @param array $formValues array of form values imported
-   * @param array $params     array of parameters for query
-   * @param int   $action - action of search basic or advanced.
+   * @param array $params array of parameters for query
+   * @param null $returnProperties
+   * @param \const|int $action - action of search basic or advanced.
+   *
+   * @param bool $includeContactIds
+   * @param bool $searchDescendentGroups
+   * @param string $searchContext
+   * @param null $contextMenu
    *
    * @return CRM_Contact_Selector
    * @access public
@@ -297,7 +304,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -1001,9 +1011,10 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
    *
    * @param int $start start for limit clause
    * @param int $end end for limit clause
-   * @param $object $sort sort object
+   * @param $sort
    * @param string $cacheKey cache key
    *
+   * @internal param $object $sort sort object
    * @return void
    */
   function rebuildPreNextCache($start, $end, $sort, $cacheKey) {

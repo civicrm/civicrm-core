@@ -152,12 +152,13 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue extends CRM_Core_DAO
      * @var boolean
      */
     public $is_active;
-    /**
-     * class constructor
-     *
-     * @access public
-     * @return civicrm_price_field_value
-     */
+
+  /**
+   * class constructor
+   *
+   * @access public
+   * @return \CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue
+   */
     function __construct()
     {
         $this->__table = 'civicrm_price_field_value';

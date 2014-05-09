@@ -43,15 +43,15 @@ class CRM_Core_Form_Tag {
   /**
    * Function to build tag widget if correct parent is passed
    *
-   * @param CRM_Core_Form  $form form object
-   * @param string  $parentNames parent name ( tag name)
-   * @param string  $entityTable entitytable 'eg: civicrm_contact'
-   * @param int     $entityId    entityid  'eg: contact id'
+   * @param CRM_Core_Form $form form object
+   * @param string $parentNames parent name ( tag name)
+   * @param string $entityTable entitytable 'eg: civicrm_contact'
+   * @param int $entityId entityid  'eg: contact id'
    * @param boolean $skipTagCreate true if tag need be created using ajax
    * @param boolean $skipEntityAction true if need to add entry in entry table via ajax
-   * @param boolean $searchMode true if widget is used in search eg: advanced search
-   * @param string  $tagsetElementName if you need to create tagsetlist with specific name
+   * @param string $tagsetElementName if you need to create tagsetlist with specific name
    *
+   * @internal param bool $searchMode true if widget is used in search eg: advanced search
    * @return void
    * @access public
    * @static

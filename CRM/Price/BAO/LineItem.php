@@ -257,6 +257,7 @@ AND li.entity_id = {$entityId}
    * @param int $entityId
    * @param int $entityTable
    *
+   * @return bool
    * @access public
    * @static
    */

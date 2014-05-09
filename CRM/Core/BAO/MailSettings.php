@@ -185,6 +185,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *
    * @param int $id mail settings id
    *
+   * @return mixed|null
    * @access public
    * @static
    *

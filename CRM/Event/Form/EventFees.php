@@ -42,6 +42,8 @@ class CRM_Event_Form_EventFees {
   /**
    * Function to set variables up before form is built
    *
+   * @param $form
+   *
    * @return void
    * @access public
    */
@@ -124,7 +126,7 @@ class CRM_Event_Form_EventFees {
     if ($form->_action == CRM_Core_Action::ADD && !$form->_mode && $form->_isPaidEvent) {
       $defaults[$form->_pId]['record_contribution'] = 1;
     }
-    
+
     //CRM-13420
     if (empty($defaults['payment_instrument_id'])) {
       $defaults[$form->_pId]['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
@@ -253,6 +255,10 @@ class CRM_Event_Form_EventFees {
    * This function sets the default values for price set.
    *
    * @access public
+   *
+   * @param $participantID
+   * @param null $eventID
+   * @param bool $includeQtyZero
    *
    * @return void
    */

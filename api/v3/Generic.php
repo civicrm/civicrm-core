@@ -137,6 +137,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
  *
  * @param array $apiRequest api request as an array. Keys are
  *
+ * @throws API_Exception
  * @return integer count of results
  */
 function civicrm_api3_generic_getcount($apiRequest) {
@@ -258,7 +259,9 @@ function civicrm_api3_generic_getoptions($apiRequest) {
  * @todo - if may be we should define a 'resolve' key on the psuedoconstant for when these rules are not fine enough
  *
  * This function is only split out for the purpose of code clarity / comment block documentation
+ *
  * @param array $metadata the array of metadata that will form the result of the getfields function
+ * @param $apiRequest
  * @param string $fieldname field currently being processed
  * @param array $fieldSpec metadata for that field
  * @param array $fieldsToResolve anny field resolutions specifically requested

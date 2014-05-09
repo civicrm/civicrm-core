@@ -52,6 +52,8 @@ class CRM_Event_BAO_Query {
   /**
    * build select for CiviEvent
    *
+   * @param $query
+   *
    * @return void
    * @access public
    */

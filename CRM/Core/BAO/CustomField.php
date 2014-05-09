@@ -1374,9 +1374,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @params string $elementName   custom field name
    * @params array  $defaults      associated array of fields
    * @params int    $contactId     contact id
-   * @param  int    $mode          profile mode
-   * @param  mixed  $value         if passed - dont fetch value from db,
+   * @param $customFieldId
+   * @param $elementName
+   * @param $defaults
+   * @param null $contactId
+   * @param  int $mode profile mode
+   * @param  mixed $value if passed - dont fetch value from db,
    *                               just format the given value
+   *
    * @static
    * @access public
    */
@@ -2059,8 +2064,9 @@ AND    cf.id = %1";
    *
    * @access public
    *
-   * @return $customOptionGroup
-   * @static
+   * @param null $includeFieldIds
+   *
+   * @return mixed $customOptionGroup@static
    */
   public static function &customOptionGroup($includeFieldIds = NULL) {
     static $customOptionGroup = NULL;
@@ -2104,6 +2110,9 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
    *
    * @access public
    *
+   * @param $customFieldId
+   * @param $optionGroupId
+   *
    * @return void
    * @static
    */
@@ -2130,8 +2139,10 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
    *
    * @params int $optionGroupId option group id
    *
-   * @return
-   * @static
+   * @param $optionGroupId
+   *
+   * @return void
+  @static
    */
   static function checkOptionGroup($optionGroupId) {
     $query = "

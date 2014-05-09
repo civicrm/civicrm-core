@@ -107,11 +107,15 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   /**
    * class constructor
    *
-   * @param int $id  the contact id
+   * @param int $id the contact id
    * @param int $gid the group id
    *
-   * @return void
-   * @access public
+   * @param $restrict
+   * @param bool $skipPermission
+   * @param null $profileIds
+   *
+   * @return \CRM_Profile_Page_Dynamic
+  @access public
    */
   function __construct($id, $gid, $restrict, $skipPermission = FALSE, $profileIds = NULL) {
     parent::__construct();

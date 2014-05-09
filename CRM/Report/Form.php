@@ -277,7 +277,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $_havingClauses = array();
 
   /**
-   * dashBoardRowCount Dashboard row count 
+   * dashBoardRowCount Dashboard row count
    * @var Integer
    */
   public $_dashBoardRowCount;
@@ -351,7 +351,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         'Boolean',
         CRM_Core_DAO::$_nullObject
       );
-    
+
     $this->_dashBoardRowCount =
       CRM_Utils_Request::retrieve(
         'rowCount',
@@ -1391,7 +1391,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           $clause = "{$field['dbAlias']} REGEXP '[[:<:]]" . implode('|', $value) . "[[:>:]]'";
         }
         break;
-        
+
       case 'mnot':
         // mnot == multiple is not one of
         if ($value !== NULL && count($value) > 0) {
@@ -2693,7 +2693,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   function limit($rowCount = self::ROW_COUNT_LIMIT) {
     // lets do the pager if in html mode
     $this->_limit = NULL;
-    
+
     // CRM-14115, over-ride row count if rowCount is specified in URL
     if ($this->_dashBoardRowCount) {
       $rowCount = $this->_dashBoardRowCount;
@@ -3188,8 +3188,12 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * and also accepts an array of options rather than a long list
    *
    * function for adding address fields to construct function in reports
+   *
    * @param bool $groupBy Add GroupBy? Not appropriate for detail report
    * @param bool $orderBy Add GroupBy? Not appropriate for detail report
+   * @param bool $filters
+   * @param array $defaults
+   *
    * @return array address fields for construct clause
    */
   function addAddressFields($groupBy = TRUE, $orderBy = FALSE, $filters = TRUE, $defaults = array(

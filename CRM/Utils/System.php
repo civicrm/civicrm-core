@@ -544,6 +544,8 @@ class CRM_Utils_System {
   /**
    * @param bool $abort
    *   (optional) Whether to exit; defaults to true.
+   *
+   * @return bool
    */
   static function authenticateKey($abort = TRUE) {
     // also make sure the key is sent and is valid

@@ -271,8 +271,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * Function to get Petition Signature Total
    *
-   * @param boolean $all
-   * @param int $id
+   * @param $surveyId
+   *
+   * @return array
+   * @internal param bool $all
+   * @internal param int $id
    * @static
    */
   static function getPetitionSignatureTotalbyCountry($surveyId) {
@@ -313,8 +316,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * Function to get Petition Signature Total
    *
-   * @param boolean $all
-   * @param int $id
+   * @param $surveyId
+   *
+   * @return array
+   * @internal param bool $all
+   * @internal param int $id
    * @static
    */
   static function getPetitionSignatureTotal($surveyId) {
@@ -368,8 +374,12 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * Function to get Petition Signature Details
    *
-   * @param boolean $all
-   * @param int $id
+   * @param $surveyId
+   * @param null $status_id
+   *
+   * @return array
+   * @internal param bool $all
+   * @internal param int $id
    * @static
    */
   static function getPetitionSignature($surveyId, $status_id = NULL) {
@@ -466,6 +476,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    *
    * @param int $surveyId
    * @param int $contactId
+   *
+   * @return array
    * @static
    */
   static function checkSignature($surveyId, $contactId) {

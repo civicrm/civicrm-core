@@ -592,9 +592,10 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * assign value to name in template
    *
-   * @param array|string $name  name  of variable
+   * @param $var
    * @param mixed $value value of varaible
    *
+   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */
@@ -605,9 +606,10 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * assign value to name in template by reference
    *
-   * @param array|string $name  name  of variable
+   * @param $var
    * @param mixed $value (reference) value of varaible
    *
+   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */

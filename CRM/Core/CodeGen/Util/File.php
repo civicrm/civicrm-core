@@ -39,7 +39,8 @@ class CRM_Core_CodeGen_Util_File {
    * Calculate a cumulative digest based on a collection of files
    *
    * @param array $files list of file names (strings)
-   * @param callable $digest a one-way hash function (string => string)
+   * @param callable|string $digest a one-way hash function (string => string)
+   *
    * @return string
    */
   static function digestAll($files, $digest = 'md5') {
