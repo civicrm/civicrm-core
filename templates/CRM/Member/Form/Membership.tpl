@@ -306,9 +306,16 @@
       </script>
       {/literal}
       {if $accessContribution and $action eq 2 and $rows.0.contribution_id}
-        <fieldset>
-        {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
-        </fieldset>
+        <div class="crm-accordion-wrapper">
+          <div class="crm-accordion-header">Related Contributions</div>
+          <div class="crm-accordion-body">{include file="CRM/Contribute/Form/Selector.tpl" context="Search"}</div>
+        </div>
+      {/if}
+      {if $softCredit}
+        <div class="crm-accordion-wrapper">
+          <div class="crm-accordion-header">Related Soft Contributions</div>
+          <div class="crm-accordion-body">{include file="CRM/Contribute/Page/ContributionSoft.tpl" context="membership"}</div>
+       </div>
       {/if}
     {/if}
 

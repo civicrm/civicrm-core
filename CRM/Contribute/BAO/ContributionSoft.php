@@ -227,14 +227,14 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   /**
    *  Function to retrieve the list of soft contributions for given contact.
    *
-   * @param int $contact_id contact id
-   *
-   * @param int $isTest
+   * @param int     $contact_id contact id
+   * @param int     $isTest
+   * @param string  $filter  additional filter criteria, later used in where clause
    *
    * @return array
    * @static
    */
-  static function getSoftContributionList($contact_id, $isTest = 0) {
+  static function getSoftContributionList($contact_id, $filter = NULL, $isTest = 0) {
     $query = '
     SELECT ccs.id, ccs.amount as amount,
            ccs.contribution_id,
@@ -258,8 +258,15 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       LEFT JOIN civicrm_contact contact ON
       ccs.contribution_id = cc.id AND cc.contact_id = contact.id
       LEFT JOIN civicrm_financial_type cct ON cc.financial_type_id = cct.id
-    WHERE cc.is_test = %2 AND ccs.contact_id = %1
-    ORDER BY cc.receive_date DESC';
+    ';
+
+    $where = "
+      WHERE cc.is_test = %2 AND ccs.contact_id = %1";
+    if ($filter) {
+      $where .= $filter;
+    }
+
+    $query .= "{$where} ORDER BY cc.receive_date DESC";
 
     $params = array(
       1 => array($contact_id, 'Integer'),
