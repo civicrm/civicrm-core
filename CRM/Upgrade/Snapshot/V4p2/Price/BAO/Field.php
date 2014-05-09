@@ -48,8 +48,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * price field object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params    (reference ) an assoc array of name/value pairs
-   * @param array  $ids       the array that holds all the db ids
+   * @param array $params (reference ) an assoc array of name/value pairs
+   *
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return object CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field object
    * @access public

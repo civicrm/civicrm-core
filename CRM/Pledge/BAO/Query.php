@@ -42,6 +42,8 @@ class CRM_Pledge_BAO_Query {
   /**
    * build select for Pledge
    *
+   * @param $query
+   *
    * @return void
    * @access public
    */

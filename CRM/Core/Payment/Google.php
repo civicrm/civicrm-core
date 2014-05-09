@@ -122,11 +122,12 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   /**
    * Sets appropriate parameters for checking out to google
    *
-   * @param array $params  name value pair of contribution datat
+   * @param array $params name value pair of contribution datat
+   *
+   * @param $component
    *
    * @return void
    * @access public
-   *
    */
   function doTransferCheckout(&$params, $component) {
     $component = strtolower($component);

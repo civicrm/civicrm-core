@@ -90,9 +90,10 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $params        input parameters to find object
-   * @param array $values        output values of the object
-   * @param array $ids           the array that holds all the db ids
+   * @param array $params input parameters to find object
+   * @param array $values output values of the object
+   *
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return array (reference)   the values that could be potentially assigned to smarty
    * @access public

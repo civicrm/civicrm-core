@@ -119,7 +119,9 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
   /**
    * Method to check group organization relationship exist
    *
-   * @param  int  $contactId
+   * @param $contactID
+   *
+   * @internal param int $contactId
    *
    * @return boolean
    * @access public

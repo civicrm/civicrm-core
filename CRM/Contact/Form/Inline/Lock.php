@@ -43,7 +43,9 @@ class CRM_Contact_Form_Inline_Lock {
    * This function provides the HTML form elements
    *
    * @param object $form form object
-   * @param int $inlineEditMode ( 1 for contact summary
+   * @param $contactID
+   *
+   * @internal param int $inlineEditMode ( 1 for contact summary
    * top bar form and 2 for display name edit )
    *
    * @access public
