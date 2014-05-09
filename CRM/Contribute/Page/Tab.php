@@ -179,7 +179,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     }
     $this->assign('isTest', $isTest);
 
-    $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $isTest);
+    $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, NULL, $isTest);
 
     if (!empty($softCreditList)) {
       $softCreditTotals = array();

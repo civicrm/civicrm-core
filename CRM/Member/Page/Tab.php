@@ -323,10 +323,21 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     if (CRM_Core_Permission::access('CiviContribute')) {
       $this->_accessContribution = TRUE;
       $this->assign('accessContribution', TRUE);
+
+      //show associated soft credit when contribution payment is paid by different person
+      if ($this->_id && $this->_contactId) {
+        $filter = " AND cc.id IN (SELECT contribution_id FROM civicrm_membership_payment WHERE membership_id = {$this->_id})";
+        $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $filter);
+        if (!empty($softCreditList)) {
+          $this->assign('softCredit', TRUE);
+          $this->assign('softCreditRows', $softCreditList);
+        }
+      }
     }
     else {
       $this->_accessContribution = FALSE;
       $this->assign('accessContribution', FALSE);
+      $this->assign('softCredit', FALSE);
     }
 
     if ($this->_action & CRM_Core_Action::VIEW) {
