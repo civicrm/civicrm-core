@@ -360,6 +360,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
 
+    //set Soft Credit Type to Gift by default
+    $scTypes = CRM_Core_OptionGroup::values("soft_credit_type");
+    $defaults['soft_credit_type_id'] = CRM_Utils_Array::value(ts('Gift'), array_flip($scTypes));
+
     if (!empty($defaults['record_contribution']) && !$this->_mode) {
       $contributionParams = array('id' => $defaults['record_contribution']);
       $contributionIds = array();

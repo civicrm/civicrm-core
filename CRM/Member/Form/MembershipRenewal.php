@@ -260,6 +260,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $defaults['num_terms'] = 1;
     $defaults['send_receipt'] = 0;
 
+    //set Soft Credit Type to Gift by default
+    $scTypes = CRM_Core_OptionGroup::values("soft_credit_type");
+    $defaults['soft_credit_type_id'] = CRM_Utils_Array::value(ts('Gift'), array_flip($scTypes));
+
     $renewalDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('renewal_date', $defaults),
       NULL, NULL, 'Y-m-d'
     );
