@@ -136,6 +136,7 @@ class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
    *
    * @param array $params reference array contains the values submitted by the form
    *
+   * @return object
    * @access public
    * @static
    *

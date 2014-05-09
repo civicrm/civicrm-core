@@ -801,6 +801,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * This function exists to wrap api getsingle function & check the result
    * so we can ensure they succeed & throw exceptions without litterering the test with checks
+   *
    * @param string $entity
    * @param array $params
    * @param array $checkAgainst - array to compare result against
@@ -810,6 +811,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * - string
    * - array
    * - object
+   *
+   * @return array|int
    */
   function callAPISuccessGetSingle($entity, $params, $checkAgainst = NULL) {
     $params += array(
@@ -1362,6 +1365,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Function to delete contribution
    *
    * @param int $contributionId
+   *
+   * @return array|int
    */
   function contributionDelete($contributionId) {
     $params = array(
@@ -1413,7 +1418,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to delete event
    *
-   * @param int $id  ID of the event
+   * @param int $id ID of the event
+   *
+   * @return array|int
    */
   function eventDelete($id) {
     $params = array(
@@ -1426,6 +1433,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Function to delete participant
    *
    * @param int $participantID
+   *
+   * @return array|int
    */
   function participantDelete($participantID) {
     $params = array(
@@ -1837,7 +1846,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Function to delete custom group
    *
-   * @param int    $customGroupID
+   * @param int $customGroupID
+   *
+   * @return array|int
    */
   function customGroupDelete($customGroupID) {
     $params['id'] = $customGroupID;
@@ -1876,6 +1887,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Function to delete custom field
    *
    * @param int $customFieldID
+   *
+   * @return array|int
    */
   function customFieldDelete($customFieldID) {
 
