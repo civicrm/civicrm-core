@@ -141,10 +141,13 @@ WHERE  id IN ( $idString )
   /**
    * Generate a checksum for a $entityId of type $entityType
    *
-   * @param int    $entityId
-   * @param int    $ts         timestamp that checksum was generated
-   * @param int    $live       life of this checksum in hours/ 'inf' for infinite
-   * @param string $hash       contact hash, if sent, prevents a query in inner loop
+   * @param int $entityId
+   * @param int $ts timestamp that checksum was generated
+   * @param int $live life of this checksum in hours/ 'inf' for infinite
+   * @param string $hash contact hash, if sent, prevents a query in inner loop
+   *
+   * @param string $entityType
+   * @param null $hashSize
    *
    * @return array ( $cs, $ts, $live )
    * @static

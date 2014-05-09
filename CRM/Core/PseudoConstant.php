@@ -897,8 +897,9 @@ WHERE  id = %1";
    * @access public
    * @static
    *
-   * @return array - array reference of all country ISO codes.
+   * @param bool $id
    *
+   * @return array - array reference of all country ISO codes.
    */
   public static function &countryIsoCode($id = FALSE) {
     if (!self::$countryIsoCode) {
@@ -926,14 +927,13 @@ WHERE  id = %1";
    *
    * Note: any database errors will be trapped by the DAO.
    *
-   * @param string $groupType     type of group(Access/Mailing)
-   * @param boolen $excludeHidden exclude hidden groups.
+   * @param string $groupType type of group(Access/Mailing)
+   * @param bool|\boolen $excludeHidden exclude hidden groups.
    *
    * @access public
    * @static
    *
    * @return array - array reference of all groups.
-   *
    */
   public static function &allGroup($groupType = NULL, $excludeHidden = TRUE) {
     $condition = CRM_Contact_BAO_Group::groupTypeCondition($groupType, $excludeHidden);

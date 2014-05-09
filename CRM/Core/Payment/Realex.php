@@ -261,11 +261,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    * @param $xml
    *   an XML string.
    *
-   * @return
-   *   An array of the result with following keys:
-   *   - error  : false, if no error. Otherwise, it is the error message
-   *   - return : a multi-dimension associative array represent the value
-   *               of the XML input string.
+   * @return array An array of the result with following keys:
    */
   function xml_parse_into_assoc($xml) {
     $input = array();

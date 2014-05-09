@@ -215,9 +215,13 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
    * - View
    * - Edit
    *
+   * @param null $componentId
+   * @param null $componentAction
+   * @param null $key
+   * @param null $compContext
+   *
    * @return array
    * @access public
-   *
    */
   static function &links($componentId = NULL, $componentAction = NULL, $key = NULL, $compContext = NULL) {
     $extraParams = NULL;
@@ -450,9 +454,9 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       ),
     );
     if ($this->_includeSoftCredits) {
-      self::$_columnHeaders = 
+      self::$_columnHeaders =
         array_merge(
-          self::$_columnHeaders, 
+          self::$_columnHeaders,
           array(
             array(
               'name' => ts('Soft Credit Amount'),
@@ -462,9 +466,9 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           )
         );
     }
-    self::$_columnHeaders = 
+    self::$_columnHeaders =
       array_merge(
-        self::$_columnHeaders, 
+        self::$_columnHeaders,
         array(
           array(
             'name' => ts('Type'),
@@ -510,9 +514,9 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       self::$_columnHeaders = array_merge($pre, self::$_columnHeaders);
     }
     if ($this->_includeSoftCredits) {
-      self::$_columnHeaders = 
+      self::$_columnHeaders =
         array_merge(
-          self::$_columnHeaders, 
+          self::$_columnHeaders,
           array(
             array(
               'name' => ts('Soft Credit For'),
@@ -527,7 +531,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           )
         );
     }
-    self::$_columnHeaders = 
+    self::$_columnHeaders =
       array_merge(
         self::$_columnHeaders, array(
           array('desc' => ts('Actions'))

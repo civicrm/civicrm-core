@@ -210,7 +210,7 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   /**
    * initialize the various templates
    *
-   * @param object  $page the CRM_Core_Form page
+   * @internal param object $page the CRM_Core_Form page
    *
    * @return void
    * @access public

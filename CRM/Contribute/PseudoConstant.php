@@ -240,6 +240,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param string $columnName
+   *
    * @return array - array reference of all payment instruments if any
    * @static
    */

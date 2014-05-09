@@ -259,6 +259,8 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
   /**
    * Get meta details of the contact.
    *
+   * @param $contactId
+   *
    * @return array contact fields in fixed order
    * @access public
    */

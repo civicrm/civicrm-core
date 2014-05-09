@@ -170,7 +170,10 @@ class CRM_Core_BAO_Block {
    * Function to get all block ids for a contact
    *
    * @param string $blockName block name
-   * @param int    $contactId contact id
+   * @param int $contactId contact id
+   *
+   * @param null $entityElements
+   * @param bool $updateBlankLocInfo
    *
    * @return array $contactBlockIds formatted array of block ids
    *

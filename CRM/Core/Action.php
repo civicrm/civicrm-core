@@ -114,12 +114,13 @@ class CRM_Core_Action {
    *
    * called by the request object to translate a string into a mask
    *
-   * @param string $action the action to be resolved
+   * @param $str
+   *
+   * @internal param string $action the action to be resolved
    *
    * @return int the action mask corresponding to the input string
    * @access public
    * @static
-   *
    */
   static function resolve($str) {
     $action = 0;

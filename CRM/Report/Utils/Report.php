@@ -301,6 +301,8 @@ WHERE  inst.report_id = %1";
    *
    * @instanceId string $str the report instance to check
    *
+   * @param $instanceId
+   *
    * @return boolean true if yes, else false
    * @static
    * @access public

@@ -138,7 +138,11 @@ class CRM_ACL_API {
    * get all the groups the user has access to for the given operation
    *
    * @param int $type the type of permission needed
-   * @param int    $contactID the contactID for whom the check is made
+   * @param int $contactID the contactID for whom the check is made
+   *
+   * @param string $tableName
+   * @param null $allGroups
+   * @param null $includedGroups
    *
    * @return array the ids of the groups for which the user has permissions
    * @access public

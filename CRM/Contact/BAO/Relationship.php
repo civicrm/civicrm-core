@@ -305,18 +305,21 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   /**
    * Function to get get list of relationship type based on the contact type.
    *
-   * @param int     $contactId      this is the contact id of the current contact.
-   * @param string  $strContact     this value is currently ignored, keeping it there for legacy reasons
-   * @param string  $relationshipId the id of the existing relationship if any
-   * @param string  $contactType    contact type
-   * @param boolean $all            if true returns relationship types in both the direction
-   * @param string  $column         name/label that going to retrieve from db.
+   * @param int $contactId this is the contact id of the current contact.
+   * @param null $contactSuffix
+   * @param string $relationshipId the id of the existing relationship if any
+   * @param string $contactType contact type
+   * @param boolean $all if true returns relationship types in both the direction
+   * @param string $column name/label that going to retrieve from db.
    *
    *
-   * @param string  $contactSubType includes relationshiptypes between this subtype
+   * @param bool $biDirectional
+   * @param string $contactSubType includes relationshiptypes between this subtype
    *
    * @param boolean $onlySubTypeRelationTypes if set only subtype which is passed by $contactSubType
    *                                          related relationshiptypes get return
+   *
+   * @internal param string $strContact this value is currently ignored, keeping it there for legacy reasons
    * @access public
    * @static
    *

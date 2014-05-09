@@ -134,7 +134,11 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param  string - $retColumn  tells populate() whether to return 'name' (default) or 'label' values
+   * @param null $id
+   * @param null $cond
+   * @param string $retColumn
+   *
+   * @internal param $string - $retColumn  tells populate() whether to return 'name' (default) or 'label' values
    *
    * @return array  - array reference of all participant statuses if any
    * @static

@@ -335,6 +335,9 @@ FROM   {$this->_componentTable}
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
+   * @param $files
+   * @param $self
+   *
    * @return mixed true or array of errors
    * @access public
    * @static

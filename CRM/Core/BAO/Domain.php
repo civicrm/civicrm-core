@@ -169,6 +169,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Create a new domain
    *
+   * @param $params
+   *
    * @return domain array
    * @access public
    */

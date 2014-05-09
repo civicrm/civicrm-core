@@ -247,7 +247,11 @@ class CRM_Case_Form_Activity_OpenCase {
   /**
    * global validation rules for the form
    *
-   * @param array $values posted values of the form
+   * @param $fields
+   * @param $files
+   * @param $form
+   *
+   * @internal param array $values posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static

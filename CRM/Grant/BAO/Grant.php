@@ -115,6 +115,8 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *
    * @static
    *
+   * @param bool $admin
+   *
    * @return array Array of grant summary statistics
    */
   static function getGrantStatistics($admin = FALSE) {

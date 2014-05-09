@@ -49,9 +49,11 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
   /**
    * Register a reply event.
    *
-   * @param int $job_id       The job ID of the reply
-   * @param int $queue_id     The queue event id
-   * @param string $hash      The hash
+   * @param int $job_id The job ID of the reply
+   * @param int $queue_id The queue event id
+   * @param string $hash The hash
+   *
+   * @param null $replyto
    *
    * @return object|null      The mailing object, or null on failure
    * @access public

@@ -1154,11 +1154,14 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
 
   /**
    *  Function to create address associated with contribution record.
-   *  @param array $params an associated array
-   *  @param int   $billingID $billingLocationTypeID
    *
-   *  @return address id
-   *  @static
+   * @param array $params an associated array
+   * @param $billingLocationTypeID
+   *
+   * @internal param int $billingID $billingLocationTypeID
+   *
+   * @return address id
+   * @static
    */
   static function createAddress(&$params, $billingLocationTypeID) {
     $billingFields = array(

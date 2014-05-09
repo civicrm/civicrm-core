@@ -236,8 +236,11 @@ WHERE e.id = %1";
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $params        input parameters to find object
-   * @param array $values        output values of the object
+   * @param $entityBlock
+   * @param bool $microformat
+   *
+   * @internal param array $params input parameters to find object
+   * @internal param array $values output values of the object
    *
    * @return array   array of objects(CRM_Core_BAO_Location)
    * @access public

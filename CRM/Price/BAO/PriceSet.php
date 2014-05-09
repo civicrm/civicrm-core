@@ -907,6 +907,9 @@ WHERE  id = %1";
   /**
    * Function to set daefult the price set fields.
    *
+   * @param $form
+   * @param $defaults
+   *
    * @return array $defaults
    * @access public
    */
