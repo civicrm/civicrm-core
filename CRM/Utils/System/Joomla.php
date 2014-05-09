@@ -102,7 +102,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $ufName = CRM_Utils_Type::escape($ufName, 'String');
 
     $values = array();
-    $user = &JUser::getInstance($ufID);
+    $user = JUser::getInstance($ufID);
 
     $values['email'] = $ufName;
     $user->bind($values);
