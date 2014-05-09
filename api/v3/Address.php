@@ -43,6 +43,8 @@
  * {@getfields address_create}
  * {@example AddressCreate.php}
  *
+ * @param $params
+ *
  * @return array of newly created tag property values.
  * @access public
  */

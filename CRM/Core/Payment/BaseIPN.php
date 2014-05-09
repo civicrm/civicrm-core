@@ -52,8 +52,10 @@ class CRM_Core_Payment_BaseIPN {
 
   /**
    * Store input array on the class
+   *
    * @param array $parameters
-   * @throws CRM_Core_Exceptions
+   *
+   * @throws CRM_Core_Exception
    */
   function setInputParameters($parameters) {
     if(!is_array($parameters)) {

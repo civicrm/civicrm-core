@@ -46,11 +46,12 @@ class CRM_Core_QuickForm_Action extends HTML_QuickForm_Action {
   /**
    * constructor
    *
-   * @param object    $stateMachine    reference to state machine object
+   * @param object $stateMachine reference to state machine object
    *
-   * @return object
-   * @access public
-   */ function __construct(&$stateMachine) {
+   * @return \CRM_Core_QuickForm_Action
+  @access public
+   */
+  function __construct(&$stateMachine) {
     $this->_stateMachine = &$stateMachine;
   }
 

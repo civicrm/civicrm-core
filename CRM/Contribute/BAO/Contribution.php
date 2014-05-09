@@ -1191,8 +1191,11 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
   /**
    * Delete billing address record related contribution
    *
-   * @param int $contact_id contact id
-   * @param int $contribution_id contributionId
+   * @param null $contributionId
+   * @param null $contactId
+   *
+   * @internal param int $contact_id contact id
+   * @internal param int $contribution_id contributionId
    * @access public
    * @static
    */
@@ -2416,6 +2419,8 @@ WHERE  contribution_id = %1 ";
    *
    * @param int $contributionId contribution id
    *
+   * @param bool $isNotCancelled
+   *
    * @return boolean
    * @access public
    * @static
@@ -2472,6 +2477,9 @@ WHERE  contribution_id = %1 ";
    * @param array $params contribution object, line item array and params for trxn
    *
    *
+   * @param null $financialTrxnVals
+   *
+   * @return null|object
    * @access public
    * @static
    */
@@ -2742,6 +2750,8 @@ WHERE  contribution_id = %1 ";
    *
    * @param string $context update scenarios
    *
+   * @param null $skipTrxn
+   *
    * @access public
    * @static
    */
@@ -2891,6 +2901,7 @@ WHERE  contribution_id = %1 ";
    *
    * @param array $errors list of errors
    *
+   * @return bool
    * @access public
    * @static
    */
@@ -2939,8 +2950,10 @@ WHERE  contribution_id = %1 ";
    * @see CRM_Core_DAO::buildOptions
    *
    * @param String $fieldName
-   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
-   * @param Array $props: whatever is known about this dao object
+   * @param String $context : @see CRM_Core_DAO::buildOptionsContext
+   * @param Array $props : whatever is known about this dao object
+   *
+   * @return Array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $className = __CLASS__;
@@ -2969,6 +2982,9 @@ WHERE  contribution_id = %1 ";
    *
    * @param integer $financialTypeId Financial Type id
    *
+   * @param string $relationName
+   *
+   * @return array|bool
    * @access public
    * @static
    */

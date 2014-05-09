@@ -70,9 +70,7 @@ class CRM_Utils_Type {
    *
    * @param  $type       integer datatype
    *
-   * @return $string     String datatype respective to integer datatype
-   *
-   * @access public
+   * @return string $string     String datatype respective to integer datatype@access public
    * @static
    */
   static function typeToString($type) {

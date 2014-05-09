@@ -168,9 +168,11 @@ function _civicrm_api3_participant_get_spec(&$params) {
  *
  * This API is used for deleting a contact participant
  *
- * @param  array  $params Array containing  Id of the contact participant to be deleted
+ * @param  array $params Array containing  Id of the contact participant to be deleted
  *
  * {@getfields participant_delete}
+ * @throws Exception
+ * @return array
  * @access public
  */
 function civicrm_api3_participant_delete($params) {

@@ -94,7 +94,7 @@ class CRM_Core_ManagedEntities {
   /**
    * Create, update, and delete entities declared by an active module
    *
-   * @param $module string
+   * @param \CRM_Core_Module|string $module string
    * @param $todos array $name => array()
    */
   public function reconcileEnabledModule(CRM_Core_Module $module, $todos) {
@@ -204,6 +204,8 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
+   * @param $modules
+   *
    * @return array indexed by is_active,name
    */
   protected static function createModuleIndex($modules) {
@@ -215,6 +217,9 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
+   * @param $moduleIndex
+   * @param $declarations
+   *
    * @return array indexed by module,name
    */
   protected static function createDeclarationIndex($moduleIndex, $declarations) {

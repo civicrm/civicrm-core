@@ -133,6 +133,9 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    * Function to delete Relationship Types
    *
    * @param int $relationshipTypeId
+   *
+   * @throws CRM_Core_Exception
+   * @return mixed
    * @static
    */
   static function del($relationshipTypeId) {

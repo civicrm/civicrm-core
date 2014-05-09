@@ -50,6 +50,8 @@ class CRM_Admin_Page_APIDoc extends CRM_Core_Page {
   /**
    * Get user context.
    *
+   * @param null $mode
+   *
    * @return string user context.
    */
   function userContext($mode = NULL) {

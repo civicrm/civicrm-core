@@ -206,8 +206,10 @@ abstract class CRM_Import_Parser {
   /**
    * Set and validate field values
    *
-   * @param $elements: array
-   * @param $erroneousField: reference
+   * @param $elements : array
+   * @param $erroneousField : reference
+   *
+   * @return int
    */
   function setActiveFieldValues($elements, &$erroneousField) {
     $maxCount = count($elements) < $this->_activeFieldCount ? count($elements) : $this->_activeFieldCount;

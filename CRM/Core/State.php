@@ -79,14 +79,20 @@ class CRM_Core_State {
   /**
    * constructor
    *
-   * @param string the internal name of the state
-   * @param int    the state type
-   * @param object the state that precedes this state
-   * @param object the state that follows  this state
-   * @param object the statemachine that this states belongs to
+   * @param $name
+   * @param $type
+   * @param $back
+   * @param $next
+   * @param $stateMachine
    *
-   * @return object
-   * @access public
+   * @internal param \the $string internal name of the state
+   * @internal param \the $int state type
+   * @internal param \the $object state that precedes this state
+   * @internal param \the $object state that follows  this state
+   * @internal param \the $object statemachine that this states belongs to
+   *
+   * @return \CRM_Core_State
+  @access public
    */
   function __construct($name, $type, $back, $next, &$stateMachine) {
     $this->_name = $name;

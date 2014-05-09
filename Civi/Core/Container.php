@@ -35,6 +35,7 @@ class Container {
 
   /**
    * @var ContainerBuilder
+   * @return \Symfony\Component\DependencyInjection\ContainerBuilder
    */
   public function createContainer() {
     $civicrm_base_path = dirname(dirname(__DIR__));

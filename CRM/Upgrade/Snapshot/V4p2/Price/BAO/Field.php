@@ -205,13 +205,18 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   /**
    * This function for building custom fields
    *
-   * @param object  $qf             form object (reference)
-   * @param string  $elementName    name of the custom field
+   * @param object $qf form object (reference)
+   * @param string $elementName name of the custom field
+   * @param $fieldId
    * @param boolean $inactiveNeeded
-   * @param boolean $useRequired    true if required else false
-   * @param boolean $search         true if used for search else false
-   * @param string  $label          label for custom field
+   * @param boolean $useRequired true if required else false
+   * @param string $label label for custom field
    *
+   * @param null $fieldOptions
+   * @param array $feezeOptions
+   *
+   * @return null
+   * @internal param bool $search true if used for search else false
    * @access public
    * @static
    */

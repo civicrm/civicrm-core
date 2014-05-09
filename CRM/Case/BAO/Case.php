@@ -59,7 +59,8 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * pairs
    *
    * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $ids    the array that holds all the db ids
+   *
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return object CRM_Case_BAO_Case object
    * @access public
@@ -100,7 +101,8 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * takes an associative array and creates a case object
    *
    * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $ids    the array that holds all the db ids
+   *
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return object CRM_Case_BAO_Case object
    * @access public
@@ -296,6 +298,8 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *
    * @param int $caseId
    *
+   * @param string $colName
+   *
    * @return  case type
    * @access public
    * @static
@@ -317,6 +321,8 @@ WHERE civicrm_case.id = %1";
    * record are deleted from case
    *
    * @param  int $caseId id of the case to delete
+   *
+   * @param bool $moveToTrash
    *
    * @return void
    * @access public
@@ -409,11 +415,12 @@ WHERE civicrm_case.id = %1";
   /**
    * Retrieve contact_id by case_id
    *
-   * @param int $caseId  ID of the case
+   * @param int $caseId ID of the case
+   *
+   * @param null $contactID
    *
    * @return array
    * @access public
-   *
    */
   static function retrieveContactIdsByCaseId($caseId, $contactID = NULL) {
     $caseContact = new CRM_Case_DAO_CaseContact();
@@ -434,7 +441,9 @@ WHERE civicrm_case.id = %1";
   /**
    * Look up a case using an activity ID
    *
-   * @param $activity_id
+   * @param $activityId
+   *
+   * @internal param $activity_id
    *
    * @return int, case ID
    */
@@ -501,13 +510,15 @@ WHERE civicrm_case.id = %1";
   /**
    * Retrieve case_id by contact_id
    *
-   * @param int $contactId      ID of the contact
+   * @param $contactID
    * @param boolean $includeDeleted include the deleted cases in result
    *
+   * @param null $caseType
+   *
+   * @internal param int $contactId ID of the contact
    * @return array
    *
    * @access public
-   *
    */
   static function retrieveCaseIdsByContactId($contactID, $includeDeleted = FALSE, $caseType = NULL) {
     $query = "
@@ -698,10 +709,11 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
    *
    * @param String $type /upcoming,recent,all/
    *
+   * @param string $context
+   *
    * @return array     Array of Cases
    *
    * @access public
-   *
    */
   static function getCases($allCases = TRUE, $userID = NULL, $type = 'upcoming', $context = 'dashboard') {
     $condition = NULL;
@@ -943,6 +955,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    *
    * @param int $contactID contact id
    * @param int $caseID case id
+   * @param null $relationshipID
+   *
    * @return returns case role / relationships
    *
    * @static
@@ -999,6 +1013,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param int $caseID case id
    * @param array $params posted params
    * @param int $contactID contact id
+   *
+   * @param null $context
+   * @param null $userID
+   * @param null $type
    *
    * @return returns case activities
    *
@@ -1379,8 +1397,12 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   /**
    * Function that sends e-mail copy of activity
    *
+   * @param $clientId
    * @param int $activityId activity Id
    * @param array $contacts array of related contact
+   *
+   * @param null $attachments
+   * @param $caseId
    *
    * @return void
    * @access public
@@ -1549,12 +1571,9 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   /**
    * Create an activity for a case via email
    *
-   * @param int $file   email sent
+   * @param int $file email sent
    *
-   * @return $activity object of newly creted activity via email
-   *
-   * @access public
-   *
+   * @return array|void $activity object of newly creted activity via email@access public
    */
   static function recordActivityViaEmail($file) {
     if (!file_exists($file) ||
@@ -1640,7 +1659,9 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   /**
    * Function to retrieve the scheduled activity type and date
    *
-   * @param  array $cases  Array of contact and case id
+   * @param  array $cases Array of contact and case id
+   *
+   * @param string $type
    *
    * @return array  $activityInfo Array of scheduled activity type and date
    *
@@ -1845,10 +1866,13 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   /**
    * Function to create activities when Case or Other roles assigned/modified/deleted.
    *
-   * @param int $caseID case id
+   * @param $caseId
    * @param int $relationshipId relationship id
    * @param int $relContactId case role assignee contactId.
    *
+   * @param null $contactId
+   *
+   * @internal param int $caseID case id
    * @return void on success creates activity and case activity
    *
    * @static
@@ -1981,6 +2005,10 @@ SELECT civicrm_contact.id as casemanager_id,
 
   /**
    * Get all cases with no end dates
+   *
+   * @param array $params
+   * @param array $excludeCaseIds
+   * @param bool $excludeDeleted
    *
    * @return array of case and related data keyed on case id
    */
@@ -2254,10 +2282,12 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    * 1. Merge two duplicate contacts cases - follow CRM-5758 rules.
    * 2. Merge two cases of same contact - follow CRM-5598 rules.
    *
-   * @param int $mainContactId    contact id of main contact record.
-   * @param int $mainCaseId       case id of main case record.
-   * @param int $otherContactId   contact id of record which is going to merge.
-   * @param int $otherCaseId      case id of record which is going to merge.
+   * @param int $mainContactId contact id of main contact record.
+   * @param int $mainCaseId case id of main case record.
+   * @param int $otherContactId contact id of record which is going to merge.
+   * @param int $otherCaseId case id of record which is going to merge.
+   *
+   * @param bool $changeClient
    *
    * @return void.
    * @static
@@ -3079,6 +3109,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   /**
    * Function to check case configuration.
    *
+   * @param null $contactId
+   *
    * @return array $configured
    */
   static function isCaseConfigured($contactId = NULL) {
@@ -3253,8 +3285,10 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @see CRM_Core_DAO::buildOptions
    *
    * @param String $fieldName
-   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
-   * @param Array  $props: whatever is known about this dao object
+   * @param String $context : @see CRM_Core_DAO::buildOptionsContext
+   * @param Array $props : whatever is known about this dao object
+   *
+   * @return Array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $className = __CLASS__;

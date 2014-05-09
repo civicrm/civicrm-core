@@ -255,8 +255,9 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   /**
    * Function to delete the pledge
    *
-   * @param int $id  pledge id
+   * @param int $id pledge id
    *
+   * @return mixed
    * @access public
    * @static
    *

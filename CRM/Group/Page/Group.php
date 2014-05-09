@@ -80,6 +80,8 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   /**
    * return user context uri to return to
    *
+   * @param null $mode
+   *
    * @return string
    * @access public
    */
@@ -89,6 +91,8 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
 
   /**
    * return user context uri params
+   *
+   * @param null $mode
    *
    * @return string
    * @access public

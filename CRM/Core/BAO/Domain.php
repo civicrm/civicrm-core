@@ -69,6 +69,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Get the domain BAO
    *
+   * @param null $reset
+   *
    * @return null|object CRM_Core_BAO_Domain
    * @access public
    * @static
@@ -108,7 +110,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * Reset domain to default (ie. as loaded from settings). This is the
    * counterpart to CRM_Core_BAO_Domain::setDomain.
    *
-   * @param integer $domainID id for domain you want to set as current
+   * @internal param int $domainID id for domain you want to set as current
    * @deprecated
    * @see CRM_Core_BAO_Domain::setDomain
    */

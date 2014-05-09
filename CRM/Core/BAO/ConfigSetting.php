@@ -46,6 +46,8 @@ class CRM_Core_BAO_ConfigSetting {
    *
    * @params array $params associated array of civicrm variables
    *
+   * @param $params
+   *
    * @return null
    * @static
    */

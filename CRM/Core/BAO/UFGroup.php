@@ -350,9 +350,13 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @param array $groupArr (mimic CRM_UF_DAO_UFGroup)
    * @param array $fieldArrs list of fields (each mimics CRM_UF_DAO_UFField)
-   * @param bool $visibility   visibility of fields we are interested in
+   * @param bool $visibility visibility of fields we are interested in
    * @param bool $searchable
-   * @param bool $showall
+   * @param bool $showAll
+   * @param null $ctype
+   * @param int $permissionType
+   *
+   * @internal param bool $showall
    * @return array
    * @see getFields
    */
@@ -1470,6 +1474,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @params int $displayName if set return display name in array
    * @params int $status if set return module other than default modules (User Account/User registration/Profile)
    *
+   * @param null $ufGroupId
+   * @param null $displayName
+   * @param null $status
+   *
    * @return array $ufGroupJoinRecords
    *
    * @access public
@@ -1576,11 +1584,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * Function to get the uf group for a module
    *
    * @param string $moduleName module name
-   * @param int    $count no to increment the weight
-   * @param bool   $skipPermision - whether to add permission clause
-   * @param int    $op - which operation (view, edit, create, etc) to check permission for
+   * @param int $count no to increment the weight
+   * @param bool $skipPermission
+   * @param int $op - which operation (view, edit, create, etc) to check permission for
    * @param array|NULL $returnFields list of UFGroup fields to return; NULL for default
    *
+   * @internal param bool $skipPermision - whether to add permission clause
    * @return array $ufGroups array of ufgroups for a module
    * @access public
    * @static
@@ -1653,6 +1662,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @params int $ufGroupId uf group id (profile id)
    *
+   * @param $ufGroupId
+   * @param null $contactID
+   *
    * @return boolean true or false
    * @static
    * @access public
@@ -1697,6 +1709,15 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @params int     $mode       profile mode
    * @params int     $contactID  contact id
    * @params string  $usedFor    for building up prefixed fieldname for special cases (e.g. onBehalf, Honor)
+   *
+   * @param $form
+   * @param $field
+   * @param $mode
+   * @param null $contactId
+   * @param bool $online
+   * @param null $usedFor
+   * @param null $rowNumber
+   * @param string $prefix
    *
    * @return null
    * @static
@@ -2211,6 +2232,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @params boolean $singleProfile  true for single profile else false(batch update)
    * @params int     $componentId    id for specific components like contribute, event etc
    *
+   * @param $contactId
+   * @param $fields
+   * @param $defaults
+   * @param bool $singleProfile
+   * @param null $componentId
+   * @param null $component
+   *
    * @return null
    * @static
    * @access public
@@ -2557,8 +2585,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   /**
    * Function to get default value for Register.
    *
-   * @return $defaults
-   * @static
+   * @param $fields
+   * @param $defaults
+   *
+   * @return mixed $defaults@static
    * @access public
    */
   static function setRegisterDefaults(&$fields, &$defaults) {

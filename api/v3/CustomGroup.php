@@ -120,6 +120,7 @@ function civicrm_api3_custom_group_delete($params) {
  *
  * @param array $params Array to search on
  *
+ * @return array
  * @access public
  * {@getfields CustomGroup_get}
  * @example CustomGroupGet.php

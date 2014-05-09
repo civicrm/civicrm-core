@@ -246,10 +246,11 @@ function civicrm_api3_job_mail_report($params) {
  *
  *                        id - Integer - greetings option group
  *
+ * @param $params
+ *
  * @return boolean        true if success, else false
  * @static
  * @access public
- *
  */
 function civicrm_api3_job_update_greeting($params) {
 

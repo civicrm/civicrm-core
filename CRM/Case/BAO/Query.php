@@ -49,6 +49,8 @@ class CRM_Case_BAO_Query {
   /**
    * build select for Case
    *
+   * @param $query
+   *
    * @return void
    * @access public
    */
@@ -215,6 +217,8 @@ class CRM_Case_BAO_Query {
    * Given a list of conditions in query generate the required
    * where clause
    *
+   * @param $query
+   *
    * @return void
    * @access public
    */
@@ -236,6 +240,9 @@ class CRM_Case_BAO_Query {
 
   /**
    * where clause for a single field
+   *
+   * @param $values
+   * @param $query
    *
    * @return void
    * @access public

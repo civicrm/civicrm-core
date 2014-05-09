@@ -43,6 +43,8 @@ class CRM_Upgrade_Incremental_Legacy {
    * Compute any messages which should be displayed before upgrade
    *
    * @param $preUpgradeMessage string, alterable
+   * @param $currentVer
+   * @param $latestVer
    */
   static function setPreUpgradeMessage(&$preUpgradeMessage, $currentVer, $latestVer) {
     $upgrade = new CRM_Upgrade_Form();

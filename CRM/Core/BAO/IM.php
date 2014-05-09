@@ -78,6 +78,8 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    *
    * @param int $id the contact id
    *
+   * @param bool $updateBlankLocInfo
+   *
    * @return array  the array of im details
    * @access public
    * @static

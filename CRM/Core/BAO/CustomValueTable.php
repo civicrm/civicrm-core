@@ -354,15 +354,17 @@ class CRM_Core_BAO_CustomValueTable {
   /**
    * Return an array of all custom values associated with an entity.
    *
-   * @param int         $entityID      Identification number of the entity
-   * @param string      $entityType    Type of entity that the entityID corresponds to, specified
+   * @param int $entityID Identification number of the entity
+   * @param string $entityType Type of entity that the entityID corresponds to, specified
    *                                   as a string with format "'<EntityName>'". Comma separated
    *                                   list may be used to specify OR matches. Allowable values
    *                                   are enumerated types in civicrm_custom_group.extends field.
    *                                   Optional. Default value assumes entityID references a
    *                                   contact entity.
-   * @param array       $fieldIDs      optional list of fieldIDs that we want to retrieve. If this
+   * @param array $fieldIDs optional list of fieldIDs that we want to retrieve. If this
    *                                   is set the entityType is ignored
+   *
+   * @param bool $formatMultiRecordField
    *
    * @return array      $fields        Array of custom values for the entity with key=>value
    *                                   pairs specified as civicrm_custom_field.id => custom value.
@@ -420,7 +422,7 @@ AND    $cond
       $fields[$dao->table_name][] = $dao->fieldID;
       $select[$dao->table_name][] = "{$dao->column_name} AS custom_{$dao->fieldID}";
       $isMultiple[$dao->table_name] = $dao->is_multiple ? TRUE : FALSE;
-      $file[$dao->table_name][$dao->fieldID] = $dao->fieldDataType;     
+      $file[$dao->table_name][$dao->fieldID] = $dao->fieldDataType;
     }
 
     $result = array();
@@ -453,7 +455,7 @@ AND    $cond
               }
             }
             else {
-              $result[$fieldID] = $dao->$fieldName;          
+              $result[$fieldID] = $dao->$fieldName;
             }
           }
         }

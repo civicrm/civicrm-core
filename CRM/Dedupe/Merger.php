@@ -488,6 +488,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param array $main contact details
    * @param array $other contact details
    *
+   * @return array
    * @static
    */
   static function findDifferences($main, $other) {
@@ -521,16 +522,19 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Function to batch merge a set of contacts based on rule-group and group.
    *
-   * @param  int     $rgid        rule group id
-   * @param  int     $gid         group id
-   * @param  array   $cacheParams prev-next-cache params based on which next pair of contacts are computed.
-   *                              Generally used with batch-merge.
-   * @param  string  $mode        helps decide how to behave when there are conflicts.
+   * @param  int $rgid rule group id
+   * @param  int $gid group id
+   * @param  string $mode helps decide how to behave when there are conflicts.
    *                              A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                              Does a force merge otherwise.
-   * @param  boolean $autoFlip   wether to let api decide which contact to retain and which to delete.
+   * @param  boolean $autoFlip wether to let api decide which contact to retain and which to delete.
    *
    *
+   * @param bool $redirectForPerformance
+   *
+   * @return array|bool
+   * @internal param array $cacheParams prev-next-cache params based on which next pair of contacts are computed.
+   *                              Generally used with batch-merge.
    * @static
    * @access public
    */
@@ -564,15 +568,18 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Function to merge given set of contacts. Performs core operation.
    *
-   * @param  array   $dupePairs   set of pair of contacts for whom merge is to be done.
-   * @param  array   $cacheParams prev-next-cache params based on which next pair of contacts are computed.
+   * @param  array $dupePairs set of pair of contacts for whom merge is to be done.
+   * @param  array $cacheParams prev-next-cache params based on which next pair of contacts are computed.
    *                              Generally used with batch-merge.
-   * @param  string  $mode       helps decide how to behave when there are conflicts.
+   * @param  string $mode helps decide how to behave when there are conflicts.
    *                             A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                             Does a force merge otherwise (aggressive mode).
-   * @param  boolean $autoFlip   wether to let api decide which contact to retain and which to delete.
+   * @param  boolean $autoFlip wether to let api decide which contact to retain and which to delete.
    *
    *
+   * @param bool $redirectForPerformance
+   *
+   * @return array|bool
    * @static
    * @access public
    */
@@ -653,13 +660,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * A function which uses various rules / algorithms for choosing which contact to bias to
    * when there's a conflict (to handle "gotchas"). Plus the safest route to merge.
    *
-   * @param  int     $mainId         main contact with whom merge has to happen
-   * @param  int     $otherId        duplicate contact which would be deleted after merge operation
-   * @param  array   $migrationInfo  array of information about which elements to merge.
-   * @param  string  $mode           helps decide how to behave when there are conflicts.
+   * @param  int $mainId main contact with whom merge has to happen
+   * @param  int $otherId duplicate contact which would be deleted after merge operation
+   * @param  array $migrationInfo array of information about which elements to merge.
+   * @param  string $mode helps decide how to behave when there are conflicts.
    *                                 A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                                 Does a force merge otherwise (aggressive mode).
    *
+   * @return bool
    * @static
    * @access public
    */
@@ -764,9 +772,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * A function to build an array of information required by merge function and the merge UI.
    *
-   * @param  int     $mainId         main contact with whom merge has to happen
-   * @param  int     $otherId        duplicate contact which would be deleted after merge operation
+   * @param  int $mainId main contact with whom merge has to happen
+   * @param  int $otherId duplicate contact which would be deleted after merge operation
    *
+   * @return array|bool|int
    * @static
    * @access public
    */
@@ -1142,9 +1151,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * other contact to the main one - be it Location / CustomFields or Contact .. related info.
    * A superset of moveContactBelongings() function.
    *
-   * @param  int     $mainId         main contact with whom merge has to happen
-   * @param  int     $otherId        duplicate contact which would be deleted after merge operation
+   * @param  int $mainId main contact with whom merge has to happen
+   * @param  int $otherId duplicate contact which would be deleted after merge operation
    *
+   * @param $migrationInfo
+   *
+   * @return bool
    * @static
    * @access public
    */
@@ -1516,7 +1528,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   static function getContactFields() {
     $contactFields = CRM_Contact_DAO_Contact::fields();
-    $invalidFields = array('api_key', 'contact_is_deleted', 'created_date', 'display_name', 'hash', 'id', 'modified_date', 
+    $invalidFields = array('api_key', 'contact_is_deleted', 'created_date', 'display_name', 'hash', 'id', 'modified_date',
       'primary_contact_id', 'sort_name', 'user_unique_id');
     foreach ($contactFields as $field => $value) {
       if (in_array($field, $invalidFields)) {

@@ -38,7 +38,7 @@
  *
  */
 class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
-  
+
   /**
    * The default variable defined
    *
@@ -354,9 +354,11 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $self
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -375,6 +377,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    * Function to process the form
    *
    * @access public
+   *
+   * @param null $params
    *
    * @return void
    */

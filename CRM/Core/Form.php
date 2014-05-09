@@ -213,16 +213,22 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Simple easy to use wrapper around addElement. Deal with
    * simple validation rules
    *
-   * @param string type of html element to be added
-   * @param string name of the html element
-   * @param string display label for the html element
-   * @param string attributes used for this element.
+   * @param $type
+   * @param $name
+   * @param string $label
+   * @param string $attributes
+   * @param bool $required
+   * @param null $extra
+   *
+   * @internal param \type $string of html element to be added
+   * @internal param \name $string of the html element
+   * @internal param \display $string label for the html element
+   * @internal param \attributes $string used for this element.
    *               These are not default values
-   * @param bool   is this a required field
+   * @internal param \is $bool this a required field
    *
    * @return HTML_QuickForm_Element could be an error object
    * @access public
-   *
    */
   function &add($type, $name, $label = '',
     $attributes = '', $required = FALSE, $extra = NULL
@@ -1457,13 +1463,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   </div>
    * </div>
    * {/if}
+   *
    * @param array $profiles ids of profiles that are on the form (to be autofilled)
-   * @param array $field metadata of field to use as selector including
+   * @param array $autoCompleteField
+   *
+   * @internal param array $field metadata of field to use as selector including
    *  - name_field
    *  - id_field
    *  - url (for ajax lookup)
    *
-   *  @todo add data attributes so we can deal with multiple instances on a form
+   * @todo add data attributes so we can deal with multiple instances on a form
    */
   function addAutoSelector($profiles = array(), $autoCompleteField = array()) {
     $autoCompleteField = array_merge(array(
@@ -1522,8 +1531,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Set default values on form for given contact (or no contact defaults)
+   *
    * @param mixed $profile_id (can be id, or profile name)
    * @param integer $contactID
+   *
+   * @return array
    */
   function getProfileDefaults($profile_id = 'Billing', $contactID = NULL) {
     try{

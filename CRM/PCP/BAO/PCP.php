@@ -441,7 +441,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
           $pcp_supporter_text .= "You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!";
         }
       }
-      
+
       $page->assign('pcpSupporterText', $pcp_supporter_text);
     }
     $page->assign('pcp', TRUE);
@@ -568,10 +568,11 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *
    * @param int $id campaign page id
    *
+   * @param $is_active
+   *
    * @return null
    * @access public
    * @static
-   *
    */
   static function setIsActive($id, $is_active) {
     switch ($is_active) {

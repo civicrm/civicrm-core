@@ -155,11 +155,13 @@ function _civicrm_api3_pledge_get_defaults() {
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array  $params       Associative array of property name/value
- *                             pairs to insert in new contact.
- * @param array  $values       The reformatted properties that we can use internally
+ * @param array $values The reformatted properties that we can use internally
  *                            '
  *
+ * @param bool $create
+ *
+ * @internal param array $params Associative array of property name/value
+ *                             pairs to insert in new contact.
  * @return array|CRM_Error
  * @access public
  */

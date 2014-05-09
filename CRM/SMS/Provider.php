@@ -48,9 +48,11 @@ abstract class CRM_SMS_Provider {
   /**
    * singleton function used to manage this object
    *
+   * @param array $providerParams
+   * @param bool $force
+   *
    * @return object
    * @static
-   *
    */
   static function &singleton($providerParams = array(
     ), $force = FALSE) {

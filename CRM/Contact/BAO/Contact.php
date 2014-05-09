@@ -1733,8 +1733,13 @@ ORDER BY civicrm_email.is_primary DESC";
    * @params  array  $fields        array of fields from UFGroup
    * @params  int    $addToGroupID  specifies the default group to which contact is added.
    * @params  int    $ufGroupId     uf group id (profile id)
-   * @param   string $ctype         contact type
-   * @param   boolean $visibility   basically lets us know where this request is coming from
+   * @param $params
+   * @param $fields
+   * @param null $contactID
+   * @param null $addToGroupID
+   * @param null $ufGroupId
+   * @param   string $ctype contact type
+   * @param   boolean $visibility basically lets us know where this request is coming from
    *                                if via a profile from web, we restrict what groups are changed
    *
    * @return  int                   contact id created/edited
@@ -2704,6 +2709,8 @@ AND       civicrm_openid.is_primary = 1";
   /**
    * Function to build context menu items.
    *
+   * @param null $contactId
+   *
    * @return array of context menu for logged in user.
    * @static
    */
@@ -3000,8 +3007,10 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   /**
    * Get the creation/modification times for a contact
    *
+   * @param $contactId
+   *
    * @return array('created_date' => $, 'modified_date' => $)
-  */
+   */
   static function getTimestamps($contactId) {
     $timestamps = CRM_Core_DAO::executeQuery(
       'SELECT created_date, modified_date
@@ -3137,8 +3146,10 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * TODO: In context of chainselect, what to return if e.g. a country has no states?
    *
    * @param String $fieldName
-   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
-   * @param Array  $props: whatever is known about this dao object
+   * @param String $context : @see CRM_Core_DAO::buildOptionsContext
+   * @param Array $props : whatever is known about this dao object
+   *
+   * @return Array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $params = array();
@@ -3158,8 +3169,9 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * Ensures that is_primary gets assigned to another object if available
    * Also calls pre/post hooks
    *
-   * @var $type: object type
-   * @var $id: object id
+   * @var $type : object type
+   * @var $id : object id
+   * @return bool
    */
   public static function deleteObjectWithPrimary($type, $id) {
     if (!$id || !is_numeric($id)) {

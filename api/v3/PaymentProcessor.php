@@ -40,6 +40,8 @@
  * Allowed @params array keys are:
  * {@getfields payment_processor_create}
  *
+ * @param $params
+ *
  * @return array of newly created PaymentProcessor property values.
  * @access public
  */

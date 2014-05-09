@@ -407,7 +407,7 @@ class CRM_Contribute_BAO_Query {
           $names[] = $softCreditTypes[$value];
         }
         $query->_qill[$grouping][]  = ts('Soft Credit Type %1', array(1 => $op)) . " '" . implode("' " . ts('or') . " '", $names) . "'";
-        $query->_where[$grouping][] = 
+        $query->_where[$grouping][] =
           CRM_Contact_BAO_Query::buildClause(
             "civicrm_contribution_soft.soft_credit_type_id",
             $op,
@@ -718,9 +718,9 @@ class CRM_Contribute_BAO_Query {
         break;
 
       case 'contribution_softcredit_type':
-        $from  = " $side JOIN civicrm_option_group option_group_contribution_softcredit_type ON 
+        $from  = " $side JOIN civicrm_option_group option_group_contribution_softcredit_type ON
           (option_group_contribution_softcredit_type.name = 'soft_credit_type')";
-        $from .= " $side JOIN civicrm_option_value contribution_softcredit_type ON 
+        $from .= " $side JOIN civicrm_option_value contribution_softcredit_type ON
           ( civicrm_contribution_soft.soft_credit_type_id = contribution_softcredit_type.value
           AND option_group_contribution_softcredit_type.id = contribution_softcredit_type.option_group_id )";
         break;
@@ -748,7 +748,7 @@ class CRM_Contribute_BAO_Query {
 
       case 'civicrm_contribution_soft_contact':
         if (in_array(self::$_contribOrSoftCredit, array("only_scredits", "both_related", "both"))) {
-          $from .= " $side JOIN civicrm_contact civicrm_contact_d ON (civicrm_contribution.contact_id = civicrm_contact_d.id ) 
+          $from .= " $side JOIN civicrm_contact civicrm_contact_d ON (civicrm_contribution.contact_id = civicrm_contact_d.id )
             AND contribution_search_scredit_combined.scredit_id IS NOT NULL";
         } else {
           $from .= " $side JOIN civicrm_contact civicrm_contact_d ON (civicrm_contribution_soft.contact_id = civicrm_contact_d.id )";
@@ -802,19 +802,19 @@ class CRM_Contribute_BAO_Query {
         }
       }
     }
-    if (in_array(self::$_contribOrSoftCredit, 
+    if (in_array(self::$_contribOrSoftCredit,
       array("only_scredits", "both_related", "both"))) {
         if (!$tempTableFilled) {
           // build a temp table which is union of contributions and soft credits
           // note: group-by in first part ensures uniqueness in counts
           $tempQuery = "
-            CREATE TEMPORARY TABLE IF NOT EXISTS contribution_search_scredit_combined AS 
-               SELECT con.id as id, con.contact_id, cso.id as filter_id, NULL as scredit_id 
+            CREATE TEMPORARY TABLE IF NOT EXISTS contribution_search_scredit_combined AS
+               SELECT con.id as id, con.contact_id, cso.id as filter_id, NULL as scredit_id
                  FROM civicrm_contribution con
             LEFT JOIN civicrm_contribution_soft cso ON con.id = cso.contribution_id
              GROUP BY id, contact_id, scredit_id
             UNION ALL
-               SELECT scredit.contribution_id as id, scredit.contact_id, scredit.id as filter_id, scredit.id as scredit_id 
+               SELECT scredit.contribution_id as id, scredit.contact_id, scredit.id as filter_id, scredit.id as scredit_id
                  FROM civicrm_contribution_soft as scredit";
           CRM_Core_DAO::executeQuery($tempQuery);
           $tempTableFilled = TRUE;
@@ -1000,12 +1000,12 @@ class CRM_Contribute_BAO_Query {
     );
     $form->add('select', 'contribution_or_softcredits', ts('Contributions OR Soft Credits?'), $options, FALSE, array('class' => "crm-select2"));
     $form->addSelect(
-      'contribution_soft_credit_type_id', 
+      'contribution_soft_credit_type_id',
       array(
-        'entity'      => 'contribution_soft', 
-        'field'       => 'soft_credit_type_id', 
-        'multiple'    => 'multiple', 
-        'option_url'  => NULL, 
+        'entity'      => 'contribution_soft',
+        'field'       => 'soft_credit_type_id',
+        'multiple'    => 'multiple',
+        'option_url'  => NULL,
         'placeholder' => ts('- any -')
       )
     );
@@ -1061,11 +1061,14 @@ class CRM_Contribute_BAO_Query {
 
   /**
    * Add the where for dates
+   *
    * @param array $values array of query values
    * @param object $query the query object
    * @param string $name query field that is set
    * @param string $field name of field to be set
    * @param string $title title of the field
+   *
+   * @return bool
    */
   static function buildDateWhere(&$values, $query, $name, $field, $title) {
     $fieldPart = strpos($name, $field);

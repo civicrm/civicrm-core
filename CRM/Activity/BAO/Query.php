@@ -38,6 +38,8 @@ class CRM_Activity_BAO_Query {
   /**
    * build select for Case
    *
+   * @param $query
+   *
    * @return void
    * @access public
    */
@@ -194,7 +196,7 @@ class CRM_Activity_BAO_Query {
         //get the component activity types.
         $compActTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE, TRUE);
         $activityTypeIds = self::buildWhereAndQill($query, $value, $types, $op, $grouping, array('Activity Type', 'civicrm_activity.activity_type_id'));
-        
+
         foreach ($activityTypeIds as $activityTypeId) {
           if (array_key_exists($activityTypeId, $compActTypes)) {
             CRM_Contact_BAO_Query::$_considerCompActivities = TRUE;
@@ -248,7 +250,7 @@ class CRM_Activity_BAO_Query {
 
       case 'activity_status':
         $status = CRM_Core_PseudoConstant::activityStatus();
-        
+
         $activityTypeIds = self::buildWhereAndQill($query, $value, $status, $op, $grouping, array('Activity Status', 'civicrm_activity.status_id'));
         break;
 
@@ -523,7 +525,7 @@ class CRM_Activity_BAO_Query {
         );
       }
     }
-     
+
     $form->assign('buildEngagementLevel', $buildEngagementLevel);
     $form->assign('buildSurveyResult', $buildSurveyResult);
     $form->setDefaults(array('activity_test' => 0));
@@ -567,17 +569,17 @@ class CRM_Activity_BAO_Query {
 
     return $properties;
   }
-  
+
   static function buildWhereAndQill(&$query, $value, $pseudoconstantType, $op, $grouping, $params) {
     $matches = $val = $clause = array();
-    
+
     if (is_array($value)) {
       foreach ($value as $k => $v) {
         if ($k) {
           $val[] = $k;
         }
       }
-      
+
       if (count($val) > 0) {
         // Overwrite $op so it works with an IN where statement.
         $op = 'IN';
@@ -594,7 +596,7 @@ class CRM_Activity_BAO_Query {
     foreach ($matches[0] as $qill) {
       $clause[] = CRM_Utils_Array::value($qill, $pseudoconstantType);
     }
-    
+
     $query->_qill[$grouping][] = ts($params[0] . ' %1 ', array(1 => $op)) . implode(' ' . ts('or') . ' ', $clause);
     $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($params[1],
       $op, $value, "Integer"

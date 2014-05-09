@@ -147,7 +147,10 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Function  to delete payment processor
    *
-   * @param  int  $paymentProcessorId     ID of the processor to be deleted.
+   * @param $paymentProcessorID
+   *
+   * @return null
+   * @internal param int $paymentProcessorId ID of the processor to be deleted.
    *
    * @access public
    * @static

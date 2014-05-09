@@ -332,6 +332,8 @@ WHERE     ct.id = cp.financial_type_id AND
    *
    * @param string $entityTable
    * @param integer $entityId
+   *
+   * @return mixed
    */
   public static function removeFrom($entityTable, $entityId) {
     $dao               = new CRM_Price_DAO_PriceSetEntity();
@@ -345,8 +347,11 @@ WHERE     ct.id = cp.financial_type_id AND
    * Used For value for events:1, contribution:2, membership:3
    *
    * @param string $entityTable
-   * @param int    $entityId
-   * @param int    $usedFor ( price set that extends/used for particular component )
+   * @param int $entityId
+   * @param int $usedFor ( price set that extends/used for particular component )
+   *
+   * @param null $isQuickConfig
+   * @param null $setName
    *
    * @return integer|false price_set_id, or false if none found
    */
@@ -411,8 +416,8 @@ WHERE     ct.id = cp.financial_type_id AND
   /**
    * Return an associative array of all price sets
    *
-   * @param bool   $withInactive        whether or not to include inactive entries
-   * @param string $extendComponentName name of the component like 'CiviEvent','CiviContribute'
+   * @param bool $withInactive whether or not to include inactive entries
+   * @param bool|string $extendComponentName name of the component like 'CiviEvent','CiviContribute'
    *
    * @return array associative array of id => name
    */
@@ -835,9 +840,9 @@ WHERE  id = %1";
     // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
     $adminFieldVisible = false;
     if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $adminFieldVisible = true; 
+      $adminFieldVisible = true;
     }
-    
+
     foreach ($feeBlock as $id => $field) {
       if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
         (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == true) ||
@@ -993,6 +998,8 @@ WHERE  id = %1";
    * This function is to check price set permission
    *
    * @param int $sid the price set id
+   *
+   * @return bool
    */
   static function checkPermission($sid) {
     if ($sid && self::eventPriceSetDomainID()) {
@@ -1010,6 +1017,9 @@ WHERE  id = %1";
    *
    * @param int $sid the price set id
    *
+   * @param bool $onlyActive
+   *
+   * @return int|null|string
    * @access public
    * @static
    */

@@ -270,6 +270,9 @@ class CRM_Queue_Runner {
 
   /**
    *
+   * @param $isOK
+   * @param null $exception
+   *
    * @return array(is_error => bool, is_continue => bool, numberOfItems => int)
    */
   function formatTaskResult($isOK, $exception = NULL) {

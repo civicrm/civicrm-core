@@ -374,7 +374,9 @@ class CRM_Core_Permission {
    * @param string $module component name.
    * @param $action action to be check across component
    *
-   **/
+   *
+   * @return bool
+   */
   static function checkActionPermission($module, $action) {
     //check delete related permissions.
     if ($action & CRM_Core_Action::DELETE) {
@@ -619,6 +621,8 @@ class CRM_Core_Permission {
    * @param string $permission
    *
    * return string $componentName the name of component.
+   *
+   * @return int|null|string
    * @static
    */
   static function getComponentName($permission) {

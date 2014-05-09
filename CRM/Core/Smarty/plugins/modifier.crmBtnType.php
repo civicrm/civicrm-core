@@ -36,7 +36,9 @@
 /**
  * Grab the button type from a passed button element 'name' by checking for reserved QF button type strings
  *
- * @param string $btnId
+ * @param $btnName
+ *
+ * @internal param string $btnId
  *
  * @return string  button type, one of: 'upload', 'next', 'back', 'cancel', 'refresh'
  *                                      'submit', 'done', 'display', 'jump' 'process'

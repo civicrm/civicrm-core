@@ -289,7 +289,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
     $this->_website_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
-    
+
     /**
      * FIXME: dirty hack to make the default option show up first.  This
      * avoids a mozilla browser bug with defaults on dynamically constructed
@@ -749,6 +749,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * global validation rules for the form
    *
    * @param array $fields posted values of the form
+   *
+   * @param $files
+   * @param $self
    *
    * @return array list of errors to be posted back to the form
    * @static

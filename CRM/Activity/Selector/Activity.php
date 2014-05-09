@@ -95,11 +95,17 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    *
    * - View
    *
-   * @param string $activityType type of activity
+   * @param $activityTypeId
+   * @param null $sourceRecordId
+   * @param bool $accessMailingReport
+   * @param null $activityId
+   * @param null $key
+   * @param null $compContext
+   *
+   * @internal param string $activityType type of activity
    *
    * @return array
    * @access public
-   *
    */
   public static function actionLinks($activityTypeId,
                                      $sourceRecordId      = NULL,

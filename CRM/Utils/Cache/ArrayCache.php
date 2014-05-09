@@ -9,9 +9,9 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
   /**
    * Constructor
    *
-   * @param array   $config  an array of configuration params
+   * @param array $config an array of configuration params
    *
-   * @return void
+   * @return \CRM_Utils_Cache_Arraycache
    */
   function __construct($config) {
     $this->_cache = array();

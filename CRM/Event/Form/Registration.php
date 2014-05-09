@@ -567,6 +567,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Function to add the custom fields
    *
+   * @param $id
+   * @param $name
+   * @param bool $viewOnly
+   *
    * @return void
    * @access public
    */
