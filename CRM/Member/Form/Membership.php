@@ -1268,9 +1268,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     //CRM-13981, allow different person as a soft-contributor of chosen type
     if ($this->_contributorContactID != $this->_contactID) {
+      $params['contribution_contact_id'] = $this->_contributorContactID;
       if (!empty($this->_params['soft_credit_type_id'])) {
         $softParams['soft_credit_type_id'] = $this->_params['soft_credit_type_id'];
-        $softParams['contact_id'] = $this->_contributorContactID;
+        $softParams['contact_id'] = $this->_contactID;
       }
     }
     if (!empty($formValues['record_contribution'])) {

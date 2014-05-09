@@ -25,14 +25,16 @@
 *}
 {if $softCreditRows}
 {strip}
-<table class="form-layout-compressed">
-    <tr>
-        <th class="contriTotalLeft">{ts}Total Soft Credits{/ts} - {$softCreditTotals.amount|crmMoney:$softCreditTotals.currency}</th>
-        <th class="right" width="10px"> &nbsp; </th>
-        <th class="right contriTotalRight"> &nbsp; {ts}Avg Soft Credits{/ts} - {$softCreditTotals.avg|crmMoney:$softCreditTotals.currency}</th>
-    </tr>
-</table> 
-<p></p>
+{if $context neq 'membership'}
+    <table class="form-layout-compressed">
+        <tr>
+            <th class="contriTotalLeft">{ts}Total Soft Credits{/ts} - {$softCreditTotals.amount|crmMoney:$softCreditTotals.currency}</th>
+            <th class="right" width="10px"> &nbsp; </th>
+            <th class="right contriTotalRight"> &nbsp; {ts}Avg Soft Credits{/ts} - {$softCreditTotals.avg|crmMoney:$softCreditTotals.currency}</th>
+        </tr>
+    </table>
+    <p></p>
+{/if}
 
 <table class="selector row-highlight">
     <tr class="columnheader">

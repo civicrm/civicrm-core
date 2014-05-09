@@ -68,6 +68,10 @@
         {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
     {/if}
 
+    {if $softCredit}
+        {include file="CRM/Contribute/Page/ContributionSoft.tpl" context="membership"}
+    {/if}
+
     {if $has_related}
         {include file="CRM/Member/Form/MembershipRelated.tpl" context="Search"}
     {/if}
