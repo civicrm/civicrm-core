@@ -88,13 +88,12 @@ class CRM_Contribute_Form_SoftCredit {
           }
 
           $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
-          $extraOption = array('onclick' => "enableHonorType();");
 
           // radio button for Honor Type
           foreach ($jsonData['soft_credit_types'] as $value) {
-            $honorTypes[$value] = $form->createElement('radio', NULL, NULL, $softCreditTypes[$value], $value, $extraOption);
+            $honorTypes[$value] = $form->createElement('radio', NULL, NULL, $softCreditTypes[$value], $value);
           }
-          $form->addGroup($honorTypes, 'soft_credit_type_id', NULL);
+          $form->addGroup($honorTypes, 'soft_credit_type_id', NULL)->setAttribute('allowClear', TRUE);
         }
       }
         return $form;
