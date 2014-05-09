@@ -108,6 +108,8 @@ WHERE  civicrm_pcp.contact_id = civicrm_contact.id
   /**
    * Function to return PCP  Block info for dashboard
    *
+   * @param $contactId
+   *
    * @return array     array of Pcp if found
    * @access public
    * @static
@@ -788,12 +790,13 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Function to get email is enabled for supporter's profile
    *
-   * @param int $id supporter's profile id
+   * @param $profileId
+   *
+   * @internal param int $id supporter's profile id
    *
    * @return boolean
    * @access public
    * @static
-   *
    */
   static function checkEmailProfile($profileId) {
     $query = "
@@ -812,12 +815,14 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
   /**
    * Function to obtain the title of page associated with a pcp
    *
-   * @param int $id campaign page id
+   * @param $pcpId
+   * @param $component
+   *
+   * @internal param int $id campaign page id
    *
    * @return int
    * @access public
    * @static
-   *
    */
   static function getPcpPageTitle($pcpId, $component) {
     if ($component == 'contribute') {
@@ -842,12 +847,14 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
   /**
    * Function to get pcp block & entity id given pcp id
    *
-   * @param int $id campaign page id
+   * @param $pcpId
+   * @param $component
+   *
+   * @internal param int $id campaign page id
    *
    * @return String
    * @access public
    * @static
-   *
    */
   static function getPcpBlockEntityId($pcpId, $component) {
     $entity_table = self::getPcpEntityTable($component);

@@ -229,7 +229,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   /**
    * Function to delete Option Value
    *
-   * @param  int  $optionGroupId     Id of the Option Group to be deleted.
+   * @param $optionValueId
+   *
+   * @internal param int $optionGroupId Id of the Option Group to be deleted.
    *
    * @return boolean
    *

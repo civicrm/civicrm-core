@@ -146,7 +146,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   /**
    * Get the next item
    *
-   * @param $leaseTime seconds
+   * @param int|\seconds $leaseTime seconds
    *
    * @return object with key 'data' that matches the inputted data
    */

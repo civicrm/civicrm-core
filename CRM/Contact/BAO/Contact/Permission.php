@@ -83,10 +83,11 @@ WHERE contact_a.id = %1 AND $permission";
   /**
    * fill the acl contact cache for this contact id if empty
    *
-   * @param int     $id     contact id
-   * @param string  $type   the type of operation (view|edit)
-   * @param boolean $force  should we force a recompute
+   * @param $userID
+   * @param int|string $type the type of operation (view|edit)
+   * @param boolean $force should we force a recompute
    *
+   * @internal param int $id contact id
    * @return void
    * @access public
    * @static

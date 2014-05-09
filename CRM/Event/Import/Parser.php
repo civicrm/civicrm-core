@@ -341,6 +341,8 @@ abstract class CRM_Event_Import_Parser extends CRM_Import_Parser {
    *
    * @param CRM_Core_Session $store
    *
+   * @param int $mode
+   *
    * @return void
    * @access public
    */

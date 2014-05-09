@@ -294,8 +294,12 @@ class CRM_Contact_Form_Edit_Address {
   /**
    * check for correct state / country mapping.
    *
-   * @param array reference $fields - submitted form values.
-   * @param array reference $errors - if any errors found add to this array. please.
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @internal param \reference $array $fields - submitted form values.
+   * @internal param \reference $array $errors - if any errors found add to this array. please.
    *
    * @return true if no errors
    *         array of errors if any present.

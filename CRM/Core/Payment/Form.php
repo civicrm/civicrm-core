@@ -140,6 +140,8 @@ class CRM_Core_Payment_Form {
   /**
    * create all fields needed for a credit card transaction
    *
+   * @param $form
+   *
    * @return void
    * @access public
    */

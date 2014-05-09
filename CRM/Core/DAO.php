@@ -1162,11 +1162,14 @@ SELECT contact_id
    * of time. This is the inverse function of create. It also stores all the retrieved
    * values in the default array
    *
-   * @param string $daoName  name of the dao object
-   * @param array  $params   (reference ) an assoc array of name/value pairs
-   * @param array  $defaults (reference ) an assoc array to hold the flattened values
-   * @param array  $returnProperities     an assoc array of fields that need to be returned, eg array( 'first_name', 'last_name')
+   * @param string $daoName name of the dao object
+   * @param string $fieldIdName
+   * @param $fieldId
+   * @param $details
+   * @param array $returnProperities an assoc array of fields that need to be returned, eg array( 'first_name', 'last_name')
    *
+   * @internal param array $params (reference ) an assoc array of name/value pairs
+   * @internal param array $defaults (reference ) an assoc array to hold the flattened values
    * @return object an object of type referenced by daoName
    * @access public
    * @static

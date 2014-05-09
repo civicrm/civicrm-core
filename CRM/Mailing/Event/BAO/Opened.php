@@ -124,7 +124,9 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    * CRM-12814
    * Get opened count for each mailing for a given set of mailing IDs
    *
-   * @param int $contactID  ID of the mailing
+   * @param $mailingIDs
+   *
+   * @internal param int $contactID ID of the mailing
    *
    * @return array          Opened count per mailing ID
    * @access public

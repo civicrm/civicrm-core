@@ -67,6 +67,8 @@ class CRM_Campaign_BAO_Query {
   /**
    * if survey, campaign are involved, add the specific fields.
    *
+   * @param $query
+   *
    * @return void
    * @access public
    */

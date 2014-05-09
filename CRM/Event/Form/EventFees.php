@@ -73,6 +73,8 @@ class CRM_Event_Form_EventFees {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function setDefaultValues(&$form) {

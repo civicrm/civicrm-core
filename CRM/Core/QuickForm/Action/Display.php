@@ -104,8 +104,9 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
    * render the page using a custom templating
    * system
    *
-   * @param object  $page the CRM_Core_Form page
-   * @param boolean $ret  should we echo or return output
+   * @param object $page the CRM_Core_Form page
+   *
+   * @internal param bool $ret should we echo or return output
    *
    * @return void
    * @access public

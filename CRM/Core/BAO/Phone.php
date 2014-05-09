@@ -103,6 +103,10 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    *
    * @param int $id the contact id
    *
+   * @param bool $updateBlankLocInfo
+   * @param null $type
+   * @param array $filters
+   *
    * @return array  the array of phone ids which are potential numbers
    * @access public
    * @static

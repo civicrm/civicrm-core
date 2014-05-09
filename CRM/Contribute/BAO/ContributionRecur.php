@@ -220,9 +220,11 @@ SELECT r.payment_processor_id
   /**
    * Cancel Recurring contribution.
    *
-   * @param integer  $recurId recur contribution id.
-   * @param array    $objects an array of objects that is to be cancelled like
+   * @param integer $recurId recur contribution id.
+   * @param array $objects an array of objects that is to be cancelled like
    *                          contribution, membership, event. At least contribution object is a must.
+   *
+   * @param array $activityParams
    *
    * @return true / false.
    * @access public

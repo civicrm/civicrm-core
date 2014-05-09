@@ -130,7 +130,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param int $fieldId price_field_id
    * @param array $values (reference ) to hold the values
    * @param string $orderBy for order by, default weight
-   * @param int $isActive is_active, default false
+   * @param bool|int $isActive is_active, default false
    *
    * @return array $values
    *

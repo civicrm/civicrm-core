@@ -83,6 +83,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * singleton function used to manage this object.
    *
+   * @param null $package
+   * @param bool $msgCallback
+   * @param bool $contextCallback
+   * @param bool $throwPEAR_Error
+   * @param string $stackClass
+   *
    * @return object
    * @static
    */

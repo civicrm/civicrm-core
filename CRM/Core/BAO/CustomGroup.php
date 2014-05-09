@@ -296,14 +296,18 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * @param string $entityType - of the contact whose contact type is needed
    * @param object $form - not used but required
-   * @param int    $entityId   - optional - id of entity if we need to populate the tree with custom values.
-   * @param int    $groupId    - optional group id (if we need it for a single group only)
-   *                           - if groupId is 0 it gets for inline groups only
-   *                           - if groupId is -1 we get for all groups
+   * @param null $entityID
+   * @param null $groupID
    * @param string $subType
    * @param string $subName
    * @param boolean $fromCache
    *
+   * @param null $onlySubType
+   *
+   * @internal param int $entityId - optional - id of entity if we need to populate the tree with custom values.
+   * @internal param int $groupId - optional group id (if we need it for a single group only)
+   *                           - if groupId is 0 it gets for inline groups only
+   *                           - if groupId is -1 we get for all groups
    * @return array $groupTree  - array  The returned array is keyed by group id and has the custom group table fields
    * and a subkey 'fields' holding the specific custom fields.
    * If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
@@ -316,7 +320,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @access public
    *
    * @static
-   *
    */
   public static function &getTree(
     $entityType,
@@ -833,16 +836,17 @@ ORDER BY civicrm_custom_group.weight,
    *
    * An array containing custom group details (including their custom field) is returned.
    *
-   * @param int     $groupId    - group id whose details are needed
+   * @param int $groupId - group id whose details are needed
    * @param boolean $searchable - is this field searchable
-   * @param array   $extends    - which table does it extend if any
+   * @param array $extends - which table does it extend if any
+   *
+   * @param null $inSelector
    *
    * @return array $groupTree - array consisting of all group and field details
    *
    * @access public
    *
    * @static
-   *
    */
   public static function &getGroupDetail($groupId = NULL, $searchable = NULL, &$extends = NULL, $inSelector = NULL) {
     // create a new tree

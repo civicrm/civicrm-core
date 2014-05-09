@@ -108,9 +108,10 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
   /**
    * Determine in which discount set the registration date falls
    *
-   * @param  integer  $entityId      entity id to be searched
-   * @param  string   $entityTable   entity table to be searched
+   * @param $entityID
+   * @param  string $entityTable entity table to be searched
    *
+   * @internal param int $entityId entity id to be searched
    * @return integer  $dao->id       discount id of the set which matches
    *                                 the date criteria
    */

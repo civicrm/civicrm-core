@@ -107,6 +107,9 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
+   * @param $files
+   * @param $self
+   *
    * @return mixed true or array of errors
    * @access public
    * @static

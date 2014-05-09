@@ -153,9 +153,11 @@ abstract class CRM_Core_Component_Info {
    *
    * NOTE: if using conditionally permission return,
    * implementation of $getAllUnconditionally is required.
+   *
+   * @param bool $getAllUnconditionally
+   *
    * @return array|null collection of permissions, null if none
    * @access public
-   *
    */
   abstract public function getPermissions($getAllUnconditionally = FALSE);
 

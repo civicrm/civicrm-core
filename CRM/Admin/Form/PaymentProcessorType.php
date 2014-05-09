@@ -148,6 +148,8 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
+   * @param bool $check
+   *
    * @return void
    * @access public
    */

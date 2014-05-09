@@ -233,6 +233,9 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    *
    * @param array $values posted values of the form
    *
+   * @param $files
+   * @param $self
+   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public
@@ -257,7 +260,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         if (! CRM_Core_BAO_UFField::checkValidProfileType($id, $required, $optional)
              && ! CRM_Core_BAO_UFGroup::checkValidProfile($id, $requiredProfileFields) ) {
           $errors['onbehalf_profile_id'] = ts('Profile does not contain the minimum required fields for an On Behalf Of Organization');
-        } 
+        }
       }
     }
 
