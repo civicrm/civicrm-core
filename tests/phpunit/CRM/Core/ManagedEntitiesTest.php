@@ -63,7 +63,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * to (1) create 'foo' entity, (2) create 'bar' entity', (3) remove 'foo'
    * entity
    */
-  function testAddRemoveEntitiesModule() {
+  function testAddRemoveEntitiesModule_UpdateAlways_DeleteAlways() {
     $decls = array();
 
     // create first managed entity ('foo')
@@ -112,7 +112,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * Set up an active module with one managed-entity and, over
    * time, the content of the entity changes
    */
-  function testModifyDeclaration() {
+  function testModifyDeclaration_UpdateAlways() {
     $decls = array();
 
     // create first managed entity ('foo')
@@ -131,6 +131,34 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->assertEquals('CRM_Example_One_Foobar', $foo2['name']);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_FooBar"');
+    $this->assertEquals($foo['id'], $foo2['id']);
+  }
+
+  /**
+   * Set up an active module with one managed-entity and, over
+   * time, the content of the entity changes
+   */
+  function testModifyDeclaration_UpdateNever() {
+    $decls = array();
+
+    // create first managed entity ('foo')
+    $decls[] = array_merge($this->fixtures['com.example.one-foo'], array(
+      'update' => 'never', // Policy is to never update after initial creation
+    ));
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $foo = $me->get('com.example.one', 'foo');
+    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+
+    // later on, hook specification changes
+    $decls[0]['params']['class_name'] = 'CRM_Example_One_Foobar';
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $foo2 = $me->get('com.example.one', 'foo');
+    $this->assertEquals('CRM_Example_One_Foo', $foo2['name']);
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_FooBar"');
     $this->assertEquals($foo['id'], $foo2['id']);
   }
 

@@ -180,20 +180,22 @@ class CRM_Core_ManagedEntities {
    *
    * @param CRM_Core_DAO_Managed $dao
    * @param array $todo entity specification (per hook_civicrm_managedEntities)
-   * @return array|int API result
    */
   public function updateExistingEntity($dao, $todo) {
-    $defaults = array(
-      'id' => $dao->entity_id,
-      'is_active' => 1, // FIXME: test whether is_active is valid
-    );
-    $params = array_merge($defaults, $todo['params']);
-    $result = civicrm_api($dao->entity_type, 'create', $params);
-    if ($result['is_error']) {
-      $this->onApiError($params, $result);
-      return $result;
+    $policy = CRM_Utils_Array::value('update', $todo, 'always');
+    $doUpdate = ($policy == 'always');
+
+    if ($doUpdate) {
+      $defaults = array(
+        'id' => $dao->entity_id,
+        'is_active' => 1, // FIXME: test whether is_active is valid
+      );
+      $params = array_merge($defaults, $todo['params']);
+      $result = civicrm_api($dao->entity_type, 'create', $params);
+      if ($result['is_error']) {
+        $this->onApiError($params, $result);
+      }
     }
-    return $result;
   }
 
   /**
