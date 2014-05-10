@@ -436,6 +436,10 @@ UPDATE civicrm_navigation
 SET civicrm_navigation.url = CONCAT(SUBSTRING(url FROM 1 FOR LOCATE('&', url) - 1), '?', SUBSTRING(url FROM LOCATE('&', url) + 1))
 WHERE civicrm_navigation.url LIKE "%&%" AND civicrm_navigation.url NOT LIKE "%?%";
 
+-- CRM-14478 Add a "cleanup" policy for managed entities
+ALTER TABLE `civicrm_managed`
+ADD COLUMN `cleanup` varchar(32) COMMENT 'Policy on when to cleanup entity (always, never, unused)';
+
 -- CRM-14639
 
 SELECT @option_grant_status := id  FROM civicrm_option_group WHERE name = 'grant_status';

@@ -163,6 +163,35 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   }
 
   /**
+   * Set up an active module with one managed-entity using the
+   * policy "cleanup=>never". When the managed-entity goes away,
+   * ensure that the policy is followed (ie the entity is not
+   * deleted).
+   */
+  function testRemoveDeclaration_CleanupNever() {
+    $decls = array();
+
+    // create first managed entity ('foo')
+    $decls[] = array_merge($this->fixtures['com.example.one-foo'], array(
+      'cleanup' => 'never'
+    ));
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $foo = $me->get('com.example.one', 'foo');
+    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+
+    // later on, entity definition disappears; but we decide not to do any cleanup (per policy)
+    $decls = array();
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $foo2 = $me->get('com.example.one', 'foo');
+    $this->assertEquals('CRM_Example_One_Foo', $foo2['name']);
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+    $this->assertEquals($foo['id'], $foo2['id']);
+  }
+
+  /**
    * Setup an active module with a malformed entity declaration
    */
   function testInvalidDeclarationModule() {
