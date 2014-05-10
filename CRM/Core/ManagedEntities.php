@@ -106,13 +106,7 @@ class CRM_Core_ManagedEntities {
     while ($dao->fetch()) {
       if (isset($todos[$dao->name]) && $todos[$dao->name]) {
         // update existing entity; remove from $todos
-        $defaults = array('id' => $dao->entity_id, 'is_active' => 1); // FIXME: test whether is_active is valid
-        $params = array_merge($defaults, $todos[$dao->name]['params']);
-        $result = civicrm_api($dao->entity_type, 'create', $params);
-        if ($result['is_error']) {
-          $this->onApiError($params, $result);
-        }
-
+        $this->updateExistingEntity($dao, $todos[$dao->name]);
         unset($todos[$dao->name]);
       } else {
         // remove stale entity; not in $todos
@@ -122,17 +116,7 @@ class CRM_Core_ManagedEntities {
 
     // create new entities from leftover $todos
     foreach ($todos as $name => $todo) {
-      $result = civicrm_api($todo['entity'], 'create', $todo['params']);
-      if ($result['is_error']) {
-        $this->onApiError($todo['params'], $result);
-      }
-
-      $dao = new CRM_Core_DAO_Managed();
-      $dao->module = $todo['module'];
-      $dao->name = $todo['name'];
-      $dao->entity_type = $todo['entity'];
-      $dao->entity_id = $result['id'];
-      $dao->save();
+      $this->insertNewEntity($todo);
     }
   }
 
@@ -146,19 +130,8 @@ class CRM_Core_ManagedEntities {
     $dao->whereAdd("module in ($in)");
     $dao->find();
     while ($dao->fetch()) {
-      // FIXME: if ($dao->entity_type supports is_active) {
-      if (TRUE) {
-        // FIXME cascading for payproc types?
-        $params = array(
-          'version' => 3,
-          'id' => $dao->entity_id,
-          'is_active' => 0,
-        );
-        $result = civicrm_api($dao->entity_type, 'create', $params);
-        if ($result['is_error']) {
-          $this->onApiError($params, $result);
-        }
-      }
+      $this->disableEntity($dao);
+
     }
   }
 
@@ -180,6 +153,68 @@ class CRM_Core_ManagedEntities {
     $dao->find();
     while ($dao->fetch()) {
       $this->removeStaleEntity($dao);
+    }
+  }
+
+  /**
+   * Create a new entity
+   *
+   * @param array $todo entity specification (per hook_civicrm_managedEntities)
+   */
+  public function insertNewEntity($todo) {
+    $result = civicrm_api($todo['entity'], 'create', $todo['params']);
+    if ($result['is_error']) {
+      $this->onApiError($todo['params'], $result);
+    }
+
+    $dao = new CRM_Core_DAO_Managed();
+    $dao->module = $todo['module'];
+    $dao->name = $todo['name'];
+    $dao->entity_type = $todo['entity'];
+    $dao->entity_id = $result['id'];
+    $dao->save();
+  }
+
+  /**
+   * Update an entity which (a) is believed to exist and which (b) ought to be active.
+   *
+   * @param CRM_Core_DAO_Managed $dao
+   * @param array $todo entity specification (per hook_civicrm_managedEntities)
+   * @return array|int API result
+   */
+  public function updateExistingEntity($dao, $todo) {
+    $defaults = array(
+      'id' => $dao->entity_id,
+      'is_active' => 1, // FIXME: test whether is_active is valid
+    );
+    $params = array_merge($defaults, $todo['params']);
+    $result = civicrm_api($dao->entity_type, 'create', $params);
+    if ($result['is_error']) {
+      $this->onApiError($params, $result);
+      return $result;
+    }
+    return $result;
+  }
+
+  /**
+   * Update an entity which (a) is believed to exist and which (b) ought to be
+   * inactive.
+   *
+   * @param CRM_Core_DAO_Managed $dao
+   */
+  public function disableEntity($dao) {
+    // FIXME: if ($dao->entity_type supports is_active) {
+    if (TRUE) {
+      // FIXME cascading for payproc types?
+      $params = array(
+        'version' => 3,
+        'id' => $dao->entity_id,
+        'is_active' => 0,
+      );
+      $result = civicrm_api($dao->entity_type, 'create', $params);
+      if ($result['is_error']) {
+        $this->onApiError($params, $result);
+      }
     }
   }
 
