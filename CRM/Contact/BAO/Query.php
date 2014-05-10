@@ -617,7 +617,10 @@ class CRM_Contact_BAO_Query {
       }
 
       // redirect to activity select clause
-      if (substr($name, 0, 9) == 'activity_') {
+      if (
+        (substr($name, 0, 9) == 'activity_') || 
+        ($name == 'parent_id')
+      ) {
         CRM_Activity_BAO_Query::select($this);
         continue;
       }
@@ -1641,6 +1644,8 @@ class CRM_Contact_BAO_Query {
       case 'activity_date_high':
       case 'activity_role':
       case 'activity_status':
+      case 'followup_parent_id':
+      case 'parent_id':
       case 'activity_subject':
       case 'test_activities':
       case 'activity_type_id':
@@ -2418,6 +2423,7 @@ class CRM_Contact_BAO_Query {
         case 'civicrm_activity_tag':
         case 'activity_type':
         case 'activity_status':
+        case 'parent_id':
         case 'civicrm_activity_contact':
         case 'source_contact':
           $from .= CRM_Activity_BAO_Query::from($name, $mode, $side);
