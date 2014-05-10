@@ -6,6 +6,15 @@
  * deactivated, and deleted in tandem with their modules.
  */
 class CRM_Core_ManagedEntities {
+
+  public static function getCleanupOptions() {
+    return array(
+      'always' => ts('Always'),
+      'never' => ts('Never'),
+      'unused' => ts('If Unused'),
+    );
+  }
+
   /**
    * @var array($status => array($name => CRM_Core_Module))
    */
@@ -172,6 +181,7 @@ class CRM_Core_ManagedEntities {
     $dao->name = $todo['name'];
     $dao->entity_type = $todo['entity'];
     $dao->entity_id = $result['id'];
+    $dao->cleanup = CRM_Utils_Array::value('cleanup', $todo);
     $dao->save();
   }
 
@@ -195,6 +205,11 @@ class CRM_Core_ManagedEntities {
       if ($result['is_error']) {
         $this->onApiError($params, $result);
       }
+    }
+
+    if (isset($todo['cleanup'])) {
+      $dao->cleanup = $todo['cleanup'];
+      $dao->update();
     }
   }
 
@@ -226,18 +241,23 @@ class CRM_Core_ManagedEntities {
    * @param CRM_Core_DAO_Managed $dao
    */
   public function removeStaleEntity($dao) {
-    $params = array(
-      'version' => 3,
-      'id' => $dao->entity_id,
-    );
-    $result = civicrm_api($dao->entity_type, 'delete', $params);
-    if ($result['is_error']) {
-      $this->onApiError($params, $result);
-    }
+    $policy = empty($dao->cleanup) ? 'always' : $dao->cleanup;
+    $doDelete = ($policy == 'always');
 
-    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_managed WHERE id = %1', array(
-      1 => array($dao->id, 'Integer')
-    ));
+    if ($doDelete) {
+      $params = array(
+        'version' => 3,
+        'id' => $dao->entity_id,
+      );
+      $result = civicrm_api($dao->entity_type, 'delete', $params);
+      if ($result['is_error']) {
+        $this->onApiError($params, $result);
+      }
+
+      CRM_Core_DAO::executeQuery('DELETE FROM civicrm_managed WHERE id = %1', array(
+        1 => array($dao->id, 'Integer')
+      ));
+    }
   }
 
   /**
