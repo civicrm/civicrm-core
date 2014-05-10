@@ -151,8 +151,19 @@
         {$form.frequency_unit.html}
       {/if}
       {if $is_recur_installments}
+        <span id="recur_installments_num">
         {ts}for{/ts} {$form.installments.html} {$form.installments.label}
+        </span>
       {/if}
+      <div id="recurHelp" class="description">
+				{ts}Your recurring contribution will be processed automatically.{/ts}
+				{if $is_recur_installments}
+					{ts}You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.{/ts}
+				{/if}
+        {if $is_email_receipt}
+          {ts}You will receive an email receipt for each recurring contribution.{/ts}
+        {/if}
+      </div>
     </div>
     <div class="clear"></div>
   </div>
@@ -356,6 +367,20 @@
     }
   }
 
+	cj('input[id="is_recur"]').on('change', function() {
+		showRecurHelp();
+	});
+
+  function showRecurHelp( ) {
+    var showHelp = cj('input[id="is_recur"]:checked'); 
+    if ( showHelp.val() > 0) {
+      cj('#recurHelp').show();
+    }
+    else {
+      cj('#recurHelp').hide();
+    }
+  }
+	
   function pcpAnonymous( ) {
     // clear nickname field if anonymous is true
     if (document.getElementsByName("pcp_is_anonymous")[1].checked) {
@@ -411,6 +436,7 @@
   CRM.$(function($) {
     toggleConfirmButton();
 		enableHonorType();
+		showRecurHelp();
   });
 
   function showHidePayPalExpressOption() {
