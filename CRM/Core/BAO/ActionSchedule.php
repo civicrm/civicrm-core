@@ -1186,6 +1186,12 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     return $result;
   }
 
+  /**
+   * @param $id
+   * @param $mappingID
+   *
+   * @return null|string
+   */
   static function isConfigured($id, $mappingID) {
     $queryString = "SELECT count(id) FROM civicrm_action_schedule
                         WHERE  mapping_id = %1 AND
