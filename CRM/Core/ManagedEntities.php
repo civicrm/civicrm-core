@@ -53,6 +53,8 @@ class CRM_Core_ManagedEntities {
 
   /**
    * Read the managed entity
+   *
+   * @return array|NULL API representation, or NULL if the entity does not exist
    */
   public function get($moduleName, $name) {
     $dao = new CRM_Core_DAO_Managed();
@@ -242,7 +244,29 @@ class CRM_Core_ManagedEntities {
    */
   public function removeStaleEntity($dao) {
     $policy = empty($dao->cleanup) ? 'always' : $dao->cleanup;
-    $doDelete = ($policy == 'always');
+    switch ($policy) {
+      case 'always':
+        $doDelete = TRUE;
+        break;
+      case 'never':
+        $doDelete = FALSE;
+        break;
+      case 'unused':
+        $getRefCount = civicrm_api3($dao->entity_type, 'getrefcount', array(
+          'debug' => 1,
+          'id' => $dao->entity_id
+        ));
+
+        $total = 0;
+        foreach ($getRefCount['values'] as $refCount) {
+          $total += $refCount['count'];
+        }
+
+        $doDelete = ($total == 0);
+        break;
+      default:
+        throw new \Exception('Unrecognized cleanup policy: ' . $policy);
+    }
 
     if ($doDelete) {
       $params = array(

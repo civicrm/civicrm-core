@@ -7,6 +7,16 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   /**
+   * @var \Civi\API\Kernel
+   */
+  protected $apiKernel;
+
+  /**
+   * @var \Civi\API\Provider\AdhocProvider
+   */
+  protected $adhocProvider;
+
+  /**
    * @var array(string $shortName => CRM_Core_Module $module)
    */
   protected $modules;
@@ -50,12 +60,17 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
         'is_reserved' => 1,
       ),
     );
+
+    $this->apiKernel = \Civi\Core\Container::singleton()->get('civi_api_kernel');
+    $this->adhocProvider = new \Civi\API\Provider\AdhocProvider(3, 'CustomSearch');
+    $this->apiKernel->registerApiProvider($this->adhocProvider);
   }
 
   function tearDown() {
     parent::tearDown();
     CRM_Core_DAO::singleValueQuery('DELETE FROM civicrm_managed');
     CRM_Core_DAO::singleValueQuery('DELETE FROM civicrm_option_value WHERE name like "CRM_Example_%"');
+    \Civi\Core\Container::singleton(TRUE);
   }
 
   /**
@@ -189,6 +204,60 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->assertEquals('CRM_Example_One_Foo', $foo2['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
     $this->assertEquals($foo['id'], $foo2['id']);
+  }
+
+  /**
+   * Set up an active module with one managed-entity using the
+   * policy "cleanup=>never". When the managed-entity goes away,
+   * ensure that the policy is followed (ie the entity is not
+   * deleted).
+   */
+  function testRemoveDeclaration_CleanupUnused() {
+    $decls = array();
+
+    // create first managed entity ('foo')
+    $decls[] = array_merge($this->fixtures['com.example.one-foo'], array(
+      'cleanup' => 'unused'
+    ));
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $foo = $me->get('com.example.one', 'foo');
+    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+
+    // Override 'getrefcount' ==> The refcount is 1
+    $this->adhocProvider->addAction('getrefcount', 'access CiviCRM', function($apiRequest) {
+      return civicrm_api3_create_success(array(
+        array(
+          'name' => 'mock',
+          'type' => 'mock',
+          'count' => 1,
+        )
+      ));
+    });
+
+    // Later on, entity definition disappears; but we decide not to do any cleanup (per policy)
+    $decls = array();
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $foo2 = $me->get('com.example.one', 'foo');
+    $this->assertEquals('CRM_Example_One_Foo', $foo2['name']);
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+    $this->assertEquals($foo['id'], $foo2['id']);
+
+
+    // Override 'getrefcount' ==> The refcount is 0
+    $this->adhocProvider->addAction('getrefcount', 'access CiviCRM', function($apiRequest) {
+      return civicrm_api3_create_success(array());
+    });
+
+    // The entity definition disappeared and there's no reference; we decide to cleanup (per policy)
+    $decls = array();
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $foo3 = $me->get('com.example.one', 'foo');
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+    $this->assertTrue($foo3 === NULL);
   }
 
   /**
