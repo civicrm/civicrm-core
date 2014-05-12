@@ -49,78 +49,77 @@
 
   CRM.$(function($) {
     buildContactRelationships{/literal}{$context}{literal}();
-  });
+    function buildContactRelationships{/literal}{$context}{literal}() {
+      var context = {/literal}"{$context}"{literal};
+      var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/contactrelationships" h=0 q="context=$context&cid=$contactId"}'{literal};
 
-  function buildContactRelationships{/literal}{$context}{literal}() {
-    var context = {/literal}"{$context}"{literal};
-    var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/contactrelationships" h=0 q="context=$context&cid=$contactId"}'{literal};
-
-    if (context == 'user') {
-      var ZeroRecordText = {/literal}'{ts escape="js"}There are no related contacts / organizations on record for you.{/ts}'{literal};
-    }
-    else if (context == 'past') {
-      var ZeroRecordText = {/literal}'{ts escape="js"}There are no past / disabled relationships for this contact.{/ts}'{literal};
-    }
-    else {
-      var ZeroRecordText = {/literal}'{ts escape="js"}There are no relationships entered for this contact.{/ts}'{literal};
-    }
-
-    {/literal}{$context}{literal}oTable = cj('.crm-contact-relationship-selector-' + context).dataTable({
-      "bFilter": false,
-      "bAutoWidth": false,
-      "aaSorting": [],
-      "aoColumns": [
-        {sClass: 'crm-contact-relationship-type'},
-        {sClass: 'crm-contact-relationship-contact_name'},
-        {sClass: 'crm-contact-relationship-start_date'},
-        {sClass: 'crm-contact-relationship-end_date'},
-        {sClass: 'crm-contact-relationship-city'},
-        {sClass: 'crm-contact-relationship-state'},
-        {sClass: 'crm-contact-relationship-email'},
-        {sClass: 'crm-contact-relationship-phone'},
-        {sClass: 'crm-contact-relationship-links', bSortable: false},
-        {sClass: 'hiddenElement', bSortable: false},
-        {sClass: 'hiddenElement', bSortable: false}
-      ],
-      "bProcessing": true,
-      "sPaginationType": "full_numbers",
-      "sDom": '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
-      "bServerSide": true,
-      "bJQueryUI": true,
-      "sAjaxSource": sourceUrl,
-      "iDisplayLength": 10,
-      "oLanguage": {
-        "sZeroRecords": ZeroRecordText,
-        "sProcessing": {/literal}"{ts escape='js'}Processing...{/ts}"{literal},
-        "sLengthMenu": {/literal}"{ts escape='js'}Show _MENU_ entries{/ts}"{literal},
-        "sInfo": {/literal}"{ts escape='js'}Showing _START_ to _END_ of _TOTAL_ entries{/ts}"{literal},
-        "sInfoEmpty": {/literal}"{ts escape='js'}Showing 0 to 0 of 0 entries{/ts}"{literal},
-        "sInfoFiltered": {/literal}"{ts escape='js'}(filtered from _MAX_ total entries){/ts}"{literal},
-        "sSearch": {/literal}"{ts escape='js'}Search:{/ts}"{literal},
-        "oPaginate": {
-          "sFirst": {/literal}"{ts escape='js'}First{/ts}"{literal},
-          "sPrevious": {/literal}"{ts escape='js'}Previous{/ts}"{literal},
-          "sNext": {/literal}"{ts escape='js'}Next{/ts}"{literal},
-          "sLast": {/literal}"{ts escape='js'}Last{/ts}"{literal}
-        }
-      },
-      "fnDrawCallback": function () {
-        {/literal}{if $context eq 'current'}{literal}
-        if (cj('#tab_rel').length) {
-          CRM.tabHeader.updateCount(cj('#tab_rel'), currentoTable.fnSettings().fnRecordsTotal());
-        }
-        {/literal}{/if}{literal}
-      },
-      "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-        cj(nRow).attr('id', 'relationship-'+ aData[9]);
-        if (aData[10] == 0) {
-          cj(nRow).addClass('crm-entity disabled');
-        }
-        else {
-          cj(nRow).addClass('crm-entity');
-        }
+      if (context == 'user') {
+        var ZeroRecordText = {/literal}'{ts escape="js"}There are no related contacts / organizations on record for you.{/ts}'{literal};
       }
-    });
-  }
+      else if (context == 'past') {
+        var ZeroRecordText = {/literal}'{ts escape="js"}There are no past / disabled relationships for this contact.{/ts}'{literal};
+      }
+      else {
+        var ZeroRecordText = {/literal}'{ts escape="js"}There are no relationships entered for this contact.{/ts}'{literal};
+      }
+
+      {/literal}{$context}{literal}oTable = $('table.crm-contact-relationship-selector-' + context).dataTable({
+        "bFilter": false,
+        "bAutoWidth": false,
+        "aaSorting": [],
+        "aoColumns": [
+          {sClass: 'crm-contact-relationship-type'},
+          {sClass: 'crm-contact-relationship-contact_name'},
+          {sClass: 'crm-contact-relationship-start_date'},
+          {sClass: 'crm-contact-relationship-end_date'},
+          {sClass: 'crm-contact-relationship-city'},
+          {sClass: 'crm-contact-relationship-state'},
+          {sClass: 'crm-contact-relationship-email'},
+          {sClass: 'crm-contact-relationship-phone'},
+          {sClass: 'crm-contact-relationship-links', bSortable: false},
+          {sClass: 'hiddenElement', bSortable: false},
+          {sClass: 'hiddenElement', bSortable: false}
+        ],
+        "bProcessing": true,
+        "sPaginationType": "full_numbers",
+        "sDom": '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
+        "bServerSide": true,
+        "bJQueryUI": true,
+        "sAjaxSource": sourceUrl,
+        "iDisplayLength": 10,
+        "oLanguage": {
+          "sZeroRecords": ZeroRecordText,
+          "sProcessing": {/literal}"{ts escape='js'}Processing...{/ts}"{literal},
+          "sLengthMenu": {/literal}"{ts escape='js'}Show _MENU_ entries{/ts}"{literal},
+          "sInfo": {/literal}"{ts escape='js'}Showing _START_ to _END_ of _TOTAL_ entries{/ts}"{literal},
+          "sInfoEmpty": {/literal}"{ts escape='js'}Showing 0 to 0 of 0 entries{/ts}"{literal},
+          "sInfoFiltered": {/literal}"{ts escape='js'}(filtered from _MAX_ total entries){/ts}"{literal},
+          "sSearch": {/literal}"{ts escape='js'}Search:{/ts}"{literal},
+          "oPaginate": {
+            "sFirst": {/literal}"{ts escape='js'}First{/ts}"{literal},
+            "sPrevious": {/literal}"{ts escape='js'}Previous{/ts}"{literal},
+            "sNext": {/literal}"{ts escape='js'}Next{/ts}"{literal},
+            "sLast": {/literal}"{ts escape='js'}Last{/ts}"{literal}
+          }
+        },
+        "fnDrawCallback": function () {
+          {/literal}{if $context eq 'current'}{literal}
+          if ($('#tab_rel').length) {
+            CRM.tabHeader.updateCount($('#tab_rel'), currentoTable.fnSettings().fnRecordsTotal());
+          }
+          {/literal}{/if}{literal}
+        },
+        "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+          $(nRow).attr('id', 'relationship-'+ aData[9]);
+          if (aData[10] == 0) {
+            $(nRow).addClass('crm-entity disabled');
+          }
+          else {
+            $(nRow).addClass('crm-entity');
+          }
+        }
+      });    
+    }
+  });
 </script>
 {/literal}
