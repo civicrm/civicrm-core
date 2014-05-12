@@ -497,7 +497,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Grant_DAO_Grant' => array(
         array(
           'fieldName' => 'status_id',
-          'sample' => 'Approved',
+          'sample' => 'Approved for Payment',
         ),
         array(
           'fieldName' => 'grant_type_id',
