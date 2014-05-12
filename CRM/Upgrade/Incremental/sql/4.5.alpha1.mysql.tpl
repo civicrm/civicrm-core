@@ -481,7 +481,7 @@ SELECT @grant_value := max(cast(value as UNSIGNED)) FROM civicrm_option_value WH
 SELECT @grant_weight := max(weight) FROM civicrm_option_value WHERE option_group_id = @option_grant_status;
 
 INSERT INTO civicrm_option_value(option_group_id, {localize field='label'}label{/localize}, name, value, weight)
-SELECT @option_grant_status, {localize}grantstatus{/localize}, grantstatus, @grant_value := @grant_value 1, @grant_weight := @grant_weight 1 FROM (
+SELECT @option_grant_status, {localize}grantstatus{/localize}, grantstatus, @grant_value := @grant_value + 1, @grant_weight := @grant_weight + 1 FROM (
 SELECT 'Submitted' AS grantstatus
     UNION ALL
 SELECT 'Approved for Payment' AS grantstatus
@@ -497,8 +497,23 @@ AND option_group_id = @option_grant_status
 WHERE co.id IS NULL;
 
 -- Fix trailing single quote in grant status label
-UPDATE civicrm_option_value v
+{if !$multilingual}
+  UPDATE civicrm_option_value v
 	INNER JOIN civicrm_option_group g
-	ON v.option_group_id=g.id AND g.name='grant_status'
-	SET label='Awaiting Information'
-	WHERE v.label='Awaiting Information\'' and v.name='Awaiting Information'; 
+	ON v.option_group_id = g.id AND g.name = 'grant_status'
+	SET label = 'Awaiting Information'
+	WHERE v.label = 'Awaiting Information\'' and v.name = 'Awaiting Information';
+{else}
+  UPDATE civicrm_option_value v
+    INNER JOIN civicrm_option_group g
+    ON v.option_group_id = g.id AND g.name = 'grant_status'
+    SET
+    {foreach from=$locales item=locale}
+      v.label_{$locale} = CASE 
+        WHEN v.label_{$locale} = 'Awaiting Information\'' THEN 'Awaiting Information'
+        ELSE v.label_{$locale}
+      END,
+    {/foreach}
+    v.name = v.name
+    WHERE v.name = 'Awaiting Information';
+{/if}
