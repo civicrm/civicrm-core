@@ -325,7 +325,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if (!empty($this->_fields) && !empty($this->_values['custom_pre_id'])) {
       $profileAddressFields = array();
       foreach ($this->_fields as $key => $value) {
-        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields, array('uf_group_id' => $this->_values['custom_pre_id']));      }
+        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields, array(
+          'uf_group_id' => $this->_values['custom_pre_id']
+        ));
+      }
       $this->set('profileAddressFields', $profileAddressFields);
     }
 
