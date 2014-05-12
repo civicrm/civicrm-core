@@ -293,7 +293,7 @@ UPDATE `civicrm_option_group` SET is_locked = 1 WHERE name IN ('contribution_sta
 ALTER TABLE `civicrm_msg_template` DROP FOREIGN KEY `FK_civicrm_msg_template_pdf_format_id`;
 
 -- CRM-14449
-CREATE TABLE `civicrm_system_log` (
+CREATE TABLE IF NOT EXISTS `civicrm_system_log` (
 `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key: ID.',
 `message` VARCHAR(128) NOT NULL COMMENT 'Standardized message',
 `context` LONGTEXT NULL COMMENT 'JSON encoded data',
