@@ -293,7 +293,7 @@ UPDATE `civicrm_option_group` SET is_locked = 1 WHERE name IN ('contribution_sta
 ALTER TABLE `civicrm_msg_template` DROP FOREIGN KEY `FK_civicrm_msg_template_pdf_format_id`;
 
 -- CRM-14449
-CREATE TABLE `civicrm_system_log` (
+CREATE TABLE IF NOT EXISTS `civicrm_system_log` (
 `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key: ID.',
 `message` VARCHAR(128) NOT NULL COMMENT 'Standardized message',
 `context` LONGTEXT NULL COMMENT 'JSON encoded data',
@@ -481,7 +481,7 @@ SELECT @grant_value := max(cast(value as UNSIGNED)) FROM civicrm_option_value WH
 SELECT @grant_weight := max(weight) FROM civicrm_option_value WHERE option_group_id = @option_grant_status;
 
 INSERT INTO civicrm_option_value(option_group_id, {localize field='label'}label{/localize}, name, value, weight)
-SELECT @option_grant_status, {localize}grantstatus{/localize}, grantstatus, @grant_value := @grant_value 1, @grant_weight := @grant_weight 1 FROM (
+SELECT @option_grant_status, {localize}grantstatus{/localize}, grantstatus, @grant_value := @grant_value+1, @grant_weight := @grant_weight+1 FROM (
 SELECT 'Submitted' AS grantstatus
     UNION ALL
 SELECT 'Approved for Payment' AS grantstatus
