@@ -517,3 +517,4 @@ WHERE co.id IS NULL;
     v.name = v.name
     WHERE v.name = 'Awaiting Information';
 {/if}
+
