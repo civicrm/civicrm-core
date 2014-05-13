@@ -1574,16 +1574,17 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $lineItems[$itemId]['line_total'] = $params['total_amount'];
           $lineItems[$itemId]['id'] = $itemId;
           $lineItem[$priceSetId] = $lineItems;
-          CRM_Price_BAO_LineItem::processPriceSet($params['contribution_id'], $lineItem);
+          $contributionBAO = new CRM_Contribute_BAO_Contribution();
+          $contributionBAO->id = $params['contribution_id'];
+          $contributionBAO->find();
+          CRM_Price_BAO_LineItem::processPriceSet($params['contribution_id'], $lineItem, $contributionBAO, 'civicrm_membership');
 
           //create new soft-credit record, CRM-13981
           $softParams['contribution_id'] = $params['contribution_id'];
-          $dao = new CRM_Contribute_DAO_Contribution();
-          $dao->id = $params['contribution_id'];
-          $dao->find();
-          while ($dao->fetch()) {
-            $softParams['currency'] = $dao->currency;
-            $softParams['amount'] = $dao->total_amount;
+
+          while ($contributionBAO->fetch()) {
+            $softParams['currency'] = $contributionBAO->currency;
+            $softParams['amount'] = $contributionBAO->total_amount;
           }
           CRM_Contribute_BAO_ContributionSoft::add($softParams);
         }
