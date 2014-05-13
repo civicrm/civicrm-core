@@ -332,6 +332,13 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $versionCheck = TRUE;
 
   /**
+   * Whether public pages should display "empowered by CiviCRM"
+   *
+   * @var boolean
+   */
+  public $empoweredBy = TRUE;
+
+  /**
    * Array of enabled add-on components (e.g. CiviContribute, CiviMail...)
    *
    * @var array
