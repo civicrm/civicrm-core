@@ -53,6 +53,7 @@
 </p>
 <p>
   {ts}If your organization has modified the default versions of System Workflow message templates, then the changes and bug fixes included in an upgrade will need to be merged with your modified versions.{/ts} {$upgradeTemplatesDocLink}
+</p>
 {/htxt}
 
 {htxt id="id-view_system_default-title"}
