@@ -284,7 +284,7 @@ INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1085
 
 -- CRM-14445
 ALTER TABLE `civicrm_option_group`
-	ADD COLUMN `is_locked` int(1) DEFAULT 0 COMMENT 'A lock to remove the ability to add new options via the UI';
+    ADD COLUMN `is_locked` int(1) DEFAULT 0 COMMENT 'A lock to remove the ability to add new options via the UI';
 
 UPDATE `civicrm_option_group` SET is_locked = 1 WHERE name IN ('contribution_status','activity_contacts','advanced_search_options','auto_renew_options','contact_autocomplete_options','batch_status','batch_type','batch_mode','contact_edit_options','contact_reference_options','contact_smart_group_display','contact_view_options','financial_item_status','mapping_type','pcp_status','user_dashboard_options','tag_used_for');
 
@@ -438,11 +438,11 @@ WHERE civicrm_navigation.url LIKE "%&%" AND civicrm_navigation.url NOT LIKE "%?%
 -- CRM-14639
 
 SELECT @option_grant_status := id  FROM civicrm_option_group WHERE name = 'grant_status';
-UPDATE civicrm_option_value 
+UPDATE civicrm_option_value
 SET
 {if !$multilingual}
-  label = 
-    CASE 
+  label =
+    CASE
       WHEN lower(name) = 'granted'
       THEN 'Paid'
       WHEN lower(name) = 'approved'
@@ -450,23 +450,23 @@ SET
       WHEN lower(name) = 'rejected'
       THEN 'Ineligible'
       ELSE 'Submitted'
-    END,  
+    END,
 {else}
   {foreach from=$locales item=locale}
-    label_{$locale} = 
-      CASE 
+    label_{$locale} =
+      CASE
         WHEN lower(name) = 'granted'
-      	THEN 'Paid'
-      	WHEN lower(name) = 'approved'
-      	THEN 'Eligible'
-      	WHEN lower(name) = 'rejected'
-      	THEN 'Ineligible'
-      	ELSE 'Submitted'
+          THEN 'Paid'
+          WHEN lower(name) = 'approved'
+          THEN 'Eligible'
+          WHEN lower(name) = 'rejected'
+          THEN 'Ineligible'
+          ELSE 'Submitted'
       END,
   {/foreach}
 {/if}
-name = 
-CASE 
+name =
+CASE
   WHEN lower(name) = 'granted'
    THEN 'Paid'
   WHEN lower(name) = 'approved'
@@ -499,17 +499,17 @@ WHERE co.id IS NULL;
 -- Fix trailing single quote in grant status label
 {if !$multilingual}
   UPDATE civicrm_option_value v
-	INNER JOIN civicrm_option_group g
-	ON v.option_group_id = g.id AND g.name = 'grant_status'
-	SET label = 'Awaiting Information'
-	WHERE v.label = 'Awaiting Information\'' and v.name = 'Awaiting Information';
+    INNER JOIN civicrm_option_group g
+    ON v.option_group_id = g.id AND g.name = 'grant_status'
+    SET label = 'Awaiting Information'
+    WHERE v.label = 'Awaiting Information\'' and v.name = 'Awaiting Information';
 {else}
   UPDATE civicrm_option_value v
     INNER JOIN civicrm_option_group g
     ON v.option_group_id = g.id AND g.name = 'grant_status'
     SET
     {foreach from=$locales item=locale}
-      v.label_{$locale} = CASE 
+      v.label_{$locale} = CASE
         WHEN v.label_{$locale} = 'Awaiting Information\'' THEN 'Awaiting Information'
         ELSE v.label_{$locale}
       END,
@@ -517,3 +517,4 @@ WHERE co.id IS NULL;
     v.name = v.name
     WHERE v.name = 'Awaiting Information';
 {/if}
+
