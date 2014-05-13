@@ -495,6 +495,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     $this->select();
     $this->where();
     $this->from();
+    $this->customDataFrom();
     $this->groupBy();
 
     $rows = array();
