@@ -48,7 +48,7 @@ class CRM_Utils_Check_Env {
 
   public function checkMysqlTime() {
     $messages = array();
-    return;
+    return $messages;
 
     $phpNow = date('Y-m-d H:i');
     $sqlNow = CRM_Core_DAO::singleValueQuery("SELECT date_format(now(), '%Y-%m-%d %H:%i')");
