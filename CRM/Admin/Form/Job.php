@@ -116,7 +116,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
     /** @var \Civi\API\Kernel $apiKernel */
     $apiKernel = \Civi\Core\Container::singleton()->get('civi_api_kernel');
-    $apiRequest = $apiKernel->createRequest($fields['api_entity'], $fields['api_action'], array('version' => 3), NULL);
+    $apiRequest = \Civi\API\Request::create($fields['api_entity'], $fields['api_action'], array('version' => 3), NULL);
     try {
       $apiKernel->resolve($apiRequest);
     } catch (\Civi\API\Exception\NotImplementedException $e) {
