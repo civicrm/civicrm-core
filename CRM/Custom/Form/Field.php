@@ -1000,7 +1000,7 @@ SELECT id
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
-      $msg += '<p>' . ts("Ready to add another.") . '</p>';
+      $msg .= '<p>' . ts("Ready to add another.") . '</p>';
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field/add',
           'reset=1&action=add&gid=' . $this->_gid
         ));
