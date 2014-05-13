@@ -59,7 +59,7 @@ class CRM_Utils_Address_BatchUpdate {
     // do check for geocoding.
     $processGeocode = FALSE;
     if (empty($config->geocodeMethod)) {
-      if ($this->geocoding == 'true') {
+      if (CRM_Utils_String::strtobool($this->geocoding) === TRUE) {
         $this->returnMessages[] = ts('Error: You need to set a mapping provider under Administer > System Settings > Mapping and Geocoding');
         $this->returnError = 1;
         $this->returnResult();
@@ -68,7 +68,7 @@ class CRM_Utils_Address_BatchUpdate {
     else {
       $processGeocode = TRUE;
       // user might want to over-ride.
-      if ($this->geocoding == 'false') {
+      if (CRM_Utils_String::strtobool($this->geocoding) === FALSE) {
         $processGeocode = FALSE;
       }
     }
@@ -83,7 +83,7 @@ class CRM_Utils_Address_BatchUpdate {
     );
     $parseStreetAddress = FALSE;
     if (!$parseAddress) {
-      if ($this->parse == 'true') {
+      if (CRM_Utils_String::strtobool($this->parse) === TRUE) {
         $this->returnMessages[] = ts('Error: You need to enable Street Address Parsing under Administer > Localization > Address Settings.');
         $this->returnError = 1;
         return $this->returnResult();
@@ -92,7 +92,7 @@ class CRM_Utils_Address_BatchUpdate {
     else {
       $parseStreetAddress = TRUE;
       // user might want to over-ride.
-      if ($this->parse == 'false') {
+      if (CRM_Utils_String::strtobool($this->parse) === FALSE) {
         $parseStreetAddress = FALSE;
       }
     }
