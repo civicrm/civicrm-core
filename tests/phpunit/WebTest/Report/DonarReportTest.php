@@ -75,7 +75,7 @@ class WebTest_Report_DonarReportTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=div#Contribute > table.report-layout', $reportName);
 
     // Visit report
-    $this->click("link=$reportName");
+    $this->click("xpath=//div[@id='Contribute']//table/tbody//tr/td/a/strong[text() = '$reportName']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //now select the criteria

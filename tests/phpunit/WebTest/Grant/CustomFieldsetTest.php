@@ -83,7 +83,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $firstName = 'First' . $rand;
     $lastName = 'Last' . $rand;
     $this->webtestNewDialogContact($firstName, $lastName);
-    $this->select('id=status_id', 'label=Approved');
+    $this->select('id=status_id', 'label=Approved for Payment');
     $this->select('id=grant_type_id', "label=$grantType");
     $this->waitForTextPresent($grantField);
     $this->assertElementContainsText("xpath=//div[@id='customData']/div[@class='custom-group custom-group-$grantFieldSet crm-accordion-wrapper ']", $grantField);
