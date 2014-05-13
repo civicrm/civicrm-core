@@ -75,6 +75,30 @@ class CRM_Upgrade_Incremental_php_FourFive {
 
     $this->addTask(ts('Set default for Individual name fields configuration'), 'addNameFieldOptions');
 
+    // CRM-14522 - The below schema checking is done as foreign key name
+    // for pdf_format_id column varies for different databases
+    // if DB is been into upgrade for 3.4.2 version, it would have pdf_format_id name for FK
+    // else FK_civicrm_msg_template_pdf_format_id
+    $config = CRM_Core_Config::singleton();
+    $dbUf = DB::parseDSN($config->dsn);
+    $query = "
+SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+WHERE TABLE_NAME = 'civicrm_msg_template'
+AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+AND TABLE_SCHEMA = %1
+";
+    $params = array(1 => array($dbUf['database'], 'String'));
+    $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
+    if ($dao->fetch()) {
+      if ($dao->CONSTRAINT_NAME == 'FK_civicrm_msg_template_pdf_format_id' ||
+        $dao->CONSTRAINT_NAME == 'pdf_format_id') {
+        $sqlDropFK = "ALTER TABLE `civicrm_msg_template`
+DROP FOREIGN KEY `{$dao->CONSTRAINT_NAME}`,
+DROP KEY `{$dao->CONSTRAINT_NAME}`";
+        CRM_Core_DAO::executeQuery($sqlDropFK, CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
+      }
+    }
+
     return TRUE;
   }
 

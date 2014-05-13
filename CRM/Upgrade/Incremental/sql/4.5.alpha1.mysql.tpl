@@ -288,10 +288,6 @@ ALTER TABLE `civicrm_option_group`
 
 UPDATE `civicrm_option_group` SET is_locked = 1 WHERE name IN ('contribution_status','activity_contacts','advanced_search_options','auto_renew_options','contact_autocomplete_options','batch_status','batch_type','batch_mode','contact_edit_options','contact_reference_options','contact_smart_group_display','contact_view_options','financial_item_status','mapping_type','pcp_status','user_dashboard_options','tag_used_for');
 
-
--- CRM-14522
-ALTER TABLE `civicrm_msg_template` DROP FOREIGN KEY `FK_civicrm_msg_template_pdf_format_id`;
-
 -- CRM-14449
 CREATE TABLE IF NOT EXISTS `civicrm_system_log` (
 `id` INT(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key: ID.',
