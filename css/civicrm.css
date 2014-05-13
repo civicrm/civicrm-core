@@ -705,6 +705,19 @@ input.crm-form-entityref {
   text-align: center;
 }
 
+.crm-container #civicrm-footer.crm-public-footer {
+  vertical-align: middle;
+  text-align: right;
+  font-size: 16px;
+  padding: 0.8em 0;
+}
+
+.crm-container img.empowered-by-logo {
+  vertical-align: baseline;
+  position: relative;
+  top: 9px;
+}
+
 #crm-record-log {
   padding: 0.8em 0.8em 0em 0em;
   text-align: right;
@@ -3349,13 +3362,13 @@ div#crm-container form {
 
 /* For the Conditional-CSS grading rows */
 /*
- 	Colour calculations (based off the main row colours)
+  Colour calculations (based off the main row colours)
   Level 1:
-		dd > c4
-		ee > d5
-	Level 2:
-	  dd > d1
-	  ee > e2
+    dd > c4
+    ee > d5
+  Level 2:
+    dd > d1
+    ee > e2
  */
 .crm-container tr.odd.gradeA td.sorting_1 {
   background-color: #c4ffc4;

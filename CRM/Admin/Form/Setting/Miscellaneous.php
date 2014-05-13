@@ -44,6 +44,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'contact_undelete' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'versionAlert' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'versionCheck' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'empoweredBy' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'maxFileSize' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'doNotAttachPDFReceipt' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'secondDegRelPermissions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
