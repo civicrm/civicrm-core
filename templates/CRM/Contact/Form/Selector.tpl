@@ -172,6 +172,9 @@ function countSelections(obj) {
       label.prepend('<span>' + obj.getCount + '</span> ');
     }
     else {
+      if(obj.getCount > 0) {
+        cj('input[name=radio_ts][value=ts_sel]').prop('checked', true);
+      }
       cj('span', label).html(obj.getCount);
     }
     toggleTaskAction(obj.getCount);
@@ -180,7 +183,7 @@ function countSelections(obj) {
 function toggleContactSelection(name, qfKey, selection) {
   var url = CRM.url('civicrm/ajax/markSelection');
   var params = {qfKey: qfKey};
-  if (!(cj('#' + name).is(':checked'))) {
+  if( cj('#' + name + ":checked").length == 0) {
     params.action = 'unselect';
     params.state = 'unchecked';
   }
