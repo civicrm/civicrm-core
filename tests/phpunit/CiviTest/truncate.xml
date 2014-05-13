@@ -89,10 +89,6 @@
 
   <civicrm_dedupe_exception />
 
-  <civicrm_case />
-
-  <civicrm_case_contact />
-
   <civicrm_case_type />
 
   <civicrm_grant />
@@ -171,8 +167,6 @@
 
   <civicrm_group_organization />
 
-  <civicrm_relationship />
-
   <civicrm_mailing />
 
   <civicrm_mailing_group />
@@ -219,11 +213,9 @@
 
   <civicrm_membership_block />
 
-  <civicrm_activity />
+  <civicrm_case />
 
-  <civicrm_activity_contact />
-
-  <civicrm_case_activity />
+  <civicrm_case_contact />
 
   <civicrm_pledge />
 
@@ -253,6 +245,8 @@
 
   <civicrm_dashboard_contact />
 
+  <civicrm_relationship />
+
   <civicrm_contribution_recur />
 
   <civicrm_financial_trxn />
@@ -260,6 +254,12 @@
   <civicrm_membership />
 
   <civicrm_membership_log />
+
+  <civicrm_activity />
+
+  <civicrm_activity_contact />
+
+  <civicrm_case_activity />
 
   <civicrm_price_field />
 
