@@ -68,4 +68,10 @@
     <comment>Ordering of the case types</comment>
     <add>4.5</add>
   </field>
+  <field>
+    <name>xml_definition</name>
+    <type>blob</type>
+    <comment>xml definition of case type</comment>
+    <add>4.5</add>
+  </field>
 </table>
