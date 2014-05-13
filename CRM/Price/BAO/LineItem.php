@@ -311,6 +311,10 @@ AND li.entity_id = {$entityId}
       foreach ($values as $line) {
         $line['entity_table'] = $entityTable;
         $line['entity_id'] = $entityId;
+        if(!empty($line['membership_type_id'])) {
+          $entityTable == 'civicrm_membership';
+          $line['contribution_id'] = $contributionDetails->id;
+        }
         if ($entityTable == 'civicrm_contribution') {
           $line['contribution_id'] = $entityId;
         }

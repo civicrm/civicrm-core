@@ -2561,6 +2561,12 @@ WHERE  contribution_id = %1 ";
       $entityTable = 'civicrm_participant';
       $additionalParticipantId = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
     }
+    elseif (!empty($params['membership_id'])) {
+      //so far $params['membership_id'] should only be set coming in from membershipBAO::create so the situation where multiple memberships
+      // are created off one contribution should be handled elsewhere
+      $entityId = $params['membership_id'];
+      $entityTable = 'civicrm_membership';
+    }
     else {
       $entityId = $params['contribution']->id;
       $entityTable = 'civicrm_contribution';
