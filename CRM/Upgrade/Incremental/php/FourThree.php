@@ -367,7 +367,7 @@ ADD CONSTRAINT `FK_civicrm_financial_item_contact_id` FOREIGN KEY (`contact_id`)
 
   function upgrade_4_3_6($rev) {
     //CRM-13094
-    $this->addTask(ts('Add missing contraints'), 'addMissingConstraints', $rev);
+    $this->addTask(ts('Add missing constraints'), 'addMissingConstraints', $rev);
     //CRM-13088
     $this->addTask('Add ON DELETE Options for constraints', 'task_4_3_x_checkConstraints', $rev);
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.6')), 'task_4_3_x_runSql', $rev);
