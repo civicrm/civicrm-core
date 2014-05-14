@@ -196,7 +196,7 @@ class CRM_Contribute_Form_SoftCredit {
    * @param $errors
    * @param $self
    *
-   * @return true if no errors, else array of errors
+   * @return array of errors
    * @access public
    * @static
    */

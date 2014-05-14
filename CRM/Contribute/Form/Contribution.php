@@ -39,7 +39,7 @@
  */
 class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditPayment {
   /**
-   * the id of the contribution that we are proceessing
+   * the id of the contribution that we are processing
    *
    * @var int
    * @public
@@ -47,7 +47,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_id;
 
   /**
-   * the id of the premium that we are proceessing
+   * the id of the premium that we are processing
    *
    * @var int
    * @public
@@ -151,10 +151,23 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @var array
    */
   public $_fromEmails;
+
+  /**
+   * ID of from email
+   * @var integer
+   */
+  public $fromEmailId;
   /*
    * Store the line items if price set used.
    */
   public $_lineItems;
+
+  /**
+   * line item
+   * @todo explain why we use lineItem & lineItems
+   * @var array
+   */
+  public $_lineItem;
 
   /**
    * @var array soft credit info
@@ -190,6 +203,19 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_priceSet;
 
   /**
+   * form defaults
+   * @todo can we define this a as protected? can we define higher up the chain
+   * @var array
+   */
+  public $_defaults;
+
+  /**
+   * User display name
+   *
+   * @var string
+   */
+  public $userDisplayName;
+  /**
    * Function to set variables up before form is built
    *
    * @return void
@@ -210,8 +236,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       CRM_Custom_Form_CustomData::preProcess($this);
       return;
     }
-
-    $config = CRM_Core_Config::singleton();
 
     $this->_formType = CRM_Utils_Array::value('formType', $_GET);
 
@@ -272,7 +296,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return;
     }
 
-    if (in_array('CiviPledge', $config->enableComponents) && !$this->_formType) {
+    if (in_array('CiviPledge', CRM_Core_Config::singleton()->enableComponents) && !$this->_formType) {
       $this->preProcessPledge();
     }
 
@@ -339,7 +363,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['option_type'] = 1;
     }
 
-    $fields = array();
     if ($this->_action & CRM_Core_Action::DELETE) {
       return $defaults;
     }
@@ -655,7 +678,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       TRUE,
       array('onChange' => "CRM.buildCustomData( 'Contribution', this.value );")
     );
-
+    $paymentInstrument = FALSE;
     if (!$this->_mode) {
       $paymentInstrument = $this->add('select', 'payment_instrument_id',
         ts('Paid By'),
@@ -973,7 +996,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public function postProcess() {
     $session = CRM_Core_Session::singleton();
-    $sendReceipt = FALSE;
+    $sendReceipt = $pId = $contribution  = FALSE;
+    $softParams = $softIDs =array();
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Contribute_BAO_Contribution::deleteContribution($this->_id);
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
@@ -1056,9 +1081,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $isQuickConfig = 1;
     }
-    //CRM-11529 for quick config backoffice transactions
+    //CRM-11529 for quick config back office transactions
     //when financial_type_id is passed in form, update the
-    //lineitems with the financial type selected in form
+    //line items with the financial type selected in form
     if ($isQuickConfig && !empty($submittedValues['financial_type_id']) && CRM_Utils_Array::value($this->_priceSetId, $lineItem)
     ) {
       foreach ($lineItem[$this->_priceSetId] as &$values) {
@@ -1091,7 +1116,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     else {
       //build soft credit params
-      $softParams = $softIDs =array();
       foreach ($submittedValues['soft_credit_contact_id'] as $key => $val) {
         if ($val && $submittedValues['soft_credit_amount'][$key]) {
           $softParams[$key]['contact_id'] = $val;
@@ -1113,7 +1137,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     //Credit Card Contribution.
     if ($this->_mode) {
-      $this->processCreditCard($submittedValues, $config, $session, $pId, $lineItem);
+      $this->processCreditCard($submittedValues, $config, $session, $lineItem);
     }
     else {
       //Offline Contribution.
@@ -1200,13 +1224,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
 
       // CRM-11956
-      // if non_deductible_amount exists i.e. Additional Details fieldset was opened [and staff typed something] -> keep it.
-      if (isset($params['non_deductible_amount']) && (!empty($params['non_deductible_amount']))) {
-        $params['non_deductible_amount'] = $params['non_deductible_amount'];
-      }
+      // if non_deductible_amount exists i.e. Additional Details field set was opened [and staff typed something] -
       // if non_deductible_amount does NOT exist - then calculate it depending on:
       // $ContributionType->is_deductible and whether there is a product (premium).
-      else {
+      if (!isset($params['non_deductible_amount']) || (!empty($params['non_deductible_amount']))) {
         $contributionType = new CRM_Financial_DAO_FinancialType();
         $contributionType->id = $params['financial_type_id'];
         if (!$contributionType->find(TRUE)) {
@@ -1376,7 +1397,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
   }
 
-  public function processCreditCard($submittedValues, $config, $session, $pId, $lineItem) {
+  /**
+   * @param $submittedValues
+   * @param $config
+   * @param $session CRM_Core_Session
+   * @param $lineItem
+   *
+   * @throws CRM_Core_Exception
+   */
+  public function processCreditCard($submittedValues, $config, $session, $lineItem) {
+    $sendReceipt = $contribution = FALSE;
     $unsetParams = array(
       'trxn_id',
       'payment_instrument_id',
@@ -1422,7 +1452,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $params['email-Primary'] = $this->userEmail;
 
     // now set the values for the billing location.
-    foreach ($this->_fields as $name => $dontCare) {
+    foreach (array_keys($this->_fields) as $name) {
       $fields[$name] = 1;
     }
 
@@ -1544,7 +1574,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if ($paymentParams['amount'] > 0.0) {
-      // force a reget of the payment processor in case the form changed it, CRM-7179
+      // force a re-get of the payment processor in case the form changed it, CRM-7179
       $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this, TRUE);
       $result = $payment->doDirectPayment($paymentParams);
     }
