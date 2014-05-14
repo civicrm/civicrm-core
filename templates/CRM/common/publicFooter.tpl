@@ -25,8 +25,8 @@
 *}
 
 {if $config->empoweredBy}
-{capture assign=civilogo}<a href="http://civicrm.org/" title="{ts}CiviCRM.org - Growing and Sustaining Relationships{/ts}" target="_blank" class="empowered-by-link"><div class="empowered-by-logo"><span>CiviCRM</span></div></a>{/capture}
-<div class="crm-public-footer" id="civicrm-footer">
-{ts 1=$civilogo}empowered by %1{/ts}
-</div>
+  {capture assign=civilogo}<a href="http://civicrm.org/" title="{ts}CiviCRM.org - Growing and Sustaining Relationships{/ts}" target="_blank" class="empowered-by-link"><div class="empowered-by-logo"><span>CiviCRM</span></div></a>{/capture}
+  <div class="crm-public-footer" id="civicrm-footer">
+    {ts 1=$civilogo}empowered by %1{/ts}
+  </div>
 {/if}
