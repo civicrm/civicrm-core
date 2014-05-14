@@ -123,7 +123,7 @@ class WebTest_Report_AddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=table.report-layout', $reportName);
 
     // Visit report
-    $this->click("link=$reportName");
+    $this->click("xpath=//div[@id='Contact']//table/tbody//tr/td/a/strong[text() = '$reportName']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
    // Is filter statistics present?
