@@ -47,9 +47,10 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
     $errorScope = CRM_Core_TemporaryErrorScope::useException();
     // look up function, file, is_generic
     $apiRequest += _civicrm_api_resolve($apiRequest);
-    if (strtolower($action) == 'create' || strtolower($action) == 'delete' || strtolower($action) == 'submit') {
-      $apiRequest['is_transactional'] = 1;
-      $transaction = new CRM_Core_Transaction();
+    if ((strtolower($action) == 'create' || strtolower($action) == 'delete' || strtolower($action) == 'submit')
+      && (!isset($params['is_transactional']) || $params['is_transactional'])) {
+        $apiRequest['is_transactional'] = 1;
+        $transaction = new CRM_Core_Transaction();
     }
 
     // support multi-lingual requests
