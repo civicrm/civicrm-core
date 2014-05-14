@@ -808,7 +808,11 @@ SELECT  id
     $billing_id = CRM_Core_BAO_LocationType::getBilling();
     list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
 
-    $profileFields = civicrm_api3('uf_field', 'get', array_merge($profileFilter, array('is_active' => 1, 'return' => 'field_name')));
+    $profileFields = civicrm_api3('uf_field', 'get', array_merge($profileFilter,
+      array('is_active' => 1, 'return' => 'field_name', 'options' => array(
+        'limit' => 0,
+      ))
+    ));
     //check for valid fields ( fields that are present in billing block )
     $validBillingFields = array(
       'first_name',
