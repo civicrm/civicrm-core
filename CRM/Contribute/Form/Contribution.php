@@ -137,8 +137,20 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   public $_context;
 
+  /**
+   * Parameter with confusing name
+   * @todo what is it?
+   * @var string
+   */
+  public $_compContext;
+
   public $_compId;
 
+  /**
+   * Possible From email addresses
+   * @var array
+   */
+  public $_fromEmails;
   /*
    * Store the line items if price set used.
    */
@@ -465,6 +477,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       CRM_Custom_Form_CustomData::buildQuickForm($this);
       return;
     }
+    $allPanes = array();
 
     // build price set form.
     $buildPriceSet = FALSE;
@@ -983,7 +996,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // process price set and get total amount and line items.
     $lineItem = array();
-    $priceSetId = $pId = NULL;
     $priceSetId = CRM_Utils_Array::value('price_set_id', $submittedValues);
     if (empty($priceSetId) && !$this->_id) {
       $this->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
@@ -1383,7 +1395,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_lineItem = $lineItem;
     }
 
-    //Get the rquire fields value only.
+    //Get the require fields value only.
     $params = $this->_params = $submittedValues;
 
     $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_params['payment_processor_id'],
@@ -1442,7 +1454,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $ctype
     );
 
-    // add all the additioanl payment params we need
+    // add all the additional payment params we need
     $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
     $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
 
