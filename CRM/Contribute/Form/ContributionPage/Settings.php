@@ -115,20 +115,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   }
 
   /**
-   * Configuration of Required Entities for On Behalf Of Profiles
-   **/
-  public static function getOnBehalfOfRequiredEntities() {
-    return array('Contact', 'Organization');
-  }
-
-  /**
-   * Configuration of optional Entities for On Behalf Of Profiles
-   **/
-  public static function getOnBehalfOfOptionalEntities() {
-    return array('Contribution', 'Membership');
-  }
-
-  /**
    * Function to actually build the form
    *
    * @return void
@@ -152,20 +138,22 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     $this->addWysiwyg('footer_text', ts('Footer Message'), $attributes['footer_text']);
 
+    //Register schema which will be used for OnBehalOf and HonorOf profile Selector
+    CRM_UF_Page_ProfileEditor::registerSchemas(array('OrganizationModel', 'HouseholdModel'));
+
     // is on behalf of an organization ?
     $this->addElement('checkbox', 'is_organization', ts('Allow individuals to contribute and / or signup for membership on behalf of an organization?'), NULL, array('onclick' => "showHideByValue('is_organization',true,'for_org_text','table-row','radio',false);showHideByValue('is_organization',true,'for_org_option','table-row','radio',false);"));
 
-   $required = self::getOnBehalfOfRequiredEntities();
-   $optional = self::getOnBehalfOfOptionalEntities();
-   $profile_entities = array();
-   foreach (array_merge($required, $optional) as $entity) {
-       if ($entity = 'Contact') continue;
-       // as needed for CRM_UF_Page::getSchema():
-       $profile_entities[] = array('entity_name' => strtolower($entity).'_entity', 'entity_type' => $entity.'Model');
-   }
+    $allowCoreTypes = array_merge(array('Contact', 'Organization'), CRM_Contact_BAO_ContactType::subTypes('Organization'));
+    $allowSubTypes = array();
+    $entities = array(
+      array(
+        'entity_name' => 'contact_1',
+        'entity_type' => 'OrganizationModel',
+      ),
+    );
 
-   $this->addProfileSelector('onbehalf_profile_id', ts('Organization Profile'),
-        array_merge($required, $optional), array(), $profile_entities);
+    $this->addProfileSelector('onbehalf_profile_id', ts('Organization Profile'), $allowCoreTypes, $allowSubTypes, $entities);
 
     $options   = array();
     $options[] = $this->createElement('radio', NULL, NULL, ts('Optional'), 1);
@@ -212,7 +200,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $allowSubTypes = array();
 
     $this->addProfileSelector('honoree_profile', ts('Honoree Profile'), $allowCoreTypes, $allowSubTypes, $entities);
-    CRM_UF_Page_ProfileEditor::registerSchemas(array('OrganizationModel','HouseholdModel'));
 
     if (!empty($this->_submitValues['honor_block_is_active'])) {
       $this->addRule('soft_credit_types', ts('At least one value must be selected if Honor Section is active'), 'required');
@@ -252,13 +239,10 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     if (!empty($values['is_organization'])) {
       if (empty($values['onbehalf_profile_id']) ) {
         $errors['onbehalf_profile_id'] = ts('Please select a profile to collect organization information on this contribution page.');
-      } else {
-        $required = self::getOnBehalfOfRequiredEntities();
-        $optional = self::getOnBehalfOfOptionalEntities();
-        $id = $values['onbehalf_profile_id'];
+      }
+      else {
         $requiredProfileFields = array('organization_name', 'email');
-        if (! CRM_Core_BAO_UFField::checkValidProfileType($id, $required, $optional)
-             && ! CRM_Core_BAO_UFGroup::checkValidProfile($id, $requiredProfileFields) ) {
+        if (!CRM_Core_BAO_UFGroup::checkValidProfile($values['onbehalf_profile_id'], $requiredProfileFields)) {
           $errors['onbehalf_profile_id'] = ts('Profile does not contain the minimum required fields for an On Behalf Of Organization');
         }
       }
