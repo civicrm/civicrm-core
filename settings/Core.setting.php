@@ -702,6 +702,8 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'empoweredBy',
+    'prefetch' => 1,
+    'config_only'=> 0,
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
