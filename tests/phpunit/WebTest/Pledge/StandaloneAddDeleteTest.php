@@ -115,8 +115,8 @@ class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
     $this->click("xpath=//form[@id='ContributionView']//div[2]/div/div/a[2]/span[text()='Delete']");
     $this->waitForElementPresent("xpath=//form[@id='Contribution']/div[2]/div[2]/span/input[@value='Delete']");
     $this->click("xpath=//form[@id='Contribution']/div[2]/div[2]/span/input[@value='Delete']");
-    $this->waitForElementPresent("ui-id-24");
-    $this->click("ui-id-24");
+    $this->waitForElementPresent("xpath=//li[@id='tab_pledge']/a");
+    $this->click("xpath=//li[@id='tab_pledge']/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]");
