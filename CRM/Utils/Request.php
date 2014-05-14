@@ -57,7 +57,7 @@ class CRM_Utils_Request {
   /**
    * Retrieve a value from the request (GET/POST/REQUEST)
    *
-   * @param $name    name of the variable to be retrieved
+   * @param $name string   name of the variable to be retrieved
    * @param $type    type of the variable (see CRM_Utils_Type for details)
    * @param $store   session scope where variable is stored
    * @param bool|\is $abort is this variable required
