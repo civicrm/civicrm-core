@@ -322,7 +322,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     // Set $newCredit variable in template to control whether link to credit card mode is included
-    CRM_Core_Payment::allowBackofficeCreditCard($this);
+    $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
 
     // fix the display of the monetary value, CRM-4038
     if (isset($defaults['total_amount'])) {
