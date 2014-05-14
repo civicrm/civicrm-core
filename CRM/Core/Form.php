@@ -118,6 +118,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public $urlPath = array();
 
   /**
+   * @var CRM_Core_Controller
+   */
+  public $controller;
+
+  /**
    * constants for attributes for various form elements
    * attempt to standardize on the number of variations that we
    * use of the below form elements
