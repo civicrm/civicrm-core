@@ -66,6 +66,10 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    * @public
    */
   public $_premiumID = NULL;
+
+  /**
+   * @var CRM_Contribute_DAO_ContributionProduct
+   */
   public $_productDAO = NULL;
 
   /**
@@ -213,6 +217,10 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
     CRM_Custom_Form_CustomData::setDefaultValues($this);
   }
 
+  /**
+   * @param $id
+   * @todo - this function is a long way, non standard of saying $dao = new CRM_Contribute_DAO_ContributionProduct(); $dao->id = $id; $dao->find();
+   */
   public function assignPremiumProduct($id) { //to get Premium id
     $sql = "
 SELECT *

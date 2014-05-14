@@ -231,8 +231,10 @@ abstract class CRM_Core_Payment {
    * Load requested payment processor and call that processor's handle<$method> method
    *
    * @public
+   * @param $method
+   * @param array $params
    */
-  static function handlePaymentMethod($method, $params = array( )) {
+  static function handlePaymentMethod($method, $params = array()) {
     if (!isset($params['processor_id']) && !isset($params['processor_name'])) {
       CRM_Core_Error::fatal("Either 'processor_id' or 'processor_name' param is required for payment callback");
     }

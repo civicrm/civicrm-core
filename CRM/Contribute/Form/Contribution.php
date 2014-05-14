@@ -53,6 +53,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @public
    */
   public $_premiumID = NULL;
+
+  /**
+   * @var CRM_Contribute_DAO_ContributionProduct
+   */
   public $_productDAO = NULL;
 
   /**
@@ -105,6 +109,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_options;
 
   /**
+   * Storage of parameters from form
+   *
+   * @var array
+   * @public
+   */
+  public $_params;
+
+  /**
    * Store the contribution Type ID
    *
    * @var array
@@ -140,6 +152,25 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   protected $_formType;
   protected $_cdType;
   public $_honoreeProfileType;
+
+  /**
+   * logged in user's email
+   * @var string
+   */
+  public $userEmail;
+
+  /**
+   * Price set ID
+   * @var integer
+   */
+  public $_priceSetId;
+
+
+  /**
+   * Price set as an array
+   * @var array
+   */
+  public $_priceSet;
 
   /**
    * Function to set variables up before form is built
@@ -924,6 +955,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public function postProcess() {
     $session = CRM_Core_Session::singleton();
+    $sendReceipt = FALSE;
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Contribute_BAO_Contribution::deleteContribution($this->_id);
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
@@ -991,9 +1023,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $lineItems[$id]['id'] = $id;
       }
       $itemId = key($lineItems);
-      $fieldType = NULL;
       if ($itemId && !empty($lineItems[$itemId]['price_field_id'])) {
-        $fieldType = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'html_type');
         $this->_priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'price_set_id');
       }
 
