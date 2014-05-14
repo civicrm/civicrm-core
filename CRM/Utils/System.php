@@ -1815,6 +1815,15 @@ class CRM_Utils_System {
     }
     return $cache;
   }
+
+  static function isInUpgradeMode() {
+    $args = explode('/', $_GET['q']);
+    $upgradeInProcess = CRM_Core_Session::singleton()->get('isUpgradePending');
+    if ((isset($args[1]) && $args[1] == 'upgrade') || $upgradeInProcess) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
 }
-
-
