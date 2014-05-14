@@ -183,8 +183,9 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Verify group merged
     $this->click("css=li#tab_group a");
-    $this->waitForElementPresent("xpath=//form[@id='GroupContact']//div[@class='view-content']//div[@class='dataTables_wrapper']/table/tbody/tr");
-    $this->verifyText("xpath=//form[@id='GroupContact']//div[@class='view-content']//div[@class='dataTables_wrapper']/table/tbody/tr/td/a",
+    $this->waitForElementPresent("GroupContact");
+    $this->waitForElementPresent("xpath=//form[@id='GroupContact']//div[@class='view-content view-contact-groups']//div/table/tbody/tr/td/a");
+    $this->verifyText("xpath=//form[@id='GroupContact']//div[@class='view-content view-contact-groups']//div/table/tbody/tr/td/a",
       preg_quote("$group")
     );
 
@@ -323,8 +324,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//a[text()='$firstName $lastName']");
     $this->click("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
-    $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", "xpath=//form[@id='Merge']/div[2]/table/tbody/tr[3]/td[4]/span[text()='(overwrite)']");
-    $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[4]/td[4]/span[text()='(add)']");
+    $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", "xpath=//form[@id='Merge']/div[2]/table/tbody/tr[3]/td[4]/span[text()='(overwrite)']", FALSE);
+    $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[5]/td[4]/span[text()='(add)']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
 
     $this->check("move_location_email_1");
@@ -409,12 +410,12 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Select the contacts to be merged
     $this->select("name=option51_length", "value=100");
-    $this->waitForElementPresent("xpath=//table[@class='pagerDisplay']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']");
-    $this->click("xpath=//table[@class='pagerDisplay']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']/../../td[4]/a[text()='merge']");
+    $this->waitForElementPresent("xpath=//*[@id='DedupeFind']//table[@class='pagerDisplay dataTable no-footer']/tbody//tr/td[1]/a[text()='57e10a6 9a3de85']/../../td[2]/a[text()='57e10a6 9a3de85']");
+    $this->click("xpath=//*[@id='DedupeFind']//table[@class='pagerDisplay dataTable no-footer']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']/../../td[4]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
-    $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", "xpath=//form[@id='Merge']/div[2]/table/tbody/tr[3]/td[4]/span[text()='(overwrite)']");
-    $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[4]/td[4]/span[text()='(add)']");
-    $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[5]/td[4]/span[text()='(overwrite)']");
+    $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", "xpath=//form[@id='Merge']/div[2]/table/tbody/tr[4]/td[4]/span[text()='(overwrite)']");
+    $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[3]/td[4]/span[text()='(add)']");
+    $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[4]/td[4]/span[text()='(overwrite)']");
     $this->select('location_email_1_locTypeId', 'value=3');
     $this->select('location_phone_1_locTypeId', 'value=1');
     $this->assertFalse($this->isElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[2]/td[4]/span[text()='(overwrite)']"));

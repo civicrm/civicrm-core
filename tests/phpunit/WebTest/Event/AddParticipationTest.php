@@ -351,10 +351,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->openCiviPage("event/search", "reset=1");
     $this->type('sort_name', $firstName);
     $eventName = "Rain-forest Cup Youth Soccer Tournament";
-    $this->type("event_name", $eventName);
-    $this->click("event_name");
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2("event_id", $eventName, FALSE, FALSE);
     $this->check('participant_test');
     $this->click("_qf_Search_refresh");
     $this->waitForElementPresent("participantSearch");
@@ -422,8 +419,9 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->webtestNewDialogContact($firstName, $lastName);
 
     $this->select('payment_processor_id', "value={$processorId}");
-    $this->verifySelectedValue("event_id", "3");
-    $this->check("role_id[1]");
+    $event_id = $this->getAttribute("xpath=//*[@id='event_id']@value");
+    $this->assertEquals($event_id, 3);
+    $this->select("role_id", "value=1");
     $this->webtestAddCreditCardDetails();
     $this->webtestAddBillingDetails();
   }
