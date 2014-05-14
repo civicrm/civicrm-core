@@ -205,6 +205,9 @@ WHERE
       while ($dao->fetch()) {
         $cidRefs[$dao->table_name][] = $dao->column_name;
       }
+
+      // FixME for time being adding below line statically as no Foreign key constraint defined for table 'civicrm_entity_tag'
+      $cidRefs['civicrm_entity_tag'][] = 'entity_id';
       $dao->free();
 
       // Allow hook_civicrm_merge() to adjust $cidRefs
