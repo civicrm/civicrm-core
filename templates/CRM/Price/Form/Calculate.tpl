@@ -212,6 +212,7 @@ function display( totalfee ) {
     scriptfee   = totalfee;
     scriptarray = price;
     cj('#total_amount').val( totalfee );
+    cj('#pricevalue').data('raw-total', totalfee ) ;
 
     ( totalfee < 0 ) ? cj('table#pricelabel').addClass('disabled') : cj('table#pricelabel').removeClass('disabled');
 
