@@ -100,7 +100,7 @@
       </td>
     </tr>
     <tr id ="limit_result" class="crm-report-instanceForm-form-block-limitUser">
-      <td class="report-label">{$form.row_count.label}</td>
+      <td class="report-label">{$form.row_count.label} {help id="id-dash_limit" file="CRM/Report/Form/Settings.hlp"}</td>
       <td>{$form.row_count.html}</td>
     </tr>
 </table>
