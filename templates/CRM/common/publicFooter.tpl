@@ -25,7 +25,8 @@
 *}
 
 {if $config->empoweredBy}
+{capture assign=civilogo}<a href="http://civicrm.org/" title="{ts}Visit CiviCRM.org{/ts}" target="_blank"><img class="empowered-by-logo" src="{$config->userFrameworkResourceURL}/i/civi99.png" alt="CiviCRM" /></a>{/capture}
 <div class="crm-public-footer" id="civicrm-footer">
-empowered by <img class="empowered-by-logo" src="{$config->userFrameworkResourceURL}/i/civi99.png" alt="CiviCRM" />
+{ts 1=$civilogo}empowered by %1{/ts}
 </div>
 {/if}
