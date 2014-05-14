@@ -420,6 +420,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
 
     $this->select('payment_processor_id', "value={$processorId}");
     $event_id = $this->getAttribute("xpath=//*[@id='event_id']@value");
+    //check if it is the selected event
     $this->assertEquals($event_id, 3);
     $this->select("role_id", "value=1");
     $this->webtestAddCreditCardDetails();
