@@ -656,6 +656,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       require $joomlaBase . '/libraries/joomla/application/component/helper.php';
     }
     else {
+      require $joomlaBase . '/libraries/cms.php';
       require $joomlaBase . '/libraries/joomla/uri/uri.php';
     }
 
