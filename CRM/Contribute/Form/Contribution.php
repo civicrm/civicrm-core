@@ -145,11 +145,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_lineItems;
 
   /**
-   * @var soft credit info
+   * @var array soft credit info
    */
   public $_softCreditInfo;
 
   protected $_formType;
+
+  /**
+   * @todo what on earth does cdType stand for????
+   * @var
+   */
   protected $_cdType;
   public $_honoreeProfileType;
 
