@@ -78,6 +78,9 @@ abstract class CRM_Core_Payment {
 
   protected $_paymentProcessor;
 
+  /**
+   * @var CRM_Core_Form
+   */
   protected $_paymentForm = NULL;
 
   /**
@@ -145,7 +148,7 @@ abstract class CRM_Core_Payment {
   /**
    * Setter for the payment form that wants to use the processor
    *
-   * @param obj $paymentForm
+   * @param CRM_Core_Form $paymentForm
    *
    */
   function setForm(&$paymentForm) {
@@ -155,7 +158,7 @@ abstract class CRM_Core_Payment {
   /**
    * Getter for payment form that is using the processor
    *
-   * @return obj  A form object
+   * @return CRM_Core_Form  A form object
    */
   function getForm() {
     return $this->_paymentForm;
