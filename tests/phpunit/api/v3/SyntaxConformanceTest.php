@@ -925,7 +925,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       );
 
       $checkEntity = $this->callAPISuccess($entityName, 'getsingle', $checkParams);
-      $this->assertAPIArrayComparison($entity, $checkEntity, array(), "checking if $fieldName was correctly updaetd\n" . print_r(array('update-params' => $updateParams, 'update-result' => $update, 'getsingle-params' => $checkParams, 'getsingle-result' => $checkEntity, 'expected entity' => $entity), TRUE));
+      $this->assertAPIArrayComparison($entity, $checkEntity, array(), "checking if $fieldName was correctly updated\n" . print_r(array('update-params' => $updateParams, 'update-result' => $update, 'getsingle-params' => $checkParams, 'getsingle-result' => $checkEntity, 'expected entity' => $entity), TRUE));
     }
     $baoObj->free();
   }
