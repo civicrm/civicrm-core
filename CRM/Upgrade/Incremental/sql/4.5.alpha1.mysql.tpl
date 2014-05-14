@@ -134,9 +134,6 @@ VALUES
       (@uf_group_id_honoree_individual, 'last_name',  0, 1, 3, 'User and User Admin Only', 0, 1, NULL, {localize}'{ts escape="sql"}Last Name{/ts}'{/localize},         'Individual'),
       (@uf_group_id_honoree_individual, 'email',      0, 1, 4, 'User and User Admin Only', 0, 1, 1,    {localize}'{ts escape="sql"}Email Address{/ts}'{/localize},     'Individual');
 
-ALTER TABLE `civicrm_uf_join`
-  ADD COLUMN `module_data` longtext COMMENT 'Json serialized array of data used by the ufjoin.module';
-
 {if $multilingual}
   {foreach from=$locales item=loc}
      ALTER TABLE civicrm_contribution_page DROP honor_block_title_{$loc};
