@@ -71,8 +71,8 @@ class CRM_Upgrade_Incremental_php_FourFive {
 
   function upgrade_4_5_alpha1($rev) {
     // task to process sql
+    $this->addTask(ts('Migrate honoree information to module_data'), 'migrateHonoreeInfo');
     $this->addTask(ts('Upgrade DB to 4.5.alpha1: SQL'), 'task_4_5_x_runSql', $rev);
-
     $this->addTask(ts('Set default for Individual name fields configuration'), 'addNameFieldOptions');
 
     // CRM-14522 - The below schema checking is done as foreign key name
@@ -120,6 +120,68 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
     $query = "UPDATE `civicrm_setting` SET `value` = %1 WHERE `group_name` = 'CiviCRM Preferences' AND `name` = 'contact_edit_options'";
     $params = array(1 => array(serialize($newValue), 'String'));
     CRM_Core_DAO::executeQuery($query, $params);
+
+    return TRUE;
+  }
+
+  /**
+   * Migrate honoree information to uf_join.module_data as honoree columns (text and title) will be dropped
+   * on DB upgrade
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   *
+   * @return bool TRUE for success
+   */
+  static function migrateHonoreeInfo(CRM_Queue_TaskContext $ctx) {
+    $query = "ALTER TABLE `civicrm_uf_join`
+    ADD COLUMN `module_data` longtext COMMENT 'Json serialized array of data used by the ufjoin.module'";
+      CRM_Core_DAO::executeQuery($query);
+
+    $honorTypes = array_keys(CRM_Core_OptionGroup::values('honor_type'));
+    $ufGroupDAO = new CRM_Core_DAO_UFGroup();
+    $ufGroupDAO->name = 'new_individual';
+    $ufGroupDAO->find(TRUE);
+
+    $query = "SELECT * FROM civicrm_contribution_page";
+    $dao = CRM_Core_DAO::executeQuery($query);
+
+    if ($dao->N) {
+      $domain = new CRM_Core_DAO_Domain;
+      $domain->find(TRUE);
+      while ($dao->fetch()) {
+        $honorParams = array('soft_credit' => array('soft_credit_types' => $honorTypes));
+        if ($domain->locales) {
+          $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+          foreach ($locales as $locale) {
+            $honor_block_title =  "honor_block_title_{$locale}";
+            $honor_block_text =  "honor_block_text_{$locale}";
+            $honorParams['soft_credit'] += array(
+              $locale => array(
+                'honor_block_title' => $dao->$honor_block_title,
+                'honor_block_text' => $dao->$honor_block_text,
+              ),
+            );
+          }
+        }
+        else {
+          $honorParams['soft_credit'] += array(
+            'default' => array(
+              'honor_block_title' => $dao->honor_block_title,
+              'honor_block_text' => $dao->honor_block_text,
+            ),
+          );
+        }
+        $ufJoinParam = array(
+          'module' => 'soft_credit',
+          'entity_table' => 'civicrm_contribution_page',
+          'is_active' => $dao->honor_block_is_active,
+          'entity_id' => $dao->id,
+          'uf_group_id' => $ufGroupDAO->id,
+          'module_data' => json_encode($honorParams),
+        );
+        CRM_Core_BAO_UFJoin::create($ufJoinParam);
+      }
+    }
 
     return TRUE;
   }
