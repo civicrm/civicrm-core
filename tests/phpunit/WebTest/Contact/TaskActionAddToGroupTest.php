@@ -88,7 +88,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
 
     // Search by group membership in newly created group
     $this->openCiviPage('contact/search/advanced', 'reset=1');
-    $this->select("crmasmSelect1", "label=" . $newGroupName);
+    $this->select("group", "label=" . $newGroupName);
     $this->click("_qf_Advanced_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -114,10 +114,10 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->type("xpath=//*[@id='Basic-rows-per-page-select']", '25');
-    $this->waitForElementPresent("xpath=//*[@id='Basic-rows-per-page-select']");
+    $this->waitForElementPresent("toggleSelect");
     $this->click("toggleSelect");
     $this->click("xpath=//div[@class='crm-content-block']/div/div[2]/div/span[2]/a");
-    $this->waitForElementPresent("Go");
+    $this->waitForText("xpath=//div[@class='crm-content-block']/div/div[2]/div/span[2]/a", "First");
     $this->click("toggleSelect");
     $this->select("task", "label=Add Contacts to Group");
     $this->click("Go");
@@ -134,7 +134,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "50 contacts added to group");
 
     $this->openCiviPage('contact/search/advanced', 'reset=1');
-    $this->select("crmasmSelect1", "label=" . $newGroupName);
+    $this->select("group", "label=" . $newGroupName);
     $this->click("_qf_Advanced_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
