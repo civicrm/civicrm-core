@@ -213,6 +213,10 @@ function display( totalfee ) {
     scriptarray = price;
     cj('#total_amount').val( totalfee );
 
+    // Do not show total amount to visitor for a quickconfig type priceset. 
+   if ( {/literal}{$quickConfig} {literal} ){
+      cj('#pricesetTotal').hide()
+   }
     ( totalfee < 0 ) ? cj('table#pricelabel').addClass('disabled') : cj('table#pricelabel').removeClass('disabled');
 
 }
