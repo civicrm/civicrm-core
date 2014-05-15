@@ -938,6 +938,47 @@ WHERE  id = %1";
   }
 
   /**
+   * Supports event create function by setting up required price sets, not tested but expect
+   * it will work for contribution page
+   * @param array $params as passed to api/bao create fn
+   * @param CRM_Core_DAO $entity object for given entity
+   * @param string $entityName name of entity - e.g event
+   */
+  static function setPriceSets(&$params, $entity, $entityName) {
+    if(empty($params['price_set_id']) || !is_array($params['price_set_id'])) {
+      return;
+    }
+    // CRM-14069 note that we may as well start by assuming more than one.
+    // currently the form does not pass in as an array & will be skipped
+    // test is passing in as an array but I feel the api should have a metadata that allows
+    // transform of single to array - seems good for managing transitions - in which case all api
+    // calls that set price_set_id will hit this
+    // e.g in getfields 'price_set_id' => array('blah', 'bao_type' => 'array') - causing
+    // all separated values, strings, json half-separated values (in participant we hit this)
+    // to be converted to json @ api layer
+    $pse = new CRM_Price_DAO_PriceSetEntity();
+    $pse->entity_table = 'civicrm_' . $entityName;
+    $pse->entity_id = $entity->id;
+    while ($pse->fetch()) {
+      if(!in_array($pse->price_set_id, $params['price_set_id'])) {
+        // note an even more aggressive form of this deletion currently happens in event form
+        // past price sets discounts are made inaccessible by this as the discount_id is set to NULL
+        // on the participant record
+        if (CRM_Price_BAO_PriceSet::removeFrom('civicrm_' . $entityName, $entity->id)) {
+          CRM_Core_BAO_Discount::del($this->_id,'civicrm_' . $entityName);
+        }
+      }
+    }
+    foreach ($params['price_set_id'] as $priceSetID) {
+      CRM_Price_BAO_PriceSet::addTo('civicrm_' . $entityName, $entity->id, $priceSetID);
+      //@todo - how should we do this - copied from form
+      //if (CRM_Utils_Array::value('price_field_id', $params)) {
+      //  $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $params['price_field_id'], 'price_set_id');
+      //  CRM_Price_BAO_PriceSet::setIsQuickConfig($priceSetID, 0);
+      //}
+    }
+  }
+  /**
    * Get field ids of a price set
    *
    * @param int id Price Set id
