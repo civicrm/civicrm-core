@@ -181,7 +181,10 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
       array('' => ts('- select -')) + $relTypeInd);
     $memberRel->setMultiple(TRUE);
 
-    $this->addSelect('visibility', array('placeholder' => NULL, 'option_url' => NULL));
+    // The auto-magic metadata retrieval does not return the correct enum values. Reverting to old approach for now. dgg
+    // $this->addSelect('visibility', array('placeholder' => NULL, 'option_url' => NULL));
+    $this->add('select', 'visibility', ts('Visibility'), CRM_Core_SelectValues::memberVisibility(), TRUE, array('class' => 'crm-select2'));
+
     $this->add('text', 'weight', ts('Order'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'weight')
     );
