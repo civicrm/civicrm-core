@@ -121,7 +121,7 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->click("xpath=//form[@id='Field']//a[text()='Advanced Filter']");
     $this->waitForElementPresent("filter");
 
-    $this->type("filter", "action=lookup&contact_type=Organization");
+    $this->type("filter", "action=get&contact_type=Organization");
 
     //clicking save
     $this->click("_qf_Field_next-bottom");
@@ -147,20 +147,22 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     // Visit custom group preview page
     $this->openCiviPage('admin/custom/group', "action=preview&reset=1&id={$customGroupId}");
 
-    $this->type("custom_{$contactRefFieldID1}_-1", "Anderson");
-    $this->fireEvent("custom_{$contactRefFieldID1}_-1", "focus");
-    $this->click("custom_{$contactRefFieldID1}_-1");
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->assertElementContainsText("css=div.ac_results-inner li", "{$contact1}@example.com");
-    $this->assertElementNotContainsText("css=div.ac_results-inner ul li", "{$contact2}@example.com");
+    $this->clickAt("//*[@id='custom_{$contactRefFieldID1}_-1']/../div/a");
+    $this->keyDown("//*[@id='select2-drop']/div/input", " ");
+    $this->type("//*[@id='select2-drop']/div/input", "Anderson");
+    $this->typeKeys("//*[@id='select2-drop']/div/input", "Anderson");
+    $this->waitForElementPresent("css=div.select2-result-label span");
+    $this->assertElementContainsText("css=div.select2-result-label", "{$contact1}@example.com");
+    $this->assertElementNotContainsText("css=div.select2-result-label", "{$contact2}@example.com");
 
     $this->openCiviPage('admin/custom/group', "action=preview&reset=1&id={$customGroupId}");
 
-    $this->type("custom_{$contactRefFieldID2}_-1", $org1);
-    $this->fireEvent("custom_{$contactRefFieldID2}_-1", "focus");
-    $this->click("custom_{$contactRefFieldID2}_-1");
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->assertElementContainsText("css=div.ac_results-inner li", "{$org1}@example.com");
+    $this->clickAt("//*[@id='custom_{$contactRefFieldID2}_-1']/../div/a");
+    $this->keyDown("//*[@id='select2-drop']/div/input", " ");
+    $this->type("//*[@id='select2-drop']/div/input", $org1);
+    $this->typeKeys("//*[@id='select2-drop']/div/input", $org1);
+    $this->waitForElementPresent("css=div.select2-result-label");
+    $this->assertElementContainsText("css=div.select2-result-label", "{$org1}@example.com");
   }
 }
 
