@@ -248,7 +248,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@class='crm-customData-block']//div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper collapsed']");
     $this->click("xpath=//div[@class='crm-customData-block']//div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper collapsed']//div[1]");
     $this->click("xpath=//div[@class='crm-customData-block']//div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper']//div[2]//table//tbody//tr[2]//td[2]//table//tbody//tr[1]//td[1]//label");
-    $this->click("xpath=//div[@class='crm-customData-block']//sdiv[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper']//div[2]//table//tbody//tr[4]//td[2]//table//tbody//tr[1]//td[1]//label");
+    $this->click("xpath=//div[@class='crm-customData-block']//div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper']//div[2]//table//tbody//tr[4]//td[2]//table//tbody//tr[1]//td[1]//label");
 
     // Choose Registration Date.
     // Using helper webtestFillDate function.
@@ -313,12 +313,12 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
       array(
         'From' => $displayName,
         'Financial Type' => 'Event Fee',
-        'Total Amount' => '$ 800.00',
         'Contribution Status' => 'Completed',
         'Paid By' => 'Check',
         'Check Number' => '1044',
       )
     );
+    $this->verifyText("xpath=//table/tbody/tr/td[text()='Total Amount']/following-sibling::td/strong", preg_quote('$ 800.00'), 'In line ' . __LINE__);
   }
 
   function testEventAddMultipleParticipants() {

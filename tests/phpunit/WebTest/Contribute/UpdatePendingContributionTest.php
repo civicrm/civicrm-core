@@ -157,6 +157,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     // go to soft creditor contact view page - this also does the soft credit check
     $this->click("xpath=id('ContributionView')/div[2]/div/div[1][contains(text(), 'Soft Credit')]/../div[2]/table[1]/tbody//tr/td[1]/a[contains(text(), '{$softCreditFname} {$softCreditLname}')]");
 
+    $this->waitForPageToLoad($this->getTimeoutMsec());
     // go to contribution tab
     $this->waitForElementPresent("css=li#tab_contribute a");
     $this->click("css=li#tab_contribute a");
@@ -249,7 +250,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
 
     $this->type("sort_name", "$lastName, $firstName");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[2]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[2]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[2]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
     // View Contribution Record and test for expected values
     $expected = array(
       'From' => "{$firstName} {$lastName}",
