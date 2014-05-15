@@ -406,7 +406,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('link=Add Membership Type');
     $this->waitForText('crm-notification-container', "The membership type 'Membership Type $title' has been saved.");
 
-    $url = $this->getAttribute("xpath=//div[@id='membership_type']//div[@class='dataTables_wrapper']//table/tbody//tr/td[1][text()='{$membershipTypeTitle}']/../td[12]/span/a[3][text()='Delete']/@href");
+    $url = $this->getAttribute("xpath=//div[@id='membership_type']//div[@id='option11_wrapper']//table/tbody//tr/td[1][text()='{$membershipTypeTitle}']/../td[12]/span/a[3][text()='Delete']/@href");
 
     $matches = array();
     preg_match('/id=([0-9]+)/', $url, $matches);
@@ -459,7 +459,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->click('link=Title');
     $this->waitForElementPresent('_qf_Settings_cancel-bottom');
     $this->click('is_organization');
-    $this->select('onbehalf_profile_id', "value=9");
+    $this->select("xpath=//input[@id='onbehalf_profile_id']/parent::td/div/div/span/select", "value=9");
     $this->type('for_organization', "On behalf $hash");
     $this->click('_qf_Settings_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
