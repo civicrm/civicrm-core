@@ -83,6 +83,11 @@ INSERT INTO `civicrm_option_value` (`option_group_id`, {localize field='label'}`
 ALTER TABLE `civicrm_contribution_soft`
   ADD COLUMN `soft_credit_type_id`  int(10) unsigned COMMENT 'Soft Credit Type ID.Implicit FK to civicrm_option_value where option_group = soft_credit_type.';
 
+INSERT INTO civicrm_contribution_soft(contribution_id, contact_id, amount, currency, soft_credit_type_id)
+SELECT id, honor_contact_id, total_amount, currency, honor_type_id
+FROM civicrm_contribution
+WHERE honor_contact_id IS NOT NULL;
+
 SELECT @sct_pcp_id := value from civicrm_option_value where name = 'pcp' and option_group_id = @option_group_id_soft_credit_type;
 
 UPDATE `civicrm_contribution_soft`
@@ -133,6 +138,8 @@ VALUES
       (@uf_group_id_honoree_individual, 'first_name', 0, 1, 2, 'User and User Admin Only', 0, 1, NULL, {localize}'{ts escape="sql"}First Name{/ts}'{/localize},        'Individual'),
       (@uf_group_id_honoree_individual, 'last_name',  0, 1, 3, 'User and User Admin Only', 0, 1, NULL, {localize}'{ts escape="sql"}Last Name{/ts}'{/localize},         'Individual'),
       (@uf_group_id_honoree_individual, 'email',      0, 1, 4, 'User and User Admin Only', 0, 1, 1,    {localize}'{ts escape="sql"}Email Address{/ts}'{/localize},     'Individual');
+
+UPDATE civicrm_uf_join SET uf_group_id = @uf_group_id_honoree_individual WHERE module = 'soft_credit';
 
 {if $multilingual}
   {foreach from=$locales item=loc}
