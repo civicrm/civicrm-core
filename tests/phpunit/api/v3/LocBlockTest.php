@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.5                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -29,7 +29,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_LocBlockTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_entity = 'loc_block';
-  public $_eNoticeCompliant = TRUE;
+
   public function setUp() {
     parent::setUp();
   }
@@ -58,7 +58,8 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
       'phone_id' => $phone['id'],
       'email_id' => $email['id'],
     );
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $description = 'Create locBlock with existing entities';
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, 'simpleCreate');
     $id = $result['id'];
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$id]['id'], 'In line ' . __LINE__);
@@ -84,16 +85,19 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
         'street_address' => '987654321',
       ),
     );
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, 'Create entities and location block in 1 api call', NULL, 'createEntities');
+    $description = "Create entities and locBlock in 1 api call";
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, 'createEntities');
     $id = $result['id'];
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
 
     // Now check our results using the return param 'all'
-    $getParams = array(      'id' => $id,
-      'return' => 'all'
+    $getParams = array(
+      'id' => $id,
+      'return' => 'all',
     );
     // Can't use callAPISuccess with getsingle
-    $result = $this->callAPIAndDocument($this->_entity, 'getsingle', $getParams, __FUNCTION__, __FILE__, 'Get entities and location block in 1 api call', NULL, 'get');
+    $result = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__, 'Get entities and location block in 1 api call', 'getEntities', 'get');
+    $result = array_pop($result['values']);
     $this->assertNotNull($result['email_id'], 'In line ' . __LINE__);
     $this->assertNotNull($result['phone_id'], 'In line ' . __LINE__);
     $this->assertNotNull($result['phone_2_id'], 'In line ' . __LINE__);

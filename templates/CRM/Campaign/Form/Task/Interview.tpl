@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -155,8 +155,8 @@
                 {continue}
               {/if}
               <td class="compressed {$field.data_type} {$fieldName}">
-                {if ( $field.data_type eq 'Date') or
-                ( $fieldName eq 'thankyou_date' ) or ( $fieldName eq 'cancel_date' ) or ( $fieldName eq 'receipt_date' ) or (  $fieldName eq 'activity_date_time') }
+                {if ( ($field.data_type eq 'Date') or
+                ( $fieldName eq 'thankyou_date' ) or ( $fieldName eq 'cancel_date' ) or ( $fieldName eq 'receipt_date' ) or (  $fieldName eq 'activity_date_time') ) and $field.is_view neq 1 }
                 {include file="CRM/common/jcalendar.tpl" elementName=$fieldName elementIndex=$voterId batchUpdate=1}
                 {elseif $fieldName|substr:0:5 eq 'phone'}
                   {assign var="phone_ext_field" value=$fieldName|replace:'phone':'phone_ext'}
@@ -166,9 +166,6 @@
                   {/if}
                 {else}
                   {$form.field.$voterId.$fieldName.html}
-                {/if}
-                {if $field.html_type eq 'Autocomplete-Select'}
-                  {include file="CRM/Custom/Form/AutoComplete.tpl" element_name = field[`$voterId`][`$fieldName`]}
                 {/if}
               </td>
             {/foreach}
@@ -212,7 +209,7 @@
 <script type="text/javascript">
 var updateVote = "{/literal}{ts escape='js'}Update Response{/ts}{literal}";
 var updateVoteforall = "{/literal}{ts escape='js'}Update Responses for All{/ts}{literal}";
-cj( function( ) {
+CRM.$(function($) {
   var count = 0; var columns='';
 
   cj('#voterRecords th').each( function( ) {
@@ -322,7 +319,7 @@ var surveyActivityIds = {/literal}{$surveyActivityIds}{literal};
   //post data to create interview.
   cj.post(dataUrl, data, function(interview) {
     if ( interview.status == 'success' ) {
-      cj("#row_"+voterId+' td.name').attr('class', 'name disabled' );
+      cj("#row_"+voterId+' td.name').attr('class', 'name survey-completed' );
       cj('#restmsg_vote_' + voterId).fadeIn("slow").fadeOut("slow");
       cj('#interview_voter_button_' + voterId).html(updateVote);
       cj('#release_voter_button_' + voterId).hide( );

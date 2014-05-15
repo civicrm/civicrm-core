@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -75,7 +75,7 @@ class WebTest_Report_DonarReportTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=div#Contribute > table.report-layout', $reportName);
 
     // Visit report
-    $this->click("link=$reportName");
+    $this->click("xpath=//div[@id='Contribute']//table/tbody//tr/td/a/strong[text() = '$reportName']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //now select the criteria

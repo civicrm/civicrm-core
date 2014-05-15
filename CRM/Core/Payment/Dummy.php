@@ -39,7 +39,9 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_Dummy
    */
   function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
@@ -52,9 +54,12 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param object $paymentProcessor
+   * @param null $paymentForm
+   * @param bool $force
+   *
    * @return object
    * @static
-   *
    */
   static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     $processorName = $paymentProcessor['name'];

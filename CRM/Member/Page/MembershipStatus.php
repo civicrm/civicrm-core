@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -37,6 +37,8 @@
  * Page for displaying list of membership types
  */
 class CRM_Member_Page_MembershipStatus extends CRM_Core_Page_Basic {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -71,14 +73,12 @@ class CRM_Member_Page_MembershipStatus extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Member_BAO_MembershipStatus' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Membership Status'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Member_BAO_MembershipStatus' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Membership Status'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -158,7 +158,12 @@ class CRM_Member_Page_MembershipStatus extends CRM_Core_Page_Basic {
           $action -= CRM_Core_Action::DISABLE;
         }
         $membershipStatus[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-          array('id' => $dao->id)
+          array('id' => $dao->id),
+          ts('more'),
+          FALSE,
+          'membershipStatus.manage.action',
+          'MembershipStatus',
+          $dao->id
         );
       }
       if ($startEvent = CRM_Utils_Array::value('start_event', $membershipStatus[$dao->id])) {
@@ -197,6 +202,8 @@ class CRM_Member_Page_MembershipStatus extends CRM_Core_Page_Basic {
 
   /**
    * Get user context.
+   *
+   * @param null $mode
    *
    * @return string user context.
    */

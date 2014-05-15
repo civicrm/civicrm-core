@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -59,14 +59,17 @@ class CRM_Utils_Geocode_Google {
    * address. Note that at a later stage, we could make this function also clean up
    * the address into a more valid format
    *
-   * @param object $address
+   * @param $values
+   * @param bool $stateName
+   *
+   * @internal param object $address
    *
    * @return boolean true if we modified the address, false otherwise
    * @static
    */
   static function format(&$values, $stateName = FALSE) {
     // we need a valid country, else we ignore
-    if (!CRM_Utils_Array::value('country', $values)) {
+    if (empty($values['country'])) {
       return FALSE;
     }
 
@@ -74,7 +77,7 @@ class CRM_Utils_Geocode_Google {
 
     $add = '';
 
-    if (CRM_Utils_Array::value('street_address', $values)) {
+    if (!empty($values['street_address'])) {
       $add = urlencode(str_replace('', '+', $values['street_address']));
       $add .= ',+';
     }
@@ -85,8 +88,8 @@ class CRM_Utils_Geocode_Google {
       $add .= ',+';
     }
 
-    if (CRM_Utils_Array::value('state_province', $values)) {
-      if (CRM_Utils_Array::value('state_province_id', $values)) {
+    if (!empty($values['state_province'])) {
+      if (!empty($values['state_province_id'])) {
         $stateProvince = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StateProvince', $values['state_province_id']);
       }
       else {
@@ -109,12 +112,12 @@ class CRM_Utils_Geocode_Google {
       }
     }
 
-    if (CRM_Utils_Array::value('postal_code', $values)) {
+    if (!empty($values['postal_code'])) {
       $add .= '+' . urlencode(str_replace('', '+', $values['postal_code']));
       $add .= ',+';
     }
 
-    if (CRM_Utils_Array::value('country', $values)) {
+    if (!empty($values['country'])) {
       $add .= '+' . urlencode(str_replace('', '+', $values['country']));
     }
 
@@ -147,7 +150,10 @@ class CRM_Utils_Geocode_Google {
         }
       }
       elseif ($xml->status == 'OVER_QUERY_LIMIT') {
-        CRM_Core_Error::fatal('Geocoding failed. Message from Google: ' . $xml->status);
+        CRM_Core_Error::debug_var('Geocoding failed. Message from Google: ', (string ) $xml->status);
+        $values['geo_code_1'] = $values['geo_code_2'] = 'null';
+        $values['geo_code_error'] = $xml->status;
+        return FALSE;
       }
     }
 

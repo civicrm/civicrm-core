@@ -44,7 +44,7 @@
         <li>{ts}Check <strong>View/Edit User Account</strong> to include it in the view and edit screens for existing user accounts.{/ts}</li>
     {/if}
     </ul>
-    {docURL page="user/the-user-interface/profiles"}
+    {docURL page="user/organising-your-data/profiles/"}
 {/htxt}
 
 {htxt id='id-profile_weight-title'}

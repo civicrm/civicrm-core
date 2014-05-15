@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -250,7 +250,7 @@ function _civicrm_regsite_civicrm_postProcess_Profile_RegSite(&$form) {
 
   // now send email to both user and org
   $params = array('from' => CIVICRM_REGSITE_FROM_EMAIL,
-    'toName' => "{CRM_Utils_Array::value( 'regsite_first_name', $params )} {CRM_Utils_Array::value( 'regsite_last_name', $params )}",
+    'toName' => "{$params['regsite_first_name']} {$params['regsite_last_name']}",
     'toEmail' => CRM_Utils_Array::value('regsite_email', $params),
     'cc' => CRM_Utils_Array::value('email-Primary', $params),
     'bcc' => CIVICRM_ARCHIVE_EMAIL,

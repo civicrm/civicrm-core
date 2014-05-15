@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -51,6 +51,8 @@ class CRM_Core_Payment_Form {
 
   /**
    * create all common fields needed for a credit card or direct debit transaction
+   *
+   * @param $form
    *
    * @return void
    * @access protected
@@ -111,7 +113,7 @@ class CRM_Core_Payment_Form {
       'attributes' => array(
         '' => ts('- select -')) +
       CRM_Core_PseudoConstant::stateProvince(),
-      'is_required' => self::checkRequiredStateProvince($form),
+      'is_required' => self::checkRequiredStateProvince($form, "billing_country_id-{$bltID}"),
     );
 
     $form->_paymentFields["billing_postal_code-{$bltID}"] = array(
@@ -137,6 +139,8 @@ class CRM_Core_Payment_Form {
 
   /**
    * create all fields needed for a credit card transaction
+   *
+   * @param $form
    *
    * @return void
    * @access public
@@ -182,12 +186,14 @@ class CRM_Core_Payment_Form {
       'title' => ts('Card Type'),
       'cc_field' => TRUE,
       'attributes' => $creditCardType,
-      'is_required' => TRUE,
+      'is_required' => FALSE,
     );
   }
 
   /**
    * create all fields needed for direct debit transaction
+   *
+   * @param $form
    *
    * @return void
    * @access public
@@ -237,7 +243,10 @@ class CRM_Core_Payment_Form {
   /**
    * Function to add all the credit card fields
    *
-   * @return None
+   * @param $form
+   * @param bool $useRequired
+   *
+   * @return void
    * @access public
    */
   static function buildCreditCard(&$form, $useRequired = FALSE) {
@@ -262,7 +271,7 @@ class CRM_Core_Payment_Form {
       );
 
       $form->addRule('credit_card_exp_date',
-        ts('Credit card expiration date cannot be a past date.'),
+        ts('Card expiration date cannot be a past date.'),
         'currentDate', TRUE
       );
 
@@ -306,7 +315,9 @@ class CRM_Core_Payment_Form {
   /**
    * Function to add all the direct debit fields
    *
-   * @return None
+   * @param $form
+   * @param bool $useRequired
+   * @return void
    * @access public
    */
   function buildDirectDebit(&$form, $useRequired = FALSE) {
@@ -355,18 +366,26 @@ class CRM_Core_Payment_Form {
       if (!empty($values['credit_card_number']) &&
         !CRM_Utils_Rule::creditCardNumber($values['credit_card_number'], $values['credit_card_type'])
       ) {
-        $errors['credit_card_number'] = ts('Please enter a valid Credit Card Number');
+        $errors['credit_card_number'] = ts('Please enter a valid Card Number');
       }
       if (!empty($values['cvv2']) &&
         !CRM_Utils_Rule::cvv($values['cvv2'], $values['credit_card_type'])
       ) {
-        $errors['cvv2'] = ts('Please enter a valid Credit Card Verification Number');
+        $errors['cvv2'] = ts('Please enter a valid Card Verification Number');
       }
+    }
+    elseif (!empty($values['credit_card_number'])) {
+      $errors['credit_card_number'] = ts('Please enter a valid Card Number');
     }
   }
 
   /**
    * function to map address fields
+   *
+   * @param $id
+   * @param $src
+   * @param $dst
+   * @param bool $reverse
    *
    * @return void
    * @static
@@ -407,6 +426,8 @@ class CRM_Core_Payment_Form {
    * The date format for this field should typically be "M Y" (ex: Feb 2011) or "m Y" (02 2011)
    * See CRM-9017
    *
+   * @param $src
+   *
    * @return int
    * @static
    */
@@ -423,6 +444,8 @@ class CRM_Core_Payment_Form {
    * The date format for this field should typically be "M Y" (ex: Feb 2011) or "m Y" (02 2011)
    * This function exists only to make it consistant with getCreditCardExpirationMonth
    *
+   * @param $src
+   *
    * @return int
    * @static
    */
@@ -433,13 +456,28 @@ class CRM_Core_Payment_Form {
   /**
    * function to return state/province is_required = true/false
    *
+   * @param obj     $form: Form object
+   * @param string  $name: Country index name on $_submitValues array
+   * @param bool    $onBehalf: Is 'On Behalf Of' profile?
+   *
+   * @return bool
+   *   TRUE/FALSE for is_required if country consist/not consist of state/province respectively
+   * @static
    */
-  static function checkRequiredStateProvince($form) {
+  static function checkRequiredStateProvince($form, $name, $onBehalf = FALSE) {
     // If selected country has possible values for state/province mark the
     // state/province field as required.
     $config = CRM_Core_Config::singleton();
     $stateProvince = new CRM_Core_DAO_StateProvince();
-    $stateProvince->country_id = CRM_Utils_Array::value("billing_country_id-{$form->_bltID}", $form->_submitValues);
+
+    if ($onBehalf) {
+      $stateProvince->country_id = CRM_Utils_Array::value($name, $form->_submitValues['onbehalf']);
+    }
+    else {
+      $stateProvince->country_id = CRM_Utils_Array::value($name, $form->_submitValues);
+    }
+
+    $limitCountryId = $stateProvince->country_id;
 
     if ($stateProvince->count() > 0) {
       // check that the state/province data is not excluded by a
@@ -451,7 +489,6 @@ class CRM_Core_Payment_Form {
         $limitIds = array_merge($limitIds, array_keys($countryIsoCodes, $code));
       }
 
-      $limitCountryId = CRM_Utils_Array::value("billing_country_id-{$form->_bltID}", $form->_submitValues);
       if ($limitCountryId && in_array($limitCountryId, $limitIds)) {
         return TRUE;
       }

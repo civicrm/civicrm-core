@@ -24,6 +24,7 @@
       <type>varchar</type>
       <length>255</length>
       <required>true</required>
+      <localizable>true</localizable>
       <comment>Title of the Survey.</comment>
       <import>true</import>
       <add>3.3</add>
@@ -34,6 +35,11 @@
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Foreign key to the Campaign.</comment>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
     <add>3.3</add>
   </field>
   <foreignKey>
@@ -46,7 +52,7 @@
 
   <field>
     <name>activity_type_id</name>
-    <title>Activity Type ID</title>
+    <title>Activity Type</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Implicit FK to civicrm_option_value where option_group = activity_type</comment>
@@ -55,6 +61,9 @@
     <pseudoconstant>
       <optionGroupName>activity_type</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <index>
     <name>UI_activity_type_id</name>
@@ -66,19 +75,24 @@
     <name>recontact_interval</name>
     <type>text</type>
     <comment>Recontact intervals for each status.</comment>
-    <htmlType>textarea</htmlType>
-    <rows>20</rows>
-    <cols>80</cols>
+    <html>
+      <type>TextArea</type>
+      <rows>20</rows>
+      <cols>80</cols>
+    </html>
     <add>3.3</add>
   </field>
 
   <field>
     <name>instructions</name>
     <type>text</type>
+    <localizable>true</localizable>
     <comment>Script instructions for volunteers to use for the survey.</comment>
-    <htmlType>textarea</htmlType>
-    <rows>20</rows>
-    <cols>80</cols>
+    <html>
+      <type>TextArea</type>
+      <rows>20</rows>
+      <cols>80</cols>
+    </html>
     <add>3.3</add>
   </field>
 
@@ -194,9 +208,11 @@
     <name>thankyou_text</name>
     <title>Thank-you Text</title>
     <type>text</type>
-    <htmlType>textarea</htmlType>
-    <rows>8</rows>
-    <cols>60</cols>
+    <html>
+      <type>TextArea</type>
+      <rows>8</rows>
+      <cols>60</cols>
+    </html>
     <localizable>true</localizable>
     <comment>text and html allowed. displayed above result on success page</comment>
     <add>4.2</add>

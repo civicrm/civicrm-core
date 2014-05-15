@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,12 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
 require_once 'HTML/QuickForm/Rule/Email.php';
+
 class CRM_Utils_Rule {
 
   static function title($str, $maxLength = 127) {
@@ -174,7 +175,7 @@ class CRM_Utils_Rule {
     }
 
     // CRM-9017 CiviContribute/CiviMember form with expiration date format 'm Y'
-    if (!$m && CRM_Utils_Array::value('m', $date)) {
+    if (!$m && !empty($date['m'])) {
       $m = CRM_Utils_Array::value('m', $date);
     }
 
@@ -272,15 +273,24 @@ class CRM_Utils_Rule {
       return TRUE;
     }
 
-    if (($value < 0)) {
+    // CRM-13460
+    // ensure number passed is always a string numeral
+    if (!is_numeric($value)) {
+      return FALSE;
+    }
+
+    // note that is_int matches only integer type
+    // and not strings which are only integers
+    // hence we do this here
+    if (preg_match('/^\d+$/', $value)) {
+      return TRUE;
+    }
+
+    if ($value < 0) {
       $negValue = -1 * $value;
       if (is_int($negValue)) {
         return TRUE;
       }
-    }
-
-    if (is_numeric($value) && preg_match('/^\d+$/', $value)) {
-      return TRUE;
     }
 
     return FALSE;
@@ -291,7 +301,13 @@ class CRM_Utils_Rule {
       return ($value < 0) ? FALSE : TRUE;
     }
 
-    if (is_numeric($value) && preg_match('/^\d+$/', $value)) {
+    // CRM-13460
+    // ensure number passed is always a string numeral
+    if (!is_numeric($value)) {
+      return FALSE;
+    }
+
+    if (preg_match('/^\d+$/', $value)) {
       return TRUE;
     }
 
@@ -299,6 +315,11 @@ class CRM_Utils_Rule {
   }
 
   static function numeric($value) {
+    // lets use a php gatekeeper to ensure this is numeric
+    if (!is_numeric($value)) {
+      return FALSE;
+    }
+
     return preg_match('/(^-?\d\d*\.\d*$)|(^-?\d\d*$)|(^-?\.\d\d*$)/', $value) ? TRUE : FALSE;
   }
 

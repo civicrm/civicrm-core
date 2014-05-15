@@ -45,6 +45,9 @@
     <pseudoconstant>
       <optionGroupName>name_badge</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <comment>This refers to name column of civicrm_option_value row in name_badge option group</comment>
     <add>4.4</add>
   </field>
@@ -54,6 +57,9 @@
     <pseudoconstant>
       <optionGroupName>label_type</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <comment>Implicit FK to civicrm_option_value row in NEW label_type option group</comment>
     <add>4.4</add>
   </field>

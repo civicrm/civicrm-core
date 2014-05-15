@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,7 +37,7 @@
   {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Membership"}
   {literal}
   <script type="text/javascript">
-  cj( function() {
+  CRM.$(function($) {
     var membershipValues = new Array;
     {/literal}{foreach from=$optionsMembershipTypes item=memType key=opId}{literal}
       membershipValues[{/literal}{$opId}{literal}] = {/literal}{$memType}{literal};
@@ -84,11 +84,12 @@
           <tr>
             <td class="font-size12pt label"><strong>{ts}Member{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
           </tr>
-          {else}
+        {else}
           {if !$membershipMode and !$emailExists and $outBound_option != 2}
             {assign var='profileCreateCallback' value=1 }
           {/if}
-        {include file="CRM/Contact/Form/NewContact.tpl"}
+          <td class="label">{$form.contact_id.label}</td>
+          <td>{$form.contact_id.html}</td>
         {/if}
         {if $membershipMode}
           <tr><td class="label">{$form.payment_processor_id.label}</td><td>{$form.payment_processor_id.html}</td></tr>
@@ -143,12 +144,14 @@
           <td>{if $isRecur && $endDate}{$endDate|crmDate}{else}{include file="CRM/common/jcalendar.tpl" elementName=end_date}{/if}
             <br />
             <span class="description">{ts}Latest membership period expiration date. End Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span></td></tr>
-        <tr id="autoRenew" class="crm-membership-form-block-auto_renew">
-          <td class="label"> {$form.auto_renew.label} </td>
-          <td> {$form.auto_renew.html} {help id="id-auto_renew" file="CRM/Member/Form/Membership.hlp" action=$action} </td>
-        </tr>
-        {if ! $membershipMode}
-          <tr><td class="label">{$form.is_override.label}</td><td>{$form.is_override.html}&nbsp;&nbsp;{help id="id-status-override"}</td></tr>
+        {if !empty($form.auto_renew)}
+          <tr id="autoRenew" class="crm-membership-form-block-auto_renew">
+            <td class="label"> {$form.auto_renew.label} {help id="id-auto_renew" file="CRM/Member/Form/Membership.hlp" action=$action} </td>
+            <td> {$form.auto_renew.html} </td>
+          </tr>
+        {/if}
+        {if !$membershipMode}
+          <tr><td class="label">{$form.is_override.label} {help id="id-status-override"}</td><td>{$form.is_override.html}</td></tr>
         {/if}
 
         {if ! $membershipMode}
@@ -174,26 +177,25 @@
             <td>{$form.total_amount.html}<br />
               <span class="description">{ts}Membership payment amount.{/ts}</span></td>
           </tr>
-          {if $context neq 'standalone'}
-            <tr class="crm-membership-form-block-contribution-contact">
-              <td class="label">{$form.is_different_contribution_contact.label}</td>
-              <td>{$form.is_different_contribution_contact.html}&nbsp;&nbsp;{help id="id-contribution_contact"}</td>
-            </tr>
-            <tr id="record-different-contact">
-              <td>&nbsp;</td>
-              <td>
-                <table class="compressed">
-                  <tr class="crm-membership-form-block-honor-type">
-                    <td class="label">{$form.honor_type_id.label}</td>
-                    <td>{$form.honor_type_id.html}</td>
-                  </tr>
-                  <tr id ='contributionContact' class="crm-membership-form-block-contribution-type">
-                  {include file="CRM/Contact/Form/NewContact.tpl"}
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          {/if}
+          <tr class="crm-membership-form-block-contribution-contact">
+            <td class="label">{$form.is_different_contribution_contact.label}</td>
+            <td>{$form.is_different_contribution_contact.html}&nbsp;&nbsp;{help id="id-contribution_contact"}</td>
+          </tr>
+          <tr id="record-different-contact">
+            <td>&nbsp;</td>
+            <td>
+              <table class="compressed">
+                <tr class="crm-membership-form-block-soft-credit-type">
+                  <td class="label">{$form.soft_credit_type.label}</td>
+                  <td>{$form.soft_credit_type.html}</td>
+                </tr>
+                <tr class="crm-membership-form-block-soft-credit-contact-id">
+                  <td class="label">{$form.soft_credit_contact_id.label}</td>
+                  <td>{$form.soft_credit_contact_id.html}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
           <tr class="crm-membership-form-block-billing">
             <td colspan="2">
             {include file='CRM/Core/BillingBlock.tpl'}
@@ -208,7 +210,7 @@
           </tr>
           <tr class="crm-membership-form-block-record_contribution"><td colspan="2">
             <fieldset id="recordContribution"><legend>{ts}Membership Payment and Receipt{/ts}</legend>
-              <table>{if $context neq 'standalone'}
+              <table>
                 <tr class="crm-membership-form-block-contribution-contact">
                   <td class="label">{$form.is_different_contribution_contact.label}</td>
                   <td>{$form.is_different_contribution_contact.html}&nbsp;&nbsp;{help id="id-contribution_contact"}</td>
@@ -217,16 +219,17 @@
                   <td>&nbsp;</td>
                   <td>
                     <table class="compressed">
-                      <tr class="crm-membership-form-block-honor-type">
-                        <td class="label">{$form.honor_type_id.label}</td>
-                        <td>{$form.honor_type_id.html}</td>
+                      <tr class="crm-membership-form-block-soft-credit-type">
+                        <td class="label">{$form.soft_credit_type_id.label}</td>
+                        <td>{$form.soft_credit_type_id.html}</td>
                       </tr>
-                      <tr id ='contributionContact' class="crm-membership-form-block-contribution-type">
-                      {include file="CRM/Contact/Form/NewContact.tpl"}
+                      <tr class="crm-membership-form-block-soft-credit-contact-id">
+                        <td class="label">{$form.soft_credit_contact_id.label}</td>
+                        <td>{$form.soft_credit_contact_id.html}</td>
                       </tr>
                     </table>
                   </td>
-                </tr>{/if}
+                </tr>
                   <tr class="crm-membership-form-block-financial_type_id">
                       <td class="label">{$form.financial_type_id.label}</td>
                       <td>{$form.financial_type_id.html}<br />
@@ -242,8 +245,8 @@
                   <td>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}</td>
                 </tr>
                 <tr class="crm-membership-form-block-payment_instrument_id">
-                  <td class="label">{$form.payment_instrument_id.label}</td>
-                  <td>{$form.payment_instrument_id.html}</td>
+                  <td class="label">{$form.payment_instrument_id.label}<span class="marker"> *</span></td>
+                  <td>{$form.payment_instrument_id.html} {help id="payment_instrument_id" file="CRM/Contribute/Page/Tab.hlp"}</td>
                 </tr>
                 <tr id="checkNumber" class="crm-membership-form-block-check_number">
                   <td class="label">{$form.check_number.label}</td>
@@ -292,7 +295,7 @@
       {include file="CRM/common/customData.tpl"}
       {literal}
       <script type="text/javascript">
-      cj(function() {
+      CRM.$(function($) {
       {/literal}
         CRM.buildCustomData( '{$customDataType}' );
         {if $customDataSubType}
@@ -303,9 +306,16 @@
       </script>
       {/literal}
       {if $accessContribution and $action eq 2 and $rows.0.contribution_id}
-        <fieldset>
-        {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
-        </fieldset>
+        <div class="crm-accordion-wrapper">
+          <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
+          <div class="crm-accordion-body">{include file="CRM/Contribute/Form/Selector.tpl" context="Search"}</div>
+        </div>
+      {/if}
+      {if $softCredit}
+        <div class="crm-accordion-wrapper">
+          <div class="crm-accordion-header">{ts}Related Soft Contributions{/ts}</div>
+          <div class="crm-accordion-body">{include file="CRM/Contribute/Page/ContributionSoft.tpl" context="membership"}</div>
+       </div>
       {/if}
     {/if}
 
@@ -336,12 +346,55 @@
 
     {literal}
     <script type="text/javascript">
-    cj( function( ) {
+
+      function setPaymentBlock(mode, checkboxEvent) {
+        var memType = parseInt(cj('#membership_type_id_1').val( ));
+        var isPriceSet = 0;
+
+        if ( cj('#price_set_id').length > 0 && cj('#price_set_id').val() ) {
+          isPriceSet = 1;
+        }
+
+        if ( !memType || isPriceSet ) {
+          return;
+        }
+
+        var allMemberships = {/literal}{$allMembershipInfo}{literal};
+        if ( !mode ) {
+          //check the record_contribution checkbox if membership is a paid one
+          {/literal}{if $action eq 1}{literal}
+          if (!checkboxEvent) {
+            if (allMemberships[memType]['total_amount_numeric'] > 0) {
+              cj('#record_contribution').prop('checked','checked');
+              cj('#recordContribution').show();
+            }
+            else {
+              cj('#record_contribution').prop('checked', false);
+              cj('#recordContribution').hide();
+            }
+          }
+          {/literal}{/if}{literal}
+        }
+
+        // skip this for test and live modes because financial type is set automatically
+        cj("#financial_type_id").val(allMemberships[memType]['financial_type_id']);
+        var term = cj('#num_terms').val();
+        if ( term ) {
+          var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
+          cj("#total_amount").val( feeTotal.toFixed(2) );
+        }
+        else {
+          cj("#total_amount").val( allMemberships[memType]['total_amount'] );
+        }
+      }
+
+
+      CRM.$(function($) {
       var mode   = {/literal}'{$membershipMode}'{literal};
       if ( !mode ) {
         // Offline form (mode = false) has the record_contribution checkbox
         cj('#record_contribution').click( function( ) {
-          if ( cj(this).attr('checked') ) {
+          if ( cj(this).prop('checked') ) {
             cj('#recordContribution').show( );
             setPaymentBlock( false, true);
           }
@@ -368,7 +421,7 @@
 
     function setDifferentContactBlock( ) {
       // show/hide different contact section
-      if ( cj('#is_different_contribution_contact').attr('checked') ) {
+      if ( cj('#is_different_contribution_contact').prop('checked') ) {
         cj('#record-different-contact').show();
       }
       else {
@@ -403,7 +456,7 @@
     {/literal}{if !$membershipMode}{literal}
     showHideMemberStatus();
     function showHideMemberStatus() {
-      if ( cj( "#is_override" ).attr('checked' ) ) {
+      if ( cj( "#is_override" ).prop('checked' ) ) {
         cj('#memberStatus').show( );
         cj('#memberStatus_show').hide( );
       }
@@ -414,52 +467,9 @@
     }
     {/literal}{/if}
 
-    {literal}
-    function setPaymentBlock(mode, checkboxEvent) {
-      var memType = parseInt(cj('#membership_type_id_1').val( ));
-      var isPriceSet = 0;
-
-      if ( cj('#price_set_id').length > 0 && cj('#price_set_id').val() ) {
-        isPriceSet = 1;
-      }
-
-      if ( !memType || isPriceSet ) {
-        return;
-      }
-
-      var allMemberships = {/literal}{$allMembershipInfo}{literal};
-      if ( !mode ) {
-        //check the record_contribution checkbox if membership is a paid one
-        {/literal}{if $action eq 1}{literal}
-          if (!checkboxEvent) {
-            if (allMemberships[memType]['total_amount_numeric'] > 0) {
-              cj('#record_contribution').attr('checked','checked');
-              cj('#recordContribution').show();
-            }
-            else {
-              cj('#record_contribution').removeAttr('checked');
-              cj('#recordContribution').hide();
-            }
-          }
-        {/literal}{/if}{literal}
-      }
-
-      // skip this for test and live modes because financial type is set automatically
-      cj("#financial_type_id").val(allMemberships[memType]['financial_type_id']);
-      var term = cj('#num_terms').val();
-      if ( term ) {
-        var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
-        cj("#total_amount").val( feeTotal.toFixed(2) );
-      }
-      else {
-        cj("#total_amount").val( allMemberships[memType]['total_amount'] );
-      }
-    }
-
-    {/literal}
     {if $context eq 'standalone' and $outBound_option != 2 }
     {literal}
-    cj( function( ) {
+    CRM.$(function($) {
       cj("#contact_1").blur( function( ) {
         checkEmail( );
       } );
@@ -500,13 +510,13 @@
 
     {literal}
     //keep read only always checked.
-    cj( function( ) {
+    CRM.$(function($) {
       var allowAutoRenew   = {/literal}'{$allowAutoRenew}'{literal};
       var alreadyAutoRenew = {/literal}'{$alreadyAutoRenew}'{literal};
       if ( allowAutoRenew || alreadyAutoRenew ) {
         cj( "#auto_renew" ).click(function( ) {
           if ( cj(this).attr( 'readonly' ) ) {
-            cj(this).attr( 'checked', true );
+            cj(this).prop('checked', true );
           }
         });
       }
@@ -525,7 +535,7 @@
       //for update lets hide it when not already recurring.
       if ( action == 2 ) {
         //user can't cancel auto renew by unchecking.
-        if ( cj("#auto_renew").attr( 'checked' ) ) {
+        if ( cj("#auto_renew").prop('checked' ) ) {
           cj("#auto_renew").attr( 'readonly', true );
         }
         else {
@@ -542,7 +552,7 @@
 
       //we don't have both required values.
       if ( !processorId || !membershipType ) {
-        cj("#auto_renew").attr( 'checked', false );
+        cj("#auto_renew").prop('checked', false );
         cj("#autoRenew").hide( );
         return;
       }
@@ -552,7 +562,7 @@
       var currentOption    = autoRenewOptions[membershipType];
 
       if ( !currentOption || !recurProcessors[processorId] ) {
-        cj("#auto_renew").attr( 'checked', false );
+        cj("#auto_renew").prop('checked', false );
         cj("#autoRenew").hide( );
         return;
       }
@@ -560,29 +570,29 @@
       if ( currentOption == 1 ) {
         cj("#autoRenew").show( );
         if ( cj("#auto_renew").attr( 'readonly' ) ) {
-          cj("#auto_renew").attr('checked', false );
+          cj("#auto_renew").prop('checked', false );
           cj("#auto_renew").removeAttr( 'readonly' );
         }
       }
       else if ( currentOption == 2 ) {
         cj("#autoRenew").show( );
-        cj("#auto_renew").attr( 'checked', true );
+        cj("#auto_renew").prop('checked', true );
         cj("#auto_renew").attr( 'readonly', true );
       }
       else {
-        cj("#auto_renew").attr( 'checked', false );
+        cj("#auto_renew").prop('checked', false );
         cj("#autoRenew").hide( );
       }
 
       //play w/ receipt option.
-      if ( cj("#auto_renew").attr( 'checked' ) ) {
+      if ( cj("#auto_renew").prop('checked' ) ) {
         cj("#notice").hide( );
-        cj("#send_receipt").attr( 'checked', false );
+        cj("#send_receipt").prop('checked', false );
         cj("#send-receipt").hide( );
       }
       else {
         cj("#send-receipt").show( );
-        if ( cj("#send_receipt").attr( 'checked' ) ) {
+        if ( cj("#send_receipt").prop('checked' ) ) {
           cj("#notice").show( );
         }
       }
@@ -592,13 +602,13 @@
 
     {literal}
     function buildReceiptANDNotice( ) {
-      if ( cj("#auto_renew").attr( 'checked' ) ) {
+      if ( cj("#auto_renew").prop('checked' ) ) {
         cj("#notice").hide( );
         cj("#send-receipt").hide( );
       }
       else {
         cj("#send-receipt").show( );
-        if ( cj("#send_receipt").attr( 'checked' ) ) {
+        if ( cj("#send_receipt").prop('checked' ) ) {
           cj("#notice").show( );
         }
       }
@@ -640,7 +650,7 @@
         cj('#autoRenew').hide();
         var autoRenew = cj("#auto_renew");
         autoRenew.removeAttr( 'readOnly' );
-        autoRenew.removeAttr( 'checked' );
+        autoRenew.prop('checked', false );
         {/literal}{/if}{literal}
         return;
       }
@@ -714,13 +724,13 @@
         cj('#autoRenew').hide();
         var autoRenew = cj("#auto_renew");
         autoRenew.removeAttr( 'readOnly' );
-        autoRenew.removeAttr( 'checked' );
+        autoRenew.prop('checked', false );
         if ( autoRenewOption == 1 ) {
           cj('#autoRenew').show();
         }
         else if ( autoRenewOption == 2 ) {
           autoRenew.attr( 'readOnly', true );
-          autoRenew.attr( 'checked',  true );
+          autoRenew.prop('checked',  true );
           cj('#autoRenew').show();
         }
         {/literal}{/if}{literal}
@@ -730,7 +740,7 @@
         if ( cj(this).attr('price') ) {
           switch( cj(this).attr('type') ) {
             case 'checkbox':
-              if ( cj(this).attr('checked') ) {
+              if ( cj(this).prop('checked') ) {
                 eval( 'var option = ' + cj(this).attr('price') ) ;
                 var ele = option[0];
                 var memTypeId = optionsMembershipTypes[ele];
@@ -747,7 +757,7 @@
               break;
 
             case 'radio':
-              if ( cj(this).attr('checked') && cj(this).val() ) {
+              if ( cj(this).prop('checked') && cj(this).val() ) {
                 var memTypeId = optionsMembershipTypes[cj(this).val()];
                 if ( memTypeId && cj.inArray(memTypeId, currentMembershipType) == -1 ) {
                   currentMembershipType[count] = memTypeId;
@@ -811,7 +821,7 @@
     }
 
   function enableAmountSection( setContributionType ) {
-    if ( !cj('#record_contribution').attr('checked') ) {
+    if ( !cj('#record_contribution').prop('checked') ) {
       cj('#record_contribution').click( );
       cj('#recordContribution').show( );
     }

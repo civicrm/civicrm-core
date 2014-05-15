@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -82,7 +82,8 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * Function to add a name label
    *
    * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   *
+   * @internal param array $ids reference array contains the id
    *
    * @access public
    * @static
@@ -166,7 +167,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
     CRM_Badge_BAO_Layout::retrieve($layoutParams, $layoutInfo);
 
     $formatProperties = CRM_Core_OptionGroup::getValue('name_badge', $layoutInfo['label_format_name'], 'name');
-    $layoutInfo['format'] = get_object_vars(json_decode($formatProperties));
+    $layoutInfo['format'] = json_decode($formatProperties, true);
     $layoutInfo['data'] = CRM_Badge_BAO_Layout::getDecodedData($layoutInfo['data']);
     return $layoutInfo;
   }

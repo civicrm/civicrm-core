@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,9 +29,7 @@
 {/if}
 {literal}
 <script type="text/javascript">
-var CRM = CRM || {};
-CRM.buildCustomData = function( type, subType, subName, cgCount, groupID, isMultiple )
-{
+CRM.buildCustomData = function( type, subType, subName, cgCount, groupID, isMultiple ) {
   var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
 
   if ( subType ) {
@@ -113,7 +111,7 @@ CRM.buildCustomData = function( type, subType, subName, cgCount, groupID, isMult
           storage[id] = cj(this).detach();
         }
       });
-      target.html(response);
+      target.html(response).trigger('crmLoad');
       target.children().each(function() {
         var id = cj(this).attr('id');
         if (id && storage[id]) {

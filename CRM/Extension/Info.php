@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,9 +44,11 @@ class CRM_Extension_Info {
   /**
    * Load extension info an XML file
    *
-   * @param string $string XML content
+   * @param $file
+   *
+   * @throws CRM_Extension_Exception_ParseException
+   * @internal param string $string XML content
    * @return CRM_Extension_Info
-   * @throws CRM_Extension_Exception
    */
   public static function loadFromFile($file) {
     list ($xml, $error) = CRM_Utils_XML::parseFile($file);
@@ -63,6 +65,8 @@ class CRM_Extension_Info {
    * Load extension info a string
    *
    * @param string $string XML content
+   *
+   * @throws CRM_Extension_Exception_ParseException
    * @return CRM_Extension_Info
    */
   public static function loadFromString($string) {

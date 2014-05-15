@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -42,7 +42,7 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -108,26 +108,14 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 
-    // if CiviCase is being enabled,
-    // load the case related sample data
-    if (in_array('CiviCase', $params['enableComponents']) &&
-      !in_array('CiviCase', $this->_defaults['enableComponents'])
-    ) {
-      $config = CRM_Core_Config::singleton();
-      CRM_Admin_Form_Setting_Component::loadCaseSampleData($config->dsn, $config->sqlDir . 'case_sample.mysql');
-      CRM_Admin_Form_Setting_Component::loadCaseSampleData($config->dsn, $config->sqlDir . 'case_sample1.mysql');
-      if (!CRM_Case_BAO_Case::createCaseViews()) {
-        $msg = ts("Could not create the MySQL views for CiviCase. Your mysql user needs to have the 'CREATE VIEW' permission");
-        CRM_Core_Error::fatal($msg);
-      }
-    }
+    CRM_Case_Info::onToggleComponents($this->_defaults['enableComponents'], $params['enableComponents'], NULL);
     parent::commonProcess($params);
 
     // reset navigation when components are enabled / disabled
     CRM_Core_BAO_Navigation::resetNavigation();
   }
 
-  public function loadCaseSampleData($dsn, $fileName, $lineMode = FALSE) {
+  public static function loadCaseSampleData($dsn, $fileName, $lineMode = FALSE) {
     global $crmPath;
 
     $db = &DB::connect($dsn);

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -205,6 +205,20 @@ return array (
     'description' => null,
     'help_text' => null,
   ),
+  'ajaxPopupsEnabled' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'ajaxPopupsEnabled',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => 1,
+    'add' => '4.5',
+    'title' => null,
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => null,
+    'help_text' => null,
+  ),
   'activity_assignee_notification' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
@@ -368,6 +382,22 @@ return array (
 When enabled, statistics about your CiviCRM installation are reported anonymously to the CiviCRM team to assist in prioritizing ongoing development efforts. The following information is gathered: CiviCRM version, versions of PHP, MySQL and framework (Drupal/Joomla/standalone), and default language. Counts (but no actual data) of the following record types are reported: contacts, activities, cases, relationships, contributions, contribution pages, contribution products, contribution widgets, discounts, price sets, profiles, events, participants, tell-a-friend pages, grants, mailings, memberships, membership blocks, pledges, pledge blocks and active payment processor types.",
     'help_text' => null,
   ),
+  'securityAlert' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'versionCheck',
+    'prefetch' => 0,
+    'config_only'=> 0,
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => 1,
+    'add' => '4.4',
+    'title' => 'Security Alerts',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => "If enabled, CiviCRM will automatically run checks for significant mis-configurations such as ineffective file protections.",
+    'help_text' => null,
+  ),
   'doNotAttachPDFReceipt' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
@@ -516,6 +546,28 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'description' => null,
     'help_text' => null,
   ),
+  'blogUrl' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'blogUrl',
+    'prefetch' => 0,
+    'config_only'=> 0,
+    'type' => 'String',
+    'quick_form_type' => 'Element',
+    'html_type' => 'text',
+    'html_attributes' => array(
+      'size' => 64,
+      'maxlength' => 128,
+    ),
+    'html_type' => 'Text',
+    'default' => '*default*',
+    'add' => '4.3',
+    'title' => 'Blog Feed URL',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Blog feed URL used by the blog dashlet',
+    'help_text' => 'Use "*default*" for the system default or override with a custom URL',
+  ),
   'communityMessagesUrl' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
@@ -626,5 +678,40 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'is_contact' => 0,
     'description' => null,
     'help_text'   => null,
+    'on_change' => array(
+      array('CRM_Case_Info', 'onToggleComponents'),
+      array('CRM_Core_Component', 'flushEnabledComponents'),
+    ),
+  ),
+
+  'disable_core_css' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'disable_core_css',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => '0',
+    'add' => '4.4',
+    'title' => 'Disable CiviCRM css',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Prevent the stylesheet "civicrm.css" from being loaded.',
+    'help_text' => NULL,
+  ),
+  'empoweredBy' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'empoweredBy',
+    'prefetch' => 1,
+    'config_only'=> 0,
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => 1,
+    'add' => '4.5',
+    'title' => 'Display "empowered by CiviCRM"',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'When enabled, "empowered by CiviCRM" is displayed at the bottom of public forms.',
+    'help_text' => null,
   ),
 );

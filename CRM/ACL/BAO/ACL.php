@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -83,13 +83,14 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * Construct a WHERE clause to handle permissions to $object_*
    *
-   * @param array ref $tables -   Any tables that may be needed in the FROM
+   * @param $tables
    * @param string $operation -   The operation being attempted
    * @param string $object_table -    The table of the object in question
-   * @param int $object_id    -   The ID of the object in question
-   * @param int $acl_id   -       If it's a grant/revoke operation, the ACL ID
+   * @param int $object_id -   The ID of the object in question
+   * @param int $acl_id -       If it's a grant/revoke operation, the ACL ID
    * @param boolean $acl_role -  For grant operations, this flag determines if we're granting a single acl (false) or an entire group.
    *
+   * @internal param \ref $array $tables -   Any tables that may be needed in the FROM
    * @return string           -   The WHERE clause, or 0 on failure
    * @access public
    * @static
@@ -319,11 +320,13 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    * Given a table and id pair, return the filter clause
    *
    * @param string $table -   The table owning the object
-   * @param int $id   -       The ID of the object
-   * @param array ref $tables - Tables that will be needed in the FROM
+   * @param int $id -       The ID of the object
+   * @param $tables
+   *
+   * @internal param \ref $array $tables - Tables that will be needed in the FROM
    *
    * @return string|null  -   WHERE-style clause to filter results,
-   or null if $table or $id is null
+   * or null if $table or $id is null
    * @access public
    * @static
    */
@@ -538,7 +541,7 @@ SELECT      $acl.*
       $rule->query($query);
 
       while ($rule->fetch()) {
-        $results[$rule->id] = &$rule->toArray();
+        $results[$rule->id] = $rule->toArray();
       }
     }
 
@@ -648,6 +651,7 @@ SELECT $acl.*
     $dao = new CRM_ACL_DAO_ACL();
     $dao->copyValues($params);
     $dao->save();
+    return $dao;
   }
 
   static function retrieve(&$params, &$defaults) {
@@ -822,6 +826,7 @@ SELECT g.*
 
     $acls = CRM_ACL_BAO_Cache::build($contactID);
 
+    $ids = array();
     if (!empty($acls)) {
       $aclKeys = array_keys($acls);
       $aclKeys = implode(',', $aclKeys);
@@ -842,9 +847,7 @@ ORDER BY a.object_id
 ";
         $params = array(1 => array($tableName, 'String'));
         $dao = CRM_Core_DAO::executeQuery($query, $params);
-        $aclFound = FALSE;
         while ($dao->fetch()) {
-          $aclFound = TRUE;
           if ($dao->object_id) {
             if (self::matchType($type, $dao->operation)) {
               $ids[] = $dao->object_id;
@@ -861,20 +864,14 @@ ORDER BY a.object_id
             break;
           }
         }
-
-        if (!$aclFound) {
-          if (!empty($includedGroups) &&
-            is_array($includedGroups)
-          ) {
-            $ids = $includedGroups;
-          }
-          else {
-            $ids = array();
-          }
-        }
-
         $cache->set($cacheKey, $ids);
       }
+    }
+
+    if (empty($ids) && !empty($includedGroups) &&
+      is_array($includedGroups)
+    ) {
+      $ids = $includedGroups;
     }
 
     CRM_Utils_Hook::aclGroup($type, $contactID, $tableName, $allGroups, $ids);

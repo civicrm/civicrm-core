@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
 /**
- * Generate the nav menu
+ * Output navigation script tag
  *
  * @param array $params
  *   - is_default: bool, true if this is normal/default instance of the menu (which may be subject to CIVICRM_DISABLE_DEFAULT_MENU)
@@ -43,18 +43,27 @@
  * @return string HTML
  */
 function smarty_function_crmNavigationMenu($params, &$smarty) {
+  $config = CRM_Core_Config::singleton();
   //check if logged in user has access CiviCRM permission and build menu
   $buildNavigation = !CRM_Core_Config::isUpgradeMode() && CRM_Core_Permission::check('access CiviCRM');
   if (defined('CIVICRM_DISABLE_DEFAULT_MENU') && CRM_Utils_Array::value('is_default', $params, FALSE)) {
+    $buildNavigation = FALSE;
+  }
+  if ($config->userFrameworkFrontend) {
     $buildNavigation = FALSE;
   }
   if ($buildNavigation) {
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
     if ($contactID) {
-      $navigation = CRM_Core_BAO_Navigation::createNavigation($contactID);
-      $smarty->assign('navigation', $navigation);
-      return $smarty->fetch('CRM/common/Navigation.tpl');
+      // These params force the browser to refresh the js file when switching user, domain, or language
+      // We don't put them as a query string because some browsers will refuse to cache a page with a ? in the url
+      // @see CRM_Admin_Page_AJAX::getNavigationMenu
+      $lang = $config->lcMessages;
+      $domain = CRM_Core_Config::domainID();
+      $key = CRM_Core_BAO_Navigation::getCacheKey($contactID);
+      $src = CRM_Utils_System::url("civicrm/ajax/menujs/$contactID/$lang/$domain/$key");
+      return '<script type="text/javascript" src="' . $src . '"></script>';
     }
   }
   return '';

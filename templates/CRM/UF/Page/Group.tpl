@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -64,7 +64,8 @@
         </ul>
 
         {* handle enable/disable actions*}
-        {include file="CRM/common/enableDisable.tpl"}
+        {include file="CRM/common/enableDisableApi.tpl"}
+        {include file="CRM/common/crmeditable.tpl"}
         {include file="CRM/common/jsortable.tpl"}
         <div id="user-profiles">
            <div class="crm-content-block">
@@ -83,7 +84,7 @@
             <tbody>
             {foreach from=$rows item=row}
             {if !$row.is_reserved }
-              <tr id="UFGroup-{$row.id}"class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
+              <tr id="UFGroup-{$row.id}" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
                 <td><span class="crmf-title crm-editable">{$row.title}</span></td>
                 <td>
                   {if $row.created_id && $row.created_by}
@@ -126,7 +127,7 @@
             <tbody>
             {foreach from=$rows item=row}
             {if $row.is_reserved}
-              <tr id="row_{$row.id}"class="{$row.class}{if NOT $row.is_active} disabled{/if}">
+              <tr id="UFGroup-{$row.id}" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
                 <td>{$row.title}</td>
                 <td>
                   {if $row.created_id && $row.created_by}
@@ -154,12 +155,11 @@
 
   </div> {* maincontainer*}
   <script type='text/javascript'>
-    var selectedTab = 'user-profiles';
-    {if $selectedChild}selectedTab = '{$selectedChild}';{/if}
-    {literal}
-      cj( function() {
-        var tabIndex = cj('#tab_' + selectedTab).prevAll().length
-        cj("#mainTabContainer").tabs( {selected: tabIndex} );
+      CRM.$(function($) {ldelim}
+        var selectedTab = '{if $selectedChild}{$selectedChild}{else}user-profiles{/if}';
+        var tabIndex = cj('#tab_' + selectedTab).prevAll().length;
+        {literal}
+        cj("#mainTabContainer").tabs( {active: tabIndex} );
       });
     {/literal}
   </script>
@@ -173,4 +173,3 @@
     {/if}
     {/if}
 {/if}
-{include file="CRM/common/crmeditable.tpl"}

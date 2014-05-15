@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -58,7 +58,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = array();
@@ -117,7 +117,10 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
    * Warning: if you make changes here, be sure to also make them in
    * Retry.php
    *
-   * @param array $params     The form values
+   * @param array $params The form values
+   *
+   * @param $files
+   * @param $self
    *
    * @return boolean          True if either we deliver immediately, or the
    *                          date is properly set.

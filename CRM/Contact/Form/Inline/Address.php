@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -111,9 +111,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
         'address_options'
       );
       $this->_parseStreetAddress = FALSE;
-      if (CRM_Utils_Array::value('street_address', $addressOptions) &&
-        CRM_Utils_Array::value('street_address_parsing', $addressOptions)
-      ) {
+      if (!empty($addressOptions['street_address']) && !empty($addressOptions['street_address_parsing'])) {
         $this->_parseStreetAddress = TRUE;
       }
       $this->set('parseStreetAddress', $this->_parseStreetAddress);
@@ -143,7 +141,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
 
     $config = CRM_Core_Config::singleton();
     //set address block defaults
-    if (CRM_Utils_Array::value('address', $defaults)) {
+    if (!empty($defaults['address'])) {
       CRM_Contact_Form_Edit_Address::setDefaultValues($defaults, $this);
     }
     else {
@@ -204,6 +202,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
     $address = CRM_Core_BAO_Address::create($params, TRUE);
 
     $this->log();
-    $this->response(array('addressId' => $address[0]->id));
+    $this->ajaxResponse['addressId'] = $address[0]->id;
+    $this->response();
   }
 }

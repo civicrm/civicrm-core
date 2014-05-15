@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -194,27 +194,12 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @static
    */
   public static function getFontSizes() {
-    return array(
-      6 => ts('6 pt'),
-      7 => ts('7 pt'),
-      8 => ts('8 pt'),
-      9 => ts('9 pt'),
-      10 => ts('10 pt'),
-      11 => ts('11 pt'),
-      12 => ts('12 pt'),
-      13 => ts('13 pt'),
-      14 => ts('14 pt'),
-      15 => ts('15 pt'),
-      16 => ts('16 pt'),
-      17 => ts('17 pt'),
-      18 => ts('18 pt'),
-      19 => ts('19 pt'),
-      20 => ts('20 pt'),
-      21 => ts('21 pt'),
-      22 => ts('22 pt'),
-      23 => ts('23 pt'),
-      24 => ts('24 pt'),
-    );
+    $fontSizes = array();
+    for ($i = 6; $i <= 60; $i++) {
+      $fontSizes[$i] = ts('%1 pt', array(1 => $i));
+    }
+
+    return $fontSizes;
   }
 
   /**
@@ -272,7 +257,9 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get Option Group ID for Label Formats
    *
-   * @param void
+   * @param string $name
+   *
+   * @internal param $void
    *
    * @return int  Group ID (null if Group ID doesn't exist)
    * @access private
@@ -358,8 +345,10 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get Label Format from the DB
    *
-   * @param string $field   Field name to search by
-   * @param int    $val     Field value to search for
+   * @param string $field Field name to search by
+   * @param int $val Field value to search for
+   *
+   * @param string $groupName
    *
    * @return array  $values (reference) associative array of name/value pairs
    * @access public
@@ -403,9 +392,11 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get Label Format field from associative array
    *
-   * @param string              $field         name of a label format field
-   * @param array (reference)   $values        associative array of name/value pairs containing
+   * @param string $field name of a label format field
+   * @param array (reference) $values associative array of name/value pairs containing
    *                                           label format field selections
+   *
+   * @param null $default
    *
    * @return value
    * @access public
@@ -435,8 +426,10 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * retrieves the relevant objects. Typically the valid params are only
    * label id. It also stores all the retrieved values in the default array.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $values   (reference ) an assoc array to hold the flattened values
+   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $values (reference ) an assoc array to hold the flattened values
+   *
+   * @param string $groupName
    *
    * @return object CRM_Core_DAO_OptionValue object
    * @access public

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -60,12 +60,13 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   /**
    * Constructor
    *
-   * @param array   $config  an array of configuration params
+   * @param array $config an array of configuration params
    *   - group: string
    *   - componentID: int
    *   - prefetch: bool, whether to preemptively read the entire cache group; default: TRUE
    *
-   * @return void
+   * @throws RuntimeException
+   * @return \CRM_Utils_Cache_SqlGroup
    */
   function __construct($config) {
     if (isset($config['group'])) {

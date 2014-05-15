@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -41,6 +41,7 @@ class CRM_Core_Page_Inline_Help {
     $args = $_REQUEST;
     if (!empty($args['file']) && strpos($args['file'], '..') === FALSE) {
       $file = $args['file'] . '.hlp';
+      $additionalTPLFile = $args['file'] . '.extra.hlp';
       $smarty = CRM_Core_Smarty::singleton();
       $smarty->assign('id', $args['id']);
       CRM_Utils_Array::remove($args, 'file', 'class_name', 'type', 'q', 'id');
@@ -48,7 +49,15 @@ class CRM_Core_Page_Inline_Help {
         $arg = strip_tags($arg);
       }
       $smarty->assign('params', $args);
-      exit($smarty->fetch($file));
+
+      $extraoutput = '';
+      if ($smarty->template_exists($additionalTPLFile)) {
+        //@todo hook has been put here as a conservative approach
+        // but probably should always run. It doesn't run otherwise because of the exit
+        CRM_Utils_Hook::pageRun($this);
+        $extraoutput .= trim($smarty->fetch($additionalTPLFile));
+      }
+      exit($smarty->fetch($file) . $extraoutput);
     }
   }
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -48,11 +48,8 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     $this->click('css=li#tab_contribute a');
 
     $this->waitForElementPresent('link=Submit Credit Card Contribution');
-    $this->click('link=Submit Credit Card Contribution');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
     // since we don't have live credentials we will switch to test mode
-    $url = $this->getLocation();
+    $url = $this->getAttribute("xpath=//*[@id='Search']//a[text()='Submit Credit Card Contribution']@href");
     $url = str_replace('mode=live', 'mode=test', $url);
     $this->open($url);
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -80,7 +77,8 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     // billing address
     $this->webtestAddBillingDetails($firstName, $middleName, $lastName);
     $this->click('_qf_Contribution_upload-bottom');
-
+    $this->waitForElementPresent('link=Edit');
+    $this->waitForText('crm-notification-container', "The contribution record has been processed.");
     // Use Find Contributions to make sure test recurring contribution exists
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_currency_type');
 
@@ -88,8 +86,8 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     $this->click('contribution_test');
     $this->click('_qf_Search_refresh');
 
-    $this->waitForElementPresent('css=#contributionSearch table tbody tr td span a.action-item-first');
-    $this->click('css=#contributionSearch table tbody tr td span a.action-item-first');
+    $this->waitForElementPresent('css=#contributionSearch table tbody tr td span a.action-item:first-child');
+    $this->click('css=#contributionSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
 
     // View Recurring Contribution Record

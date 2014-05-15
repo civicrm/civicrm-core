@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -71,7 +71,7 @@
   {/strip}
 {else}
     <div class="messages status no-popup">
-        {ts}<strong>Delivery has not yet begun for this mailing.</strong> If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently.{/ts} {docURL page="user/initial-set-up/email-system-configuration"}
+        {ts}<strong>Delivery has not yet begun for this mailing.</strong> If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently.{/ts} {docURL page="user/advanced-configuration/email-system-configuration"}
     </div>
 {/if}
 </fieldset>
@@ -169,7 +169,7 @@
   <td>
     {$report.mailing.body_text|mb_truncate:30|escape|nl2br}
     <br />
-    <strong><a href='{$textViewURL}'>&raquo; {ts}View complete message{/ts}</a></strong>
+    <strong><a class="crm-popup" href='{$textViewURL}'>&raquo; {ts}View complete message{/ts}</a></strong>
   </td>
 </tr>
 {/if}
@@ -180,7 +180,7 @@
   <td>
     {$report.mailing.body_html|mb_truncate:30|escape|nl2br}
     <br/>
-    <strong><a href='{$htmlViewURL}'>&raquo; {ts}View complete message{/ts}</a></strong>
+    <strong><a class="crm-popup" href='{$htmlViewURL}'>&raquo; {ts}View complete message{/ts}</a></strong>
   </td>
 </tr>
 {/if}

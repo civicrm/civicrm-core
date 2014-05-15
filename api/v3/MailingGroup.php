@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_MailerGroup
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -51,6 +51,7 @@ function civicrm_api3_mailing_group_event_unsubscribe($params) {
 
 /**
  * Handle a site-level unsubscribe event
+ * @deprecated
  *
  * @param array $params
  *
@@ -95,6 +96,12 @@ function civicrm_api3_mailing_group_getfields($params) {
   $d = new $dao();
   $fields = $fields + $d->fields();
   $d->free();
+
+  // CRM-13830 - prevent the api wrapper from helping out with pseudoconstants
+  // Since these fields don't belong to this entity it will fail
+  foreach ($fields as &$field) {
+    unset($field['pseudoconstant']);
+  }
 
   return civicrm_api3_create_success($fields);
 }

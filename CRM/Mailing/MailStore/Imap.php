@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,13 +40,13 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
   /**
    * Connect to the supplied IMAP server and make sure the two mailboxes exist
    *
-   * @param string $host      host to connect to
-   * @param string $username  authentication username
-   * @param string $password  authentication password
-   * @param bool   $ssl       whether to use IMAP or IMAPS
-   * @param string $folder    name of the inbox folder
+   * @param string $host host to connect to
+   * @param string $username authentication username
+   * @param string $password authentication password
+   * @param bool $ssl whether to use IMAP or IMAPS
+   * @param string $folder name of the inbox folder
    *
-   * @return void
+   * @return \CRM_Mailing_MailStore_Imap
    */
   function __construct($host, $username, $password, $ssl = TRUE, $folder = 'INBOX') {
     // default to INBOX if an empty string

@@ -20,6 +20,7 @@
   </primaryKey>
   <field>
        <name>name</name>
+       <title>Tag Name</title>
        <type>varchar</type>
        <required>true</required>
        <length>64</length>
@@ -28,6 +29,7 @@
   </field>
   <field>
        <name>description</name>
+       <title>Description</title>
        <type>varchar</type>
        <length>255</length>
        <comment>Optional verbose description of the tag.</comment>
@@ -35,6 +37,7 @@
   </field>
   <field>
        <name>parent_id</name>
+       <title>Parent Tag</title>
        <type>int unsigned</type>
        <default>NULL</default>
        <comment>Optional parent id for this tag.</comment>
@@ -61,21 +64,30 @@
   </index>
   <field>
     <name>is_reserved</name>
+    <title>Reserved</title>
     <type>boolean</type>
     <default>0</default>
     <add>3.2</add>
   </field>
   <field>
     <name>is_tagset</name>
+    <title>Tagset</title>
     <type>boolean</type>
     <default>0</default>
     <add>3.2</add>
   </field>
   <field>
     <name>used_for</name>
+    <title>Used For</title>
     <type>varchar</type>
     <length>64</length>
     <default>NULL</default>
+    <html>
+      <type>Select</type>
+    </html>
+    <pseudoconstant>
+      <optionGroupName>tag_used_for</optionGroupName>
+    </pseudoconstant>
     <add>3.2</add>
   </field>
   <field>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -45,7 +45,6 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   protected $_eventID;
   protected $_individualId;
   protected $_params;
-  public $_eNoticeCompliant = FALSE;
 
   function get_info() {
     return array(
@@ -403,14 +402,14 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   function testCreateUpdateParticipantFeeLevel() {
     $myParams = $this->_params + array('participant_fee_level' => CRM_Core_DAO::VALUE_SEPARATOR . "fee" . CRM_Core_DAO::VALUE_SEPARATOR);
     $participant = $this->callAPISuccess('participant', 'create', $myParams);
-    $this->assertAPISuccess($participant);
     $update = array(
-           'id' => $participant['id'],
+      'id' => $participant['id'],
       'status_id' => 2,
     );
-    $this->callAPISuccess('participant', 'create', $update);
-    $this->assertEquals($participant['values'][$participant['id']]['participant_fee_level'],
-      $update['values'][$participant['id']]['participant_fee_level']
+    $update = $this->callAPISuccess('participant', 'create', $update);
+
+    $this->assertEquals($participant['values'][$participant['id']]['fee_level'],
+      $update['values'][$participant['id']]['fee_level']
     );
 
     $this->callAPISuccess('participant', 'delete', array('id' => $participant['id']));
@@ -419,7 +418,10 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
    * check with complete array
    */
   function testUpdate() {
-    $participantId = $this->participantCreate(array('contactID' => $this->_individualId, 'eventID' => $this->_eventID, $this->_apiversion));
+    $participantId = $this->participantCreate(array(
+      'contactID' => $this->_individualId,
+      'eventID' => $this->_eventID
+    ));
     $params = array(
       'id' => $participantId,
       'contact_id' => $this->_individualId,
@@ -428,7 +430,6 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'role_id' => 3,
       'register_date' => '2006-01-21',
       'source' => 'US Open',
-      'event_level' => 'Donation',
     );
     $participant = $this->callAPISuccess('participant', 'create', $params);
     $this->getAndCheck($params, $participant['id'], 'participant');

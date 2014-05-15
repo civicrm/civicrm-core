@@ -12,13 +12,29 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
    * in fixing the existing pdfLetter classes to be suitably generic
    * @access public
    *
-   * @return None
+   * @param $form
+   * @param $membershipIDs
+   * @param $skipOnHold
+   * @param $skipDeceased
+   * @param $contactIDs
+   *
+   * @return void
    */
-  static function postProcess(&$form, $membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {
+  static function postProcessMembers(&$form, $membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {
 
-    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);
+    list($formValues, $categories, $html_message, $messageToken, $returnProperties) =
+      self::processMessageTemplate($form);
 
-    $html = self::generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories);
+    $html =
+      self::generateHTML(
+        $membershipIDs,
+        $returnProperties,
+        $skipOnHold,
+        $skipDeceased,
+        $messageToken,
+        $html_message,
+        $categories
+      );
     self::createActivities($form, $html_message, $contactIDs);
 
     CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
@@ -31,17 +47,22 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
 
   /**
    * generate htmlfor pdf letters
+   *
    * @param unknown_type $membershipIDs
    * @param unknown_type $returnProperties
    * @param unknown_type $skipOnHold
    * @param unknown_type $skipDeceased
    * @param unknown_type $messageToken
+   * @param $html_message
+   * @param $categories
+   *
    * @return unknown
    */
   static function generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories) {
     $memberships = CRM_Utils_Token::getMembershipTokenDetails($membershipIDs);
 
-    foreach ($memberships as $membershipID => $membership) {
+    foreach ($membershipIDs as $membershipID) {
+      $membership = $memberships[$membershipID];
       // get contact information
       $contactId = $membership['contact_id'];
       $params = array('contact_id' => $contactId);

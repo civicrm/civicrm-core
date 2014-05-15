@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -51,7 +51,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "John", "$firstName2.john@example.org");
@@ -64,7 +64,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     // Enable CiviCampaign module if necessary
     $this->enableComponents("CiviCampaign");
@@ -111,8 +111,8 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
       "Status message didn't show up after saving campaign!"
     );
 
-    $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
-    $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $this->waitForElementPresent("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $id = (int) $this->getText("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
 
     $this->offlineParticipantAddTest($campaignTitle, $id);
   }
@@ -123,10 +123,12 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     $eventId = $this->registerUrl();
 
     $this->openCiviPage('event/manage/settings', "reset=1&action=update&id=$eventId", "_qf_EventInfo_cancel-bottom");
-
+    $this->waitForElementPresent('title');
+    $eventName = $this->getAttribute("//*[@id='title']@value");
     // select campaign
     $this->click("campaign_id");
     $this->select("campaign_id", "value=$id");
+    $this->waitForElementPresent('_qf_EventInfo_upload_done-bottom');
     $this->click("_qf_EventInfo_upload_done-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -140,13 +142,13 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
 
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
-    $this->webtestFillAutocomplete($firstName);
+    $this->webtestFillAutocomplete($firstName, 'contact_id');
 
     // Select event. Based on label for now.
-    $this->select("event_id", "value=$eventId");
+    $this->select2("event_id", $eventName);
 
     // Select role
-    $this->click("role_id[2]");
+    $this->multiselect2("role_id", array('Volunteer'));
 
     // Choose Registration Date.
     // Using helper webtestFillDate function.
@@ -165,7 +167,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
 
     // Select an event fee
     $this->waitForElementPresent('priceset');
-    $this->click("xpath=//div[@id='priceset']//input[1][@class='form-radio']");
+    $this->click("xpath=//*[@id='priceset']//input[1][@class='crm-form-radio']");
 
     // Select 'Record Payment'
     $this->click("record_contribution");
@@ -179,18 +181,18 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     $this->type("check_number", "1044");
 
     // go for the chicken combo (obviously)
-    //      $this->click("CIVICRM_QFID_chicken_Chicken");
+    // $this->click("CIVICRM_QFID_chicken_Chicken");
 
     // Clicking save.
     $this->click("_qf_Participant_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("Event registration for $displayName has been added"), "Status message didn't show up after saving!");
+    $this->waitForText("crm-notification-container", "Event registration for $displayName has been added", "Status message didn't show up after saving!");
 
-    $this->waitForElementPresent("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->click("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_ParticipantView_cancel-bottom");
 
     // verify participant record
@@ -208,7 +210,7 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
 
     $this->type('sort_name', $firstName);
     $this->click("_qf_Search_refresh");
-    $this->waitForElementPresent("_qf_Search_next_print");
+    $this->waitForElementPresent("xpath=//div[@id='participantSearch']");
     $this->click("xpath=//div[@id='participantSearch']/table/tbody/tr/td[11]/span/a[text()='Edit']");
     $this->waitForElementPresent("_qf_Participant_cancel-bottom");
     $this->assertTrue($this->isTextPresent("$campaignTitle"));
@@ -216,8 +218,9 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
 
   function registerUrl() {
     $this->openCiviPage("event/manage", "reset=1");
-    $eventId = explode('_', $this->getAttribute("//div[@id='event_status_id']//table/tbody/tr@id"));
+    $eventId = explode('-', $this->getAttribute("//div[@id='event_status_id']//div[2]/table/tbody/tr@id"));
     return $eventId[1];
   }
+
 }
 

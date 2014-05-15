@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,7 +40,9 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * Check to see if we have cache entries for this group
    * if not, regenerate, else return
    *
-   * @param int $groupID groupID of group that we are checking against
+   * @param $groupIDs
+   *
+   * @internal param int $groupID groupID of group that we are checking against
    *
    * @return boolean true if we did not regenerate, false if we did
    */
@@ -491,7 +493,7 @@ WHERE  civicrm_group_contact.status = 'Added'
       $result = CRM_Core_DAO::executeQuery($insertSql);
       CRM_Core_DAO::executeQuery(
         "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
-        SELECT DISTINCT id, group_id FROM $tempTable
+        SELECT DISTINCT $idName, group_id FROM $tempTable
       ");
       CRM_Core_DAO::executeQuery(" DROP TABLE $tempTable");
     }

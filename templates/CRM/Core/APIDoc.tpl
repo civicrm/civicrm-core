@@ -63,7 +63,7 @@ function APIDoc(entity){
 }
 
 
-cj(function ($) {
+CRM.$(function($) {
     $('h2.entity').click ( function(){APIDoc($(this).attr('id'))} ); 
     entity=window.location.hash;
     if (entity.substring(0, 1) === '#') {

@@ -1,9 +1,9 @@
 <?php
 /**
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -46,7 +46,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   protected $_customGroupId = NULL;
   protected $_customFieldId = NULL;
   protected $_params;
-  public $_eNoticeCompliant = TRUE;
+
   protected $_entity;
   function get_info() {
     return array(
@@ -288,7 +288,22 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $params['id'] = $result['id'];
     $this->callAPISuccess('relationship', 'delete', $params);
   }
-
+  /**
+   * ensure disabling works
+   */
+  function testRelationshipUpdate() {
+    $result = $this->callAPISuccess('relationship', 'create', $this->_params);
+    $relID = $result['id'];
+    $result = $this->callAPISuccess('relationship', 'create', array('id' => $relID, 'description' => 'blah'));
+    $this->assertEquals($relID, $result['id']);
+    $this->assertEquals('blah', $result['values'][$result['id']]['description']);
+    $result = $this->callAPISuccess('relationship', 'create', array('id' => $relID, 'is_permission_b_a' => 1));
+    $this->assertEquals(1, $result['values'][$result['id']]['is_permission_b_a']);
+    $result = $this->callAPISuccess('relationship', 'create', array('id' => $result['id'], 'is_active' => 0));
+    $this->assertEquals(0, $result['values'][$result['id']]['is_active']);
+    $this->assertEquals('blah', $result['values'][$result['id']]['description']);
+    $this->assertEquals(1, $result['values'][$result['id']]['is_permission_b_a']);
+  }
   /**
    * check relationship creation
    */
@@ -1073,5 +1088,14 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     foreach ($result['values'] as $key => $value) {
       $this->assertTrue(in_array($value['relationship_type_id'], array($relType1, $relType3)));
     }
+  }
+
+  /**
+   * Check for enotices on enable & disable as reported in CRM-14350
+   */
+  function testSetActive() {
+    $relationship = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $this->callAPISuccess($this->_entity, 'create', array('id' => $relationship['id'], 'is_active' => 0));
+    $this->callAPISuccess($this->_entity, 'create', array('id' => $relationship['id'], 'is_active' => 1));
   }
 }

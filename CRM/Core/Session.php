@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -79,7 +79,7 @@ class CRM_Core_Session {
    * This constructor is invoked whenever any module requests an instance of
    * the session and one is not available.
    *
-   * @return void
+   * @return \CRM_Core_Session
    */
   function __construct() {
     $this->_session = null;
@@ -88,7 +88,7 @@ class CRM_Core_Session {
   /**
    * singleton function used to manage this object
    *
-   * @return CRM_CoreSession
+   * @return CRM_Core_Session
    * @static
    */
   static function &singleton() {
@@ -119,7 +119,11 @@ class CRM_Core_Session {
         }
         $config =& CRM_Core_Config::singleton();
         if ($config->userSystem->is_drupal && function_exists('drupal_session_start')) {
-          drupal_session_start();
+          // https://issues.civicrm.org/jira/browse/CRM-14356
+          if (! (isset($GLOBALS['lazy_session']) && $GLOBALS['lazy_session'] == true)) {
+            drupal_session_start();
+          }
+          $_SESSION = array();
         }
         else {
           session_start();
@@ -144,6 +148,8 @@ class CRM_Core_Session {
    * Resets the session store
    *
    * @access public
+   *
+   * @param int $all
    *
    * @return void
    */
@@ -179,7 +185,7 @@ class CRM_Core_Session {
       return;
     }
 
-    if (!CRM_Utils_Array::value($prefix, $this->_session[$this->_key])) {
+    if (empty($this->_session[$this->_key][$prefix])) {
       $this->_session[$this->_key][$prefix] = array();
     }
   }
@@ -496,7 +502,7 @@ class CRM_Core_Session {
     if (!isset(self::$_singleton->_session[self::$_singleton->_key]['status'])) {
       self::$_singleton->_session[self::$_singleton->_key]['status'] = array();
     }
-    if ($text) {
+    if ($text || $title) {
       if ($options['unique']) {
         foreach (self::$_singleton->_session[self::$_singleton->_key]['status'] as $msg) {
           if ($msg['text'] == $text && $msg['title'] == $title) {
@@ -509,7 +515,7 @@ class CRM_Core_Session {
         'text' => $text,
         'title' => $title,
         'type' => $type,
-        'options' => $options ? json_encode($options) : NULL,
+        'options' => $options ? $options : NULL,
       );
     }
   }
@@ -539,6 +545,18 @@ class CRM_Core_Session {
     CRM_Core_BAO_Cache::storeSessionToCache(self::$_managedNames, $reset);
 
     self::$_managedNames = NULL;
+  }
+
+  /**
+   * Retrieve contact id of the logged in user
+   * @return integer | NULL contact ID of logged in user
+   */
+  static function getLoggedInContactID() {
+    $session = CRM_Core_Session::singleton();
+    if (!is_numeric($session->get('userID'))) {
+      return NULL;
+    }
+    return $session->get('userID');
   }
 
   function isEmpty() {

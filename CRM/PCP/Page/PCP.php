@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -161,6 +161,8 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    * Browse all custom data groups.
    *
    *
+   * @param null $action
+   *
    * @return void
    * @access public
    * @static
@@ -183,26 +185,26 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
     $whereClause = NULL;
 
     if (!empty($_POST) || !empty($_GET['page_type'])) {
-      if (CRM_Utils_Array::value('status_id', $_POST)) {
+      if (!empty($_POST['status_id'])) {
         $whereClause = ' AND cp.status_id = %1';
         $params['1'] = array($_POST['status_id'], 'Integer');
       }
 
-      if (CRM_Utils_Array::value('page_type', $_POST)) {
+      if (!empty($_POST['page_type'])) {
         $whereClause .= ' AND cp.page_type = %2';
         $params['2'] = array($_POST['page_type'], 'String');
       }
-      elseif (CRM_Utils_Array::value('page_type', $_GET)) {
+      elseif (!empty($_GET['page_type'])) {
         $whereClause .= ' AND cp.page_type = %2';
         $params['2'] = array($_GET['page_type'], 'String');
       }
 
-      if (CRM_Utils_Array::value('page_id', $_POST)) {
+      if (!empty($_POST['page_id'])) {
         $whereClause .= ' AND cp.page_id = %4 AND cp.page_type = "contribute"';
         $params['4'] = array($_POST['page_id'], 'Integer');
       }
 
-      if (CRM_Utils_Array::value('event_id', $_POST)) {
+      if (!empty($_POST['event_id'])) {
         $whereClause .= ' AND cp.page_id = %5 AND cp.page_type = "event"';
         $params['5'] = array($_POST['event_id'], 'Integer');
       }
@@ -320,7 +322,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
         'page_url' => $pageUrl,
         'page_type' => $page_type,
         'action' => CRM_Core_Action::formLink(self::links(), $action,
-          array('id' => $pcp->id)
+          array('id' => $pcp->id), ts('more'), FALSE, 'contributionpage.pcp.list', 'PCP', $pcp->id
         ),
         'title' => $pcp->title,
         'class' => $class,
@@ -374,6 +376,8 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
 
   /**
    * Get user context.
+   *
+   * @param null $mode
    *
    * @return string user context.
    */

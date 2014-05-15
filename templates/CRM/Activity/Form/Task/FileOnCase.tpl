@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,10 +30,11 @@
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
    <table class="form-layout-compressed">
       <tr class="crm-file-on-case-form-block-unclosed_cases">
-         <td class="label">{$form.unclosed_cases.label}
-           <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></td>
-         <td>{$form.unclosed_cases.html}<br />
-           <span class="description">{ts}Begin typing client name for a list of open cases.{/ts}</span>
+         <td class="label">
+           {$form.unclosed_case_id.label}
+         </td>
+         <td>
+           {$form.unclosed_case_id.html}<br />
          </td>
       </tr>
      <tr>
@@ -44,13 +45,21 @@
 </div>
 {literal}
 <script type="text/javascript">
-
-var unclosedCaseUrl = {/literal}"{crmURL p='civicrm/case/ajax/unclosed' h=0}"{literal};
-cj( "#unclosed_cases" ).autocomplete( unclosedCaseUrl, { width : 250, selectFirst : false, matchContains:true
-                                    }).result( function(event, data, formatted) {
-                                      cj( "#unclosed_case_id" ).val( data[1] );
-                                    }).bind( 'click', function( ) {
-                                      cj( "#unclosed_case_id" ).val('');
-                                    });
+CRM.$(function($) {
+  var $form = $("#{/literal}{$form.formName}{literal}");
+  $('input[name=unclosed_case_id]', $form).crmSelect2({
+    placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
+    minimumInputLength: 1,
+    ajax: {
+      url: {/literal}"{crmURL p='civicrm/case/ajax/unclosed' h=0}"{literal},
+      data: function(term) {
+        return {term: term};
+      },
+      results: function(response) {
+        return {results: response};
+      }
+    }
+  });
+});
 {/literal}
 </script>

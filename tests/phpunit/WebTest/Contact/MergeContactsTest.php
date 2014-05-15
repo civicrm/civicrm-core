@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -70,7 +70,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_GroupContact_next');
     $this->select('group_id', "label=$group");
     $this->click('_qf_GroupContact_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Delete');
     $this->waitForText('crm-notification-container', "Added to Group");
 
     // Add Tags to the contact
@@ -183,8 +183,9 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Verify group merged
     $this->click("css=li#tab_group a");
-    $this->waitForElementPresent("xpath=//form[@id='GroupContact']//div[@class='view-content']//div[@class='dataTables_wrapper']/table/tbody/tr");
-    $this->verifyText("xpath=//form[@id='GroupContact']//div[@class='view-content']//div[@class='dataTables_wrapper']/table/tbody/tr/td/a",
+    $this->waitForElementPresent("GroupContact");
+    $this->waitForElementPresent("xpath=//form[@id='GroupContact']//div[@class='view-content view-contact-groups']//div/table/tbody/tr/td/a");
+    $this->verifyText("xpath=//form[@id='GroupContact']//div[@class='view-content view-contact-groups']//div/table/tbody/tr/td/a",
       preg_quote("$group")
     );
 
@@ -215,25 +216,13 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Now we're filling the "Assigned To" field.
     // Typing contact's name into the field (using typeKeys(), not type()!)...
-    $this->click("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id");
-    $this->type("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id", $firstName);
-    $this->typeKeys("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id", $firstName);
-
-    // ...waiting for drop down with results to show up...
-    $this->waitForElementPresent("css=div.token-input-dropdown-facebook");
-    $this->waitForElementPresent("css=li.token-input-dropdown-item2-facebook");
-
-    //..need to use mouseDownAt on first result (which is a li element), click does not work
-    $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
-
-    // ...again, waiting for the box with contact name to show up...
-    $this->waitForElementPresent("css=tr.crm-activity-form-block-assignee_contact_id td ul li span.token-input-delete-token-facebook");
+    $this->select2("assignee_contact_id", $firstName,TRUE,FALSE);
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertTrue($this->isTextPresent("$lastName, " . $firstName), "Contact not found in line " . __LINE__);
 
     // Since we're here, let's check if screen help is being displayed properly
-    $this->assertTrue($this->isTextPresent("Assigned activities will appear in their Activities listing at CiviCRM Home"));
+    $this->assertTrue($this->isTextPresent("A copy of this activity will be emailed to each Assignee."));
 
     // Putting the contents into subject field - assigning the text to variable, it'll come in handy later
     // For simple input fields we can use field id as selector
@@ -260,7 +249,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click("_qf_Activity_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("crm-notification-container");
 
     // Is status message correct?
     $this->waitForText('crm-notification-container', "Activity '$subject' has been saved.", "Status message didn't show up after saving!");
@@ -335,8 +324,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//a[text()='$firstName $lastName']");
     $this->click("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
-    $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", "xpath=//form[@id='Merge']/div[2]/table/tbody/tr[3]/td[4]/span[text()='(overwrite)']");
-    $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[4]/td[4]/span[text()='(add)']");
+    $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", "xpath=//form[@id='Merge']/div[2]/table/tbody/tr[3]/td[4]/span[text()='(overwrite)']", FALSE);
+    $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[5]/td[4]/span[text()='(add)']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
 
     $this->check("move_location_email_1");
@@ -421,12 +410,12 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Select the contacts to be merged
     $this->select("name=option51_length", "value=100");
-    $this->waitForElementPresent("xpath=//table[@class='pagerDisplay']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']");
-    $this->click("xpath=//table[@class='pagerDisplay']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']/../../td[4]/a[text()='merge']");
+    $this->waitForElementPresent("xpath=//*[@id='DedupeFind']//table[@class='pagerDisplay dataTable no-footer']/tbody//tr/td[1]/a[text()='57e10a6 9a3de85']/../../td[2]/a[text()='57e10a6 9a3de85']");
+    $this->click("xpath=//*[@id='DedupeFind']//table[@class='pagerDisplay dataTable no-footer']/tbody//tr/td[1]/a[text()='$firstName1 $lastName1']/../../td[2]/a[text()='$firstName1 $lastName1']/../../td[4]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
-    $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", "xpath=//form[@id='Merge']/div[2]/table/tbody/tr[3]/td[4]/span[text()='(overwrite)']");
-    $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[4]/td[4]/span[text()='(add)']");
-    $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[5]/td[4]/span[text()='(overwrite)']");
+    $this->clickLink("css=div.crm-contact-merge-form-block div.action-link a", "xpath=//form[@id='Merge']/div[2]/table/tbody/tr[4]/td[4]/span[text()='(overwrite)']");
+    $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[3]/td[4]/span[text()='(add)']");
+    $this->waitForElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[4]/td[4]/span[text()='(overwrite)']");
     $this->select('location_email_1_locTypeId', 'value=3');
     $this->select('location_phone_1_locTypeId', 'value=1');
     $this->assertFalse($this->isElementPresent("xpath=//form[@id='Merge']/div[2]/table/tbody/tr[2]/td[4]/span[text()='(overwrite)']"));
@@ -580,10 +569,10 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
       $this->type('css=input#sort_name_navigation', $value);
       $this->typeKeys('css=input#sort_name_navigation', $value);
       // Wait for result list.
-      $this->waitForElementPresent("css=div.ac_results-inner li");
+      $this->waitForElementPresent("css=ul.ui-autocomplete li.ui-menu-item");
 
       // Visit contact summary page.
-      $this->clickLink("css=div.ac_results-inner li", 'civicrm-footer');
+      $this->clickLink("css=ul.ui-autocomplete li.ui-menu-item", 'civicrm-footer');
     }
   }
 
@@ -687,17 +676,14 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
 
     $this->type('name', "Membership Type $membershipOrganization");
-    $this->type('member_of_contact', $membershipOrganization);
-    $this->click('member_of_contact');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li.ac_even");
+    $this->select2('member_of_contact_id', $membershipOrganization);
 
     $this->type('minimum_fee', '1');
     $this->select( 'financial_type_id', 'value=2' );
     $this->type('duration_interval', 1);
     $this->select('duration_unit', "label=year");
 
-    $this->select('period_type', "label=fixed");
+    $this->select('period_type', "label=Fixed");
     $this->waitForElementPresent('fixed_period_rollover_day[d]');
 
     // fixed period start set to April 1
@@ -709,7 +695,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->select('relationship_type_id', 'value=5_b_a');
     $this->click('_qf_MembershipType_upload-bottom');
     $this->waitForElementPresent('link=Add Membership Type');
-    $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $membershipOrganization' has been saved."));
+    $this->waitForText("crm-notification-container", "The membership type 'Membership Type $membershipOrganization' has been saved.");
   }
 
   /**
@@ -762,7 +748,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click("_qf_Membership_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('crm-notification-container');
     // page was loaded
     $this->waitForTextPresent($sourceText);
     // Is status message correct?
@@ -781,9 +767,9 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->select('relationship_type_id', "value=5_b_a");
 
     //fill in the individual
-    $this->webtestFillAutocomplete($sortName);
+    $this->select2('related_contact_id', $sortName, TRUE, FALSE);
 
-    $this->waitForElementPresent("quick-save");
+    $this->waitForElementPresent("_qf_Relationship_upload");
 
     //fill in the relationship start date
     //$this->webtestFillDate('start_date', '-2 year');
@@ -793,13 +779,13 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->type("description", $description);
 
     //save the relationship
-    $this->click("quick-save");
-    $this->waitForElementPresent("current-relationships");
+    $this->click("_qf_Relationship_upload");
+    $this->isTextPresent("Current Relationships");
 
     //check the status message
-    $this->assertTrue($this->isTextPresent("New relationship created."));
+    $this->waitForText('crm-notification-container', "Relationship created.");
 
-    $this->waitForElementPresent("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//table[@id='crm-contact-relationship-selector-current']/tbody//tr/td[9]/span/a[text()='View']");
     $this->waitForElementPresent("xpath=//a[text()='$sortName']");
     $this->click("xpath=//a[text()='$sortName']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -829,9 +815,9 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->select('relationship_type_id', "value=5_b_a");
 
     //fill in the individual
-    $this->webtestFillAutocomplete($sortNameOther);
+    $this->select2('related_contact_id', $sortNameOther, TRUE, FALSE);
 
-    $this->waitForElementPresent("quick-save");
+    $this->waitForElementPresent("_qf_Relationship_upload");
 
     //fill in the relationship start date
     $this->webtestFillDate('start_date', '-2 year');
@@ -842,13 +828,13 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     //save the relationship
     //$this->click("_qf_Relationship_upload");
-    $this->click("quick-save");
-    $this->waitForElementPresent("current-relationships");
+    $this->click("_qf_Relationship_upload");
+    $this->isTextPresent("Current Relationships");
 
     //check the status message
-    $this->assertTrue($this->isTextPresent("New relationship created."));
+    $this->isTextPresent("Relationship created.");
 
-    $this->waitForElementPresent("xpath=//div[@id='current-relationships']//div//table/tbody//tr/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//table[@id='crm-contact-relationship-selector-current']/tbody//tr/td[9]/span/a[text()='View']");
 
     // go directly to contact merge page.
     $this->openCiviPage("contact/merge", "reset=1&cid={$contactIds['mainId']}&oid={$contactIds['duplicateId']}&action=update&rgid=2");
@@ -861,10 +847,10 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->click("css=li#tab_rel a");
 
     // wait for add Relationship link
-    $this->waitForElementPresent("xpath=//a[text()='$sortNameOther']");
+    $this->waitForElementPresent("xpath=//a[text()='$sortName']");
     // go to duplicate organization's related contact
     // to check if membership is added to that contact
-    $this->click("xpath=//a[text()='$sortNameOther']");
+    $this->click("xpath=//a[text()='$sortName']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check if Membership for the individual is created

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.5                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -38,7 +38,7 @@ require_once 'tests/phpunit/CiviTest/CiviUnitTestCase.php';
  */
 class api_v3_CustomFieldTest extends CiviUnitTestCase {
   protected $_apiversion;
-  public $_eNoticeCompliant = TRUE;
+
   function get_info() {
     return array(
       'name' => 'Custom Field Create',
@@ -203,7 +203,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
 
         $customGroup = $this->customGroupCreate('Individual','date_test_group',3);
-        require_once 'api/v3/examples/CustomFieldCreate.php';
+        require_once 'api/v3/examples/CustomField/Create.php';
         $result = custom_field_create_example();
         $expectedResult = custom_field_create_expectedresult();
         $this->assertEquals($result,$expectedResult);

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -63,43 +63,27 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * object for this user. If the user has new values, we need
    * to update the CRM DB with the new values
    *
-   * @param Object  $user    the drupal user object
-   * @param boolean $update  has the user object been edited
-   * @param         $uf
+   * @param Object $user the drupal user object
+   * @param boolean $update has the user object been edited
+   * @param $uf
+   *
+   * @param $ctype
+   * @param bool $isLogin
    *
    * @return void
    * @access public
    * @static
    */
   static function synchronize(&$user, $update, $uf, $ctype, $isLogin = FALSE) {
-    $config = CRM_Core_Config::singleton();
+    $userSystem = CRM_Core_Config::singleton()->userSystem;
     $session = CRM_Core_Session::singleton();
     if (!is_object($session)) {
       CRM_Core_Error::fatal('wow, session is not an object?');
       return;
     }
 
-    if ($config->userSystem->is_drupal) {
-      $key   = 'uid';
-      $login = 'name';
-      $mail  = 'mail';
-    }
-    elseif ($uf == 'Joomla') {
-      $key   = 'id';
-      $login = 'username';
-      $mail  = 'email';
-      if (!isset($user->id) || !isset($user->email)) {
-        $user = JFactory::getUser();
-      }
-    }
-    elseif ($uf == 'WordPress') {
-      $key   = 'ID';
-      $login = 'user_login';
-      $mail  = 'user_email';
-    }
-    else {
-      CRM_Core_Error::statusBounce(ts('Please set the user framework variable'));
-    }
+    $userSystemID = $userSystem->getBestUFID($user);
+    $uniqId = $userSystem->getBestUFUniqueIdentifier($user);
 
     // if the id of the object is zero (true for anon users in drupal)
     // have we already processed this user, if so early
@@ -107,7 +91,7 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     $userID = $session->get('userID');
     $ufID = $session->get('ufID');
 
-    if (!$update && $ufID == $user->$key) {
+    if (!$update && $ufID == $userSystemID) {
       return;
     }
 
@@ -115,7 +99,7 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     $isUserLoggedIn = CRM_Utils_System::isUserLoggedIn();
 
     // reset the session if we are a different user
-    if ($ufID && $ufID != $user->$key) {
+    if ($ufID && $ufID != $userSystemID) {
       $session->reset();
 
       //get logged in user ids, and set to session.
@@ -128,15 +112,11 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     }
 
     // return early
-    if ($user->$key == 0) {
+    if ($userSystemID == 0) {
       return;
     }
 
-    if (!isset($uniqId) || !$uniqId) {
-      $uniqId = $user->$mail;
-    }
-
-    $ufmatch = self::synchronizeUFMatch($user, $user->$key, $uniqId, $uf, NULL, $ctype, $isLogin);
+    $ufmatch = self::synchronizeUFMatch($user, $userSystemID, $uniqId, $uf, NULL, $ctype, $isLogin);
     if (!$ufmatch) {
       return;
     }
@@ -187,11 +167,14 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * Synchronize the object with the UF Match entry. Can be called stand-alone from
    * the drupalUsers script
    *
-   * @param Object  $user    the drupal user object
-   * @param string  $userKey the id of the user from the uf object
-   * @param string  $uniqId    the OpenID of the user
-   * @param string  $uf      the name of the user framework
-   * @param integer $status  returns the status if user created or already exits (used for CMS sync)
+   * @param Object $user the drupal user object
+   * @param string $userKey the id of the user from the uf object
+   * @param string $uniqId the OpenID of the user
+   * @param string $uf the name of the user framework
+   * @param integer $status returns the status if user created or already exits (used for CMS sync)
+   *
+   * @param null $ctype
+   * @param bool $isLogin
    *
    * @return the ufmatch object that was found or created
    * @access public
@@ -426,7 +409,9 @@ AND    domain_id    = %4
    * Update the email value for the contact and user profile
    *
    * @param  $contactId  Int     Contact ID of the user
-   * @param  $email      String  email to be modified for the user
+   * @param $emailAddress
+   *
+   * @internal param String $email email to be modified for the user
    *
    * @return void
    * @access public
@@ -570,6 +555,8 @@ AND    domain_id    = %4
    * see if this user exists, and if so, if they're allowed to login
    *
    *
+   * @param $openId
+   *
    * @return bool     true if allowed to login, false otherwise
    * @access public
    * @static
@@ -622,10 +609,13 @@ AND    domain_id    = %4
   /**
    * Get uf match values for given uf id or logged in user.
    *
-   * @param int    $ufID uf id.
+   * @param int $ufID uf id.
    *
    * return array  $ufValues uf values.
-   **/
+   **
+   *
+   * @return array
+   */
   static function getUFValues($ufID = NULL) {
     if (!$ufID) {
       //get logged in user uf id.

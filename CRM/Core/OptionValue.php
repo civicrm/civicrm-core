@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -146,17 +146,22 @@ class CRM_Core_OptionValue {
           'id' => $dao->id,
           'gid' => $optionGroupID,
           'value' => $dao->value,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'optionValue.row.actions',
+        'optionValue',
+        $dao->id
       );
 
-      if (CRM_Utils_Array::value('component_id', $optionValue[$dao->id])) {
+      if (!empty($optionValue[$dao->id]['component_id'])) {
         $optionValue[$dao->id]['component_name'] = $componentNames[$optionValue[$dao->id]['component_id']];
       }
       else {
         $optionValue[$dao->id]['component_name'] = 'Contact';
       }
 
-      if (CRM_Utils_Array::value('visibility_id', $optionValue[$dao->id])) {
+      if (!empty($optionValue[$dao->id]['visibility_id'])) {
         $optionValue[$dao->id]['visibility_label'] = $visibilityLabels[$optionValue[$dao->id]['visibility_id']];
       }
     }
@@ -167,11 +172,12 @@ class CRM_Core_OptionValue {
   /**
    * Function to add/edit option-value of a particular group
    *
-   * @param  array     $params           Array containing exported values from the invoking form.
-   * @param  array     $groupParams      Array containing group fields whose option-values is to retrieved/saved.
-   * @param  string    $orderBy          for orderBy clause
-   * @param  integer   $optionValueID    has the id of the optionValue being edited, disabled ..etc
+   * @param  array $params Array containing exported values from the invoking form.
+   * @param  array $groupParams Array containing group fields whose option-values is to retrieved/saved.
+   * @param $action
+   * @param  integer $optionValueID has the id of the optionValue being edited, disabled ..etc
    *
+   * @internal param string $orderBy for orderBy clause
    * @return array of option-values
    *
    * @access public
@@ -205,7 +211,7 @@ class CRM_Core_OptionValue {
     }
     $params['option_group_id'] = $optionGroupID;
 
-    if (($action & CRM_Core_Action::ADD) && !CRM_Utils_Array::value('value', $params)) {
+    if (($action & CRM_Core_Action::ADD) && empty($params['value'])) {
       $fieldValues = array('option_group_id' => $optionGroupID);
       // use the next available value
       /* CONVERT(value, DECIMAL) is used to convert varchar
@@ -221,7 +227,7 @@ class CRM_Core_OptionValue {
     }
 
     // set name to label if it's not set - but *only* for ADD action (CRM-3522)
-    if (($action & CRM_Core_Action::ADD) && !CRM_Utils_Array::value('name', $params) && $params['label']) {
+    if (($action & CRM_Core_Action::ADD) && empty($params['name']) && $params['label']) {
       $params['name'] = $params['label'];
     }
     if ($action & CRM_Core_Action::UPDATE) {
@@ -234,10 +240,11 @@ class CRM_Core_OptionValue {
   /**
    * Check if there is a record with the same name in the db
    *
-   * @param string $value     the value of the field we are checking
-   * @param string $daoName   the dao object name
-   * @param string $daoID     the id of the object being updated. u can change your name
+   * @param string $value the value of the field we are checking
+   * @param string $daoName the dao object name
+   * @param string $daoID the id of the object being updated. u can change your name
    *                          as long as there is no conflict
+   * @param $optionGroupID
    * @param string $fieldName the name of the field in the DAO
    *
    * @return boolean     true if object exists
@@ -260,11 +267,14 @@ class CRM_Core_OptionValue {
   /**
    * Check if there is a record with the same name in the db
    *
-   * @param string $value     the value of the field we are checking
-   * @param string $daoName   the dao object name
-   * @param string $daoID     the id of the object being updated. u can change your name
+   * @param string $mode
+   * @param string $contactType
+   *
+   * @internal param string $value the value of the field we are checking
+   * @internal param string $daoName the dao object name
+   * @internal param string $daoID the id of the object being updated. u can change your name
    *                          as long as there is no conflict
-   * @param string $fieldName the name of the field in the DAO
+   * @internal param string $fieldName the name of the field in the DAO
    *
    * @return boolean     true if object exists
    * @access public
@@ -337,6 +347,8 @@ class CRM_Core_OptionValue {
   /**
    * build select query in case of option-values
    *
+   * @param $query
+   *
    * @return void
    * @access public
    */
@@ -344,11 +356,11 @@ class CRM_Core_OptionValue {
     if (!empty($query->_params) || !empty($query->_returnProperties)) {
       $field = self::getFields();
       foreach ($field as $name => $values) {
-        if (CRM_Utils_Array::value('pseudoconstant', $values)) {
+        if (!empty($values['pseudoconstant'])) {
           continue;
         }
         list($tableName, $fieldName) = explode('.', $values['where']);
-        if (CRM_Utils_Array::value($name, $query->_returnProperties)) {
+        if (!empty($query->_returnProperties[$name])) {
           $query->_select["{$name}_id"] = "{$name}.value as {$name}_id";
           $query->_element["{$name}_id"] = 1;
           $query->_select[$name] = "{$name}.{$fieldName} as $name";

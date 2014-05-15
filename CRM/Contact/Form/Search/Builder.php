@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -57,7 +57,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function preProcess() {
@@ -139,14 +139,18 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   /**
    * global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param $values
+   * @param $files
+   * @param $self
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public
    */
   static function formRule($values, $files, $self) {
-    if (CRM_Utils_Array::value('addMore', $values) || CRM_Utils_Array::value('addBlock', $values)) {
+    if (!empty($values['addMore']) || !empty($values['addBlock'])) {
       return TRUE;
     }
     $fields = self::fields();
@@ -208,7 +212,9 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         }
         else {
           if (substr($v[0], 0, 7) == 'custom_') {
-            $type = $fields[$v[0]]['data_type'];
+            // Get rid of appended location type id
+            list($fieldKey) = explode('-', $v[0]);
+            $type = $fields[$fieldKey]['data_type'];
 
             // hack to handle custom data of type state and country
             if (in_array($type, array(
@@ -358,7 +364,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       $this->_formValues = $this->controller->exportValues($this->_name);
 
       // set the group if group is submitted
-      if (CRM_Utils_Array::value('uf_group_id', $this->_formValues)) {
+      if (!empty($this->_formValues['uf_group_id'])) {
         $this->set('id', $this->_formValues['uf_group_id']);
       }
       else {
@@ -393,12 +399,13 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   }
 
   static function fields() {
-    return array_merge(
+    $fields = array_merge(
       CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE),
       CRM_Core_Component::getQueryFields(),
       CRM_Contact_BAO_Query_Hook::singleton()->getFields(),
       CRM_Activity_BAO_Activity::exportableFields()
     );
+    return $fields;
   }
 
   /**
@@ -413,31 +420,22 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     $options = array(
       'group' => 'group_contact',
       'tag' => 'entity_tag',
-      'country' => 'address',
-      'state_province' => 'address',
-      'gender' => 'contact',
-      'world_region' => 'contact',
-      'individual_prefix' => 'contact',
-      'individual_suffix' => 'contact',
-      'preferred_communication_method' => 'contact',
-      'preferred_language' => 'contact',
       'on_hold' => 'yesno',
       'is_bulkmail' => 'yesno',
-      'activity_type' => 'activity',
-      'activity_status' => 'activity',
-      'financial_type' => 'contribution',
-      'contribution_page_id' => 'contribution',
-      'contribution_status' => 'contribution',
       'payment_instrument' => 'contribution',
       'membership_status' => 'membership',
       'membership_type' => 'membership',
+      'member_campaign_id' => 'membership',
+      'member_is_test' => 'yesno',
+      'member_is_pay_later' => 'yesno',
+      'is_override' => 'yesno',
     );
-    $entities = array('contact', 'activity', 'participant', 'pledge', 'member', 'contribution');
+    $entities = array('contact', 'address', 'activity', 'participant', 'pledge', 'member', 'contribution');
     CRM_Contact_BAO_Query_Hook::singleton()->alterSearchBuilderOptions($entities, $options);
     foreach ($entities as $entity) {
-      $fields = civicrm_api($entity, 'getfields', array('version' => 3));
+      $fields = civicrm_api3($entity, 'getfields');
       foreach ($fields['values'] as $field => $info) {
-        if (!empty($info['options']) || !empty($info['pseudoconstant']) || !empty($info['option_group_id']) || !empty($info['enumValues'])) {
+        if (!empty($info['options']) || !empty($info['pseudoconstant']) || !empty($info['option_group_id'])) {
           $options[$field] = $entity;
           if (substr($field, -3) == '_id') {
             $options[substr($field, 0, -3)] = $entity;

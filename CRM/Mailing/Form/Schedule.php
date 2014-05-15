@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -73,7 +73,7 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = array();
@@ -168,7 +168,13 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
         $this->_mailingID,
         'subject'
       );
-      $preview['viewURL'] = CRM_Utils_System::url('civicrm/mailing/view', "reset=1&id={$this->_mailingID}");
+
+      $mailingKey = $this->_mailingID;
+      if ($hash = CRM_Mailing_BAO_Mailing::getMailingHash($mailingKey)) {
+        $mailingKey = $hash;
+      }
+
+      $preview['viewURL'] = CRM_Utils_System::url('civicrm/mailing/view', "reset=1&id={$mailingKey}");
 
       $preview['attachment'] = CRM_Core_BAO_File::attachmentInfo('civicrm_mailing', $this->_mailingID);
 
@@ -183,7 +189,10 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
    * Warning: if you make changes here, be sure to also make them in
    * Retry.php
    *
-   * @param array $params     The form values
+   * @param array $params The form values
+   *
+   * @param $files
+   * @param $self
    *
    * @return boolean          True if either we deliver immediately, or the
    *                          date is properly set.
@@ -282,9 +291,9 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
     }
 
     $session = CRM_Core_Session::singleton();
+
     // set the scheduled_id
     $params['scheduled_id'] = $session->get('userID');
-    $params['scheduled_date'] = date('YmdHis');
 
     // set approval details if workflow is not enabled
     if (!CRM_Mailing_Info::workflowEnabled()) {
@@ -294,16 +303,9 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
     }
     else {
       // reset them in case this mailing was rejected
-      $mailing->approver_id = 'null';
-      $mailing->approval_date = 'null';
-      $mailing->approval_status_id = 'null';
-    }
-
-    if ($params['now']) {
-      $params['scheduled_date'] = date('YmdHis');
-    }
-    else {
-      $params['scheduled_date'] = CRM_Utils_Date::processDate($params['start_date'] . ' ' . $params['start_date_time']);
+      $params['approver_id'] = 'null';
+      $params['approval_date'] = 'null';
+      $params['approval_status_id'] = 'null';
     }
 
     /* Build the mailing object */

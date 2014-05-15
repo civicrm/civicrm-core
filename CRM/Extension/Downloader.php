@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * This class handles downloads of remotely-provided extensions
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -45,6 +45,7 @@ class CRM_Extension_Downloader {
   public $tmpDir;
 
   /**
+   * @param CRM_Extension_Manager $manager
    * @param string $containerDir the place to store downloaded & extracted extensions
    * @param string $tmpDir
    */
@@ -82,6 +83,11 @@ class CRM_Extension_Downloader {
         'title' => ts('ZIP Support Required'),
         'message' => ts('You will not be able to install extensions at this time because your installation of PHP does not support ZIP archives. Please ask your system administrator to install the standard PHP-ZIP extension.'),
       );
+    }
+
+    if (empty($errors) && ! CRM_Utils_HttpClient::singleton()->isRedirectSupported()) {
+      CRM_Core_Session::setStatus(ts('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.'));
+      CRM_Core_Error::debug_log_message('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.');
     }
 
     return $errors;
@@ -179,6 +185,9 @@ class CRM_Extension_Downloader {
 
   /**
    * Validate that $extractedZipPath contains valid for extension $key
+   *
+   * @param $key
+   * @param $extractedZipPath
    *
    * @return bool
    */

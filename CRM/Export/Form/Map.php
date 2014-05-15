@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -65,7 +65,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function preProcess() {
@@ -112,6 +112,9 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
    *
    * @param array $fields posted values of the form
    *
+   * @param $values
+   * @param $mappingTypeId
+   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public
@@ -119,7 +122,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
   static function formRule($fields, $values, $mappingTypeId) {
     $errors = array();
 
-    if (CRM_Utils_Array::value('saveMapping', $fields) && CRM_Utils_Array::value('_qf_Map_next', $fields)) {
+    if (!empty($fields['saveMapping']) && !empty($fields['_qf_Map_next'])) {
       $nameField = CRM_Utils_Array::value('saveMappingName', $fields);
       if (empty($nameField)) {
         $errors['saveMappingName'] = ts('Name is required to save Export Mapping');
@@ -208,12 +211,12 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
     }
 
     if ($buttonName1 == '_qf_Map_next') {
-      if (CRM_Utils_Array::value('updateMapping', $params)) {
+      if (!empty($params['updateMapping'])) {
         //save mapping fields
         CRM_Core_BAO_Mapping::saveMappingFields($params, $params['mappingId']);
       }
 
-      if (CRM_Utils_Array::value('saveMapping', $params)) {
+      if (!empty($params['saveMapping'])) {
         $mappingParams = array(
           'name' => $params['saveMappingName'],
           'description' => $params['saveMappingDesc'],

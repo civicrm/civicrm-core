@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -124,6 +124,7 @@ class CRM_Contact_Form_Search_Custom_Base {
   function addSortOffset(&$sql, $offset, $rowcount, $sort) {
     if (!empty($sort)) {
       if (is_string($sort)) {
+        $sort = CRM_Utils_Type::escape($sort, 'String');
         $sql .= " ORDER BY $sort ";
       }
       else {
@@ -132,6 +133,9 @@ class CRM_Contact_Form_Search_Custom_Base {
     }
 
     if ($rowcount > 0 && $offset >= 0) {
+      $offset = CRM_Utils_Type::escape($offset, 'Int');
+      $rowcount = CRM_Utils_Type::escape($rowcount, 'Int');
+
       $sql .= " LIMIT $offset, $rowcount ";
     }
   }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * This file contains the various menus of the CiviCRM module
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -271,11 +271,11 @@ class CRM_Core_Menu {
     $values = array();
 
     foreach ($menu as $path => $item) {
-      if (!CRM_Utils_Array::value('adminGroup', $item)) {
+      if (empty($item['adminGroup'])) {
         continue;
       }
 
-      $query = CRM_Utils_Array::value('path_arguments', $item) ? str_replace(',', '&', $item['path_arguments']) . '&reset=1' : 'reset=1';
+      $query = !empty($item['path_arguments']) ? str_replace(',', '&', $item['path_arguments']) . '&reset=1' : 'reset=1';
 
       $value = array(
         'title' => $item['title'],
@@ -456,11 +456,16 @@ class CRM_Core_Menu {
       if (array_key_exists($currentPath, $menu) &&
         isset($menu[$currentPath]['title'])
       ) {
-        $urlVar = CRM_Utils_Array::value('path_arguments', $menu[$currentPath]) ? '&' . $menu[$currentPath]['path_arguments'] : '';
+        $urlVar = !empty($menu[$currentPath]['path_arguments']) ? '&' . $menu[$currentPath]['path_arguments'] : '';
         $crumbs[] = array(
           'title' => $menu[$currentPath]['title'],
           'url' => CRM_Utils_System::url($currentPath,
-            'reset=1' . $urlVar, FALSE
+            'reset=1' . $urlVar,
+            FALSE, // absolute
+            NULL, // fragment
+            TRUE, // htmlize
+            FALSE, // frontend
+            TRUE // forceBackend; CRM-14439 work-around; acceptable for now because we don't display breadcrumbs on frontend
           ),
         );
       }

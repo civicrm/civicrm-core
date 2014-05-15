@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -98,6 +98,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_LineItem extends CRM_Upgrade_Snapshot_
    *
    * @param $entityId  int    participant/contribution id
    * @param $entity    string participant/contribution.
+   *
+   * @param null $isQuick
    *
    * @return array of line items
    */
@@ -233,6 +235,7 @@ WHERE     %2.id = %1";
    * @param int $entityId
    * @param int $entityTable
    *
+   * @return bool
    * @access public
    * @static
    */

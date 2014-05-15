@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  *
  */
 
@@ -46,12 +46,19 @@ class CRM_Core_Page_AJAX_Location {
    * location field values for selected permissioned contact.
    */
   static function getPermissionedLocation() {
-    $cid = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
-    if ($_GET['ufId']) {
-      $ufId = CRM_Utils_Type::escape($_GET['ufId'], 'Integer');
+    $cid = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
+    $ufId = CRM_Utils_Request::retrieve('ufId', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
+
+    // Verify user id
+    $user = CRM_Utils_Request::retrieve('uid', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, CRM_Core_Session::singleton()->get('userID'));
+    if (!$user || !CRM_Contact_BAO_Contact_Permission::validateChecksumContact($user, CRM_Core_DAO::$_nullObject, FALSE)) {
+      CRM_Utils_System::civiExit();
     }
-    elseif ($_GET['relContact']) {
-      $relContact = CRM_Utils_Type::escape($_GET['relContact'], 'Integer');
+
+    // Verify user permission on related contact
+    $employers = CRM_Contact_BAO_Relationship::getPermissionedEmployer($user);
+    if (!isset($employers[$cid])) {
+      CRM_Utils_System::civiExit();
     }
 
     $values      = array();
@@ -62,38 +69,6 @@ class CRM_Core_Page_AJAX_Location {
     $addressSequence = array_flip($config->addressSequence());
 
 
-    if (!empty($relContact)) {
-      $elements = array(
-        "phone_1_phone" =>
-        $location['phone'][1]['phone'],
-        "email_1_email" =>
-        $location['email'][1]['email'],
-      );
-
-      if (array_key_exists('street_address', $addressSequence)) {
-        $elements["address_1_street_address"] = $location['address'][1]['street_address'];
-      }
-      if (array_key_exists('supplemental_address_1', $addressSequence)) {
-        $elements['address_1_supplemental_address_1'] = $location['address'][1]['supplemental_address_1'];
-      }
-      if (array_key_exists('supplemental_address_2', $addressSequence)) {
-        $elements['address_1_supplemental_address_2'] = $location['address'][1]['supplemental_address_2'];
-      }
-      if (array_key_exists('city', $addressSequence)) {
-        $elements['address_1_city'] = $location['address'][1]['city'];
-      }
-      if (array_key_exists('postal_code', $addressSequence)) {
-        $elements['address_1_postal_code'] = $location['address'][1]['postal_code'];
-        $elements['address_1_postal_code_suffix'] = $location['address'][1]['postal_code_suffix'];
-      }
-      if (array_key_exists('country', $addressSequence)) {
-        $elements['address_1_country_id'] = $location['address'][1]['country_id'];
-      }
-      if (array_key_exists('state_province', $addressSequence)) {
-        $elements['address_1_state_province_id'] = $location['address'][1]['state_province_id'];
-      }
-    }
-    else {
       $profileFields = CRM_Core_BAO_UFGroup::getFields($ufId, FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE,
         NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL
       );
@@ -203,6 +178,11 @@ class CRM_Core_Page_AJAX_Location {
               $elements["onbehalf_{$key}"]['value'] = $defaults[$key];
               $elements["onbehalf_{$key}"]['id'] = $defaults["{$key}_id"];
             }
+            elseif ($htmlType == 'Select Date') {
+              $elements["onbehalf_{$key}"]['type'] = $htmlType;
+              $elements["onbehalf_{$key}"]['value'] = $defaults[$key];
+              $elements["onbehalf_{$key}_display"]['value'] = $defaults[$key];
+            }
             else {
               $elements["onbehalf_{$key}"]['type'] = $htmlType;
               $elements["onbehalf_{$key}"]['value'] = $defaults[$key];
@@ -213,27 +193,22 @@ class CRM_Core_Page_AJAX_Location {
           }
         }
       }
-    }
 
     echo json_encode($elements);
     CRM_Utils_System::civiExit();
   }
 
-  static function jqState($config) {
-    if (
-      !isset($_GET['_value']) ||
-      empty($_GET['_value'])
-    ) {
+  static function jqState() {
+    if (empty($_GET['_value'])) {
       CRM_Utils_System::civiExit();
     }
 
     $result = CRM_Core_PseudoConstant::stateProvinceForCountry($_GET['_value']);
 
-    $elements = array(
-      array('name' => ts('- select a state -'),
-        'value' => '',
-      )
-    );
+    $elements = array(array(
+      'name' => $result ? ts('- select a state -') : ts('- N/A -'),
+      'value' => '',
+    ));
     foreach ($result as $id => $name) {
       $elements[] = array(
         'name' => $name,
@@ -245,29 +220,23 @@ class CRM_Core_Page_AJAX_Location {
     CRM_Utils_System::civiExit();
   }
 
-  static function jqCounty($config) {
-    if (CRM_Utils_System::isNull($_GET['_value'])) {
+  static function jqCounty() {
+    if (!isset($_GET['_value']) || CRM_Utils_System::isNull($_GET['_value'])) {
       $elements = array(
-        array('name' => ts('- select state -'), 'value' => '')
+        array('name' => ts('(choose state first)'), 'value' => '')
       );
     }
     else {
       $result = CRM_Core_PseudoConstant::countyForState($_GET['_value']);
 
-      $elements = array(
-        array('name' => ts('- select -'), 'value' => '')
-      );
+      $elements = array(array(
+        'name' => $result ? ts('- select -') : ts('- N/A -'),
+        'value' => '',
+      ));
       foreach ($result as $id => $name) {
         $elements[] = array(
           'name' => $name,
           'value' => $id,
-        );
-      }
-
-      if ($elements == array(
-        array('name' => ts('- select -'), 'value' => ''))) {
-        $elements = array(
-          array('name' => ts('- no counties -'), 'value' => '')
         );
       }
     }

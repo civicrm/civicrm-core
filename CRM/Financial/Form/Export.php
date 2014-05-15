@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -109,7 +109,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext(CRM_Utils_System::url('civicrm/financial/financialbatches',
-      "reset=1&batchStatus=5"));
+      "reset=1&batchStatus={$this->_exportStatusId}"));
   }
 
   /**
@@ -156,7 +156,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
    * process the form after the input has been submitted and validated
    *
    * @access public
-   * @return None
+   * @return void
    */
   public function postProcess( ) {
     if (!$this->_exportFormat) {

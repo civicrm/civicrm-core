@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,9 +49,9 @@
       <div class="crm-block crm-form-block crm-pdf-format-form-block">
     <table class="form-layout-compressed">
       <tr>
-        <td class="label-left">{$form.format_id.label}</td><td>{$form.format_id.html}{help id="id-pdf-format" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
-        <td colspan="2">&nbsp;</td>
-            </tr>
+        <td class="label-left">{$form.format_id.label} {help id="id-pdf-format" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
+        <td>{$form.format_id.html}</td>
+      </tr>
       <tr>
         <td class="label-left">{$form.paper_size.label}</td><td>{$form.paper_size.html}</td>
         <td class="label-left">{$form.orientation.label}</td><td>{$form.orientation.html}</td>
@@ -84,17 +84,10 @@
     {$form.html_message.label}
 </div><!-- /.crm-accordion-header -->
  <div class="crm-accordion-body">
-  {if $action neq 4}
-  <span class="helpIcon" id="helphtml">
-  <a href="#" onClick="return showToken('Html', 1);">{$form.token1.label}</a>
-  {help id="id-token-html" file="CRM/Contact/Form/Task/Email.hlp" tplFile=$tplFile isAdmin=$isAdmin editor=$editor}
-  <div id="tokenHtml" style="display:none;">
-      <input style="border:1px solid #999999;" type="text" id="filter1" size="20" name="filter1" onkeyup="filter(this, 1)"/><br />
-      <span class="description">{ts}Begin typing to filter list of tokens{/ts}</span><br/>
-      {$form.token1.html}
-  </div>
-  </span>
-  {/if}
+   <div class="helpIcon" id="helphtml">
+     <input class="crm-token-selector big" data-field="html_message" />
+     {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin editor=$editor file="CRM/Contact/Form/Task/Email.hlp"}
+   </div>
     <div class="clear"></div>
     <div class='html'>
   {if $editor EQ 'textarea'}
@@ -124,8 +117,11 @@
 
 {literal}
 <script type="text/javascript">
-cj(function() {
-    cj().crmAccordions();
+CRM.$(function($) {
+  var $form = $('form#{/literal}{$form.formName}{literal}');
+  $('#format_id', $form).on('change', function() {
+    selectFormat($(this).val());
+  });
 });
 
 var currentWidth;
@@ -134,51 +130,13 @@ var currentMetric = document.getElementById('metric').value;
 showBindFormatChkBox();
 selectPaper( document.getElementById('paper_size').value );
 
-function tokenReplHtml ( )
-{
-    var token1 = cj("#token1").val( )[0];
-    var editor = {/literal}"{$editor}"{literal};
-    if ( editor == "tinymce" ) {
-        var content= tinyMCE.get('html_message').getContent() +token1;
-        tinyMCE.get('html_message').setContent(content);
-    } else if ( editor == "joomlaeditor" ) {
-        tinyMCE.execCommand('mceInsertContent',false, token1);
-        var msg       = document.getElementById(html_message).value;
-        var cursorlen = document.getElementById(html_message).selectionStart;
-        var textlen   = msg.length;
-        document.getElementById(html_message).value = msg.substring(0, cursorlen) + token1 + msg.substring(cursorlen, textlen);
-        var cursorPos = (cursorlen + token1.length);
-        document.getElementById(html_message).selectionStart = cursorPos;
-        document.getElementById(html_message).selectionEnd   = cursorPos;
-        document.getElementById(html_message).focus();
-  } else if ( editor == "ckeditor" ) {
-        oEditor = CKEDITOR.instances[html_message];
-        oEditor.insertHtml(token1.toString() );
-    } else if ( editor == "drupalwysiwyg" ) {
-        Drupal.wysiwyg.instances[html_message].insert(token1.toString());
-    } else {
-    var msg       = document.getElementById(html_message).value;
-        var cursorlen = document.getElementById(html_message).selectionStart;
-        var textlen   = msg.length;
-        document.getElementById(html_message).value = msg.substring(0, cursorlen) + token1 + msg.substring(cursorlen, textlen);
-        var cursorPos = (cursorlen + token1.length);
-        document.getElementById(html_message).selectionStart = cursorPos;
-        document.getElementById(html_message).selectionEnd   = cursorPos;
-        document.getElementById(html_message).focus();
-    }
-    verify();
-}
-
 function showBindFormatChkBox()
 {
     var templateExists = true;
     if ( document.getElementById('template') == null || document.getElementById('template').value == '' ) {
         templateExists = false;
     }
-    var formatExists = true;
-    if ( document.getElementById('format_id').value == 0 ) {
-        formatExists = false;
-    }
+    var formatExists = !!cj('#format_id').val();
     if ( templateExists && formatExists ) {
         document.getElementById("bindFormat").style.display = "block";
     } else if ( formatExists && document.getElementById("saveTemplate") != null && document.getElementById("saveTemplate").checked ) {
@@ -195,20 +153,21 @@ function showBindFormatChkBox()
 
 function showUpdateFormatChkBox()
 {
-    if ( document.getElementById('format_id').value != 0 ) {
-        document.getElementById("updateFormat").style.display = "block";
+    if (cj('#format_id').val()) {
+      cj("#updateFormat").show();
     }
 }
 
-function hideUpdateFormatChkBox()
-{
-    document.getElementById("update_format").checked = false;
-    document.getElementById("updateFormat").style.display = "none";
+function updateFormatLabel() {
+  cj('.pdf-format-header-label').html(cj('#format_id option:selected').text() || cj('#format_id').attr('placeholder'));
 }
+
+updateFormatLabel();
 
 function selectFormat( val, bind )
 {
-    if ( val == null || val == 0 ) {
+  updateFormatLabel();
+    if (!val) {
         val = 0;
         bind = false;
     }
@@ -223,7 +182,7 @@ function selectFormat( val, bind )
         cj("#margin_left").val( data.margin_left );
         cj("#margin_right").val( data.margin_right );
         selectPaper( data.paper_size );
-        hideUpdateFormatChkBox();
+        cj("#update_format").prop({checked: false}).parent().hide();
         document.getElementById('bind_format').checked = bind;
         showBindFormatChkBox();
     }, 'json');

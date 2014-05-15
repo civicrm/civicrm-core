@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -91,7 +91,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     return $ufID;
   }
 
-  /*
+  /**
    *  Change user name in host CMS
    *
    *  @param integer $ufID User ID in CMS
@@ -116,6 +116,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @params $params    array   array of name and mail values
    * @params $errors    array   array of errors
    * @params $emailName string  field label for the 'email'
+   *
+   * @param $params
+   * @param $errors
+   * @param string $emailName
    *
    * @return void
    */
@@ -191,8 +195,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb
    *
-   * @param string $title
-   * @param string $url
+   * @param $breadCrumbs
+   *
+   * @internal param string $title
+   * @internal param string $url
    *
    * @return void
    * @access public
@@ -224,7 +230,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Reset an additional breadcrumb tag to the existing breadcrumb
    *
-   * @param string $bc the new breadcrumb to be appended
+   * @internal param string $bc the new breadcrumb to be appended
    *
    * @return void
    * @access public
@@ -236,7 +242,9 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Append a string to the head of the html file
    *
-   * @param string $head the new string to be appended
+   * @param null $string
+   *
+   * @internal param string $head the new string to be appended
    *
    * @return void
    * @access public
@@ -334,9 +342,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @param $htmlize  boolean  whether to convert to html eqivalant
    * @param $frontend boolean  a gross joomla hack
    *
+   * @param bool $forceBackend
+   *
    * @return string            an HTML string containing a link to the given path.
    * @access public
-   *
    */
   function url($path = NULL, $query = NULL, $absolute = TRUE,
     $fragment = NULL, $htmlize = TRUE,
@@ -456,6 +465,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     require_once 'DB.php';
 
     $config = CRM_Core_Config::singleton();
+    $user = NULL;
 
     if ($loadCMSBootstrap) {
       $bootStrapParams = array();
@@ -470,49 +480,71 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     jimport('joomla.application.component.helper');
     jimport('joomla.database.table');
+    jimport('joomla.user.helper');
 
-    $JUserTable = &JTable::getInstance('User', 'JTable');
+    $JUserTable = JTable::getInstance('User', 'JTable');
 
     $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
-    $query->select('id, username, email, password');
+    $query->select('id, name, username, email, password');
     $query->from($JUserTable->getTableName());
     $query->where('(LOWER(username) = LOWER(\'' . $name . '\')) AND (block = 0)');
     $db->setQuery($query, 0, 0);
-    $users = $db->loadAssocList();
+    $users = $db->loadObjectList();
 
-    $row = array();;
+    $row = array();
     if (count($users)) {
       $row = $users[0];
     }
 
-    $user = NULL;
-    if (!empty($row)) {
-      $dbPassword = CRM_Utils_Array::value('password', $row);
-      $dbId       = CRM_Utils_Array::value('id', $row);
-      $dbEmail    = CRM_Utils_Array::value('email', $row);
+    $joomlaBase = dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
+    if ( !defined('JVERSION') ) {
+      require $joomlaBase . '/libraries/cms/version/version.php';
+      $jversion = new JVersion;
+      define('JVERSION', $jversion->getShortVersion());
+    }
 
-      // now check password
-      if (strpos($dbPassword, ':') === FALSE) {
-        if ($dbPassword != md5($password)) {
-          return FALSE;
+    if (!empty($row)) {
+      $dbPassword = $row->password;
+      $dbId = $row->id;
+      $dbEmail = $row->email;
+
+      if ( version_compare(JVERSION, '2.5.18', 'lt') ||
+        ( version_compare(JVERSION, '3.0', 'ge') && version_compare(JVERSION, '3.2.1', 'lt') )
+      ) {
+        // now check password
+        if (strpos($dbPassword, ':') === FALSE) {
+          if ($dbPassword != md5($password)) {
+            return FALSE;
+          }
+        }
+        else {
+          list($hash, $salt) = explode(':', $dbPassword);
+          $cryptpass = md5($password . $salt);
+          if ($hash != $cryptpass) {
+            return FALSE;
+          }
         }
       }
       else {
-        list($hash, $salt) = explode(':', $dbPassword);
-        $cryptpass = md5($password . $salt);
-        if ($hash != $cryptpass) {
-          return FALSE;
+        if (!JUserHelper::verifyPassword($password, $dbPassword, $dbId)) return FALSE;
+
+        //include additional files required by Joomla 3.2.1+
+        if ( version_compare(JVERSION, '3.2.1', 'ge') ) {
+          require $joomlaBase . '/libraries/cms/application/helper.php';
+          require $joomlaBase . '/libraries/cms/application/cms.php';
+          require $joomlaBase . '/libraries/cms/application/administrator.php';
         }
       }
 
-      CRM_Core_BAO_UFMatch::synchronizeUFMatch($user, $dbId, $dbEmail, 'Joomla');
+      CRM_Core_BAO_UFMatch::synchronizeUFMatch($row, $dbId, $dbEmail, 'Joomla');
       $contactID = CRM_Core_BAO_UFMatch::getContactId($dbId);
       if (!$contactID) {
         return FALSE;
       }
       return array($contactID, $dbId, mt_rand());
     }
+
     return FALSE;
   }
 
@@ -526,7 +558,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   function setUserSession($data) {
     list($userID, $ufID) = $data;
     $user = new JUser( $ufID );
-    $session = &JFactory::getSession();
+    $session = JFactory::getSession();
     $session->set('user', $user);
 
     parent::setUserSession($data);
@@ -580,12 +612,16 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
   }
 
-  /*
+  /**
    * load joomla bootstrap
    *
    * @param $params array with uid or name and password
    * @param $loadUser boolean load cms user?
-   * @param $throwError throw error on failure?
+   * @param bool|\throw $throwError throw error on failure?
+   * @param null $realPath
+   * @param bool $loadDefines
+   *
+   * @return bool
    */
   function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL, $loadDefines = TRUE) {
     // Setup the base path related constant.
@@ -620,10 +656,15 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       require $joomlaBase . '/libraries/joomla/application/component/helper.php';
     }
     else {
+      require $joomlaBase . '/libraries/cms.php';
       require $joomlaBase . '/libraries/joomla/uri/uri.php';
     }
 
     jimport('joomla.application.cli');
+
+    // CRM-14281 Joomla wasn't available during bootstrap, so hook_civicrm_config never executes.
+    $config = CRM_Core_Config::singleton();
+    CRM_Utils_Hook::config($config);
 
     return TRUE;
   }
@@ -646,6 +687,34 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function getLoggedInUfID() {
     $user = JFactory::getUser();
     return ($user->guest) ? NULL : $user->id;
+  }
+
+  /**
+   * Get currently logged in user unique identifier - this tends to be the email address or user name.
+   *
+   * @return string $userID logged in user unique identifier
+   */
+  function getLoggedInUniqueIdentifier() {
+    $user = JFactory::getUser();
+    return $this->getUniqueIdentifierFromUserObject($user);
+  }
+  /**
+   * Get User ID from UserFramework system (Joomla)
+   * @param object $user object as described by the CMS
+   * @return mixed <NULL, number>
+   */
+  function getUserIDFromUserObject($user) {
+    return !empty($user->id) ? $user->id : NULL;
+  }
+
+  /**
+   * Get Unique Identifier from UserFramework system (CMS)
+   * @param object $user object as described by the User Framework
+   * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
+   *
+   */
+  function getUniqueIdentifierFromUserObject($user) {
+    return ($user->guest) ? NULL : $user->email;
   }
 
   /**
@@ -693,6 +762,9 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
   /**
    * Return default Site Settings
+   *
+   * @param $dir
+   *
    * @return array array
    * - $url, (Joomla - non admin url)
    * - $siteName,

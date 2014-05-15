@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -49,7 +49,11 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
   /**
    * The action links that we need to display for the browse screen
    *
-   * @var array
+   * @param $params
+   * @param $defaults
+   *
+   * @return \CRM_Campaign_DAO_Survey|null
+   * @internal param array $
    */
   static function retrieve(&$params, &$defaults) {
     $dao = new CRM_Campaign_DAO_Survey();
@@ -70,6 +74,8 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
    * survey object.
    *
    *
+   * @param $params
+   *
    * @return object CRM_Survey_DAO_Survey object
    * @access public
    * @static
@@ -79,7 +85,7 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
       return false;
     }
 
-    if (CRM_Utils_Array::value('is_default', $params)) {
+    if (!empty($params['is_default'])) {
       $query = "UPDATE civicrm_survey SET is_default = 0";
       CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
     }
@@ -99,7 +105,7 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
     $dao->copyValues($params);
     $dao->save();
 
-    if (CRM_Utils_Array::value('custom', $params) &&
+    if (!empty($params['custom']) &&
       is_array($params['custom'])
     ) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_survey', $dao->id);
@@ -124,7 +130,7 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
         'sortOrder' => 'desc',
       );
       foreach ($sortParams as $name => $default) {
-        if (CRM_Utils_Array::value($name, $params)) {
+        if (!empty($params[$name])) {
           $sortParams[$name] = $params[$name];
         }
       }
@@ -165,15 +171,15 @@ INNER JOIN civicrm_option_group grp ON ( activity_type.option_group_id = grp.id 
       $queryParams[1] = array($petitionTypeID, 'Positive');
     }
 
-    if (CRM_Utils_Array::value('title', $params)) {
+    if (!empty($params['title'])) {
       $where[] = "( survey.title LIKE %2 )";
       $queryParams[2] = array('%' . trim($params['title']) . '%', 'String');
     }
-    if (CRM_Utils_Array::value('campaign_id', $params)) {
+    if (!empty($params['campaign_id'])) {
       $where[] = '( survey.campaign_id = %3 )';
       $queryParams[3] = array($params['campaign_id'], 'Positive');
     }
-    if (CRM_Utils_Array::value('activity_type_id', $params)) {
+    if (!empty($params['activity_type_id'])) {
       $typeId = $params['activity_type_id'];
       if (is_array($params['activity_type_id'])) {
         $typeId = implode(' , ', $params['activity_type_id']);
@@ -326,6 +332,7 @@ SELECT  survey.id    as id,
    *
    * @param $surveyTypes array an array of survey type id.
    *
+   * @return array
    * @static
    */
   static function getSurveyCustomGroups($surveyTypes = array(
@@ -379,6 +386,7 @@ SELECT  survey.id    as id,
    *
    * @param int $id survey id
    *
+   * @return mixed|null
    * @access public
    * @static
    *
@@ -399,11 +407,11 @@ SELECT  survey.id    as id,
   /**
    * This function retrieve contact information.
    *
-   * @param array  $voter            an array of contact Ids.
-   * @param array  $returnProperties an array of return elements.
+   * @param $voterIds
+   * @param array $returnProperties an array of return elements.
    *
-   * @return $voterDetails array of contact info.
-   * @static
+   * @internal param array $voter an array of contact Ids.
+   * @return array $voterDetails array of contact info.@static
    */
   static function voterDetails($voterIds, $returnProperties = array(
     )) {
@@ -490,11 +498,13 @@ Group By  contact.id";
   /**
    * This function retrieve survey related activities w/ for give voter ids.
    *
-   * @param int   $surveyId  survey id.
-   * @param array $voterIds  voterIds.
+   * @param int $surveyId survey id.
+   * @param array $voterIds voterIds.
    *
-   * @return $activityDetails array of survey activity.
-   * @static
+   * @param null $interviewerId
+   * @param array $statusIds
+   *
+   * @return array $activityDetails array of survey activity.@static
    */
   static function voterActivityDetails($surveyId, $voterIds, $interviewerId = NULL,
                                        $statusIds = array()) {
@@ -510,16 +520,12 @@ Group By  contact.id";
       $whereClause = ' AND ( activity.status_id IN ( ' . implode(',', array_values($statusIds)) . ' ) )';
     }
 
-    if (!$interviewerId) {
-      $session = CRM_Core_Session::singleton();
-      $interviewerId = $session->get('userID');
-    }
-
     $targetContactIds = ' ( ' . implode(',', $voterIds) . ' ) ';
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
+    $params[1] = array($surveyId, 'Integer');
     $query = "
     SELECT  activity.id, activity.status_id,
             activityTarget.contact_id as voter_id,
@@ -530,14 +536,14 @@ INNER JOIN  civicrm_activity_contact activityTarget
 INNER JOIN  civicrm_activity_contact activityAssignment
   ON ( activityAssignment.activity_id = activity.id AND activityAssignment.record_type_id = $assigneeID )
      WHERE  activity.source_record_id = %1
-       AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 )
-       AND  activityAssignment.contact_id = %2
-       AND  activityTarget.contact_id IN {$targetContactIds}
+     AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 ) ";
+    if(!empty($interviewerId)) {
+      $query .= "AND activityAssignment.contact_id = %2 ";
+      $params[2] = array($interviewerId, 'Integer');
+    }
+    $query .= "AND  activityTarget.contact_id IN {$targetContactIds}
             $whereClause";
-
-    $activity = CRM_Core_DAO::executeQuery($query, array(1 => array($surveyId, 'Integer'),
-        2 => array($interviewerId, 'Integer'),
-      ));
+    $activity = CRM_Core_DAO::executeQuery($query, $params);
     while ($activity->fetch()) {
       $activityDetails[$activity->voter_id] = array(
         'voter_id' => $activity->voter_id,
@@ -553,10 +559,13 @@ INNER JOIN  civicrm_activity_contact activityAssignment
   /**
    * This function retrieve survey related activities.
    *
-   * @param int    $surveyId  survey id.
+   * @param int $surveyId survey id.
    *
-   * @return $activities an array of survey activity.
-   * @static
+   * @param null $interviewerId
+   * @param null $statusIds
+   * @param null $voterIds
+   * @param bool $onlyCount
+   * @return array $activities an array of survey activity.@static
    */
   static function getSurveyActivities($surveyId,
     $interviewerId = NULL,
@@ -688,8 +697,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   /**
    * This function retrieve all option groups which are created as a result set
    *
-   * @return $resultSets an array of option groups.
-   * @static
+   * @param string $valueColumnName
+   * @return array $resultSets an array of option groups.@static
    */
   static function getResultSets( $valueColumnName = 'title' ) {
     $resultSets = array();
@@ -708,7 +717,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * This function is to check survey activity.
    *
    * @param int $activityId activity id.
-   * @param int $activityTypeId activity type id.
+   * @internal param int $activityTypeId activity type id.
    * @return boolean $isSurveyActivity true/false boolean.
    * @static
    */
@@ -737,8 +746,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * This function retrive all response options of survey
    *
    * @param int $surveyId survey id.
-   * @return $responseOptions an array of option values
-   * @static
+   * @return array $responseOptions an array of option values@static
    */
   static function getResponsesOptions($surveyId) {
     $responseOptions = array();
@@ -757,8 +765,10 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
   /**
    * This function return all voter links with respecting permissions
    *
-   * @return $url array of permissioned links
-   * @static
+   * @param $surveyId
+   * @param bool $enclosedInUL
+   * @param string $extraULName
+   * @return array|string $url array of permissioned links@static
    */
   static function buildPermissionLinks($surveyId, $enclosedInUL = FALSE, $extraULName = 'more') {
     $menuLinks = array();
@@ -816,13 +826,13 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
 
     $ids = array('id' => $surveyId);
     foreach ($voterLinks as $link) {
-      if (CRM_Utils_Array::value('qs', $link) &&
+      if (!empty($link['qs']) &&
         !CRM_Utils_System::isNull($link['qs'])
       ) {
         $urlPath = CRM_Utils_System::url(CRM_Core_Action::replace($link['url'], $ids),
           CRM_Core_Action::replace($link['qs'], $ids)
         );
-        $menuLinks[] = sprintf('<a href="%s" class="action-item" title="%s">%s</a>',
+        $menuLinks[] = sprintf('<a href="%s" class="action-item crm-hover-button" title="%s">%s</a>',
           $urlPath,
           CRM_Utils_Array::value('title', $link),
           $link['title']
@@ -834,7 +844,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       $allLinks = '';
       CRM_Utils_String::append($allLinks, '</li><li>', $menuLinks);
       $allLinks = "$extraULName <ul id='panel_{$extraLinksName}_xx' class='panel'><li>{$allLinks}</li></ul>";
-      $menuLinks = "<span class='btn-slide' id={$extraLinksName}_xx>{$allLinks}</span>";
+      $menuLinks = "<span class='btn-slide crm-hover-button' id={$extraLinksName}_xx>{$allLinks}</span>";
     }
 
     return $menuLinks;
@@ -868,7 +878,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       }
     }
 
-    return $ufIds[$surveyId];
+    return CRM_Utils_Array::value($surveyId, $ufIds);
   }
 
   public Static function getReportID($surveyId) {
@@ -1029,6 +1039,8 @@ INNER JOIN  civicrm_survey survey ON ( activity.source_record_id = survey.id )
   /**
    * Check and update the survey respondents.
    *
+   * @param $params
+   *
    * @return array success message
    */
   public function releaseRespondent($params) {
@@ -1081,6 +1093,30 @@ UPDATE  civicrm_activity
     );
 
     return $rtnMsg;
+  }
+
+  /**
+   * Get options for a given field.
+   * @see CRM_Core_DAO::buildOptions
+   *
+   * @param String $fieldName
+   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
+   * @param Array  $props: whatever is known about this dao object
+   *
+   * @return array|bool
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $params = array();
+    // Special logic for fields whose options depend on context or properties
+    switch ($fieldName) {
+      case 'activity_type_id':
+        $campaignCompId = CRM_Core_Component::getComponentID('CiviCampaign');
+        if ($campaignCompId) {
+          $params['condition'] = array("component_id={$campaignCompId}", "v.name != 'Petition'");
+        }
+        break;
+    }
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 }
 

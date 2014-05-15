@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -46,7 +46,7 @@ class CRM_Upgrade_Incremental_php_ThreeFour {
       $formValues = unserialize($instances->form_values);
 
       // replace display_name fields by sort_name
-      if (CRM_Utils_Array::value('fields', $formValues) && isset($formValues['fields']['display_name'])) {
+      if (!empty($formValues['fields']) && isset($formValues['fields']['display_name'])) {
         $formValues['fields']['sort_name'] = $formValues['fields']['display_name'];
         unset($formValues['fields']['display_name']);
       }

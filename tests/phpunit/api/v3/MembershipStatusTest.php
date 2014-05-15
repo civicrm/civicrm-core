@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
   protected $_contributionTypeID;
   protected $_membershipTypeID;
   protected $_membershipStatusID;
-  public $_eNoticeCompliant = TRUE;
+
   protected $_apiversion =3;
 
   function get_info() {

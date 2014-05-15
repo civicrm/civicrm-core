@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,14 +26,14 @@
 {if (!$chartEnabled || !$chartSupported )&& $rows}
     {if $pager and $pager->_response and $pager->_response.numPages > 1}
         <div class="report-pager">
-            {include file="CRM/common/pager.tpl" location="top" noForm=0}
+            {include file="CRM/common/pager.tpl" location="top"}
         </div>
     {/if}
     <table class="report-layout display">
         {capture assign="tableHeader"}
             {foreach from=$columnHeaders item=header key=field}
                 {assign var=class value=""}
-                {if $header.type eq 1024 OR $header.type eq 1}
+                {if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512}
                 {assign var=class value="class='reports-header-right'"}
                 {else}
                     {assign var=class value="class='reports-header'"}
@@ -81,13 +81,13 @@
                         {$l}assign var=printValue value=$row.{$column}{$r}
                     {$l}/if{$r}
 
-                    <tr><th colspan="{$columnCount}">
+                    <tr class="crm-report-sectionHeader crm-report-sectionHeader-{$h}{if $section.pageBreak} page-break{/if}"><th colspan="{$columnCount}">
                         <h{$h}>{$section.title}: {$l}$printValue|default:"<em>none</em>"{$r}
                             ({$l}sectionTotal key=$row.{$column} depth={$smarty.foreach.sections.index}{$r})
                         </h{$h}>
                     </th></tr>
                     {if $smarty.foreach.sections.last}
-                        <tr>{$l}$tableHeader{$r}</tr>
+                        <tr class="crm-report-sectionCols">{$l}$tableHeader{$r}</tr>
                     {/if}
                 {$l}/if{$r}
             {/foreach}
@@ -99,7 +99,7 @@
                 {foreach from=$columnHeaders item=header key=field}
                     {assign var=fieldLink value=$field|cat:"_link"}
                     {assign var=fieldHover value=$field|cat:"_hover"}
-                    <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1} report-contents-right{elseif $row.$field eq 'Subtotal'} report-label{/if}">
+                    <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512} report-contents-right{elseif $row.$field eq 'Subtotal'} report-label{/if}">
                         {if $row.$fieldLink}
                             <a title="{$row.$fieldHover}" href="{$row.$fieldLink}">
                         {/if}
@@ -152,7 +152,7 @@
     </table>
     {if $pager and $pager->_response and $pager->_response.numPages > 1}
         <div class="report-pager">
-            {include file="CRM/common/pager.tpl"  noForm=0}
+            {include file="CRM/common/pager.tpl" }
         </div>
     {/if}
 {/if}

@@ -2,7 +2,6 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
   protected $_apiversion;
-  public $_eNoticeCompliant = TRUE;
 
   function setUp() {
     $this->_apiversion = 3;
@@ -173,9 +172,14 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $customGroupParams
-   * @param $fieldParams
-   * @param $expectedXmlFilePath
+   * @param $expectCustomGroup
+   * @param $expectCustomField
+   * @param $inputXmlFilePath
+   *
+   * @throws CRM_Core_Exception
+   * @internal param $customGroupParams
+   * @internal param $fieldParams
+   * @internal param $expectedXmlFilePath
    * @dataProvider basicXmlTestCases
    */
   function testBasicXMLImports($expectCustomGroup, $expectCustomField, $inputXmlFilePath) {

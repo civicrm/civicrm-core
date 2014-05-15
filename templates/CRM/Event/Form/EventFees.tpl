@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,8 +35,14 @@
       {if $action eq 2 and $hasPayment} {* Updating *}
             {if $lineItem}
                 <tr class="crm-event-eventfees-form-block-line_items">
-                    <td class="label">{ts}Event Fees{/ts}</td>
+                    <td class="label">{ts}Selections{/ts}</td>
                     <td>{include file="CRM/Price/Page/LineItem.tpl" context="Event"}</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>
+                    <a class="button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}' title="{ts}Change Selections{/ts}"><span><div class="icon edit-icon"></div> {ts}Change Selections{/ts}</span></a>
+                  </td>
                 </tr>
             {else}
                 <tr class="crm-event-eventfees-form-block-event_level">
@@ -76,12 +82,12 @@
                     <td class="label">{$form.financial_type_id.label}<span class="marker"> *</span></td>
                     <td>{$form.financial_type_id.html}<br /><span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span></td>
                 </tr>
-                <tr class="crm-event-eventfees-form-block-total_amount"><td class="label">{$form.total_amount.label}</td><td>{$form.total_amount.html|crmMoney:$currency}<br/><span class="description">{ts}Actual payment amount for this registration.{/ts}</span></td></tr>
+                <tr class="crm-event-eventfees-form-block-total_amount"><td class="label">{$form.total_amount.label}</td><td>{$form.total_amount.html|crmMoney:$currency}</td></tr>
                 <tr>
                     <td class="label" >{$form.receive_date.label}</td>
                     <td>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}</td>
                 </tr>
-                <tr class="crm-event-eventfees-form-block-payment_instrument_id"><td class="label">{$form.payment_instrument_id.label}</td><td>{$form.payment_instrument_id.html}</td></tr>
+                <tr class="crm-event-eventfees-form-block-payment_instrument_id"><td class="label">{$form.payment_instrument_id.label}<span class="marker"> *</span></td><td>{$form.payment_instrument_id.html} {help id="payment_instrument_id" file="CRM/Contribute/Page/Tab.hlp"}</td></tr>
                 <tr id="checkNumber" class="crm-event-eventfees-form-block-check_number"><td class="label">{$form.check_number.label}</td><td>{$form.check_number.html|crmAddClass:six}</td></tr>
                 {if $showTransactionId }
                     <tr class="crm-event-eventfees-form-block-trxn_id"><td class="label">{$form.trxn_id.label}</td><td>{$form.trxn_id.html}</td></tr>
@@ -198,7 +204,7 @@
 {if $context eq 'standalone' and $outBound_option != 2 }
 <script type="text/javascript">
 {literal}
-cj( function( ) {
+CRM.$(function($) {
     cj("#contact_1").blur( function( ) {
         checkEmail( );
     } );
@@ -245,7 +251,7 @@ function checkEmail( ) {
        cj("#contribution_status_id").val( cStatusId );
 
        //unset value for send receipt check box.
-       cj("#send_receipt").attr( "checked", false );
+       cj("#send_receipt").prop("checked", false );
        cj("#send_confirmation_receipt").hide( );
 
        // set receive data to null.

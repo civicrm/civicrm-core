@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,7 +36,8 @@
     <div id="optionList">
   {strip}
   {* handle enable/disable actions*}
-   {include file="CRM/common/enableDisable.tpl"}
+   {include file="CRM/common/enableDisableApi.tpl"}
+   {include file="CRM/common/crmeditable.tpl"}
    {include file="CRM/common/jsortable.tpl"}
        <table id="options" class="display">
        <thead>
@@ -56,8 +57,8 @@
     </tr>
         </thead>
     {foreach from=$rows item=row}
-        <tr id="row_{$row.id}" class="crm-report {cycle values="odd-row,even-row"}{$row.class}{if NOT $row.is_active} crm-report-optionList crm-report-optionList-status_disable disabled{else} crm-report-optionList crm-report-optionList-status_enable{/if}">
-             <td class="crm-report-optionList-label">{$row.label}</td>
+        <tr id="report-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{$row.class}{if NOT $row.is_active} crm-report-optionList crm-report-optionList-status_disable disabled{else} crm-report-optionList crm-report-optionList-status_enable{/if}">
+             <td class="crm-report-optionList-label crm-editable" data-field="label">{$row.label}</td>
             <td class="crm-report-optionList-value">{$row.value}</td>
             <td class="crm-report-optionList-description">{$row.description}</td>
             <td class="nowrap crm-report-optionList-order">{$row.order}</td>

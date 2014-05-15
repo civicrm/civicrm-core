@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -98,7 +98,7 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
     $defaults = array();
     $groupId  = $this->get('groupId');
     $fieldId  = $this->get('fieldId');
-    if (CRM_Utils_Array::value('fields', $this->_groupTree[$groupId])) {
+    if (!empty($this->_groupTree[$groupId]['fields'])) {
       foreach ($this->_groupTree[$groupId]['fields'] as $key => $val) {
         foreach ($val['options'] as $keys => $values) {
           if ($values['is_default']) {

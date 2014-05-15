@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -133,11 +133,6 @@
             {/if}
         </table>
         {/strip}
-
-        <script type="text/javascript">
-            {* this function is called to change the color of selected row(s) *}
-            on_load_init_checkboxes("{$form.formName}");
-        </script>
 
         {include file="CRM/common/pager.tpl" location="bottom"}
 

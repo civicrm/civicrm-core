@@ -50,9 +50,9 @@
 </tr>
 <tr>
    <td><a href="{crmURL p='civicrm/admin/contribute/custom' q="reset=1&action=update&id=`$contributionPageID`"}" id="idCustom">&raquo; {ts}Include Profiles{/ts}</a></td>
-    <td>{ts}You may want to collect information from contributors beyond what is required to make a contribution. For example, you may want to inquire about volunteer availability and skills. Add any number of fields to your contribution form by selecting CiviCRM Profiles (collections of fields) to include at the beginning of the page, and/or at the bottom.<br />
-You can use existing CiviCRM Profiles on your page - OR create profile(s) specifically for use in Online Contribution pages. Go to {/ts}<a href="{crmURL p='civicrm/admin/uf/group' q="reset=1&action=browse"}"><strong>{ts}Administer CiviCRM Profiles{/ts}</strong></a> {ts}if you need to review, modify or create profiles (you can come back at any time to select or update the Profile(s) used for this page).
-{/ts}</td>
+    <td>{ts}You may want to collect information from contributors beyond what is required to make a contribution. For example, you may want to inquire about volunteer availability and skills. Add any number of fields to your contribution form by selecting CiviCRM Profiles (collections of fields) to include at the beginning of the page, and/or at the bottom.{/ts}<br />
+{capture assign=adminGroupURL}{crmURL p="civicrm/admin/uf/group" q="reset=1&action=browse"}{/capture}
+{ts 1=$adminGroupURL}You can use existing CiviCRM Profiles on your page - OR create profile(s) specifically for use in Online Contribution pages. Go to <a href="%1"><strong>Administer CiviCRM Profiles</strong></a> if you need to review, modify or create profiles (you can come back at any time to select or update the Profile(s) used for this page).{/ts}</td>
 </tr>
 <tr>
    <td><a href="{crmURL p='civicrm/admin/contribute/premium q="reset=1&action=update&id=`$contributionPageID`"}" id="idPremium">&raquo; {ts}Premiums{/ts}</a></td>
@@ -72,7 +72,7 @@ You can use existing CiviCRM Profiles on your page - OR create profile(s) specif
 </tr>
 <tr>
   <td><a href="{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$contributionPageID`"}" id="idLive">&raquo; {ts}Online Contribution{/ts}</a><br /> ({ts}Live{/ts})</td>
-  <td>{ts}Review your customized <strong>LIVE</strong> online contribution page here. Use the following URL in links and buttons on any website to send visitors to this live page{/ts}:<br />
+  <td>{ts}Review your customized <strong>LIVE</strong> online contribution page here. Use the following URL in links and buttons on any website to send visitors to this live page:{/ts}<br />
       <strong>{crmURL a=1 fe=1 p="civicrm/contribute/transact" q="reset=1&id=`$contributionPageID`"}</strong></td>
 </tr>
 </table>

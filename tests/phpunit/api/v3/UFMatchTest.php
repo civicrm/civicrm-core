@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,7 +44,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_params = array();
 
-  public $_eNoticeCompliant = TRUE;
+
 
   protected function setUp() {
     parent::setUp();
@@ -122,7 +122,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
    *  Test civicrm_activity_create() using example code
    */
   function testUFMatchGetExample() {
-    require_once 'api/v3/examples/UFMatchGet.php';
+    require_once 'api/v3/examples/UFMatch/Get.php';
     $result = UF_match_get_example();
     $expectedResult = UF_match_get_expectedresult();
     $this->assertEquals($result, $expectedResult);

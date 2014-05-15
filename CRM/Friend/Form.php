@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -104,7 +104,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
         $params, $values, array('is_tellfriend_enabled', 'tellfriend_limit')
       );
 
-      if (!CRM_Utils_Array::value('is_tellfriend_enabled', $values)) {
+      if (empty($values['is_tellfriend_enabled'])) {
         CRM_Core_Error::fatal(ts('Tell Friend is disable for this Personal Campaign Page'));
       }
 
@@ -150,7 +150,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -177,7 +177,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -231,7 +231,9 @@ class CRM_Friend_Form extends CRM_Core_Form {
   /**
    * Function for validation
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param $fields
+   *
+   * @internal param array $params (ref.) an assoc array of name/value pairs
    *
    * @return mixed true or array of errors
    * @access public
@@ -272,7 +274,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // get the submitted form values.

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,44 +49,41 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     // We're filling in ajaxiefied  "With Contact" field:
     // We can not use id as selector for these input widgets. Use css selector, starting with the table row containing this field (which will have a unique class)
     // Typing contact's name into the field (using typeKeys(), not type()!)...
-    $this->click("css=tr.crm-activity-form-block-target_contact_id input#token-input-contact_1");
-    $this->type("css=tr.crm-activity-form-block-target_contact_id input#token-input-contact_1", "$firstName1");
-    $this->typeKeys("css=tr.crm-activity-form-block-target_contact_id input#token-input-contact_1", "$firstName1");
+    $this->click("xpath=//div[@id='s2id_target_contact_id']/ul/li/input");
+    $this->keyDown("xpath=//div[@id='s2id_target_contact_id']/ul/li/input", " ");
+    $this->type("xpath=//div[@id='s2id_target_contact_id']/ul/li/input", $firstName1);
+    $this->typeKeys("xpath=//div[@id='s2id_target_contact_id']/ul/li/input", $firstName1);
 
     // ...waiting for drop down with results to show up...
-    $this->waitForElementPresent("css=div.token-input-dropdown-facebook");
-    $this->waitForElementPresent("css=li.token-input-dropdown-item2-facebook");
+    $this->waitForElementPresent("xpath=//div[@class='select2-result-label']");
 
     // ...need to use mouseDownAt on first result (which is a li element), click does not work
-    $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
+    $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up (span with delete token class indicates that it's present)...
-    $this->waitForElementPresent("css=tr.crm-activity-form-block-target_contact_id td ul li span.token-input-delete-token-facebook");
+    $this->waitForText("xpath=//div[@id='s2id_target_contact_id']","$firstName1");
 
     //..and verifying if the page contains properly formatted display name for chosen contact.
-    $this->assertElementContainsText('css=tr.crm-activity-form-block-target_contact_id td ul li.token-input-token-facebook', "Anderson, $firstName1", 'Contact not found in line ' . __LINE__);
+    $this->assertElementContainsText("xpath=//div[@id='s2id_target_contact_id']", "Anderson, $firstName1", 'Contact not found in line ' . __LINE__);
 
     // Now we're doing the same for "Assigned To" field.
     // Typing contact's name into the field (using typeKeys(), not type()!)...
-    $this->click("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id");
-    $this->type("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id", "$firstName2");
-    $this->typeKeys("css=tr.crm-activity-form-block-assignee_contact_id input#token-input-assignee_contact_id", "$firstName2");
+    $this->click("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input");
+    $this->keyDown("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input", " ");
+    $this->type("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input", $firstName2);
+    $this->typeKeys("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input", $firstName2);
 
     // ...waiting for drop down with results to show up...
-    $this->waitForElementPresent("css=div.token-input-dropdown-facebook");
-    $this->waitForElementPresent("css=li.token-input-dropdown-item2-facebook");
+    $this->waitForElementPresent("xpath=//div[@class='select2-result-label']");
 
     //..need to use mouseDownAt on first result (which is a li element), click does not work
-    $this->mouseDownAt("css=li.token-input-dropdown-item2-facebook");
+    $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up...
-    $this->waitForElementPresent("css=tr.crm-activity-form-block-assignee_contact_id td ul li span.token-input-delete-token-facebook");
+    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$firstName2");
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
-    $this->assertElementContainsText('css=tr.crm-activity-form-block-assignee_contact_id td ul li.token-input-token-facebook', "Summerson, $firstName2", 'Contact not found in line ' . __LINE__);
-
-    // Since we're here, let's check of screen help is being displayed properly
-    $this->assertElementContainsText('css=tr.crm-activity-form-block-assignee_contact_id td span.description', 'You can optionally assign this activity to someone', 'Help text is missing.');
+    $this->assertElementContainsText("xpath=//div[@id='s2id_assignee_contact_id']", "Summerson, $firstName2", 'Contact not found in line ' . __LINE__);
 
     // Putting the contents into subject field - assigning the text to variable, it'll come in handy later
     $subject = "This is subject of test activity being added through standalone screen.";
@@ -115,7 +112,6 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->select("priority_id", "value=1");
 
     // Adding attachment
-    $this->click("css=.crm-activity-form-block-attachment div.crm-accordion-header");
     //FIX ME: need to fix file uploading
     //$this->waitForElementPresent("attachFile_1");
     //$filePath = $this->webtestAttachFile( "attachFile_1" );
@@ -136,16 +132,16 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
 
     $this->type("sort_name", $firstName1);
     $this->click("_qf_Search_refresh");
-    $this->waitForElementPresent("_qf_Search_next_print");
+    $this->waitForElementPresent("Go");
 
     $this->click("xpath=id('Search')/div[3]/div/div[2]/table/tbody/tr[3]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_Activity_cancel-bottom");
 
-    $this->webtestVerifyTabularData(
+    $this->VerifyTabularData(
       array(
         'Subject' => $subject,
         'Location' => $location,
-        'Status' => 'Scheduled',
+        'Activity Status' => 'Scheduled',
         'Duration' => '30',
         // Tough luck filling in WYSIWYG editor, so skipping verification for now.
         //'Details'    => 'Really brief details information.',
@@ -155,11 +151,12 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
       "/label"
     );
 
-    $this->webtestVerifyTabularData(
+    $this->VerifyTabularData(
       array(
         'With Contact' => "Anderson, {$firstName1}",
         'Assigned To' => "Summerson, {$firstName2}",
-      )
+      ),
+      "/label"
     );
   }
 
@@ -173,5 +170,12 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
 
     $pageUrl = array('url' => 'activity', 'args' => 'reset=1&action=add&context=standalone');
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
+  }
+
+  function VerifyTabularData($expected, $xpathPrefix = NULL) {
+    foreach ($expected as $label => $value) {
+        $this->waitForElementPresent("xpath=//table/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td/span");
+        $this->verifyText("xpath=//table/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td/span", preg_quote($value), 'In line ' . __LINE__);
+    }
   }
 }

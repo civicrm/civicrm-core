@@ -1,9 +1,9 @@
 <?php
 /**
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.5                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -31,7 +31,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
   protected $individual;
   protected $params;
   protected $ids;
-  public $_eNoticeCompliant = TRUE;
+
   public $DBResetRequired = FALSE;
 
   function setUp() {

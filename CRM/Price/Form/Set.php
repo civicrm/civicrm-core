@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -134,46 +134,47 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
 
     $config           = CRM_Core_Config::singleton();
     $showContribution = FALSE;
-    $components       = array('CiviEvent' => array('title' => ts('Event'),
-        'extend' => CRM_Core_Component::getComponentID('CiviEvent'),
-        'tables' => array(
-          'civicrm_event',
-          'civicrm_participant',
-        ),
-      ),
-      'CiviContribute' => array('title' => ts('Contribution'),
-        'extend' => CRM_Core_Component::getComponentID('CiviContribute'),
-        'tables' => array(
-          'civicrm_contribution',
-          'civicrm_contribution_page',
-        ),
-      ),
-      'CiviMember' => array('title' => ts('Membership'),
-        'extend' => CRM_Core_Component::getComponentID('CiviMember'),
-        'tables' => array(
-          'civicrm_membership',
-          'civicrm_contribution_page',
-        ),
-      ),
-    );
-    foreach ($components as $compName => $compValues) {
-      // take only enabled components.
-      if (!in_array($compName, $config->enableComponents)) {
-        continue;
-      }
-      $option = $this->createElement('checkbox', $compValues['extend'], NULL, $compValues['title']);
+    $enabledComponents = CRM_Core_Component::getEnabledComponents();
 
-      //if price set is used than freeze it.
-      if (!empty($priceSetUsedTables)) {
-        foreach ($compValues['tables'] as $table) {
-
-          if (in_array($table, $priceSetUsedTables)) {
-            $option->freeze();
-            break;
+    foreach ($enabledComponents as $name => $compObj) {
+      switch ($name) {
+        case 'CiviEvent':
+          $option = $this->createElement('checkbox', $compObj->componentID, NULL, ts('Event'));
+          if (!empty($priceSetUsedTables)) {
+            foreach (array('civicrm_event', 'civicrm_participant') as $table) {
+              if (in_array($table, $priceSetUsedTables)) {
+                $option->freeze();
+                break;
+              }
+            }
           }
-        }
+          $extends[] = $option;
+          break;
+        case 'CiviContribute':
+          $option = $this->createElement('checkbox', $compObj->componentID, NULL, ts('Contribution'));
+          if (!empty($priceSetUsedTables)) {
+            foreach (array('civicrm_contribution', 'civicrm_contribution_page') as $table) {
+              if (in_array($table, $priceSetUsedTables)) {
+                $option->freeze();
+                break;
+              }
+            }
+          }
+          $extends[] = $option;
+          break;
+        case 'CiviMember':
+          $option = $this->createElement('checkbox', $compObj->componentID, NULL, ts('Membership'));
+          if (!empty($priceSetUsedTables)) {
+            foreach (array('civicrm_membership', 'civicrm_contribution_page') as $table) {
+              if (in_array($table, $priceSetUsedTables)) {
+                $option->freeze();
+                break;
+              }
+            }
+          }
+          $extends[] = $option;
+          break;
       }
-      $extends[] = $option;
     }
 
     if (CRM_Utils_System::isNull($extends)) {

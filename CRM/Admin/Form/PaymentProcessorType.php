@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: PaymentProcessorType.php 9702 2007-05-29 23:57:16Z lobo $
  *
  */
@@ -148,7 +148,9 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @param bool $check
+   *
+   * @return void
    * @access public
    */
   public function buildQuickForm($check = FALSE) {
@@ -165,7 +167,7 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
       $this->add('text', $field['name'],
         $field['label'], $attributes['name'], $required
       );
-      if (CRM_Utils_Array::value('rule', $field)) {
+      if (!empty($field['rule'])) {
         $this->addRule($field['name'], $field['msg'], $field['rule']);
       }
     }
@@ -205,7 +207,7 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     CRM_Utils_System::flushCache( 'CRM_Financial_DAO_PaymentProcessorType' );
@@ -217,7 +219,7 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
 
     $values = $this->controller->exportValues($this->_name);
 
-    if (CRM_Utils_Array::value('is_default', $values)) {
+    if (!empty($values['is_default'])) {
       $query = "
 UPDATE civicrm_payment_processor SET is_default = 0";
       CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);

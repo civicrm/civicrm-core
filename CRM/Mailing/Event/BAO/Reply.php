@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -49,9 +49,11 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
   /**
    * Register a reply event.
    *
-   * @param int $job_id       The job ID of the reply
-   * @param int $queue_id     The queue event id
-   * @param string $hash      The hash
+   * @param int $job_id The job ID of the reply
+   * @param int $queue_id The queue event id
+   * @param string $hash The hash
+   *
+   * @param null $replyto
    *
    * @return object|null      The mailing object, or null on failure
    * @access public
@@ -116,7 +118,9 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
 
     $eq = new CRM_Core_DAO();
     $eq->query("SELECT     $contacts.display_name as display_name,
-                               $emails.email as email
+                           $emails.email as email,
+                           $queue.job_id as job_id,
+                           $queue.hash as hash
                    FROM        $queue
                    INNER JOIN  $contacts
                            ON  $queue.contact_id = $contacts.id
@@ -144,7 +148,9 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
       $b = $parsed->generateBody();
 
       // strip Return-Path of possible bounding brackets, CRM-4502
-      $h['Return-Path'] = trim($h['Return-Path'], '<>');
+      if (!empty($h['Return-Path'])) {
+        $h['Return-Path'] = trim($h['Return-Path'], '<>');
+      }
 
       // FIXME: ugly hack - find the first MIME boundary in
       // the body and make the boundary in the header match it
@@ -187,12 +193,10 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $config = CRM_Core_Config::singleton();
     $mailer = $config->getMailer();
 
-    PEAR::setErrorHandling(PEAR_ERROR_CALLBACK,
-      array('CRM_Core_Error', 'nullHandler')
-    );
     if (is_object($mailer)) {
+      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       $mailer->send($mailing->replyto_email, $h, $b);
-      CRM_Core_Error::setCallback();
+      unset($errorScope);
     }
   }
 
@@ -217,9 +221,9 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $eq = new CRM_Core_DAO();
     $eq->query(
       "SELECT     $contacts.preferred_mail_format as format,
-                    $email.email as email
-                    $queue.job_id as job_id
-                    $queue.hash as hash
+                  $email.email as email,
+                  $queue.job_id as job_id,
+                  $queue.hash as hash
         FROM        $contacts
         INNER JOIN  $queue ON $queue.contact_id = $contacts.id
         INNER JOIN  $email ON $queue.email_id = $email.id
@@ -279,12 +283,10 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     CRM_Mailing_BAO_Mailing::addMessageIdHeader($h, 'a', $eq->job_id, queue_id, $eq->hash);
 
     $mailer = $config->getMailer();
-    PEAR::setErrorHandling(PEAR_ERROR_CALLBACK,
-      array('CRM_Core_Error', 'nullHandler')
-    );
     if (is_object($mailer)) {
+      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       $mailer->send($to, $h, $b);
-      CRM_Core_Error::setCallback();
+      unset($errorScope);
     }
   }
 
@@ -396,6 +398,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $orderBy = "sort_name ASC, {$reply}.time_stamp DESC";
     if ($sort) {
       if (is_string($sort)) {
+        $sort = CRM_Utils_Type::escape($sort, 'String');
         $orderBy = $sort;
       }
       else {

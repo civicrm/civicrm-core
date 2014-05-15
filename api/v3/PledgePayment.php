@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Pledge_Payment
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: PledgePayment.php
  *
  */
@@ -56,7 +56,7 @@
 function civicrm_api3_pledge_payment_create($params) {
 
   $paymentParams = $params;
-  if (empty($params['id']) && !CRM_Utils_Array::value('option.create_new', $params)) {
+  if (empty($params['id']) && empty($params['option.create_new'])) {
     $paymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($params['pledge_id']);
     if (empty($paymentDetails)) {
       return civicrm_api3_create_error("There are no unmatched payment on this pledge. Pass in the pledge_payment id to specify one or 'option.create_new' to create one");
@@ -136,6 +136,8 @@ function updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds) {
 
 /**
  * Gets field for civicrm_pledge_payment functions
+ *
+ * @param $params
  *
  * @return array fields valid for other functions
  */

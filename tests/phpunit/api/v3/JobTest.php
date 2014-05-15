@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Job
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
@@ -39,7 +39,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_JobTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
-  public $_eNoticeCompliant = TRUE;
   public $DBResetRequired = FALSE;
   public $_entity = 'Job';
   public $_params = array();
@@ -59,7 +58,9 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   function tearDown() {
-    $this->quickCleanup(array('civicrm_job'));
+    $this->quickCleanup(array('civicrm_job', 'civicrm_action_log', 'civicrm_action_schedule'));
+    $this->quickCleanUpFinancialEntities();
+    CRM_Utils_Hook::singleton()->reset();
     parent::tearDown();
   }
 
@@ -174,6 +175,120 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $gt = 'postal_greeting,email_greeting,addressee';
     $ct = 'Individual,Household';
     $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => $gt, 'ct' => $ct));
+  }
+
+  /**
+   * test the call reminder success sends more than 25 reminders & is not incorrectly limited
+   * Note that this particular test sends the reminders to the additional recipients only
+   * as no real reminder person is configured
+   *
+   * Also note that this is testing a 'job' api so is in this class rather than scheduled_reminder - which
+   * seems a cleaner place to build up a collection of scheduled reminder testing functions. However, it seems
+   * that the api itself would need to be moved to the scheduled_reminder fn to do that  with the job wrapper being respected for legacy functions
+   */
+  public function testCallSendReminderSuccessMoreThanDefaultLimit() {
+    $membershipTypeID = $this->membershipTypeCreate();
+    $this->membershipStatusCreate();
+    $createTotal = 30;
+    for($i = 1; $i <= $createTotal; $i++) {
+      $contactID = $this->individualCreate();
+      $groupID = $this->groupCreate(array('name' => $i, 'title' => $i));
+      $result = $this->callAPISuccess('action_schedule', 'create', array(
+        'title' => " job $i",
+        'subject' => "job $i",
+        'entity_value' => $membershipTypeID,
+        'mapping_id' => 4,
+        'start_action_date' => 'membership_join_date',
+        'start_action_offset' => 0,
+        'start_action_condition' => 'before',
+        'start_action_unit' => 'hour',
+        'group_id' => $groupID,
+        'limit_to' => FALSE,
+      ));
+      $this->callAPISuccess('group_contact', 'create', array('contact_id' => $contactID, 'status' => 'Added', 'group_id' => $groupID));
+    }
+    $result = $this->callAPISuccess('job', 'send_reminder', array());
+    $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
+    $this->assertEquals($successfulCronCount, $createTotal);
+  }
+
+  /**
+   * test scheduled reminders respect limit to (since above identified addition_to handling issue)
+   * We create 3 contacts - 1 is in our group, 1 has our membership & the chosen one has both
+   * & check that only the chosen one got the reminder
+   */
+  public function testCallSendReminderLimitTo() {
+    $membershipTypeID = $this->membershipTypeCreate();
+    $this->membershipStatusCreate();
+    $createTotal = 3;
+    $groupID = $this->groupCreate(array('name' => 'Texan drawlers', 'title' => 'a...'));
+    for($i = 1; $i <= $createTotal; $i++) {
+      $contactID = $this->individualCreate();
+      if($i == 2) {
+        $theChosenOneID = $contactID;
+      }
+      if($i < 3) {
+        $this->callAPISuccess('group_contact', 'create', array('contact_id' => $contactID, 'status' => 'Added', 'group_id' => $groupID));
+      }
+      if($i > 1) {
+        $this->callAPISuccess('membership', 'create', array(
+          'contact_id' => $contactID,
+          'membership_type_id' => $membershipTypeID,
+          'join_date' => '+ 1 hour',
+          )
+        );
+      }
+    }
+    $result = $this->callAPISuccess('action_schedule', 'create', array(
+      'title' => " remind all Texans",
+      'subject' => "drawling renewal",
+      'entity_value' => $membershipTypeID,
+      'mapping_id' => 4,
+      'start_action_date' => 'membership_join_date',
+      'start_action_offset' => 0,
+      'start_action_condition' => 'before',
+      'start_action_unit' => 'hour',
+      'group_id' => $groupID,
+      'limit_to' => TRUE,
+    ));
+    $result = $this->callAPISuccess('job', 'send_reminder', array());
+    $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
+    $this->assertEquals($successfulCronCount, 1);
+    $sentToID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_action_log");
+    $this->assertEquals($sentToID, $theChosenOneID);
+  }
+
+  public function testCallDisableExpiredRelationships() {
+    $individualID = $this->individualCreate();
+    $orgID = $this->organizationCreate();
+    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_pre', array($this, 'hookPreRelationship'));
+    $relationshipTypeID = $this->callAPISuccess('relationship_type', 'getvalue', array('return' => 'id', 'name_a_b' => 'Employee of'));
+    $result = $this->callAPISuccess('relationship', 'create', array(
+      'relationship_type_id' => $relationshipTypeID,
+      'contact_id_a' => $individualID,
+      'contact_id_b' => $orgID,
+      'is_active' => 1,
+      'end_date' => 'yesterday',
+    ));
+    $relationshipID = $result['id'];
+    $this->assertEquals('Hooked', $result['values'][$relationshipID]['description']);
+    $this->callAPISuccess($this->_entity, 'disable_expired_relationships', array());
+    $result = $this->callAPISuccess('relationship', 'get', array());
+    $this->assertEquals('Go Go you good thing', $result['values'][$relationshipID]['description']);
+    $this->contactDelete($individualID);
+    $this->contactDelete($orgID);
+  }
+
+  function hookPreRelationship($op, $objectName, $id, &$params ) {
+    if($op == 'delete') {
+      return;
+    }
+    if($params['is_active']) {
+      $params['description'] = 'Hooked';
+    }
+    else {
+      $params['description'] = 'Go Go you good thing';
+    }
   }
 }
 

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.5                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -39,6 +39,8 @@ require_once 'tests/phpunit/CiviTest/CiviUnitTestCase.php';
 class api_v3_ProfileTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_profileID = 0;
+  protected $_membershipTypeID;
+  protected $_contactID;
   function get_info() {
     return array(
       'name' => 'Profile Test',
@@ -54,6 +56,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $config->countryLimit[1] = 1013;
     $config->stateLimit[1] = 1013;
     $this->createLoggedInUser();
+    $this->_membershipTypeID = $this->membershipTypeCreate();
   }
 
   function tearDown() {
@@ -62,7 +65,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'civicrm_contact',
       'civicrm_phone',
       'civicrm_address',
+      'civicrm_membership',
+      'civicrm_contribution',
     ), TRUE);
+    $this->callAPISuccess('membership_type', 'delete', array('id' => $this->_membershipTypeID));
     // ok can't be bothered wring an api to do this & truncating is crazy
     CRM_Core_DAO::executeQuery(" DELETE FROM civicrm_uf_group WHERE id IN ($this->_profileID, 26)");
   }
@@ -318,8 +324,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'profile_id' => 'participant_status',
       'get_options' => 'all')
     );
-    $this->assertTrue(array_key_exists('participant_status', $result['values']));
-    $this->assertEquals('Attended', $result['values']['participant_status']['options'][2]);
+    $this->assertTrue(array_key_exists('participant_status_id', $result['values']));
+    $this->assertEquals('Attended', $result['values']['participant_status_id']['options'][2]);
+    $this->assertEquals(array('participant_status'), $result['values']['participant_status_id']['api.aliases']);
   }
 
   /**
@@ -333,6 +340,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'get_options' => 'all')
     );
     $this->assertTrue(array_key_exists('total_amount', $result['values']));
+    $this->assertTrue(array_key_exists('financial_type_id', $result['values']));
+    $this->assertEquals(array('contribution_type_id', 'contribution_type', 'financial_type'), $result['values']['financial_type_id']['api.aliases']);
+    $this->assertTrue(!array_key_exists('financial_type', $result['values']));
     $this->assertEquals(12, $result['values']['receive_date']['type']);
   }
 
@@ -441,6 +451,52 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->assertEquals('my@mail.com', $profileDetails['values']['email-Primary']);
   }
 
+  /**
+   * Ensure caches are being cleared so we don't get into a debugging trap because of cached metadata
+   * First we delete & create to increment the version & then check for caching probs
+   */
+  function testProfileSubmitCheckCaching() {
+    $this->callAPISuccess('membership_type', 'delete', array('id' => $this->_membershipTypeID));
+    $this->_membershipTypeID = $this->membershipTypeCreate();
+
+    $membershipTypes = $this->callAPISuccess('membership_type', 'get', array());
+    $profileFields = $this->callAPISuccess('profile', 'getfields', array('get_options' => 'all', 'action' => 'submit', 'profile_id' => 'membership_batch_entry'));
+    $getoptions = $this->callAPISuccess('membership', 'getoptions', array('field' => 'membership_type', 'context' => 'validate'));
+    $this->assertEquals(array_keys($membershipTypes['values']), array_keys($getoptions['values']));
+    $this->assertEquals(array_keys($membershipTypes['values']), array_keys($profileFields['values']['membership_type_id']['options']));
+
+}
+
+  /**
+   * Test that the fields are returned in the right order despite the faffing around that goes on
+   */
+  function testMembershipGetFieldsOrder() {
+    $result = $this->callAPISuccess('profile', 'getfields', array('action' => 'submit', 'profile_id' => 'membership_batch_entry'));
+    $weight = 1;
+    foreach($result['values'] as $fieldName => $field) {
+      if($fieldName == 'profile_id') {
+        continue;
+      }
+      $this->assertEquals($field['weight'], $weight);
+      $weight++;
+    }
+  }
+  /**
+   * Check we can submit membership batch profiles (create mode)
+   */
+  function testProfileSubmitMembershipBatch() {
+    $this->_contactID = $this->individualCreate();
+    $this->callAPISuccess('profile', 'submit', array(
+     'profile_id' => 'membership_batch_entry',
+     'financial_type_id' => 1,
+     'membership_type' => $this->_membershipTypeID,
+     'join_date' => 'now',
+     'total_amount' => 10,
+     'contribution_status_id' => 1,
+     'receive_date' => 'now',
+     'contact_id' => $this->_contactID,
+    ));
+  }
   /**
    * set is deprecated but we need to ensure it still works
    */
@@ -672,10 +728,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
      ), $params
     );
 
-    $contactID = $this->individualCreate($contactParams);
+    $this->_contactID = $this->individualCreate($contactParams);
     $this->_createIndividualProfile();
     // expected result of above created profile with contact Id $contactId
-    $profileData[$contactID] = array(
+    $profileData[$this->_contactID] = array(
       'first_name' => 'abc1',
       'last_name' => 'xyz1',
       'email-primary' => 'abc1.xyz1@yahoo.com',

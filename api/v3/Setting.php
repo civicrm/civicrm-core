@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  *
  * @package CiviCRM_APIv3_Core
  * @subpackage API_Settings
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Settings.php
  *
  */
@@ -61,7 +61,7 @@ function civicrm_api3_setting_getfields($params) {
     CRM_Utils_Array::value('profile', $params, null)
   );
   // find any supplemental information
-  if(CRM_Utils_Array::value('action',$params)){
+  if (!empty($params['action'])){
     $specFunction = '_civicrm_api3_setting_' . strtolower($params['action']) . '_spec';
     if (function_exists($specFunction)) {
       $specFunction($result);
@@ -85,7 +85,7 @@ function _civicrm_api3_setting_getfields_spec(&$params) {
  * Note that is not in place as yet
  */
 function civicrm_api3_setting_getdefaults(&$params){
-  $settings = civicrm_api('setting','getfields', $params);
+  $settings = civicrm_api3('setting','getfields', $params);
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $defaults = array();
   foreach ($domains as $domainID){
@@ -158,7 +158,7 @@ function _civicrm_api3_setting_revert_spec(&$params) {
  * Revert settings to defaults
  */
 function civicrm_api3_setting_fill(&$params){
-  $defaults = civicrm_api('setting','getdefaults', $params);
+  $defaults = civicrm_api3('setting','getdefaults', $params);
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $result = array();
   foreach ($domains as $domainID){
@@ -166,7 +166,7 @@ function civicrm_api3_setting_fill(&$params){
       'version' => $params['version'],
       'domain_id' => $domainID
     );
-    $existing = civicrm_api('setting','get', $apiArray);
+    $existing = civicrm_api3('setting','get', $apiArray);
     $valuesToFill = array_diff_key($defaults['values'][$domainID], $existing['values'][$domainID]);
     if(!empty($valuesToFill)){
       $result = array_merge($result, civicrm_api('setting', 'create', $valuesToFill + $apiArray));

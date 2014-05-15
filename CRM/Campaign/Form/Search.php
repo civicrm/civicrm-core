@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -36,7 +36,7 @@
 /**
  * Files required
  */
-class CRM_Campaign_Form_Search extends CRM_Core_Form {
+class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Are we forced to run a search
@@ -53,14 +53,6 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
    * @access protected
    */
   protected $_searchButtonName;
-
-  /**
-   * name of print button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_printButtonName;
 
   /**
    * name of action button
@@ -257,6 +249,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
    * @return void
    */
   function buildQuickForm() {
+    parent::buildQuickForm();
     //build the search form.
     CRM_Campaign_BAO_Query::buildSearchForm($this);
 
@@ -269,11 +262,11 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
     $rows = $this->get('rows');
     if (is_array($rows)) {
       if (!$this->_single) {
-        $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('onclick' => "toggleTaskAction( true ); return toggleCheckboxVals('mark_x_',this);"));
+        $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('onclick' => "toggleTaskAction( true );", 'class' => 'select-rows'));
         foreach ($rows as $row) {
           $this->addElement('checkbox', $row['checkbox'],
             NULL, NULL,
-            array('onclick' => "toggleTaskAction( true ); return checkSelectedBox('" . $row['checkbox'] . "');")
+            array('onclick' => "toggleTaskAction( true );", 'class' => 'select-row')
           );
         }
       }
@@ -292,9 +285,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
 
       $currentTaskValue = CRM_Utils_Array::value($this->_operation, $taskMapping);
       $taskValue = array($currentTaskValue => $allTasks[$currentTaskValue]);
-      if ($this->_operation == 'interview' &&
-        CRM_Utils_Array::value('campaign_survey_id', $this->_formValues)
-      ) {
+      if ($this->_operation == 'interview' && !empty($this->_formValues['campaign_survey_id'])) {
         $activityTypes = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
 
         $surveyTypeId = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey',
@@ -307,8 +298,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
           ));
       }
 
-      $this->add('select', 'task', ts('Actions:') . ' ', $taskValue);
-      $this->setDefaults(array('task' => $currentTaskValue));
+      $this->add('select', 'task', ts('Actions:') . ' ', array('' => ts('- actions -')) + $taskValue);
 
       $this->add('submit', $this->_actionButtonName, ts('Go'),
         array(
@@ -317,27 +307,11 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
         )
       );
 
-      $this->add('submit', $this->_printButtonName, ts('Print'),
-        array(
-          'class' => 'form-submit',
-          'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 1);",
-        )
-      );
-
       // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
       $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('onclick' => $this->getName() . ".toggleSelect.checked = false; toggleCheckboxVals('mark_x_',this); toggleTaskAction( true );"));
+      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );"));
     }
 
-    // add buttons
-    $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      )
-    );
   }
 
   /**
@@ -379,7 +353,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
-    if ($buttonName == $this->_actionButtonName || $buttonName == $this->_printButtonName) {
+    if ($buttonName == $this->_actionButtonName) {
       // check actionName and if next, then do not repeat a search, since we are going to the next page
 
       // hack, make sure we reset the task values
@@ -434,22 +408,12 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
 
   function formatParams() {
     $interviewerId = CRM_Utils_Array::value('survey_interviewer_id', $this->_formValues);
-    if (!$interviewerId) {
-      $session = CRM_Core_Session::singleton();
-      $this->_formValues['survey_interviewer_id'] = $interviewerId = $session->get('userID');
-    }
-    $this->set('interviewerId', $interviewerId);
-    if (!CRM_Utils_Array::value('survey_interviewer_name', $this->_formValues)) {
-      $this->_formValues['survey_interviewer_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-        $interviewerId,
-        'sort_name',
-        'id'
-      );
+    if ($interviewerId) {
+      $this->set('interviewerId', $interviewerId);
     }
 
     //format multi-select group and contact types.
-    foreach (array(
-      'group', 'contact_type') as $param) {
+    foreach (array('group', 'contact_type') as $param) {
       if ($this->_force) {
         continue;
       }
@@ -470,7 +434,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
     }
 
     if ($this->_operation == 'reserve') {
-      if (CRM_Utils_Array::value('campaign_survey_id', $this->_formValues)) {
+      if (!empty($this->_formValues['campaign_survey_id'])) {
         $campaignId = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey',
           $this->_formValues['campaign_survey_id'],
           'campaign_id'
@@ -547,11 +511,6 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
       CRM_Utils_System::civiExit();
     }
     $this->_formValues['survey_interviewer_id'] = $cid;
-    $this->_formValues['survey_interviewer_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-      $cid,
-      'sort_name',
-      'id'
-    );
     //get all in defaults.
     $this->_defaults = $this->_formValues;
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);

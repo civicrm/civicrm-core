@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -75,26 +75,28 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   static $activityTypeList = array();
 
   /**
-   * case type
-   * @var array
-   * @static
-   */
-  static $caseTypePair = array();
-
-  /**
    * Get all the case statues
    *
    * @access public
    *
+   * @param string $column
+   * @param bool $onlyActive
+   * @param null $condition
+   * @param bool $fresh
+   *
    * @return array - array reference of all case statues
    * @static
    */
-  public static function caseStatus($column = 'label', $onlyActive = TRUE) {
+  public static function caseStatus($column = 'label', $onlyActive = TRUE, $condition = NULL, $fresh = FALSE) {
     $cacheKey = "{$column}_" . (int)$onlyActive;
-    if (!isset(self::$caseStatus[$cacheKey])) {
+    if (!$condition) {
+      $condition = 'AND filter = 0';
+    }
+
+    if (!isset(self::$caseStatus[$cacheKey]) || $fresh) {
       self::$caseStatus[$cacheKey] = CRM_Core_OptionGroup::values('case_status',
-        FALSE, FALSE, FALSE, NULL,
-        $column, $onlyActive
+        FALSE, FALSE, FALSE, $condition,
+        $column, $onlyActive, $fresh
       );
     }
 
@@ -105,6 +107,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * Get all the redaction rules
    *
    * @access public
+   *
+   * @param null $filter
    *
    * @return array - array reference of all redaction rules
    * @static
@@ -134,25 +138,41 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param string $column
+   * @param bool $onlyActive
+   *
    * @return array - array reference of all case type
    * @static
    */
-  public static function caseType($column = 'label', $onlyActive = TRUE) {
-    $cacheKey = "{$column}_" . (int)$onlyActive;
-    if (!isset(self::$caseType[$cacheKey])) {
-      self::$caseType[$cacheKey] = CRM_Core_OptionGroup::values('case_type',
-        FALSE, FALSE, FALSE, NULL,
-        $column, $onlyActive
-      );
+  public static function caseType($column = 'title', $onlyActive = TRUE) {
+    if ($onlyActive) {
+      $condition = " is_active = 1 ";
+    } else {
+      $condition = NULL;
     }
+    $caseType = NULL;
+    // FIXME: deprecated?
+    CRM_Core_PseudoConstant::populate(
+      $caseType,
+      'CRM_Case_DAO_CaseType',
+      TRUE,
+      $column,
+      '',
+      $condition,
+      'weight',
+      'id'
+    );
 
-    return self::$caseType[$cacheKey];
+    return $caseType;
   }
 
   /**
    * Get all the Encounter Medium
    *
    * @access public
+   *
+   * @param string $column
+   * @param bool $onlyActive
    *
    * @return array - array reference of all Encounter Medium.
    * @static
@@ -176,6 +196,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param boolean $indexName - true return activity name in array
    * key else activity id as array key.
+   *
+   * @param bool $all
    *
    * @access public
    * @static
@@ -229,49 +251,13 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get the associated case type name/id, given a case Id
-   *
-   * @access public
-   *
-   * @return array - array reference of all case type name/id
-   * @static
-   */
-  public static function caseTypeName($caseId, $column = 'name') {
-    if (!$caseId) {
-      return FALSE;
-    }
-
-    if (!array_key_exists($caseId, self::$caseTypePair) || empty(self::$caseTypePair[$caseId][$column])) {
-      $caseTypes = self::caseType($column);
-      $caseTypeIds = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case',
-        $caseId,
-        'case_type_id'
-      );
-      $caseTypeId = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        trim($caseTypeIds,
-          CRM_Core_DAO::VALUE_SEPARATOR
-        )
-      );
-      $caseTypeId = $caseTypeId[0];
-
-      self::$caseTypePair[$caseId][$column] = array(
-        'id' => $caseTypeId,
-        'name' => $caseTypes[$caseTypeId],
-      );
-    }
-
-    return self::$caseTypePair[$caseId][$column];
-  }
-
-  /**
    * Flush given pseudoconstant so it can be reread from db
    * next time it's requested.
    *
    * @access public
    * @static
    *
-   * @param boolean $name pseudoconstant to be flushed
-   *
+   * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'cache') {
    if (isset(self::$$name)) {

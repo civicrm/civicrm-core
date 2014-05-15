@@ -1,7 +1,7 @@
 <?php
 /*
    +----------------------------------------------------------------------------+
-   | PayflowPro Core Payment Module for CiviCRM version 4.4                     |
+   | PayflowPro Core Payment Module for CiviCRM version 4.5                     |
    +----------------------------------------------------------------------------+
    | Licensed to CiviCRM under the Academic Free License version 3.0            |
    |                                                                            |
@@ -41,9 +41,10 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param object $paymentProcessor
+   *
    * @return object
    * @static
-   *
    */
    static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
@@ -484,7 +485,9 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     // return into a variable
     curl_setopt($ch, CURLOPT_TIMEOUT, 90);
     // times out after 90 secs
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
+    if (ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off') {
+      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
+    }
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL'));
     // this line makes it work under https
     curl_setopt($ch, CURLOPT_POSTFIELDS, $payflow_query);

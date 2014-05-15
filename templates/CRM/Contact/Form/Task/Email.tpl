@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -57,14 +57,10 @@
 {/if}
     <tr class="crm-contactEmail-form-block-subject">
        <td class="label">{$form.subject.label}</td>
-       <td>{$form.subject.html|crmAddClass:huge}&nbsp;
-        <a href="#" onClick="return showToken('Subject', 3);">{$form.token3.label}</a>
-      {help id="id-token-subject" file="CRM/Contact/Form/Task/Email.hlp"}
-        <div id='tokenSubject' style="display:none">
-        <input style="border:1px solid #999999;" type="text" id="filter3" size="20" name="filter3" onkeyup="filter(this, 3)"/><br />
-        <span class="description">{ts}Begin typing to filter list of tokens{/ts}</span><br/>
-        {$form.token3.html}
-        </div>
+       <td>
+         {$form.subject.html|crmAddClass:huge}&nbsp;
+         <input class="crm-token-selector big" data-field="subject" />
+         {help id="id-token-subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
        </td>
     </tr>
 </table>
@@ -97,25 +93,44 @@ var toContact = ccContact = bccContact = '';
 {/if}
 
 {literal}
-cj('#addcc').toggle( function() { cj(this).text('Remove CC');
+CRM.$(function($){
+  cj('#addcc').toggle( function() { cj(this).text('Remove CC');
                                   cj('tr#cc').show().find('ul').find('input').focus();
                    },function() { cj(this).text('Add CC');cj('#cc_id').val('');
                                   cj('tr#cc ul li:not(:last)').remove();cj('#cc').hide();
 });
-cj('#addbcc').toggle( function() { cj(this).text('Remove BCC');
+  cj('#addbcc').toggle( function() { cj(this).text('Remove BCC');
                                    cj('tr#bcc').show().find('ul').find('input').focus();
                     },function() { cj(this).text('Add BCC');cj('#bcc_id').val('');
                                    cj('tr#bcc ul li:not(:last)').remove();cj('#bcc').hide();
 });
 
-var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name or email address of an existing contact.{/ts}{literal}";
-var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' h=0 }{literal}";
-var toDataUrl     = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1' h=0 }{literal}";
+  var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1' h=0 }{literal}";
 
-cj( "#to"     ).tokenInput( toDataUrl,     { prePopulate: toContact,  theme: 'facebook', hintText: hintText });
-cj( "#cc_id"  ).tokenInput( sourceDataUrl, { prePopulate: ccContact,  theme: 'facebook', hintText: hintText });
-cj( "#bcc_id" ).tokenInput( sourceDataUrl, { prePopulate: bccContact, theme: 'facebook', hintText: hintText });
-cj( 'ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px' );
+  function emailSelect(el, prepopulate){
+    $(el).data('api-entity', 'contact').crmSelect2({
+      minimumInputLength: 1,
+      multiple: true,
+      ajax: {
+        url: sourceDataUrl,
+        data: function(term) {
+          return {
+            name: term,
+          };
+        },
+        results: function(response) {
+          return {
+            results: response,
+          };
+        }
+      }
+    }).select2('data', prepopulate);
+  }
+  emailSelect('#to', toContact);
+  emailSelect('#cc_id', ccContact);
+  emailSelect('#bcc_id', bccContact);
+});
+
+
 </script>
 {/literal}
-{include file="CRM/common/formNavigate.tpl"}

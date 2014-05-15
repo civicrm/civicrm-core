@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -39,8 +39,9 @@
       <div class="form-item">
         {strip}
         {* handle enable/disable actions*}
-         {include file="CRM/common/enableDisable.tpl"}
-        <table class="selector">
+         {include file="CRM/common/enableDisableApi.tpl"}
+         {include file="CRM/common/crmeditable.tpl"}
+        <table class="selector row-highlight">
           <tr class="columnheader">
             <th>{ts}Label{/ts}</th>
             <th>{ts}Value{/ts}</th>
@@ -63,7 +64,7 @@
         {/strip}
 
         <div class="action-link">
-            <a href="{crmURL q="reset=1&action=add&fid=$fid&gid=$gid"}" class="button"><span><div class="icon add-icon"></div> {ts 1=$fieldTitle}Add Option for '%1'{/ts}</span></a>
+            <a href="{crmURL q="reset=1&action=add&fid=$fid&gid=$gid"}" class="button action-item"><span><div class="icon add-icon"></div> {ts 1=$fieldTitle}Add Option for '%1'{/ts}</span></a>
         </div>
       </div>
     </div>
@@ -72,10 +73,7 @@
     {if $action eq 16}
         <div class="messages status no-popup">
            <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
-           {capture assign=crmURL}{crmURL p='civicrm/admin/custom/group/field/option' q="action=add&fid=$fid&gid=$gid"}{/capture}{ts 1=$fieldTitle 2=$crmURL}There are no multiple choice options for the custom field '%1', <a href='%2'>add one</a>.{/ts}
+           {capture assign=crmURL}{crmURL p='civicrm/admin/custom/group/field/option' q="action=add&fid=$fid&gid=$gid"}{/capture}{ts 1=$fieldTitle 2=$crmURL}There are no multiple choice options for the custom field '%1', <a href='%2' class="action-item">add one</a>.{/ts}
         </div>
     {/if}
 {/if}
-
-{include file="CRM/common/crmeditable.tpl"}
-

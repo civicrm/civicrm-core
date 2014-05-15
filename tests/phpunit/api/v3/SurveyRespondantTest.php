@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
   protected $_apiversion =3;
   protected $params;
-  public $_eNoticeCompliant = TRUE;
+
 
   function setUp() {
     $phoneBankActivity = $this->callAPISuccess('Option_value', 'Get', array('label' => 'PhoneBank', 'sequential' => 1));

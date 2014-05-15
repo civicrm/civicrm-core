@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -90,14 +90,16 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // TODO: rewrite using contribution token and one letter by contribution
     $this->setContactIDs();
     $skipOnHold = isset($this->skipOnHold) ? $this->skipOnHold : FALSE;
     $skipDeceased = isset($this->skipDeceased) ? $this->skipDeceased : TRUE;
-    CRM_Member_Form_Task_PDFLetterCommon::postProcess($this, $this->_memberIds, $skipOnHold, $skipDeceased, $this->_contactIds);
+    CRM_Member_Form_Task_PDFLetterCommon::postProcessMembers(
+      $this, $this->_memberIds, $skipOnHold, $skipDeceased, $this->_contactIds
+    );
   }
 
   /**

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,38 +22,42 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
-{if $config->debug}
+*}{strip}
+  {if $config->debug}
     {include file="CRM/common/debug.tpl"}
-{/if}
+  {/if}
 
-{if $smarty.get.snippet eq 4}
+  {if $smarty.get.snippet eq 4}
     {if $isForm}
-        {include file="CRM/Form/default.tpl"}
+      {include file="CRM/Form/default.tpl"}
     {else}
-        {include file=$tplFile}
+      {include file=$tplFile}
     {/if}
-{else}
+  {else}
     {if $smarty.get.snippet eq 2}
-    {include file="CRM/common/print.tpl"}
+      {include file="CRM/common/print.tpl"}
     {else}
-    <div class="crm-container-snippet" bgColor="white">
+      {crmRegion name='page-body'}
 
-    {* Check for Status message for the page (stored in session->getStatus). Status is cleared on retrieval. *}
-    {if $session->getStatus(false)}
-    <div class="messages status no-popup">
-      <div class="icon alert-icon"></div>
-      {$session->getStatus(true)}
-    </div>
-    {/if}
+        {* Add status messages and container-snippet div unless we are outputting json. *}
+        {if $smarty.get.snippet neq 'json'}
+          {* this div is deprecated but included for older-style snippets for legacy support *}
+          <div class="crm-container-snippet">
+          {include file="CRM/common/status.tpl"}
+        {/if}
 
-    <!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
-    {if !empty($isForm)}
-        {include file="CRM/Form/default.tpl"}
-    {else}
-        {include file=$tplFile}
-    {/if}
+        <!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
+        {if !empty($isForm)}
+          {include file="CRM/Form/default.tpl"}
+        {else}
+          {include file=$tplFile}
+        {/if}
 
-    </div> {* end crm-container-snippet div *}
+        {if $smarty.get.snippet neq 'json'}
+          </div>
+        {/if}
+
+      {/crmRegion}
     {/if}
-{/if}
+  {/if}
+{/strip}

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -99,11 +99,21 @@
         <td class="label">{ts}Event Source{/ts}</td><td>{$source}&nbsp;</td>
       </tr>
     {/if}
+    {if $participantId and $hasPayment}
+      <tr>
+        <td class='label'>{ts}Fees{/ts}</td>
+        <td id='payment-info'></td>
+      </tr>
+    {/if}
     {if $fee_level}
         <tr class="crm-event-participantview-form-block-fee_amount">
             {if $lineItem}
-                <td class="label">{ts}Event Fees{/ts}</td>
-                <td>{include file="CRM/Price/Page/LineItem.tpl" context="Event"}</td>
+                <td class="label">{ts}Selections{/ts}</td>
+                <td>{include file="CRM/Price/Page/LineItem.tpl" context="Event"}
+                {if $hasPayment or $parentHasPayment}
+                   <a class="button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}' title="{ts}Change Selections{/ts}"><span><div class="icon edit-icon"></div> {ts}Change Selections{/ts}</span></a>
+                {/if}
+                </td>
             {else}
                 <td class="label">{ts}Event Level{/ts}</td>
                 <td>{$fee_level}&nbsp;{if $fee_amount}- {$fee_amount|crmMoney:$fee_currency}{/if}</td>
@@ -116,6 +126,9 @@
       {/if}
     {/foreach}
     </table>
+    {if $participantId and $hasPayment}
+      {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
+    {/if}
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
     {if $accessContribution and $rows.0.contribution_id}
         {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -161,6 +161,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
       $hints = array(
         CRM_Core_Action::UPDATE => ts('Change the content and appearance of your page'),
         CRM_Core_Action::DETACH => ts('Send emails inviting your friends to support your campaign!'),
+        CRM_Core_Action::VIEW =>   ts('Copy this link to share directly with your network!'),
         CRM_Core_Action::BROWSE => ts('Update your personal contact information'),
         CRM_Core_Action::DISABLE => ts('De-activate the page (you can re-activate it later)'),
         CRM_Core_Action::ENABLE => ts('Activate the page (you can de-activate it later)'),
@@ -194,9 +195,12 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
 
     $honor = CRM_PCP_BAO_PCP::honorRoll($this->_id);
 
-    if ($file_id = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $this->_id, 'file_id', 'entity_id')) {
+    $entityFile = CRM_Core_BAO_File::getEntityFile('civicrm_pcp', $this->_id);
+    if (!empty($entityFile)) {
+      $fileInfo = reset($entityFile);
+      $fileId = $fileInfo['fileID'];
       $image = '<img src="' . CRM_Utils_System::url('civicrm/file',
-        "reset=1&id=$file_id&eid={$this->_id}"
+        "reset=1&id=$fileId&eid={$this->_id}"
       ) . '" />';
       $this->assign('image', $image);
     }
@@ -266,7 +270,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     if ($validDate) {
 
       $contributionText = ts('Contribute Now');
-      if (CRM_Utils_Array::value('donate_link_text', $pcpInfo)) {
+      if (!empty($pcpInfo['donate_link_text'])) {
         $contributionText = $pcpInfo['donate_link_text'];
       }
 

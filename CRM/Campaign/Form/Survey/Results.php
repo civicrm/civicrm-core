@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -131,10 +131,10 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         'onclick' => "showOptionSelect();"), '<br/>', TRUE
     );
 
-    if (empty($optionGroups) || !CRM_Utils_Array::value('result_id', $this->_values)) {
+    if (empty($optionGroups) || empty($this->_values['result_id'])) {
       $this->setdefaults(array('option_type' => 1));
     }
-    elseif (CRM_Utils_Array::value('result_id', $this->_values)) {
+    elseif (!empty($this->_values['result_id'])) {
       $this->setdefaults(array(
         'option_type' => 2,
           'option_group_id' => $this->_values['result_id'],
@@ -206,26 +206,19 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
    */
   static function formRule($fields, $files, $form) {
     $errors = array();
-    if (
-      CRM_Utils_Array::value('option_label', $fields) &&
-      CRM_Utils_Array::value('option_value', $fields) &&
+    if (!empty($fields['option_label']) && !empty($fields['option_value']) &&
       (count(array_filter($fields['option_label'])) == 0) &&
       (count(array_filter($fields['option_value'])) == 0)
     ) {
       $errors['option_label[1]'] = ts('Enter at least one result option.');
       return $errors;
     }
-    elseif (
-      !CRM_Utils_Array::value('option_label', $fields) &&
-      !CRM_Utils_Array::value('option_value', $fields)
-    ) {
+    elseif (empty($fields['option_label']) && empty($fields['option_value'])) {
       return $errors;
     }
 
     if (
-      $fields['option_type'] == 2 &&
-      !CRM_Utils_Array::value('option_group_id', $fields)
-    ) {
+      $fields['option_type'] == 2 && empty($fields['option_group_id'])) {
       $errors['option_group_id'] = ts("Please select a Survey Result Set.");
       return $errors;
     }
@@ -299,7 +292,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         }
       }
 
-      if (CRM_Utils_Array::value($i, $fields['option_interval']) && !CRM_Utils_Rule::integer($fields['option_interval'][$i])) {
+      if (!empty($fields['option_interval'][$i]) && !CRM_Utils_Rule::integer($fields['option_interval'][$i])) {
         $_flagOption = 1;
         $errors['option_interval[' . $i . ']'] = ts('Please enter a valid integer.');
       }
@@ -345,9 +338,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
     $updateResultSet = FALSE;
     $resultSetOptGrpId = NULL;
-    if ((CRM_Utils_Array::value('option_type', $params) == 2) &&
-      CRM_Utils_Array::value('option_group_id', $params)
-    ) {
+    if ((CRM_Utils_Array::value('option_type', $params) == 2) && !empty($params['option_group_id'])) {
       $updateResultSet = TRUE;
       $resultSetOptGrpId = $params['option_group_id'];
     }
@@ -382,7 +373,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         $optionValue->weight = $params['option_weight'][$k];
         $optionValue->is_active = 1;
 
-        if (CRM_Utils_Array::value('default_option', $params) &&
+        if (!empty($params['default_option']) &&
           $params['default_option'] == $k
         ) {
           $optionValue->is_default = 1;
@@ -401,7 +392,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
     $survey = CRM_Campaign_BAO_Survey::create($params);
 
     // create report if required.
-    if ( !$this->_reportId && $survey->id && CRM_Utils_Array::value('create_report', $params) ) {
+    if ( !$this->_reportId && $survey->id && !empty($params['create_report'])) {
       $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
       $activityStatus = array_flip($activityStatus);
       $this->_params =

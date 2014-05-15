@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,7 +40,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
   protected $params;
   protected $ids = array();
   protected $_entity = 'Grant';
-  public $_eNoticeCompliant = TRUE;
+
   public $DBResetRequired = FALSE;
 
   function setUp() {
@@ -139,7 +139,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
         case CRM_Utils_Type::T_INT:
           // probably created with a 1
           $entity[$field] = 2;
-          if (CRM_Utils_Array::value('FKClassName', $specs)) {
+          if (!empty($specs['FKClassName'])) {
             $entity[$field] = empty($entity2[$field]) ? $entity2[$specs]['uniqueName'] : $entity2[$field];
           }
           break;

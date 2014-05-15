@@ -45,9 +45,9 @@ class Utils {
   /**
    *  Construct an object for this database
    */
-  public function __construct($host, $user, $pass) {
+  public function __construct($host, $port, $user, $pass) {
     try {
-      $this->pdo = new PDO("mysql:host={$host}",
+      $this->pdo = new PDO("mysql:host={$host}" . ($port ? ";port=$port" : ""),
         $user, $pass,
         array(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE)
       );

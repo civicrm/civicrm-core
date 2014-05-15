@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,10 @@
  +--------------------------------------------------------------------+
 *}
 
-{if $action eq 1 or $action eq 2 or $action eq 8}
+{if empty($gName)}
+  {include file="CRM/Admin/Page/OptionGroup.tpl"}
+
+{elseif $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Admin/Form/Options.tpl"}
 {else}
 
@@ -61,21 +64,21 @@
   {elseif $gName eq 'from_email_address'}
     {ts}By default, CiviCRM uses the primary email address of the logged in user as the FROM address when sending emails to contacts. However, you can use this page to define one or more general Email Addresses that can be selected as an alternative. EXAMPLE: <em>"Client Services" &lt;clientservices@example.org&gt;</em>{/ts}
   {else}
-    {ts 1=$GName}The existing option choices for %1 group are listed below. You can add, edit or delete them from this screen.{/ts}
+    {ts 1=$gLabel}The existing option choices for %1 group are listed below. You can add, edit or delete them from this screen.{/ts}
   {/if}
 </div>
 
 <div class="crm-content-block crm-block">
 {if $rows}
-{if $action ne 1 and $action ne 2}
+{if $action ne 1 and $action ne 2 and $isLocked ne 1}
     <div class="action-link">
-        <a href="{crmURL q="group="|cat:$gName|cat:"&action=add&reset=1"}" id="new"|cat:$GName class="button"><span><div class="icon add-icon"></div>{ts 1=$GName}Add %1{/ts}</span></a>
+        <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
     </div>
 {/if}
 <div id={$gName}>
         {strip}
   {* handle enable/disable actions*}
-  {include file="CRM/common/enableDisable.tpl"}
+  {include file="CRM/common/enableDisableApi.tpl"}
     {include file="CRM/common/jsortable.tpl"}
         <table id="options" class="display">
          <thead>
@@ -118,11 +121,11 @@
           </thead>
           <tbody>
         {foreach from=$rows item=row}
-          <tr id="row_{$row.id}" class="crm-admin-options crm-admin-options_{$row.id} {cycle values="odd-row,even-row"}{if NOT $row.is_active} disabled{/if}">
+          <tr id="option_value-{$row.id}" class="crm-admin-options crm-admin-options_{$row.id} crm-entity {cycle values="odd-row,even-row"}{if NOT $row.is_active} disabled{/if}">
             {if $showComponent}
               <td class="crm-admin-options-component_name">{$row.component_name}</td>
             {/if}
-            <td class="crm-admin-options-label">{$row.label}</td>
+            <td class="crm-admin-options-label crm-editable" data-field="label">{$row.label}</td>
             {if $gName eq "case_status"}
               <td class="crm-admin-options-grouping">{$row.grouping}</td>
             {/if}
@@ -134,7 +137,7 @@
               <td class="yes-no crm-admin-options-filter">{if $row.filter eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Counted{/ts}" />{/if}</td>
             {/if}
             {if $showVisibility}<td class="crm-admin-visibility_label">{$row.visibility_label}</td>{/if}
-            <td class="crm-admin-options-description">{$row.description}</td>
+            <td class="crm-admin-options-description crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
             <td class="nowrap crm-admin-options-order">{$row.order}</td>
             {if $showIsDefault}
               <td class="crm-admin-options-is_default" align="center">{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>
@@ -147,19 +150,20 @@
         {/foreach}
         </tbody>
         </table>
+        {include file="CRM/common/crmeditable.tpl"}
         {/strip}
 
-        {if $action ne 1 and $action ne 2}
+        {if $action ne 1 and $action ne 2 and $isLocked ne 1}
             <div class="action-link">
-                <a href="{crmURL q="group="|cat:$gName|cat:"&action=add&reset=1"}" id="new"|cat:$GName class="button"><span><div class="icon add-icon"></div>{ts 1=$GName}Add %1{/ts}</span></a>
+                <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
             </div>
         {/if}
 </div>
 {else}
     <div class="messages status no-popup">
          <div class="icon inform-icon"></div>
-        {capture assign=crmURL}{crmURL  q="group="|cat:$gName|cat:"&action=add&reset=1"}{/capture}
-        {ts 1=$crmURL}There are no option values entered. You can <a href='%1'>add one</a>.{/ts}
+        {capture assign=link}class="action-item" href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}"{/capture}
+        {ts 1=$link}There are no option values entered. You can <a %1>add one</a>.{/ts}
     </div>
 {/if}
 </div>

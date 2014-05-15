@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -52,19 +52,21 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'packages/jquery/plugins/jquery.redirect.min.js', 0, 'html-header');
     $attributes = CRM_Core_DAO::getAttribute('CRM_Batch_DAO_Batch');
     $attributes['total']['class'] = $attributes['item_count']['class'] = 'number';
     $this->add('text', 'title', ts('Batch Name'), $attributes['title']);
-
+    
+    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
     $this->add(
       'select',
       'status_id',
       ts('Batch Status'),
       array(
         '' => ts('- any -' ),
-        1 => ts('Open'),
-        2 => ts('Closed'),
-        5 => ts('Exported'),
+        array_search('Open', $batchStatus) => ts('Open'),
+        array_search('Closed', $batchStatus) => ts('Closed'),
+        array_search('Exported', $batchStatus) => ts('Exported'),
       ),
       false
     );
@@ -122,7 +124,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
         $batchIds[] = $batch[1];
       }
     }
-    if (CRM_Utils_Array::value('batch_update', $_POST)) {
+    if (!empty($_POST['batch_update'])) {
       CRM_Batch_BAO_Batch::closeReOpen($batchIds, $_POST['batch_update']);
     }
   }

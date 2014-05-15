@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -82,14 +82,12 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_CustomGroup' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Custom Set'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_CustomGroup' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Custom Set'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -227,13 +225,19 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
       }
       $customGroup[$dao->id]['order'] = $customGroup[$dao->id]['weight'];
       $customGroup[$dao->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
-        array('id' => $dao->id)
+        array('id' => $dao->id),
+        ts('more'),
+        FALSE,
+        'customGroup.row.actions',
+        'CustomGroup',
+        $dao->id
       );
     }
 
     $customGroupExtends = CRM_Core_SelectValues::customGroupExtends();
+    $customGroupStyle = CRM_Core_SelectValues::customGroupStyle();
     foreach ($customGroup as $key => $array) {
-      CRM_Core_DAO_CustomGroup::addDisplayEnums($customGroup[$key]);
+      $customGroup[$key]['style_display'] = $customGroupStyle[$customGroup[$key]['style']];
       $customGroup[$key]['extends_display'] = $customGroupExtends[$customGroup[$key]['extends']];
     }
 

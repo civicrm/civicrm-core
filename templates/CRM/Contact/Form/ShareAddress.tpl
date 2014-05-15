@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,9 +41,10 @@
       </span>
     {/if}
 
-    <table id="shared-address-{$blockId}" class="form-layout-compressed hiddenElement">
-      {include file="CRM/Contact/Form/NewContact.tpl" blockNo="$blockId"}
-    </table>
+    <div id="shared-address-{$blockId}" class="form-layout-compressed hiddenElement">
+      {$form.address.$blockId.master_contact_id.label}
+      {$form.address.$blockId.master_contact_id.html}
+    </div>
   </td>
 </tr>
 
@@ -52,7 +53,7 @@
 <script type="text/javascript">
   function showHideSharedAddress( blockNo, showSelect ) {
     // based on checkbox, show or hide
-    if ( cj( '#address\\[' + blockNo + '\\]\\[use_shared_address\\]' ).attr( 'checked') ) {
+    if ( cj( '#address\\[' + blockNo + '\\]\\[use_shared_address\\]' ).prop('checked') ) {
       if ( showSelect && cj( '#shared-address-display-' + blockNo ).length == 0 ) {
         cj( '#shared-address-' + blockNo ).show( );
       }
@@ -71,7 +72,7 @@
     }
   }
 
-cj( function( ) {
+CRM.$(function($) {
     var blockNo = {/literal}{$blockId}{literal};
 
     // call this when form loads
@@ -83,10 +84,7 @@ cj( function( ) {
     });
 
     // start of code to add onchange event for hidden element
-    var contactHiddenElement = 'input[name="contact_select_id[' + blockNo +']"]';
-
-    // store initial value
-    var _default  = cj( contactHiddenElement ).val();
+    var contactHiddenElement = 'input[name="address[' + blockNo +'][master_contact_id]"]';
 
     // observe changes
     cj( contactHiddenElement ).change(function( ) {
@@ -98,11 +96,10 @@ cj( function( ) {
       var addressHTML = '';
       var postUrl = {/literal}"{crmURL p='civicrm/ajax/inline' h=0}"{literal};
 
-      addCiviOverlay('div.crm-address_' + blockNo);
-
       cj.post( postUrl, {
         'contact_id': sharedContactId,
         'type': 'method',
+        'async': false,
         'class_name': 'CRM_Contact_Page_AJAX',
         'fn_name': 'getAddressDisplay'
         },
@@ -137,25 +134,9 @@ cj( function( ) {
               cj( '#shared-address-' + blockNo + ' .shared-address-list' ).remove( );
               cj( '#shared-address-' + blockNo ).append( '<tr class="shared-address-list"><td></td><td>' + helpText + '</td></tr>');
             }
-
-            removeCiviOverlay('div.crm-address_' + blockNo);
           }
         },'json');
     });
-
-
-    // continuous check for changed value
-    setInterval(function( ) {
-        if ( cj( contactHiddenElement ).val( ) != _default ) {
-        // trigger native
-        cj( contactHiddenElement ).change( );
-
-        // update stored value
-        _default = cj( contactHiddenElement ).val( );
-        }
-
-    }, 500);
-    // end of code to add onchange event for hidden element
 });
 </script>
 {/literal}

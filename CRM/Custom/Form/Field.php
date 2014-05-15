@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -103,8 +103,23 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       self::$_dataToHTML = CRM_Core_BAO_CustomField::dataToHtml();
     }
 
-    //custom group id
-    $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
+    //custom field id
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+
+    $this->_values = array();
+    //get the values form db if update.
+    if ($this->_id) {
+      $params = array('id' => $this->_id);
+      CRM_Core_BAO_CustomField::retrieve($params, $this->_values);
+      // note_length is an alias for the text_length field
+      $this->_values['note_length'] = CRM_Utils_Array::value('text_length', $this->_values);
+      // custom group id
+      $this->_gid = $this->_values['custom_group_id'];
+    }
+    else {
+      // custom group id
+      $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
+    }
 
     if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
       CRM_Core_Error::fatal("You cannot add or edit fields in a reserved custom field-set.");
@@ -117,18 +132,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext($url);
-    }
-
-    //custom field id
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-
-    //get the values form db if update.
-    $this->_values = array();
-    if ($this->_id) {
-      $params = array('id' => $this->_id);
-      CRM_Core_BAO_CustomField::retrieve($params, $this->_values);
-      // note_length is an alias for the text_length field
-      $this->_values['note_length'] = CRM_Utils_Array::value('text_length', $this->_values);
     }
 
     if (self::$_dataToLabels == NULL) {
@@ -187,7 +190,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         $defaults['default_value'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', $countryId);
       }
 
-      if ($defaults['data_type'] == 'ContactReference' && CRM_Utils_Array::value('filter', $defaults)) {
+      if ($defaults['data_type'] == 'ContactReference' && !empty($defaults['filter'])) {
         $contactRefFilter = 'Advance';
         if (strpos($defaults['filter'], 'action=lookup') !== FALSE &&
           strpos($defaults['filter'], 'group=') !== FALSE
@@ -212,7 +215,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         $defaults['filter_selected'] = $contactRefFilter;
       }
 
-      if (CRM_Utils_Array::value('data_type', $defaults)) {
+      if (!empty($defaults['data_type'])) {
         $defaultDataType = array_search($defaults['data_type'],
           self::$_dataTypeKeys
         );
@@ -251,13 +254,18 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $defaults['is_view'] = 0;
     }
 
-    if (CRM_Utils_Array::value('html_type', $defaults)) {
+    if (!empty($defaults['html_type'])) {
       $dontShowLink = substr($defaults['html_type'], -14) == 'State/Province' || substr($defaults['html_type'], -7) == 'Country' ? 1 : 0;
     }
 
     if (isset($dontShowLink)) {
       $this->assign('dontShowLink', $dontShowLink);
     }
+    if ($this->_action & CRM_Core_Action::ADD &&
+      CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple', 'id')) {
+      $defaults['in_selector'] = 1;
+    }
+
     return $defaults;
   }
 
@@ -272,7 +280,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   public function buildQuickForm() {
     if ($this->_gid) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'title');
-      CRM_Utils_System::setTitle($this->_title . ' - ' . ts('Custom Fields'));
+      CRM_Utils_System::setTitle($this->_title . ' - ' . ($this->_id ? ts('Edit Field') : ts('Add Field')));
+      $this->assign('gid', $this->_gid);
     }
 
     // lets trim all the whitespace
@@ -300,6 +309,11 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       '&nbsp;&nbsp;&nbsp;'
     );
     $sel->setOptions(array($dt, $it));
+
+    if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple')) {
+      $this->add('checkbox', 'in_selector', ts('Display in Table?'));
+    }
+
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $this->freeze('data_type');
     }
@@ -547,7 +561,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   /**
    * global validation rules for the form
    *
-   * @param array  $fields   (referance) posted values of the form
+   * @param array $fields (referance) posted values of the form
+   *
+   * @param $files
+   * @param $self
    *
    * @return array    if errors then list of errors to be posted back to the form,
    *                  true otherwise
@@ -656,19 +673,12 @@ SELECT count(*)
           break;
 
         case 'ContactReference':
-          if ($fields['filter_selected'] == 'Advance' &&
-            CRM_Utils_Array::value('filter', $fields)
-          ) {
+          if ($fields['filter_selected'] == 'Advance' && !empty($fields['filter'])) {
             if (strpos($fields['filter'], 'entity=') !== FALSE) {
               $errors['filter'] = ts("Please do not include entity parameter (entity is always 'contact')");
             }
-            elseif (strpos($fields['filter'], 'action=') === FALSE) {
-              $errors['filter'] = ts("Please specify 'action' parameter, it should be 'lookup' or 'get'");
-            }
-            elseif (strpos($fields['filter'], 'action=get') === FALSE &&
-              strpos($fields['filter'], 'action=lookup') === FALSE
-            ) {
-              $errors['filter'] = ts("Only 'get' and 'lookup' actions are supported.");
+            elseif (strpos($fields['filter'], 'action=get') === FALSE) {
+              $errors['filter'] = ts("Only 'get' action is supported.");
             }
           }
           $self->setDefaults(array('filter_selected', $fields['filter_selected']));
@@ -694,7 +704,7 @@ SELECT count(*)
     }
     $optionFields = array('Select', 'Multi-Select', 'CheckBox', 'Radio', 'AdvMulti-Select');
 
-    if ($fields['option_type'] == 1) {
+    if (isset($fields['option_type']) && $fields['option_type'] == 1) {
       //capture duplicate Custom option values
       if (!empty($fields['option_value'])) {
         $countValue = count($fields['option_value']);
@@ -872,9 +882,7 @@ AND    option_group_id = %2";
     }
 
     // we can not set require and view at the same time.
-    if (CRM_Utils_Array::value('is_required', $fields) &&
-      CRM_Utils_Array::value('is_view', $fields)
-    ) {
+    if (!empty($fields['is_required']) && !empty($fields['is_view'])) {
       $errors['is_view'] = ts('Can not set this field Required and View Only at the same time.');
     }
 
@@ -906,7 +914,7 @@ AND    option_group_id = %2";
     //fix for 'is_search_range' field.
     if (in_array($dataTypeKey, array(
       1, 2, 3, 5))) {
-      if (!CRM_Utils_Array::value('is_searchable', $params)) {
+      if (empty($params['is_searchable'])) {
         $params['is_search_range'] = 0;
       }
     }
@@ -915,11 +923,11 @@ AND    option_group_id = %2";
     }
 
     $filter = 'null';
-    if ($dataTypeKey == 11 && CRM_Utils_Array::value('filter_selected', $params)) {
+    if ($dataTypeKey == 11 && !empty($params['filter_selected'])) {
       if ($params['filter_selected'] == 'Advance' && trim(CRM_Utils_Array::value('filter', $params))) {
         $filter = trim($params['filter']);
       }
-      elseif ($params['filter_selected'] == 'Group' && CRM_Utils_Array::value('group_id', $params)) {
+      elseif ($params['filter_selected'] == 'Group' && !empty($params['group_id'])) {
 
         $filter = 'action=lookup&group=' . implode(',', $params['group_id']);
       }
@@ -981,20 +989,18 @@ SELECT id
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;
     }
-
     $customField = CRM_Core_BAO_CustomField::create($params);
+    $this->_id = $customField->id;
 
     // reset the cache
     CRM_Core_BAO_Cache::deleteGroup('contact fields');
 
-    CRM_Core_Session::setStatus(ts('Your custom field \'%1\' has been saved.',
-        array(1 => $customField->label)
-      ), ts('Saved'), 'success');
+    $msg = '<p>' . ts("Custom field '%1' has been saved.", array(1 => $customField->label)) . '</p>';
 
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
-      CRM_Core_Session::setStatus(ts(' You can add another custom field.'), '', 'info');
+      $msg .= '<p>' . ts("Ready to add another.") . '</p>';
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field/add',
           'reset=1&action=add&gid=' . $this->_gid
         ));
@@ -1004,6 +1010,10 @@ SELECT id
           'reset=1&action=browse&gid=' . $this->_gid
         ));
     }
+    $session->setStatus($msg, ts('Saved'), 'success');
+
+    // Add data when in ajax contect
+    $this->ajaxResponse['customField'] = $customField->toArray();
   }
 }
 

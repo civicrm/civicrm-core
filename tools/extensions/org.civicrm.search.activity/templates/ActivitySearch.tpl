@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -131,12 +131,6 @@
     </table>
     {/strip}
 
-<script type="text/javascript">
- {* this function is called to change the color of selected row(s) *}
-    var fname = "{$form.formName}";	
-    on_load_init_checkboxes(fname);
- </script>
-
 {include file="CRM/common/pager.tpl" location="bottom"}
 
 
@@ -148,7 +142,7 @@
 {/if}
 {literal}
 <script type="text/javascript">
-cj(function() {
+CRM.$(function($) {
    cj().crmaccordions(); 
 });
 </script>

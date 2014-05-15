@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -42,6 +42,8 @@
  *
  */
 class CRM_Price_Page_Option extends CRM_Core_Page {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The field id of the option
@@ -99,14 +101,12 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%oid%%,\'' . 'CRM_Price_BAO_PriceFieldValue' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Price Option'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%oid%%,\'' . 'CRM_Price_BAO_PriceFieldValue' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Price Option'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -135,7 +135,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     $financialType = CRM_Contribute_PseudoConstant::financialType();
     foreach ($customOption as $id => $values) {
       $action = array_sum(array_keys($this->actionLinks()));
-      if( CRM_Utils_Array::value('financial_type_id', $values)){
+      if (!empty($values['financial_type_id'])){
         $customOption[$id]['financial_type_id'] = $financialType[$values['financial_type_id']];
       }
       // update enable/disable links depending on price_field properties.
@@ -150,7 +150,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
           $action -= CRM_Core_Action::DISABLE;
         }
       }
-      if (CRM_Utils_Array::value('is_default', $customOption[$id])) {
+      if (!empty($customOption[$id]['is_default'])) {
         $customOption[$id]['is_default'] = '<img src="' . $config->resourceBase . 'i/check.gif" />';
       }
       else {
@@ -162,7 +162,12 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
           'oid' => $id,
           'fid' => $this->_fid,
           'sid' => $this->_sid,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'priceFieldValue.row.actions',
+        'PriceFieldValue',
+        $id
       );
     }
     // Add order changing widget to selector

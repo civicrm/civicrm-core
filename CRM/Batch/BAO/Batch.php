@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -60,13 +60,13 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @access public
    */
   static function create(&$params, $ids = NULL, $context = NULL) {
-    if (!CRM_Utils_Array::value('id', $params)) {
+    if (empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
 
     $batch = new CRM_Batch_DAO_Batch();
     $batch->copyValues($params);
-    if ($context == 'financialBatch' && CRM_Utils_Array::value('batchID', $ids)) {
+    if ($context == 'financialBatch' && !empty($ids['batchID'])) {
       $batch->id = $ids['batchID'];
     }
     $batch->save();
@@ -165,10 +165,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @access public
    */
   static function deleteBatch($batchId) {
-    //delete batch entries from cache
-    $cacheKeyString = CRM_Batch_BAO_Batch::getCacheKeyForBatch($batchId);
-    CRM_Core_BAO_Cache::deleteGroup('batch entry', $cacheKeyString, FALSE);
-
     // delete entry from batch table
     $batch = new CRM_Batch_DAO_Batch();
     $batch->id = $batchId;
@@ -195,9 +191,14 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
     // get batch totals for open batches
     $fetchTotals = array();
+    $batchStatus =  CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
+    $batchStatus = array(
+      array_search('Open', $batchStatus),
+      array_search('Reopened', $batchStatus),
+    );
     if ($params['context'] == 'financialBatch') {
       foreach ($batches as $id => $batch) {
-        if ($batch['status_id'] == 1) {
+        if (in_array($batch['status_id'], $batchStatus)) {
           $fetchTotals[] = $id;
         }
       }
@@ -216,10 +217,11 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
         $batch['check'] = $value['check'];
       }
       $batch['batch_name'] = $value['title'];
-      $batch['total'] = $batch['item_count'] = '';
+      $batch['total'] = '';
       $batch['payment_instrument'] = $value['payment_instrument'];
       $batch['item_count'] = CRM_Utils_Array::value('item_count', $value);
-      if (CRM_Utils_Array::value('total', $value)) {
+      $batch['type'] = $value['batch_type'];
+      if (!empty($value['total'])) {
         $batch['total'] = CRM_Utils_Money::format($value['total']);
       }
 
@@ -239,7 +241,9 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Get list of batches
    *
-   * @param  array   $params associated array for params
+   * @param  array $params associated array for params
+   *
+   * @return array
    * @access public
    */
   static function getBatchList(&$params) {
@@ -253,7 +257,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
     $orderBy = ' ORDER BY batch.id desc';
     if (!empty($params['sort'])) {
-      $orderBy = ' ORDER BY ' . $params['sort'];
+      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'String');
     }
 
     $query = "
@@ -265,7 +269,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     {$limit}";
 
     $object = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Batch_DAO_Batch');
-    if (CRM_Utils_Array::value('context', $params)) {
+    if (!empty($params['context'])) {
       $links = self::links($params['context']);
     }
     else {
@@ -274,6 +278,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
     $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id');
     $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
+    $batchStatusByName = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
     $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
 
     $results = array();
@@ -283,7 +288,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       CRM_Core_DAO::storeValues($object, $values);
       $action = array_sum(array_keys($newLinks));
 
-      if ($values['status_id'] == 2 && $params['context'] != 'financialBatch') {
+      if ($values['status_id'] == array_search('Closed', $batchStatusByName) && $params['context'] != 'financialBatch') {
         $newLinks = array();
       }
       elseif ($params['context'] == 'financialBatch') {
@@ -295,18 +300,18 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
           "' value='1'  data-status_id='" .
           $values['status_id']."' class='select-row'></input>";
 
-        switch ($values['status_id']) {
-          case '1':
+        switch ($batchStatusByName[$values['status_id']]) {
+          case 'Open':
             CRM_Utils_Array::remove($newLinks, 'reopen', 'download');
             break;
-          case '2':
+          case 'Closed':
             CRM_Utils_Array::remove($newLinks, 'close', 'edit', 'download');
             break;
-          case '5':
+          case 'Exported':
             CRM_Utils_Array::remove($newLinks, 'close', 'edit', 'reopen', 'export');
         }
       }
-      if (CRM_Utils_Array::value('type_id', $values)) {
+      if (!empty($values['type_id'])) {
         $values['batch_type'] = $batchTypes[$values['type_id']];
       }
       $values['batch_status'] = $batchStatus[$values['status_id']];
@@ -316,7 +321,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
         $values['payment_instrument'] = $paymentInstrument[$object->payment_instrument_id];
       }
       $tokens = array('id' => $object->id, 'status' => $values['status_id']);
-      if ($values['status_id'] == CRM_Core_OptionGroup::getValue('batch_status', 'Exported')) {
+      if ($values['status_id'] == array_search('Exported', $batchStatusByName)) {
         $aid = CRM_Core_OptionGroup::getValue('activity_type','Export Accounting Batch');
         $activityParams = array('source_record_id' => $object->id, 'activity_type_id' => $aid);
         $exportActivity = CRM_Activity_BAO_Activity::retrieve($activityParams, $val);
@@ -326,7 +331,12 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       $values['action'] = CRM_Core_Action::formLink(
         $newLinks,
         $action,
-        $tokens
+        $tokens,
+        ts('more'),
+        FALSE,
+        'batch.selector.row',
+        'Batch',
+        $object->id
       );
       $results[$object->id] = $values;
     }
@@ -337,7 +347,9 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Get count of batches
    *
-   * @param  array   $params associated array for params
+   * @param  array $params associated array for params
+   *
+   * @return null|string
    * @access public
    */
   public static function getBatchCount(&$params) {
@@ -352,14 +364,17 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Format where clause for getting lists of batches
    *
-   * @param  array   $params associated array for params
+   * @param  array $params associated array for params
+   *
+   * @return string
    * @access public
    */
   public static function whereClause($params) {
     $clauses = array();
     // Exclude data-entry batches
+    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
     if (empty($params['status_id'])) {
-      $clauses[] = 'batch.status_id <> 3';
+      $clauses[] = 'batch.status_id <> ' . array_search('Data Entry', $batchStatus);
     }
 
     $fields = array(
@@ -382,7 +397,12 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
           $clauses[] = "$table.$field = '$value'";
         }
         elseif ($value) {
-          $clauses[] = "$table.$field = $value";
+          if ($field == 'status_id' && $value == array_search('Open', $batchStatus)) {
+            $clauses[] = "$table.$field IN ($value," . array_search('Reopened', $batchStatus) . ')';
+          }
+          else {
+            $clauses[] = "$table.$field = $value";
+          }
         }
       }
     }
@@ -391,6 +411,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
   /**
    * Function to define action links
+   *
+   * @param null $context
    *
    * @return array $links array of action links
    * @access public
@@ -470,14 +492,16 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * function to get batch list
    *
-   * @return array array of batches
+   * @return array array of all batches
+   * excluding batches with data entry in progress
    */
   static function getBatches() {
-    $query = 'SELECT id, title
+    $dataEntryStatusId = CRM_Core_OptionGroup::getValue('batch_status','Data Entry', 'name');
+    $query = "SELECT id, title
       FROM civicrm_batch
-      WHERE type_id IN (1,2)
-      AND status_id = 2
-      ORDER BY id DESC';
+      WHERE item_count >= 1
+      AND status_id != {$dataEntryStatusId}
+      ORDER BY id DESC";
 
     $batches = array();
     $dao = CRM_Core_DAO::executeQuery($query);
@@ -603,6 +627,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param array $returnValues
    * @param null $notPresent
    * @param null $params
+   * @param bool $getCount
+   *
    * @return Object
    */
   static function getBatchFinancialItems($entityID, $returnValues, $notPresent = NULL, $params = NULL, $getCount = FALSE) {
@@ -620,8 +646,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     }
 
     $orderBy = " ORDER BY civicrm_financial_trxn.id";
-    if (CRM_Utils_Array::value('sort', $params)) {
-      $orderBy = ' ORDER BY ' . CRM_Utils_Array::value('sort', $params);
+    if (!empty($params['sort'])) {
+      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'String');
     }
 
     $from = "civicrm_financial_trxn

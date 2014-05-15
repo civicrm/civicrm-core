@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -74,7 +74,9 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_PaymentExpressIPN
    */
   function __construct($mode, &$paymentProcessor) {
     parent::__construct();
@@ -88,10 +90,14 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param $paymentProcessor
+   * @param null $paymentForm
+   * @param bool $force
+   *
    * @return object
    * @static
    */
-  static function &singleton($mode, $component, &$paymentProcessor) {
+  static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     if (self::$_singleton === NULL) {
       self::$_singleton = new CRM_Core_Payment_PaymentExpressIPN($mode, $paymentProcessor);
     }
@@ -101,11 +107,15 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * The function gets called when a new order takes place.
    *
-   * @param xml   $dataRoot    response send by google in xml format
+   * @param $success
    * @param array $privateData contains the name value pair of <merchant-private-data>
    *
-   * @return void
+   * @param $component
+   * @param $amount
+   * @param $transactionReference
    *
+   * @internal param \xml $dataRoot response send by google in xml format
+   * @return void
    */
   function newOrderNotify($success, $privateData, $component, $amount, $transactionReference) {
     $ids = $input = $params = array();

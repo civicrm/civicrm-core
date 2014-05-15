@@ -2,9 +2,9 @@
 
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -31,7 +31,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_ActivityProfile
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: ActivityProfile.php 30486 2011-05-20 16:12:09Z rajan $
  *
  */
@@ -155,7 +155,6 @@ function _civicrm_api3_profile_get_spec(&$params) {
  */
 function civicrm_api3_profile_submit($params) {
   $profileID = _civicrm_api3_profile_getProfileID($params['profile_id']);
-
   if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileID, 'is_active')) {
     //@todo declare pseudoconstant & let api do this
     throw new API_Exception('Invalid value for profile_id');
@@ -198,6 +197,10 @@ function civicrm_api3_profile_submit($params) {
     $entity = strtolower(CRM_Utils_Array::value('entity', $field));
     if($entity && !in_array($entity, array_merge($contactEntities, $locationEntities))) {
       $contactParams['api.' . $entity . '.create'][$fieldName] = $value;
+      //@todo we are not currently declaring this option
+      if(isset($params['batch_id']) && strtolower($entity) == 'contribution') {
+        $contactParams['api.' . $entity . '.create']['batch_id'] = $params['batch_id'];
+      }
       if(isset($params[$entity . '_id'])) {
         //todo possibly declare $entity_id in getfields ?
         $contactParams['api.' . $entity . '.create']['id'] = $params[$entity . '_id'];
@@ -206,6 +209,19 @@ function civicrm_api3_profile_submit($params) {
     else {
       $contactParams[_civicrm_api3_profile_translate_fieldnames_for_bao($fieldName)] = $value;
     }
+  }
+  if(isset($contactParams['api.contribution.create']) && isset($contactParams['api.membership.create'])) {
+    $contactParams['api.membership_payment.create'] = array(
+      'contribution_id' => '$value.api.contribution.create.id',
+      'membership_id' => '$value.api.membership.create.id'
+    );
+  }
+
+  if(isset($contactParams['api.contribution.create']) && isset($contactParams['api.participant.create'])) {
+    $contactParams['api.participant_payment.create'] = array(
+      'contribution_id' => '$value.api.contribution.create.id',
+      'participant_id' => '$value.api.participant.create.id'
+    );
   }
 
   $contactParams['contact_id'] = CRM_Utils_Array::value('contact_id', $params);
@@ -255,7 +271,7 @@ function civicrm_api3_profile_submit($params) {
     );
   }
 
-  if (CRM_Utils_Array::value('add_to_group_id', $ufGroupDetails)) {
+  if (!empty($ufGroupDetails['add_to_group_id'])) {
     $contactIds = array($params['contact_id']);
     CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds,
       $ufGroupDetails['add_to_group_id']
@@ -295,7 +311,10 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
     // we don't resolve state, country & county for performance reasons
     $resolveOptions = CRM_Utils_Array::value('get_options',$apirequest['params']) == 'all' ? True : False;
     $profileID = _civicrm_api3_profile_getProfileID($apirequest['params']['profile_id']);
-    $params = _civicrm_api3_buildprofile_submitfields($profileID, $resolveOptions);
+    $params = _civicrm_api3_buildprofile_submitfields($profileID, $resolveOptions, CRM_Utils_Array::value('cache_clear', $params));
+  }
+  elseif (isset($apirequest['params']['cache_clear'])) {
+    _civicrm_api3_buildprofile_submitfields(FALSE, FALSE, True);
   }
   $params['profile_id']['api.required'] = TRUE;
 }
@@ -367,6 +386,10 @@ function civicrm_api3_profile_apply($params) {
  *
  *  Note that that since the existing code for deriving a blank profile is not easily accessible our
  *  interim solution is just to return an empty array
+ *
+ * @param $params
+ *
+ * @return array
  */
 function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
 
@@ -451,10 +474,21 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
  *
  * @param integer $profileID
  * @param integer $optionsBehaviour 0 = don't resolve, 1 = resolve non-aggressively, 2 = resolve aggressively - ie include country & state
+ * @param $is_flush
+ *
+ * @internal param $params
+ *
+ * @return
  */
 
-function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour = 1) {
+function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour = 1, $is_flush) {
   static $profileFields = array();
+  if($is_flush) {
+    $profileFields = array();
+    if(empty($profileID)) {
+      return;
+    }
+  }
   if(isset($profileFields[$profileID])) {
     return $profileFields[$profileID];
   }
@@ -476,9 +510,15 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
       'help_pre' => CRM_Utils_Array::value('help_pre', $field),
       'help_post' => CRM_Utils_Array::value('help_post', $field),
       'entity' => $entity,
+      'weight' => CRM_Utils_Array::value('weight', $field),
     ), $aliasArray);
 
-    $realFieldName = $field['field_name'];
+    $ufFieldTaleFieldName = $field['field_name'];
+    if(isset($entity[$ufFieldTaleFieldName]['name'])) {
+      // in the case where we are dealing with an alias we map back to a name
+      // this will be tested by 'membership_type_id' field
+      $ufFieldTaleFieldName = $entity[$ufFieldTaleFieldName]['name'];
+    }
     //see function notes
     // as we build up a list of these we should be able to determine a generic approach
     //
@@ -491,33 +531,60 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
       'soft_credit' => 'soft_credit_to',
       'group' => 'group_id',
       'tag' => 'tag_id',
+      'soft_credit_type' => 'soft_credit_type_id',
     );
 
-    if(array_key_exists($realFieldName, $hardCodedEntityFields)) {
-      $realFieldName = $hardCodedEntityFields[$realFieldName];
+    if(array_key_exists($ufFieldTaleFieldName, $hardCodedEntityFields)) {
+      $ufFieldTaleFieldName = $hardCodedEntityFields[$ufFieldTaleFieldName];
     }
 
-    $entities[$entity][$fieldName] = $realFieldName;
+    $entities[$entity][$fieldName] = $ufFieldTaleFieldName;
   }
 
   foreach ($entities as $entity => $entityFields) {
     $result = civicrm_api3($entity, 'getfields', array('action' => 'create'));
     $entityGetFieldsResult = _civicrm_api3_profile_appendaliases($result['values'], $entity);
     foreach ($entityFields as $entityfield => $realName) {
-      $profileFields[$profileID][strtolower($entityfield)] = array_merge($profileFields[$profileID][$entityfield], $entityGetFieldsResult[$realName]);
+      $fieldName = strtolower($entityfield);
+      if(!strstr($fieldName, '-')) {
+         if(strtolower($realName) != $fieldName) {
+        // we want to keep the '-' pattern for locations but otherwise
+        // we are going to make the api-standard field the main / preferred name but support the db name
+        // in future naming the fields in the DB to reflect the way the rest of the api / BAO / metadata works would
+        // reduce code
+        $fieldName = strtolower($realName);
+        }
+        if(isset($entityGetFieldsResult[$realName]['uniqueName'])) {
+          // we won't alias the field name on here are we are using uniqueNames for the possibility of needing to differentiate
+          // which entity 'status_id' belongs to
+          $fieldName = $entityGetFieldsResult[$realName]['uniqueName'];
+        }
+        else{
+          if(isset($entityGetFieldsResult[$realName]['name'])) {
+            // this will sort out membership_type_id vs membership_type
+            $fieldName = $entityGetFieldsResult[$realName]['name'];
+          }
+        }
+      }
+      $profileFields[$profileID][$fieldName] = array_merge($entityGetFieldsResult[$realName], $profileFields[$profileID][$entityfield]);
+      if(!isset($profileFields[$profileID][$fieldName]['api.aliases'])) {
+       $profileFields[$profileID][$fieldName]['api.aliases'] = array();
+      }
       if($optionsBehaviour && !empty($entityGetFieldsResult[$realName]['pseudoconstant'])) {
         if($optionsBehaviour > 1  || !in_array($realName, array('state_province_id', 'county_id', 'country_id'))) {
           $options = civicrm_api3($entity, 'getoptions', array('field' => $realName));
-          $profileFields[$profileID][$entityfield]['options'] = $options['values'];
+          $profileFields[$profileID][$fieldName]['options'] = $options['values'];
         }
       }
 
-      if($entityfield != strtolower($entityfield)) {
-        // we will make the mixed case version (e.g. of 'Primary') an aliase
-        if(!isset($profileFields[$profileID][strtolower($entityfield)])) {
-          $profileFields[$profileID][strtolower($entityfield)]['api.aliases'] = array();
+      if($entityfield != $fieldName) {
+        if(isset($profileFields[$profileID][$entityfield])) {
+          unset($profileFields[$profileID][$entityfield]);
         }
-        $profileFields[$profileID][strtolower($entityfield)]['api.aliases'][] = $entityfield;
+        if(!in_array($entityfield, $profileFields[$profileID][$fieldName]['api.aliases'])) {
+          // we will make the mixed case version (e.g. of 'Primary') an alias
+          $profileFields[$profileID][$fieldName]['api.aliases'][] = $entityfield;
+        }
       }
       /**
        * putting this on hold -this would cause the api to set the default - but could have unexpected behaviour
@@ -528,38 +595,47 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
        */
     }
   }
+  uasort($profileFields[$profileID], "_civicrm_api3_order_by_weight");
   return $profileFields[$profileID];
+}
+
+function _civicrm_api3_order_by_weight($a, $b) {
+  return CRM_Utils_Array::value('weight', $b) < CRM_Utils_Array::value('weight', $a) ? TRUE : FALSE;
 }
 
 /**
  * Here we map the profile fields as stored in the uf_field table to their 'real entity'
  * we also return the profile fieldname
  *
+ * @param $field
+ *
+ * @return array
  */
 function _civicrm_api3_map_profile_fields_to_entity(&$field) {
   $entity = $field['field_type'];
   $contactTypes = civicrm_api3('contact', 'getoptions', array('field' => 'contact_type'));
-  $locationFields = array('email' => 'Email');
   if(in_array($entity, $contactTypes['values'])) {
-    $entity = 'Contact';
+    $entity = 'contact';
   }
+  $entity = _civicrm_api_get_entity_name_from_camel($entity);
+  $locationFields = array('email' => 'email');
   $fieldName = $field['field_name'];
   if(!empty($field['location_type_id'])) {
     if($fieldName == 'email') {
-      $entity = 'Email';
+      $entity = 'email';
     }
     else{
-      $entity = 'Address';
+      $entity = 'address';
     }
     $fieldName .= '-' . $field['location_type_id'];
   }
   elseif(array_key_exists($fieldName, $locationFields)) {
     $fieldName .= '-Primary';
-    $entity = 'Email';
+    $entity = 'email';
   }
   if(!empty($field['phone_type_id'])) {
     $fieldName .= '-' . $field['location_type_id'];
-    $entity = 'Phone';
+    $entity = 'phone';
   }
 
   // @todo - sort this out!
@@ -568,29 +644,30 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
   // in a perfect world the uf_field table would hold the correct entity for each item
   // & only the relationships between entities would need to be coded
   $hardCodedEntityMappings = array(
-    'street_address' => 'Address',
-    'street_number' => 'Address',
-    'supplemental_address_1' => 'Address',
-    'supplemental_address_2' => 'Address',
-    'supplemental_address_3' => 'Address',
-    'postal_code' => 'Address',
-    'city' => 'Address',
-    'email' => 'Email',
-    'state_province' => 'Address',
-    'country' => 'Address',
-    'county' => 'Address',
+    'street_address' => 'address',
+    'street_number' => 'address',
+    'supplemental_address_1' => 'address',
+    'supplemental_address_2' => 'address',
+    'supplemental_address_3' => 'address',
+    'postal_code' => 'address',
+    'city' => 'address',
+    'email' => 'email',
+    'state_province' => 'address',
+    'country' => 'address',
+    'county' => 'address',
     //note that in discussions about how to restructure the api we discussed making these membership
     // fields into 'membership_payment' fields - which would entail declaring them in getfields
     // & renaming them in existing profiles
-    'financial_type' => 'Contribution',
-    'total_amount' => 'Contribution',
-    'receive_date' => 'Contribution',
-    'payment_instrument' => 'Contribution',
-    'check_number' => 'Contribution',
-    'contribution_status_id' => 'Contribution',
-    'soft_credit' => 'Contribution',
-    'group' => 'GroupContact',
-    'tag' => 'EntityTag',
+    'financial_type' => 'contribution',
+    'total_amount' => 'contribution',
+    'receive_date' => 'contribution',
+    'payment_instrument' => 'contribution',
+    'check_number' => 'contribution',
+    'contribution_status_id' => 'contribution',
+    'soft_credit' => 'contribution',
+    'soft_credit_type' => 'contribution_soft',
+    'group' => 'group_contact',
+    'tag' => 'entity_tag',
    );
   if(array_key_exists($fieldName, $hardCodedEntityMappings)) {
     $entity = $hardCodedEntityMappings[$fieldName];
@@ -633,7 +710,7 @@ function _civicrm_api3_profile_appendaliases($values, $entity) {
     }
   }
   //special case on membership & contribution - can't see how to handle in a generic way
-  if(in_array($entity, array('Membership', 'Contribution'))) {
+  if(in_array($entity, array('membership', 'contribution'))) {
     $values['send_receipt'] = array('title' => 'Send Receipt', 'type' => (int) 16);
   }
   return $values;

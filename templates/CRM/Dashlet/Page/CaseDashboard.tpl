@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -58,7 +58,7 @@
   </table>
 </div>
 
-<h3>{ts}Summary of Case Involvement{/ts}</h3>
+<h3>{ts}Summary of Involvement{/ts}</h3>
 
 <table class="report">
   <tr class="columnheader">

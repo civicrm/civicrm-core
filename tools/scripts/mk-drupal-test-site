@@ -135,6 +135,7 @@ popd
 ## Create CiviCRM config
 cat > "$CIVI_ROOT/bin/setup.conf" << EOF
   SVNROOT="$CIVI_ROOT"
+  CIVISOURCEDIR="$CIVI_ROOT"
   SCHEMA=schema/Schema.xml
   DBNAME="$DB_NAME"
   DBUSER="$DB_USER"
@@ -179,12 +180,12 @@ popd
 
 if [ -n "$SQL_DUMP" ]; then
   echo "Importing SQL dump: $SQL_DUMP"
-  mysql $DB_NAME < $SQL_DUMP
+  mysql $DB_NAME < "$SQL_DUMP"
   echo "SQL import complete."
 
   if [ -n "$SQL_DUMP2" -a -f "$SQL_DUMP2" ]; then
     echo "Importing SQL dump: $SQL_DUMP2"
-    mysql $DB_NAME < $SQL_DUMP2
+    mysql $DB_NAME < "$SQL_DUMP2"
     echo "SQL import complete."
   fi
 else

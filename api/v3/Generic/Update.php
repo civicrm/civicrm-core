@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,14 +41,14 @@
  *  - version: string
  *  - function: callback (mixed)
  *  - params: array, varies
+ *
+ * @return array|int|mixed
  */
 function civicrm_api3_generic_update($apiRequest) {
-  $errorFnName = 'civicrm_api3_create_error';
-
   //$key_id = strtolower ($apiRequest['entity'])."_id";
   $key_id = "id";
   if (!array_key_exists($key_id, $apiRequest['params'])) {
-    return $errorFnName("Mandatory parameter missing $key_id");
+    return civicrm_api3_create_error("Mandatory parameter missing $key_id");
   }
   // @fixme
   // tests show that contribution works better with create
@@ -62,10 +62,10 @@ function civicrm_api3_generic_update($apiRequest) {
     return $existing;
   }
   if ($existing['count'] > 1) {
-    return $errorFnName("More than one " . $apiRequest['entity'] . " with id " . $apiRequest['params'][$key_id]);
+    return civicrm_api3_create_error("More than one " . $apiRequest['entity'] . " with id " . $apiRequest['params'][$key_id]);
   }
   if ($existing['count'] == 0) {
-    return $errorFnName("No " . $apiRequest['entity'] . " with id " . $apiRequest['params'][$key_id]);
+    return civicrm_api3_create_error("No " . $apiRequest['entity'] . " with id " . $apiRequest['params'][$key_id]);
   }
 
   $existing = array_pop($existing['values']);

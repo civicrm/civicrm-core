@@ -534,6 +534,9 @@ class Givi {
    * FIXME: only supports $refs like "foo" (implicit origin) or "myremote/foo"
    *
    * @param $ref
+   * @param string $defaultRemote
+   *
+   * @throws Exception
    * @return array
    */
   function parseBranchRepo($ref, $defaultRemote = 'origin') {
@@ -554,8 +557,10 @@ class Givi {
    *
    * Any items after $command will be escaped and added to $command
    *
+   * @param $repoName
    * @param string $runDir
    * @param string $command
+   *
    * @return string
    */
   function run($repoName, $runDir, $command) {
@@ -589,6 +594,8 @@ class Givi {
 
   /**
    * @param string $default branch to use by default
+   * @param $overrides
+   *
    * @return array ($repoName => $gitRef)
    */
   function resolveBranches($default, $overrides) {
@@ -617,6 +624,8 @@ class Givi {
   /**
    * @param string $filter e.g. "all" or "repo1,repo2"
    * @param array $repos ($repoName => $repoDir)
+   *
+   * @throws Exception
    * @return array ($repoName => $repoDir)
    */
   function filterRepos($filter, $repos) {
@@ -669,8 +678,9 @@ class HttpClient {
    *
    * Any items after $command will be escaped and added to $command
    *
-   * @param string $runDir
    * @param string $command
+   *
+   * @internal param string $runDir
    * @return string
    */
   static function run($command) {

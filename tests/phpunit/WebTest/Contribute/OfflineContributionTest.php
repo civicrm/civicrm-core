@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,8 +42,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->webtestAddContact($softCreditFname, $softCreditLname, FALSE);
 
     //financial account for check
-    $this->openCiviPage("admin/options/payment_instrument", "group=payment_instrument&reset=1");
-    $financialAccount = $this->getText("xpath=//div[@id='payment_instrument']/div[2]/table/tbody//tr/td[1][text()='Check']/../td[3]");
+    $this->openCiviPage("admin/options/payment_instrument", "reset=1");
+    $financialAccount = $this->getText("xpath=//div[@id='payment_instrument']/div/table/tbody//tr/td[1][text()='Check']/../td[3]");
 
     // Add new Financial Account
     $orgName = 'Alberta ' . substr(sha1(rand()), 0, 7);
@@ -81,8 +81,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=li#tab_contribute a");
     $this->click("css=li#tab_contribute a");
     $this->waitForElementPresent("link=Record Contribution (Check, Cash, EFT ...)");
-    $this->click("link=Record Contribution (Check, Cash, EFT ...)");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("link=Record Contribution (Check, Cash, EFT ...)", "_qf_Contribution_cancel-bottom", FALSE);
 
     // select financial type
     $this->select("financial_type_id", "value=1");
@@ -104,19 +103,22 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // create first soft credit
-    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 'soft_credit_contact_1');
+    $this->click("softCredit");
+    $this->waitForElementPresent("soft_credit_amount_1");
+    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 's2id_soft_credit_contact_id_1');
     $this->type("soft_credit_amount_1", "50");
 
     // add second soft credit field
     $this->click("addMoreSoftCredit");
     $this->waitForElementPresent("soft_credit_amount_2");
-    // create new individual via soft credit 
+    // create new individual via soft credit
     $softCreditSecondFname = substr(sha1(rand()), 0, 7);
     $softCreditSecondLname = substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($softCreditSecondFname, $softCreditSecondLname, NULL, 4, 'soft_credit_profiles_2', 'soft_credit_1');
+    $this->webtestNewDialogContact($softCreditSecondFname, $softCreditSecondLname, NULL, 4, 's2id_soft_credit_contact_id_2', 'soft_credit_1');
     // enter the second soft credit
     $this->verifyText("soft_credit_amount_2", ""); // it should be blank cause first soft credit != total_amount
     $this->type("soft_credit_amount_2", "100"); //the sum of the soft credit amounts can exceed total_amount
+    $this->select("soft_credit_type[2]", "In Honor of");
 
     //Custom Data
     // $this->click('CIVICRM_QFID_3_6');
@@ -132,15 +134,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->type("invoice_id", time());
     $this->webtestFillDate('thankyou_date');
 
-    //Honoree section
-    $this->click("Honoree");
-    $this->waitForElementPresent("honor_email");
 
-    $this->click("CIVICRM_QFID_1_2");
-    $this->select("honor_prefix_id", "label=Ms.");
-    $this->type("honor_first_name", "Foo");
-    $this->type("honor_last_name", "Bar");
-    $this->type("honor_email", "foo@bar.com");
 
     //Premium section
     $this->click("Premium");
@@ -151,16 +145,15 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click("_qf_Contribution_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
     //$this->assertTrue($this->isTextPresent("The contribution record has been saved."), "Status message didn't show up after saving!");
 
     // verify if Contribution is created
-    $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
 
     //click through to the Contribution view screen
-    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
 
     $expected = array(
@@ -173,17 +166,17 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'Received Into' => $financialAccount,
     );
 
-    $this->waitForElementPresent("xpath=/html/body/div[3]/div/div[2]/div/div[3]/div/div[2]/div/div/div/form/div[2]");
+    $this->waitForElementPresent("xpath=//*[@id='ContributionView']/div[2]");
     foreach ($expected as $value) {
-      $this->verifyText("xpath=/html/body/div[3]/div/div[2]/div/div[3]/div/div[2]/div/div/div/form/div[2]", preg_quote($value));
+      $this->verifyText("xpath=//*[@id='ContributionView']/div[2]", preg_quote($value));
     }
 
     // verify if soft credit was created successfully
     $expected = array(
       'Soft Credit To 1' => "{$softCreditFname} {$softCreditLname}",
       'Soft Credit To 2' => "{$softCreditSecondFname} {$softCreditSecondLname}",
-      'Amount' => '50.00',
-      'Amount' => '100.00',
+      'Amount (Soft Credit Type)' => '50.00 (Solicited)',
+      'Amount (Soft Credit Type)' => '100.00 (In Honor of)',
     );
 
     foreach ($expected as $value) {
@@ -191,22 +184,22 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     }
 
     // go to first soft creditor contact view page
-    $this->click("css=table.crm-soft-credit-listing tbody tr td a");
+    $this->clickLink("xpath=//*[@id='ContributionView']/div[2]/div[2]/div[2]/table/tbody/tr[1]/td[1]/a", "css=li#tab_contribute a");
 
     // go to contribution tab
-    $this->waitForElementPresent("css=li#tab_contribute a");
     $this->click("css=li#tab_contribute a");
     $this->waitForElementPresent("link=Record Contribution (Check, Cash, EFT ...)");
 
     // verify soft credit details
     $expected = array(
-      3 => 'Donation',
+      3 => 'Solicited',
+      4 => 'Donation',
       2 => '50.00',
-      5 => 'Completed',
+      6 => 'Completed',
       1 => "{$firstName} {$lastName}"
     );
     foreach ($expected as $value => $label) {
-      $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[$value]", preg_quote($label));
+      $this->verifyText("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[2]/td[$value]", preg_quote($label));
     }
   }
 
@@ -320,11 +313,10 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=li#tab_contribute a");
     $this->click("css=li#tab_contribute a");
     $this->waitForElementPresent("link=Submit Credit Card Contribution");
-    $this->click("link=Submit Credit Card Contribution");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("link=Submit Credit Card Contribution", "_qf_Contribution_cancel-bottom", FALSE);
 
     // since we don't have live credentials we will switch to test mode
-    $url = $this->getLocation();
+    $url = $this->getAttribute("xpath=//*[@id='Search']/div[2]/div[2]/a[2]@href");
     $url = str_replace('mode=live', 'mode=test', $url);
     $this->open($url);
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -352,7 +344,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       $this->type("non_deductible_amount", "{$nonDeductibleAmt}");
     }
 
-    if (CRM_Utils_Array::value('premium', $params)) {
+    if (!empty($params['premium'])) {
       //Premium section
       $this->click("Premium");
       $this->waitForElementPresent("fulfilled_date");
@@ -376,7 +368,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     // select show test contributions
     $this->click("contribution_test", "value=1");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
     foreach ($verifyData as $label => $value) {
       if ( $label == 'sort_name' ) {
@@ -394,7 +386,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       "xpath=//form[@id='Basic']/div[3]/div[1]/div[2]/table/tbody/tr[1]/td[11]/span/a[text()='View']");
 
     $this->clickLink("xpath=//form[@id='Basic']/div[3]/div[1]/div[2]/table/tbody/tr[1]/td[11]/span/a[text()='View']",
-    'crm-contact-actions-link');
+    'crm-contact-actions-link', FALSE);
   }
 
   function testOnlineContributionWithZeroAmount() {
@@ -407,7 +399,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=li#tab_contribute a");
     $this->click("css=li#tab_contribute a");
     $this->waitForElementPresent("link=Record Contribution (Check, Cash, EFT ...)");
-    $this->clickLink("link=Record Contribution (Check, Cash, EFT ...)");
+    $this->clickLink("link=Record Contribution (Check, Cash, EFT ...)", "_qf_Contribution_cancel-bottom", FALSE);
 
     // select financial type
     $this->select("financial_type_id", "value=1");
@@ -419,11 +411,11 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->select("payment_instrument_id", "value=1");
 
     $this->type("trxn_id", "X20901X1" . rand(100, 10000));
-    $this->clickLink('_qf_Contribution_upload-bottom');
+    $this->click('_qf_Contribution_upload-bottom');
     $this->waitForText("crm-notification-container", "The contribution record has been saved.");
 
-    $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
     $expected = array(
       'Financial Type' => 'Donation',
       'Total Amount' => '0.00',

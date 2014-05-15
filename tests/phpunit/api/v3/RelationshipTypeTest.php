@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.5                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -28,9 +28,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -63,7 +63,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   protected $_cId_b;
   protected $_relTypeID;
   protected $_apiversion = 3;
-  public $_eNoticeCompliant = TRUE;
+
   function get_info() {
     return array(
       'name' => 'RelationshipType Create',
@@ -140,7 +140,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
    *  Test  using example code
    */
   function testRelationshipTypeCreateExample() {
-    require_once 'api/v3/examples/RelationshipTypeCreate.php';
+    require_once 'api/v3/examples/RelationshipType/Create.php';
     $result = relationship_type_create_example();
     $expectedResult = relationship_type_create_expectedresult();
     $this->assertAPISuccess($result);

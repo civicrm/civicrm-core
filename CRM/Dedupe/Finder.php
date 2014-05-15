@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -201,15 +201,14 @@ class CRM_Dedupe_Finder {
     $flat = array();
     CRM_Utils_Array::flatten($fields, $flat);
 
+    // FIXME: This may no longer be necessary - check inputs
     $replace_these = array(
       'individual_prefix' => 'prefix_id',
       'individual_suffix' => 'suffix_id',
       'gender' => 'gender_id',
     );
-    //handle for individual_suffix, individual_prefix, gender
-    foreach (array(
-      'individual_suffix', 'individual_prefix', 'gender') as $name) {
-      if (CRM_Utils_Array::value($name, $fields)) {
+    foreach (array('individual_suffix', 'individual_prefix', 'gender') as $name) {
+      if (!empty($fields[$name])) {
         $flat[$replace_these[$name]] = $flat[$name];
         unset($flat[$name]);
       }
@@ -218,7 +217,7 @@ class CRM_Dedupe_Finder {
     // handle {birth,deceased}_date
     foreach (array(
       'birth_date', 'deceased_date') as $date) {
-      if (CRM_Utils_Array::value($date, $fields)) {
+      if (!empty($fields[$date])) {
         $flat[$date] = $fields[$date];
         if (is_array($flat[$date])) {
           $flat[$date] = CRM_Utils_Date::format($flat[$date]);
@@ -227,7 +226,7 @@ class CRM_Dedupe_Finder {
       }
     }
 
-    if (CRM_Utils_Array::value('contact_source', $flat)) {
+    if (!empty($flat['contact_source'])) {
       $flat['source'] = $flat['contact_source'];
       unset($flat['contact_source']);
     }
@@ -291,13 +290,13 @@ class CRM_Dedupe_Finder {
             'state_province' => 'state_province_id', 'county' => 'county_id',
           );
           foreach ($fixes as $orig => $target) {
-            if (CRM_Utils_Array::value($orig, $flat)) {
+            if (!empty($flat[$orig])) {
               $params[$table][$target] = $flat[$orig];
             }
           }
         }
         foreach ($fields as $field => $title) {
-          if (CRM_Utils_Array::value($field, $flat)) {
+          if (!empty($flat[$field])) {
             $params[$table][$field] = $flat[$field];
           }
         }

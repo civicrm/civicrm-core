@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * This class stores logic for managing CiviCRM extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -43,6 +43,10 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
   public function onPreInstall(CRM_Extension_Info $info) {
     $this->callHook($info, 'install');
     $this->callHook($info, 'enable');
+  }
+
+  public function onPostPostInstall(CRM_Extension_Info $info) {
+    $this->callHook($info, 'postInstall');
   }
 
   private function callHook(CRM_Extension_Info $info, $hookName) {

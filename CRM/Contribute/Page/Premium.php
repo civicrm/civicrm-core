@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -167,7 +167,12 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
         $action = array_sum(array_keys($this->links()));
 
         $premiums[$dao->product_id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-          array('id' => $pageID, 'pid' => $dao->id)
+          array('id' => $pageID, 'pid' => $dao->id),
+          ts('more'),
+          FALSE,
+          'premium.contributionpage.row',
+          'Premium',
+          $dao->id
         );
         //Financial Type
         if (!empty($dao->financial_type_id)) {
@@ -212,6 +217,8 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
 
   /**
    * Get user context.
+   *
+   * @param null $mode
    *
    * @return string user context.
    */

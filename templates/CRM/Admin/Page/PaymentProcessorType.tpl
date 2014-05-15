@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,7 +36,8 @@
 <p></p>
     <div class="form-item">
         {strip}
-  {include file="CRM/common/enableDisable.tpl"}
+  {include file="CRM/common/enableDisableApi.tpl"}
+  {include file="CRM/common/crmeditable.tpl"}
         <table cellpadding="0" cellspacing="0" border="0">
         <tr class="columnheader">
             <th>{ts}Name{/ts}</th>
@@ -47,9 +48,9 @@
             <th></th>
         </tr>
         {foreach from=$rows item=row}
-        <tr id="row_{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-paymentProcessorType {if NOT $row.is_active} disabled{/if}">
+        <tr id="paymentProcessorType-{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-entity {if NOT $row.is_active} disabled{/if}">
           <td class="crm-paymentProcessorType-name">{$row.name}</td>
-          <td class="crm-paymentProcessorType-title">{$row.title}</td>
+          <td class="crm-paymentProcessorType-title crm-editable" data-field="title">{$row.title}</td>
             <td class="crm-paymentProcessorType-description">{$row.description}</td>
           <td id="row_{$row.id}_status" class="crm-paymentProcessorType-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td class="crm-paymentProcessorType-is_default">{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>

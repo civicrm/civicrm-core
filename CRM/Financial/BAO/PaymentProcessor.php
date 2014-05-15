@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -68,7 +68,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $processor->save();
     // CRM-11826, add entry in civicrm_entity_financial_account
     // if financial_account_id is not NULL
-    if (CRM_Utils_Array::value('financial_account_id', $params)) {
+    if (!empty($params['financial_account_id'])) {
       $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
       $values = array(
         'entity_table' => 'civicrm_payment_processor',
@@ -147,7 +147,10 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Function  to delete payment processor
    *
-   * @param  int  $paymentProcessorId     ID of the processor to be deleted.
+   * @param $paymentProcessorID
+   *
+   * @return null
+   * @internal param int $paymentProcessorId ID of the processor to be deleted.
    *
    * @access public
    * @static
@@ -270,10 +273,11 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Function to retrieve payment processor id / info/ object based on component-id.
    *
-   * @param int    $componentID id of a component
-   * @param string $component   component
-   * @param string $type        type of payment information to be retrieved
+   * @param $entityID
+   * @param string $component component
+   * @param string $type type of payment information to be retrieved
    *
+   * @internal param int $componentID id of a component
    * @return id / array / object based on type
    * @static
    * @access public

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * The default values in general, should reflect production values (minimizes chances of screwing up)
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,6 +40,7 @@ require_once 'Log.php';
 require_once 'Mail.php';
 
 require_once 'api/api.php';
+
 class CRM_Core_Config extends CRM_Core_Config_Variables {
   ///
   /// BASE SYSTEM PROPERTIES (CIVICRM.SETTINGS.PHP)
@@ -47,42 +48,50 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
   /**
    * the dsn of the database connection
+   *
    * @var string
    */
   public $dsn;
 
   /**
    * the name of user framework
+   *
    * @var string
    */
   public $userFramework = 'Drupal';
 
   /**
    * the name of user framework url variable name
+   *
    * @var string
    */
   public $userFrameworkURLVar = 'q';
 
   /**
    * the dsn of the database connection for user framework
+   *
    * @var string
    */
   public $userFrameworkDSN = NULL;
 
   /**
    * The connector module for the CMS/UF
+   * @todo Introduce an interface.
    *
-   * @var CRM_Util_System_{$uf}
+   * @var CRM_Utils_System_Base
    */
   public $userSystem = NULL;
 
   /**
-   * The root directory where Smarty should store
-   * compiled files
+   * The root directory where Smarty should store compiled files
+   *
    * @var string
    */
   public $templateCompileDir = './templates_c/en_US/';
 
+  /**
+   * @var string
+   */
   public $configAndLogDir = NULL;
 
   // END: BASE SYSTEM PROPERTIES (CIVICRM.SETTINGS.PHP)
@@ -93,12 +102,19 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
   /**
    * are we initialized and in a proper state
+   *
    * @var string
    */
   public $initialized = 0;
 
   /**
+   * @var string
+   */
+  public $customPHPPathDir;
+
+  /**
    * the factory class used to instantiate our DB objects
+   *
    * @var string
    */
   private $DAOFactoryClass = 'CRM_Contact_DAO_Factory';
@@ -111,6 +127,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
   /**
    * the handle on the mail handler that we are using
+   *
    * @var object
    */
   public static $_mail = NULL;
@@ -118,13 +135,13 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   /**
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
-   * @var object
-   * @static
+   *
+   * @var CRM_Core_Config
    */
   private static $_singleton = NULL;
 
   /**
-   * component registry object (of CRM_Core_Component type)
+   * @var CRM_Core_Component
    */
   public $componentRegistry = NULL;
 
@@ -137,7 +154,9 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   ///
 
   /**
-   * to determine wether the call is from cms or civicrm
+   * @var bool
+   *   TRUE, if the call is CiviCRM.
+   *   FALSE, if the call is from the CMS.
    */
   public $inCiviCRM = FALSE;
 
@@ -146,17 +165,13 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   ///
 
   /**
-   *  Define recaptcha key
+   * @var string
    */
-
   public $recaptchaPublicKey;
 
   /**
    * The constructor. Sets domain id if defined, otherwise assumes
    * single instance installation.
-   *
-   * @return void
-   * @access private
    */
   private function __construct() {
   }
@@ -167,14 +182,14 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * @param $loadFromDB boolean  whether to load from the database
    * @param $force      boolean  whether to force a reconstruction
    *
-   * @return object
+   * @return CRM_Core_Config
    * @static
    */
   static function &singleton($loadFromDB = TRUE, $force = FALSE) {
     if (self::$_singleton === NULL || $force) {
       // goto a simple error handler
-      $GLOBALS['_PEAR_default_error_mode'] = PEAR_ERROR_CALLBACK;
-      $GLOBALS['_PEAR_default_error_options'] = array('CRM_Core_Error', 'simpleHandler');
+      $GLOBALS['civicrm_default_error_scope'] = CRM_Core_TemporaryErrorScope::create(array('CRM_Core_Error', 'handle'));
+      $errorScope = CRM_Core_TemporaryErrorScope::create(array('CRM_Core_Error', 'simpleHandler'));
 
       // lets ensure we set E_DEPRECATED to minimize errors
       // CRM-6327
@@ -226,7 +241,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
       // set the callback at the very very end, to avoid an infinite loop
       // set the error callback
-      CRM_Core_Error::setCallback();
+      unset($errorScope);
 
       // call the hook so other modules can add to the config
       // again doing this at the very very end
@@ -242,11 +257,17 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
           array(1 => array($userID, 'Integer'))
         );
       }
+
+      // initialize authentication source
+      self::$_singleton->initAuthSrc();
     }
     return self::$_singleton;
   }
 
-
+  /**
+   * @param string $userFramework
+   *   One of 'Drupal', 'Joomla', etc.
+   */
   private function _setUserFrameworkConfig($userFramework) {
 
     $this->userFrameworkClass = 'CRM_Utils_System_' . $userFramework;
@@ -256,7 +277,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
     $class = $this->userFrameworkClass;
     // redundant with _initVariables
-    $userSystem = $this->userSystem = new $class();
+    $this->userSystem = new $class();
 
     if ($userFramework == 'Joomla') {
       $this->userFrameworkURLVar = 'task';
@@ -287,9 +308,10 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       $this->cleanURL = 0;
     }
 
-    $this->userFrameworkVersion = $userSystem->getVersion();
+    $this->userFrameworkVersion = $this->userSystem->getVersion();
 
     if ($userFramework == 'Joomla') {
+      /** @var object|null $mainframe */
       global $mainframe;
       $dbprefix = $mainframe ? $mainframe->getCfg('dbprefix') : 'jos_';
       $this->userFrameworkUsersTableName = $dbprefix . 'users';
@@ -306,8 +328,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * Reads constants defined in civicrm.settings.php and
    * stores them in config properties.
    *
-   * @return void
-   * @access public
+   * @param bool $loadFromDB
    */
   private function _initialize($loadFromDB = TRUE) {
 
@@ -332,6 +353,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
         CRM_Utils_File::baseFilePath($this->templateCompileDir) .
         'ConfigAndLog' . DIRECTORY_SEPARATOR;
       CRM_Utils_File::createDir($this->configAndLogDir);
+      CRM_Utils_File::restrictAccess($this->configAndLogDir);
 
       // we're automatically prefixing compiled templates directories with country/language code
       global $tsLocale;
@@ -343,6 +365,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       }
 
       CRM_Utils_File::createDir($this->templateCompileDir);
+      CRM_Utils_File::restrictAccess($this->templateCompileDir);
     }
     elseif ($loadFromDB) {
       echo 'You need to define CIVICRM_TEMPLATE_COMPILEDIR in civicrm.settings.php';
@@ -463,6 +486,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
         if (substr($this->templateCompileDir, -1 * strlen($value) - 1, -1) != $value) {
           $this->templateCompileDir .= CRM_Utils_File::addTrailingSlash($value);
           CRM_Utils_File::createDir($this->templateCompileDir);
+          CRM_Utils_File::restrictAccess($this->templateCompileDir);
         }
       }
 
@@ -600,13 +624,11 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * delete the web server writable directories
+   * Deletes the web server writable directories
    *
-   * @param int $value 1 - clean templates_c, 2 - clean upload, 3 - clean both
-   *
-   * @access public
-   *
-   * @return void
+   * @param int $value
+   *   1: clean templates_c, 2: clean upload, 3: clean both
+   * @param bool $rmdir
    */
   public function cleanup($value, $rmdir = TRUE) {
     $value = (int ) $value;
@@ -620,7 +642,14 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       // clean upload dir
       CRM_Utils_File::cleanDir($this->uploadDir);
       CRM_Utils_File::createDir($this->uploadDir);
-      CRM_Utils_File::restrictAccess($this->uploadDir);
+    }
+
+    // Whether we delete/create or simply preserve directories, we should
+    // certainly make sure the restrictions are enforced.
+    foreach (array($this->templateCompileDir, $this->uploadDir, $this->configAndLogDir, $this->customFileUploadDir) as $dir) {
+      if ($dir && is_dir($dir)) {
+        CRM_Utils_File::restrictAccess($dir);
+      }
     }
   }
 
@@ -650,6 +679,17 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   function reset() {
     $query = "UPDATE civicrm_domain SET config_backend = null";
     CRM_Core_DAO::executeQuery($query);
+  }
+
+  // This method should initialize auth sources
+  function initAuthSrc() {
+    $session = CRM_Core_Session::singleton();
+    if ($session->get('userID') && !$session->get('authSrc')) {
+      $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_LOGIN);
+    }
+
+    // checksum source
+    CRM_Contact_BAO_Contact_Permission::initChecksumAuthSrc();
   }
 
   /**

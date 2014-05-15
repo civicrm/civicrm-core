@@ -105,12 +105,12 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
     ),
     // prefix_id 2 = 'Ms.'
     array(
-      'fv' => array('individual_prefix' => 2),
+      'fv' => array('prefix_id' => 2),
       'id' => array('10', '13'),
     ),
     // suffix_id 6 = 'V'
     array(
-      'fv' => array('individual_suffix' => 6),
+      'fv' => array('suffix_id' => 6),
       'id' => array('16', '19', '20', '21'),
     ),
   );

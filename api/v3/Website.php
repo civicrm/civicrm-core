@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Website
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Website.php 2011-03-16 ErikHommel $
  */
 
@@ -43,6 +43,8 @@
  * {@getfields website_create}
  * @example WebsiteCreate.php
  * {@example WebsiteCreate.php}
+ *
+ * @param $params
  *
  * @return array of newly created website property values.
  * @access public
@@ -109,6 +111,6 @@ function civicrm_api3_website_delete($params) {
  * @access public
  */
 function civicrm_api3_website_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'website');
 }
 

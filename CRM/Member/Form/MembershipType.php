@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -61,15 +61,10 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
-
-    // get the member org display name
-    if ( $this->_id && CRM_Utils_Array::value('member_of_contact_id', $defaults)) {
-      $this->assign('member_org_id', $defaults['member_of_contact_id']);
-    }
 
     //finding default weight to be put
     if (!isset($defaults['weight']) || (!$defaults['weight'])) {
@@ -113,7 +108,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -137,27 +132,17 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
     );
     $this->addRule('minimum_fee', ts('Please enter a monetary value for the Minimum Fee.'), 'money');
 
-    $this->addElement('select', 'duration_unit', ts('Duration'), CRM_Core_SelectValues::unitList('duration'));
+    $this->addSelect('duration_unit', array('placeholder' => NULL), TRUE);
 
     //period type
-    $this->addElement('select', 'period_type', ts('Period Type'), CRM_Core_SelectValues::periodType());
+    $this->addSelect('period_type', array(), TRUE);
 
     $this->add('text', 'duration_interval', ts('Duration Interval'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'duration_interval')
     );
 
-    $dataUrl = CRM_Utils_System::url(
-      "civicrm/ajax/rest",
-      "className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=membershipType&reset=1&org=1",
-      FALSE, NULL, FALSE
-    );
-    $this->assign('dataUrl', $dataUrl);
-
-    $memberOrg = &$this->add('text', 'member_of_contact', ts('Membership Organization'), NULL, TRUE);
-    $this->add('hidden', 'member_of_contact_id', '', array('id' => 'member_of_contact_id'));
-    if ($memberOrg->getValue()) {
-      $this->assign('member_org', $memberOrg->getValue());
-    }
+    $props = array('api' => array('params' => array('contact_type' => 'Organization')));
+    $this->addEntityRef('member_of_contact_id', ts('Membership Organization'), $props, TRUE);
 
     //start day
     $this->add('date', 'fixed_period_start_day', ts('Fixed Period Start Day'),
@@ -185,7 +170,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
     );
 
     $this->add('select', 'financial_type_id', ts( 'Financial Type' ),
-      array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType()
+      array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType(), TRUE, array('class' => 'crm-select2')
     );
 
     $relTypeInd = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, NULL, TRUE);
@@ -196,7 +181,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
       array('' => ts('- select -')) + $relTypeInd);
     $memberRel->setMultiple(TRUE);
 
-    $this->add('select', 'visibility', ts('Visibility'), CRM_Core_SelectValues::memberVisibility());
+    $this->addSelect('visibility', array('placeholder' => NULL, 'option_url' => NULL));
     $this->add('text', 'weight', ts('Order'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'weight')
     );
@@ -239,20 +224,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
       $errors['name'] = ts('Please enter a membership type name.');
     }
 
-    if ($params['member_of_contact'] && !is_numeric($params['member_of_contact_id'])) {
-      $errors['member_of_contact'] = ts('Please select valid organization contact.');
-    }
-
-    if (empty( $params['financial_type_id'] ) ) {
-      $errors['financial_type_id'] = ts('Please enter a financial type.');
-    }
-
     if (($params['minimum_fee'] > 0 ) && !$params['financial_type_id'] ) {
       $errors['financial_type_id'] = ts('Please enter the financial type.');
-    }
-
-    if (empty($params['duration_unit'])) {
-      $errors['duration_unit'] = ts('Please enter a duration unit.');
     }
 
     if (empty($params['duration_interval']) and $params['duration_unit'] != 'lifetime') {
@@ -266,10 +239,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
       ) {
         $errors['duration_unit'] = ts('Automatic renewals are not supported by the currently available payment processors when the membership duration is greater than 1 year / 12 months.');
       }
-    }
-
-    if (empty($params['period_type'])) {
-      $errors['period_type'] = ts('Please select a period type.');
     }
 
     if ($params['period_type'] == 'fixed' &&
@@ -321,7 +290,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -398,13 +367,11 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
 
       $periods = array('fixed_period_start_day', 'fixed_period_rollover_day');
       foreach ($periods as $per) {
-        if (CRM_Utils_Array::value('M', $params[$per]) &&
-          CRM_Utils_Array::value('d', $params[$per])
-        ) {
+        if (!empty($params[$per]['M']) && !empty($params[$per]['d'])) {
           $mon          = $params[$per]['M'];
           $dat          = $params[$per]['d'];
-          $mon          = ($mon < 9) ? '0' . $mon : $mon;
-          $dat          = ($dat < 9) ? '0' . $dat : $dat;
+          $mon          = ($mon < 10) ? '0' . $mon : $mon;
+          $dat          = ($dat < 10) ? '0' . $dat : $dat;
           $params[$per] = $mon . $dat;
         }
         else if($per == 'fixed_period_rollover_day' && !empty($params['month_fixed_period_rollover_day'])){

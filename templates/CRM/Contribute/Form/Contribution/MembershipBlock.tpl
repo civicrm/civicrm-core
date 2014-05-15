@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -91,7 +91,7 @@
 </div>
 {literal}
 <script type="text/javascript">
-cj(function(){
+CRM.$(function($) {
     //if price set is set we use below below code to show for showing auto renew
     var autoRenewOption =  {/literal}'{$autoRenewOption}'{literal};
     cj('#allow_auto_renew').hide();
@@ -99,7 +99,7 @@ cj(function(){
         cj('#allow_auto_renew').show();
     } else if ( autoRenewOption == 2 ) {
         var autoRenew = cj("#auto_renew");
-        autoRenew.attr( 'checked',  true );
+        autoRenew.prop('checked',  true );
         autoRenew.attr( 'readonly', true );
         cj('#allow_auto_renew').show();
     }
@@ -240,7 +240,7 @@ cj(function(){
 {if $membershipBlock AND $quickConfig}
 {literal}
 <script type="text/javascript">
-cj(function(){
+CRM.$(function($) {
     showHideAutoRenew( null );
 });
 function showHideAutoRenew( memTypeId )
@@ -272,7 +272,7 @@ function showHideAutoRenew( memTypeId )
   }
 
   var autoRenew = cj("#auto_renew");
-  if ( considerUserInput ) isChecked = autoRenew.attr( 'checked' );
+  if ( considerUserInput ) isChecked = autoRenew.prop('checked' );
 
   //its a normal recur contribution.
   if ( cj( "is_recur" ) &&
@@ -286,16 +286,16 @@ function showHideAutoRenew( memTypeId )
   if ( readOnly && funName == 'show();' ) isChecked = true;
 
   autoRenew.attr( 'readonly', readOnly );
-  autoRenew.attr( 'checked',  isChecked );
+  autoRenew.prop('checked',  isChecked );
   eval( "cj('#allow_auto_renew')." + funName );
 }
 
 {/literal}{if $allowAutoRenewMembership}{literal}
-  cj( function( ) {
+  CRM.$(function($) {
      //keep read only always checked.
      cj( "#auto_renew" ).click(function( ) {
         if ( cj(this).attr( 'readonly' ) ) {
-            cj(this).attr( 'checked', true );
+            cj(this).prop('checked', true );
         }
      });
   });

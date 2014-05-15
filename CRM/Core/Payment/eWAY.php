@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | eWAY Core Payment Module for CiviCRM version 4.4 & 1.9             |
+ | eWAY Core Payment Module for CiviCRM version 4.5 & 1.9             |
  +--------------------------------------------------------------------+
  | Licensed to CiviCRM under the Academic Free License version 3.0    |
  |                                                                    |
@@ -108,8 +108,10 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
-   **********************************************************/
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_eWAY *******************************************************
+   */
   function __construct($mode, &$paymentProcessor) {
     // require Standaard eWAY API libraries
     require_once 'eWAY/eWAY_GatewayRequest.php';
@@ -126,11 +128,14 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param object $paymentProcessor
+   * @param null $paymentForm
+   * @param bool $force
+   *
    * @return object
    * @static
-   *
    */
-  static function &singleton($mode, &$paymentProcessor) {
+  static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = false) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
       self::$_singleton[$processorName] = new CRM_Core_Payment_eWAY($mode, $paymentProcessor);
@@ -472,13 +477,15 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    * NOTE: Called by Events and Contribute to check config params are set prior to trying
    *       register any credit card details
    *
-   * @param string $mode the mode we are operating in (live or test) - not used but could be
+   * @return null|string
+   * @internal param string $mode the mode we are operating in (live or test) - not used but could be
    * to check that the 'test' mode CustomerID was equal to '87654321' and that the URL was
    * set to https://www.eway.com.au/gateway_cvn/xmltest/TestPage.asp
    *
    * returns string $errorMsg if any errors found - null if OK
    *
-   ********************************************************************************************/
+   ******************************************************************************************
+   */
   //function checkConfig( $mode )          // CiviCRM V1.9 Declaration
   // CiviCRM V2.0 Declaration
   function checkConfig() {

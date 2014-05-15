@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -50,6 +50,8 @@ class CRM_Mailing_BAO_Query {
   /**
    * if mailings are involved, add the specific Mailing fields
    *
+   * @param $query
+   *
    * @return void
    * @access public
    */
@@ -66,19 +68,19 @@ class CRM_Mailing_BAO_Query {
       $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
 
       // get mailing name
-      if (CRM_Utils_Array::value('mailing_name', $query->_returnProperties)) {
+      if (!empty($query->_returnProperties['mailing_name'])) {
         $query->_select['mailing_name']  = "civicrm_mailing.name as mailing_name";
         $query->_element['mailing_name'] = 1;
       }
 
       // get mailing subject
-      if (CRM_Utils_Array::value('mailing_subject', $query->_returnProperties)) {
+      if (!empty($query->_returnProperties['mailing_subject'])) {
         $query->_select['mailing_subject']  = "civicrm_mailing.subject as mailing_subject";
         $query->_element['mailing_subject'] = 1;
       }
 
       // get mailing status
-      if (CRM_Utils_Array::value('mailing_job_status', $query->_returnProperties)) {
+      if (!empty($query->_returnProperties['mailing_job_status'])) {
         $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] =
           " LEFT JOIN civicrm_mailing_job ON civicrm_mailing_job.mailing_id = civicrm_mailing.id AND civicrm_mailing_job.parent_id IS NULL AND civicrm_mailing_job.is_test != 1 ";
         $query->_select['mailing_job_status']  = "civicrm_mailing_job.status as mailing_job_status";
@@ -86,34 +88,34 @@ class CRM_Mailing_BAO_Query {
       }
 
       // get email on hold
-      if (CRM_Utils_Array::value('email_on_hold', $query->_returnProperties)) {
+      if (!empty($query->_returnProperties['email_on_hold'])) {
         $query->_select['email_on_hold'] = "recipient_email.on_hold as email_on_hold";
         $query->_element['email_on_hold'] = 1;
         $query->_tables['recipient_email'] = $query->_whereTables['recipient_email'] = 1;
       }
 
       // get recipient email
-      if (CRM_Utils_Array::value('email', $query->_returnProperties)) {
+      if (!empty($query->_returnProperties['email'])) {
         $query->_select['email'] = "recipient_email.email as email";
         $query->_element['email'] = 1;
         $query->_tables['recipient_email'] = $query->_whereTables['recipient_email'] = 1;
       }
 
       // get user opt out
-      if (CRM_Utils_Array::value('contact_opt_out', $query->_returnProperties)) {
+      if (!empty($query->_returnProperties['contact_opt_out'])) {
         $query->_select['contact_opt_out'] = "contact_a.is_opt_out as contact_opt_out";
         $query->_element['contact_opt_out'] = 1;
       }
 
       // mailing job end date / completed date
-      if (CRM_Utils_Array::value('mailing_job_end_date', $query->_returnProperties)) {
+      if (!empty($query->_returnProperties['mailing_job_end_date'])) {
         $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] =
           " LEFT JOIN civicrm_mailing_job ON civicrm_mailing_job.mailing_id = civicrm_mailing.id AND civicrm_mailing_job.parent_id IS NULL AND civicrm_mailing_job.is_test != 1 ";
         $query->_select['mailing_job_end_date']  = "civicrm_mailing_job.end_date as mailing_job_end_date";
         $query->_element['mailing_job_end_date'] = 1;
       }
 
-      if (CRM_Utils_Array::value('mailing_recipients_id', $query->_returnProperties)) {
+      if (!empty($query->_returnProperties['mailing_recipients_id'])) {
         $query->_select['mailing_recipients_id'] = " civicrm_mailing_recipients.id as mailing_recipients_id";
         $query->_element['mailing_recipients_id'] = 1;
       }
@@ -123,7 +125,7 @@ class CRM_Mailing_BAO_Query {
   static function where(&$query) {
     $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
-      if (!CRM_Utils_Array::value(0, $query->_params[$id])) {
+      if (empty($query->_params[$id][0])) {
         continue;
       }
       if (substr($query->_params[$id][0], 0, 8) == 'mailing_') {
@@ -354,6 +356,7 @@ class CRM_Mailing_BAO_Query {
    *
    * @access public
    *
+   * @param $form CRM_Core_Form
    * @return void
    * @static
    */
@@ -363,7 +366,7 @@ class CRM_Mailing_BAO_Query {
 
     if (!empty($mailings)) {
       $form->add('select', 'mailing_id', ts('Mailing Name(s)'), $mailings, FALSE,
-        array('id' => 'mailing_id', 'multiple' => 'multiple', 'title' => ts('- select -'))
+        array('id' => 'mailing_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
       );
     }
 
@@ -383,66 +386,26 @@ class CRM_Mailing_BAO_Query {
       array('keyColumn' => 'id', 'labelColumn' => 'name')
     );
     $form->add('select', 'mailing_bounce_types', ts('Bounce Types'), $mailingBounceTypes, FALSE,
-      array('id' => 'mailing_bounce_types', 'multiple' => 'multiple', 'title' => ts('- select -'))
+      array('id' => 'mailing_bounce_types', 'multiple' => 'multiple', 'class' => 'crm-select2')
     );
 
     // event filters
-    $form->addRadio('mailing_delivery_status', ts('Delivery Status'), CRM_Mailing_PseudoConstant::yesNoOptions('delivered'));
-    $form->addRadio('mailing_open_status', ts('Trackable Opens'), CRM_Mailing_PseudoConstant::yesNoOptions('open'));
-    $form->addRadio('mailing_click_status', ts('Trackable URLs'), CRM_Mailing_PseudoConstant::yesNoOptions('click'));
-    $form->addRadio('mailing_reply_status', ts('Trackable Replies'), CRM_Mailing_PseudoConstant::yesNoOptions('reply'));
+    $form->addRadio('mailing_delivery_status', ts('Delivery Status'), CRM_Mailing_PseudoConstant::yesNoOptions('delivered'), array('allowClear' => TRUE));
+    $form->addRadio('mailing_open_status', ts('Trackable Opens'), CRM_Mailing_PseudoConstant::yesNoOptions('open'), array('allowClear' => TRUE));
+    $form->addRadio('mailing_click_status', ts('Trackable URLs'), CRM_Mailing_PseudoConstant::yesNoOptions('click'), array('allowClear' => TRUE));
+    $form->addRadio('mailing_reply_status', ts('Trackable Replies'), CRM_Mailing_PseudoConstant::yesNoOptions('reply'), array('allowClear' => TRUE));
 
     $form->add('checkbox', 'mailing_unsubscribe', ts('Unsubscribe Requests'));
     $form->add('checkbox', 'mailing_optout', ts('Opt-out Requests'));
     $form->add('checkbox', 'mailing_forward', ts('Forwards'));
 
     $form->assign('validCiviMailing', TRUE);
-    $form->addFormRule(array('CRM_Mailing_BAO_Query', 'formRule'), $form);
-  }
-
-  /**
-   * global form rule
-   *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
-   *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
-   */
-  static function formRule($fields, $files, $self) {
-    $errors = array();
-    // if an event filter is specified, then a mailing selector must also be specified
-    if ((CRM_Utils_Array::value('mailing_delivery_status', $fields) ||
-        CRM_Utils_Array::value('mailing_open_status', $fields) ||
-        CRM_Utils_Array::value('mailing_click_status', $fields) ||
-        CRM_Utils_Array::value('mailing_reply_status', $fields) ||
-        CRM_Utils_Array::value('mailing_bounce_types', $fields)
-      ) &&
-      (!CRM_Utils_Array::value('mailing_id', $fields) &&
-        !CRM_Utils_Array::value('mailing_date_low', $fields) &&
-        !CRM_Utils_Array::value('mailing_date_high', $fields)
-      )
-    ) {
-      $errors['mailing_id'] = ts('Must specify mailing name or date');
-      // Keep search form opened in case of form rule.
-      if (is_a($self, 'CRM_Contact_Form_Search_Advanced') && !isset(CRM_Contact_BAO_Query::$_openedPanes['Mailings'])) {
-        CRM_Contact_BAO_Query::$_openedPanes['Mailings'] = TRUE;
-        $self->assign('openedPanes', CRM_Contact_BAO_Query::$_openedPanes);
-      }
-    }
-    return $errors;
-  }
-
-  static function addShowHide(&$showHide) {
-    $showHide->addHide('MailingForm');
-    $showHide->addShow('MailingForm_show');
   }
 
   static function searchAction(&$row, $id) {}
 
-  static function tableNames(&$tables) {}
+  static function tableNames(&$tables) {
+  }
 
   /**
    * Filter query results based on which contacts do (not) have a particular mailing event in their history.
@@ -452,6 +415,8 @@ class CRM_Mailing_BAO_Query {
    * @param $tableName
    * @param $fieldName
    * @param $fieldTitle
+   *
+   * @param $valueTitles
    *
    * @return void
    */
@@ -478,6 +443,7 @@ class CRM_Mailing_BAO_Query {
       $query->_qill[$grouping][] = $fieldTitle . ' - ' . $valueTitles[$value];
     }
 
+    $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
     $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] = 1;
     $query->_tables['civicrm_mailing_event_queue'] = $query->_whereTables['civicrm_mailing_event_queue'] = 1;
     $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;

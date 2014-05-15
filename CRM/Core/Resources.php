@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,7 +37,7 @@
  * should incorporte services for aggregation, minimization, etc.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -95,6 +95,11 @@ class CRM_Core_Resources {
   protected $cacheCodeKey = NULL;
 
   /**
+   * @var bool
+   */
+  public $ajaxPopupsEnabled;
+
+  /**
    * Get or set the single instance of CRM_Core_Resources
    *
    * @param $instance CRM_Core_Resources, new copy of the manager
@@ -123,6 +128,8 @@ class CRM_Core_Resources {
    * Construct a resource manager
    *
    * @param CRM_Extension_Mapper $extMapper Map extension names to their base path or URLs.
+   * @param $cache
+   * @param null $cacheCodeKey
    */
   public function __construct($extMapper, $cache, $cacheCodeKey = NULL) {
     $this->extMapper = $extMapper;
@@ -134,6 +141,9 @@ class CRM_Core_Resources {
     if (!$this->cacheCode) {
       $this->resetCacheCode();
     }
+    $this->ajaxPopupsEnabled = (bool) CRM_Core_BAO_Setting::getItem(
+      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajaxPopupsEnabled', NULL, TRUE
+    );
   }
 
   /**
@@ -150,6 +160,13 @@ class CRM_Core_Resources {
   public function addScriptFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION, $translate = TRUE) {
     if ($translate) {
       $this->translateScript($ext, $file);
+    }
+    // Look for non-minified version if we are in debug mode
+    if (CRM_Core_Config::singleton()->debug && strpos($file, '.min.js') !== FALSE) {
+      $nonMiniFile = str_replace('.min.js', '.js', $file);
+      if ($this->getPath($ext, $nonMiniFile)) {
+        $file = $nonMiniFile;
+      }
     }
     return $this->addScriptUrl($this->getUrl($ext, $file, TRUE), $weight, $region);
   }
@@ -369,7 +386,7 @@ class CRM_Core_Resources {
    * @param $ext string, extension name; use 'civicrm' for core
    * @param $file string, file path -- relative to the extension base dir
    *
-   * @return (string|bool), full file path or FALSE if not found
+   * @return bool|string (string|bool), full file path or FALSE if not found
    */
   public function getPath($ext, $file) {
     // TODO consider caching results
@@ -385,6 +402,8 @@ class CRM_Core_Resources {
    *
    * @param $ext string, extension name; use 'civicrm' for core
    * @param $file string, file path -- relative to the extension base dir
+   * @param bool $addCacheCode
+   *
    * @return string, URL
    */
   public function getUrl($ext, $file = NULL, $addCacheCode = FALSE) {
@@ -420,6 +439,7 @@ class CRM_Core_Resources {
    * TODO: Separate the functional code (like addStyle/addScript) from the policy code
    * (like addCoreResources/addCoreStyles).
    *
+   * @param string $region
    * @return CRM_Core_Resources
    * @access public
    */
@@ -428,35 +448,25 @@ class CRM_Core_Resources {
       $this->addedCoreResources[$region] = TRUE;
       $config = CRM_Core_Config::singleton();
 
-      // Add resources from jquery.files.tpl
-      $files = self::parseTemplate('CRM/common/jquery.files.tpl');
+      // Add resources from coreResourceList
       $jsWeight = -9999;
-      foreach ($files as $file => $type) {
-        if ($type == 'js') {
+      foreach ($this->coreResourceList() as $file) {
+        if (substr($file, -2) == 'js') {
           // Don't bother  looking for ts() calls in packages, there aren't any
           $translate = (substr($file, 0, 9) != 'packages/');
           $this->addScriptFile('civicrm', $file, $jsWeight++, $region, $translate);
         }
-        elseif ($type == 'css') {
+        else {
           $this->addStyleFile('civicrm', $file, -100, $region);
-        }
-      }
-
-      // Add localized calendar js
-      // Search for i18n file in order of specificity (try fr-CA, then fr)
-      list($lang) = explode('_', $config->lcMessages);
-      foreach (array(str_replace('_', '-', $config->lcMessages), $lang) as $language) {
-        $localizationFile = "packages/jquery/jquery-ui-1.9.0/development-bundle/ui/i18n/jquery.ui.datepicker-{$language}.js";
-        if ($this->getPath('civicrm', $localizationFile)) {
-          $this->addScriptFile('civicrm', $localizationFile, $jsWeight++, $region, FALSE);
-          break;
         }
       }
 
       // Initialize CRM.url and CRM.formatMoney
       $url = CRM_Utils_System::url('civicrm/example', 'placeholder', FALSE, NULL, FALSE);
       $js = "CRM.url('init', '$url');\n";
-      $js .= "CRM.formatMoney('init', '" . CRM_Utils_Money::format(1234.56) . "');";
+      $js .= "CRM.formatMoney('init', " . json_encode(CRM_Utils_Money::format(1234.56)) . ");";
+
+      $this->addLocalization($js);
       $this->addScript($js, $jsWeight++, $region);
 
       // Add global settings
@@ -464,6 +474,7 @@ class CRM_Core_Resources {
         'userFramework' => $config->userFramework,
         'resourceBase' => $config->resourceBase,
         'lcMessages' => $config->lcMessages,
+        'ajaxPopupsEnabled' => $this->ajaxPopupsEnabled,
       );
       $this->addSetting(array('config' => $settings));
 
@@ -491,11 +502,10 @@ class CRM_Core_Resources {
       // Load custom or core css
       $config = CRM_Core_Config::singleton();
       if (!empty($config->customCSSURL)) {
-        $this->addStyleUrl($config->customCSSURL, -99, $region);
+        $this->addStyleUrl($config->customCSSURL, 99, $region);
       }
-      else {
+      if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'disable_core_css')) {
         $this->addStyleFile('civicrm', 'css/civicrm.css', -99, $region);
-        $this->addStyleFile('civicrm', 'css/extras.css', -98, $region);
       }
     }
     return $this;
@@ -535,20 +545,96 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Read resource files from a template
-   *
-   * @param $tpl (str) template file name
-   * @return array: filename => filetype
+   * Add inline scripts needed to localize js widgets
+   * @param string $js
    */
-  static function parseTemplate($tpl) {
-    $items = array();
-    $template = CRM_Core_Smarty::singleton();
-    $buffer = $template->fetch($tpl);
-    $lines = preg_split('/\s+/', $buffer);
-    foreach ($lines as $line) {
-      $line = trim($line);
-      if ($line) {
-        $items[$line] = substr($line, 1 + strrpos($line, '.'));
+  function addLocalization(&$js) {
+    $config = CRM_Core_Config::singleton();
+
+    // Localize select2 strings
+    $contactSearch = json_encode($config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...'));
+    $otherSearch = json_encode(ts('Enter search term...'));
+    $js .= "
+      $.fn.select2.defaults.formatNoMatches = " . json_encode(ts("None found.")) . ";
+      $.fn.select2.defaults.formatLoadMore = " . json_encode(ts("Loading...")) . ";
+      $.fn.select2.defaults.formatSearching = " . json_encode(ts("Searching...")) . ";
+      $.fn.select2.defaults.formatInputTooShort = function(){return CRM.$(this).data('api-entity') == 'contact' ? $contactSearch : $otherSearch};
+    ";
+
+    // Contact create profiles with localized names
+    if (CRM_Core_Permission::check('edit all contacts') || CRM_Core_Permission::check('add contacts')) {
+      $this->addSetting(array('profile' => array('contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks())));
+    }
+  }
+
+  /**
+   * List of core resources we add to every CiviCRM page
+   *
+   * @return array
+   */
+  public function coreResourceList() {
+    $config = CRM_Core_Config::singleton();
+    // Use minified files for production, uncompressed in debug mode
+    // Note, $this->addScriptFile would automatically search for the non-minified file in debug mode but this is probably faster
+    $min = $config->debug ? '' : '.min';
+
+    // Scripts needed by everyone, everywhere
+    // FIXME: This is too long; list needs finer-grained segmentation
+    $items = array(
+      "packages/jquery/jquery-1.11.0$min.js",
+      "packages/jquery/jquery-ui/js/jquery-ui-1.10.4.custom$min.js",
+      "packages/jquery/jquery-ui/css/theme/jquery-ui-1.10.4.custom$min.css",
+
+      "packages/backbone/lodash.compat$min.js",
+
+      "packages/jquery/plugins/jquery.mousewheel$min.js",
+
+      "packages/jquery/plugins/select2/select2$min.js",
+      "packages/jquery/plugins/select2/select2.css",
+
+      "packages/jquery/plugins/jquery.tableHeader.js",
+
+      "packages/jquery/plugins/jquery.textarearesizer.js",
+
+      "packages/jquery/plugins/jquery.form$min.js",
+
+      "packages/jquery/plugins/jquery.timeentry$min.js",
+
+      "packages/jquery/plugins/DataTables/media/js/jquery.dataTables$min.js",
+
+      "packages/jquery/plugins/jquery.validate$min.js",
+      "packages/jquery/plugins/jquery.ui.datepicker.validation.pack.js",
+
+      "js/Common.js",
+      "js/crm.ajax.js",
+    );
+
+    // These scripts are only needed by back-office users
+    if (CRM_Core_Permission::check('access CiviCRM')) {
+      $items[] = "packages/jquery/plugins/jquery.menu$min.js";
+      $items[] = "packages/jquery/css/menu.css";
+      $items[] = "packages/jquery/plugins/jquery.jeditable$min.js";
+      $items[] = "packages/jquery/plugins/jquery.blockUI$min.js";
+      $items[] = "packages/jquery/plugins/jquery.notify$min.js";
+      $items[] = "js/jquery/jquery.crmeditable.js";
+    }
+
+    // Enable administrators to edit option lists in a dialog
+    if (CRM_Core_Permission::check('administer CiviCRM') && $this->ajaxPopupsEnabled) {
+      $items[] = "js/crm.optionEdit.js";
+    }
+
+    // Add localized jQuery UI files
+    if ($config->lcMessages && $config->lcMessages != 'en_US') {
+      // Search for i18n file in order of specificity (try fr-CA, then fr)
+      list($lang) = explode('_', $config->lcMessages);
+      $path = "packages/jquery/jquery-ui/development-bundle/ui/" . ($min ? 'minified/' : '') . "i18n";
+      foreach (array(str_replace('_', '-', $config->lcMessages), $lang) as $language) {
+        $localizationFile = "$path/jquery.ui.datepicker-{$language}{$min}.js";
+        if ($this->getPath('civicrm', $localizationFile)) {
+          $items[] = $localizationFile;
+          break;
+        }
       }
     }
     return $items;

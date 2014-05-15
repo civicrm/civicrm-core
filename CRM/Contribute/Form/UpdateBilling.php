@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -109,7 +109,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     $this->assign('paymentProcessor', $this->_paymentProcessor);
 
     // get the billing location type
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
     $this->_bltID = array_search('Billing', $locationTypes);
     $this->assign('bltID', $this->_bltID);
     if (!$this->_bltID) {
@@ -163,7 +163,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
     $config = CRM_Core_Config::singleton();
     // set default country from config if no country set
-    if (!CRM_Utils_Array::value("billing_country_id-{$this->_bltID}", $this->_defaults)) {
+    if (empty($this->_defaults["billing_country_id-{$this->_bltID}"])) {
       $this->_defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
     }
 
@@ -176,7 +176,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -205,9 +205,11 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $self
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -317,7 +319,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
       // format new billing name
       $name = $processorParams['first_name'];
-      if (CRM_Utils_Array::value('middle_name', $processorParams)) {
+      if (!empty($processorParams['middle_name'])) {
         $name .= " {$processorParams['middle_name']}";
       }
       $name .= ' ' . $processorParams['last_name'];
@@ -326,7 +328,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
       // format old billing name
       $name = $this->_defaults['first_name'];
-      if (CRM_Utils_Array::value('middle_name', $this->_defaults)) {
+      if (!empty($this->_defaults['middle_name'])) {
         $name .= " {$this->_defaults['middle_name']}";
       }
       $name .= ' ' . $this->_defaults['last_name'];

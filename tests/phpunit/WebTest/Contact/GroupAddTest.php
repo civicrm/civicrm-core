@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -70,8 +70,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $params['name']);
     $this->click('_qf_Search_refresh');
-    $this->waitForVisible('crm-group-selector_processing');
-    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(text(), '{$params['name']}')]");
+    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(., '{$params['name']}')]");
     $createdBy = $this->getText("xpath=//table[@id='crm-group-selector']/tbody/tr/td[3]/a");
     $this->click("xpath=//table[@id='crm-group-selector']/tbody/tr/td[7]/span/a[2]");
     $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/table[2]/tbody/tr/td[2]/select");
@@ -92,11 +91,11 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->select("xpath=//select[@name='crm-group-selector_length']", '100');
     $this->waitForVisible('crm-group-selector_processing');
 
-    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody//tr/td[contains(text(), '{$params['name']}')]");
-    $this->assertTrue($this->isElementPresent("xpath=//table[@id='crm-group-selector']/tbody//tr/td[1][text()='{$params['name']}']/following-sibling::td[2]/a[text()='{$createdBy}']"));
+    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(., '{$params['name']}')]");
+    $this->assertTrue($this->isElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(., '{$params['name']}')]/following-sibling::td[2]/a[text()='{$createdBy}']"));
 
     //check link of the contact who created the group
-    $this->click("xpath=//table[@id='crm-group-selector']/tbody//tr/td[1][text()='{$params['name']}']/following-sibling::td[2]/a");
+    $this->click("xpath=//table[@id='crm-group-selector']/tbody//tr/td[1][contains(.,'{$params['name']}')]/following-sibling::td[2]/a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $name = explode(',', $createdBy);
     $name1 = isset($name[1]) ? trim($name[1]) : NULL;

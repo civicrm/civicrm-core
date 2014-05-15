@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -393,21 +393,21 @@ WHERE  email = %2
 
     $mailer = $config->getMailer();
 
-    PEAR::setErrorHandling(PEAR_ERROR_CALLBACK,
-      array('CRM_Core_Error', 'nullHandler')
-    );
     if (is_object($mailer)) {
+      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       $mailer->send($eq->email, $h, $b);
-      CRM_Core_Error::setCallback();
+      unset($errorScope);
     }
   }
 
   /**
    * Get row count for the event selector
    *
-   * @param int $mailing_id       ID of the mailing
-   * @param int $job_id           Optional ID of a job to filter on
-   * @param boolean $is_distinct  Group by queue ID?
+   * @param int $mailing_id ID of the mailing
+   * @param int $job_id Optional ID of a job to filter on
+   * @param boolean $is_distinct Group by queue ID?
+   *
+   * @param null $org_unsubscribe
    *
    * @return int                  Number of rows in result set
    * @access public
@@ -463,13 +463,14 @@ WHERE  email = %2
   /**
    * Get rows for the event browser
    *
-   * @param int $mailing_id       ID of the mailing
-   * @param int $job_id           optional ID of the job
-   * @param boolean $is_distinct  Group by queue id?
-   * @param int $offset           Offset
-   * @param int $rowCount         Number of rows
-   * @param array $sort           sort array
+   * @param int $mailing_id ID of the mailing
+   * @param int $job_id optional ID of the job
+   * @param boolean $is_distinct Group by queue id?
+   * @param int $offset Offset
+   * @param int $rowCount Number of rows
+   * @param array $sort sort array
    *
+   * @param null $org_unsubscribe
    * @return array                Result set
    * @access public
    * @static
@@ -528,6 +529,7 @@ WHERE  email = %2
     $orderBy = "sort_name ASC, {$unsub}.time_stamp DESC";
     if ($sort) {
       if (is_string($sort)) {
+        $sort = CRM_Utils_Type::escape($sort, 'String');
         $orderBy = $sort;
       }
       else {

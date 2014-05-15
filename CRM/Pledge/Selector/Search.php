@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -140,14 +140,16 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * Class constructor
    *
-   * @param array   $queryParams array of parameters for query
-   * @param int     $action - action of search basic or advanced.
-   * @param string  $additionalClause if the caller wants to further restrict the search (used in participations)
+   * @param array $queryParams array of parameters for query
+   * @param \const|int $action - action of search basic or advanced.
+   * @param string $additionalClause if the caller wants to further restrict the search (used in participations)
    * @param boolean $single are we dealing only with one contact?
-   * @param int     $limit  how many signers do we want returned
+   * @param int $limit how many signers do we want returned
    *
-   * @return CRM_Contact_Selector
-   * @access public
+   * @param string $context
+   *
+   * @return \CRM_Pledge_Selector_Search
+  @access public
    */
   function __construct(&$queryParams,
     $action           = CRM_Core_Action::NONE,
@@ -236,7 +238,10 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -329,7 +334,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
         $pledgeStatuses
       );
       // append (test) to status label
-      if (CRM_Utils_Array::value('pledge_is_test', $row)) {
+      if (!empty($row['pledge_is_test'])) {
         $row['pledge_status'] .= ' (test)';
       }
 
@@ -348,7 +353,12 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
           'id' => $result->pledge_id,
           'cid' => $result->contact_id,
           'cxt' => $this->_context,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'pledge.selector.row',
+        'Pledge',
+        $result->pledge_id
       );
 
 

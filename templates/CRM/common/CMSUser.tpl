@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -56,6 +56,7 @@
              <div class="content">
                {$form.cms_pass.html}
              </div>
+             <div class="clear"></div>
              <div class="label">
                <label for="crm_confirm_pass-section">{$form.cms_confirm_pass.label}</label>
              </div>

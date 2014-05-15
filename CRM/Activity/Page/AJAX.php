@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  *
  */
 
@@ -83,6 +83,8 @@ class CRM_Activity_Page_AJAX {
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
 
     $params = $_POST;
+    //CRM-14466 initialize variable to avoid php notice
+    $sortSQL = "";
     if ($sort && $sortOrder) {
       $sortSQL = $sort .' '.$sortOrder;
     }
@@ -196,7 +198,7 @@ class CRM_Activity_Page_AJAX {
 
     foreach ($caseRelationships as $key => $value) {
       //calculate roles that don't have relationships
-      if (CRM_Utils_Array::value($value['relation_type'], $caseRoles)) {
+      if (!empty($caseRoles[$value['relation_type']])) {
         //keep naming from careRoles array
         $caseRelationships[$key]['relation'] = $caseRoles[$value['relation_type']];
         unset($caseRoles[$value['relation_type']]);
@@ -209,6 +211,7 @@ class CRM_Activity_Page_AJAX {
 
     // move/transform caseRoles array data to caseRelationships
     // for sorting and display
+    // CRM-14466 added cid to the non-client array to avoid php notice
     foreach($caseRoles as $id => $value) {
       if ($id != "client") {
         $rel = array();
@@ -248,38 +251,45 @@ class CRM_Activity_Page_AJAX {
     // set user name, email and edit columns links
     // idx will count number of current row / needed by edit links
     $idx = 1;
-    foreach ($caseRelationships as $key => $row) {
+    foreach ($caseRelationships as &$row) {
+      // Get rid of the "<br />(Case Manager)" from label
+      list($typeLabel) = explode('<', $row['relation']);
       // view user links
-      if ($caseRelationships[$key]['cid']) {
-        $caseRelationships[$key]['name'] = '<a href='.CRM_Utils_System::url('civicrm/contact/view',
-          'action=view&reset=1&cid='.$caseRelationships[$key]['cid']).'>'.$caseRelationships[$key]['name'].'</a>';
+      if (!empty($row['cid'])) {
+        $row['name'] = '<a class="view-contact" title="'. ts('View Contact') .'" href='.CRM_Utils_System::url('civicrm/contact/view',
+          'action=view&reset=1&cid='.$row['cid']).'>'.$row['name'].'</a>';
       }
       // email column links/icon
-      if ($caseRelationships[$key]['email']) {
-        $caseRelationships[$key]['email'] = '<a href="'.CRM_Utils_System::url('civicrm/contact/view/activity', 'action=reset=1&action=add&atype=3&cid='.$caseRelationships[$key]['cid']).'" title="compose and send an email"><div class="icon email-icon" title="compose and send an email"></div>
-             </a>';
+      if ($row['email']) {
+        $row['email'] = '<a class="crm-hover-button crm-popup" href="'.CRM_Utils_System::url('civicrm/activity/email/add', 'reset=1&action=add&atype=3&cid='.$row['cid']).'&caseid='.$caseID.'" title="'. ts('Send an Email') . '"><span class="icon email-icon"></span></a>';
       }
       // edit links
+      $row['actions'] = '';
       if ($hasAccessToAllCases) {
-        switch($caseRelationships[$key]['source']){
+        switch($row['source']){
         case 'caseRel':
-          $caseRelationships[$key]['actions'] =
-            '<a href="#" title="edit case role" onclick="createRelationship( '.$caseRelationships[$key]['relation_type'].', '.$caseRelationships[$key]['cid'].', '.$caseRelationships[$key]['rel_id'].', '.$idx.', \''.$caseRelationships[$key]['relation'].'\' );return false;"><div class="icon edit-icon" ></div></a>&nbsp;&nbsp;<a href="#" class="case-role-delete" case_id="'.$caseID.'" rel_type="'.$caseRelationships[$key]['relation_type'].'"><div class="icon delete-icon" title="remove contact from case role"></div></a>';
+          $row['actions'] =
+            '<a href="#editCaseRoleDialog" title="'. ts('Reassign %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-rel_type="'. $row['relation_type'] .'" data-rel_id="'. $row['rel_id'] .'"data-key="'. CRM_Core_Key::get('civicrm/ajax/relation') .'">'.
+              '<span class="icon edit-icon"></span>'.
+            '</a>'.
+            '<a href="#deleteCaseRoleDialog" title="'. ts('Remove %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-rel_type="'.$row['relation_type'].'" data-key="'. CRM_Core_Key::get('civicrm/ajax/delcaserole') .'">'.
+              '<span class="icon delete-icon"></span>'.
+            '</a>';
           break;
 
         case 'caseRoles':
-          $caseRelationships[$key]['actions'] =
-            '<a href="#" title="edit case role" onclick="createRelationship('.$caseRelationships[$key]['relation_type'].', null, null, '.$idx.',  \''.$caseRelationships[$key]['relation'].'\');return false;"><div class="icon edit-icon"></div></a>';
+          $row['actions'] =
+            '<a href="#editCaseRoleDialog" title="'. ts('Assign %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-rel_type="'. $row['relation_type'] .'" data-key="'. CRM_Core_Key::get('civicrm/ajax/relation') .'">'.
+              '<span class="icon edit-icon"></span>'.
+            '</a>';
           break;
         }
-      } else {
-        $caseRelationships[$key]['actions'] = '';
       }
       $idx++;
     }
     $iFilteredTotal = $iTotal = $params['total'] = count($allCaseRelationships);
     $selectorElements = array('relation', 'name', 'phone', 'email', 'actions');
-
+   
     echo CRM_Utils_JSON::encodeDataTableSelector($caseRelationships, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -415,14 +425,19 @@ class CRM_Activity_Page_AJAX {
     $context = CRM_Utils_Type::escape(CRM_Utils_Array::value('context', $_GET), 'String');
 
     $sortMapper = array(
-      0 => 'activity_type', 1 => 'subject', 2 => 'source_contact_name',
-      3 => '', 4 => 'activity_date_time', 5 => 'status_id',
+      0 => 'activity_type',
+      1 => 'subject',
+      2 => 'source_contact_name',
+      3 => '',
+      4 => '',
+      5 => 'activity_date_time',
+      6 => 'status_id',
     );
 
-    $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
-    $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
-    $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
-    $sort      = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
+    $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
+    $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
+    $rowCount = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
+    $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
 
     $params = $_POST;
@@ -443,16 +458,36 @@ class CRM_Activity_Page_AJAX {
     $session = CRM_Core_Session::singleton();
     $userID = $session->get('userID');
     if ($userID) {
-      $activityFilter =
-        array('activity_type_filter_id' => CRM_Utils_Array::value('activity_type_id', $params),
-              'activity_type_exclude_filter_id' => CRM_Utils_Array::value('activity_type_exclude_id', $params));
-              CRM_Core_BAO_Setting::setItem($activityFilter,
-                                            CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
-                                            'activity_tab_filter',
-                                            NULL,
-                                            $userID,
-                                            $userID
-                                    );
+      //flush cache before setting filter to account for global cache (memcache)
+      $domainID = CRM_Core_Config::domainID();
+      $cacheKey = CRM_Core_BAO_Setting::inCache(
+        CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
+        'activity_tab_filter',
+        NULL,
+        $userID,
+        TRUE,
+        $domainID,
+        TRUE
+      );
+      if ( $cacheKey ) {
+        CRM_Core_BAO_Setting::flushCache($cacheKey);
+      }
+
+      $activityFilter = array(
+        'activity_type_filter_id' => empty($params['activity_type_id']) ? '' :
+          CRM_Utils_Type::escape($params['activity_type_id'], 'Integer'),
+        'activity_type_exclude_filter_id' => empty($params['activity_type_exclude_id']) ? '' :
+          CRM_Utils_Type::escape($params['activity_type_exclude_id'], 'Integer'),
+      );
+
+      CRM_Core_BAO_Setting::setItem(
+        $activityFilter,
+        CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
+        'activity_tab_filter',
+        NULL,
+        $userID,
+        $userID
+      );
     }
 
     $iFilteredTotal = $iTotal = $params['total'];

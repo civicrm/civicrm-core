@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -68,14 +68,16 @@ class CRM_Campaign_Task {
    */
   static function &tasks() {
     if (!(self::$_tasks)) {
-      self::$_tasks = array(1 => array('title' => ts('Record Respondents Interview'),
+      self::$_tasks = array(1 => array(
+        'title' => ts('Record Respondents Interview'),
           'class' => array(
             'CRM_Campaign_Form_Task_Interview',
             'CRM_Campaign_Form_Task_Release',
           ),
           'result' => FALSE,
         ),
-        2 => array('title' => ts('Reserve Respondents'),
+        2 => array(
+          'title' => ts('Reserve Respondents'),
           'class' => array(
             'CRM_Campaign_Form_Task_Reserve',
             'CRM_Campaign_Form_Task_Interview',
@@ -83,11 +85,13 @@ class CRM_Campaign_Task {
           ),
           'result' => FALSE,
         ),
-        3 => array('title' => ts('Release Respondents'),
+        3 => array(
+          'title' => ts('Release Respondents'),
           'class' => 'CRM_Campaign_Form_Task_Release',
           'result' => FALSE,
         ),
-        4 => array('title' => ts('Print Respondents'),
+        4 => array(
+          'title' => ts('Print Respondents'),
           'class' => 'CRM_Campaign_Form_Task_Print',
           'result' => FALSE,
         ),

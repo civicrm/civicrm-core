@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -127,8 +127,8 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
         'dao' => 'CRM_Pledge_DAO_PledgePayment',
         'fields' =>
         array(
-          'scheduled_date' =>
-          array('title' => ts('Next Payment Due'),
+          'scheduled_date' => array(
+            'title' => ts('Next Payment Due'),
             'type' => CRM_Utils_Type::T_DATE,
             'required' => TRUE,
           ),
@@ -139,6 +139,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
           array(
             'title' => ts('Next Payment Due'),
             'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
         ),
         'grouping' => 'pledge-fields',
@@ -214,9 +215,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             // to include optional columns address and email, only if checked
             if ($tableName == 'civicrm_address') {
               $this->_addressField = TRUE;

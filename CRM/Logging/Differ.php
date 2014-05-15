@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -196,7 +196,7 @@ WHERE lt.log_conn_id = %1 AND
         // we need to make sure separators are trimmed
         if ($diff == 'case_type_id') {
           foreach (array('original', 'changed') as $var)  {
-            if (CRM_Utils_Array::value($diff, $$var)) {
+            if (!empty($$var[$diff])) {
               $holder =& $$var;
               $val = explode(CRM_Case_BAO_Case::VALUE_SEPARATOR, $holder[$diff]);
               $holder[$diff] = CRM_Utils_Array::value(1, $val);
@@ -261,7 +261,7 @@ WHERE lt.log_conn_id = %1 AND
           'suffix_id' => CRM_Contact_BAO_Contact::buildOptions('suffix_id'),
           'website_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'),
           'activity_type_id' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
-          'case_type_id' => CRM_Case_PseudoConstant::caseType('label', FALSE),
+          'case_type_id' => CRM_Case_PseudoConstant::caseType('title', FALSE),
           'priority_id'  => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
         );
 

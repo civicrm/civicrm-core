@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -37,6 +37,8 @@
  * Page for displaying list of Gender
  */
 class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -60,7 +62,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * @var array
    * @static
    */
-  static $_GName = NULL;
+  static $_gLabel = NULL;
 
   /**
    * The option group id
@@ -71,33 +73,55 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
   static $_gId = NULL;
 
   /**
-   * Obtains the group name from url and sets the title.
+   * A boolean determining if you can add options to this group in the GUI
+   *
+   * @var boolean
+   * @static
+   */
+  static $_isLocked = FALSE;
+
+  /**
+   * Obtains the group name from url string or id from $_GET['gid'].
+   * Sets the title.
    *
    * @return void
    * @access public
    *
    */
   function preProcess() {
+    if (!self::$_gName && !empty($this->urlPath[3])) {
+      self::$_gName = $this->urlPath[3];
+    }
+    // If an id arg is passed instead of a group name in the path
+    elseif (!self::$_gName && !empty($_GET['gid'])) {
+      self::$_gId = $_GET['gid'];
+      self::$_gName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', self::$_gId, 'name');
+      self::$_isLocked = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', self::$_gId, 'is_locked');
+      $breadCrumb = array(
+        'title' => ts('Option Groups'),
+        'url' => CRM_Utils_System::url('civicrm/admin/options', 'reset=1'),
+      );
+      CRM_Utils_System::appendBreadCrumb(array($breadCrumb));
+    }
     if (!self::$_gName) {
-      self::$_gName = CRM_Utils_Request::retrieve('group', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'GET');
-    }
-    if (self::$_gName) {
-      $this->set('gName', self::$_gName);
-    }
-    else {
       self::$_gName = $this->get('gName');
     }
-    if (self::$_gName) {
+    // If we don't have a group we will browse all groups
+    if (!self::$_gName) {
+      return;
+    }
+    $this->set('gName', self::$_gName);
+    if (!self::$_gId) {
       self::$_gId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', self::$_gName, 'id', 'name');
     }
-    else {
-      CRM_Core_Error::fatal();
+
+    self::$_gLabel = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', self::$_gId, 'title');
+    if (!self::$_gLabel) {
+      self::$_gLabel = ts('Option');
     }
 
-    self::$_GName = ucwords(str_replace('_', ' ', self::$_gName));
-
     $this->assign('gName', self::$_gName);
-    $this->assign('GName', self::$_GName);
+    $this->assign('gLabel', self::$_gLabel);
 
     if (self::$_gName == 'acl_role') {
       CRM_Utils_System::setTitle(ts('Manage ACL Roles'));
@@ -110,14 +134,16 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
     }
     else {
-      CRM_Utils_System::setTitle(ts("%1 Options", array(1 => self::$_GName)));
+      CRM_Utils_System::setTitle(ts("%1 Options", array(1 => self::$_gLabel)));
     }
     if (in_array(self::$_gName,
         array(
           'from_email_address', 'email_greeting',
           'postal_greeting', 'addressee',
+          'communication_style',
           'case_status', 'encounter_medium',
-          'case_type',
+          'case_type', 'payment_instrument',
+          'soft_credit_type', 'website_type'
         )
       )) {
       $this->assign('showIsDefault', TRUE);
@@ -130,6 +156,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     if (self::$_gName == 'participant_role') {
       $this->assign('showCounted', TRUE);
     }
+    $this->assign('isLocked', self::$_isLocked);
     $config = CRM_Core_Config::singleton();
     if (self::$_gName == 'activity_type') {
       $this->assign('showComponent', TRUE);
@@ -142,7 +169,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * @return string Classname of BAO.
    */
   function getBAOName() {
-    return 'CRM_Core_BAO_OptionValue';
+    return self::$_gName ? 'CRM_Core_BAO_OptionValue' : 'CRM_Core_BAO_OptionGroup';
   }
 
   /**
@@ -156,25 +183,23 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
         CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/options/' . self::$_gName,
-          'qs' => 'group=' . self::$_gName . '&action=update&id=%%id%%&reset=1',
+          'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit %1', array(1 => self::$_gName)),
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_OptionValue' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable %1', array(1 => self::$_gName)),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_OptionValue' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable %1', array(1 => self::$_gName)),
         ),
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/options/' . self::$_gName,
-          'qs' => 'group=' . self::$_gName . '&action=delete&id=%%id%%',
+          'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete %1 Type', array(1 => self::$_gName)),
         ),
       );
@@ -212,7 +237,9 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * @static
    */
   function browse() {
-
+    if (!self::$_gName) {
+      return parent::browse();
+    }
     $groupParams = array('name' => self::$_gName);
     $optionValue = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'component_id,weight');
     $gName       = self::$_gName;
@@ -227,9 +254,9 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     // retrieve financial account name for the payment instrument page
     if ($gName = "payment_instrument") {
       foreach ($optionValue as  $key => $option) {
-        $optionValue[$key]['financial_account'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($key, 'civicrm_option_value');      }
+        $optionValue[$key]['financial_account'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($key, 'civicrm_option_value');
+      }
     }
-
     $this->assign('rows', $optionValue);
   }
 
@@ -239,7 +266,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * @return string Classname of edit form.
    */
   function editForm() {
-    return 'CRM_Admin_Form_Options';
+    return self::$_gName ? 'CRM_Admin_Form_Options' : 'CRM_Admin_Form_OptionGroup';
   }
 
   /**
@@ -248,28 +275,18 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * @return string name of this page.
    */
   function editName() {
-    return self::$_GName;
+    return self::$_gLabel;
   }
 
   /**
    * Get user context.
    *
+   * @param null $mode
+   *
    * @return string user context.
    */
   function userContext($mode = NULL) {
-    return 'civicrm/admin/options/' . self::$_gName;
-  }
-
-  /**
-   * function to get userContext params
-   *
-   * @param int $mode mode that we are in
-   *
-   * @return string
-   * @access public
-   */
-  function userContextParams($mode = NULL) {
-    return 'group=' . self::$_gName . '&reset=1&action=browse';
+    return 'civicrm/admin/options' . (self::$_gName ? '/' . self::$_gName : '');
   }
 }
 

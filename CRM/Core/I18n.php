@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -50,7 +50,7 @@ class CRM_Core_I18n {
    *
    * @param  $locale string  the base of this certain object's existence
    *
-   * @return         void
+   * @return \CRM_Core_I18n
    */
   function __construct($locale) {
     if ($locale != '' and $locale != 'en_US') {
@@ -78,10 +78,20 @@ class CRM_Core_I18n {
       }
 
       // Otherwise, use PHP-gettext
+      // we support both the old file hierarchy format and the new:
+      // pre-4.5:  civicrm/l10n/xx_XX/civicrm.mo
+      // post-4.5: civicrm/l10n/xx_XX/LC_MESSAGES/civicrm.mo
       require_once 'PHPgettext/streams.php';
       require_once 'PHPgettext/gettext.php';
 
-      $streamer = new FileReader($config->gettextResourceDir . $locale . DIRECTORY_SEPARATOR . 'civicrm.mo');
+      $mo_file = $config->gettextResourceDir . $locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
+
+      if (! file_exists($mo_file)) {
+        // fallback to pre-4.5 mode
+        $mo_file = $config->gettextResourceDir . $locale . DIRECTORY_SEPARATOR . 'civicrm.mo';
+      }
+
+      $streamer = new FileReader($mo_file);
       $this->_phpgettext = new gettext_reader($streamer);
     }
   }
@@ -240,7 +250,8 @@ class CRM_Core_I18n {
 
     // do all wildcard translations first
     $config = CRM_Core_Config::singleton();
-    $stringTable = CRM_Utils_Array::value($config->lcMessages,
+    $stringTable = CRM_Utils_Array::value(
+      $config->lcMessages,
       $config->localeCustomStrings
     );
 
@@ -255,15 +266,13 @@ class CRM_Core_I18n {
       }
     }
 
-    if (!$exactMatch &&
+    if (
+      !$exactMatch &&
       isset($stringTable['enabled']['wildcardMatch'])
     ) {
       $search  = array_keys($stringTable['enabled']['wildcardMatch']);
       $replace = array_values($stringTable['enabled']['wildcardMatch']);
-      $text    = str_replace($search,
-        $replace,
-        $text
-      );
+      $text    = str_replace($search, $replace, $text);
     }
 
     // dont translate if we've done exactMatch already

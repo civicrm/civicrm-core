@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -76,18 +76,14 @@ class CRM_Pledge_StateMachine_Search extends CRM_Core_StateMachine {
    *
    * @param CRM_Core_Controller $controller the controller object
    *
+   * @param string $formName
+   *
    * @return string the name of the form that will handle the task
    * @access protected
    */
   function taskName($controller, $formName = 'Search') {
     // total hack, check POST vars and then session to determine stuff
-    // fix value if print button is pressed
-    if (CRM_Utils_Array::value('_qf_' . $formName . '_next_print', $_POST)) {
-      $value = CRM_Pledge_Task::PRINT_PLEDGES;
-    }
-    else {
-      $value = CRM_Utils_Array::value('task', $_POST);
-    }
+    $value = CRM_Utils_Array::value('task', $_POST);
     if (!isset($value)) {
       $value = $this->_controller->get('task');
     }

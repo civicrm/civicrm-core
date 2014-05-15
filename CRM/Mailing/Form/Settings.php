@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -62,7 +62,7 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
@@ -98,7 +98,7 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -121,9 +121,7 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
     $this->add('checkbox', 'auto_responder', ts('Auto-respond to Replies?'));
     $defaults['auto_responder'] = FALSE;
 
-    $this->add('select', 'visibility', ts('Mailing Visibility'),
-      CRM_Core_SelectValues::ufVisibility(TRUE), TRUE
-    );
+    $this->add('select', 'visibility', ts('Mailing Visibility'), CRM_Core_SelectValues::groupVisibility(), TRUE);
 
     $this->add('select', 'reply_id', ts('Auto-responder'),
       CRM_Mailing_PseudoConstant::component('Reply'), TRUE

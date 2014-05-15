@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,14 +36,14 @@
   <table class="form-layout-compressed">
              {if $form.template_id}
       <tr class="crm-event-manage-eventinfo-form-block-template_id">
-        <td class="label">{$form.template_id.label}</td>
-            <td>{$form.template_id.html} {help id="id-select-template" isTemplate=$isTemplate}</td>
+        <td class="label">{$form.template_id.label} {help id="id-select-template" isTemplate=$isTemplate}</td>
+            <td>{$form.template_id.html}</td>
           </tr>
         {/if}
     {if $form.template_title}
       <tr class="crm-event-manage-eventinfo-form-block-template_title">
-        <td class="label">{$form.template_title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='template_title' id=$eventID}{/if}</td>
-        <td>{$form.template_title.html} {help id="id-template-title"}</td>
+        <td class="label">{$form.template_title.label} {help id="id-template-title"}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='template_title' id=$eventID}{/if}</td>
+        <td>{$form.template_title.html}</td>
       </tr>
     {/if}
     <tr class="crm-event-manage-eventinfo-form-block-event_type_id">
@@ -56,13 +56,13 @@
           campaignTrClass="crm-event-manage-eventinfo-form-block-campaign_id"}
 
     <tr class="crm-event-manage-eventinfo-form-block-default_role_id">
-      <td class="label">{$form.default_role_id.label}</td>
-      <td>{$form.default_role_id.html} {help id="id-participant-role"}
+      <td class="label">{$form.default_role_id.label} {help id="id-participant-role"}</td>
+      <td>{$form.default_role_id.html}
       </td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-participant_listing_id">
-      <td class="label">{$form.participant_listing_id.label}</td>
-      <td>{$form.participant_listing_id.html} {help id="id-listing" isTemplate=$isTemplate action=$action entityId=$entityId}</td>
+      <td class="label">{$form.participant_listing_id.label} {help id="id-listing" isTemplate=$isTemplate action=$action entityId=$entityId}</td>
+      <td>{$form.participant_listing_id.html}</td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-title">
       <td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='title' id=$eventID}{/if}</td>
@@ -89,8 +89,8 @@
       </tr>
     {/if}
     <tr class="crm-event-manage-eventinfo-form-block-max_participants">
-      <td class="label">{$form.max_participants.label}</td>
-      <td>{$form.max_participants.html|crmAddClass:four} {help id="id-max_participants" waitlist=$waitlist}</td>
+      <td class="label">{$form.max_participants.label} {help id="id-max_participants" waitlist=$waitlist}</td>
+      <td>{$form.max_participants.html|crmAddClass:four}</td>
     </tr>
     <tr id="id-waitlist" class="crm-event-manage-eventinfo-form-block-has_waitlist">
       {if $waitlist}
@@ -165,27 +165,18 @@
         </div>
     {include file="CRM/common/showHide.tpl" elemType="table-row"}
 
-    {* include jscript to warn if unsaved form field changes *}
-    {include file="CRM/common/formNavigate.tpl"}
-
     {include file="CRM/Form/validate.tpl"}
 {/if}
 </div>
 {literal}
 <script type="text/javascript">
-
-function reloadWindow( tempId ) {
-
-   //ignore form navigation, CRM-6815
-   global_formNavigate = true;
-
-   //freeze the event type element
-   //when template form is loading.
-   cj( "#event_type_id" ).attr('disabled', true );
-
-   window.location += '&template_id=' + tempId;
-}
-
+  CRM.$(function($) {
+    $('#template_id', '#EventInfo').change(function() {
+      $('#crm-main-content-wrapper')
+        .crmSnippet({url: CRM.url('civicrm/event/add', {action: 'add', reset: 1, template_id: $(this).val()})})
+        .crmSnippet('refresh');
+    })
+  });
 </script>
 {/literal}
 

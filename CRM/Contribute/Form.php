@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -64,7 +64,7 @@ class CRM_Contribute_Form extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = array();
@@ -77,7 +77,7 @@ class CRM_Contribute_Form extends CRM_Core_Form {
         $baoName::retrieve($params, $defaults);
       }
     }
-    if ($this->_action == CRM_Core_Action::DELETE && CRM_Utils_Array::value('name', $defaults)) {
+    if ($this->_action == CRM_Core_Action::DELETE && !empty($defaults['name'])) {
       $this->assign('delName', $defaults['name']);
     }
     elseif ($this->_action == CRM_Core_Action::ADD) {
@@ -88,8 +88,8 @@ class CRM_Contribute_Form extends CRM_Core_Form {
 
     }
     elseif ($this->_action & CRM_Core_Action::UPDATE) {
-      if (CRM_Utils_Array::value('contact_id', $defaults) || CRM_Utils_Array::value('created_id', $defaults)) {
-        $contactID = CRM_Utils_Array::value('created_id', $defaults) ? $defaults['created_id'] : $defaults['contact_id'];
+      if (!empty($defaults['contact_id']) || !empty($defaults['created_id'])) {
+        $contactID = !empty($defaults['created_id']) ? $defaults['created_id'] : $defaults['contact_id'];
         $this->assign('created_id', $contactID);
         $this->assign('organisationId', $contactID);
       }
@@ -104,7 +104,7 @@ class CRM_Contribute_Form extends CRM_Core_Form {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

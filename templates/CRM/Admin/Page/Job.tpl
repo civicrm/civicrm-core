@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,8 +44,9 @@
 <div id="ltype">
     {strip}
         {* handle enable/disable actions*}
-       {include file="CRM/common/enableDisable.tpl"}
-        <br/><table class="selector">
+       {include file="CRM/common/enableDisableApi.tpl"}
+       {include file="CRM/common/crmeditable.tpl"}
+        <br/><table class="selector row-highlight">
         <tr class="columnheader">
             <th >{ts}Name (Frequency)/Description{/ts}</th>
             <th >{ts}Command/Parameters{/ts}</th>
@@ -54,8 +55,8 @@
             <th ></th>
         </tr>
         {foreach from=$rows item=row}
-        <tr id="row_{$row.id}" class="crm-job {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-            <td class="crm-job-name"><strong>{$row.name}</strong> ({$row.run_frequency})<br/>
+        <tr id="job-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+            <td class="crm-job-name"><strong><span data-field="name">{$row.name}</span></strong> ({$row.run_frequency})<br/>
                 {$row.description}<br />
                 {ts}API Entity:{/ts} {$row.api_entity}<br/>
                 {ts}API Action:{/ts} <strong>{$row.api_action}</strong><br/>

@@ -7,8 +7,8 @@ function relationship_get_example(){
 $params = array(
   'relationship_type_id' => array(
       'IN' => array(
-          '0' => 32,
-          '1' => 33,
+          '0' => 33,
+          '1' => 34,
         ),
     ),
 );
@@ -39,9 +39,9 @@ function relationship_get_expectedresult(){
   'values' => array(
       '2' => array(
           'id' => '2',
-          'contact_id_a' => '63',
-          'contact_id_b' => '64',
-          'relationship_type_id' => '32',
+          'contact_id_a' => '87',
+          'contact_id_b' => '89',
+          'relationship_type_id' => '33',
           'start_date' => '2013-07-29 00:00:00',
           'is_active' => '1',
           'description' => '',
@@ -50,9 +50,9 @@ function relationship_get_expectedresult(){
         ),
       '3' => array(
           'id' => '3',
-          'contact_id_a' => '63',
-          'contact_id_b' => '64',
-          'relationship_type_id' => '33',
+          'contact_id_a' => '87',
+          'contact_id_b' => '89',
+          'relationship_type_id' => '34',
           'start_date' => '2013-07-29 00:00:00',
           'is_active' => '1',
           'description' => '',
@@ -70,16 +70,16 @@ function relationship_get_expectedresult(){
 * This example has been generated from the API test suite. The test that created it is called
 *
 * testGetTypeOperators and can be found in
-* http://svn.civicrm.org/civicrm/trunk/tests/phpunit/CiviTest/api/v3/RelationshipTest.php
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/RelationshipTest.php
 *
 * You can see the outcome of the API tests at
-* http://tests.dev.civicrm.org/trunk/results-api_v3
+* https://test.civicrm.org/job/CiviCRM-master-git/
 *
 * To Learn about the API read
-* http://book.civicrm.org/developer/current/techniques/api/
+* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
 *
-* and review the wiki at
-* http://wiki.civicrm.org/confluence/display/CRMDOC/CiviCRM+Public+APIs
+* Browse the api on your own site with the api explorer
+* http://MYSITE.ORG/path/to/civicrm/api/explorer
 *
 * Read more about testing here
 * http://wiki.civicrm.org/confluence/display/CRM/Testing

@@ -72,7 +72,7 @@
   {ts}Link Text{/ts}
 {/htxt}
 {htxt id="id-link_text"}
-{ts}Text for the link inviting constituents to create a Personal Campaign Page. This link will appear on the Event registration Thank-you page as well as on each Personal Campaign Page.{/ts}
+{ts}Text for the link inviting constituents to create a Personal Campaign Page. This link will appear on the Event registration Thank-you page as well as on each Personal Campaign Page. Leave blank if you do not want constituents to be prompted to create their own Personal Campaign Pages.{/ts}
 {/htxt}
 
 {htxt id="id-target_entity_type-title"}

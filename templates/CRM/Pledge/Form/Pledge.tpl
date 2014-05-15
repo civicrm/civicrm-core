@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -59,10 +59,13 @@
    {else}
       <table class="form-layout-compressed">
         {if $context eq 'standalone'}
-      {if !$email and $outBound_option != 2}
-        {assign var='profileCreateCallback' value=1 }
-      {/if}
-            {include file="CRM/Contact/Form/NewContact.tpl"}
+          {if !$email and $outBound_option != 2}
+            {assign var='profileCreateCallback' value=1 }
+          {/if}
+          <tr class="crm-pledge-form-contact-id">
+            <td class="label">{$form.contact_id.label}</td>
+            <td>{$form.contact_id.html}</td>
+          </tr>
         {else}
           <tr class="crm-pledge-form-block-displayName">
               <td class="font-size12pt right"><strong>{ts}Pledge by{/ts}</strong></td>
@@ -171,7 +174,7 @@ function loadPanes( id ) {
       cj('div.'+id).html(loading);
       cj.ajax({
           url    : url,
-          success: function(data) { cj('div.'+id).html(data); }
+          success: function(data) { cj('div.'+id).html(data).trigger('crmLoad'); }
           });
       }
   }
@@ -197,13 +200,6 @@ function loadPanes( id ) {
 <br />
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-{literal}
-<script type="text/javascript">
-cj(function() {
-   cj().crmAccordions();
-});
-</script>
-{/literal}
 {literal}
      <script type="text/javascript">
 
@@ -248,7 +244,7 @@ cj(function() {
     {/literal}
     {if $context eq 'standalone' and $outBound_option != 2 }
     {literal}
-    cj( function( ) {
+    CRM.$(function($) {
         cj("#contact_1").blur( function( ) {
             checkEmail( );
         });
@@ -300,9 +296,5 @@ cj(function() {
     invert              = 0
 }
 {/if}
-
-   {* include jscript to warn if unsaved form field changes *}
-   {include file="CRM/common/formNavigate.tpl"}
-
 {/if}
 {* closing of main custom data if *}

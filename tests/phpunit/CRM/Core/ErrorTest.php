@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,10 +31,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Tests for linking to resource files
  */
 class CRM_Core_ErrorTest extends CiviUnitTestCase {
-  //@todo make BAO enotice compliant  & remove the line below
-  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
-  // new test classes should be compliant.
-  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name'    => 'Errors',

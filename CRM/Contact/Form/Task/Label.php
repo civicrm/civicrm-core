@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -154,7 +154,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     if (stristr($mailingFormat, 'custom_')) {
       foreach ($mailingFormatProperties as $token => $true) {
         if (substr($token, 0, 7) == 'custom_') {
-          if (!CRM_Utils_Array::value($token, $customFormatProperties)) {
+          if (empty($customFormatProperties[$token])) {
             $customFormatProperties[$token] = $mailingFormatProperties[$token];
           }
         }
@@ -171,9 +171,20 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       $returnProperties['last_name'] = 1;
     }
 
+    $individualFormat = FALSE;
+
+    /*
+     * CRM-8338: replace ids of household members with the id of their household
+     * so we can merge labels by household.
+     */
+    if (isset($fv['merge_same_household'])) {
+      $this->mergeContactIdsByHousehold();
+      $individualFormat = TRUE;
+    }
+
     //get the contacts information
     $params = array();
-    if (CRM_Utils_Array::value('location_type_id', $fv)) {
+    if (!empty($fv['location_type_id'])) {
       $locType          = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       $locName          = $locType[$fv['location_type_id']];
       $location         = array('location' => array("{$locName}" => $address));
@@ -194,7 +205,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     }
 
     // fix for CRM-2651
-    if (CRM_Utils_Array::value('do_not_mail', $fv)) {
+    if (!empty($fv['do_not_mail'])) {
       $params[] = array('do_not_mail', '=', 0, 0, 0);
     }
     // fix for CRM-2613
@@ -247,7 +258,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       // we need to remove all the "_id"
       unset($contact['contact_id']);
 
-      if ($locName && CRM_Utils_Array::value($locName, $contact)) {
+      if ($locName && !empty($contact[$locName])) {
         // If location type is not primary, $contact contains
         // one more array as "$contact[$locName] = array( values... )"
 
@@ -257,7 +268,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
         unset($contact[$locName]);
 
-        if (CRM_Utils_Array::value('county_id', $contact)) {
+        if (!empty($contact['county_id'])) {
           unset($contact['county_id']);
         }
 
@@ -268,7 +279,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         $valuesothers = array();
         $paramsothers = array('contact_id' => $value);
         $valuesothers = CRM_Core_BAO_Location::getValues($paramsothers, $valuesothers);
-        if (CRM_Utils_Array::value('location_type_id', $fv)) {
+        if (!empty($fv['location_type_id'])) {
           foreach ($valuesothers as $vals) {
                         if ( CRM_Utils_Array::value('location_type_id', $vals) ==
                              CRM_Utils_Array::value('location_type_id', $fv ) ) {
@@ -293,10 +304,10 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
           continue;
         }
 
-        if (CRM_Utils_Array::value('addressee_display', $contact)) {
+        if (!empty($contact['addressee_display'])) {
           $contact['addressee_display'] = trim($contact['addressee_display']);
         }
-        if (CRM_Utils_Array::value('addressee', $contact)) {
+        if (!empty($contact['addressee'])) {
           $contact['addressee'] = $contact['addressee_display'];
         }
 
@@ -307,13 +318,8 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       }
     }
 
-    $individualFormat = FALSE;
     if (isset($fv['merge_same_address'])) {
       $this->mergeSameAddress($rows);
-      $individualFormat = TRUE;
-    }
-    if (isset($fv['merge_same_household'])) {
-      $rows = $this->mergeSameHousehold($rows);
       $individualFormat = TRUE;
     }
 
@@ -352,13 +358,16 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
   /**
    * Check for presence of tokens to be swapped out
+   *
    * @param array $contact
    * @param array $mailingFormatProperties
    * @param array $tokenFields
+   *
+   * @return bool
    */
   function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
     foreach (array_merge($mailingFormatProperties, array_fill_keys($tokenFields, 1)) as $key => $dontCare) {
-      if (CRM_Utils_Array::value($key, $contact)) {
+      if (!empty($contact[$key])) {
         return TRUE;
       }
     }
@@ -434,14 +443,16 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       }
       // fill uniqueAddress array with last/first name tree
       if (isset($uniqueAddress[$address])) {
-        $uniqueAddress[$address]['names'][$name][] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$rows[$rowID]['first_name']]['first_name'] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$rows[$rowID]['first_name']]['addressee_display'] = $rows[$rowID]['addressee_display'];
         // drop unnecessary rows
         unset($rows[$rowID]);
         // this is the first listing at this address
       }
       else {
         $uniqueAddress[$address]['ID'] = $rowID;
-        $uniqueAddress[$address]['names'][$name][] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$rows[$rowID]['first_name']]['first_name'] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$rows[$rowID]['first_name']]['addressee_display'] = $rows[$rowID]['addressee_display'];
       }
     }
     foreach ($uniqueAddress as $address => $data) {
@@ -453,50 +464,24 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         if ($count > 2) {
           break;
         }
-        // collapse the tree to summarize
-        $family = trim(implode(" & ", $first_names) . " " . $last_name);
-        if ($count) {
-          $processedNames .= "\n" . $family;
-        }
-        else {
-          // build display_name string
-          $processedNames = $family;
-        }
+          if(count($first_names) == 1){
+            $family = $first_names[current(array_keys($first_names))]['addressee_display'];
+          }
+          else {
+            // collapse the tree to summarize
+            $family = trim(implode(" & ", array_keys($first_names)) . " " . $last_name);
+          }
+          if ($count) {
+            $processedNames .= "\n" . $family;
+          }
+          else {
+            // build display_name string
+            $processedNames = $family;
+          }
         $count++;
       }
       $rows[$data['ID']]['addressee'] = $rows[$data['ID']]['addressee_display'] = $rows[$data['ID']]['display_name'] = $processedNames;
     }
-  }
-
-  function mergeSameHousehold(&$rows) {
-    # group selected contacts by type
-    $individuals = array();
-    $households = array();
-    foreach ($rows as $contact_id => $row) {
-      if ($row['contact_type'] == 'Household') {
-        $households[$contact_id] = $row;
-      }
-      elseif ($row['contact_type'] == 'Individual') {
-        $individuals[$contact_id] = $row;
-      }
-    }
-
-    # exclude individuals belonging to selected households
-    foreach ($households as $household_id => $row) {
-      $dao = new CRM_Contact_DAO_Relationship();
-      $dao->contact_id_b = $household_id;
-      $dao->find();
-      while ($dao->fetch()) {
-        $individual_id = $dao->contact_id_a;
-        if (array_key_exists($individual_id, $individuals)) {
-          unset($individuals[$individual_id]);
-        }
-      }
-    }
-
-    # merge back individuals and households
-    $rows = array_merge($individuals, $households);
-    return $rows;
   }
 }
 

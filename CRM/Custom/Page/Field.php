@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -42,6 +42,8 @@
  *
  */
 class CRM_Custom_Page_Field extends CRM_Core_Page {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The group id of the field
@@ -69,7 +71,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    */
   function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
-      $deleteExtra = ts('Are you sure you want to delete this custom data field?');
       self::$_actionLinks = array(
         CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit Field'),
@@ -91,14 +92,12 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_CustomField' . '\',\'' . 'enable-disable' . '\',0,\'CustomField\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Custom Field'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_CustomField' . '\',\'' . 'disable-enable' . '\',0,\'CustomField\'  );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Custom Field'),
         ),
         CRM_Core_Action::EXPORT => array(
@@ -112,7 +111,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
           'url' => 'civicrm/admin/custom/group/field',
           'qs' => 'action=delete&reset=1&gid=%%gid%%&id=%%id%%',
           'title' => ts('Delete Custom Field'),
-          'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
         ),
       );
     }
@@ -177,7 +175,12 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
         array(
           'id' => $customFieldBAO->id,
           'gid' => $this->_gid,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'customField.row.actions',
+        'CustomField',
+        $customFieldBAO->id
       );
     }
 
@@ -227,10 +230,21 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    */
   function run() {
 
-    // get the group id
-    $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive',
-      $this
+
+    $id = CRM_Utils_Request::retrieve('id', 'Positive',
+      $this, FALSE, 0
     );
+
+    if ($id) {
+      $values = civicrm_api3('custom_field', 'getsingle', array('id' => $id));
+      $this->_gid = $values['custom_group_id'];
+    }
+    // get the group id
+    else {
+      $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive',
+        $this
+      );
+    }
 
     if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
       CRM_Core_Error::fatal("You cannot add or edit fields in a reserved custom field-set.");
@@ -266,10 +280,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
 
     // assign vars to templates
     $this->assign('action', $action);
-
-    $id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this, FALSE, 0
-    );
 
     // what action to take ?
     if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {

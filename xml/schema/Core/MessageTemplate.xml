@@ -34,8 +34,11 @@
   <field>
       <name>msg_text</name>
       <type>longtext</type>
-      <rows>10</rows>
-      <cols>75</cols>
+      <html>
+          <type>TextArea</type>
+          <rows>10</rows>
+          <cols>75</cols>
+      </html>
       <comment>Text formatted message</comment>
       <add>1.6</add>
       <!-- type changed from TEXT to LONGTEXT in 4.3 -->
@@ -43,8 +46,11 @@
   <field>
       <name>msg_html</name>
       <type>longtext</type>
-      <rows>10</rows>
-      <cols>75</cols>
+      <html>
+          <type>RichTextEditor</type>
+          <rows>10</rows>
+          <cols>75</cols>
+      </html>
       <comment>HTML formatted message</comment>
       <add>1.6</add>
       <!-- type changed from TEXT to LONGTEXT in 4.3 -->
@@ -78,14 +84,10 @@
   <field>
       <name>pdf_format_id</name>
       <type>int unsigned</type>
-      <comment>FK to civicrm_option_value containing PDF Page Format.</comment>
+      <comment>a pseudo-FK to civicrm_option_value containing PDF Page Format.</comment>
+      <pseudoconstant>
+        <optionGroupName>pdf_format</optionGroupName>
+      </pseudoconstant>
       <add>3.4</add>
   </field>
-  <foreignKey>
-      <name>pdf_format_id</name>
-      <table>civicrm_option_value</table>
-      <key>id</key>
-      <onDelete>SET NULL</onDelete>
-      <add>3.4</add>
-  </foreignKey>
 </table>

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -63,7 +63,7 @@ cj("#button").click(function(){
      });
   });
 
-    cj( function( ) {
+    CRM.$(function($) {
         var count = 0; var columns=''; var sortColumn = '';
 
         cj('#selectedRecords th').each( function( ) {

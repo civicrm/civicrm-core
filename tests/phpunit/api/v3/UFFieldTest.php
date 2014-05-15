@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,7 +42,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params;
   protected $_entity = 'uf_field';
-  public $_eNoticeCompliant = TRUE;
+
 
   protected function setUp() {
     parent::setUp();

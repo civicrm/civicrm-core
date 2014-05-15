@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -48,8 +48,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * price field object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params    (reference ) an assoc array of name/value pairs
-   * @param array  $ids       the array that holds all the db ids
+   * @param array $params (reference ) an assoc array of name/value pairs
+   *
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return object CRM_Price_BAO_PriceField object
    * @access public
@@ -113,7 +114,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       }
     }
     else {
-      if (CRM_Utils_Array::value('default_option', $params)) {
+      if (!empty($params['default_option'])) {
         $defaultArray[$params['default_option']] = 1;
       }
     }
@@ -121,8 +122,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     for ($index = 1; $index <= $maxIndex; $index++) {
       if (array_key_exists('option_amount', $params) &&
         array_key_exists($index, $params['option_amount']) &&
-        (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_label', $params)) ||
-          CRM_Utils_Array::value('is_quick_config', $params)) &&
+        (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_label', $params)) || !empty($params['is_quick_config'])) &&
         !CRM_Utils_System::isNull($params['option_amount'][$index])
       ) {
         $options = array(
@@ -146,7 +146,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         if (CRM_Utils_Array::value( $index, CRM_Utils_Array::value('option_financial_type_id', $params))) {
           $options['financial_type_id'] =  $params['option_financial_type_id'][$index];
-        } elseif (CRM_Utils_Array::value( 'financial_type_id', $params )) {
+        } elseif (!empty($params['financial_type_id'])) {
           $options['financial_type_id'] = $params['financial_type_id'];
         }
 
@@ -216,13 +216,18 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   /**
    * This function for building custom fields
    *
-   * @param object  $qf             form object (reference)
-   * @param string  $elementName    name of the custom field
+   * @param object $qf form object (reference)
+   * @param string $elementName name of the custom field
+   * @param $fieldId
    * @param boolean $inactiveNeeded
-   * @param boolean $useRequired    true if required else false
-   * @param boolean $search         true if used for search else false
-   * @param string  $label          label for custom field
+   * @param boolean $useRequired true if required else false
+   * @param string $label label for custom field
    *
+   * @param null $fieldOptions
+   * @param array $feezeOptions
+   *
+   * @return null
+   * @internal param bool $search true if used for search else false
    * @access public
    * @static
    */
@@ -296,12 +301,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $extra = array('onclick' => 'useAmountOther();');
         }
 
-        // if seperate membership payment is used with quick config priceset then change the other amount label
         if (!empty($qf->_membershipBlock) && !empty($qf->_quickConfig) && $field->name == 'other_amount' && empty($qf->_contributionAmount)) {
-          $label = ts('Additional Contribution');
           $useRequired = 0;
         }
-        elseif (CRM_Utils_Array::value('label', $fieldOptions[$optionKey])) {      //check for label.
+        elseif (!empty($fieldOptions[$optionKey]['label'])) {      //check for label.
           $label = $fieldOptions[$optionKey]['label'];
         }
 
@@ -344,7 +347,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         foreach ($customOption as $opId => $opt) {
           if ($field->is_display_amounts) {
-            $opt['label'] =  CRM_Utils_Array::value('label', $opt) ? $opt['label'] : '';
+            $opt['label'] = !empty($opt['label']) ? $opt['label'] : '';
             $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
           }
           $count = CRM_Utils_Array::value('count', $opt, '');
@@ -386,10 +389,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         if (!$field->is_required) {
           // add "none" option
-          if (CRM_Utils_Array::value('is_allow_other_amount', $otherAmount) && $field->name == 'contribution_amount') {
+          if (!empty($otherAmount['is_allow_other_amount']) && $field->name == 'contribution_amount') {
             $none = ts('Other Amount');
           }
-          elseif (!empty($qf->_membershipBlock) && !CRM_Utils_Array::value('is_required', $qf->_membershipBlock) && $field->name == 'membership_amount') {
+          elseif (!empty($qf->_membershipBlock) && empty($qf->_membershipBlock['is_required']) && $field->name == 'membership_amount') {
             $none = ts('No thank you');
           }
           else {
@@ -580,13 +583,16 @@ WHERE
   /**
    * Validate the priceset
    *
-   * @param int $priceSetId, array $fields
+   * @param int $priceSetId , array $fields
    *
    * retrun the error string
    *
+   * @param $fields
+   * @param $error
+   * @param bool $allowNoneSelection
+   *
    * @access public
    * @static
-   *
    */
 
   public static function priceSetValidation($priceSetId, $fields, &$error, $allowNoneSelection = FALSE) {
@@ -613,7 +619,7 @@ WHERE
         }
       }
 
-      if (CRM_Utils_Array::value($key, $fields)) {
+      if (!empty($fields[$key])) {
         $priceFields[$priceField->id] = $fields[$key];
       }
     }

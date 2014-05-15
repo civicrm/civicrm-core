@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -444,8 +444,10 @@ class CRM_Utils_Migrate_Export {
   }
 
   /**
-   * @param CRM_Core_DAO $object
    * @param string $objectName business-entity/xml-tag name
+   * @param CRM_Core_DAO $object
+   * @param $mappedFields
+   *
    * @return array
    */
   function exportDAO($objectName, $object, $mappedFields) {
@@ -461,7 +463,7 @@ class CRM_Utils_Migrate_Export {
       if (isset($object->$name) && $object->$name !== NULL) {
         // hack for extends_entity_column_value
         if ($name == 'extends_entity_column_value') {
-          if (in_array($object->extends, array('Event', 'Activity', 'Relationship', 'Individual', 'Organization', 'Household'))) {
+          if (in_array($object->extends, array('Event', 'Activity', 'Relationship', 'Individual', 'Organization', 'Household', 'Case'))) {
             if ($object->extends == 'Event') {
               $key = 'event_type';
             }
@@ -471,6 +473,9 @@ class CRM_Utils_Migrate_Export {
             elseif ($object->extends == 'Relationship') {
               $key = 'relationship_type';
             }
+            elseif($object->extends == 'Case') {
+              $key = 'case_type';
+            }
             $types = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($object->$name, 1, -1));
             $values = array();
             if (in_array($object->extends, array('Individual', 'Organization', 'Household'))) {
@@ -479,7 +484,7 @@ class CRM_Utils_Migrate_Export {
             }
             else {
               foreach ($types as $type) {
-                if (in_array($key, array('activity_type', 'event_type'))) {
+                if (in_array($key, array('activity_type', 'event_type', 'case_type'))) {
                   $ogID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $key, 'id', 'name');
                   $ovParams = array('option_group_id' => $ogID, 'value' => $type);
                   CRM_Core_BAO_OptionValue::retrieve($ovParams, $oValue);
@@ -522,7 +527,8 @@ class CRM_Utils_Migrate_Export {
   /**
    * @param string $tagName
    * @param array $keyValues
-   * @param string $additional XML
+   * @throws Exception
+   * @internal param string $additional XML
    * @return string XML
    */
   public function renderKeyValueXML($tagName, $keyValues) {
@@ -538,6 +544,8 @@ class CRM_Utils_Migrate_Export {
    * @param string $name tag name
    * @param string $value text
    * @param string $prefix
+   *
+   * @throws Exception
    * @return string XML
    */
   function renderTextTag($name, $value, $prefix = '') {

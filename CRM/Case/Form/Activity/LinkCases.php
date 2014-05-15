@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -65,21 +65,25 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @access public
    *
-   * @return None
+   * @param $form
+   *
+   * @return void
    */
   static function setDefaultValues(&$form) {
     return $defaults = array();
   }
 
   static function buildQuickForm(&$form) {
-    $form->add('text', 'link_to_case', ts('Link To Case'));
-    $form->add('hidden', 'link_to_case_id', '', array('id' => 'link_to_case_id'));
+    $form->add('text', 'link_to_case_id', ts('Link To Case'), array('class' => 'huge'), TRUE);
   }
 
   /**
    * global validation rules for the form
    *
    * @param array $values posted values of the form
+   *
+   * @param $files
+   * @param $form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -89,17 +93,14 @@ class CRM_Case_Form_Activity_LinkCases {
     $errors = array();
 
     $linkCaseId = CRM_Utils_Array::value('link_to_case_id', $values);
-    if (!$linkCaseId) {
-      $errors['link_to_case'] = ts('Please select a case to link.');
-    }
-    elseif ($linkCaseId == $form->_caseId) {
+    if ($linkCaseId == $form->_caseId) {
       $errors['link_to_case'] = ts('Please select some other case to link.');
     }
 
     // do check for existing related cases.
     $relatedCases = $form->get('relatedCases');
     if (is_array($relatedCases) && array_key_exists($linkCaseId, $relatedCases)) {
-      $errors['link_to_case'] = ts('It looks like selected case is already linked.');
+      $errors['link_to_case'] = ts('Selected case is already linked.');
     }
 
     return empty($errors) ? TRUE : $errors;
@@ -110,18 +111,23 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @access public
    *
-   * @return None
+   * @param $form
+   * @param $params
+   *
+   * @return void
    */
-  static function beginPostProcess(&$form, &$params) {
-    $params['id'] = $params['case_id'];
-  }
+  static function beginPostProcess(&$form, &$params) {}
 
   /**
    * Function to process the form
    *
    * @access public
    *
-   * @return None
+   * @param $form
+   * @param $params
+   * @param $activity
+   *
+   * @return void
    */
   static function endPostProcess(&$form, &$params, &$activity) {
     $activityId = $activity->id;

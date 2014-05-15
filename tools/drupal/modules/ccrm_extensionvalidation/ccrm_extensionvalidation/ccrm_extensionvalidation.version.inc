@@ -5,6 +5,8 @@ define(CCRM_EXTENSIONVALIDATION_PAD, 7);
 /**
  * Determine if a version is valid
  *
+ * @param $ver
+ *
  * @return bool
  */
 function ccrm_extensionvalidation_version_isValid($ver) {
@@ -21,6 +23,7 @@ function ccrm_extensionvalidation_version_isValid($ver) {
  * Normalize version, producing a code that can be correclty
  * sorted in SQL.
  *
+ * @param $ver
  * @return string
  */
 function ccrm_extensionvalidation_version_normalize($ver) {
@@ -35,6 +38,8 @@ function ccrm_extensionvalidation_version_normalize($ver) {
  *  - Explode into numeric and alphabetic parts
  *  - Make numerals higher than alphas (1.2.0 > 1.2.alpha)
  *
+ * @param $ver
+ * @param $pad
  * @return array of version parts
  */
 function ccrm_extensionvalidation_version_split($ver, $pad = CCRM_EXTENSIONVALIDATION_PAD) {
@@ -55,7 +60,7 @@ function ccrm_extensionvalidation_version_split($ver, $pad = CCRM_EXTENSIONVALID
     } else {
       $newCharType = 'ALPHA';
     }
-    
+
     // printf("ver=[%s] state=%-5s newCharType=%-5s char=[%s] parts=[%-12s] buf=[%s]\n", $ver, $state, $newCharType, $ver{$i}, implode('/', $parts), $buf);
     switch ($state) {
       case 'NEW':
@@ -83,7 +88,7 @@ function ccrm_extensionvalidation_version_split($ver, $pad = CCRM_EXTENSIONVALID
         break;
     }
   }
-  
+
   $codes = array(
     'alpha' => 'pre010',
     'beta' => 'pre020',

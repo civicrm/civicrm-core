@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * uninstalling extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -101,7 +101,10 @@ class CRM_Extension_Manager {
   public $statuses;
 
   /**
+   * @param CRM_Extension_Container_Interface $fullContainer
    * @param CRM_Extension_Container_Basic|FALSE $defaultContainer
+   * @param CRM_Extension_Mapper $mapper
+   * @param $typeManagers
    */
   function __construct(CRM_Extension_Container_Interface $fullContainer, $defaultContainer, CRM_Extension_Mapper $mapper, $typeManagers) {
     $this->fullContainer = $fullContainer;
@@ -138,6 +141,7 @@ class CRM_Extension_Manager {
         $tgtPath = $this->fullContainer->getPath($newInfo->key);
         if (! CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath)) {
           // force installation in the default-container
+          $oldPath = $tgtPath;
           $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
           CRM_Core_Session::setStatus(ts('A copy of the extension (%1) is in a system folder (%2). The system copy will be preserved, but the new copy will be used.', array(
             1 => $newInfo->key,
@@ -157,7 +161,7 @@ class CRM_Extension_Manager {
         $oldInfo = $typeManager = NULL;
         break;
       default:
-        throw new CRM_Extension_Exception("Cannot install or enable extension: $key");
+        throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
     }
 
     // move the code!
@@ -182,7 +186,7 @@ class CRM_Extension_Manager {
         $typeManager->onPostReplace($oldInfo, $newInfo);
         break;
       default:
-        throw new CRM_Extension_Exception("Cannot install or enable extension: $key");
+        throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
     }
 
     $this->refresh();
@@ -229,6 +233,28 @@ class CRM_Extension_Manager {
     $this->statuses = NULL;
     $this->mapper->refresh();
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+
+    foreach ($keys as $key) {
+      list ($info, $typeManager) = $this->_getInfoTypeHandler($key); // throws Exception
+      //print_r(array('post post?', $info, 'k' => $key, 'os'=> $origStatuses[$key]));
+
+      switch ($origStatuses[$key]) {
+        case self::STATUS_INSTALLED:
+          // ok, nothing to do
+          break;
+        case self::STATUS_DISABLED:
+          // re-enable it
+          break;
+        case self::STATUS_UNINSTALLED:
+          // install anew
+          $typeManager->onPostPostInstall($info);
+          break;
+        case self::STATUS_UNKNOWN:
+        default:
+          throw new CRM_Extension_Exception("Cannot install or enable extension: $key");
+      }
+    }
+
   }
 
   /**
@@ -335,6 +361,8 @@ class CRM_Extension_Manager {
   /**
    * Determine the status of an extension
    *
+   * @param $key
+   *
    * @return string constant (STATUS_INSTALLED, STATUS_DISABLED, STATUS_UNINSTALLED, STATUS_UNKNOWN)
    */
   public function getStatus($key) {
@@ -392,8 +420,10 @@ class CRM_Extension_Manager {
   /**
    * Find the $info and $typeManager for a $key
    *
-   * @return array (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
+   * @param $key
+   *
    * @throws CRM_Extension_Exception
+   * @return array (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
    */
   private function _getInfoTypeHandler($key) {
     $info = $this->mapper->keyToInfo($key); // throws Exception
@@ -407,8 +437,10 @@ class CRM_Extension_Manager {
   /**
    * Find the $info and $typeManager for a $key
    *
-   * @return array (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
+   * @param $key
+   *
    * @throws CRM_Extension_Exception
+   * @return array (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
    */
   private function _getMissingInfoTypeHandler($key) {
     $info = $this->createInfoFromDB($key);
@@ -473,6 +505,7 @@ class CRM_Extension_Manager {
    * Auto-generate a place-holder for a missing extension using info from
    * database.
    *
+   * @param $key
    * @return CRM_Extension_Info|NULL
    */
   public function createInfoFromDB($key) {

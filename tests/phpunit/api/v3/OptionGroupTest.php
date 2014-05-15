@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.5                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -28,7 +28,7 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_OptionGroupTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
-  public $_eNoticeCompliant = TRUE;
+
   protected $_entity = 'OptionGroup';
 
   function setUp() {

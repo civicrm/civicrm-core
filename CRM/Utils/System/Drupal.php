@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -50,7 +50,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *
    */
   function createUser(&$params, $mail) {
-    $form_state = array();
+    $form_state = form_state_defaults();
+
     $form_state['input'] = array(
       'name' => $params['cms_name'],
       'mail' => $params[$mail],
@@ -121,6 +122,10 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @params $errors    array   array of errors
    * @params $emailName string  field label for the 'email'
    *
+   * @param $params
+   * @param $errors
+   * @param string $emailName
+   *
    * @return void
    */
   static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
@@ -135,7 +140,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       unset($_SESSION['messages']);
     }
 
-    if (CRM_Utils_Array::value('name', $params)) {
+    if (!empty($params['name'])) {
       if ($nameError = user_validate_name($params['name'])) {
         $errors['cms_name'] = $nameError;
       }
@@ -150,7 +155,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       }
     }
 
-    if (CRM_Utils_Array::value('mail', $params)) {
+    if (!empty($params['mail'])) {
       if ($emailError = user_validate_mail($params['mail'])) {
         $errors[$emailName] = $emailError;
       }
@@ -231,6 +236,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * sets the title of the page
    *
    * @param string $title
+   * @param null $pageTitle
+   *
    * @paqram string $pageTitle
    *
    * @return void
@@ -249,8 +256,10 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb
    *
-   * @param string $title
-   * @param string $url
+   * @param $breadCrumbs
+   *
+   * @internal param string $title
+   * @internal param string $url
    *
    * @return void
    * @access public
@@ -331,7 +340,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
         return FALSE;
     }
     // If the path is within the drupal directory we can use the more efficient 'file' setting
-    $params['type'] = self::formatResourceUrl($url) ? 'file' : 'external';
+    $params['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
     drupal_add_js($url, $params);
     return TRUE;
   }
@@ -380,7 +389,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     }
     $params = array();
     // If the path is within the drupal directory we can use the more efficient 'file' setting
-    $params['type'] = self::formatResourceUrl($url) ? 'file' : 'external';
+    $params['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
     drupal_add_css($url, $params);
     return TRUE;
   }
@@ -404,35 +413,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     $params = array('type' => 'inline');
     drupal_add_css($code, $params);
     return TRUE;
-  }
-
-  /**
-   * Check if a resource url is within the drupal directory and format appropriately
-   *
-   * @param url (reference)
-   *
-   * @return bool: TRUE for internal paths, FALSE for external
-   */
-  static function formatResourceUrl(&$url) {
-    $internal = FALSE;
-    $base = CRM_Core_Config::singleton()->resourceBase;
-    global $base_url;
-    // Handle absolute urls
-    if (strpos($url, $base_url) === 0) {
-      $internal = TRUE;
-      $url = trim(str_replace($base_url, '', $url), '/');
-    }
-    // Handle relative urls
-    elseif (strpos($url, $base) === 0) {
-      $internal = TRUE;
-      $url = substr(drupal_get_path('module', 'civicrm'), 0, -6) . trim(substr($url, strlen($base)), '/');
-    }
-    // Strip query string
-    $q = strpos($url, '?');
-    if ($q && $internal) {
-      $url = substr($url, 0, $q);
-    }
-    return $internal;
   }
 
   /**
@@ -464,80 +444,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     return $this->url($_GET['q']);
   }
 
-  /**
-   * Generate an internal CiviCRM URL (copied from DRUPAL/includes/common.inc#url)
-   *
-   * @param $path     string   The path being linked to, such as "civicrm/add"
-   * @param $query    string   A query string to append to the link.
-   * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
-   *                           Useful for links that will be displayed outside the site, such as in an
-   *                           RSS feed.
-   * @param $fragment string   A fragment identifier (named anchor) to append to the link.
-   * @param $htmlize  boolean  whether to convert to html eqivalant
-   * @param $frontend boolean  a gross joomla hack
-   *
-   * @return string            an HTML string containing a link to the given path.
-   * @access public
-   *
-   */
-  function url($path = NULL, $query = NULL, $absolute = FALSE,
-    $fragment = NULL, $htmlize = TRUE,
-    $frontend = FALSE, $forceBackend = FALSE
-  ) {
-    $config = CRM_Core_Config::singleton();
-    $script = 'index.php';
-
-    $path = CRM_Utils_String::stripPathChars($path);
-
-    if (isset($fragment)) {
-      $fragment = '#' . $fragment;
-    }
-
-    if (!isset($config->useFrameworkRelativeBase)) {
-      $base = parse_url($config->userFrameworkBaseURL);
-      $config->useFrameworkRelativeBase = $base['path'];
-    }
-    $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
-
-    $separator = $htmlize ? '&amp;' : '&';
-
-    if (!$config->cleanURL) {
-      if (isset($path)) {
-        if (isset($query)) {
-          return $base . $script . '?q=' . $path . $separator . $query . $fragment;
-        }
-        else {
-          return $base . $script . '?q=' . $path . $fragment;
-        }
-      }
-      else {
-        if (isset($query)) {
-          return $base . $script . '?' . $query . $fragment;
-        }
-        else {
-          return $base . $fragment;
-        }
-      }
-    }
-    else {
-      if (isset($path)) {
-        if (isset($query)) {
-          return $base . $path . '?' . $query . $fragment;
-        }
-        else {
-          return $base . $path . $fragment;
-        }
-      }
-      else {
-        if (isset($query)) {
-          return $base . $script . '?' . $query . $fragment;
-        }
-        else {
-          return $base . $fragment;
-        }
-      }
-    }
-  }
 
   /**
    * Authenticate the user against the drupal db
@@ -683,10 +589,6 @@ AND    u.status = 1
     drupal_set_message($message);
   }
 
-  function permissionDenied() {
-    drupal_access_denied();
-  }
-
   function logout() {
     module_load_include('inc', 'user', 'user.pages');
     return user_logout();
@@ -749,6 +651,8 @@ AND    u.status = 1
    * @param boolean $loadUser boolean Require CMS user load.
    * @param boolean $throwError If true, print error on failure and exit.
    * @param boolean|string $realPath path to script
+   *
+   * @return bool
    */
   function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     //take the cms root path.
@@ -933,6 +837,9 @@ AND    u.status = 1
    *
    * @param string $url
    *
+   * @param bool $addLanguagePart
+   * @param bool $removeLanguagePart
+   *
    * @return string $url, formatted url.
    * @static
    */
@@ -969,7 +876,12 @@ AND    u.status = 1
         if ($urlType == LOCALE_LANGUAGE_NEGOTIATION_URL_DOMAIN) {
           if (isset($language->domain) && $language->domain) {
             if ($addLanguagePart) {
-              $url = CRM_Utils_File::addTrailingSlash($language->domain, '/');
+              $cleanedUrl = preg_replace('#^https?://#', '', $language->domain);
+              // drupal function base_path() adds a "/" to the beginning and end of the returned path
+              if (substr($cleanedUrl, -1) == '/') {
+                $cleanedUrl = substr($cleanedUrl, 0, -1);
+              }
+              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $cleanedUrl . base_path();
             }
             if ($removeLanguagePart && defined('CIVICRM_UF_BASEURL')) {
               $url = str_replace('\\', '/', $url);
@@ -1065,6 +977,22 @@ AND    u.status = 1
     }
   }
 
+  /**
+   * Over-ridable function to get timezone as a string eg.
+   * @return string Timezone e.g. 'America/Los_Angeles'
+   */
+  function getTimeZoneString() {
+    global $user;
+    if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
+      $timezone = $user->timezone;
+    } else {
+      $timezone = variable_get('date_default_timezone', null);
+    }
+    if (!$timezone) {
+      $timezone = parent::getTimeZoneString();
+    }
+    return $timezone;
+  }
   /**
    * Reset any system caches that may be required for proper CiviCRM
    * integration.

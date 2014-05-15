@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -121,12 +121,10 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
 
     // Add $c1, $c2, $c3 to $child
     foreach ($deceased as $contact) {
-      $result = civicrm_api('group_contact', 'create', array(
+      $result = $this->callAPISuccess('group_contact', 'create', array(
         'contact_id' => $contact->id,
         'group_id' => $child->id,
-        'version' => '3',
       ));
-      $this->assertAPISuccess($result);
     }
 
     // GroupContactCache::load()

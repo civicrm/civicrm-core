@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
+
+  // Number of characters in the menu js cache key
+  const CACHE_KEY_STRLEN = 8;
 
   /**
    * class constructor
@@ -151,8 +154,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    * @param $parentID parent_id of a menu
    * @param $menuID  menu id
    *
-   * @return $weight string
-   * @static
+   * @return int $weight string@static
    */
   static function calculateWeight($parentID = NULL, $menuID = NULL) {
     $domainID = CRM_Core_Config::domainID();
@@ -488,14 +490,14 @@ ORDER BY parent_id, weight";
 
     $makeLink = FALSE;
     if (isset($url) && $url) {
-      if (substr($url, 0, 4) === 'http') {
-        $url = $url;
-      }
-      else {
+      if (substr($url, 0, 4) !== 'http') {
         //CRM-7656 --make sure to separate out url path from url params,
         //as we'r going to validate url path across cross-site scripting.
-        $urlParam = CRM_Utils_System::explode('&', str_replace('?', '&', $url), 2);
-        $url = CRM_Utils_System::url($urlParam[0], $urlParam[1], FALSE, NULL, FALSE);
+        $urlParam = explode('?', $url);
+        if (empty($urlParam[1])) {
+          $urlParam[1] = NULL;
+        }
+        $url = CRM_Utils_System::url($urlParam[0], $urlParam[1], FALSE, NULL, TRUE);
       }
       $makeLink = TRUE;
     }
@@ -571,77 +573,80 @@ ORDER BY parent_id, weight";
   static function createNavigation($contactID) {
     $config = CRM_Core_Config::singleton();
 
-    // if on frontend, do not create navigation menu items, CRM-5349
-    if ($config->userFrameworkFrontend) {
-      return "<!-- $config->lcMessages -->";
-    }
+    $navigation = self::buildNavigation();
 
-    $navParams = array('contact_id' => $contactID);
-
-    $navigation = CRM_Core_BAO_Setting::getItem(
-      CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
-      'navigation',
-      NULL,
-      NULL,
-      $contactID
-    );
-
-    // FIXME: hack for CRM-5027: we need to prepend the navigation string with
-    // (HTML-commented-out) locale info so that we rebuild menu on locale changes
-    if (
-      !$navigation ||
-      substr($navigation, 0, 14) != "<!-- $config->lcMessages -->"
-    ) {
-      //retrieve navigation if it's not cached.
-      $navigation = self::buildNavigation();
+    if ($navigation) {
 
       //add additional navigation items
       $logoutURL = CRM_Utils_System::url('civicrm/logout', 'reset=1');
-      $appendSring = "<li id=\"menu-logout\" class=\"menumain\"><a href=\"{$logoutURL}\">" . ts('Logout') . "</a></li>";
 
       // get home menu from db
       $homeParams = array('name' => 'Home');
       $homeNav = array();
+      $homeIcon = '<img src="' . $config->userFrameworkResourceURL . 'i/logo16px.png" style="vertical-align:middle;" />';
       self::retrieve($homeParams, $homeNav);
       if ($homeNav) {
-        list($path, $q) = explode('&', $homeNav['url']);
+        list($path, $q) = explode('?', $homeNav['url']);
         $homeURL = CRM_Utils_System::url($path, $q);
         $homeLabel = $homeNav['label'];
         // CRM-6804 (we need to special-case this as we don’t ts()-tag variables)
         if ($homeLabel == 'Home') {
-          $homeLabel = ts('Home');
+          $homeLabel = ts('CiviCRM Home');
         }
       }
       else {
         $homeURL = CRM_Utils_System::url('civicrm/dashboard', 'reset=1');
-        $homeLabel = ts('Home');
+        $homeLabel = ts('CiviCRM Home');
       }
-
+      // Link to hide the menubar
       if (
         ($config->userSystem->is_drupal) &&
         ((module_exists('toolbar') && user_access('access toolbar')) ||
           module_exists('admin_menu') && user_access('access administration menu')
         )
       ) {
-        $prepandString = "<li class=\"menumain crm-link-home\">" . $homeLabel . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . "</a></li><li><a href=\"#\" onclick=\"cj.Menu.closeAll( );cj('#civicrm-menu').toggle( );\">" . ts('Drupal Menu') . "</a></li></ul></li>";
+        $hideLabel = ts('Drupal Menu');
       }
       elseif ($config->userSystem->is_wordpress) {
-        $prepandString = "<li class=\"menumain crm-link-home\">" . $homeLabel . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . "</a></li><li><a href=\"#\" onclick=\"cj.Menu.closeAll( );cj('#civicrm-menu').toggle( );\">" . ts('WordPress Menu') . "</a></li></ul></li>";
+        $hideLabel = ts('WordPress Menu');
       }
       else {
-        $prepandString = "<li class=\"menumain crm-link-home\"><a href=\"{$homeURL}\" title=\"" . $homeLabel . "\">" . $homeLabel . "</a></li>";
+        $hideLabel = ts('Hide Menu');
       }
 
-      // prepend the navigation with locale info for CRM-5027
-      $navigation = "<!-- $config->lcMessages -->" . $prepandString . $navigation . $appendSring;
+      $prepandString = "
+        <li class='menumain crm-link-home'>$homeIcon
+          <ul id='civicrm-home'>
+            <li><a href='$homeURL'>$homeLabel</a></li>
+            <li><a href='#' class='crm-hidemenu'>$hideLabel</a></li>
+            <li><a href='$logoutURL' class='crm-logout-link'>". ts('Logout') ."</a></li>
+          </ul>";
+      // <li> tag doesn't need to be closed
+    }
+    return $prepandString . $navigation;
+  }
 
+  /**
+   * Reset navigation for all contacts or a specified contact
+   *
+   * @param integer $contactID - reset only entries belonging to that contact ID
+   * @return string
+   */
+  static function resetNavigation($contactID = NULL) {
+    $newKey = CRM_Utils_String::createRandom(self::CACHE_KEY_STRLEN, CRM_Utils_String::ALPHANUMERIC);
+    if (!$contactID) {
+      $query = "UPDATE civicrm_setting SET value = '$newKey' WHERE name='navigation' AND contact_id IS NOT NULL";
+      CRM_Core_DAO::executeQuery($query);
+      CRM_Core_BAO_Cache::deleteGroup('navigation');
+    }
+    else {
       // before inserting check if contact id exists in db
-      // this is to handle wierd case when contact id is in session but not in db
+      // this is to handle weird case when contact id is in session but not in db
       $contact = new CRM_Contact_DAO_Contact();
       $contact->id = $contactID;
       if ($contact->find(TRUE)) {
         CRM_Core_BAO_Setting::setItem(
-          $navigation,
+          $newKey,
           CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
           'navigation',
           NULL,
@@ -650,30 +655,11 @@ ORDER BY parent_id, weight";
         );
       }
     }
-    return $navigation;
-  }
-
-  /**
-   * Reset navigation for all contacts
-   *
-   * @param integer $contactID - reset only entries belonging to that contact ID
-   */
-  static function resetNavigation($contactID = NULL) {
-    $params = array();
-    $query = "UPDATE civicrm_setting SET value = NULL WHERE name='navigation'";
-    if ($contactID) {
-      $query .= " AND contact_id = %1";
-      $params[1] = array($contactID, 'Integer');
-    }
-    else {
-      $query .= " AND contact_id IS NOT NULL";
-    }
-
-    CRM_Core_DAO::executeQuery($query, $params);
-    CRM_Core_BAO_Cache::deleteGroup('navigation');
-
     // also reset the dashlet cache in case permissions have changed etc
+    // FIXME: decouple this
     CRM_Core_BAO_Dashboard::resetDashletCache($contactID);
+
+    return $newKey;
   }
 
   /**
@@ -826,6 +812,20 @@ ORDER BY parent_id, weight";
       $dao->copyValues($newParams);
       $dao->save();
     }
+  }
+
+  static function getCacheKey($cid) {
+    $key = CRM_Core_BAO_Setting::getItem(
+      CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
+      'navigation',
+      NULL,
+      '',
+      $cid
+    );
+    if (strlen($key) !== self::CACHE_KEY_STRLEN) {
+      $key = self::resetNavigation($cid);
+    }
+    return $key;
   }
 }
 

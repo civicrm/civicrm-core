@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
  *
  */
@@ -129,7 +129,12 @@ class CRM_Utils_File {
    * delete a directory given a path name, delete children directories
    * and files if needed
    *
-   * @param string $path  the path name
+   * @param $target
+   * @param bool $rmdir
+   * @param bool $verbose
+   *
+   * @throws Exception
+   * @internal param string $path the path name
    *
    * @return void
    * @access public
@@ -236,6 +241,9 @@ class CRM_Utils_File {
 
   /**
    * Appends trailing slashed to paths
+   *
+   * @param $name
+   * @param null $separator
    *
    * @return string
    * @access public
@@ -378,13 +386,14 @@ class CRM_Utils_File {
   /**
    * Restrict access to a given directory (by planting there a restrictive .htaccess file)
    *
-   * @param string $dir  the directory to be secured
+   * @param string $dir the directory to be secured
+   * @param bool $overwrite
    */
-  static function restrictAccess($dir) {
+  static function restrictAccess($dir, $overwrite = FALSE) {
     // note: empty value for $dir can play havoc, since that might result in putting '.htaccess' to root dir
     // of site, causing site to stop functioning.
     // FIXME: we should do more checks here -
-    if (!empty($dir)) {
+    if (!empty($dir) && is_dir($dir)) {
       $htaccess = <<<HTACCESS
 <Files "*">
   Order allow,deny
@@ -393,8 +402,38 @@ class CRM_Utils_File {
 
 HTACCESS;
       $file = $dir . '.htaccess';
-      if (file_put_contents($file, $htaccess) === FALSE) {
-        CRM_Core_Error::movedSiteError($file);
+      if ($overwrite || !file_exists($file)) {
+        if (file_put_contents($file, $htaccess) === FALSE) {
+          CRM_Core_Error::movedSiteError($file);
+        }
+      }
+    }
+  }
+
+  /**
+   * Restrict remote users from browsing the given directory.
+   *
+   * @param $publicDir
+   */
+  static function restrictBrowsing($publicDir) {
+    if (!is_dir($publicDir) || !is_writable($publicDir)) {
+      return;
+    }
+
+    // base dir
+    $nobrowse = realpath($publicDir) . '/index.html';
+    if (!file_exists($nobrowse)) {
+      @file_put_contents($nobrowse, '');
+    }
+
+    // child dirs
+    $dir = new RecursiveDirectoryIterator($publicDir);
+    foreach ($dir as $name => $object) {
+      if (is_dir($name) && $name != '..') {
+        $nobrowse = realpath($name) . '/index.html';
+        if (!file_exists($nobrowse)) {
+          @file_put_contents($nobrowse, '');
+        }
       }
     }
   }
@@ -469,6 +508,9 @@ HTACCESS;
 
   /**
    * Make a file path relative to some base dir
+   *
+   * @param $directory
+   * @param $basePath
    *
    * @return string
    */
@@ -558,6 +600,8 @@ HTACCESS;
    *
    * @param string $parent
    * @param string $child
+   * @param bool $checkRealPath
+   *
    * @return bool
    */
   static function isChildPath($parent, $child, $checkRealPath = TRUE) {
@@ -586,6 +630,8 @@ HTACCESS;
    *
    * @param string $fromDir the directory which should be moved
    * @param string $toDir the new location of the directory
+   * @param bool $verbose
+   *
    * @return bool TRUE on success
    */
   static function replaceDir($fromDir, $toDir, $verbose = FALSE) {

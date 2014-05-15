@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Pledge
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Pledge.php
  *
  */
@@ -129,25 +129,11 @@ function _civicrm_api3_pledge_create_spec(&$params) {
  * @access public
  */
 function civicrm_api3_pledge_get($params) {
+  $mode = CRM_Contact_BAO_Query::MODE_PLEDGE;
+  $entity = 'pledge';
 
-  $options = _civicrm_api3_get_options_from_params($params, TRUE, 'pledge','get');
-  if (empty($options['return'])) {
-    $options['return'] = CRM_Pledge_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_PLEDGE);
-  }
-  else {
-    $options['return']['pledge_id'] = 1;
-  }
-  $newParams = CRM_Contact_BAO_Query::convertFormValues($options['input_params']);
-  $query = new CRM_Contact_BAO_Query($newParams, $options['return'], NULL,
-    FALSE, FALSE, CRM_Contact_BAO_Query::MODE_PLEDGE
-  );
-  list($select, $from, $where) = $query->query();
-  $sql = "$select $from $where";
-  if (!empty($options['sort'])) {
-    $sql .= " ORDER BY " . $options['sort'];
-  }
-  $sql .= " LIMIT " . $options['offset'] . " , " . $options['limit'];
-  $dao = CRM_Core_DAO::executeQuery($sql);
+  list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, $entity);
+
   $pledge = array();
   while ($dao->fetch()) {
     $pledge[$dao->pledge_id] = $query->store($dao);
@@ -169,11 +155,13 @@ function _civicrm_api3_pledge_get_defaults() {
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array  $params       Associative array of property name/value
- *                             pairs to insert in new contact.
- * @param array  $values       The reformatted properties that we can use internally
+ * @param array $values The reformatted properties that we can use internally
  *                            '
  *
+ * @param bool $create
+ *
+ * @internal param array $params Associative array of property name/value
+ *                             pairs to insert in new contact.
  * @return array|CRM_Error
  * @access public
  */

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -36,11 +36,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -75,14 +77,12 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_ACL_BAO_ACL' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable ACL'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_ACL_BAO_ACL' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable ACL'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -141,9 +141,10 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
       }
     }
 
-
     // finally browse the acl's
-    $this->browse();
+    if ($action & CRM_Core_Action::BROWSE) {
+      $this->browse();
+    }
 
     // parent run
     return parent::run();
@@ -157,7 +158,6 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
    * @static
    */
   function browse() {
-
     // get all acl's sorted by weight
     $acl = array();
     $query = "
@@ -236,8 +236,15 @@ ORDER BY entity_id
         $action -= CRM_Core_Action::DISABLE;
       }
 
-      $acl[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $dao->id)
+      $acl[$dao->id]['action'] = CRM_Core_Action::formLink(
+        self::links(),
+        $action,
+        array('id' => $dao->id),
+        ts('more'),
+        FALSE,
+        'ACL.manage.action',
+        'ACL',
+        $dao->id
       );
     }
     $this->assign('rows', $acl);
@@ -263,6 +270,8 @@ ORDER BY entity_id
 
   /**
    * Get user context.
+   *
+   * @param null $mode
    *
    * @return string user context.
    */

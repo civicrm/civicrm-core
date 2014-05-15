@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,9 +40,9 @@ class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
   /**
    * Connect to and lock the supplied file and make sure the two mail dirs exist
    *
-   * @param string $file  mbox to operate upon
+   * @param string $file mbox to operate upon
    *
-   * @return void
+   * @return \CRM_Mailing_MailStore_Mbox
    */
   function __construct($file) {
     $this->_transport = new ezcMailMboxTransport($file);

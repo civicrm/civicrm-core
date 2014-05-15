@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -54,7 +54,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
    */
   public function preProcess() {
     if (CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG") {
-      CRM_Core_Error::fatal(ts('The <a href="%1">default mailbox</a> has not been configured. You will find <a href="%2">more info in our online user and administrator guide.</a>', array(1 => CRM_Utils_System::url('civicrm/admin/mailSettings', 'reset=1'), 2 => "http://book.civicrm.org/user/initial-set-up/email-system-configuration")));
+      CRM_Core_Error::fatal(ts('The <a href="%1">default mailbox</a> has not been configured. You will find <a href="%2">more info in our online user and administrator guide.</a>', array(1 => CRM_Utils_System::url('civicrm/admin/mailSettings', 'reset=1'), 2 => "http://book.civicrm.org/user/advanced-configuration/email-system-configuration/")));
     }
 
     $this->_mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
@@ -94,12 +94,16 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $continue = CRM_Utils_Request::retrieve('continue', 'String', $this, FALSE, NULL);
 
     $defaults = array();
+    $defaults['dedupe_email'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+      'dedupe_email_default', NULL, FALSE
+    );
+
     if ($this->_mailingID) {
       // check that the user has permission to access mailing id
       CRM_Mailing_BAO_Mailing::checkPermission($this->_mailingID);
@@ -139,8 +143,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
         $mailingGroups[$entityTable][$dao->group_type][] = $dao->entity_id;
       }
 
-      $defaults['includeGroups'] = $mailingGroups['civicrm_group']['Include'];
-      $defaults['excludeGroups'] = CRM_Utils_Array::value('Exclude', $mailingGroups['civicrm_group']);
+      $defaults['includeGroups'] = $mailingGroups['civicrm_group']['include'];
+      $defaults['excludeGroups'] = CRM_Utils_Array::value('exclude', $mailingGroups['civicrm_group']);
 
       if (!empty($mailingGroups['civicrm_mailing'])) {
         $defaults['includeMailings'] = CRM_Utils_Array::value('Include', $mailingGroups['civicrm_mailing']);
@@ -179,7 +183,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -236,12 +240,19 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       );
     }
 
+    if (count($groups) <= 10) {
+      // setting minimum height to 2 since widget looks strange when size (height) is 1
+      $groupSize = max(count($groups), 2);
+    }
+    else {
+      $groupSize = 10;
+    }
     $inG = &$this->addElement('advmultiselect', 'includeGroups',
       ts('Include Group(s)') . ' ',
       $groups,
       array(
-        'size' => 5,
-        'style' => 'width:240px',
+        'size' => $groupSize,
+        'style' => 'width:auto; min-width:240px;',
         'class' => 'advmultiselect',
       )
     );
@@ -255,8 +266,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       ts('Exclude Group(s)') . ' ',
       $groups,
       array(
-        'size' => 5,
-        'style' => 'width:240px',
+        'size' => $groupSize,
+        'style' => 'width:auto; min-width:240px;',
         'class' => 'advmultiselect',
       )
     );
@@ -266,12 +277,19 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     $inG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
     $outG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
 
+    if (count($mailings) <= 10) {
+      // setting minimum height to 2 since widget looks strange when size (height) is 1
+      $mailingSize = max(count($mailings), 2);
+    }
+    else {
+      $mailingSize = 10;
+    }
     $inM = &$this->addElement('advmultiselect', 'includeMailings',
       ts('INCLUDE Recipients of These Mailing(s)') . ' ',
       $mailings,
       array(
-        'size' => 5,
-        'style' => 'width:240px',
+        'size' => $mailingSize,
+        'style' => 'width:auto; min-width:240px;',
         'class' => 'advmultiselect',
       )
     );
@@ -279,8 +297,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       ts('EXCLUDE Recipients of These Mailing(s)') . ' ',
       $mailings,
       array(
-        'size' => 5,
-        'style' => 'width:240px',
+        'size' => $mailingSize,
+        'style' => 'width:auto; min-width:240px;',
         'class' => 'advmultiselect',
       )
     );
@@ -315,6 +333,9 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
     $this->assign('groupCount', count($groups));
     $this->assign('mailingCount', count($mailings));
+    if(count($groups) == 0 && count($mailings) == 0 && !$this->_searchBasedMailing) {
+      CRM_Core_Error::statusBounce("To send a mailing, you must have a valid group of recipients - either at least one group that's a Mailing List or at least one previous mailing or start from a search");
+    }
   }
 
   public function postProcess() {
@@ -390,7 +411,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     foreach (
       array('name', 'group_id', 'search_id', 'search_args', 'campaign_id', 'dedupe_email') as $n
     ) {
-      if (CRM_Utils_Array::value($n, $values)) {
+      if (!empty($values[$n])) {
         $params[$n] = $values[$n];
       }
     }
@@ -472,6 +493,9 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     if (isset($params['dedupe_email'])) {
       $dedupeEmail = $params['dedupe_email'];
     }
+
+    // mailing id should be added to the form object
+    $this->_mailingID = $mailing->id;
 
     // also compute the recipients and store them in the mailing recipients table
     CRM_Mailing_BAO_Mailing::getRecipients(

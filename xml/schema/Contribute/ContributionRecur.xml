@@ -54,15 +54,25 @@
       <labelColumn>full_name</labelColumn>
       <nameColumn>numeric_code</nameColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>frequency_unit</name>
     <title>Frequency Unit</title>
-    <type>enum</type>
-    <values>day,week,month,year</values>
+    <type>varchar</type>
+    <length>8</length>
     <default>'month'</default>
     <comment>Time units for recurrence of payment.</comment>
+    <pseudoconstant>
+      <optionGroupName>recur_frequency_units</optionGroupName>
+      <keyColumn>name</keyColumn>
+    </pseudoconstant>
     <add>1.6</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>frequency_interval</name>
@@ -159,6 +169,9 @@
     <default>1</default>
     <import>true</import>
     <add>1.6</add>
+    <pseudoconstant>
+      <optionGroupName>contribution_status</optionGroupName>
+    </pseudoconstant>
   </field>
   <index>
     <name>index_contribution_status</name>
@@ -257,6 +270,11 @@
     <type>int unsigned</type>
     <comment>FK to Financial Type</comment>
     <add>4.3</add>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
   </field>
   <foreignKey>
     <name>financial_type_id</name>
@@ -273,6 +291,9 @@
     <pseudoconstant>
       <optionGroupName>payment_instrument</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>4.1</add>
   </field>
   <index>
@@ -284,9 +305,14 @@
     <name>campaign_id</name>
     <uniqueName>contribution_campaign_id</uniqueName>
     <type>int unsigned</type>
-    <title>Campaign ID</title>
+    <title>Campaign</title>
     <import>true</import>
     <comment>The campaign for which this contribution has been triggered.</comment>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
     <add>4.1</add>
   </field>
   <foreignKey>

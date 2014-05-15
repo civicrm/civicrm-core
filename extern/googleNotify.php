@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  */
 
@@ -36,6 +36,8 @@ session_start();
 require_once '../civicrm.config.php';
 
 $config = CRM_Core_Config::singleton();
+$log = new CRM_Utils_SystemLogger();
+$log->alert('payment_notification processor_name=Google_Checkout', $_REQUEST);
 
 $rawPostData = file_get_contents('php://input');
 CRM_Core_Payment_GoogleIPN::main($rawPostData);

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -73,7 +73,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
  *
  */
@@ -88,12 +88,12 @@ class CRM_Utils_Tree {
   /**
    * Constructor for the tree.
    *
-   * @param string $root
+   * @param $nodeName
+   *
+   * @internal param string $root
    *
    * @return CRM_Utils_Tree
-
    * @access public
-   *
    */
   public function __construct($nodeName) {
     // create the root node
@@ -182,7 +182,7 @@ class CRM_Utils_Tree {
    * @param string $parentName - name of the parent ?
    * @param array  (ref)       - node to be added
    *
-   * @return none
+   * @return void
    *
    * @access public
    */
@@ -200,7 +200,7 @@ class CRM_Utils_Tree {
    * @param mixed              - data to be added
    * @param string             - key to be used (optional)
    *
-   * @return none
+   * @return void
    *
    * @access public
    */
@@ -234,7 +234,7 @@ class CRM_Utils_Tree {
    *
    * @param none
    *
-   * @return none
+   * @return void
    *
    * @access public
    */

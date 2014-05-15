@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -44,16 +44,19 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
   /**
    * Store Mails into Spool table.
    *
-   * @param mixed $recipients Either a comma-seperated list of recipients
-   *              (RFC822 compliant), or an array of recipients,
-   *              each RFC822 valid. This may contain recipients not
-   *              specified in the headers, for Bcc:, resending
-   *              messages, etc.
-   *
+   * @param $recipient
    * @param array $headers The string of headers to send with the mail.
    *
    * @param string $body The full text of the message body, including any
    *               Mime parts, etc.
+   *
+   * @param null $job_id
+   *
+   * @internal param mixed $recipients Either a comma-seperated list of recipients
+   *              (RFC822 compliant), or an array of recipients,
+   *              each RFC822 valid. This may contain recipients not
+   *              specified in the headers, for Bcc:, resending
+   *              messages, etc.
    *
    * @return mixed Returns true on success, or a CRM_Eore_Error
    *               containing a descriptive error message on
@@ -76,9 +79,6 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
       $params['created_date'] = date('YmdHis');
       $params['scheduled_id'] = $params['created_id'];
       $params['scheduled_date'] = $params['created_date'];
-      $params['approver_id'] = $params['created_id'];
-      $params['approval_date'] = $params['created_date'];
-      $params['approval_status_id'] = CRM_Core_OptionGroup::getValue('mail_approval_status', 'Approved', 'name');
       $params['is_completed'] = 1;
       $params['is_archived'] = 1;
       $params['body_html'] = htmlspecialchars( $headerStr ) . "\n\n" . $body;

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_MailerGroup
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,9 +40,10 @@
 /**
  * Handle a confirm event
  *
- * @param array $params  Associative array of property
+ * @param array $params Associative array of property
  *                       name/value pairs to insert in new 'survey'
  *
+ * @throws Exception
  * @return array api result array
  * {@getfields mailing_event_confirm_create}
  * @access public

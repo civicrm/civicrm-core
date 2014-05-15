@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -57,10 +57,12 @@
       {/if}
       {foreach from=$fields item=field key=fieldName}
         <div class="crm-grid-cell">
+          {if $field.name|substr:0:11 ne 'soft_credit'}
           <img src="{$config->resourceBase}i/copy.png"
                alt="{ts 1=$field.title}Click to copy %1 from row one to all rows.{/ts}"
                fname="{$field.name}" class="action-icon"
-               title="{ts}Click here to copy the value in row one to ALL rows.{/ts}"/>{$field.title}
+               title="{ts}Click here to copy the value in row one to ALL rows.{/ts}"/>
+          {/if}{$field.title}
         </div>
       {/foreach}
     </div>
@@ -71,7 +73,7 @@
         <div class="compressed crm-grid-cell"><span class="batch-edit"></span></div>
         {* contact select/create option*}
         <div class="compressed crm-grid-cell">
-          {include file="CRM/Contact/Form/NewContact.tpl" blockNo = $rowNumber noLabel=true prefix="primary_" newContactCallback="updateContactInfo($rowNumber, 'primary_')"}
+          {$form.primary_contact_id.$rowNumber.html|crmAddClass:big}
         </div>
 
         {if $batchType eq 2 }
@@ -88,7 +90,8 @@
             </div>
           {elseif $n eq 'soft_credit'}
             <div class="compressed crm-grid-cell">
-              {include file="CRM/Contact/Form/NewContact.tpl" blockNo = $rowNumber noLabel=true prefix="soft_credit_"}
+              {$form.soft_credit_contact_id.$rowNumber.html|crmAddClass:big}
+              {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
             </div>
           {elseif in_array( $fields.$n.html_type, array('Radio', 'CheckBox'))}
             <div class="compressed crm-grid-cell">&nbsp;{$form.field.$rowNumber.$n.html}</div>
@@ -103,7 +106,7 @@
 </div>
 {literal}
 <script type="text/javascript">
-cj(function () {
+CRM.$(function($) {
   cj('.selector-rows').change(function () {
     var options = {
       'url': {/literal}"{crmURL p='civicrm/ajax/batch' h=0}"{literal}
@@ -139,7 +142,7 @@ cj(function () {
   {/literal}{else}{literal}
   cj('select[id^="member_option_"]').each(function () {
     if (cj(this).val() == 1) {
-      cj(this).attr('disabled', true);
+      cj(this).prop('disabled', true);
     }
   });
 
@@ -337,7 +340,7 @@ function updateContactInfo(blockNo, prefix) {
               },
               { success: function (data) {
                 var memTypeContactId = data.values[0].member_of_contact_id;
-                cj('select[id="member_option_' + blockNo + '"]').removeAttr('disabled').val(2);
+                cj('select[id="member_option_' + blockNo + '"]').prop('disabled', false).val(2);
                 cj('select[id="field_' + blockNo + '_membership_type_0"]').val(memTypeContactId).change();
                 cj('select[id="field_' + blockNo + '_membership_type_1"]').val(membershipTypeId).change();
                 setDateFieldValue('join_date', membershipJoinDate, blockNo)

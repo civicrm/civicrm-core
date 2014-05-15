@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -38,6 +38,8 @@
  *
  */
 class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * Function to set variables up before form is built
@@ -62,9 +64,29 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
 
     CRM_Event_BAO_Participant::resolveDefaults($values[$participantID]);
 
-    if (CRM_Utils_Array::value('fee_level', $values[$participantID])) {
+    if (!empty($values[$participantID]['fee_level'])) {
       CRM_Event_BAO_Participant::fixEventLevel($values[$participantID]['fee_level']);
     }
+
+    $this->assign('contactId', $contactID);
+    $this->assign('participantId', $participantID);
+
+    $paymentId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+      $participantID, 'id', 'participant_id'
+    );
+    $this->assign('hasPayment', $paymentId);
+
+    if ($parentParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
+          $participantID, 'registered_by_id'
+      )) {
+      $parentHasPayment = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+        $parentParticipantId, 'id', 'participant_id'
+      );
+      $this->assign('parentHasPayment', $parentHasPayment);
+    }
+
+    $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'status_id', 'id');
+    $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
 
     if ($values[$participantID]['is_test']) {
       $values[$participantID]['status'] .= ' (test) ';
@@ -86,7 +108,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $values[$participantID]['totalAmount'] = CRM_Utils_Array::value('fee_amount', $values[$participantID]);
 
     // Get registered_by contact ID and display_name if participant was registered by someone else (CRM-4859)
-    if (CRM_Utils_Array::value('participant_registered_by_id', $values[$participantID])) {
+    if (!empty($values[$participantID]['participant_registered_by_id'])) {
       $values[$participantID]['registered_by_contact_id'] = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Participant",
         $values[$participantID]['participant_registered_by_id'],
         'contact_id', 'id'
@@ -124,7 +146,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $finalTree);
     $eventTitle = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $values[$participantID]['event_id'], 'title');
     //CRM-7150, show event name on participant view even if the event is disabled
-    if (!CRM_Utils_Array::value('event', $values[$participantID])) {
+    if (empty($values[$participantID]['event'])) {
       $values[$participantID]['event'] = $eventTitle;
     }
 
@@ -193,7 +215,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -60,7 +60,9 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_Google
    */
   function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
@@ -73,9 +75,10 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param object $paymentProcessor
+   *
    * @return object
    * @static
-   *
    */
   static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
@@ -119,16 +122,17 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   /**
    * Sets appropriate parameters for checking out to google
    *
-   * @param array $params  name value pair of contribution datat
+   * @param array $params name value pair of contribution datat
+   *
+   * @param $component
    *
    * @return void
    * @access public
-   *
    */
   function doTransferCheckout(&$params, $component) {
     $component = strtolower($component);
 
-    if (CRM_Utils_Array::value('is_recur', $params) &&
+    if (!empty($params['is_recur']) &&
       $params['contributionRecurID']
     ) {
       return $this->doRecurCheckout($params, $component);

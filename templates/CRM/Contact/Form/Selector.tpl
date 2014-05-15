@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -146,8 +146,8 @@
 
 <script type="text/javascript">
   {literal}
-  cj(function($) {
-    cj("#toggleSelect, input[id^=mark_x_]").removeAttr('checked');
+  CRM.$(function($) {
+    cj("#toggleSelect, input[id^=mark_x_]").prop('checked', false);
     var cids = [];
     var i = 0;
     {/literal}
@@ -155,13 +155,12 @@
       cids[i++] = "#mark_x_{$selectedContactId}";
     {/foreach}
     {literal}
-    $(cids.join(',')).attr('checked', 'checked');
+    $(cids.join(',')).prop('checked', true);
     if (cids.length > 0) {
-      $('input[name=radio_ts][value=ts_sel]').attr('checked', 'checked');
+      $('input[name=radio_ts][value=ts_sel]').prop('checked', true);
     }
     var params = {getCount: cids.length};
     countSelections(params);
-    on_load_init_checkboxes("{/literal}{$form.formName}{literal}");
   });
 function countSelections(obj) {
   var label = cj('label[for*=ts_sel]');
@@ -173,16 +172,18 @@ function countSelections(obj) {
       label.prepend('<span>' + obj.getCount + '</span> ');
     }
     else {
+      if(obj.getCount > 0) {
+        cj('input[name=radio_ts][value=ts_sel]').prop('checked', true);
+      }
       cj('span', label).html(obj.getCount);
     }
     toggleTaskAction(obj.getCount);
   }
-  on_load_init_checkboxes("{/literal}{$form.formName}{literal}");
 }
 function toggleContactSelection(name, qfKey, selection) {
   var url = CRM.url('civicrm/ajax/markSelection');
   var params = {qfKey: qfKey};
-  if (!(cj('#' + name).is(':checked'))) {
+  if( cj('#' + name + ":checked").length == 0) {
     params.action = 'unselect';
     params.state = 'unchecked';
   }
@@ -196,12 +197,13 @@ function toggleContactSelection(name, qfKey, selection) {
   }
   else if (name == 'resetSel' && selection == 'reset') {
     params.variableType = 'multiple';
-    cj("#toggleSelect, input[id^=mark_x_]").removeAttr('checked');
+    cj("#toggleSelect, input[id^=mark_x_]").prop('checked', false);
   }
   else {
     params.name = name;
   }
   cj.getJSON(url, params, countSelections);
+  return false;
 }
 {/literal}
 </script>

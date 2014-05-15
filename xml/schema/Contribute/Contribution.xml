@@ -30,6 +30,9 @@
     <headerPattern>/contact(.?id)?/i</headerPattern>
     <dataPattern>/^\d+$/</dataPattern>
     <comment>FK to Contact ID</comment>
+    <html>
+       <type>Autocomplete-Select</type>
+     </html>
     <add>1.3</add>
   </field>
   <foreignKey>
@@ -83,6 +86,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>
@@ -102,6 +108,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>1.5</add>
   </field>
   <foreignKey>
@@ -119,6 +128,9 @@
     <pseudoconstant>
       <optionGroupName>payment_instrument</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>1.3</add>
   </field>
   <index>
@@ -134,6 +146,9 @@
     <dataPattern>/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/</dataPattern>
     <comment>when was gift received</comment>
     <add>1.3</add>
+    <html>
+     <type>Select Date</type>
+   </html>
   </field>
   <field>
     <name>non_deductible_amount</name>
@@ -145,6 +160,9 @@
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
     <comment>Portion of total amount which is NOT tax deductible. Equal to total_amount for non-deductible financial types.</comment>
     <add>1.3</add>
+    <html>
+     <type>Text</type>
+   </html>
   </field>
   <field>
     <name>total_amount</name>
@@ -155,6 +173,9 @@
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
     <comment>Total amount of this contribution. Use market value for non-monetary gifts.</comment>
     <add>1.3</add>
+    <html>
+     <type>Text</type>
+   </html>
   </field>
   <field>
     <name>fee_amount</name>
@@ -164,6 +185,9 @@
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
     <comment>actual processor fee if known - may be 0.</comment>
     <add>1.3</add>
+    <html>
+     <type>Text</type>
+   </html>
   </field>
   <field>
     <name>net_amount</name>
@@ -173,6 +197,9 @@
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
     <comment>actual funds transfer amount. total less fees. if processor does not report actual fee during transaction, this is set to total_amount.</comment>
     <add>1.3</add>
+    <html>
+     <type>Text</type>
+   </html>
   </field>
   <field>
     <name>trxn_id</name>
@@ -182,6 +209,9 @@
     <import>true</import>
     <headerPattern>/tr(ansactio|x)n(.?id)?/i</headerPattern>
     <comment>unique transaction id. may be processor id, bank id + trans id, or account number + check number... depending on payment_method</comment>
+    <html>
+     <type>Text</type>
+   </html>
     <add>1.3</add>
   </field>
   <field>
@@ -192,8 +222,11 @@
     <import>true</import>
     <headerPattern>/invoice(.?id)?/i</headerPattern>
     <comment>unique invoice id, system generated or passed in</comment>
+    <html>
+      <type>Text</type>
+    </html>  
     <add>1.3</add>
-  </field>
+    </field>
   <field>
     <name>currency</name>
     <type>varchar</type>
@@ -210,6 +243,9 @@
       <labelColumn>full_name</labelColumn>
       <nameColumn>numeric_code</nameColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>cancel_date</name>
@@ -219,13 +255,19 @@
     <dataPattern>/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/</dataPattern>
     <comment>when was gift cancelled</comment>
     <add>1.3</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>cancel_reason</name>
     <type>text</type>
     <import>true</import>
     <headerPattern>/(cancel.?)?reason/i</headerPattern>
-    <add>1.3</add>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>1.3</add>    
   </field>
   <field>
     <name>receipt_date</name>
@@ -234,7 +276,10 @@
     <headerPattern>/receipt(.?date)?/i</headerPattern>
     <dataPattern>/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/</dataPattern>
     <comment>when (if) receipt was sent. populated automatically for online donations w/ automatic receipting</comment>
-    <add>1.3</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+    <add>1.3</add>    
   </field>
   <field>
     <name>thankyou_date</name>
@@ -245,6 +290,9 @@
     <dataPattern>/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/</dataPattern>
     <comment>when (if) was donor thanked</comment>
     <add>1.3</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>source</name>
@@ -256,6 +304,9 @@
     <headerPattern>/source/i</headerPattern>
     <comment>Origin of this Contribution.</comment>
     <add>1.3</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>amount_level</name>
@@ -263,14 +314,14 @@
     <type>text</type>
     <import>true</import>
     <add>1.7</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>note</name>
     <type>text</type>
     <comment>Note and/or Comment.</comment>
-    <htmlType>textarea</htmlType>
-    <rows>4</rows>
-    <cols>80</cols>
     <import>true</import>
     <headerPattern>/Note|Comment/i</headerPattern>
     <dataPattern>//</dataPattern>
@@ -303,25 +354,14 @@
     <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
-    <name>honor_contact_id</name>
-    <title>Honor Contact</title>
-    <type>int unsigned</type>
-    <comment>FK to contact ID</comment>
-    <add>1.3</add>
-  </field>
-  <foreignKey>
-    <name>honor_contact_id</name>
-    <table>civicrm_contact</table>
-    <key>id</key>
-    <add>1.6</add>
-    <onDelete>SET NULL</onDelete>
-  </foreignKey>
-  <field>
     <name>is_test</name>
     <title>Test</title>
     <type>boolean</type>
     <default>0</default>
     <import>true</import>
+    <html>
+      <type>CheckBox</type>
+    </html>
   </field>
   <field>
     <name>is_pay_later</name>
@@ -330,6 +370,9 @@
     <default>0</default>
     <import>true</import>
     <add>2.1</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
   </field>
   <field>
     <name>contribution_status_id</name>
@@ -342,18 +385,10 @@
     <pseudoconstant>
       <optionGroupName>contribution_status</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>1.6</add>
-  </field>
-  <field>
-    <name>honor_type_id</name>
-    <title>Honor Type</title>
-    <type>int unsigned</type>
-    <comment>Implicit FK to civicrm_option_value.</comment>
-    <add>2.0</add>
-    <onDelete>SET NULL</onDelete>
-    <pseudoconstant>
-      <optionGroupName>honor_type</optionGroupName>
-    </pseudoconstant>
   </field>
   <index>
     <name>index_contribution_status</name>
@@ -384,7 +419,10 @@
     <headerPattern>/check(.?number)?/i</headerPattern>
     <type>varchar</type>
     <length>255</length>
-    <size>SIX</size>
+    <html>
+      <type>Text</type>
+      <size>SIX</size>
+    </html>
     <import>true</import>
     <add>2.2</add>
   </field>
@@ -397,10 +435,18 @@
     <name>campaign_id</name>
     <uniqueName>contribution_campaign_id</uniqueName>
     <type>int unsigned</type>
-    <title>Campaign ID</title>
+    <title>Campaign</title>
     <import>true</import>
     <comment>The campaign for which this contribution has been triggered.</comment>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
     <add>3.4</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <foreignKey>
     <name>campaign_id</name>

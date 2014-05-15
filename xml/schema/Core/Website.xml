@@ -9,6 +9,7 @@
   <field>
       <name>id</name>
       <type>int unsigned</type>
+      <title>Website ID</title>
       <required>true</required>
       <comment>Unique Website ID</comment>
        <add>3.2</add>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
       <name>contact_id</name>
+      <title>Contact</title>
       <type>int unsigned</type>
       <comment>FK to Contact ID</comment>
       <add>3.2</add>
@@ -35,7 +37,10 @@
        <title>Website</title>
        <type>varchar</type>
        <length>128</length>
-       <size>BIG</size>
+       <html>
+         <type>Text</type>
+         <size>BIG</size>
+       </html>
        <import>true</import>
        <headerPattern>/Website/i</headerPattern>
        <dataPattern>/^[A-Za-z][0-9A-Za-z]{20,}$/</dataPattern>
@@ -51,6 +56,9 @@
       <pseudoconstant>
         <optionGroupName>website_type</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <index>
     <name>UI_website_type_id</name>

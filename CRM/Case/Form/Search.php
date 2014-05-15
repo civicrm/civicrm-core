@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -36,7 +36,7 @@
 /**
  * This file is for Case search
  */
-class CRM_Case_Form_Search extends CRM_Core_Form {
+class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Are we forced to run a search
@@ -53,14 +53,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
    * @access protected
    */
   protected $_searchButtonName;
-
-  /**
-   * name of print button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_printButtonName;
 
   /**
    * name of action button
@@ -135,9 +127,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
   function preProcess() {
     $this->set('searchFormName', 'Search');
 
-    // js for changing activity status
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Case/Form/ActivityChangeStatus.js');
-
     //check for civicase access.
     if (!CRM_Case_BAO_Case::accessCiviCase()) {
       CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
@@ -154,7 +143,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
      * set the button names
      */
     $this->_searchButtonName = $this->getButtonName('refresh');
-    $this->_printButtonName = $this->getButtonName('next', 'print');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
@@ -239,6 +227,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
    * @return void
    */
   function buildQuickForm() {
+    parent::buildQuickForm();
     $this->addElement('text',
       'sort_name',
       ts('Client Name or Email'),
@@ -253,19 +242,18 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
      */
     $rows = $this->get('rows');
     if (is_array($rows)) {
-
       if (!$this->_single) {
         $this->addElement('checkbox',
           'toggleSelect',
           NULL,
           NULL,
-          array('onclick' => "toggleTaskAction( true ); return toggleCheckboxVals('mark_x_',this);")
+          array('onclick' => "toggleTaskAction( true );", 'class' => 'select-rows')
         );
 
         foreach ($rows as $row) {
           $this->addElement('checkbox', $row['checkbox'],
             NULL, NULL,
-            array('onclick' => "toggleTaskAction( true ); return checkSelectedBox('" . $row['checkbox'] . "');")
+            array('onclick' => "toggleTaskAction( true );", 'class' => 'select-row')
           );
         }
       }
@@ -276,7 +264,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
 
       $tasks = array('' => ts('- actions -')) + CRM_Case_Task::permissionedTaskTitles($permission);
 
-      if (CRM_Utils_Array::value('case_deleted', $this->_formValues)) {
+      if (!empty($this->_formValues['case_deleted'])) {
         unset($tasks[1]);
       }
       else {
@@ -292,26 +280,11 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
         )
       );
 
-      $this->add('submit', $this->_printButtonName, ts('Print'),
-        array(
-          'class' => 'form-submit',
-          'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 1);",
-        )
-      );
-
       // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
       $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('onclick' => $this->getName() . ".toggleSelect.checked = false; toggleCheckboxVals('mark_x_',this); toggleTaskAction( true );"));
+      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );"));
     }
 
-    // add buttons
-    $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      ));
   }
 
   /**
@@ -357,7 +330,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
       $this->_formValues['case_owner'] = 2;
     }
 
-    if (!CRM_Utils_Array::value('case_deleted', $this->_formValues)) {
+    if (empty($this->_formValues['case_deleted'])) {
       $this->_formValues['case_deleted'] = 0;
     }
     CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($this->_formValues);
@@ -368,7 +341,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
-    if ($buttonName == $this->_actionButtonName || $buttonName == $this->_printButtonName) {
+    if ($buttonName == $this->_actionButtonName) {
       // check actionName and if next, then do not repeat a search, since we are going to the next page
 
       // hack, make sure we reset the task values
@@ -425,7 +398,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
    * This function is used to add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
-   * @return None
+   * @return void
    * @access public
    * @see valid_date
    */
@@ -437,7 +410,8 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
    * global validation rules for the form
    *
    * @param array $fields posted values of the form
-   * @param array $errors list of errors to be posted back to the form
+   *
+   * @internal param array $errors list of errors to be posted back to the form
    *
    * @return void
    * @static

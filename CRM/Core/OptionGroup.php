@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -163,6 +163,7 @@ WHERE  v.option_group_id = g.id
    * @param $condition
    * @param $labelColumnName
    * @param $onlyActive
+   * @param string $keyColumnName
    */
   protected static function flushValues($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName = 'value') {
     $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName);
@@ -188,6 +189,9 @@ WHERE  v.option_group_id = g.id
    * @param $grouping   boolean if true, return the value in 'grouping' column
    * @param $localize   boolean if true, localize the results before returning
    * @param $labelColumnName string the column to use for 'label'
+   *
+   * @param bool $onlyActive
+   * @param bool $fresh
    *
    * @return array      the values as specified by the above params
    * @static
@@ -401,7 +405,7 @@ WHERE  v.option_group_id = g.id
    * not messed up. Currently deletes the old group
    *
    * @param string $groupName the name of the option group - make sure there is no conflict
-   * @param array  $values    the associative array that has information on the option values
+   * @param array $values the associative array that has information on the option values
    *                          the keys of this array are:
    *                          string 'title'       (required)
    *                          string 'value'       (required)
@@ -410,14 +414,15 @@ WHERE  v.option_group_id = g.id
    *                          int    'weight'      (optional) - the order in which the value are displayed
    *                          bool   'is_default'  (optional) - is this the default one to display when rendered in form
    *                          bool   'is_active'   (optional) - should this element be rendered
-   * @param int    $defaultID (reference) - the option value ID of the default element (if set) is returned else 'null'
-   * @param string $groupLabel            - the optional label of the option group else set to group name
+   * @param int $defaultID (reference) - the option value ID of the default element (if set) is returned else 'null'
+   * @param null $groupTitle
+   *
+   * @internal param string $groupLabel - the optional label of the option group else set to group name
    *
    * @access public
    * @static
    *
    * @return int   the option group ID
-   *
    */
   static function createAssoc($groupName, &$values, &$defaultID, $groupTitle = NULL) {
     self::deleteAssoc($groupName);

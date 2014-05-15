@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,6 +40,8 @@ class CRM_Utils_Zip {
 
   /**
    * Given a zip file which contains a single root directory, determine the root's name.
+   *
+   * @param ZipArchive $zip
    *
    * @return mixed; FALSE if #root level items !=1; otherwise, the name of base dir
    */
@@ -69,6 +71,8 @@ class CRM_Utils_Zip {
   /**
    * Given a zip file, find all directory names in the root
    *
+   * @param ZipArchive $zip
+   *
    * @return array(string), no trailing /
    */
   static public function findBaseDirs(ZipArchive $zip) {
@@ -88,6 +92,9 @@ class CRM_Utils_Zip {
 
   /**
    * Determine the name of the folder within a zip
+   *
+   * @param ZipArchive $zip
+   * @param $expected
    *
    * @return string or FALSE
    */

@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -138,7 +138,7 @@ WHERE  cacheKey     = %3 AND
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 
-  function retrieve($cacheKey, $join = NULL, $where = NULL, $offset = 0, $rowCount = 0) {
+  static function retrieve($cacheKey, $join = NULL, $where = NULL, $offset = 0, $rowCount = 0) {
     $query = "
 SELECT data
 FROM   civicrm_prevnext_cache pn
@@ -152,6 +152,9 @@ WHERE  cacheKey = %1
     }
 
     if ($rowCount) {
+      $offset = CRM_Utils_Type::escape($offset, 'Int');
+      $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
+
       $query .= " LIMIT {$offset}, {$rowCount}";
     }
 
@@ -338,11 +341,13 @@ WHERE  cacheKey LIKE %1 AND is_selected = 1
   /**
    * function to get the selections
    *
-   * @param string $cacheKey     cache key
-   * @param string $action       action
+   * @param string $cacheKey cache key
+   * @param string $action action
    *  $action : get - get only selection records
    *            getall - get all the records of the specified cache key
    * @param string $entity_table entity table
+   *
+   * @return array
    */
   static function getSelection($cacheKey, $action = 'get', $entity_table = 'civicrm_contact') {
     if (!$cacheKey) {

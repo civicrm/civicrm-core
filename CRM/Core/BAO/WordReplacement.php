@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,10 +40,10 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
 
   function __construct() {
     parent::__construct();
-  }  
+  }
   /**
    * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. 
+   * retrieves the relevant objects.
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
@@ -52,13 +52,15 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @access public
    * @static
    */
-    
+
   static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_WordRepalcement', $params, $defaults);
   }
 
   /**
    * Get the domain BAO
+   *
+   * @param null $reset
    *
    * @return null|object CRM_Core_BAO_WordRepalcement
    * @access public
@@ -67,7 +69,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   static function getWordReplacement($reset = NULL) {
     static $wordReplacement = NULL;
     if (!$wordReplacement || $reset) {
-      $wordReplacement = new CRM_Core_BAO_WordRepalcement();
+      $wordReplacement = new CRM_Core_BAO_WordReplacement();
       $wordReplacement->id = CRM_Core_Config::wordReplacementID();
       if (!$wordReplacement->find(TRUE)) {
         CRM_Core_Error::fatal();
@@ -79,6 +81,9 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
 
   /**
    * Save the values of a WordReplacement
+   *
+   * @param $params
+   * @param $id
    *
    * @return WordReplacement array
    * @access public
@@ -97,13 +102,15 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   /**
    * Create a new WordReplacement
    *
+   * @param $params
+   *
    * @return WordReplacement array
    * @access public
    */
   static function create($params) {
     if(array_key_exists("domain_id",$params) === FALSE) {
-      $params["domain_id"] = CRM_Core_Config::domainID();  
-    }  
+      $params["domain_id"] = CRM_Core_Config::domainID();
+    }
     $wordReplacement = new CRM_Core_DAO_WordReplacement();
     $wordReplacement->copyValues($params);
     $wordReplacement->save();
@@ -112,7 +119,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
     }
     return $wordReplacement;
   }
-  
+
   /**
    * Delete website
    *
@@ -139,14 +146,23 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @see civicrm_domain.locale_custom_strings
    */
   public static function getAllAsConfigArray($id) {
-    $query = "SELECT find_word,replace_word,is_active,match_type FROM civicrm_word_replacement WHERE domain_id = ".CRM_Utils_Type::escape($id, 'Integer');
-    $dao = CRM_Core_DAO::executeQuery($query);
-    
+    $query = "
+SELECT find_word,replace_word,is_active,match_type
+FROM   civicrm_word_replacement
+WHERE  domain_id = %1
+";
+    $params = array( 1 => array($id, 'Integer'));
+
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+
+    $overrides = array();
+
     while ($dao->fetch()) {
       if ($dao->is_active==1) {
-      	$overrides['enabled'][$dao->match_type][$dao->find_word] = $dao->replace_word;
-      }	else {
-      	$overrides['disabled'][$dao->match_type][$dao->find_word] = $dao->replace_word;
+        $overrides['enabled'][$dao->match_type][$dao->find_word] = $dao->replace_word;
+      }
+      else {
+        $overrides['disabled'][$dao->match_type][$dao->find_word] = $dao->replace_word;
       }
     }
     $config = CRM_Core_Config::singleton();
@@ -220,19 +236,19 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
           $wordMatchArray = array();
           // Traverse Language array
           foreach ($localeCustomArray as $localCustomData) {
-          	// Traverse status array "enabled" "disabled"
-          	foreach ($localCustomData as $status => $matchTypes) {
-          		$params["is_active"] = ($status == "enabled")?TRUE:FALSE;
-          		// Traverse Match Type array "wildcardMatch" "exactMatch"
-          		foreach ($matchTypes as $matchType => $words) {
-          			$params["match_type"] = $matchType;
-          			foreach ($words as $word => $replace) {
-          				$params["find_word"] = $word;
-          				$params["replace_word"] = $replace;
-          				$wordReplacementCreateParams[] = $params;
-          			}
-          		}
-          	}
+          // Traverse status array "enabled" "disabled"
+            foreach ($localCustomData as $status => $matchTypes) {
+              $params["is_active"] = ($status == "enabled")?TRUE:FALSE;
+              // Traverse Match Type array "wildcardMatch" "exactMatch"
+              foreach ($matchTypes as $matchType => $words) {
+                $params["match_type"] = $matchType;
+                foreach ($words as $word => $replace) {
+                  $params["find_word"] = $word;
+                  $params["replace_word"] = $replace;
+                  $wordReplacementCreateParams[] = $params;
+                }
+              }
+            }
           }
         }
       }

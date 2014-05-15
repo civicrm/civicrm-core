@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -67,7 +67,7 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
     }
 
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
-    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_contact', NULL, TRUE, FALSE, TRUE);
+    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_contact', NULL, TRUE, FALSE);
 
     $this->addDefaultButtons(ts('Remove Tags from Contacts'));
   }
@@ -89,7 +89,7 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     //get the submitted values in an array
@@ -98,12 +98,12 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
     $contactTags = $tagList = array();
 
     // check if contact tags exists
-    if (CRM_Utils_Array::value('tag', $params)) {
+    if (!empty($params['tag'])) {
       $contactTags = $params['tag'];
     }
 
     // check if tags are selected from taglists
-    if (CRM_Utils_Array::value('contact_taglist', $params)) {
+    if (!empty($params['contact_taglist'])) {
       foreach ($params['contact_taglist'] as $val) {
         if ($val) {
           if (is_numeric($val)) {

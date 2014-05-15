@@ -77,7 +77,9 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_GoogleIPN
    */
   function __construct($mode, &$paymentProcessor) {
     parent::__construct();
@@ -89,11 +91,12 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * The function gets called when a new order takes place.
    *
-   * @param xml   $dataRoot    response send by google in xml format
+   * @param xml $dataRoot response send by google in xml format
    * @param array $privateData contains the name value pair of <merchant-private-data>
    *
-   * @return void
+   * @param $component
    *
+   * @return void
    */
   function newOrderNotify($dataRoot, $privateData, $component) {
     $ids = $input = $params = array();
@@ -168,8 +171,6 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
           $contribution->invoice_id = $input['invoice'];
           $contribution->total_amount = $dataRoot['order-total']['VALUE'];
           $contribution->contribution_status_id = 2;
-          $contribution->honor_contact_id = $objects['contribution']->honor_contact_id;
-          $contribution->honor_type_id = $objects['contribution']->honor_type_id;
           $contribution->campaign_id = $objects['contribution']->campaign_id;
 
           $objects['contribution'] = $contribution;
@@ -213,10 +214,10 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
              * lets make use of it by passing the eventID/membershipTypeID to next level.
              * And change trxn_id to google-order-number before finishing db update */
 
-      if (CRM_Utils_Array::value('event', $ids)) {
+      if (!empty($ids['event'])) {
         $contribution->trxn_id = $ids['event'] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['participant'];
       }
-      elseif (CRM_Utils_Array::value('membership', $ids)) {
+      elseif (!empty($ids['membership'])) {
         $contribution->trxn_id = $ids['membership'][0] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['related_contact'] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['onbehalf_dupe_alert'];
       }
     }
@@ -231,11 +232,13 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * The function gets called when the state(CHARGED, CANCELLED..) changes for an order
    *
-   * @param string $status      status of the transaction send by google
-   * @param array  $privateData contains the name value pair of <merchant-private-data>
+   * @param string $status status of the transaction send by google
+   * @param $dataRoot
+   * @param array $privateData contains the name value pair of <merchant-private-data>
+   *
+   * @param $component
    *
    * @return void
-   *
    */
   function orderStateChange($status, $dataRoot, $privateData, $component) {
     $input = $objects = $ids = array();
@@ -378,6 +381,9 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param $component
+   * @param $paymentProcessor
+   *
    * @return object
    * @static
    */
@@ -410,11 +416,13 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   /**
    * The function returns the component(Event/Contribute..), given the google-order-no and merchant-private-data
    *
-   * @param xml     $xml_response   response send by google in xml format
-   * @param array   $privateData    contains the name value pair of <merchant-private-data>
-   * @param int     $orderNo        <order-total> send by google
-   * @param string  $root           root of xml-response
+   * @param array $privateData contains the name value pair of <merchant-private-data>
+   * @param int $orderNo <order-total> send by google
+   * @param string $root root of xml-response
    *
+   * @param $response
+   * @param $serial
+   * @internal param \xml $xml_response response send by google in xml format
    * @return array context of this call (test, module, payment processor id)
    * @static
    */

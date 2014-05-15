@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,7 +36,8 @@
     <div id="help">
         <p>{ts 1=$displayName}This page lists all grants for %1 since inception.{/ts} 
         {if $permission EQ 'edit'}
-            {ts 1=$newGrantURL}Click <a accesskey='N' href='%1'>Add Grant</a> to record a Grant for this contact.{/ts}
+          {capture assign=link}accesskey='N' href='{$newGrantURL}' class='action-item'{/capture}
+            {ts 1=$link}Click <a %1>Add Grant</a> to record a Grant for this contact.{/ts}
         {/if}
         </p>
     </div>

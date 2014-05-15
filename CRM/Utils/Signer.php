@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -107,6 +107,8 @@ class CRM_Utils_Signer {
    *
    * @param $token string, the full public token representing the signature
    * @param $params array, key-value pairs
+   *
+   * @throws Exception
    * @return bool, TRUE iff all $paramNames for the submitted validate($params) and the original sign($params)
    */
   function validate($token, $params) {

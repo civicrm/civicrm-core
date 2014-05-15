@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -109,7 +109,10 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
    *
    * Create and auth a Clickatell session.
    *
-   * @return void
+   * @param array $provider
+   * @param bool $skipAuth
+   *
+   * @return \org_civicrm_sms_clickatell
    */
   function __construct($provider = array( ), $skipAuth = FALSE) {
     // initialize vars
@@ -133,7 +136,9 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
     curl_setopt($this->_ch, CURLOPT_TIMEOUT, 20);
     curl_setopt($this->_ch, CURLOPT_VERBOSE, 1);
     curl_setopt($this->_ch, CURLOPT_FAILONERROR, 1);
-    curl_setopt($this->_ch, CURLOPT_FOLLOWLOCATION, 1);
+    if (ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off') {
+      curl_setopt($this->_ch, CURLOPT_FOLLOWLOCATION, 1);
+    }
     curl_setopt($this->_ch, CURLOPT_COOKIEJAR, "/dev/null");
     curl_setopt($this->_ch, CURLOPT_SSL_VERIFYHOST, 2);
     curl_setopt($this->_ch, CURLOPT_USERAGENT, 'CiviCRM - http://civicrm.org/');
@@ -144,9 +149,10 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
   /**
    * singleton function used to manage this object
    *
+   * @param array $providerParams
+   * @param bool $force
    * @return object
    * @static
-   *
    */
   static function &singleton($providerParams = array(
     ), $force = FALSE) {
@@ -217,7 +223,12 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
   /**
    * Send an SMS Message via the Clickatell API Server
    *
-   * @param array the message with a to/from/text
+   * @param $recipients
+   * @param $header
+   * @param $message
+   * @param null $jobID
+   * @param null $userID
+   * @internal param \the $array message with a to/from/text
    *
    * @return mixed true on sucess or PEAR_Error object
    * @access public
@@ -235,7 +246,7 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
       }
       //TODO:
       $postDataArray['to']   = $header['To'];
-      $postDataArray['text'] = substr($message, 0, 460); // max of 460 characters, is probably not multi-lingual
+      $postDataArray['text'] = utf8_decode(substr($message, 0, 460)); // max of 460 characters, is probably not multi-lingual
       if (array_key_exists('mo', $this->_providerInfo['api_params'])) {
         $postDataArray['mo'] = $this->_providerInfo['api_params']['mo'];
       }

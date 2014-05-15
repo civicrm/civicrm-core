@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -94,7 +94,8 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // soft credit
-    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 'soft_credit_contact_1');
+    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 's2id_soft_credit_contact_id_1');
+    $this->type("soft_credit_amount_1", "100");
 
     //Custom Data
     //$this->click('CIVICRM_QFID_3_6');
@@ -110,15 +111,6 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->type("invoice_id", time());
     $this->webtestFillDate('thankyou_date');
 
-    //Honoree section
-    $this->click("Honoree");
-    $this->waitForElementPresent("honor_email");
-
-    $this->click("CIVICRM_QFID_1_2");
-    $this->select("honor_prefix_id", "label=Ms.");
-    $this->type("honor_first_name", "Foo");
-    $this->type("honor_last_name", "Bar");
-    $this->type("honor_email", "foo@bar.com");
 
     //Premium section
     $this->click("Premium");
@@ -132,13 +124,13 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("The contribution record has been saved."), "Status message didn't show up after saving!");
+    $this->waitForText("crm-notification-container", "The contribution record has been saved.");
 
     // verify if Membership is created
-    $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
 
     //click through to the Membership view screen
-    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
 
     $expected = array(
@@ -173,13 +165,109 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
 
     // verify soft credit details
     $expected = array(
-      3 => 'Donation',
-      2 => '100.00',
-      5 => 'Completed',
       1 => "{$firstName} Contributor",
+      2 => 'Donation',
+      1 => '100.00',
+      6 => 'Completed',
     );
     foreach ($expected as $value => $label) {
-      $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[$value]", preg_quote($label));
+      $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[1]/td[$value]", preg_quote($label));
+    }
+  }
+
+  function testfinancialTypeSearch() {
+    $this->webtestLogin();
+
+    $financialType = array(
+      'name' => 'Financial type' . substr(sha1(rand()), 0, 7),
+      'is_reserved' => FALSE,
+      'is_deductible' => FALSE,
+    );
+    
+    $this->addeditFinancialType($financialType);
+    $this->addStandaloneContribution($financialType);
+    $this->addStandaloneContribution($financialType);
+
+    $this->openCiviPage("contribute/search", "reset=1", "_qf_Search_refresh");
+    // select group
+    $this->select("financial_type_id", "label={$financialType['name']}");
+    $this->clickLink("_qf_Search_refresh");
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[1]", "2 Result");
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[2]", "Financial Type IN {$financialType['name']}");
+    
+    $this->openCiviPage("contact/search/advanced", "reset=1", "_qf_Advanced_refresh-top");
+    $this->click('CiviContribute');
+    $this->waitForElementPresent("financial_type_id");
+    
+    // select group
+    $this->select("financial_type_id", "label={$financialType['name']}");
+    $this->clickLink("_qf_Advanced_refresh-top");
+    $this->assertElementContainsText("xpath=//div[@id='search-status']//table/tbody/tr[1]/td[1]", "2 Contacts");
+    $this->assertElementContainsText("xpath=//div[@id='search-status']//table/tbody/tr[1]/td[2]", "Financial Type IN {$financialType['name']}");
+  }
+
+  function addStandaloneContribution($financialType) {
+    
+    $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
+
+    // create new contact using dialog
+    $firstName = substr(sha1(rand()), 0, 7);
+    $this->webtestNewDialogContact($firstName, "Contributor", $firstName . "@example.com");
+
+    // select financial type
+    $this->select("financial_type_id", "label={$financialType['name']}");
+
+    // fill in Received Date
+    $this->webtestFillDate('receive_date');
+
+    // source
+    $this->type("source", "Mailer 1");
+
+    // total amount
+    $this->type("total_amount", "100");
+
+    // select payment instrument type = Check and enter chk number
+    $this->select("payment_instrument_id", "value=4");
+    $this->waitForElementPresent("check_number");
+    $this->type("check_number", "check #1041");
+
+    $this->type("trxn_id", "P20901X1" . rand(100, 10000));
+
+    //Additional Detail section
+    $this->click("AdditionalDetail");
+    $this->waitForElementPresent("thankyou_date");
+
+    $this->type("note", "This is a test note.");
+    $this->type("non_deductible_amount", "10");
+    $this->type("fee_amount", "0");
+    $this->type("net_amount", "0");
+    $this->type("invoice_id", time());
+    $this->webtestFillDate('thankyou_date');
+
+    // Clicking save.
+    $this->click("_qf_Contribution_upload");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    // Is status message correct?
+    $this->assertTrue($this->isTextPresent("The contribution record has been saved."), "Status message didn't show up after saving!");
+
+    // verify if Membership is created
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
+
+    //click through to the Membership view screen
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+
+    $expected = array(
+      'Financial Type' => $financialType['name'],
+      'Total Amount' => '$ 100.00',
+      'Contribution Status' => 'Completed',
+      'Paid By' => 'Check',
+      'Check Number' => 'check #1041',
+    );
+
+    foreach ($expected as $label => $value) {
+      $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody//tr/td[1][text()='$label']/../td[2]", preg_quote($value));
     }
   }
 

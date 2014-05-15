@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -69,6 +69,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Get the domain BAO
    *
+   * @param null $reset
+   *
    * @return null|object CRM_Core_BAO_Domain
    * @access public
    * @static
@@ -108,7 +110,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * Reset domain to default (ie. as loaded from settings). This is the
    * counterpart to CRM_Core_BAO_Domain::setDomain.
    *
-   * @param integer $domainID id for domain you want to set as current
+   * @internal param int $domainID id for domain you want to set as current
    * @deprecated
    * @see CRM_Core_BAO_Domain::setDomain
    */
@@ -153,6 +155,9 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Save the values of a domain
    *
+   * @param $params
+   * @param $id
+   *
    * @return domain array
    * @access public
    */
@@ -166,6 +171,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
   /**
    * Create a new domain
+   *
+   * @param $params
    *
    * @return domain array
    * @access public

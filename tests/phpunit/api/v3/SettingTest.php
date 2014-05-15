@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -47,7 +47,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   protected $_currentDomain;
   protected $_domainID2;
   protected $_domainID3;
-  public $_eNoticeCompliant = TRUE;
+
   function __construct() {
     parent::__construct();
 
@@ -84,14 +84,25 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     }
     $this->_domainID3 = $result['id'];
     $this->_currentDomain = CRM_Core_Config::domainID();
+    $this->hookClass = CRM_Utils_Hook::singleton();
   }
 
   function tearDown() {
+    CRM_Utils_Hook::singleton()->reset();
     parent::tearDown();
     $this->callAPISuccess('system','flush', array());
     $this->quickCleanup(array('civicrm_domain'));
   }
 
+  /**
+   * Set additional settings into metadata (implements hook)
+   * @param array $metaDataFolders
+   */
+  function setExtensionMetadata(&$metaDataFolders) {
+    global $civicrm_root;
+    $metaDataFolders[] = $civicrm_root . '/tests/phpunit/api/v3/settings';
+  }
+  /**
   /**
    * check getfields works
    */
@@ -124,6 +135,92 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->assertArrayNotHasKey('customCSSURL', $result['values']);
     $this->assertArrayHasKey('advanced_search_options',$result['values']);
   }
+
+  /**
+   * Test that getfields will filter on group
+   */
+  function testGetFieldsGroupFilters() {
+    $params = array('filters' => array('group' => 'multisite'));
+    $result = $this->callAPISuccess('setting', 'getfields', $params);
+    $this->assertArrayNotHasKey('customCSSURL', $result['values']);
+    $this->assertArrayHasKey('domain_group_id',$result['values']);
+  }
+
+  /**
+   * Test that getfields will filter on another field (prefetch)
+   */
+  function testGetFieldsPrefetchFilters() {
+    $params = array('filters' => array('prefetch' => 1));
+    $result = $this->callAPISuccess('setting', 'getfields', $params);
+    $this->assertArrayNotHasKey('disable_mandatory_tokens_check', $result['values']);
+    $this->assertArrayHasKey('monetaryDecimalPoint',$result['values']);
+  }
+
+  /**
+   * Ensure that on_change callbacks fire.
+   *
+   * Note: api_v3_SettingTest::testOnChange and CRM_Core_BAO_SettingTest::testOnChange
+   * are very similar, but they exercise different codepaths. The first uses the API
+   * and setItems [plural]; the second uses setItem [singular].
+   */
+  function testOnChange() {
+    global $_testOnChange_hookCalls;
+    $this->setMockSettingsMetaData(array(
+      'onChangeExample' => array(
+        'group_name' => 'CiviCRM Preferences',
+        'group' => 'core',
+        'name' => 'onChangeExample',
+        'type' => 'Array',
+        'quick_form_type' => 'Element',
+        'html_type' => 'advmultiselect',
+        'default' => array('CiviEvent', 'CiviContribute'),
+        'add' => '4.4',
+        'title' => 'List of Components',
+        'is_domain' => '1',
+        'is_contact' => 0,
+        'description' => NULL,
+        'help_text' => NULL,
+        'on_change' => array( // list of callbacks
+          array(__CLASS__, '_testOnChange_onChangeExample')
+        ),
+      ),
+    ));
+
+    // set initial value
+    $_testOnChange_hookCalls = array('count' => 0);
+    $this->callAPISuccess('setting', 'create', array(
+      'onChangeExample' => array('First', 'Value'),
+    ));
+    $this->assertEquals(1, $_testOnChange_hookCalls['count']);
+    $this->assertEquals(array('First', 'Value'), $_testOnChange_hookCalls['newValue']);
+    $this->assertEquals('List of Components', $_testOnChange_hookCalls['metadata']['title']);
+
+    // change value
+    $_testOnChange_hookCalls = array('count' => 0);
+    $this->callAPISuccess('setting', 'create', array(
+      'onChangeExample' => array('Second', 'Value'),
+    ));
+    $this->assertEquals(1, $_testOnChange_hookCalls['count']);
+    $this->assertEquals(array('First', 'Value'), $_testOnChange_hookCalls['oldValue']);
+    $this->assertEquals(array('Second', 'Value'), $_testOnChange_hookCalls['newValue']);
+    $this->assertEquals('List of Components', $_testOnChange_hookCalls['metadata']['title']);
+  }
+
+  /**
+   * Mock callback for a setting's on_change handler
+   *
+   * @param $oldValue
+   * @param $newValue
+   * @param $metadata
+   */
+  static function _testOnChange_onChangeExample($oldValue, $newValue, $metadata) {
+    global $_testOnChange_hookCalls;
+    $_testOnChange_hookCalls['count']++;
+    $_testOnChange_hookCalls['oldValue'] = $oldValue;
+    $_testOnChange_hookCalls['newValue'] = $newValue;
+    $_testOnChange_hookCalls['metadata'] = $metadata;
+  }
+
   /**
    * check getfields works
    */
@@ -274,6 +371,22 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $description = "shows getting a variable for a current domain";
     $result =  $this->callAPIAndDocument('setting', 'get', $params, __FUNCTION__, __FILE__, $description, 'GetSettingCurrentDomain');
     $this->assertArrayHasKey(CRM_Core_Config::domainID(), $result['values']);
+  }
+
+  /**
+   * Check that setting defined in extension can be retrieved
+   */
+  function testGetExtensionSetting() {
+    $this->hookClass->setHook('civicrm_alterSettingsFolders', array($this, 'setExtensionMetadata'));
+    $data = NULL;
+    // the caching of data to all duplicates the caching of data to the empty string
+    CRM_Core_BAO_Cache::setItem($data, 'CiviCRM setting Spec', 'All');
+    CRM_Core_BAO_Cache::setItem($data, 'CiviCRM setting Specs', 'settingsMetadata__');
+    $fields = $this->callAPISuccess('setting', 'getfields', array('filters' => array('group_name' => 'Test Settings')));
+    $this->assertArrayHasKey('test_key', $fields['values']);
+    $this->callAPISuccess('setting', 'create', array('test_key' => 'keyset'));
+    $result = $this->callAPISuccess('setting', 'getvalue', array('name' => 'test_key', 'group' => 'Test Settings'));
+    $this->assertEquals('keyset', $result);
   }
 /**
  * setting api should set & fetch settings stored in config as well as those in settings table

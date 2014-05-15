@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,7 +35,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   protected $_apiversion;
-  public $_eNoticeCompliant = True;
 
   function get_info() {
     return array(
@@ -54,7 +53,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   protected function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
-    $this->_groupID = $this->groupCreate(NULL);
+    $this->_groupID = $this->groupCreate();
 
     $this->_orgID = $this->organizationCreate(NULL);
   }
@@ -100,17 +99,18 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    * Test civicrm_group_organization_get with group_id.
    */
   public function testGroupOrganizationGetWithGroupId() {
-
-    $params = array(
+    $createParams = array(
       'organization_id' => $this->_orgID,
-      'group_id' => $this->_groupID,      'sequential' => 1,
+      'group_id' => $this->_groupID,
     );
-    $result = $this->callAPISuccess('group_organization', 'create', $params);
+    $createResult = $this->callAPISuccess('group_organization', 'create', $createParams);
 
-    $paramsGet = array('organization_id' => $result['values'][0]['organization_id']);
-
-    $result = $this->callAPISuccess('group_organization', 'get', $params);
-    $this->assertAPISuccess($result);
+    $getParams = array(
+      'group_id' => $this->_groupID,
+      'sequential' => 1,
+    );
+    $getResult = $this->callAPISuccess('group_organization', 'get', $getParams);
+    $this->assertEquals($createResult['values'], $getResult['values'][0]);
   }
 
   /**
@@ -155,6 +155,17 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('group_organization', 'create', $params, __FUNCTION__, __FILE__);
   }
 
+  /**
+   * CRM-13841 - Load Group Org before save
+   */
+  public function testGroupOrganizationCreateTwice() {
+    $params = array(
+        'organization_id' => $this->_orgID,
+        'group_id' => $this->_groupID,    );
+    $result = $this->callAPISuccess('group_organization', 'create', $params);
+    $result2 = $this->callAPISuccess('group_organization', 'create', $params);
+    $this->assertEquals($result['values'], $result2['values']);
+  }
   /**
    * check with empty params array
    */

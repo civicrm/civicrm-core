@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -97,7 +97,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -149,9 +149,11 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $self
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -165,14 +167,6 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     if (strlen($fields['donate_link_text']) >= 64) {
       $errors['donate_link_text'] = ts('Button Text must be less than 64 characters.');
     }
-    if (isset($files['attachFile_1']) &&
-      CRM_Utils_Array::value('tmp_name', $files['attachFile_1'])
-    ) {
-      list($width, $height) = getimagesize($files['attachFile_1']['tmp_name']);
-      if ($width > 360 || $height > 360) {
-        $errors['attachFile_1'] = ts('Your picture or image file cannot be larger than 360 x 360 pixels in size.') . ' ' . ts("The dimensions of the image you have selected are %1 x %2.", array(1 => $width, 2 => $height)) . ' ' . ts('Please shrink or crop the file or find another smaller image and try again.');
-      }
-    }
     return $errors;
   }
 
@@ -181,7 +175,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params  = $this->controller->exportValues( $this->_name );

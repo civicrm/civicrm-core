@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,15 +31,18 @@
 {elseif $action eq 32768}  {* renew *}
     {include file="CRM/Member/Form/MembershipRenewal.tpl"}
 {elseif $action eq 16} {* Browse memberships for a contact *}
-    {if $permission EQ 'edit'}{capture assign=newURL}{crmURL p="civicrm/contact/view/membership" q="reset=1&action=add&cid=`$contactId`&context=membership"}{/capture}{/if}
+    {if $permission EQ 'edit'}
+      {capture assign=newURL}{crmURL p="civicrm/contact/view/membership" q="reset=1&action=add&cid=`$contactId`&context=membership"}{/capture}{/if}
 
     {if $action ne 1 and $action ne 2 and $permission EQ 'edit'}
         <div id="help">
             {if $permission EQ 'edit'}
-                {ts 1=$newURL}Click <a href='%1'>Add Membership</a> to record a new membership.{/ts}
+              {capture assign="link"}class="action-item" href="{$newURL}"{/capture}
+              {ts 1=$link}Click <a %1>Add Membership</a> to record a new membership.{/ts}
               {if $newCredit}
-                    {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/membership" q="reset=1&action=add&cid=`$contactId`&context=membership&mode=live"}{/capture}
-                    {ts 1=$newCreditURL}Click <a href='%1'>Submit Credit Card Membership</a> to process a Membership on behalf of the member using their credit card.{/ts}
+                {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/membership" q="reset=1&action=add&cid=`$contactId`&context=membership&mode=live"}{/capture}
+                {capture assign="link"}class="action-item" href="{$newCreditURL}"{/capture}
+                {ts 1=$link}Click <a %1>Submit Credit Card Membership</a> to process a Membership on behalf of the member using their credit card.{/ts}
                 {/if}
             {else}
                 {ts 1=$displayName}Current and inactive memberships for %1 are listed below.{/ts}

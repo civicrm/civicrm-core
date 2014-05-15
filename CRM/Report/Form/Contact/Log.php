@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -106,7 +106,15 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
           'activity_type_id' => array('title' => ts('Activity Type'),
             'required' => TRUE,
           ),
-          'source_contact_id' => array(
+        ),
+      ),
+      'civicrm_activity_source' =>
+      array(
+        'dao' => 'CRM_Activity_DAO_ActivityContact',
+        'fields' =>
+        array(
+          'contact_id' =>
+          array(
             'no_display' => TRUE,
             'required' => TRUE,
           ),
@@ -150,9 +158,7 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
 
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
@@ -171,11 +177,16 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
   }
 
   function from() {
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $this->_from = "
         FROM civicrm_log {$this->_aliases['civicrm_log']}
         inner join civicrm_contact {$this->_aliases['civicrm_contact']} on {$this->_aliases['civicrm_log']}.modified_id = {$this->_aliases['civicrm_contact']}.id
         left join civicrm_contact {$this->_aliases['civicrm_contact_touched']} on ({$this->_aliases['civicrm_log']}.entity_table='civicrm_contact' AND {$this->_aliases['civicrm_log']}.entity_id = {$this->_aliases['civicrm_contact_touched']}.id)
         left join civicrm_activity {$this->_aliases['civicrm_activity']} on ({$this->_aliases['civicrm_log']}.entity_table='civicrm_activity' AND {$this->_aliases['civicrm_log']}.entity_id = {$this->_aliases['civicrm_activity']}.id)
+        LEFT JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_source']} ON
+          {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_source']}.activity_id AND
+          {$this->_aliases['civicrm_activity_source']}.record_type_id = {$sourceID}
         ";
   }
 

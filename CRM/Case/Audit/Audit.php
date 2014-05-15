@@ -53,7 +53,7 @@ class CRM_Case_Audit_Audit {
           $value = $value_elements->item(0)->nodeValue;
 
           $category_elements = $field->getElementsByTagName("Category");
-          if (!empty($category_elements)) {
+          if (!empty($category_elements->length)) {
             $category = $category_elements->item(0)->nodeValue;
           }
 

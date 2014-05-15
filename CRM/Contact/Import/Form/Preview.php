@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -129,7 +129,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -192,6 +192,9 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    *
    * @param array $fields posted values of the form
    *
+   * @param $files
+   * @param $self
+   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public
@@ -200,7 +203,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     $errors = array();
     $invalidTagName = $invalidGroupName = FALSE;
 
-    if (CRM_Utils_Array::value('newTagName', $fields)) {
+    if (!empty($fields['newTagName'])) {
       if (!CRM_Utils_Rule::objectExists(trim($fields['newTagName']),
           array('CRM_Core_DAO_Tag')
         )) {
@@ -211,7 +214,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       }
     }
 
-    if (CRM_Utils_Array::value('newGroupName', $fields)) {
+    if (!empty($fields['newGroupName'])) {
       $title  = trim($fields['newGroupName']);
       $name   = CRM_Utils_String::titleToVar($title);
       $query  = 'select count(*) from civicrm_group where name like %1 OR title like %2';

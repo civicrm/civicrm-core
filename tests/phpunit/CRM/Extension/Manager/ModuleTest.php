@@ -36,6 +36,7 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     $manager->install(array('test.extension.manager.moduletest'));
     $this->assertHookCounts('moduletest', array(
       'install' => 1,
+      'postInstall' => 1,
       'enable' => 1,
       'disable' => 0,
       'uninstall' => 0,
@@ -46,6 +47,7 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     $manager->disable(array('test.extension.manager.moduletest'));
     $this->assertHookCounts('moduletest', array(
       'install' => 1,
+      'postInstall' => 1,
       'enable' => 1,
       'disable' => 1,
       'uninstall' => 0,
@@ -56,6 +58,7 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     $manager->uninstall(array('test.extension.manager.moduletest'));
     $this->assertHookCounts('moduletest', array(
       'install' => 1,
+      'postInstall' => 1,
       'enable' => 1,
       'disable' => 1,
       'uninstall' => 1,
@@ -212,6 +215,7 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
   }
 
   /**
+   * @param $module
    * @param array $counts expected hook invocation counts ($hookName => $count)
    */
   function assertHookCounts($module, $counts) {
@@ -263,6 +267,10 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
 <?php
 function _FILE__civicrm_install() {
   CRM_Extension_Manager_ModuleTest::incHookCount('_FILE_', 'install');
+}
+
+function _FILE__civicrm_postInstall() {
+  CRM_Extension_Manager_ModuleTest::incHookCount('_FILE_', 'postInstall');
 }
 
 function _FILE__civicrm_uninstall() {

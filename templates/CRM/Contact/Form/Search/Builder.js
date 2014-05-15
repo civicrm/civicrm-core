@@ -62,7 +62,7 @@
     $('.crm-search-value select', row).remove();
     $('input[id^=value]', row)
       .hide()
-      .after('<select class="form-select required" ' + multiSelect + '><option value="">' + ts('Loading') + '...</option></select>');
+      .after('<select class="crm-form-' + multiSelect.substr(0, 5) + 'select required" ' + multiSelect + '><option value="">' + ts('Loading') + '...</option></select>');
     
     fetchOptions(row, field);
   }
@@ -74,10 +74,10 @@
    */
   function fetchOptions(row, field) {
     if (CRM.searchBuilder.fieldOptions[field] === 'yesno') {
-      CRM.searchBuilder.fieldOptions[field] = {1: ts('Yes'), 0: ts('No')};
+      CRM.searchBuilder.fieldOptions[field] = [{key: 1, value: ts('Yes')}, {key: 0, value: ts('No')}];
     }
     if (typeof(CRM.searchBuilder.fieldOptions[field]) == 'string') {
-      CRM.api(CRM.searchBuilder.fieldOptions[field], 'getoptions', {field: field}, {
+      CRM.api(CRM.searchBuilder.fieldOptions[field], 'getoptions', {field: field, sequential: 1}, {
         success: function(result, settings) {
           var field = settings.field;
           if (result.count) {
@@ -121,9 +121,9 @@
         options = [options[0]];
       }
     }
-    $.each(CRM.searchBuilder.fieldOptions[field], function(value, label) {
-      var selected = ($.inArray(value, options) > -1) ? 'selected="selected"' : '';
-      select.append('<option value="' + value + '"' + selected + '>' + label + '</option>');
+    $.each(CRM.searchBuilder.fieldOptions[field], function(key, option) {
+      var selected = ($.inArray(''+option.key, options) > -1) ? 'selected="selected"' : '';
+      select.append('<option value="' + option.key + '"' + selected + '>' + option.value + '</option>');
     });
     select.change();
   }
@@ -171,30 +171,32 @@
 
   // Initialize display: Hide empty blocks & fields
   var newBlock = CRM.searchBuilder && CRM.searchBuilder.newBlock || 0;
-  $('.crm-search-block', '#Builder').each(function(blockNo) {
-    var block = $(this);
-    var empty = blockNo + 1 > newBlock;
-    var skippedRow = false;
-    $('tr:not(.crm-search-builder-add-row)', block).each(function(rowNo) {
-      var row = $(this);
-      if ($('select:first', row).val() === '') {
-        if (!skippedRow && (rowNo == 0 || blockNo + 1 == newBlock)) {
-          skippedRow = true;
+  function initialize() {
+    $('.crm-search-block', '#Builder').each(function(blockNo) {
+      var block = $(this);
+      var empty = blockNo + 1 > newBlock;
+      var skippedRow = false;
+      $('tr:not(.crm-search-builder-add-row)', block).each(function(rowNo) {
+        var row = $(this);
+        if ($('select:first', row).val() === '') {
+          if (!skippedRow && (rowNo == 0 || blockNo + 1 == newBlock)) {
+            skippedRow = true;
+          }
+          else {
+            row.hide();
+          }
         }
         else {
-          row.hide();
+          empty = false;
         }
-      }
-      else {
-        empty = false;
+      });
+      if (empty) {
+        block.hide();
       }
     });
-    if (empty) {
-      block.hide();
-    }
-  });
+  }
 
-  $('#Builder')
+  $('#crm-main-content-wrapper')
     // Reset and hide row
     .on('click', '.crm-reset-builder-row', function() {
       var row = $(this).closest('tr');
@@ -235,8 +237,30 @@
       }
       $(this).siblings('input').val(value);
     })
-  ;
+    .on('crmLoad', function() {
+      initialize();
+      $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
+    });
 
-  $().crmAccordions();
-  $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
+  initialize();
+
+  // Fetch initial options during page refresh - it's more efficient to bundle them in a single ajax request
+  var initialFields = {}, fetchFields = false;
+  $('select[id^=mapper][id$="_1"] option:selected', '#Builder').each(function() {
+    var field = $(this).attr('value');
+    if (typeof(CRM.searchBuilder.fieldOptions[field]) == 'string') {
+      initialFields[field] = [CRM.searchBuilder.fieldOptions[field], 'getoptions', {field: field, sequential: 1}];
+      fetchFields = true;
+    }
+  });
+  if (fetchFields) {
+    CRM.api3(initialFields).done(function(data) {
+      $.each(data, function(field, result) {
+        CRM.searchBuilder.fieldOptions[field] = result.values;
+      });
+      $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
+    });
+  } else {
+    $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
+  }
 })(cj, CRM);

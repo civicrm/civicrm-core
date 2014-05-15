@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -37,6 +37,8 @@
  * Page for displaying Surveys
  */
 class CRM_Campaign_Page_Survey extends CRM_Core_Page {
+
+  public $useLivePageJS = TRUE;
 
   private static $_actionLinks;
 
@@ -53,14 +55,12 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Survey' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Survey'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Survey' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Survey'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -96,7 +96,16 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
           $action -= CRM_Core_Action::DISABLE;
         }
 
-        $surveys[$sid]['action'] = CRM_Core_Action::formLink($this->actionLinks(), $action, array('id' => $sid));
+        $surveys[$sid]['action'] = CRM_Core_Action::formLink(
+          $this->actionLinks(),
+          $action,
+          array('id' => $sid),
+          ts('more'),
+          FALSE,
+          'survey.selector.row',
+          'Survey',
+          $sid
+        );
       }
     }
 

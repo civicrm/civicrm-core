@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -137,15 +137,18 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * Class constructor
    *
-   * @param array   $queryParams array of parameters for query
-   * @param int     $action - action of search basic or advanced.
-   * @param string  $memberClause if the caller wants to further restrict the search (used in memberships)
+   * @param array $queryParams array of parameters for query
+   * @param \const|int $action - action of search basic or advanced.
+   * @param string $memberClause if the caller wants to further restrict the search (used in memberships)
    * @param boolean $single are we dealing only with one contact?
-   * @param int     $limit  how many memberships do we want returned
+   * @param int $limit how many memberships do we want returned
    *
-   * @return CRM_Contact_Selector
-   * @access public
-   */ function __construct(&$queryParams,
+   * @param string $context
+   *
+   * @return \CRM_Member_Selector_Search
+  @access public
+   */
+  function __construct(&$queryParams,
     $action       = CRM_Core_Action::NONE,
     $memberClause = NULL,
     $single       = FALSE,
@@ -183,9 +186,15 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    * - View
    * - Edit
    *
+   * @param string $status
+   * @param null $isPaymentProcessor
+   * @param null $accessContribution
+   * @param null $qfKey
+   * @param null $context
+   * @param bool $isCancelSupported
+   *
    * @return array
    * @access public
-   *
    */
   static
   function &links($status = 'all',
@@ -268,7 +277,9 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -371,7 +382,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       $row['campaign'] = CRM_Utils_Array::value($result->member_campaign_id, $allCampaigns);
       $row['campaign_id'] = $result->member_campaign_id;
 
-      if (CRM_Utils_Array::value('member_is_test', $row)) {
+      if (!empty($row['member_is_test'])) {
         $row['membership_type'] = $row['membership_type'] . " (test)";
       }
 
@@ -397,7 +408,12 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
             'id' => $result->membership_id,
             'cid' => $result->contact_id,
             'cxt' => $this->_context,
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'membership.selector.row',
+          'Membership',
+          $result->membership_id
         );
       }
       else {
@@ -406,7 +422,12 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
             'id' => $result->membership_id,
             'cid' => $result->contact_id,
             'cxt' => $this->_context,
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'membership.selector.row',
+          'Membership',
+          $result->membership_id
         );
       }
 

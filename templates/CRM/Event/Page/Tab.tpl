@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,10 +33,12 @@
 
     <div id="help">
         <p>{ts 1=$displayName}This page lists all event registrations for %1 since inception.{/ts}
-        {if $permission EQ 'edit'}{ts 1=$newEventURL}Click <a accesskey="N" href='%1'>Add Event Registration</a> to register this contact for an event.{/ts}{/if}
+        {capture assign="link"}class="action-item" href="{$newEventURL}"{/capture}
+        {if $permission EQ 'edit'}{ts 1=$link}Click <a %1>Add Event Registration</a> to register this contact for an event.{/ts}{/if}
         {if $accessContribution and $newCredit}
             {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/participant" q="reset=1&action=add&cid=`$contactId`&context=participant&mode=live"}{/capture}
-            {ts 1=$newCreditURL}Click <a href='%1'>Submit Credit Card Event Registration</a> to process a new New Registration on behalf of the participant using their credit card.{/ts}
+            {capture assign="link"}class="action-item" href="{$newCreditURL}"{/capture}
+            {ts 1=$link}Click <a %1>Submit Credit Card Event Registration</a> to process a new New Registration on behalf of the participant using their credit card.{/ts}
         {/if}
         </p>
     </div>

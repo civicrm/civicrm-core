@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -59,7 +59,9 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_Realex
    */
   function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
@@ -80,9 +82,10 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param object $paymentProcessor
+   *
    * @return object
    * @static
-   *
    */
   static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
@@ -258,11 +261,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    * @param $xml
    *   an XML string.
    *
-   * @return
-   *   An array of the result with following keys:
-   *   - error  : false, if no error. Otherwise, it is the error message
-   *   - return : a multi-dimension associative array represent the value
-   *               of the XML input string.
+   * @return array An array of the result with following keys:
    */
   function xml_parse_into_assoc($xml) {
     $input = array();

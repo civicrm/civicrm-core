@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -37,6 +37,8 @@
  * Page for displaying list of Providers
  */
 class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -77,14 +79,12 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_SMS_BAO_Provider' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Provider'),
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_SMS_BAO_Provider' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Provider'),
         ),
       );
@@ -126,6 +126,8 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
   /**
    * Browse all Providers.
    *
+   * @param null $action
+   *
    * @return void
    * @access public
    * @static
@@ -147,7 +149,12 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
       $provider['api_type'] = $apiTypes[$provider['api_type']];
 
       $provider['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $provider['id'])
+        array('id' => $provider['id']),
+        ts('more'),
+        FALSE,
+        'sms.provider.row',
+        'SMSProvider',
+        $provider['id']
       );
       $rows[] = $provider;
     }
@@ -174,6 +181,8 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
 
   /**
    * Get user context.
+   *
+   * @param null $mode
    *
    * @return string user context.
    */

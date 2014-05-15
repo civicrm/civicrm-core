@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -55,7 +55,7 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
         'sortOrder' => 'desc',
       );
       foreach ($sortParams as $name => $default) {
-        if (CRM_Utils_Array::value($name, $params)) {
+        if (!empty($params[$name])) {
           $sortParams[$name] = $params[$name];
         }
       }
@@ -95,11 +95,11 @@ INNER JOIN civicrm_option_group grp ON ( activity_type.option_group_id = grp.id 
       $where[] = "( petition.activity_type_id = %1 )";
       $queryParams[1] = array($petitionTypeID, 'Positive');
     }
-    if (CRM_Utils_Array::value('title', $params)) {
+    if (!empty($params['title'])) {
       $where[] = "( petition.title LIKE %2 )";
       $queryParams[2] = array('%' . trim($params['title']) . '%', 'String');
     }
-    if (CRM_Utils_Array::value('campaign_id', $params)) {
+    if (!empty($params['campaign_id'])) {
       $where[] = '( petition.campaign_id = %3 )';
       $queryParams[3] = array($params['campaign_id'], 'Positive');
     }
@@ -194,7 +194,6 @@ SELECT  petition.id                         as id,
       $surveyInfo = CRM_Campaign_BAO_Petition::getSurveyInfo($params['sid']);
 
       // create activity
-      // activity status id (from /civicrm/admin/optionValue?reset=1&action=browse&gid=25)
       // 1-Schedule, 2-Completed
 
       $activityParams = array(
@@ -213,7 +212,7 @@ SELECT  petition.id                         as id,
       $activity = CRM_Activity_BAO_Activity::create($activityParams);
 
       // save activity custom data
-      if (CRM_Utils_Array::value('custom', $params) &&
+      if (!empty($params['custom']) &&
         is_array($params['custom'])
       ) {
         CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_activity', $activity->id);
@@ -272,8 +271,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * Function to get Petition Signature Total
    *
-   * @param boolean $all
-   * @param int $id
+   * @param $surveyId
+   *
+   * @return array
+   * @internal param bool $all
+   * @internal param int $id
    * @static
    */
   static function getPetitionSignatureTotalbyCountry($surveyId) {
@@ -314,8 +316,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * Function to get Petition Signature Total
    *
-   * @param boolean $all
-   * @param int $id
+   * @param $surveyId
+   *
+   * @return array
+   * @internal param bool $all
+   * @internal param int $id
    * @static
    */
   static function getPetitionSignatureTotal($surveyId) {
@@ -369,8 +374,12 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * Function to get Petition Signature Details
    *
-   * @param boolean $all
-   * @param int $id
+   * @param $surveyId
+   * @param null $status_id
+   *
+   * @return array
+   * @internal param bool $all
+   * @internal param int $id
    * @static
    */
   static function getPetitionSignature($surveyId, $status_id = NULL) {
@@ -467,6 +476,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    *
    * @param int $surveyId
    * @param int $contactId
+   *
+   * @return array
    * @static
    */
   static function checkSignature($surveyId, $contactId) {
@@ -518,8 +529,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return
-   * @access public
+   * @param $sendEmailMode
+   *
+   * @throws Exception
+   * @return void
+  @access public
    * @static
    */
   public static function sendEmail($params, $sendEmailMode) {
@@ -545,7 +559,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
     $dao->title = $petitionGroupName;
     if (!$dao->find(TRUE)) {
       $dao->is_active = 1;
-      $dao->visibility = 'Public Pages';
+      $dao->visibility = 'User and User Admin Only';
       $dao->save();
     }
     $group_id = $dao->id;
@@ -604,7 +618,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
         // this will allow using a hash key to confirm email address by sending a url link
         $se = CRM_Mailing_Event_BAO_Subscribe::subscribe($group_id,
           $params['email-Primary'],
-          $params['contactId']
+          $params['contactId'],
+          'profile'
         );
 
         //    require_once 'CRM/Core/BAO/Domain.php';

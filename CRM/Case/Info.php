@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -64,10 +64,6 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     CRM_Utils_Hook::caseTypes($caseTypes);
 
     $proc = new CRM_Case_XMLProcessor();
-    $caseTypesGroupId = civicrm_api3('OptionGroup', 'getvalue', array('name' => 'case_type', 'return' => 'id'));
-    if (!is_numeric($caseTypesGroupId)) {
-      throw new CRM_Core_Exception("Found invalid ID for OptionGroup (case_type)");
-    }
     foreach ($caseTypes as $name => $caseType) {
       $xml = $proc->retrieve($name);
       if (!$xml) {
@@ -78,14 +74,15 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
         $entities[] = array(
           'module' => $caseType['module'],
           'name' => $caseType['name'],
-          'entity' => 'OptionValue',
+          'entity' => 'CaseType',
           'params' => array(
             'version' => 3,
             'name' => $caseType['name'],
-            'label' => (string) $xml->name,
-            'description' => (string) $xml->description, // CRM_Utils_Array::value('description', $caseType, ''),
-            'option_group_id' => $caseTypesGroupId,
+            'title' => (string) $xml->name,
+            'description' => (string) $xml->description,
             'is_reserved' => 1,
+            'is_active' => 1,
+            'weight' => $xml->weight ? $xml->weight : 1,
           ),
         );
       }
@@ -149,6 +146,31 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
               'ref' => 'new-case',
               'title' => ts('Case'),
             )));
+      }
+    }
+  }
+
+  /**
+   * (Setting Callback)
+   * Respond to changes in the "enable_components" setting
+   *
+   * If CiviCase is being enabled, load the case related sample data
+   *
+   * @param array $oldValue List of component names
+   * @param array $newValue List of component names
+   * @param array $metadata Specification of the setting (per *.settings.php)
+   */
+  public static function onToggleComponents($oldValue, $newValue, $metadata) {
+    if (
+      in_array('CiviCase', $newValue)
+      &&
+      (!$oldValue || !in_array('CiviCase', $oldValue))
+    ) {
+      $config = CRM_Core_Config::singleton();
+      CRM_Admin_Form_Setting_Component::loadCaseSampleData($config->dsn, $config->sqlDir . 'case_sample.mysql');
+      if (!CRM_Case_BAO_Case::createCaseViews()) {
+        $msg = ts("Could not create the MySQL views for CiviCase. Your mysql user needs to have the 'CREATE VIEW' permission");
+        CRM_Core_Error::fatal($msg);
       }
     }
   }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -61,14 +61,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * @public
    */
   public $_values;
-
-  /**
-   * stores the honor id
-   *
-   * @var int
-   * @public
-   */
-  public $_honorID = NULL;
 
   /**
    * The Pledge frequency Units
@@ -134,9 +126,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $params = array('id' => $this->_id);
       CRM_Pledge_BAO_Pledge::getValues($params, $this->_values);
 
-      //get the honorID
-      $this->_honorID = CRM_Utils_Array::value('honor_contact_id', $this->_values);
-
       $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
       //check for pending pledge.
@@ -181,7 +170,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = $this->_values;
@@ -191,7 +180,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       return $defaults;
     }
 
-    if (CRM_Utils_Array::value('is_test', $defaults)) {
+    if (!empty($defaults['is_test'])) {
       $this->assign('is_test', TRUE);
     }
 
@@ -252,19 +241,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         $defaultPledgeStatus
       ));
 
-    //honoree contact.
-    if ($this->_honorID) {
-      $honorDefault = array();
-      $idParams = array('contact_id' => $this->_honorID);
-      CRM_Contact_BAO_Contact::retrieve($idParams, $honorDefault);
-      $honorType = CRM_Core_PseudoConstant::get('CRM_Pledge_DAO_Pledge', 'honor_type_id');
-      $defaults['honor_prefix_id'] = $honorDefault['prefix_id'];
-      $defaults['honor_first_name'] = CRM_Utils_Array::value('first_name', $honorDefault);
-      $defaults['honor_last_name'] = CRM_Utils_Array::value('last_name', $honorDefault);
-      $defaults['honor_email'] = CRM_Utils_Array::value('email', $honorDefault['email'][1]);
-      $defaults['honor_type'] = $honorType[$defaults['honor_type_id']];
-    }
-
     if (isset($this->userEmail)) {
       $this->assign('email', $this->userEmail);
     }
@@ -278,7 +254,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -300,20 +276,15 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     if ($this->_context == 'standalone') {
-      CRM_Contact_Form_NewContact::buildQuickForm($this);
+      $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE), TRUE);
     }
 
     $showAdditionalInfo = FALSE;
     $this->_formType = CRM_Utils_Array::value('formType', $_GET);
 
-    //fix to load honoree pane on edit.
     $defaults = array();
-    if ($this->_honorID) {
-      $defaults['hidden_Honoree'] = 1;
-    }
 
     $paneNames = array(
-      'Honoree Information' => 'Honoree',
       'Payment Reminders' => 'PaymentReminders',
     );
     foreach ($paneNames as $name => $type) {
@@ -323,8 +294,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         'id' => $type,
       );
       //see if we need to include this paneName in the current form
-      if ($this->_formType == $type ||
-        CRM_Utils_Array::value("hidden_{$type}", $_POST) ||
+      if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
         CRM_Utils_Array::value("hidden_{$type}", $defaults)
       ) {
         $showAdditionalInfo = TRUE;
@@ -511,9 +481,11 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $self
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -522,20 +494,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   static function formRule($fields, $files, $self) {
     $errors = array();
 
-    //check if contact is selected in standalone mode
-    if (isset($fields['contact_select_id'][1]) && !$fields['contact_select_id'][1]) {
-      $errors['contact[1]'] = ts('Please select a contact or create new contact');
-    }
-
-    if (isset($fields['honor_type_id'])) {
-      if (!((CRM_Utils_Array::value('honor_first_name', $fields) &&
-            CRM_Utils_Array::value('honor_last_name', $fields)
-          ) ||
-          CRM_Utils_Array::value('honor_email', $fields)
-        )) {
-        $errors['honor_first_name'] = ts('Honor First Name and Last Name OR an email should be set.');
-      }
-    }
     if ($fields['amount'] <= 0) {
       $errors['amount'] = ts('Total Pledge Amount should be greater than zero.');
     }
@@ -561,7 +519,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -573,11 +531,10 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $formValues = $this->controller->exportValues($this->_name);
 
     // set the contact, when contact is selected
-    if (CRM_Utils_Array::value('contact_select_id', $formValues)) {
-      $this->_contactID = $formValues['contact_select_id'][1];
+    if (!empty($formValues['contact_id'])) {
+      $this->_contactID = $formValues['contact_id'];
     }
 
-    $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
 
     //get All Payments status types.
@@ -588,15 +545,10 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       'frequency_interval',
       'frequency_day',
       'installments',
-                         'financial_type_id',
+      'financial_type_id',
       'initial_reminder_day',
       'max_reminders',
       'additional_reminder_day',
-      'honor_type_id',
-      'honor_prefix_id',
-      'honor_first_name',
-      'honor_last_name',
-      'honor_email',
       'contribution_page_id',
       'campaign_id',
     );
@@ -619,13 +571,13 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $dates = array('create_date', 'start_date', 'acknowledge_date', 'cancel_date');
     foreach ($dates as $d) {
-      if ($this->_id && (!$this->_isPending) && CRM_Utils_Array::value($d, $this->_values)) {
+      if ($this->_id && (!$this->_isPending) && !empty($this->_values[$d])) {
         if ($d == 'start_date') {
           $params['scheduled_date'] = CRM_Utils_Date::processDate($this->_values[$d]);
         }
         $params[$d] = CRM_Utils_Date::processDate($this->_values[$d]);
       }
-      elseif (CRM_Utils_Array::value($d, $formValues) && !CRM_Utils_System::isNull($formValues[$d])) {
+      elseif (!empty($formValues[$d]) && !CRM_Utils_System::isNull($formValues[$d])) {
         if ($d == 'start_date') {
           $params['scheduled_date'] = CRM_Utils_Date::processDate($formValues[$d]);
         }
@@ -636,7 +588,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       }
     }
 
-    if (CRM_Utils_Array::value('is_acknowledge', $formValues)) {
+    if (!empty($formValues['is_acknowledge'])) {
       $params['acknowledge_date'] = date('Y-m-d');
     }
 
@@ -647,22 +599,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $params['contact_id'] = $this->_contactID;
 
-    //handle Honoree contact.
-    if (CRM_Utils_Array::value('honor_type_id', $params)) {
-      if ($this->_honorID) {
-        $honorID = CRM_Contribute_BAO_Contribution::createHonorContact($params, $this->_honorID);
-      }
-      else {
-        $honorID = CRM_Contribute_BAO_Contribution::createHonorContact($params);
-      }
-      $params['honor_contact_id'] = $honorID;
-    }
-    else {
-      $params['honor_contact_id'] = 'null';
-    }
-
     //format custom data
-    if (CRM_Utils_Array::value('hidden_custom', $formValues)) {
+    if (!empty($formValues['hidden_custom'])) {
       $params['hidden_custom'] = 1;
 
       $customFields = CRM_Core_BAO_CustomField::getFields('Pledge');
@@ -692,7 +630,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     //handle Acknowledgment.
-    if (CRM_Utils_Array::value('is_acknowledge', $formValues) && $pledge->id) {
+    if (!empty($formValues['is_acknowledge']) && $pledge->id) {
 
       //calculate scheduled amount.
       $params['scheduled_amount'] = round($params['amount'] / $params['installments']);

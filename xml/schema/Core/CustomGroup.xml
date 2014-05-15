@@ -64,13 +64,18 @@
      <comment>linking custom group for dynamic object</comment>
      <add>1.6</add>
   </field>
-
   <field>
      <name>style</name>
-     <type>enum</type>
-     <values>Tab, Inline</values>
+     <type>varchar</type>
+     <length>15</length>
      <comment>Visual relationship between this form and its parent.</comment>
+     <pseudoconstant>
+       <callback>CRM_Core_SelectValues::customGroupStyle</callback>
+     </pseudoconstant>
        <add>1.1</add>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <field>
      <name>collapse_display</name>
@@ -84,19 +89,23 @@
      <type>text</type>
      <localizable>true</localizable>
      <comment>Description and/or help text to display before fields in form.</comment>
-     <htmlType>textarea</htmlType>
-     <rows>4</rows>
-     <cols>80</cols>
-       <add>1.1</add>
+     <html>
+       <type>TextArea</type>
+       <rows>4</rows>
+       <cols>80</cols>
+     </html>
+     <add>1.1</add>
   </field>
   <field>
      <name>help_post</name>
      <type>text</type>
      <localizable>true</localizable>
      <comment>Description and/or help text to display after fields in form.</comment>
-     <htmlType>textarea</htmlType>
-     <rows>4</rows>
-     <cols>80</cols>
+     <html>
+       <type>TextArea</type>
+       <rows>4</rows>
+       <cols>80</cols>
+     </html>
      <add>1.1</add>
   </field>
   <field>

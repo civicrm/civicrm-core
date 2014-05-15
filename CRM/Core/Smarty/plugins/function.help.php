@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -51,7 +51,7 @@ function smarty_function_help($params, &$smarty) {
     $params['file'] = $smarty->_tpl_vars['tplFile'];
   }
   elseif (empty($params['file'])) {
-    return $help;
+    return NULL;
   }
 
   $params['file'] = str_replace(array('.tpl', '.hlp'), '', $params['file']);
@@ -61,11 +61,16 @@ function smarty_function_help($params, &$smarty) {
     $oldID = $smarty->get_template_vars('id');
     $smarty->assign('id', $params['id'] . '-title');
     $name = trim($smarty->fetch($params['file'] . '.hlp'));
+    $additionalTPLFile = $params['file'] . '.extra.hlp';
+    if ($smarty->template_exists($additionalTPLFile)) {
+      $name .= trim($smarty->fetch($additionalTPLFile));
+    }
     $smarty->assign('id', $oldID);
   }
   else {
     $name = trim(strip_tags($params['title']));
   }
+
   // Escape for html
   $title = htmlspecialchars(ts('%1 Help', array(1 => $name)));
   // Escape for html and js

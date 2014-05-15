@@ -17,7 +17,17 @@ mailto tags. This is also a really long long line
 Links:
 ------
 [1] http://www.example.com
-'
+',
+    '
+<p>
+A <a href="{action.do_something}">token</a>
+is not treated as a relative URL' => '
+A token [1] is not treated as a relative URL
+
+Links:
+------
+[1] {action.do_something}
+',
   );
 
   function get_info() {

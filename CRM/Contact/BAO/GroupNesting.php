@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright U.S. PIRG Education Fund (c) 2007                        |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -243,8 +243,11 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * Adds a new child group identified by $childGroupId to the group
    * identified by $groupId
    *
-   * @param            $groupId               The id of the group to add the child to
-   * @param            $childGroupId          The id of the new child group
+   * @param $parentID
+   * @param $childID
+   *
+   * @internal param \The $groupId id of the group to add the child to
+   * @internal param \The $childGroupId id of the new child group
    *
    * @return           void
    *
@@ -280,9 +283,9 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    * identified by $groupId; does not delete child group, just the
    * association between the two
    *
-   * @param            $parentID         The id of the group to remove the child from
    * @param            $childID          The id of the child group being removed
    *
+   * @internal param \The $parentID id of the group to remove the child from
    * @return           void
    *
    * @access public
@@ -504,9 +507,9 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *
    * @param             $groupIds             An array of valid group ids (passed by reference)
    *
-   * @return            $groupIdArray         List of groupIds that represent the requested group and its ancestors
+   * @param bool $includeSelf
    *
-   * @access public
+   * @return array $groupIdArray         List of groupIds that represent the requested group and its ancestors@access public
    */
   static function getAncestorGroupIds($groupIds, $includeSelf = TRUE) {
     if (!is_array($groupIds)) {
@@ -540,9 +543,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *
    * @param             $groupIds     An array of valid group ids (passed by reference)
    *
-   * @return            $groupArray   List of ancestor groups
-   *
-   * @access public
+   * @param bool $includeSelf
+   * @return \An $groupArray   List of ancestor groups@access public
    */
   static function getAncestorGroups($groupIds, $includeSelf = TRUE) {
     $groupIds = self::getAncestorGroupIds($groupIds, $includeSelf);
@@ -555,9 +557,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *
    * @param             $groupIds     An array of valid group ids (passed by reference)
    *
-   * @return            $groupIdArray List of groupIds that represent the requested group and its children
-   *
-   * @access public
+   * @return array $groupIdArray List of groupIds that represent the requested group and its children@access public
    */
   static function getChildGroupIds($groupIds) {
     if (!is_array($groupIds)) {
@@ -578,9 +578,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *
    * @param             $groupIds               An array of valid group ids (passed by reference)
    *
-   * @return            $groupIdArray         List of groupIds that represent the requested group and its parents
-   *
-   * @access public
+   * @return array $groupIdArray         List of groupIds that represent the requested group and its parents@access public
    */
   static function getParentGroupIds($groupIds) {
     if (!is_array($groupIds)) {
@@ -601,9 +599,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *
    * @param             $groupIds               An array of valid group ids (passed by reference)
    *
-   * @return            $groupIdArray         List of groupIds that represent the requested group and its descendents
-   *
-   * @access public
+   * @param bool $includeSelf
+   * @return array $groupIdArray         List of groupIds that represent the requested group and its descendents@access public
    */
   static function getDescendentGroupIds($groupIds, $includeSelf = TRUE) {
     if (!is_array($groupIds)) {
@@ -635,9 +632,8 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *
    * @param             $groupIds     An array of valid group ids (passed by reference)
    *
-   * @return            $groupArray   List of descendent groups
-   *
-   * @access public
+   * @param bool $includeSelf
+   * @return \An $groupArray   List of descendent groups@access public
    */
   static function getDescendentGroups($groupIds, $includeSelf = TRUE) {
     $groupIds = self::getDescendentGroupIds($groupIds, $includeSelf);
@@ -650,9 +646,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *
    * @param             $groupId              The group id to get valid potential children for
    *
-   * @return            $groupIdArray         List of groupIds that represent the valid potential children of the group
-   *
-   * @access public
+   * @return array $groupIdArray         List of groupIds that represent the valid potential children of the group@access public
    */
   static function getPotentialChildGroupIds($groupId) {
     $groups = CRM_Contact_BAO_Group::getGroups();

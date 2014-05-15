@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -127,9 +127,9 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * class constructor
    *
    * @param string $title title of the page
-   * @param int    $mode  mode of the page
+   * @param int $mode mode of the page
    *
-   * @return CRM_Core_Page
+   * @return \CRM_Core_Page_Basic
    */
   function __construct($title = NULL, $mode = NULL) {
     parent::__construct($title, $mode);
@@ -192,7 +192,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   /**
    * browse all entities.
    *
-   * @param int $action
+   * @internal param int $action
    *
    * @return void
    * @access public
@@ -224,13 +224,13 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
 
     $fields = &$object->fields();
     $key = '';
-    if (CRM_Utils_Array::value('title', $fields)) {
+    if (!empty($fields['title'])) {
       $key = 'title';
     }
-    elseif (CRM_Utils_Array::value('label', $fields)) {
+    elseif (!empty($fields['label'])) {
       $key = 'label';
     }
-    elseif (CRM_Utils_Array::value('name', $fields)) {
+    elseif (!empty($fields['name'])) {
       $key = 'name';
     }
 
@@ -241,7 +241,10 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
       $object->orderBy($key . ' asc');
     }
 
-
+    //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
+    // this is loaded onto then replace with something like '__' & test
+    $separator = CRM_Core_DAO::VALUE_SEPARATOR;
+    $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, $separator);
     // find all objects
     $object->find();
     while ($object->fetch()) {
@@ -257,7 +260,10 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
           $values[$object->id] = array();
           CRM_Core_DAO::storeValues($object, $values[$object->id]);
 
-          CRM_Contact_DAO_RelationshipType::addDisplayEnums($values[$object->id]);
+          if (is_a($object, 'CRM_Contact_DAO_RelationshipType')) {
+            $values[$object->id]['contact_type_a_display'] = $contactTypes[$values[$object->id]['contact_type_a']];
+            $values[$object->id]['contact_type_b_display'] = $contactTypes[$values[$object->id]['contact_type_b']];
+          }
 
           // populate action links
           $this->action($object, $action, $values[$object->id], $links, $permission);
@@ -278,10 +284,12 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * actions
    *
    * @param CRM_Core_DAO $object the object being considered
-   * @param int     $action the base set of actions
-   * @param array   $values the array of values that we send to the template
-   * @param array   $links  the array of links
-   * @param string  $permission the permission assigned to this object
+   * @param int $action the base set of actions
+   * @param array $values the array of values that we send to the template
+   * @param array $links the array of links
+   * @param string $permission the permission assigned to this object
+   *
+   * @param bool $forceAction
    *
    * @return void
    * @access private
@@ -291,7 +299,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     $newAction       = $action;
     $hasDelete       = $hasDisable = TRUE;
 
-    if (CRM_Utils_Array::value('name', $values) && in_array($values['name'], array(
+    if (!empty($values['name']) && in_array($values['name'], array(
       'encounter_medium', 'case_type', 'case_status'))) {
       static $caseCount = NULL;
       if (!isset($caseCount)) {
@@ -356,6 +364,9 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    *
    * @param int $mode - what mode for the form ?
    * @param int $id - id of the entity (for update, view operations)
+   *
+   * @param bool $imageUpload
+   * @param bool $pushUserContext
    *
    * @return void
    */

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -90,6 +90,8 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
   /**
    * Browse all jobs.
    *
+   * @param null $action
+   *
    * @return void
    * @access public
    * @static
@@ -101,20 +103,25 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
     $sj = new CRM_Core_JobManager();
 
     $jobName = NULL;
-    foreach ($sj->jobs as $i => $job) {
-      if ($job->id == $jid) {
-        $jobName = $job->name;
-      }
+    if ($jid) {
+      $jobName =
+        CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $jid);
     }
 
     $this->assign('jobName', $jobName);
 
     $dao = new CRM_Core_DAO_JobLog();
     $dao->orderBy('id desc');
-    if ($jobName) {
+
+    // limit to last 1000 records
+    $dao->limit(1000);
+
+    if ($jid) {
       $dao->job_id = $jid;
     }
     $dao->find();
+
+
     $rows = array();
     while ($dao->fetch()) {
       unset($row);
@@ -146,6 +153,8 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
 
   /**
    * Get user context.
+   *
+   * @param null $mode
    *
    * @return string user context.
    */

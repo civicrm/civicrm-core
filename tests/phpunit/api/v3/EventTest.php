@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   protected $_params;
   protected $_apiversion;
   protected $_entity;
-  public $_eNoticeCompliant = TRUE;
+
   function get_info() {
     return array(
       'name' => 'Event Create',
@@ -475,7 +475,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $config = &CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array('access CiviCRM');
     $result = $this->callAPIFailure('event', 'create', $params);
-    $this->assertEquals('API permission check failed for event/create call; missing permission: access CiviEvent.', $result['error_message'], 'lacking permissions should not be enough to create an event');
+    $this->assertEquals('API permission check failed for event/create call; insufficient permission: require access CiviCRM and access CiviEvent and edit all events', $result['error_message'], 'lacking permissions should not be enough to create an event');
 
     $config->userPermissionClass->permissions = array('access CiviEvent', 'edit all events', 'access CiviCRM');
     $result = $this->callAPISuccess('event', 'create', $params);

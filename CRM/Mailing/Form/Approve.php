@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -86,7 +86,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = array();
@@ -146,7 +146,13 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
       $this->_mailingID,
       'subject'
     );
-    $preview['viewURL'] = CRM_Utils_System::url('civicrm/mailing/view', "reset=1&id={$this->_mailingID}");
+
+    $mailingKey = $this->_mailingID;
+    if ($hash = CRM_Mailing_BAO_Mailing::getMailingHash($mailingKey)) {
+      $mailingKey = $hash;
+    }
+
+    $preview['viewURL'] = CRM_Utils_System::url('civicrm/mailing/view', "reset=1&id={$mailingKey}");
     $preview['type'] = $this->_mailing->body_html ? 'html' : 'text';
     $preview['attachment'] = CRM_Core_BAO_File::attachmentInfo('civicrm_mailing', $this->_mailingID);
 
@@ -195,6 +201,13 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
       $job = new CRM_Mailing_BAO_MailingJob();
       $job->mailing_id = $ids['mailing_id'];
       $job->delete();
+    }
+    else {
+      $mailing = new CRM_Mailing_BAO_Mailing();
+      $mailing->id = $ids['mailing_id'];
+      $mailing->find(TRUE);
+
+      $params['scheduled_date'] = CRM_Utils_Date::processDate($mailing->scheduled_date);
     }
 
     CRM_Mailing_BAO_Mailing::create($params, $ids);

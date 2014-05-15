@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -51,7 +51,7 @@
         <div class="finalconf-button">
             <a href="{$fixDefaultMailbox}" id="fixDefaultMailbox" class="button"><span><div class="icon settings-icon"></div>{ts}Go{/ts}</span></a>
         </div>
-        <div class="finalconf-itemdesc">{ts}Please configure a default mailbox for CiviMail.{/ts} (<a href="http://http://book.civicrm.org/user/current/initial-set-up/email-system-configuration/0" title="{ts}opens online user guide in a new window{/ts}" target="_blank">{ts}learn more{/ts}</a>)</div>
+        <div class="finalconf-itemdesc">{ts}Please configure a default mailbox for CiviMail.{/ts} (<a href="http://book.civicrm.org/user/advanced-configuration/email-system-configuration/" title="{ts}opens online user guide in a new window{/ts}" target="_blank">{ts}learn more{/ts}</a>)</div>
         <h4 class="finalconf-item"><div class="icon alert-icon"></div> &nbsp;{ts}Default CiviMail Mailbox{/ts}</h4>
         <div style="clear:both"></div>
     {/if}
@@ -59,14 +59,17 @@
 {/if}
 {$communityMessages}
 <div class="crm-submit-buttons">
-<a href="#" id="crm-dashboard-configure" class="button show-add">
-  <span><div class="icon settings-icon"></div>{ts}Configure Your Dashboard{/ts}</span></a>
+<a href="#" id="crm-dashboard-configure" class="crm-hover-button show-add">
+  <span class="icon settings-icon"></span> {ts}Configure Your Dashboard{/ts}
+</a>
 
 <a style="display:none;" href="{crmURL p="civicrm/dashboard" q="reset=1"}" class="button show-done" style="margin-left: 6px;">
-  <span><div class="icon check-icon"></div>{ts}Done{/ts}</span></a>
+  <span><div class="icon check-icon"></div> {ts}Done{/ts}</span>
+</a>
 
-<a style="float:right;" href="{crmURL p="civicrm/dashboard" q="reset=1&resetCache=1"}" class="button show-refresh" style="margin-left: 6px;">
-  <span> <div class="icon refresh-icon"></div>{ts}Refresh Dashboard Data{/ts}</span></a>
+<a style="float:right;" href="{crmURL p="civicrm/dashboard" q="reset=1&resetCache=1"}" class="crm-hover-button show-refresh" style="margin-left: 6px;">
+  <span class="icon refresh-icon"></span> {ts}Refresh Dashboard Data{/ts}
+</a>
 
 </div>
 <div class="clear"></div>
@@ -89,20 +92,19 @@
 <div class="clear"></div>
 {literal}
 <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
     $('#crm-dashboard-configure').click(function() {
       $.ajax({
          url: CRM.url('civicrm/dashlet', 'reset=1&snippet=1'),
          success: function( content ) {
            $("#civicrm-dashboard, #crm-dashboard-configure, .show-refresh, #empty-message").hide();
            $('.show-done').show();
-           $("#configure-dashlet").show().html(content);
+           $("#configure-dashlet").show().html(content).trigger('crmLoad');
          }
       });
       return false;
     });
   });
-  cj().crmAccordions();
 </script>
 {/literal}
 </div>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,7 +35,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   protected $_paymentProcessorType;
   protected $_apiversion = 3;
   protected $_params;
-  public $_eNoticeCompliant = TRUE;
+
   function get_info() {
     return array(
       'name' => 'PaymentProcessor Create',
@@ -103,7 +103,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
    * Test  using example code
    */
   function testPaymentProcessorCreateExample() {
-    require_once 'api/v3/examples/PaymentProcessorCreate.php';
+    require_once 'api/v3/examples/PaymentProcessor/Create.php';
     $result = payment_processor_create_example();
     $expectedResult = payment_processor_create_expectedresult();
     $this->assertAPISuccess($result);

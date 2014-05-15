@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -101,7 +101,7 @@ class CRM_Upgrade_TwoTwo_Form_Step3 extends CRM_Upgrade_Form {
    * and drop these columns from civicrm_domain table.
    * @access public
    *
-   * @return None
+   * @return void
    */
   function upgradeDomainFromEmail() {
     $query = "
@@ -287,7 +287,8 @@ ALTER TABLE `civicrm_domain`
       $domain->config_backend = serialize($backendValues);
       $domain->save();
 
-      $mailingDomain = new CRM_Core_DAO_Preferences();
+      $sql = 'SELECT id, mailing_backend FROM civicrm_preferences';
+      $mailingDomain = CRM_Core_DAO::executeQuery($sql);
       $mailingDomain->find(TRUE);
       $mailingDomain->mailing_backend = serialize($mailerValues);
       $mailingDomain->save();

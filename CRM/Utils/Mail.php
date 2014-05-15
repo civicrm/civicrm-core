@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -72,10 +72,7 @@ class CRM_Utils_Mail {
     CRM_Utils_Hook::alterMailParams($params);
 
     // check if any module has aborted mail sending
-    if (
-      CRM_Utils_Array::value('abortMailSend', $params) ||
-      !CRM_Utils_Array::value('toEmail', $params)
-    ) {
+    if (!empty($params['abortMailSend']) || empty($params['toEmail'])) {
       return FALSE;
     }
 
@@ -90,7 +87,7 @@ class CRM_Utils_Mail {
 
     $headers         = array();
     // CRM-10699 support custom email headers
-    if (CRM_Utils_Array::value('headers', $params)) {
+    if (!empty($params['headers'])) {
       $headers = array_merge($headers, $params['headers']);
     }
     $headers['From'] = $params['from'];
@@ -118,7 +115,7 @@ class CRM_Utils_Mail {
     if ($includeMessageId) {
       $headers['Message-ID'] = '<' . uniqid('civicrm_', TRUE) . "@$emailDomain>";
     }
-    if (CRM_Utils_Array::value('autoSubmitted', $params)) {
+    if (!empty($params['autoSubmitted'])) {
       $headers['Auto-Submitted'] = "Auto-Generated";
     }
 
@@ -163,23 +160,24 @@ class CRM_Utils_Mail {
     $headers = &$msg->headers($headers);
 
     $to = array($params['toEmail']);
+    $result = null;
+    $mailer =& CRM_Core_Config::getMailer( );
 
-    //get emails from headers, since these are
-    //combination of name and email addresses.
-    if (CRM_Utils_Array::value('Cc', $headers)) {
-      $to[] = CRM_Utils_Array::value('Cc', $headers);
+    // Mail_smtp and Mail_sendmail mailers require Bcc anc Cc emails
+    // be included in both $to and $headers['Cc', 'Bcc']
+    if (get_class($mailer) != "Mail_mail") {
+        //get emails from headers, since these are
+        //combination of name and email addresses.
+        if (!empty($headers['Cc'])) {
+            $to[] = CRM_Utils_Array::value( 'Cc', $headers );
+        }
+        if (!empty($headers['Bcc'])) {
+            $to[] = CRM_Utils_Array::value( 'Bcc', $headers );
+        }
     }
-    if (CRM_Utils_Array::value('Bcc', $headers)) {
-      $to[] = CRM_Utils_Array::value('Bcc', $headers);
-      unset($headers['Bcc']);
-    }
-
-    $result = NULL;
-    $mailer = CRM_Core_Config::getMailer();
     if (is_object($mailer)) {
-      CRM_Core_Error::ignoreException();
+      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       $result = $mailer->send($to, $headers, $message);
-      CRM_Core_Error::setCallback();
       if (is_a($result, 'PEAR_Error')) {
         $message = self::errorMessage($mailer, $result);
         // append error message in case multiple calls are being made to
@@ -206,7 +204,7 @@ class CRM_Utils_Mail {
     }
 
     $message .= '<li>' . ts('The FROM Email Address configured for this feature may not be a valid sender based on your email service provider rules.') . '</li>' . '</ul>' . '<p>' . ts('Check <a href="%1">this page</a> for more information.', array(
-      1 => CRM_Utils_System::docURL2('user/initial-set-up/email-system-configuration', TRUE))) . '</p>';
+      1 => CRM_Utils_System::docURL2('user/advanced-configuration/email-system-configuration', TRUE))) . '</p>';
 
     return $message;
   }
@@ -364,6 +362,35 @@ class CRM_Utils_Mail {
     }
 
     return $name;
+  }
+
+  /**
+   *
+   * @param string $fileName
+   * @param string $html
+   * @param string $format
+   *
+   * @return array $attachments
+   */
+  static function appendPDF($fileName, $html, $format = NULL) {
+    $pdf_filename = CRM_Core_Config::singleton()->templateCompileDir . CRM_Utils_File::makeFileName($fileName);
+
+    //FIXME : CRM-7894
+    //xmlns attribute is required in XHTML but it is invalid in HTML,
+    //Also the namespace "xmlns=http://www.w3.org/1999/xhtml" is default,
+    //and will be added to the <html> tag even if you do not include it.
+    $html = preg_replace('/(<html)(.+?xmlns=["\'].[^\s]+["\'])(.+)?(>)/', '\1\3\4', $html);
+
+    file_put_contents($pdf_filename, CRM_Utils_PDF_Utils::html2pdf($html,
+      $fileName,
+      TRUE,
+      $format)
+    );
+    return array(
+      'fullPath' => $pdf_filename,
+      'mime_type' => 'application/pdf',
+      'cleanName' => $fileName,
+    );
   }
 }
 

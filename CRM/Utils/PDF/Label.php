@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *  Class to print labels in Avery or custom formats
  * functionality and smarts to the base PDF_Label.
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  *
  *
  */
@@ -91,7 +91,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
    *
    * @param $format   Either the name of a Label Format in the Option Value table
    *                  or an array of Label Format values.
-   * @param $unit     Unit of measure for the PDF document
+   * @param string|\Unit $unit Unit of measure for the PDF document
    *
    * @access public
    */

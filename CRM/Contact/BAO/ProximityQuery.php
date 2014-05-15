@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -36,6 +36,11 @@ class CRM_Contact_BAO_ProximityQuery {
 
   /**
    * Trigonometry for calculating geographical distances.
+   *
+   * Modification made in: CRM-13904
+   * http://en.wikipedia.org/wiki/Great-circle_distance
+   * http://www.movable-type.co.uk/scripts/latlong.html
+   *
    * All function arguments and return values measure distances in metres
    * and angles in degrees.  The ellipsoid model is from the WGS-84 datum.
    * Ka-Ping Yee, 2003-08-11
@@ -117,24 +122,6 @@ class CRM_Contact_BAO_ProximityQuery {
   }
 
   /**
-   * Estimate the earth-surface distance between two locations.
-   */
-  static function earthDistance($longitudeSrc, $latitudeSrc,
-    $longitudeDst, $latitudeDst
-  ) {
-
-    $longSrc = deg2rad($longitudeSrc);
-    $latSrc  = deg2rad($latitudeSrc);
-    $longDst = deg2rad($longitudeDst);
-    $latDst  = deg2rad($latitudeDst);
-
-    $radius = self::earthRadius(($latitudeSrc + $latitudeDst) / 2);
-
-    $cosAngle = cos($latSrc) * cos($latDst) * (cos($longSrc) * cos($longDst) + sin($longSrc) * sin($longDst)) + sin($latSrc) * sin($latDst);
-    return acos($cosAngle) * $radius;
-  }
-
-  /**
    * Estimate the min and max longitudes within $distance of a given location.
    */
   static function earthLongitudeRange($longitude, $latitude, $distance) {
@@ -198,57 +185,51 @@ class CRM_Contact_BAO_ProximityQuery {
     );
   }
 
-  /*
-     * Returns the SQL fragment needed to add a column called 'distance'
-     * to a query that includes the location table
-     *
-     * @param $longitude
-     * @param $latitude
-     */
-
-  static function earthDistanceSQL($longitude, $latitude) {
-    $long   = deg2rad($longitude);
-    $lat    = deg2rad($latitude);
-    $radius = self::earthRadius($latitude);
-
-    $cosLong = cos($long);
-    $cosLat  = cos($lat);
-    $sinLong = sin($long);
-    $sinLat  = sin($lat);
-
-    return "
-IFNULL( ACOS( $cosLat * COS( RADIANS( $latitude ) ) *
-              ( $cosLong * COS( RADIANS( $longitude ) ) +
-                $sinLong * SIN( RADIANS( $longitude ) ) ) +
-              $sinLat  * SIN( RADIANS( $latitude  ) ) ), 0.00000 ) * $radius
-";
-  }
-
   static function where($latitude, $longitude, $distance, $tablePrefix = 'civicrm_address') {
     self::initialize();
 
     $params = array();
     $clause = array();
 
-    list($minLongitude, $maxLongitude) = self::earthLongitudeRange($longitude,
-      $latitude,
-      $distance
-    );
-    list($minLatitude, $maxLatitude) = self::earthLatitudeRange($longitude,
-      $latitude,
-      $distance
-    );
+    list($minLongitude, $maxLongitude) =
+      self::earthLongitudeRange($longitude,
+        $latitude,
+        $distance
+      );
+    list($minLatitude, $maxLatitude) =
+      self::earthLatitudeRange(
+        $longitude,
+        $latitude,
+        $distance
+      );
 
-    $earthDistanceSQL = self::earthDistanceSQL($longitude, $latitude);
+    // DONT consider NAN values (which is returned by rad2deg php function)
+    // for checking BETWEEN geo_code's criteria as it throws obvious 'NAN' field not found DB: Error
+    $geoCodeWhere = array();
+    if (!is_nan($minLatitude)) {
+      $geoCodeWhere[] = "{$tablePrefix}.geo_code_1  >= $minLatitude ";
+    }
+    if (!is_nan($maxLatitude)) {
+      $geoCodeWhere[] = "{$tablePrefix}.geo_code_1  <= $maxLatitude ";
+    }
+    if (!is_nan($minLongitude)) {
+      $geoCodeWhere[] = "{$tablePrefix}.geo_code_2 >= $minLongitude ";
+    }
+    if (!is_nan($maxLongitude)) {
+      $geoCodeWhere[] = "{$tablePrefix}.geo_code_2 <= $maxLongitude ";
+    }
+    $geoCodeWhereClause = implode(' AND ', $geoCodeWhere);
 
     $where = "
-{$tablePrefix}.geo_code_1  >= $minLatitude  AND
-{$tablePrefix}.geo_code_1  <= $maxLatitude  AND
-{$tablePrefix}.geo_code_2 >= $minLongitude AND
-{$tablePrefix}.geo_code_2 <= $maxLongitude AND
-$earthDistanceSQL  <= $distance
+{$geoCodeWhereClause} AND
+ACOS(
+    COS(RADIANS({$tablePrefix}.geo_code_1)) *
+    COS(RADIANS($latitude)) *
+    COS(RADIANS({$tablePrefix}.geo_code_2) - RADIANS($longitude)) +
+    SIN(RADIANS({$tablePrefix}.geo_code_1)) *
+    SIN(RADIANS($latitude))
+  ) * 6378137  <= $distance
 ";
-
     return $where;
   }
 

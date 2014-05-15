@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -46,9 +46,9 @@
           installments.val( '' );
        }
 
-       frUnit.attr( 'disabled', isDisabled );
-       frInerval.attr( 'disabled', isDisabled );
-       installments.attr( 'disabled', isDisabled );
+       frUnit.prop( 'disabled', isDisabled );
+       frInerval.prop( 'disabled', isDisabled );
+       installments.prop( 'disabled', isDisabled );
    }
 
    function buildRecurBlock( processorId ) {
@@ -74,7 +74,7 @@
        eval( 'cj( "#recurringPaymentBlock" ).' + funName + "( )" );
    }
 
-   cj( function() {
+   CRM.$(function($) {
        buildRecurBlock( null );
        enablePeriod( );
    });

@@ -5,7 +5,7 @@
  */
 function membership_get_example(){
 $params = array(
-  'contact_id' => 17,
+  'contact_id' => 18,
   'filters' => array(
       'is_current' => 1,
     ),
@@ -38,23 +38,16 @@ function membership_get_expectedresult(){
   'values' => array(
       '1' => array(
           'id' => '1',
-          'membership_id' => '1',
-          'contact_id' => '17',
-          'membership_contact_id' => '17',
-          'membership_type_id' => '25',
+          'contact_id' => '18',
+          'membership_type_id' => '27',
           'join_date' => '2009-01-21',
           'start_date' => '2013-07-29 00:00:00',
-          'membership_start_date' => '2009-01-21',
           'end_date' => '2013-08-04 00:00:00',
-          'membership_end_date' => '2009-12-21',
           'source' => 'Payment',
-          'membership_source' => 'Payment',
-          'status_id' => '20',
+          'status_id' => '21',
           'is_override' => '1',
           'is_test' => 0,
-          'member_is_test' => 0,
           'is_pay_later' => 0,
-          'member_is_pay_later' => 0,
           'membership_name' => 'General',
           'relationship_name' => 'Child of',
         ),
@@ -69,16 +62,16 @@ function membership_get_expectedresult(){
 * This example has been generated from the API test suite. The test that created it is called
 *
 * testGetOnlyActive and can be found in
-* http://svn.civicrm.org/civicrm/trunk/tests/phpunit/CiviTest/api/v3/MembershipTest.php
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MembershipTest.php
 *
 * You can see the outcome of the API tests at
-* http://tests.dev.civicrm.org/trunk/results-api_v3
+* https://test.civicrm.org/job/CiviCRM-master-git/
 *
 * To Learn about the API read
-* http://book.civicrm.org/developer/current/techniques/api/
+* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
 *
-* and review the wiki at
-* http://wiki.civicrm.org/confluence/display/CRMDOC/CiviCRM+Public+APIs
+* Browse the api on your own site with the api explorer
+* http://MYSITE.ORG/path/to/civicrm/api/explorer
 *
 * Read more about testing here
 * http://wiki.civicrm.org/confluence/display/CRM/Testing

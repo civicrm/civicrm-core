@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -286,7 +286,8 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   /**
    * @param CRM_Utils_Cache_Interface $cache
    * @param null $cacheKey
-   * @param string $appendPathGarbage
+   *
+   * @internal param string $appendPathGarbage
    * @return array(string $basedir, CRM_Extension_Container_Interface, CRM_Extension_Mapper)
    */
   function _createMapper(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {

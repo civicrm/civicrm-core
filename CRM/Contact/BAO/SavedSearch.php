@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -42,7 +42,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   /**
    * class constructor
    *
-   * @return object CRM_Contact_BAO_SavedSearch
+   * @return \CRM_Contact_BAO_SavedSearch CRM_Contact_BAO_SavedSearch
    */
   function __construct() {
     parent::__construct();
@@ -136,7 +136,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
     if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $id, 'mapping_id')) {
       return CRM_Core_BAO_Mapping::formattedFields($fv);
     }
-    elseif (CRM_Utils_Array::value('customSearchID', $fv)) {
+    elseif (!empty($fv['customSearchID'])) {
       return $fv;
     }
     else {
@@ -158,7 +158,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   static function whereClause($id, &$tables, &$whereTables) {
     $params = self::getSearchParams($id);
     if ($params) {
-      if (CRM_Utils_Array::value('customSearchID', $params)) {
+      if (!empty($params['customSearchID'])) {
         // this has not yet been implemented
       } else {
       return CRM_Contact_BAO_Query::getWhereClause($params, NULL, $tables, $whereTables);
@@ -169,9 +169,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
 
   static function contactIDsSQL($id) {
     $params = self::getSearchParams($id);
-    if ($params &&
-      CRM_Utils_Array::value('customSearchID', $params)
-    ) {
+    if ($params && !empty($params['customSearchID'])) {
       return CRM_Contact_BAO_SearchCustom::contactIDSQL(NULL, $id);
     }
     else {
@@ -192,7 +190,7 @@ WHERE  $where";
     $params = self::getSearchParams($id);
 
     if ($params) {
-      if (CRM_Utils_Array::value('customSearchID', $params)) {
+      if (!empty($params['customSearchID'])) {
         return CRM_Contact_BAO_SearchCustom::fromWhereEmail(NULL, $id);
       }
       else {
@@ -254,6 +252,8 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
    * given an id, get the name of the saved search
    *
    * @param int $id the id of the saved search
+   *
+   * @param string $value
    *
    * @return string the name of the saved search
    * @access public

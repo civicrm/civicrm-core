@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -64,6 +64,13 @@ class CRM_Core_Permission {
   const ALWAYS_ALLOW_PERMISSION = "*always allow*";
 
   /**
+   * Various authentication sources
+   *
+   * @var int
+   */
+  CONST AUTH_SRC_UNKNOWN = 0, AUTH_SRC_CHECKSUM = 1, AUTH_SRC_SITEKEY = 2, AUTH_SRC_LOGIN = 4;
+
+  /**
    * get the current permission of this user
    *
    * @return string the permission of the user (edit or view or null)
@@ -74,17 +81,63 @@ class CRM_Core_Permission {
   }
 
   /**
-   * given a permission string, check for access requirements
+   * given a permission string or array, check for access requirements
+   * @param mixed $permissions the permission to check as an array or string -see examples
+   *  arrays
    *
-   * @param string $str the permission to check
+   *  Ex 1
+   *
+   *  Must have 'access CiviCRM'
+   *  (string) 'access CiviCRM'
+   *
+   *
+   *  Ex 2 Must have 'access CiviCRM' and 'access Ajax API'
+   *   array('access CiviCRM', 'access Ajax API')
+   *
+   *  Ex 3 Must have 'access CiviCRM' or 'access Ajax API'
+   *   array(
+   *      array('access CiviCRM', 'access Ajax API'),
+   *   ),
+   *
+   *  Ex 4 Must have 'access CiviCRM' or 'access Ajax API' AND 'access CiviEvent'
+   *  array(
+   *    array('access CiviCRM', 'access Ajax API'),
+   *    'access CiviEvent',
+   *   ),
+   *
+   *  Note that in permissions.php this is keyed by the action eg.
+   *  (access Civi || access AJAX) && (access CiviEvent || access CiviContribute)
+   *  'myaction' => array(
+   *    array('access CiviCRM', 'access Ajax API'),
+   *    array('access CiviEvent', 'access CiviContribute')
+   *  ),
    *
    * @return boolean true if yes, else false
    * @static
    * @access public
    */
-  static function check($str) {
-    $config = CRM_Core_Config::singleton();
-    return $config->userPermissionClass->check($str);
+  static function check($permissions) {
+    $permissions = (array) $permissions;
+
+    foreach ($permissions as $permission) {
+      if(is_array($permission)) {
+        foreach ($permission as $orPerm) {
+          if(self::check($orPerm)) {
+            //one of our 'or' permissions has succeeded - stop checking this permission
+            return TRUE;;
+          }
+        }
+        //none of our our conditions was met
+        return FALSE;
+      }
+      else {
+        if(!CRM_Core_Config::singleton()->userPermissionClass->check($permission)) {
+          //one of our 'and' conditions has not been met
+          return FALSE;
+        }
+      }
+    }
+    return TRUE;
   }
 
   /**
@@ -135,14 +188,13 @@ class CRM_Core_Permission {
    * Get all groups from database, filtered by permissions
    * for this user
    *
-   * @param string $groupType     type of group(Access/Mailing)
-   * @param boolen $excludeHidden exclude hidden groups.
+   * @param string $groupType type of group(Access/Mailing)
+   * @param bool|\boolen $excludeHidden exclude hidden groups.
    *
    * @access public
    * @static
    *
    * @return array - array reference of all groups.
-   *
    */
   public static function group($groupType, $excludeHidden = TRUE) {
     $config = CRM_Core_Config::singleton();
@@ -283,9 +335,7 @@ class CRM_Core_Permission {
     if (!empty($permissionedEvents)) {
       return array_search($eventID, $permissionedEvents) === FALSE ? NULL : $eventID;
     }
-    else {
-      return $eventID;
-    }
+    return NULL;
   }
 
   static function eventClause($type = CRM_Core_Permission::VIEW, $prefix = NULL) {
@@ -323,7 +373,9 @@ class CRM_Core_Permission {
    * @param string $module component name.
    * @param $action action to be check across component
    *
-   **/
+   *
+   * @return bool
+   */
   static function checkActionPermission($module, $action) {
     //check delete related permissions.
     if ($action & CRM_Core_Action::DELETE) {
@@ -420,14 +472,13 @@ class CRM_Core_Permission {
     static $permissions = NULL;
 
     if (!$permissions) {
+      $config = CRM_Core_Config::singleton();
       $prefix = ts('CiviCRM') . ': ';
       $permissions = self::getCorePermissions();
 
       if (self::isMultisiteEnabled()) {
         $permissions['administer Multiple Organizations'] = $prefix . ts('administer Multiple Organizations');
       }
-
-      $config = CRM_Core_Config::singleton();
 
       if (!$all) {
         $components = CRM_Core_Component::getEnabledComponents();
@@ -447,12 +498,32 @@ class CRM_Core_Permission {
       }
 
       // Add any permissions defined in hook_civicrm_permission implementations.
-      $config = CRM_Core_Config::singleton();
       $module_permissions = $config->userPermissionClass->getAllModulePermissions();
       $permissions = array_merge($permissions, $module_permissions);
     }
 
     return $permissions;
+  }
+
+  static function getAnonymousPermissionsWarnings() {
+    static $permissions = array();
+    if (empty($permissions)) {
+      $permissions = array(
+        'administer CiviCRM'
+      );
+      $components = CRM_Core_Component::getComponents();
+      foreach ($components as $comp) {
+        if (!method_exists($comp, 'getAnonymousPermissionWarnings')) {
+          continue;
+        }
+        $permissions = array_merge($permissions, $comp->getAnonymousPermissionWarnings());
+      }
+    }
+    return $permissions;
+  }
+
+  static function validateForPermissionWarnings($anonymous_perms) {
+    return array_intersect($anonymous_perms, self::getAnonymousPermissionsWarnings());
   }
 
   static function getCorePermissions() {
@@ -499,6 +570,7 @@ class CRM_Core_Permission {
       'delete all manual batches' => $prefix . ts('delete all manual batches'),
       'export own manual batches' => $prefix . ts('export own manual batches'),
       'export all manual batches' => $prefix . ts('export all manual batches'),
+      'administer payment processors' => $prefix . ts('administer payment processors'),
     );
 
     return $permissions;
@@ -548,6 +620,8 @@ class CRM_Core_Permission {
    * @param string $permission
    *
    * return string $componentName the name of component.
+   *
+   * @return int|null|string
    * @static
    */
   static function getComponentName($permission) {

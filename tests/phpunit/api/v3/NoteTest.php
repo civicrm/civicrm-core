@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,7 +38,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   protected $_params;
   protected $_noteID;
   protected $_note;
-  public $_eNoticeCompliant = TRUE;
+
 
   function __construct() {
     parent::__construct();
@@ -153,8 +153,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$result['id']]['note'], 'Hello!!! m testing Note', 'in line ' . __LINE__);
     $this->assertEquals(date('Y-m-d', strtotime($this->_params['modified_date'])), date('Y-m-d', strtotime($result['values'][$result['id']]['modified_date'])), 'in line ' . __LINE__);
 
-    $this->assertArrayHasKey('id', $result, 'in line ' . __LINE__);
-    $this->assertAPISuccess($result, 'in line ' . __LINE__);
+    $this->assertArrayHasKey('id', $result);
     $note = array(
       'id' => $result['id'],    );
     $this->noteDelete($note);
@@ -279,7 +278,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
  *  Test civicrm_activity_create() using example code
  */
 function testNoteCreateExample() {
-  require_once 'api/v3/examples/NoteCreate.php';
+  require_once 'api/v3/examples/Note/Create.php';
   $result = UF_match_get_example();
   $expectedResult = UF_match_get_expectedresult();
   $this->assertEquals($result, $expectedResult);

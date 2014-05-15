@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -45,6 +45,9 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * @param array $params input parameters
    */
   static function create($params) {
+    // Ensure mysql phone function exists
+    CRM_Core_DAO::checkSqlFunctionsExist();
+
     if (is_numeric(CRM_Utils_Array::value('is_primary', $params)) ||
       // if id is set & is_primary isn't we can assume no change
       empty($params['id'])
@@ -66,6 +69,9 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * @static
    */
   static function add(&$params) {
+    // Ensure mysql phone function exists
+    CRM_Core_DAO::checkSqlFunctionsExist();
+
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Phone', CRM_Utils_Array::value('id', $params), $params);
 
@@ -96,6 +102,10 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * Get all the phone numbers for a specified contact_id, with the primary being first
    *
    * @param int $id the contact id
+   *
+   * @param bool $updateBlankLocInfo
+   * @param null $type
+   * @param array $filters
    *
    * @return array  the array of phone ids which are potential numbers
    * @access public
@@ -168,6 +178,8 @@ ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
    * @param array $entityElements the array containing entity_id and
    * entity_table name
    *
+   * @param null $type
+   *
    * @return array  the array of phone ids which are potential numbers
    * @access public
    * @static
@@ -229,6 +241,8 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
     if (!$optionId) {
       return;
     }
+    // Ensure mysql phone function exists
+    CRM_Core_DAO::checkSqlFunctionsExist();
 
     $tables = array(
       'civicrm_phone',
@@ -252,6 +266,8 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
    * Call common delete function
    */
   static function del($id) {
+    // Ensure mysql phone function exists
+    CRM_Core_DAO::checkSqlFunctionsExist();
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Phone', $id);
   }
 }

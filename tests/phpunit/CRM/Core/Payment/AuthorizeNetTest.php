@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,12 +28,8 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/AuthorizeNet.php';
-require_once 'CiviTest/Contact.php';
+
 class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
-  //@todo make BAO enotice compliant  & remove the line below
-  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
-  // new test classes should be compliant.
-  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name' => 'Authorize.net processing',
@@ -51,6 +47,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'user_name' => $this->processorParams->user_name,
       'password' => $this->processorParams->password,
       'url_recur' => $this->processorParams->url_recur,
+      'signature' => '',
     );
 
     $this->processor = new CRM_Core_Payment_AuthorizeNet('Contribute', $paymentProcessor);
@@ -63,8 +60,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
   function tearDown() {
     $this->paymentProcessor->delete($this->processorParams->id);
-    $tablesToTruncate = array('civicrm_contribution', 'civicrm_contribution_recur', 'civicrm_line_item' );
-    $this->quickCleanup($tablesToTruncate);
+    $this->quickCleanUpFinancialEntities();
   }
 
   /**
@@ -76,7 +72,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $firstName  = 'John_' .  substr(sha1(rand()), 0, 7);
     $lastName   = 'Smith_' . substr(sha1(rand()), 0, 7);
     $nameParams = array('first_name' => $firstName, 'last_name' => $lastName);
-    $contactId  = Contact::createIndividual($nameParams);
+    $contactId  = $this->individualCreate($nameParams);
 
     $invoiceID = sha1(rand());
     $amount    = rand(100, 1000) . '.00';
@@ -95,7 +91,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'is_test' => 1,
       'payment_processor_id' => $this->processorParams->id,
     );
-    $recur = CRM_Contribute_BAO_ContributionRecur::add($contributionRecurParams, $ids);
+    $recur = CRM_Contribute_BAO_ContributionRecur::add($contributionRecurParams);
 
     $contributionParams = array(
       'contact_id'   => $contactId,
@@ -108,7 +104,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'is_test'      => 1,
       'contribution_status_id' => 2,
     );
-    $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams, $ids);
+    $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
 
     $params = array(
       'qfKey' => '08ed21c7ca00a1f7d32fff2488596ef7_4454',
@@ -195,10 +191,9 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     // cancel it or the transaction will be rejected by A.net if the test is re-run
     $subscriptionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $recur->id, 'processor_id');
+    $message = '';
     $result = $this->processor->cancelSubscription($message, array('subscriptionId' => $subscriptionID));
     $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
-
-    Contact::delete($contactId);
   }
 
   /**
@@ -210,7 +205,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $firstName  = 'John_' .  substr(sha1(rand()), 0, 7);
     $lastName   = 'Smith_' . substr(sha1(rand()), 0, 7);
     $nameParams = array('first_name' => $firstName, 'last_name' => $lastName);
-    $contactId  = Contact::createIndividual($nameParams);
+    $contactId  = $this->individualCreate($nameParams);
 
     $ids = array('contribution' => NULL);
     $invoiceID = sha1(rand());
@@ -244,7 +239,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
     );
 
-    $this->callAPISuccess('contribution', 'create', $contributionParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
 
     $params = array(
       'qfKey' => '00ed21c7ca00a1f7d555555596ef7_4454',
@@ -314,7 +309,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'contributionPageID' => '',
       'email' => "{$firstName}.{$lastName}@example.com",
       'contactID' => $contactId,
-      'contributionID' => $contribution->id,
+      'contributionID' => $contribution['id'],
       'contributionTypeID' => $this->_financialTypeId,
       'contributionRecurID' => $recur->id,
     );
@@ -337,9 +332,8 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     // cancel it or the transaction will be rejected by A.net if the test is re-run
     $subscriptionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $recur->id, 'processor_id');
+    $message = '';
     $result = $this->processor->cancelSubscription($message, array('subscriptionId' => $subscriptionID));
     $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
-
-    Contact::delete($contactId);
   }
 }

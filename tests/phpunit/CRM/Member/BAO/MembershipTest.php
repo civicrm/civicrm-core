@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,10 +34,6 @@ require_once 'CiviTest/Membership.php';
 require_once 'CRM/Core/Controller.php';
 
 class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
-  //@todo make BAO enotice compliant  & remove the line below
-  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
-  // new test classes should be compliant.
-  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name' => 'Membership BAOs',
@@ -211,6 +207,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'contact_id', 'Database check for created membership.'
     );
     $params = array('id' => $membershipId);
+    $values = array();
     CRM_Member_BAO_Membership::retrieve($params, $values);
     $this->assertEquals($values['id'], $membershipId, 'Verify membership record is retrieved.');
 
@@ -239,6 +236,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     );
 
     $params = array('id' => $membershipId1);
+    $values1 = array();
     CRM_Member_BAO_Membership::retrieve($params, $values1);
     $membership = array($membershipId1 => $values1);
 
@@ -260,6 +258,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     );
 
     $params = array('id' => $membershipId2);
+    $values2 = array();
     CRM_Member_BAO_Membership::retrieve($params, $values2);
     $membership[$membershipId2] = $values2;
 

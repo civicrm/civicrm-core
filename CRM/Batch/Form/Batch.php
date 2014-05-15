@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -49,7 +49,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -84,7 +84,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = array();
@@ -104,7 +104,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -124,7 +124,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
     }
 
     // always create with data entry status
-    $params['status_id'] = 3;
+    $params['status_id'] = CRM_Core_OptionGroup::getValue('batch_status','Data Entry', 'name');
     $batch = CRM_Batch_BAO_Batch::create($params);
 
     // redirect to batch entry page.

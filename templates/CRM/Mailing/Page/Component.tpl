@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,8 @@
     <div class="form-item">
        {strip}
        {* handle enable/disable actions*}
-       {include file="CRM/common/enableDisable.tpl"}
+       {include file="CRM/common/enableDisableApi.tpl"}
+       {include file="CRM/common/crmeditable.tpl"}
        <table cellpadding="0" cellspacing="0" border="0">
         <thead class="sticky">
         <th>{ts}Name{/ts}</th>
@@ -45,8 +46,8 @@
         <th></th>
         </thead>
        {foreach from=$rows item=row}
-         <tr id="row_{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-           <td>{$row.name}</td>
+         <tr id="mailing_component-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+           <td class="crm-editable" data-field="name">{$row.name}</td>
            <td>{$row.component_type}</td>
            <td>{$row.subject}</td>
            <td>{$row.body_text}</td>

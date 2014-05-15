@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -63,7 +63,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     $this->openCiviPage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
 
@@ -93,8 +93,8 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
 
     $this->waitForText('crm-notification-container', "Campaign $title");
 
-    $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
-    $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $this->waitForElementPresent("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $id = (int) $this->getText("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
     $this->mailingAddTest($groupName, $campaignTitle, $id);
   }
 
@@ -209,7 +209,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     //----------end New Mailing-------------
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
-    $this->assertElementContainsText('page-title', "Scheduled and Sent Mailings");
+    $this->assertElementContainsText('page-title', "Find Mailings");
     $this->assertElementContainsText('Search', "Mailing $mailingName Webtest");
 
     //--------- mail delivery verification---------

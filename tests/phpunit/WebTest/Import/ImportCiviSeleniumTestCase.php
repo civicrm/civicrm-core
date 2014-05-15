@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -550,10 +550,11 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
       $this->typeKeys("css=input#sort_name_navigation", $searchName);
 
       // Wait for result list.
-      $this->waitForElementPresent("css=div.ac_results-inner li");
+      $this->waitForElementPresent("css=ul.ui-autocomplete li");
 
       // Visit contact summary page.
-      $this->clickLink("css=div.ac_results-inner li");
+      $this->click("css=ul.ui-autocomplete li");
+      $this->waitForPageToLoad($this->getTimeoutMsec());
 
       // Get contact id from url.
       $contactIds[] = $this->urlArg('cid');

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -97,18 +97,17 @@
 {/literal}
 </script>
 
-</td>
+			</td>
     </tr>
     <tr class="crm-job-form-block-parameters">
-        <td class="label">{$form.parameters.label}<br />{docURL page="Managing Scheduled Jobs" resource="wiki"}</td><td>{$form.parameters.html}</td>
+      <td class="label">{$form.parameters.label}<br />{docURL page="Managing Scheduled Jobs" resource="wiki"}</td>
+			<td>{$form.parameters.html}</td>
     </tr>
     <tr class="crm-job-form-block-is_active">
-        <td></td><td>{$form.is_active.html}&nbsp;{$form.is_active.label}</td>
+      <td></td><td>{$form.is_active.html}&nbsp;{$form.is_active.label}</td>
     </tr>
   </table>
 {/if}
-</table>
-       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-  </fieldset>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 

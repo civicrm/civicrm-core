@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -59,10 +59,10 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
   /**
    * Class constructor
    *
-   * @param
+   * @internal param $
    *
-   * @return CRM_Contact_Selector_Profile
-   * @access public
+   * @return \CRM_Mailing_Selector_Browse
+  @access public
    */
   function __construct() {
   }
@@ -83,7 +83,10 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -374,7 +377,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           }
         }
 
-        if (in_array($row['status'], array('Complete', 'Canceled')) && 
+        if (in_array($row['status'], array('Complete', 'Canceled')) &&
           !$row['archived']) {
           if ($allAccess || $showCreateLinks) {
             $actionMask |= CRM_Core_Action::RENEW;

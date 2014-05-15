@@ -31,10 +31,9 @@
     <weight>410</weight>
   </item>
   <item>
-    <path>civicrm/admin/options/from_email</path>
+    <path>civicrm/admin/options/from_email_address/civimail</path>
     <title>From Email Addresses</title>
     <desc>List of Email Addresses which can be used when sending emails to contacts.</desc>
-    <path_arguments>group=from_email_address</path_arguments>
     <page_callback>CRM_Admin_Page_Options</page_callback>
     <adminGroup>CiviMail</adminGroup>
     <icon>admin/small/title.png</icon>
@@ -104,7 +103,7 @@
   <item>
     <path>civicrm/mailing/unsubscribe</path>
     <title>Unsubscribe</title>
-    <page_callback>CRM_Mailing_Page_Unsubscribe</page_callback>
+    <page_callback>CRM_Mailing_Form_Unsubscribe</page_callback>
     <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
     <is_public>true</is_public>
     <weight>640</weight>
@@ -120,7 +119,7 @@
   <item>
     <path>civicrm/mailing/optout</path>
     <title>Optout</title>
-    <page_callback>CRM_Mailing_Page_Optout</page_callback>
+    <page_callback>CRM_Mailing_Form_Optout</page_callback>
     <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
     <is_public>true</is_public>
     <weight>650</weight>

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,10 +29,6 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
-  //@todo make BAO enotice compliant  & remove the line below
-  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
-  // new test classes should be compliant.
-  public $_eNoticeCompliant = FALSE;
   /**
    * @var CRM_Utils_Cache_Interface
    */
@@ -321,7 +317,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $freq = array(); // array($message => $count)
     for ($i = 0; $i < $trials; $i++) {
       $message = $communityMessages->pick();
-      $freq[$message['markup']]++;
+      $freq[$message['markup']] = CRM_Utils_Array::value($message['markup'], $freq, 0) + 1;
     }
 
     // assert the probabilities
@@ -348,7 +344,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $freq = array(); // array($message => $count)
     for ($i = 0; $i < $trials; $i++) {
       $message = $communityMessages->pick();
-      $freq[$message['markup']]++;
+      $freq[$message['markup']] = CRM_Utils_Array::value($message['markup'], $freq, 0) + 1;
     }
 
     $this->assertEquals($trials, $freq['<h1>Two</h1>']);
@@ -376,6 +372,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
 
   /**
    * Generate a mock HTTP client with the expectation that it is called once.
+   *
+   * @param $response
    *
    * @return CRM_Utils_HttpClient|PHPUnit_Framework_MockObject_MockObject
    */

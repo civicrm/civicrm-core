@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -70,14 +70,12 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
       self::$_actionLinks = array(
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Event_BAO_Event' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Event'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Event_BAO_Event' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Event'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -102,6 +100,8 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
   /**
    * Get tab  Links for events
    *
+   * @param $enableCart
+   *
    * @return array (reference) of tab links
    */
   static function &tabs($enableCart) {
@@ -110,48 +110,58 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
       self::$_tabLinks = array();
     }
     if (!isset(self::$_tabLinks[$cacheKey])) {
-      self::$_tabLinks[$cacheKey] = array(
-        'settings' => array(
+      self::$_tabLinks[$cacheKey]['settings'] =
+        array(
           'title' => ts('Info and Settings'),
           'url' => 'civicrm/event/manage/settings',
           'field' => 'id'
-        ),
-        'location' => array(
+        );
+      self::$_tabLinks[$cacheKey]['location'] =
+        array(
           'title' => ts('Location'),
           'url' => 'civicrm/event/manage/location',
-          'field' => 'is_show_location',
-        ),
-        'fee' => array(
+          'field' => 'loc_block_id',
+        );
+
+      self::$_tabLinks[$cacheKey]['fee'] =
+        array(
           'title' => ts('Fees'),
           'url' => 'civicrm/event/manage/fee',
           'field' => 'is_monetary',
-        ),
-        'registration' => array(
+        );
+      self::$_tabLinks[$cacheKey]['registration'] =
+        array(
           'title' => ts('Online Registration'),
           'url' => 'civicrm/event/manage/registration',
           'field' => 'is_online_registration',
-        ),
-        'reminder' => array(
+        );
+      if (CRM_Core_Permission::check('administer CiviCRM')) {
+      self::$_tabLinks[$cacheKey]['reminder'] =
+        array(
           'title' => ts('Schedule Reminders'),
           'url' => 'civicrm/event/manage/reminder',
           'field' => 'reminder',
-        ),
-        'conference' => array(
+        );
+      }
+      self::$_tabLinks[$cacheKey]['conference'] =
+        array(
           'title' => ts('Conference Slots'),
           'url' => 'civicrm/event/manage/conference',
           'field' => 'slot_label_id',
-        ),
-        'friend' => array(
+        );
+      self::$_tabLinks[$cacheKey]['friend'] =
+        array(
           'title' => ts('Tell a Friend'),
           'url' => 'civicrm/event/manage/friend',
           'field' => 'friend',
-        ),
-        'pcp' => array(
+        );
+      self::$_tabLinks[$cacheKey]['pcp'] =
+        array(
           'title' => ts('Personal Campaign Pages'),
           'url' => 'civicrm/event/manage/pcp',
           'field' => 'is_pcp_enabled',
-        ),
-      );
+        );
+
     }
 
     if (!$enableCart) {
@@ -323,7 +333,10 @@ ORDER BY start_date desc
           $action,
           array('id' => $dao->id),
           ts('more'),
-          TRUE
+          TRUE,
+          'event.manage.list',
+          'Event',
+          $dao->id
         );
 
         $params = array(
@@ -348,6 +361,9 @@ ORDER BY start_date desc
         $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mappingID);
         $manageEvent[$dao->id]['is_pcp_enabled'] = CRM_Utils_Array::value($dao->id, $eventPCPS);
         $manageEvent[$dao->id]['event_type'] = CRM_Utils_Array::value($manageEvent[$dao->id]['event_type_id'], $eventType);
+
+        // allow hooks to set 'field' value which allows configuration pop-up to show a tab as enabled/disabled
+        CRM_Utils_Hook::tabset('civicrm/event/manage/rows', $manageEvent, array('event_id' => $dao->id));
       }
     }
 

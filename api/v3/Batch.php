@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,6 +41,8 @@
  * {@getfields batch_create}
  * @example BatchCreate.php
  *
+ * @param $params
+ *
  * @return array of newly created batch property values.
  * @access public
  */
@@ -49,11 +51,31 @@ function civicrm_api3_batch_create($params) {
 }
 
 /**
+ * Adjust Metadata for Create action
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
+ */
+function _civicrm_api3_batch_create_spec(&$params) {
+  //@todo - the entity table field looks like it is not actually required & should probably be removed (or a description added if
+  // it is actually required)
+  $params['entity_table']['api.default'] = "civicrm_batch";
+  $params['entity_table']['type'] = CRM_Utils_Type::T_STRING;
+
+  $params['modified_date']['api.default'] = "now";
+  $params['status_id']['api.required'] = 1;
+  $params['title']['api.required'] = 1;
+  $params['status_id']['api.required'] = 1;
+}
+
+/**
  * Get a Batch
  *
  * Allowed @params array keys are:
  * {@getfields batch_get}
  * @example BatchCreate.php
+ *
+ * @param $params
  *
  * @return array of retrieved batch property values.
  * @access public
@@ -68,6 +90,8 @@ function civicrm_api3_batch_get($params) {
  * Allowed @params array keys are:
  * {@getfields batch_delete}
  * @example BatchCreate.php
+ *
+ * @param $params
  *
  * @return array of deleted values.
  * @access public

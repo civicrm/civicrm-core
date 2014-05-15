@@ -1,5 +1,4 @@
-(function($) {
-  var CRM = (window.CRM) ? (window.CRM) : (window.CRM = {});
+(function($, _) {
   if (!CRM.Designer) CRM.Designer = {};
 
   // TODO Optimize this class
@@ -97,7 +96,7 @@
      */
     getFieldByName: function(entityName, fieldName) {
       return this.find(function(paletteFieldModel) {
-        return (paletteFieldModel.get('entityName') == entityName && paletteFieldModel.get('fieldName') == fieldName);
+        return ((!entityName || paletteFieldModel.get('entityName') == entityName) && paletteFieldModel.get('fieldName') == fieldName);
       });
     },
 
@@ -114,4 +113,4 @@
       return fieldsByEntitySection;
     }
   });
-})(cj);
+})(CRM.$, CRM._);

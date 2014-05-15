@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
 *}
 {literal}
 <script type="text/javascript">
-  cj( function() {
+  CRM.$(function($) {
     //bind the click event for action icon
     cj('.action-icon').click( function( ) {
       copyFieldValues( cj(this).attr('fname') );
@@ -83,7 +83,7 @@
 
       if ( firstCheckElement.length > 1 ) {
         // lets uncheck all the checkbox except first one
-        cj('.crm-copy-fields [type=checkbox][name^="field["][name*="[' + fname +']"][type=checkbox]:not([name^="field['+ firstEntityId +']['+ fname +']["])').removeAttr('checked');
+        cj('.crm-copy-fields [type=checkbox][name^="field["][name*="[' + fname +']"][type=checkbox]:not([name^="field['+ firstEntityId +']['+ fname +']["])').prop('checked', false);
 
         //here for each checkbox for first row, check if it is checked and set remaining checkboxes
         firstCheckElement.each(function() {
@@ -91,16 +91,16 @@
             var elementName = cj(this).attr('name');
             var correctIndex = elementName.split('field['+ firstEntityId +']['+ fname +'][');
             correctIndexValue = correctIndex[1].replace(']', '');
-            cj('.crm-copy-fields [type=checkbox][name^="field["][name*="['+ fname +']['+ correctIndexValue+']"][type!=hidden]').attr('checked',true).change();
+            cj('.crm-copy-fields [type=checkbox][name^="field["][name*="['+ fname +']['+ correctIndexValue+']"][type!=hidden]').prop('checked',true).change();
           }
         });
       }
       else {
         if ( firstCheckElement.prop('checked') ) {
-          cj('.crm-copy-fields [type=checkbox][name^="field["][name*="['+ fname +']"][type!=hidden]').attr('checked',true).change();
+          cj('.crm-copy-fields [type=checkbox][name^="field["][name*="['+ fname +']"][type!=hidden]').prop('checked',true).change();
         }
         else {
-          cj('.crm-copy-fields [type=checkbox][name^="field["][name*="['+ fname +']"][type!=hidden]').removeAttr('checked').change();
+          cj('.crm-copy-fields [type=checkbox][name^="field["][name*="['+ fname +']"][type!=hidden]').prop('checked', false).change();
         }
       }
     }

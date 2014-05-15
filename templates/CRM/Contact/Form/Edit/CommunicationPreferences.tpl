@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,6 +32,12 @@
   </div><!-- /.crm-accordion-header -->
 <div id="commPrefs" class="crm-accordion-body">
     <table class="form-layout-compressed" >
+        {if !empty($form.communication_style_id)}
+            <tr><td colspan='4'>
+                <span class="label">{$form.communication_style_id.label} {help id="id-communication_style" file="CRM/Contact/Form/Contact.hlp"}</span>
+                <span class="value">{$form.communication_style_id.html}</span>
+            </td><tr>
+        {/if}
         <tr>
             {if !empty($form.email_greeting_id)}
                 <td>{$form.email_greeting_id.label}</td>
@@ -123,7 +129,7 @@
 
 {literal}
 <script type="text/javascript">
-cj( function( ) {
+CRM.$(function($) {
     var fields = new Array( 'postal_greeting', 'addressee', 'email_greeting');
     for ( var i = 0; i < 3; i++ ) {
         cj( "#" + fields[i] + "_id").change( function( ) {

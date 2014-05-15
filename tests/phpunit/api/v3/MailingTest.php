@@ -37,7 +37,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params = array();
   protected $_entity = 'Mailing';
-  public $_eNoticeCompliant = TRUE;
+
 
   function get_info() {
     return array(
@@ -49,7 +49,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
-    $this->_groupID = $this->groupCreate(NULL);
+    $this->_groupID = $this->groupCreate();
     $this->_email = 'test@test.test';
     $this->_params = array(
       'subject' => 'maild',

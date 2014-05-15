@@ -1,6 +1,6 @@
 {literal}
 <script type="text/javascript">
-cj(function() {
+CRM.$(function($) {
   if (cj('#update_modified_date').length == 0) {
     return;
   }
@@ -20,7 +20,7 @@ cj(function() {
   cj('<button>')
     .text("{/literal}{ts}Reload Page{/ts}{literal}")
     .click(function() {
-      window.location = CRM.url('civicrm/contact/add', {
+      window.location.href = CRM.url('civicrm/contact/add', {
         reset: 1,
         action: 'update',
         cid: {/literal}{$contactId}{literal}

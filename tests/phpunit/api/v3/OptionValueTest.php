@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.5                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -29,7 +29,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 
 class api_v3_OptionValueTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
-  public $_eNoticeCompliant = TRUE;
+
   function setUp() {
     parent::setUp();
   }
@@ -278,5 +278,43 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $fields = $this->callAPISuccess('contribution', 'getoptions', array('field' => 'payment_instrument_id'));
     $this->assertFalse(in_array($newOption, $fields['values']));
   }
-}
 
+
+  /*
+   * update option value with 'id' paramter and the value to update
+   * and not passing option group id
+   */
+  public function testUpdateOptionValueNoGroupId() {
+    // create a option group
+    $og = $this->callAPISuccess('option_group', 'create', array('name' => 'our test Option Group', 'is_active' => 1));
+    // create a option value
+    $ov = $this->callAPISuccess('option_value', 'create',
+      array('option_group_id' => $og['id'], 'label' => 'test option value')
+    );
+    // update option value without 'option_group_id'
+    $res =     $this->callAPISuccess('option_value', 'create', array('id' => $ov['id'], 'is_active' => 0));
+    $val = $this->callAPISuccess('option_value', 'getvalue', array(
+      'id' => $ov['id'], 'return' => 'is_active',
+    ));
+    $this->assertEquals($val, 0, "update with no group id is not proper" . __LINE__);
+  }
+
+  /*
+   * update option value with 'id' paramter and the value to update
+   * and as well as option group id
+   */
+  public function testUpdateOptionValueWithGroupId() {
+    // create a option group
+    $og = $this->callAPISuccess('option_group', 'create', array('name' => 'our test Option Group for with group id', 'is_active' => 1));
+    // create a option value
+    $ov = $this->callAPISuccess('option_value', 'create',
+      array('option_group_id' => $og['id'], 'label' => 'test option value')
+    );
+    // update option value without 'option_group_id'
+    $this->callAPISuccess('option_value', 'create', array('id' => $ov['id'], 'option_group_id' => $og['id'], 'is_active' => 0));
+    $val = $this->callAPISuccess('option_value', 'getvalue', array(
+      'id' => $ov['id'], 'return' => 'is_active',
+    ));
+    $this->assertEquals($val, 0, "update with group id is not proper " . __LINE__);
+  }
+}

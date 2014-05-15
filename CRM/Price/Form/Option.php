@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -82,6 +82,9 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @access public
    */
   function setDefaultValues() {
+    if ($this->_action == CRM_Core_Action::DELETE) {
+      return;
+    }
     $defaults = array();
 
     if (isset($this->_oid)) {
@@ -268,7 +271,10 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   /**
    * global validation rules for the form
    *
-   * @param array  $fields   (referance) posted values of the form
+   * @param array $fields (referance) posted values of the form
+   *
+   * @param $files
+   * @param $form
    *
    * @return array    if errors then list of errors to be posted back to the form,
    *                  true otherwise
@@ -277,7 +283,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    */
   static function formRule($fields, $files, $form) {
     $errors = array();
-    if (CRM_Utils_Array::value('count', $fields) && CRM_Utils_Array::value('max_value', $fields) &&
+    if (!empty($fields['count']) && !empty($fields['max_value']) &&
       $fields['count'] > $fields['max_value']
     ) {
       $errors['count'] = ts('Participant count can not be greater than max participants.');

@@ -39,16 +39,14 @@
   </foreignKey>
   <field>
        <name>case_type_id</name>
-       <type>varchar</type>
-       <length>128</length>
-       <required>true</required>
+       <type>int unsigned</type>
        <import>true</import>
        <export>false</export>
-       <title>Case Type Id</title>
-       <comment>Multivalued pseudo-fk to option_value table where option_group_name = case_type.</comment>
-       <pseudoconstant>
-         <optionGroupName>case_type</optionGroupName>
-       </pseudoconstant>
+       <title>Case Type</title>
+       <comment>FK to civicrm_case_type.id</comment>
+       <html>
+         <type>Select</type>
+       </html>
        <add>2.0</add>
   </field>
   <index>
@@ -56,6 +54,13 @@
        <fieldName>case_type_id</fieldName>
        <add>2.0</add>
   </index>
+  <foreignKey>
+       <name>case_type_id</name>
+       <table>civicrm_case_type</table>
+       <key>id</key>
+       <add>4.5</add>
+       <onDelete>SET NULL</onDelete>
+  </foreignKey>
   <field>
        <name>casetag1_id</name>
        <type>varchar</type>
@@ -109,7 +114,10 @@
       <import>true</import>
       <uniqueName>case_subject</uniqueName>
       <comment>Short name of the case.</comment>
-       <add>1.8</add>
+      <html>
+         <type>Text</type>
+      </html>
+      <add>1.8</add>
   </field>
     <field>
      <name>start_date</name>
@@ -118,6 +126,9 @@
      <import>true</import>
      <type>date</type>
      <comment>Date on which given case starts.</comment>
+     <html>
+         <type>Select Date</type>
+     </html>
      <add>1.8</add>
   </field>
   <field>
@@ -127,14 +138,19 @@
      <import>true</import>
      <type>date</type>
      <comment>Date on which given case ends.</comment>
+     <html>
+         <type>Select Date</type>
+      </html>
      <add>1.8</add>
   </field>
   <field>
       <name>details</name>
       <type>text</type>
-      <htmlType>textarea</htmlType>
-      <rows>8</rows>
-      <cols>60</cols>
+      <html>
+        <type>TextArea</type>
+        <rows>8</rows>
+        <cols>60</cols>
+      </html>
       <comment>Details about the meeting (agenda, notes, etc).</comment>
       <add>1.8</add>
   </field>
@@ -145,11 +161,14 @@
        <required>true</required>
        <import>true</import>
        <export>false</export>
-       <title>Case Status Id</title>
+       <title>Case Status</title>
        <comment>Id of case status.</comment>
        <pseudoconstant>
          <optionGroupName>case_status</optionGroupName>
        </pseudoconstant>
+       <html>
+         <type>Select</type>
+       </html>
        <add>1.8</add>
   </field>
   <field>

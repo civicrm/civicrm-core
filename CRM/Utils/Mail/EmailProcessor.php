@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -112,7 +112,7 @@ class CRM_Utils_Mail_EmailProcessor {
   /**
    * Process the mailbox for all the settings from civicrm_mail_settings
    *
-   * @param string $civiMail  if true, processing is done in CiviMail context, or Activities otherwise.
+   * @param bool|string $civiMail if true, processing is done in CiviMail context, or Activities otherwise.
    *
    * @return void
    */
@@ -167,7 +167,7 @@ class CRM_Utils_Mail_EmailProcessor {
       $store = CRM_Mailing_MailStore::getStore($dao->name);
     }
     catch(Exception$e) {
-      $message = ts('Could not connect to MailStore') . '<p>';
+      $message = ts('Could not connect to MailStore for ') . $dao->username . '@' . $dao->server .'<p>';
       $message .= ts('Error message: ');
       $message .= '<pre>' . $e->getMessage() . '</pre><p>';
       CRM_Core_Error::fatal($message);

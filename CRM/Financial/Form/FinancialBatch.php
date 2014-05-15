@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -76,7 +76,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       );
 
       $createdID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $this->_id, 'created_id');
-      if (CRM_Utils_Array::value($this->_action, $permissions)) {
+      if (!empty($permissions[$this->_action])) {
         $this->checkPermissions($this->_action, $permissions[$this->_action]['permission'], $createdID, $session->get('userID'), $permissions[$this->_action]['actionName'] );
       }
     }
@@ -85,7 +85,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -173,7 +173,11 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   /**
    * global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param $values
+   * @param $files
+   * @param $self
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -181,7 +185,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    */
   static function formRule($values, $files, $self) {
     $errors = array();
-    if (CRM_Utils_Array::value('contact_name', $values) && !is_numeric($values['created_id'])) {
+    if (!empty($values['contact_name']) && !is_numeric($values['created_id'])) {
       $errors['contact_name'] = ts('Please select a valid contact.');
     }
     if ($values['item_count'] && (!is_numeric($values['item_count']) || $values['item_count'] < 1)) {
@@ -190,7 +194,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
     if ($values['total'] && (!is_numeric($values['total']) || $values['total'] <= 0)) {
       $errors['total'] = ts('Total Amount should be a positive number');
     }
-    if (CRM_Utils_Array::value('created_date', $values) && date('Y-m-d') < date('Y-m-d', strtotime($values['created_date']))) {
+    if (!empty($values['created_date']) && date('Y-m-d') < date('Y-m-d', strtotime($values['created_date']))) {
       $errors['created_date'] = ts('Created date cannot be greater than current date');
     }
     $batchName = $values['title'];
@@ -204,7 +208,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    * Function to process the form
    *
    * @access public
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $session = CRM_Core_Session::singleton();
@@ -219,7 +223,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
     // store the submitted values in an array
     $params['modified_date'] = date('YmdHis');
     $params['modified_id'] = $session->get('userID');
-    if (CRM_Utils_Array::value('created_date', $params)) {
+    if (!empty($params['created_date'])) {
       $params['created_date'] = CRM_Utils_Date::processDate($params['created_date']);
     }
 
@@ -289,7 +293,13 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   /**
    * global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param $action
+   * @param $permissions
+   * @param $createdID
+   * @param $userContactID
+   * @param $actionName
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static

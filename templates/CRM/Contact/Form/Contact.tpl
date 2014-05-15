@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,9 +38,6 @@
     <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="top"}
     </div>
-
-    {* include overlay js *}
-    {include file="CRM/common/overlay.tpl"}
 
     <div class="crm-accordion-wrapper crm-contactDetails-accordion">
       <div class="crm-accordion-header">
@@ -110,9 +107,8 @@
   {literal}
 
   <script type="text/javascript" >
-  cj(function($) {
+  CRM.$(function($) {
     var action = "{/literal}{$action}{literal}";
-    $().crmAccordions();
 
     $('.crm-accordion-body').each( function() {
       //remove tab which doesn't have any element
@@ -239,13 +235,6 @@
       return true;
     });
     {/literal}{/if}{literal}
-
-    $("select#contact_sub_type").crmasmSelect({
-      addItemTarget: 'bottom',
-      animate: false,
-      highlight: true,
-      respectParents: true
-    });
   });
 
 </script>
@@ -256,8 +245,5 @@
 
 {* include common additional blocks tpl *}
 {include file="CRM/common/additionalBlocks.tpl"}
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
 
 {/if}

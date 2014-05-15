@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -58,7 +58,10 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
   /**
    * Function to delete membership log record
    *
-   * @param int $membershipTypeId
+   * @param $membershipID
+   *
+   * @return mixed
+   * @internal param int $membershipTypeId
    * @static
    */
 

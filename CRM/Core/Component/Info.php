@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * for a component to introduce itself to the system.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -137,15 +137,27 @@ abstract class CRM_Core_Component_Info {
   }
 
   /**
+   * Provides permissions that are unwise for Anonymous Roles to have
+   *
+   * @return array list of permissions
+   * @see CRM_Component_Info::getPermissions
+   */
+  public function getAnonymousPermissionWarnings() {
+    return array();
+  }
+
+  /**
    * Provides permissions that are used by component.
    * Needs to be implemented in component's information
    * class.
    *
    * NOTE: if using conditionally permission return,
    * implementation of $getAllUnconditionally is required.
+   *
+   * @param bool $getAllUnconditionally
+   *
    * @return array|null collection of permissions, null if none
    * @access public
-   *
    */
   abstract public function getPermissions($getAllUnconditionally = FALSE);
 
@@ -350,9 +362,10 @@ abstract class CRM_Core_Component_Info {
   /**
    * Helper for instantiating component's elements.
    *
+   * @param $cl
+   *
    * @return mixed component's element as class instance
    * @access private
-   *
    */
   private function _instantiate($cl) {
     $className = $this->namespace . '_' . $cl;

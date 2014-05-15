@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -153,8 +153,10 @@ class CRM_Event_Badge {
   /**
    * function to create labels (pdf)
    *
-   * @param   array    $contactRows   assciated array of contact data
-   * @param   string   $format   format in which labels needs to be printed
+   * @param $participants
+   *
+   * @internal param array $contactRows assciated array of contact data
+   * @internal param string $format format in which labels needs to be printed
    *
    * @return  null
    * @access  public

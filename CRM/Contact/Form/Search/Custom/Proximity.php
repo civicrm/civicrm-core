@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -48,11 +48,11 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
 
     if (!empty($this->_formValues)) {
       // add the country and state
-      if (CRM_Utils_Array::value('country_id', $this->_formValues)) {
+      if (!empty($this->_formValues['country_id'])) {
         $this->_formValues['country'] = CRM_Core_PseudoConstant::country($this->_formValues['country_id']);
       }
 
-      if (CRM_Utils_Array::value('state_province_id', $this->_formValues)) {
+      if (!empty($this->_formValues['state_province_id'])) {
         $this->_formValues['state_province'] = CRM_Core_PseudoConstant::stateProvince($this->_formValues['state_province_id']);
       }
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -77,7 +77,9 @@ class CRM_Utils_ReCAPTCHA {
     $error  = NULL;
     $config = CRM_Core_Config::singleton();
     $useSSL = FALSE;
-    require_once 'packages/recaptcha/recaptchalib.php';
+    if ( !function_exists( 'recaptcha_get_html' ) ) {
+      require_once 'packages/recaptcha/recaptchalib.php';
+    }
 
     // See if we are using SSL
     if (CRM_Utils_System::isSSL()) {

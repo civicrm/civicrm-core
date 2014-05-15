@@ -1,9 +1,9 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.4                                                |
+   | CiviCRM version 4.5                                                |
    +--------------------------------------------------------------------+
-   | Copyright CiviCRM LLC (c) 2004-2013                                |
+   | Copyright CiviCRM LLC (c) 2004-2014                                |
    +--------------------------------------------------------------------+
    | This file is a part of CiviCRM.                                    |
    |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -84,6 +84,8 @@ class CRM_Contact_Form_Task_SMSCommon {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function buildQuickForm(&$form) {
@@ -106,8 +108,8 @@ class CRM_Contact_Form_Task_SMSCommon {
       $form->_contactIds = array($cid);
     }
 
-    $to = $form->add('text', 'to', ts('To'), '', TRUE);
-    $form->add('text', 'activity_subject', ts('Name The SMS'), '', TRUE);
+    $to = $form->add('text', 'to', ts('To'), array('class' => 'huge'), TRUE);
+    $form->add('text', 'activity_subject', ts('Name The SMS'), array('class' => 'huge'), TRUE);
 
     $toSetDefault = TRUE;
     if (property_exists($form, '_context') && $form->_context == 'standalone') {
@@ -208,13 +210,11 @@ class CRM_Contact_Form_Task_SMSCommon {
           }
         }
 
-        if ((isset($value['phone_type_id']) && $value['phone_type_id'] != CRM_Utils_Array::value('Mobile', $phoneTypes)) || $value['do_not_sms'] || empty($value['phone']) || CRM_Utils_Array::value('is_deceased', $value)) {
+        if ((isset($value['phone_type_id']) && $value['phone_type_id'] != CRM_Utils_Array::value('Mobile', $phoneTypes)) || $value['do_not_sms'] || empty($value['phone']) || !empty($value['is_deceased'])) {
 
           //if phone is not primary check if non-primary phone is "Mobile"
           if (!empty($value['phone'])
-            && $value['phone_type_id'] != CRM_Utils_Array::value('Mobile', $phoneTypes)
-            && !CRM_Utils_Array::value('is_deceased', $value)
-          ) {
+            && $value['phone_type_id'] != CRM_Utils_Array::value('Mobile', $phoneTypes) && empty($value['is_deceased'])) {
             $filter = array('do_not_sms' => 0);
             $contactPhones = CRM_Core_BAO_Phone::allPhones($contactId, FALSE, 'Mobile', $filter);
             if (count($contactPhones) > 0) {
@@ -248,7 +248,7 @@ class CRM_Contact_Form_Task_SMSCommon {
 
         if ($phone) {
           $toArray[] = array(
-            'name' => '"' . $value['sort_name'] . '" &lt;' . $phone . '&gt;',
+            'text' => '"' . $value['sort_name'] . '" (' . $phone . ')',
             'id' => "$contactId::{$phone}",
           );
         }
@@ -314,11 +314,11 @@ class CRM_Contact_Form_Task_SMSCommon {
 
     $template = CRM_Core_Smarty::singleton();
 
-    if (!CRM_Utils_Array::value('text_message', $fields)) {
+    if (empty($fields['text_message'])) {
       $errors['text_message'] = ts('Please provide Text message.');
     }
     else {
-      if (CRM_Utils_Array::value('text_message', $fields)) {
+      if (!empty($fields['text_message'])) {
         $messageCheck = CRM_Utils_Array::value('text_message', $fields);
         $messageCheck = str_replace("\r\n", "\n", $messageCheck);
         if ($messageCheck && (strlen($messageCheck) > CRM_SMS_Provider::MAX_SMS_CHAR)) {
@@ -328,7 +328,7 @@ class CRM_Contact_Form_Task_SMSCommon {
     }
 
     //Added for CRM-1393
-    if (CRM_Utils_Array::value('saveTemplate', $fields) && empty($fields['saveTemplateName'])) {
+    if (!empty($fields['saveTemplate']) && empty($fields['saveTemplateName'])) {
       $errors['saveTemplateName'] = ts("Enter name to save message template");
     }
 
@@ -340,7 +340,9 @@ class CRM_Contact_Form_Task_SMSCommon {
    *
    * @access public
    *
-   * @return None
+   * @param $form
+   *
+   * @return void
    */
   static function postProcess(&$form) {
 
@@ -350,22 +352,18 @@ class CRM_Contact_Form_Task_SMSCommon {
     $fromSmsProviderId = $thisValues['sms_provider_id'];
 
     // process message template
-    if (CRM_Utils_Array::value('saveTemplate', $thisValues)
-      || CRM_Utils_Array::value('updateTemplate', $thisValues)
-    ) {
+    if (!empty($thisValues['saveTemplate']) || !empty($thisValues['updateTemplate'])) {
       $messageTemplate = array(
         'msg_text' => $thisValues['text_message'],
         'is_active' => TRUE,
       );
 
-      if (CRM_Utils_Array::value('saveTemplate', $thisValues)) {
+      if (!empty($thisValues['saveTemplate'])) {
         $messageTemplate['msg_title'] = $thisValues['saveTemplateName'];
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
 
-      if (CRM_Utils_Array::value('template', $thisValues) &&
-        CRM_Utils_Array::value('updateTemplate', $thisValues)
-      ) {
+      if (!empty($thisValues['template']) && !empty($thisValues['updateTemplate'])) {
         $messageTemplate['id'] = $thisValues['template'];
         unset($messageTemplate['msg_title']);
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
@@ -383,7 +381,7 @@ class CRM_Contact_Form_Task_SMSCommon {
         $phoneKey = "{$contactId}::{$phone}";
         if (!in_array($phoneKey, $tempPhones)) {
           $tempPhones[] = $phoneKey;
-          if (CRM_Utils_Array::value($contactId, $form->_contactDetails)) {
+          if (!empty($form->_contactDetails[$contactId])) {
             $formattedContactDetails[] = $form->_contactDetails[$contactId];
           }
         }

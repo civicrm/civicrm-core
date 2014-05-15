@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,7 +42,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
   protected $_ufFieldId;
   protected $_contactId = 69;
   protected $_apiversion;
-  public $_eNoticeCompliant = TRUE;
+
   protected function setUp() {
     parent::setUp();
     //  Truncate the tables
@@ -254,7 +254,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
    *  Test civicrm_activity_create() using example code
    */
   function testUFJoinCreateExample() {
-    require_once 'api/v3/examples/UFJoinCreate.php';
+    require_once 'api/v3/examples/UFJoin/Create.php';
     $result = UF_join_create_example();
     $expectedResult = UF_join_create_expectedresult();
     $this->assertEquals($result, $expectedResult);

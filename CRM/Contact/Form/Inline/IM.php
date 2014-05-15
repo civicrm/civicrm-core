@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -99,25 +99,23 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
   /**
    * global validation rules for the form
    *
-   * @param array $fields     posted values of the form
-   * @param array $errors     list of errors to be posted back to the form
+   * @param array $fields posted values of the form
+   * @param array $errors list of errors to be posted back to the form
    *
-   * @return $errors
-   * @static
+   * @return array $errors@static
    * @access public
    */
   static function formRule($fields, $errors) {
     $hasData = $hasPrimary = $errors = array();
-    if (CRM_Utils_Array::value('im', $fields) && is_array($fields['im'])) {
+    if (!empty($fields['im']) && is_array($fields['im'])) {
       foreach ($fields['im'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
 
         if ($dataExists) {
           $hasData[] = $instance;
-          if (CRM_Utils_Array::value('is_primary', $blockValues)) {
+          if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
-            if (!$primaryID &&
-              CRM_Utils_Array::value('im', $blockValues)) {
+            if (!$primaryID && !empty($blockValues['im'])) {
                 $primaryID = $blockValues['im'];
             }
           }

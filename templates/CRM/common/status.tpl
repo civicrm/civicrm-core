@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,6 +33,6 @@
     {else}
       {assign var="infoType" value=$statItem.type}
     {/if}
-    {include file="CRM/common/info.tpl" infoTitle=$statItem.title infoMessage=$statItem.text infoOptions=$statItem.options}
+    {include file="CRM/common/info.tpl" infoTitle=$statItem.title infoMessage=$statItem.text infoOptions=$statItem.options|@json_encode}
   {/foreach}
 {/if}

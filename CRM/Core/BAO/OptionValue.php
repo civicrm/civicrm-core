@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,18 +40,21 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   function __construct() {
     parent::__construct();
   }
+
   /**
    * Create option value - note that the create function calls 'add' but
-  * has more business logic
-  *
-  * @param array $params input parameters
-  */
+   * has more business logic
+   *
+   * @param array $params input parameters
+   *
+   * @return object
+   */
   static function create($params) {
     if (empty($params['id'])){
       self::setDefaults($params);
     }
     $ids = array();
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       $ids = array('optionValue' => $params['id']);
     }
     return  CRM_Core_BAO_OptionValue::add($params, $ids);
@@ -84,12 +87,16 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $params['value'] = self::getDefaultValue($params);
     }
   }
+
   /**
    * Get next available value
    * We will take the highest numeric value (or 0 if no numeric values exist)
    * and add one. The calling function is responsible for any
    * more complex decision making
+   *
    * @param array $params
+   *
+   * @return int
    */
   static function getDefaultWeight($params){
     return (int) CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
@@ -169,7 +176,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     // these would be usefully set @ the api layer so they are visible to api users
     // complex defaults like the domain id below would make sense in the setDefauls function
     // but unclear what other ways this function is being used
-    if (!CRM_Utils_Array::value('optionValue', $ids)) {
+    if (empty($ids['optionValue'])) {
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
       $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
       $params['is_optgroup'] = CRM_Utils_Array::value('is_optgroup', $params, FALSE);
@@ -180,7 +187,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->copyValues($params);
 
-    if (CRM_Utils_Array::value('is_default', $params)) {
+    if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_option_value SET is_default = 0 WHERE  option_group_id = %1';
 
       // tweak default reset, and allow multiple default within group.
@@ -195,8 +202,19 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $p = array(1 => array($params['option_group_id'], 'Integer'));
       CRM_Core_DAO::executeQuery($query, $p);
     }
+
+    // CRM-13814 : evalute option group id
+    if (!array_key_exists('option_group_id', $params) && !empty($ids['optionValue'])) {
+      $groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',
+        $ids['optionValue'], 'option_group_id', 'id'
+      );
+    }
+    else {
+      $groupId = $params['option_group_id'];
+    }
+
     $groupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
-      $params['option_group_id'], 'name', 'id'
+      $groupId, 'name', 'id'
     );
     if (in_array($groupName, CRM_Core_OptionGroup::$_domainIDGroups)) {
       $optionValue->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
@@ -211,7 +229,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   /**
    * Function to delete Option Value
    *
-   * @param  int  $optionGroupId     Id of the Option Group to be deleted.
+   * @param $optionValueId
+   *
+   * @internal param int $optionGroupId Id of the Option Group to be deleted.
    *
    * @return boolean
    *
@@ -290,10 +310,12 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     $value = $optionValue->value;
 
     // get the proper group name & affected field name
+    // todo: this may no longer be needed for individuals - check inputs
     $individuals = array(
       'gender' => 'gender_id',
       'individual_prefix' => 'prefix_id',
       'individual_suffix' => 'suffix_id',
+      'communication_style' => 'communication_style_id', // Not only Individuals -- but the code seems to be generic for all contact types, despite the naming...
     );
     $contributions = array('payment_instrument' => 'payment_instrument_id');
     $activities    = array('activity_type' => 'activity_type_id');
@@ -396,9 +418,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   /**
    * updates options values weights.
    *
-   * @param int   $opGroupIde option group id.
-   * @param array $opWeights  options value , weight pair
+   * @param $opGroupId
+   * @param array $opWeights options value , weight pair
    *
+   * @internal param int $opGroupIde option group id.
    * @return void
    * @access public
    * @static

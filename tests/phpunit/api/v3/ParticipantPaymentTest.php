@@ -1,9 +1,9 @@
 <?php
 /**
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,7 +44,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   protected $_eventID;
   protected $_participantPaymentID;
   protected $_contributionTypeId;
-  public $_eNoticeCompliant = TRUE;
+
 
   function get_info() {
     return array(
@@ -302,7 +302,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => 0,    );
     $deletePayment = $this->callAPIFailure('participant_payment', 'delete', $params);
-    $this->assertEquals($deletePayment['error_message'], 'Mandatory key(s) missing from params array: id');
+    $this->assertEquals($deletePayment['error_message'], 'Error while deleting participantPayment');
   }
 
   /**

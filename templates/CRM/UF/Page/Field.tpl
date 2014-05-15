@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<script type="text/javascript" src="{$config->resourceBase}js/rest.js"></script>
 {if $showBestResult }
     <span class="font-red">{ts}For best results, the Country field should precede the State-Province field in your Profile form. You can use the up and down arrows on field listing page for this profile to change the order of these fields or manually edit weight for Country/State-Province Field.{/ts}</span>
 {/if}
@@ -44,7 +43,8 @@
         {/if}
         {strip}
         {* handle enable/disable actions*}
-   {include file="CRM/common/enableDisable.tpl"}
+   {include file="CRM/common/enableDisableApi.tpl"}
+   {include file="CRM/common/crmeditable.tpl"}
    {include file="CRM/common/jsortable.tpl"}
         <table id="options" class="display">
             <thead>
@@ -100,6 +100,3 @@
     {/if}
 </div>
 {/if}
-
-{include file="CRM/common/crmeditable.tpl"}
-

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -121,8 +121,8 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
    */
   public static function formRule($params) {
     $errors = array();
-    if (CRM_Utils_Array::value('premiums_active', $params)) {
-      if (!CRM_Utils_Array::value('premiums_nothankyou_label', $params)) {
+    if (!empty($params['premiums_active'])) {
+      if (empty($params['premiums_nothankyou_label'])) {
         $errors['premiums_nothankyou_label'] = ts('No Thank-you Label is a required field.');
       }
     }

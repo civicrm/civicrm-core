@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -74,7 +74,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     }
 
     // when custom data is included in this page
-    if (CRM_Utils_Array::value('hidden_custom', $_POST)) {
+    if (!empty($_POST['hidden_custom'])) {
       CRM_Custom_Form_CustomData::preProcess($this);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
@@ -118,9 +118,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     if ($this->_surveyId) {
 
-      if (CRM_Utils_Array::value('result_id', $defaults) &&
-        CRM_Utils_Array::value('recontact_interval', $defaults)
-      ) {
+      if (!empty($defaults['result_id']) && !empty($defaults['recontact_interval'])) {
 
         $resultId = $defaults['result_id'];
         $recontactInterval = unserialize($defaults['recontact_interval']);
@@ -159,7 +157,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     $surveyActivityTypes = CRM_Campaign_BAO_Survey::getSurveyActivityType();
     // Activity Type id
-    $this->add('select', 'activity_type_id', ts('Activity Type'), array('' => ts('- select -')) + $surveyActivityTypes, TRUE);
+    $this->addSelect('activity_type_id', array(), TRUE);
 
     // Campaign id
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value('campaign_id', $this->_values));
@@ -226,7 +224,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     $survey = CRM_Campaign_BAO_Survey::create($params);
     $this->_surveyId = $survey->id;
 
-    if (CRM_Utils_Array::value('result_id', $this->_values)) {
+    if (!empty($this->_values['result_id'])) {
       $query = "SELECT COUNT(*) FROM civicrm_survey WHERE result_id = %1";
       $countSurvey = (int)CRM_Core_DAO::singleValueQuery($query,
         array(

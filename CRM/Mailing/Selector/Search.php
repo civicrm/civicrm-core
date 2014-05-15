@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -142,13 +142,16 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    * Class constructor
    *
    * @param array $queryParams array of parameters for query
-   * @param int   $action - action of search basic or advanced.
-   * @param string   $mailingClause if the caller wants to further restrict the search
+   * @param \const|int $action - action of search basic or advanced.
+   * @param string $mailingClause if the caller wants to further restrict the search
    * @param boolean $single are we dealing only with one contact?
-   * @param int     $limit  how many mailing do we want returned
+   * @param int $limit how many mailing do we want returned
    *
-   * @return CRM_Contact_Selector
-   * @access public
+   * @param string $context
+   * @param null $compContext
+   *
+   * @return \CRM_Mailing_Selector_Search
+  @access public
    */
   function __construct(&$queryParams,
     $action = CRM_Core_Action::NONE,
@@ -227,7 +230,10 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -308,7 +314,13 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
 
       $row['action'] = CRM_Core_Action::formLink(
         self::links($qfKey, $this->_context),
-        $mask, $actions
+        $mask,
+        $actions,
+        ts('more'),
+        FALSE,
+        'contact.mailing.row',
+        'Contact',
+        $result->contact_id
       );
       $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
         $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id

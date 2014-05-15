@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -67,22 +67,26 @@ class CRM_Grant_Task {
    */
   static function &tasks() {
     if (!(self::$_tasks)) {
-      self::$_tasks = array(1 => array('title' => ts('Delete Grants'),
+      self::$_tasks = array(1 => array(
+        'title' => ts('Delete Grants'),
           'class' => 'CRM_Grant_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array('title' => ts('Print Grants'),
+        2 => array(
+          'title' => ts('Print Selected Rows'),
           'class' => 'CRM_Grant_Form_Task_Print',
           'result' => FALSE,
         ),
-        3 => array('title' => ts('Export Grants'),
+        3 => array(
+          'title' => ts('Export Grants'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
           ),
           'result' => FALSE,
         ),
-        4 => array('title' => ts('Update Grants'),
+        4 => array(
+          'title' => ts('Update Grants'),
           'class' => 'CRM_Grant_Form_Task_Update',
           'result' => FALSE,
         ),
@@ -107,10 +111,7 @@ class CRM_Grant_Task {
     self::tasks();
     $titles = array();
     foreach (self::$_tasks as $id => $value) {
-      // skip Print Grant task
-      if ($id != 2) {
-        $titles[$id] = $value['title'];
-      }
+      $titles[$id] = $value['title'];
     }
     return $titles;
   }

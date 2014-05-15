@@ -34,7 +34,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
-  public $_eNoticeCompliant = TRUE;
   /**
    * Membership type name used in test function
    * @var String
@@ -160,12 +159,12 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->assertEquals(3, $result['count']);
 
     //check start dates #1 should default to 1 Jan this year, #2 should be as entered
-    $this->assertEquals(date('Y-m-d', strtotime('first day of January this year')), $result['values'][1]['start_date']);
+    $this->assertEquals(date('Y-m-d', strtotime('first day of January 2013')), $result['values'][1]['start_date']);
     $this->assertEquals('2013-02-03', $result['values'][2]['start_date']);
 
     //check start dates #1 should default to 1 Jan this year, #2 should be as entered
-    $this->assertEquals(date('Y-m-d', strtotime('last day of December this year')), $result['values'][1]['end_date']);
-    $this->assertEquals(date('Y-m-d', strtotime('last day of December this year')), $result['values'][2]['end_date']);
+    $this->assertEquals(date('Y-m-d', strtotime('last day of December 2013')), $result['values'][1]['end_date']);
+    $this->assertEquals(date('Y-m-d', strtotime('last day of December 2013')), $result['values'][2]['end_date']);
     $this->assertEquals('2013-12-01', $result['values'][3]['end_date']);
 
     //check start dates #1 should default to 1 Jan this year, #2 should be as entered
@@ -188,7 +187,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     return array(
       'batch_id' => 4,
       'primary_profiles' => array(1 => NULL, 2 => NULL, 3 => NULL),
-      'primary_contact_select_id' => Array (
+      'primary_contact_id' => Array (
         1 => $this->_contactID,
         2 => $this->_contactID2,
         3 => $this->_contactID3,

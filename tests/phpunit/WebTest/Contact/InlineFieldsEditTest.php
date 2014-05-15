@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -67,10 +67,10 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
     // Justification for this instance: opening an accordion is predictable
     sleep(1);
     $this->openInlineForm('custom-set-content-1');
-    $dateFieldId = $this->getAttribute("xpath=//div[@id='constituent_information']/table/tbody/tr[3]/td[@class='html-adjust']/input@id");
+    $dateFieldId = $this->getAttribute("xpath=//div[@class='crm-accordion-body']/table/tbody/tr[3]/td[@class='html-adjust']/input@id");
     $this->inlineEdit('custom-set-content-1', array(
       'CIVICRM_QFID_Edu_2' => 1,
-      "//div[@id='constituent_information']/table/tbody/tr[2]/td[@class='html-adjust']/select" => array('Single'),
+      "//div[@class='crm-accordion-body']/table/tbody/tr[2]/td[@class='html-adjust']/select" => array('Single'),
       $dateFieldId => 'date: now - 10 years',
     ));
 
@@ -218,6 +218,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
    * Click on an inline-edit block and wait for it to open
    *
    * @param $block string selector
+   * @param bool $wait
    */
   private function openInlineForm($block, $wait = TRUE) {
     $this->mouseDown($block);
@@ -232,7 +233,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
    *
    * @param $block string selector
    * @param $params array
-   * @param $valid str: submit behavior
+   * @param \str|string $valid str: submit behavior
    *   'error' if we are expecting a form validation error,
    *   're_open' (default) after saving, opens the form and validate inputs
    *   'keep_open' same as 're_open' but doesn't automatically cancel at the end

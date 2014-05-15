@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.5                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -32,7 +32,7 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
   protected $id = 0;
   protected $priceSetID = 0;
   protected $_entity = 'price_field';
-  public $_eNoticeCompliant = TRUE;
+
   public $DBResetRequired = TRUE;
 
   public function setUp() {

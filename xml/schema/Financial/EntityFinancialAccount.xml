@@ -48,6 +48,9 @@
     <pseudoconstant>
       <optionGroupName>account_relationship</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>financial_account_id</name>
@@ -60,6 +63,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <foreignKey>
     <name>financial_account_id</name>

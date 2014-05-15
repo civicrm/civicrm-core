@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,10 +28,7 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
-  //@todo make BAO enotice compliant  & remove the line below
-  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
-  // new test classes should be compliant.
-  public $_eNoticeCompliant = FALSE;
+
   protected $_contributionTypeId;
   protected $_contributionParams;
   protected $_contactId;
@@ -71,9 +68,14 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'user_name' => 'user_name',
       'password' => 'password',
       'url_recur' => 'url_recur',
+      //@todo - if we used the api then we could pass in 'AuthNet & the api will resolve
+      // (as least it will once the pseudoconstant s in the schema)
+      'payment_processor_type_id' => $this->callAPISuccess('payment_processor_type', 'getvalue', array(
+        'return' => 'id',
+        'name' => 'AuthNet'
+      )),
     );
 
-    $paymentProcessorParams['payment_processor_type'] = 'AuthorizeNet';
     $paymentProcessorParams['domain_id'] = 1;
     $paymentProcessorParams['is_active'] = 1;
     $paymentProcessorParams['is_test'] = 1;
@@ -107,22 +109,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   }
 
   function tearDown() {
-
-    $tablesToTruncate = array(
-      'civicrm_contribution',
-      'civicrm_contribution_recur',
-      'civicrm_membership',
-      'civicrm_membership_type',
-      'civicrm_membership_payment',
-      'civicrm_membership_status',
-      'civicrm_payment_processor',
-      'civicrm_event',
-      'civicrm_participant',
-      'civicrm_pledge',
-      'civicrm_line_item',
-    );
-    $this->quickCleanup($tablesToTruncate);
-    CRM_Member_PseudoConstant::membershipType($this->_membershipTypeID, TRUE);
+    $this->quickCleanUpFinancialEntities();
+    CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
     CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'name', TRUE);
   }
 
@@ -213,7 +201,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $values = array();
     $this->assertFalse(empty($this->objects['event']));
     $msg = $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, False,True);
-    $this->assertContains('registration has been received and your status has been updated to registered', $msg['body']);
+    $this->assertContains('registration has been received and your status has been updated to Attended.', $msg['body']);
     $this->assertContains('Annual CiviCRM meet', $msg['html']);
   }
 
@@ -462,17 +450,25 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
     $contribution->find(TRUE);
+    $contributionPageID = NULL;
     if (!empty($contributionPage)) {
       $dao = new CRM_Core_DAO();
       $contribution_page = $dao->createTestObject('CRM_Contribute_DAO_ContributionPage');
-      $contribution->contribution_page_id = $contribution_page->id;
-      $contribution->save;
+      $contribution->contribution_page_id = $contributionPageID = $contribution_page->id;
+      //for unknown reasons trying to do a find & save on a contribution with a receive_date set
+      // doesn't work. This seems of minimal relevance to this test so ignoring
+      // note that in tests it worked sometimes & not others - dependent on which other tests run.
+      // running all CRM_Core tests caused failure as did just the single failing test. But running
+      // just this class succeeds - because it actually doesn't do a mysql update on the following save
+      // (unknown reason)
+      unset($contribution->receive_date);
+      $contribution->save();
     }
 
     $this->objects['contribution'] = $contribution;
     $this->input = array(
       'component' => 'contribute',
-      'contribution_page_id' => $contribution_page->id,
+      'contribution_page_id' => $contributionPageID,
       'total_amount' => 110.00,
       'invoiceID' => "c8acb91e080ad7777a2adc119c192885",
       'contactID' => $this->_contactId,

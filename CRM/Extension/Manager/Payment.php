@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * This class stores logic for managing CiviCRM extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -176,7 +176,9 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
    * Function to run hooks in the payment processor class
    * Load requested payment processor and call the method specified.
    *
+   * @param CRM_Extension_Info $info
    * @param string $method - the method to call in the payment processor class
+   *
    * @private
    */
   private function _runPaymentHook(CRM_Extension_Info $info, $method) {

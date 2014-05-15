@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -205,29 +205,39 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
   /**
    * create honor-contact method
-   * createHonorContact();
    */
   function testcreateAndGetHonorContact() {
     $firstName = 'John_' . substr(sha1(rand()), 0, 7);
     $lastName  = 'Smith_' . substr(sha1(rand()), 0, 7);
     $email     = "{$firstName}.{$lastName}@example.com";
 
-    $honorId = NULL;
-    $params = array(
-      'honor_type_id' => 1,
-      'honor_prefix_id' => 3,
-      'honor_first_name' => $firstName,
-      'honor_last_name' => $lastName,
-      'honor_email' => $email,
-    );
-    $contact = CRM_Contribute_BAO_Contribution::createHonorContact($params, $honorId);
+    //Get profile id of name honoree_individual used to create profileContact
+    $honoreeProfileId = NULL;
+    $ufGroupDAO = new CRM_Core_DAO_UFGroup();
+    $ufGroupDAO->name = 'honoree_individual';
+    if ($ufGroupDAO->find(TRUE)) {
+      $honoreeProfileId = $ufGroupDAO->id;
+    }
 
-    $this->assertDBCompareValue('CRM_Contact_DAO_Contact', $contact, 'first_name', 'id', $firstName,
+    $params = array(
+      'prefix_id' => 3,
+      'first_name' => $firstName,
+      'last_name' => $lastName,
+      'email-1' => $email,
+    );
+    $softParam = array('soft_credit_type_id' => 1);
+
+    $honoreeContactId = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray,
+        NULL, NULL, $honoreeProfileId
+      );
+
+    $this->assertDBCompareValue('CRM_Contact_DAO_Contact', $honoreeContactId, 'first_name', 'id', $firstName,
       'Database check for created honor contact record.'
     );
     //create contribution on behalf of honary.
 
     $contactId = Contact::createIndividual();
+    $softParam['contact_id'] = $honoreeContactId;
 
     $ids = array('contribution' => NULL);
     $param = array(
@@ -237,19 +247,24 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'receive_date' => date('Ymd'),
       'total_amount' => 66,
-      'honor_type_id' => 1,
-      'honor_contact_id' => $contact,
     );
 
     $contribution = CRM_Contribute_BAO_Contribution::create($param, $ids);
     $id = $contribution->id;
-    $this->assertDBCompareValue('CRM_Contribute_DAO_Contribution', $id, 'honor_contact_id',
-      'id', $contact, 'Check DB for honor contact of the contribution'
+    $softParam['contribution_id'] = $id;
+    $softParam['currency'] = $contribution->currency;
+    $softParam['amount'] = $contribution->total_amount;
+
+    //Create Soft Contribution for honoree contact
+    CRM_Contribute_BAO_ContributionSoft::add($softParam);
+
+    $this->assertDBCompareValue('CRM_Contribute_DAO_ContributionSoft', $id, 'contact_id',
+      'contribution_id', $honoreeContactId, 'Check DB for honor contact of the contribution'
     );
     //get honory information
-    $getHonorContact = CRM_Contribute_BAO_Contribution::getHonorContacts($contact);
+    $getHonorContact = CRM_Contribute_BAO_Contribution::getHonorContacts($honoreeContactId);
 
-    $this->assertDBCompareValue('CRM_Contact_DAO_Contact', $contact, 'first_name', 'id', $firstName,
+    $this->assertDBCompareValue('CRM_Contact_DAO_Contact', $honoreeContactId, 'first_name', 'id', $firstName,
       'Database check for created honor contact record.'
     );
 
@@ -263,7 +278,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     );
 
     //Delete honor contact
-    Contact::delete($contact);
+    Contact::delete($honoreeContactId);
 
     //Delete Contribution record
     $this->contributionDelete($contribution->id);

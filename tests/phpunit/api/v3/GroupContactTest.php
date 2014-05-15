@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,7 +34,6 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   protected $_contactId1;
   protected $_apiversion = 3;
   protected $_groupId1;
-  public $_eNoticeCompliant = True;
 
   function get_info() {
     return array(
@@ -54,7 +53,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
 
     $this->_contactId = $this->individualCreate();
 
-    $this->_groupId1 = $this->groupCreate(NULL);
+    $this->_groupId1 = $this->groupCreate();
     $params = array(
       'contact_id' => $this->_contactId,
       'group_id' => $this->_groupId1,
@@ -71,11 +70,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
       'visibility' => 'User and User Admin Only',
     );
 
-    $this->_groupId2 = $this->groupCreate($group, 3);
-    $params = array(
-      'contact_id.1' => $this->_contactId,
-      'group_id' => $this->_groupId2,
-    );
+    $this->_groupId2 = $this->groupCreate($group);
 
     $this->_group = array(
       $this->_groupId1 => array('title' => 'New Test Group Created',
@@ -183,6 +178,18 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['removed'], 1, "in line " . __LINE__);
     $this->assertEquals($result['total_count'], 1, "in line " . __LINE__);
+  }
+
+  function testDeletePermanent() {
+    $result = $this->callAPISuccess('group_contact', 'get', array('contact_id' => $this->_contactId));
+    $params = array(
+      'id' => $result['id'],
+      'skip_undelete' => TRUE,
+    );
+    $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('group_contact', 'get', $params);
+    $this->assertEquals(0, $result['count'], "in line " . __LINE__);
+    $this->assertArrayNotHasKey('id', $result, "in line " . __LINE__);
   }
 }
 

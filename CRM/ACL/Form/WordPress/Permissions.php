@@ -2,9 +2,9 @@
 
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -102,7 +102,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
    * Function to process the form
    *
    * @access public
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -127,6 +127,25 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
       if (!empty($rolePermissions)) {
         foreach ( $rolePermissions as $key => $capability ) {
           $roleObj->add_cap($key);
+        }
+      }
+
+      if ($role == 'anonymous_user') {
+        // Get the permissions into a format that matches what we get from WP
+        $allWarningPermissions = CRM_Core_Permission::getAnonymousPermissionsWarnings();
+        foreach ($allWarningPermissions  as $key => $permission) {
+          $allWarningPermissions[$key] = CRM_utils_String::munge(strtolower($permission));
+        }
+        $warningPermissions = array_intersect($allWarningPermissions, array_keys($rolePermissions));
+        $warningPermissionNames = array();
+        foreach ($warningPermissions as $permission) {
+          $warningPermissionNames[$permission] = $permissionsArray[$permission];
+        }
+        if (!empty($warningPermissionNames)) {
+          CRM_Core_Session::setStatus(
+            ts('The %1 role was assigned one or more permissions that may prove dangerous for users of that role to have. Please reconsider assigning %2 to them.', array( 1 => $wp_roles->role_names[$role], 2 => implode(', ', $warningPermissionNames))),
+            ts('Unsafe Permission Settings')
+          );
         }
       }
     }
@@ -159,19 +178,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
   static function getPermissionArray(){
     global $civicrm_root;
 
-    $permissions = CRM_Core_Permission::getCorePermissions();
-    $crmFolderDir = $civicrm_root . DIRECTORY_SEPARATOR . 'CRM';
-
-    $components = CRM_Core_Component::getComponentsFromFile($crmFolderDir);
-    foreach ($components as $comp) {
-      $perm = $comp->getPermissions();
-      if ($perm) {
-        $info = $comp->getInfo();
-        foreach ($perm as $p) {
-          $permissions[$p] = $info['translatedName'] . ': ' . $p;
-        }
-      }
-    }
+    $permissions = CRM_Core_Permission::basicPermissions();
 
     $perms_array = array();
     foreach ($permissions as $perm => $title) {
@@ -182,4 +189,3 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
     return $perms_array;
   }
 }
-

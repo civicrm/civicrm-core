@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -81,6 +81,7 @@ class CRM_Utils_Weight {
    *
    * @param string $daoName full name of the DAO
    * $param integer $weight the weight to be removed
+   * @param $fieldID
    * @param array $fieldValues field => value to be used in the WHERE
    * @param string $weightField field which contains the weight value,
    * defaults to 'weight'
@@ -255,7 +256,10 @@ class CRM_Utils_Weight {
    * @param string $daoName full name of the DAO
    * @param array $fieldValues field => value to be used in the WHERE
    * @param string $queryData data to be used, dependent on the query type
+   * @param null $additionalWhere
    * @param string $orderBy optional ORDER BY field
+   *
+   * @param null $groupBy
    *
    * @return Object CRM_Core_DAO objet that holds the results of the query
    */
@@ -368,10 +372,10 @@ class CRM_Utils_Weight {
 
       if ($prevID != 0) {
         $alt = ts('Move to top');
-        $links[] = "<a href=\"{$url}&dst={$firstID}&dir=first\"><img src=\"{$imageURL}/first.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
+        $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&dst={$firstID}&dir=first\"><img src=\"{$imageURL}/first.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
 
         $alt = ts('Move up one row');
-        $links[] = "<a href=\"{$url}&dst={$prevID}&dir=swap\"><img src=\"{$imageURL}/up.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
+        $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&dst={$prevID}&dir=swap\"><img src=\"{$imageURL}/up.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
       }
       else {
         $links[] = "<img src=\"{$imageURL}/spacer.gif\" class=\"order-icon\">";
@@ -380,10 +384,10 @@ class CRM_Utils_Weight {
 
       if ($nextID != 0) {
         $alt = ts('Move down one row');
-        $links[] = "<a href=\"{$url}&dst={$nextID}&dir=swap\"><img src=\"{$imageURL}/down.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
+        $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&dst={$nextID}&dir=swap\"><img src=\"{$imageURL}/down.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
 
         $alt = ts('Move to bottom');
-        $links[] = "<a href=\"{$url}&dst={$lastID}&dir=last\"><img src=\"{$imageURL}/last.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
+        $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&dst={$lastID}&dir=last\"><img src=\"{$imageURL}/last.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
       }
       else {
         $links[] = "<img src=\"{$imageURL}/spacer.gif\" class=\"order-icon\">";
@@ -415,7 +419,7 @@ class CRM_Utils_Weight {
     $srcWeight = CRM_Core_DAO::getFieldValue($daoName, $src, 'weight', $idName);
     $dstWeight = CRM_Core_DAO::getFieldValue($daoName, $dst, 'weight', $idName);
     if ($srcWeight == $dstWeight) {
-      CRM_Utils_System::redirect($url);
+      self::fixOrderOutput($url);
     }
 
     $tableName = $object->tableName();
@@ -455,7 +459,17 @@ class CRM_Utils_Weight {
       CRM_Core_DAO::executeQuery($query, $params);
     }
 
-    CRM_Utils_System::redirect($url);
+    self::fixOrderOutput($url);
+  }
+
+  static function fixOrderOutput($url) {
+    if (empty($_GET['snippet']) || $_GET['snippet'] !== 'json') {
+      CRM_Utils_System::redirect($url);
+    }
+
+    CRM_Core_Page_AJAX::returnJsonResponse(array(
+      'userContext' => $url,
+    ));
   }
 }
 

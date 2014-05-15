@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -838,10 +838,16 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
     }
   }
 
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
+  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     $this->initialize();
 
-    return CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM {$this->_tableName}");
+    $sql = "SELECT contact_id FROM {$this->_tableName}";
+    if ($returnSQL) {
+      return $sql;
+    }
+    else {
+      return CRM_Core_DAO::singleValueQuery($sql);
+    }
   }
 
   function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {

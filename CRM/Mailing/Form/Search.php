@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -59,7 +59,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
       $this->addElement('checkbox', "mailing_status[$status]", NULL, $status);
     }
     $this->addElement('checkbox', 'status_unscheduled', NULL, 'Draft / Unscheduled');
-    $this->addYesNo('is_archived', ts('Mailing is Archived'));
+    $this->addYesNo('is_archived', ts('Mailing is Archived'), TRUE);
 
     if ($parent->_sms) {
       $this->addElement('hidden', 'sms', $parent->_sms);

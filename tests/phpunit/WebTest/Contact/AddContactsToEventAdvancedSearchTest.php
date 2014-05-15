@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -47,10 +47,10 @@ class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumT
 
     // Select event. Based on label for now.
     $this->waitForElementPresent('event_id');
-    $this->select('event_id', "label=regexp:Rain-forest Cup Youth Soccer Tournament.");
+    $this->select2('event_id', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select role
-    $this->click('role_id[2]');
+    $this->multiselect2('role_id', array('Volunteer'));
 
     // Select participant status
     $this->select('status_id', 'value=1');

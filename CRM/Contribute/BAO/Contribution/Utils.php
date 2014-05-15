@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -37,14 +37,16 @@ class CRM_Contribute_BAO_Contribution_Utils {
   /**
    * Function to process payment after confirmation
    *
-   * @param object  $form   form object
-   * @param array   $paymentParams   array with payment related key
+   * @param object $form form object
+   * @param array $paymentParams array with payment related key
    * value pairs
-   * @param array   $premiumParams   array with premium related key
+   * @param array $premiumParams array with premium related key
    * value pairs
-   * @param int     $contactID       contact id
-     * @param int     $contributionTypeId   financial type id
-   * @param int     $component   component id
+   * @param int $contactID contact id
+   * @param int $contributionTypeId financial type id
+   * @param int|string $component component id
+   *
+   * @param null $fieldTypes
    *
    * @return array associated array
    *
@@ -65,7 +67,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
     if (isset($paymentParams['financial_type'])) {
       $contributionType->id = $paymentParams['financial_type'];
     }
-    elseif (CRM_Utils_Array::value('pledge_id', $form->_values)) {
+    elseif (!empty($form->_values['pledge_id'])) {
       $contributionType->id = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
         $form->_values['pledge_id'],
         'financial_type_id'
@@ -200,7 +202,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       }
     }
     elseif ($form->_values['is_monetary'] && $form->_amount > 0.0) {
-      if (CRM_Utils_Array::value('is_recur', $paymentParams) &&
+      if (!empty($paymentParams['is_recur']) &&
         $form->_contributeMode == 'direct'
       ) {
 
@@ -209,6 +211,19 @@ class CRM_Contribute_BAO_Contribution_Utils {
         // When we get a callback from the payment processor
 
         $paymentParams['contactID'] = $contactID;
+
+        // Fix for CRM-14354. If the membership is recurring, don't create a
+        // civicrm_contribution_recur record for the additional contribution
+        // (i.e., the amount NOT associated with the membership). Temporarily
+        // cache the is_recur values so we can process the additional gift as a
+        // one-off payment.
+        if ($form->_membershipBlock['is_separate_payment']) {
+          $cachedFormValue = CRM_Utils_Array::value('is_recur', $form->_values);
+          unset($form->_values['is_recur']);
+          $cachedParamValue = CRM_Utils_Array::value('is_recur', $paymentParams);
+          unset($paymentParams['is_recur']);
+        }
+
         $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution(
           $form,
           $paymentParams,
@@ -217,6 +232,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
           $contributionType,
           TRUE, TRUE, TRUE
         );
+
+        // restore cached values (part of fix for CRM-14354)
+        if ($form->_membershipBlock['is_separate_payment']) {
+          $form->_values['is_recur'] = $cachedFormValue;
+          $paymentParams['is_recur'] = $cachedParamValue;
+        }
 
         $paymentParams['contributionID'] = $contribution->id;
         $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
@@ -240,10 +261,10 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
     if (is_a($result, 'CRM_Core_Error')) {
       //make sure to cleanup db for recurring case.
-      if (CRM_Utils_Array::value('contributionID', $paymentParams)) {
+      if (!empty($paymentParams['contributionID'])) {
         CRM_Contribute_BAO_Contribution::deleteContribution($paymentParams['contributionID']);
       }
-      if (CRM_Utils_Array::value('contributionRecurID', $paymentParams)) {
+      if (!empty($paymentParams['contributionRecurID'])) {
         CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
       }
 
@@ -279,9 +300,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
       // check if pending was set to true by payment processor
       $pending = FALSE;
-      if (CRM_Utils_Array::value('contribution_status_pending',
-          $form->_params
-        )) {
+      if (!empty($form->_params['contribution_status_pending'])) {
         $pending = TRUE;
       }
       if (!(!empty($paymentParams['is_recur']) && $form->_contributeMode == 'direct')) {
@@ -418,7 +437,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     }
     $created = TRUE;
 
-    if (CRM_Utils_Array::value('cms_create_account', $params)) {
+    if (!empty($params['cms_create_account'])) {
       $params['contactID'] = $contactID;
       if (!CRM_Core_BAO_CMSUser::create($params, $mail)) {
         CRM_Core_Error::statusBounce(ts('Your profile is not saved and Account is not created.'));
@@ -602,11 +621,11 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
 
       if ($riskInfo['google-order-number']['VALUE'] == $apiParams[2]['google-order-number']['VALUE']) {
         foreach ($riskInfo['risk-information']['billing-address'] as $field => $info) {
-          if (CRM_Utils_Array::value($field, $mapper['location'])) {
+          if (!empty($mapper['location'][$field])) {
             $params['address'][1][$mapper['location'][$field]] = $info['VALUE'];
           }
-          elseif (CRM_Utils_Array::value($field, $mapper['contact'])) {
-            if ($newOrder && CRM_Utils_Array::value('structured-name', $newOrder['buyer-billing-address'])) {
+          elseif (!empty($mapper['contact'][$field])) {
+            if ($newOrder && !empty($newOrder['buyer-billing-address']['structured-name'])) {
               foreach ($newOrder['buyer-billing-address']['structured-name'] as $namePart => $nameValue) {
                 $params[$mapper['contact'][$namePart]] = $nameValue['VALUE'];
               }
@@ -615,7 +634,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
               $params[$mapper['contact'][$field]] = $info['VALUE'];
             }
           }
-          elseif (CRM_Utils_Array::value($field, $mapper['transaction'])) {
+          elseif (!empty($mapper['transaction'][$field])) {
             $transaction[$mapper['transaction'][$field]] = $info['VALUE'];
           }
         }
@@ -661,7 +680,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
         }
 
         foreach ($localMapper as $localKey => $localVal) {
-          if (CRM_Utils_Array::value($localKey, $mapper['transaction'])) {
+          if (!empty($mapper['transaction'][$localKey])) {
             $transaction[$mapper['transaction'][$localKey]] = $localVal;
           }
         }
@@ -693,7 +712,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     $dedupeParams['check_permission'] = FALSE;
     $dupeIds = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
     // if we find more than one contact, use the first one
-    if (CRM_Utils_Array::value(0, $dupeIds)) {
+    if (!empty($dupeIds[0])) {
       $params['contact_id'] = $dupeIds[0];
     }
     $contact = CRM_Contact_BAO_Contact::create($params);

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -67,24 +67,24 @@
 {include file="CRM/Form/validate.tpl"}
 {literal}
 <script type="text/javascript">
-cj(function($) {
+CRM.$(function($) {
   var batchSelector;
   buildBatchSelector();
-  $("#batch_update").removeAttr('disabled');
+  $("#batch_update").prop('disabled', false);
 
-  $('#financial-search-form :input').change(function() {
-    if (!$(this).hasClass('crm-inline-error')) {
-      batchSelector.fnDraw();
-    }
-  });
-
-  $('#financial-search-form :input').keypress(function(event) {
-    if (event.which == 13) {
-      event.preventDefault();
-      $(this).change();
-      return false;
-    }
-  });
+  $('#financial-search-form :input')
+    .change(function() {
+      if (!$(this).hasClass('crm-inline-error')) {
+        batchSelector.fnDraw();
+      }
+    })
+    .keypress(function(event) {
+      if (event.which == 13) {
+        event.preventDefault();
+        $(this).change();
+        return false;
+      }
+    });
 
   var checkedRows = [];
   function buildBatchSelector() {
@@ -164,12 +164,6 @@ cj(function($) {
       $("#enableDisableStatusMsg").dialog({
         title: {/literal}'{ts escape="js"}Confirm Changes{/ts}'{literal},
         modal: true,
-        bgiframe: true,
-        position: "center",
-        overlay: {
-          opacity: 0.5,
-          background: "black"
-        },
         open:function() {
           switch (op) {{/literal}
             case 'reopen':

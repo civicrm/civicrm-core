@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -142,6 +142,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @params $errors    array   array of errors
    * @params $emailName string  field label for the 'email'
    *
+   * @param $params
+   * @param $errors
+   * @param string $emailName
+   *
    * @return void
    */
   function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
@@ -153,10 +157,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     _user_edit_validate(NULL, $params);
     $errors = form_get_errors();
     if ($errors) {
-      if (CRM_Utils_Array::value('name', $errors)) {
+      if (!empty($errors['name'])) {
         $errors['cms_name'] = $errors['name'];
       }
-      if (CRM_Utils_Array::value('mail', $errors)) {
+      if (!empty($errors['mail'])) {
         $errors[$emailName] = $errors['mail'];
       }
       // also unset drupal messages to avoid twice display of errors
@@ -170,34 +174,43 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     }
 
     $sql = "
-SELECT name, mail
-  FROM {$config->userFrameworkUsersTableName}
- WHERE (LOWER(name) = LOWER('$name')) OR (LOWER(mail) = LOWER('$email'))";
+      SELECT name, mail
+      FROM {users}
+      WHERE (LOWER(name) = LOWER('$name')) OR (LOWER(mail) = LOWER('$email'))
+    ";
 
-    $db_cms = DB::connect($config->userFrameworkDSN);
-    if (DB::isError($db_cms)) {
-      die("Cannot connect to UF db via $dsn, " . $db_cms->getMessage());
+    $result = db_query($sql);
+    $row = db_fetch_array($result);
+    if (!$row) {
+      return;
     }
-    $query = $db_cms->query($sql);
-    $row = $query->fetchRow();
+
+    $user = NULL;
+
     if (!empty($row)) {
-      $dbName = CRM_Utils_Array::value(0, $row);
-      $dbEmail = CRM_Utils_Array::value(1, $row);
+      $dbName = CRM_Utils_Array::value('name', $row);
+      $dbEmail = CRM_Utils_Array::value('mail', $row);
       if (strtolower($dbName) == strtolower($name)) {
         $errors['cms_name'] = ts('The username %1 is already taken. Please select another username.',
           array(1 => $name)
         );
       }
       if (strtolower($dbEmail) == strtolower($email)) {
-        $resetUrl = $config->userFrameworkBaseURL . 'user/password';
-        $errors[$emailName] = ts('The email address %1 is already registered. <a href="%2">Have you forgotten your password?</a>',
-          array(1 => $email, 2 => $resetUrl)
-        );
+        if(empty($email)) {
+          $errors[$emailName] = ts('You cannot create an email account for a contact with no email',
+            array(1 => $email)
+          );
+        }
+        else{
+          $errors[$emailName] = ts('This email %1 is already registered. Please select another email.',
+            array(1 => $email)
+          );
+        }
       }
     }
   }
 
-  /*
+  /**
    * Function to get the drupal destination string. When this is passed in the
    * URL the user will be directed to it after filling in the drupal form
    *
@@ -239,6 +252,8 @@ SELECT name, mail
    * sets the title of the page
    *
    * @param string $title
+   * @param null $pageTitle
+   *
    * @paqram string $pageTitle
    *
    * @return void
@@ -257,8 +272,10 @@ SELECT name, mail
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb
    *
-   * @param string $title
-   * @param string $url
+   * @param $breadCrumbs
+   *
+   * @internal param string $title
+   * @internal param string $url
    *
    * @return void
    * @access public
@@ -330,7 +347,7 @@ SELECT name, mail
         return FALSE;
     }
     // If the path is within the drupal directory we can add in the normal way
-    if (CRM_Utils_System_Drupal::formatResourceUrl($url)) {
+    if ($this->formatResourceUrl($url)) {
       drupal_add_js($url, 'module', $scope);
       return TRUE;
     }
@@ -375,7 +392,7 @@ SELECT name, mail
    * @access public
    */
   public function addStyleUrl($url, $region) {
-    if ($region != 'html-header' || !CRM_Utils_System_Drupal::formatResourceUrl($url)) {
+    if ($region != 'html-header' || !$this->formatResourceUrl($url)) {
       return FALSE;
     }
     drupal_add_css($url);
@@ -428,81 +445,6 @@ SELECT name, mail
   }
 
   /**
-   * Generate an internal CiviCRM URL (copied from DRUPAL/includes/common.inc#url)
-   *
-   * @param $path     string   The path being linked to, such as "civicrm/add"
-   * @param $query    string   A query string to append to the link.
-   * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
-   *                           Useful for links that will be displayed outside the site, such as in an
-   *                           RSS feed.
-   * @param $fragment string   A fragment identifier (named anchor) to append to the link.
-   * @param $htmlize  boolean  whether to convert to html eqivalant
-   * @param $frontend boolean  a gross joomla hack
-   *
-   * @return string            an HTML string containing a link to the given path.
-   * @access public
-   *
-   */
-  function url($path = NULL, $query = NULL, $absolute = FALSE,
-    $fragment = NULL, $htmlize = TRUE,
-    $frontend = FALSE
-  ) {
-    $config = CRM_Core_Config::singleton();
-    $script = 'index.php';
-
-    $path = CRM_Utils_String::stripPathChars($path);
-
-    if (isset($fragment)) {
-      $fragment = '#' . $fragment;
-    }
-
-    if (!isset($config->useFrameworkRelativeBase)) {
-      $base = parse_url($config->userFrameworkBaseURL);
-      $config->useFrameworkRelativeBase = $base['path'];
-    }
-    $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
-
-    $separator = $htmlize ? '&amp;' : '&';
-
-    if (!$config->cleanURL) {
-      if (isset($path)) {
-        if (isset($query)) {
-          return $base . $script . '?q=' . $path . $separator . $query . $fragment;
-        }
-        else {
-          return $base . $script . '?q=' . $path . $fragment;
-        }
-      }
-      else {
-        if (isset($query)) {
-          return $base . $script . '?' . $query . $fragment;
-        }
-        else {
-          return $base . $fragment;
-        }
-      }
-    }
-    else {
-      if (isset($path)) {
-        if (isset($query)) {
-          return $base . $path . '?' . $query . $fragment;
-        }
-        else {
-          return $base . $path . $fragment;
-        }
-      }
-      else {
-        if (isset($query)) {
-          return $base . $script . '?' . $query . $fragment;
-        }
-        else {
-          return $base . $fragment;
-        }
-      }
-    }
-  }
-
-  /**
    * Authenticate the user against the drupal db
    *
    * @param string $name     the user name
@@ -516,6 +458,13 @@ SELECT name, mail
    * @access public
    */
   function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+   //@todo this 'PEAR-y' stuff is only required when bookstrap is not being loaded which is rare
+   // if ever now.
+   // probably if bootstrap is loaded this call
+   // CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, $realPath); would be
+   // sufficient to do what this fn does. It does exist as opposed to return which might need some hanky-panky to make
+   // safe in the unknown situation where authenticate might be called & it is important that
+   // false is returned
     require_once 'DB.php';
 
     $config = CRM_Core_Config::singleton();
@@ -556,7 +505,7 @@ SELECT name, mail
     return FALSE;
   }
 
-  /*
+  /**
    * Load user into session
    */
   function loadUser($username) {
@@ -614,10 +563,6 @@ SELECT name, mail
     drupal_set_message($message);
   }
 
-  function permissionDenied() {
-    drupal_access_denied();
-  }
-
   function logout() {
     module_load_include('inc', 'user', 'user.pages');
     return user_logout();
@@ -671,6 +616,8 @@ SELECT name, mail
    * @param boolean $loadUser boolean Require CMS user load.
    * @param boolean $throwError If true, print error on failure and exit.
    * @param boolean|string $realPath path to script
+   *
+   * @return bool
    */
   function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     //take the cms root path.
@@ -724,7 +671,7 @@ SELECT name, mail
     if (!$loadUser) {
       return TRUE;
     }
-
+    global $user;
     // If $uid is passed in, authentication has been done already.
     $uid = CRM_Utils_Array::value('uid', $params);
     if (!$uid) {
@@ -733,13 +680,16 @@ SELECT name, mail
       $pass = CRM_Utils_Array::value('pass', $params, FALSE) ? $params['pass'] : trim(CRM_Utils_Array::value('pass', $_REQUEST));
 
       if ($name) {
-        $uid = user_authenticate(array('name' => $name, 'pass' => $pass));
-        if (!$uid) {
+        $user = user_authenticate(array('name' => $name, 'pass' => $pass));
+        if (!$user->uid) {
           if ($throwError) {
             echo '<br />Sorry, unrecognized username or password.';
             exit();
           }
           return FALSE;
+        }
+        else {
+          return TRUE;
         }
       }
     }
@@ -747,7 +697,6 @@ SELECT name, mail
     if ($uid) {
       $account = user_load($uid);
       if ($account && $account->uid) {
-        global $user;
         $user = $account;
         return TRUE;
       }
@@ -855,6 +804,9 @@ SELECT name, mail
    * Format the url as per language Negotiation.
    *
    * @param string $url
+   *
+   * @param bool $addLanguagePart
+   * @param bool $removeLanguagePart
    *
    * @return string $url, formatted url.
    * @static
@@ -997,6 +949,24 @@ SELECT name, mail
   function og_membership_delete($ogID, $drupalID) {
       og_delete_subscription( $ogID, $drupalID );
   }
+
+  /**
+   * Over-ridable function to get timezone as a string eg.
+   * @return string Timezone e.g. 'America/Los_Angeles'
+   */
+  function getTimeZoneString() {
+    global $user;
+    if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
+      $timezone = $user->timezone;
+    } else {
+      $timezone = variable_get('date_default_timezone', null);
+    }
+    if (!$timezone) {
+      $timezone = parent::getTimeZoneString();
+    }
+    return $timezone;
+  }
+
 
   /**
    * Reset any system caches that may be required for proper CiviCRM

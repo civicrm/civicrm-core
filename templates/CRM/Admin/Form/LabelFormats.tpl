@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -29,9 +29,7 @@
   {if $action eq 8}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-      {ts 1=$formatName}WARNING: You are about to delete the Label Format titled
-        <strong>%1</strong>
-        .{/ts} {ts}Do you want to continue?{/ts}
+      {ts 1=$formatName}WARNING: You are about to delete the Label Format titled <strong>%1</strong>.{/ts} {ts}Do you want to continue?{/ts}
     </div>
   {elseif $action eq 16384}
     <div class="messages status no-popup">
@@ -111,18 +109,10 @@
       </tr>
       <tr class="crm-labelFormat-form-block-weight">
         <td class="right">{$form.weight.label}</td>
-        <td colspan="3">{$form.weight.html}<br/>
-          <span class="description">{ts}Weight controls the order in which Label Formats are displayed
-              <br/>
-              in selection lists. Enter a positive or negative integer. Lower numbers
-              <br/>
-              are displayed ahead of higher numbers.{/ts}</span>
+        <td colspan="3">{$form.weight.html}
+          <div class="description">{ts}Weight controls the order in which Label Formats are displayed in selection lists. Enter a positive or negative integer. Lower numbers are displayed ahead of higher numbers.{/ts}</div>
       </tr>
     </table>
-  {/if}
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-</div>
-{if $action neq 8}
 {literal}
   <script type="text/javascript">
     var currentWidth;
@@ -209,4 +199,6 @@
 
   </script>
 {/literal}
-{/if}
+  {/if}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+</div>

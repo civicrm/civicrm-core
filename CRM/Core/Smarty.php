@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -59,8 +59,10 @@ class CRM_Core_Smarty extends Smarty {
     // this prints a complete form and also generates a qfKey, can we replace this with
     // snippet = 2?? Does the constant _NOFFORM do anything?
     PRINT_QFKEY = 5,
-    // this sends the output back in json
-    PRINT_JSON = 6;
+    // Note: added in v 4.3 with the value '6'
+    // Value changed in 4.5 to 'json' for better readability
+    // @see CRM_Core_Page_AJAX::returnJsonResponse
+    PRINT_JSON = 'json';
 
   /**
    * We only need one instance of this object. So we use the singleton
@@ -159,6 +161,9 @@ class CRM_Core_Smarty extends Smarty {
     }
 
     $this->register_function('crmURL', array('CRM_Utils_System', 'crmURL'));
+    $this->load_filter('pre', 'resetExtScope');
+
+    $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
   }
 
   /**
@@ -184,6 +189,8 @@ class CRM_Core_Smarty extends Smarty {
    * @param string $cache_id
    * @param string $compile_id
    * @param boolean $display
+   *
+   * @return bool|mixed|string
    */
   function fetch($resource_name, $cache_id = NULL, $compile_id = NULL, $display = FALSE) {
     if (preg_match( '/^(\s+)?string:/', $resource_name)) {

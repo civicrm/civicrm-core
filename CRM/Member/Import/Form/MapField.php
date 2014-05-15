@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -302,6 +302,9 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @param array $fields posted values of the form
    *
+   * @param $files
+   * @param $self
+   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public
@@ -373,7 +376,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
 
-    if (CRM_Utils_Array::value('saveMapping', $fields)) {
+    if (!empty($fields['saveMapping'])) {
       $nameField = CRM_Utils_Array::value('saveMappingName', $fields);
       if (empty($nameField)) {
         $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
@@ -432,14 +435,14 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       $mapper[$i] = $this->_mapperFields[$mapperKeys[$i][0]];
       $mapperKeysMain[$i] = $mapperKeys[$i][0];
 
-      if (CRM_Utils_Array::value(1, $mapperKeys[$i]) && is_numeric($mapperKeys[$i][1])) {
+      if (!empty($mapperKeys[$i][1]) && is_numeric($mapperKeys[$i][1])) {
         $mapperLocType[$i] = $mapperKeys[$i][1];
       }
       else {
         $mapperLocType[$i] = NULL;
       }
 
-      if (CRM_Utils_Array::value(2, $mapperKeys[$i]) && (!is_numeric($mapperKeys[$i][2]))) {
+      if (!empty($mapperKeys[$i][2]) && (!is_numeric($mapperKeys[$i][2]))) {
         $mapperPhoneType[$i] = $mapperKeys[$i][2];
       }
       else {
@@ -450,11 +453,11 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->set('mapper', $mapper);
 
     // store mapping Id to display it in the preview page
-    if (CRM_Utils_Array::value('mappingId', $params)) {
+    if (!empty($params['mappingId'])) {
       $this->set('loadMappingId', $params['mappingId']);
     }
     //Updating Mapping Records
-    if (CRM_Utils_Array::value('updateMapping', $params)) {
+    if (!empty($params['updateMapping'])) {
       $mappingFields = new CRM_Core_DAO_MappingField();
       $mappingFields->mapping_id = $params['mappingId'];
       $mappingFields->find();
@@ -482,7 +485,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     //Saving Mapping Details and Records
-    if (CRM_Utils_Array::value('saveMapping', $params)) {
+    if (!empty($params['saveMapping'])) {
       $mappingParams = array(
         'name' => $params['saveMappingName'],
         'description' => $params['saveMappingDesc'],

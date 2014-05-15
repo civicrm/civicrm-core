@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,11 +40,12 @@
 class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
   protected $_settings = array(
     'cvv_backoffice_required' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
+    'disable_core_css' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -55,7 +56,7 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
 
     $this->addElement('text', 'userFrameworkResourceURL', ts('CiviCRM Resource URL'));
     $this->addElement('text', 'imageUploadURL', ts('Image Upload URL'));
-    $this->addElement('text', 'customCSSURL', ts('Custom CiviCRM CSS URL'));
+    $this->addElement('text', 'customCSSURL', ts('Custom css URL'));
     $this->addElement('text', 'extensionsURL', ts('Extension Resource URL'));
     $this->addYesNo('enableSSL', ts('Force Secure URLs (SSL)'));
     $this->addYesNo('verifySSL', ts('Verify SSL Certs'));

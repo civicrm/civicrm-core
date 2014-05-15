@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -78,6 +78,9 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           ),
         ),
       ),
+    )
+    + $this->getAddressColumns()
+    + array(
       'civicrm_contribution' =>
       array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
@@ -195,11 +198,9 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             // only include statistics columns if set
-            if (CRM_Utils_Array::value('statistics', $field)) {
+            if (!empty($field['statistics'])) {
               foreach ($field['statistics'] as $stat => $label) {
                 switch (strtolower($stat)) {
                   case 'sum':
@@ -227,13 +228,15 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             }
             else {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'];
+              // $field['type'] is not always set. Use string type as default if not set.
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = isset($field['type']) ? $field['type'] : 2;
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
             }
           }
         }
       }
     }
+
     $this->_select = " SELECT * FROM ( SELECT " . implode(', ', $select) . " ";
   }
 
@@ -258,7 +261,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $this->_from = "
         FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
             INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-                 ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0
+                ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0
              LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
                          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
                          AND {$this->_aliases['civicrm_email']}.is_primary = 1
@@ -266,11 +269,12 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
                          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                             {$this->_aliases['civicrm_phone']}.is_primary = 1
   ";
+    $this->addAddressFromClause();
   }
 
   function where() {
     $clauses = array();
-    $this->_tempClause = $this->_outerCluase = '';
+    $this->_tempClause = $this->_outerCluase = $this->_groupLimit = '';
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
@@ -300,6 +304,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             if ($fieldName == 'total_range') {
               $value = CRM_Utils_Array::value("total_range_value", $this->_params);
               $this->_outerCluase = " WHERE (( @rows := @rows + 1) <= {$value}) ";
+              $this->_groupLimit = " LIMIT {$value}";
             }
             else {
               $clauses[] = $clause;
@@ -375,7 +380,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
       $sql = "
 {$this->_select} {$this->_from}  {$this->_where} {$this->_groupBy}
 ORDER BY civicrm_contribution_total_amount_sum DESC
-) as abc {$this->_outerCluase}";
+) as abc {$this->_groupLimit}";
       $dao = CRM_Core_DAO::executeQuery($sql);
 
       $contact_ids = array();
@@ -392,6 +397,11 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
   function limit($rowCount = CRM_Report_Form::ROW_COUNT_LIMIT) {
     // lets do the pager if in html mode
     $this->_limit = NULL;
+    
+    // CRM-14115, over-ride row count if rowCount is specified in URL
+    if ($this->_dashBoardRowCount) {
+      $rowCount = $this->_dashBoardRowCount;
+    }
     if ($this->_outputMode == 'html' || $this->_outputMode == 'group') {
       //replace only first occurence of SELECT
       $this->_select = preg_replace('/SELECT/', 'SELECT SQL_CALC_FOUND_ROWS ', $this->_select, 1);
@@ -410,6 +420,9 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
       $this->set(CRM_Utils_Pager::PAGE_ID, $pageId);
       $offset = ($pageId - 1) * $rowCount;
 
+      $offset = CRM_Utils_Type::escape($offset, 'Int');
+      $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
+
       $this->_limit = " LIMIT $offset, " . $rowCount;
     }
   }
@@ -425,9 +438,7 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
         $rows[$rowNum]['civicrm_donor_rank'] = $rank++;
         // convert display name to links
         if (array_key_exists('civicrm_contact_display_name', $row) &&
-          array_key_exists('civicrm_contact_id', $row) &&
-            CRM_Utils_Array::value('civicrm_contribution_currency', $row)
-        ) {
+          array_key_exists('civicrm_contact_id', $row) && !empty($row['civicrm_contribution_currency'])) {
           $url = CRM_Report_Utils_Report::getNextUrl('contribute/detail',
             'reset=1&force=1&id_op=eq&id_value=' . $row['civicrm_contact_id'] . "&currency_value=" . $row['civicrm_contribution_currency'],
             $this->_absoluteUrl, $this->_id, $this->_drilldownReport
@@ -435,6 +446,7 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
           $rows[$rowNum]['civicrm_contact_display_name_link'] = $url;
           $entryFound = TRUE;
         }
+        $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'contribute/detail', 'List all contribution(s)') ? TRUE : $entryFound;
 
         // skip looking further in rows, if first row itself doesn't
         // have the column we need

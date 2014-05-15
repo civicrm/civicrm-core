@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Membership
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: MembershipType.php 30171 2010-10-14 09:11:27Z mover $
  *
  */
@@ -47,17 +47,16 @@
  * {getfields MembershipType_get}
  */
 function civicrm_api3_membership_type_create($params) {
-  $values = $params;
-  civicrm_api3_verify_mandatory($values, 'CRM_Member_DAO_MembershipType');
+  $ids['membershipType'] = CRM_Utils_Array::value('id', $params);
+  $ids['memberOfContact'] = CRM_Utils_Array::value('member_of_contact_id', $params);
+  $ids['contributionType'] = CRM_Utils_Array::value('financial_type_id', $params);
 
-  $ids['membershipType'] = CRM_Utils_Array::value('id', $values);
-  $ids['memberOfContact'] = CRM_Utils_Array::value('member_of_contact_id', $values);
-  $ids['contributionType'] = CRM_Utils_Array::value('financial_type_id', $values);
-
-  $membershipTypeBAO = CRM_Member_BAO_MembershipType::add($values, $ids);
+  $membershipTypeBAO = CRM_Member_BAO_MembershipType::add($params, $ids);
   $membershipType = array();
   _civicrm_api3_object_to_array($membershipTypeBAO, $membershipType[$membershipTypeBAO->id]);
   CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
+  civicrm_api3('membership', 'getfields', array('cache_clear' => 1, 'fieldname' => 'membership_type_id'));
+  civicrm_api3('profile', 'getfields', array('action' => 'submit', 'cache_clear' => 1));
   return civicrm_api3_create_success($membershipType, $params, 'membership_type', 'create', $membershipTypeBAO);
 }
 

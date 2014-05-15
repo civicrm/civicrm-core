@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -107,6 +107,7 @@ class CRM_Report_Utils_Get {
         break;
       case 'in':
       case 'notin':
+      case 'mhas':
         $value = self::getTypedValue("{$fieldName}_value", CRM_Utils_Type::T_STRING);
         if ($value !== NULL) {
           $defaults["{$fieldName}_value"] = explode(",", $value);

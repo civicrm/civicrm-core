@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,11 +38,13 @@ class CRM_Utils_Address {
    * Format an address basing on the address fields provided.
    * Use Setting's address_format if there's no format specified.
    *
-   * @param array   $fields            the address fields
-   * @param string  $format            the desired address format
-   * @param boolean $microformat       if true indicates, the address to be built in hcard-microformat standard.
-   * @param boolean $mailing           if true indicates, the call has been made from mailing label
-   * @param boolean $individualFormat  if true indicates, the call has been made for the contact of type 'individual'
+   * @param array $fields the address fields
+   * @param string $format the desired address format
+   * @param boolean $microformat if true indicates, the address to be built in hcard-microformat standard.
+   * @param boolean $mailing if true indicates, the call has been made from mailing label
+   * @param boolean $individualFormat if true indicates, the call has been made for the contact of type 'individual'
+   *
+   * @param null $tokenFields
    *
    * @return string  formatted address string
    *
@@ -107,6 +109,7 @@ class CRM_Utils_Address {
       $replacements = array(
         'contact.display_name' => CRM_Utils_Array::value('display_name', $fields),
         'contact.individual_prefix' => CRM_Utils_Array::value('individual_prefix', $fields),
+        'contact.formal_title' => CRM_Utils_Array::value('formal_title', $fields),
         'contact.first_name' => CRM_Utils_Array::value('first_name', $fields),
         'contact.middle_name' => CRM_Utils_Array::value('middle_name', $fields),
         'contact.last_name' => CRM_Utils_Array::value('last_name', $fields),
@@ -148,6 +151,7 @@ class CRM_Utils_Address {
         'contact.organization_name' => CRM_Utils_Array::value('display_name', $fields),
         'contact.legal_name' => CRM_Utils_Array::value('legal_name', $fields),
         'contact.preferred_communication_method' => CRM_Utils_Array::value('preferred_communication_method', $fields),
+        'contact.communication_style' => CRM_Utils_Array::value('communication_style', $fields),
         'contact.addressee' => CRM_Utils_Array::value('addressee_display', $fields),
         'contact.email_greeting' => CRM_Utils_Array::value('email_greeting_display', $fields),
         'contact.postal_greeting' => CRM_Utils_Array::value('postal_greeting_display', $fields),

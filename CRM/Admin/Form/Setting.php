@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -48,7 +48,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if (!$this->_defaults) {
@@ -108,15 +108,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
       $this->_defaults['enableSSL'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enableSSL', NULL, 0);
       $this->_defaults['verifySSL'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL', NULL, 1);
-
-      $sql = "
-SELECT time_format
-FROM   civicrm_preferences_date
-WHERE  time_format IS NOT NULL
-AND    time_format <> ''
-LIMIT  1
-";
-      $this->_defaults['timeInputFormat'] = CRM_Core_DAO::singleValueQuery($sql);
     }
 
     return $this->_defaults;
@@ -125,7 +116,7 @@ LIMIT  1
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -180,7 +171,7 @@ LIMIT  1
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -192,7 +183,7 @@ LIMIT  1
   public function commonProcess(&$params) {
 
     // save autocomplete search options
-    if (CRM_Utils_Array::value('autocompleteContactSearch', $params)) {
+    if (!empty($params['autocompleteContactSearch'])) {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
         array_keys($params['autocompleteContactSearch'])
       ) . CRM_Core_DAO::VALUE_SEPARATOR;
@@ -206,7 +197,7 @@ LIMIT  1
     }
 
     // save autocomplete contact reference options
-    if (CRM_Utils_Array::value('autocompleteContactReference', $params)) {
+    if (!empty($params['autocompleteContactReference'])) {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
         array_keys($params['autocompleteContactReference'])
       ) . CRM_Core_DAO::VALUE_SEPARATOR;
@@ -220,7 +211,7 @@ LIMIT  1
     }
 
     // save components to be enabled
-    if (CRM_Utils_Array::value('enableComponents', $params)) {
+    if (array_key_exists('enableComponents', $params)) {
       CRM_Core_BAO_Setting::setItem($params['enableComponents'],
         CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,'enable_components');
 
@@ -230,7 +221,7 @@ LIMIT  1
     }
 
     // save checksum timeout
-    if (CRM_Utils_Array::value('checksumTimeout', $params)) {
+    if (!empty($params['checksumTimeout'])) {
       CRM_Core_BAO_Setting::setItem($params['checksumTimeout'],
         CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'checksum_timeout'
@@ -238,7 +229,7 @@ LIMIT  1
     }
 
     // update time for date formats when global time is changed
-    if (CRM_Utils_Array::value('timeInputFormat', $params)) {
+    if (!empty($params['timeInputFormat'])) {
       $query = "
 UPDATE civicrm_preferences_date
 SET    time_format = %1
@@ -247,8 +238,6 @@ AND    time_format <> ''
 ";
       $sqlParams = array(1 => array($params['timeInputFormat'], 'String'));
       CRM_Core_DAO::executeQuery($query, $sqlParams);
-
-      unset($params['timeInputFormat']);
     }
 
     // verify ssl peer option

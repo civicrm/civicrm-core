@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -43,24 +43,12 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
-      return;
+      return parent::buildQuickForm();
     }
 
     $config = CRM_Core_Config::singleton();
@@ -84,7 +72,12 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
     // get the tokens
     $contactTokens = CRM_Core_SelectValues::contactTokens();
-    $eventTokens   = CRM_Core_SelectValues::eventTokens();
+    $eventTokens = array(
+      '{event.event_id}' => ts('Event ID'),
+      '{event.title}' => ts('Event Title'),
+      '{event.start_date}' => ts('Event Start Date'),
+      '{event.end_date}' => ts('Event End Date')
+    );
     $participantTokens = CRM_Core_SelectValues::participantTokens();
 
     $tokens = array_merge($contactTokens, $eventTokens, $participantTokens);
@@ -117,13 +110,13 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $attributes = array('readonly'=> true);
     $this->add('text', 'image_1', ts('Image (top left)'),
       $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
-    $this->add('text', 'width_image_1', ts('Width'), array('size' => 6));
-    $this->add('text', 'height_image_1', ts('Height'), array('size' => 6));
+    $this->add('text', 'width_image_1', ts('Width (mm)'), array('size' => 6));
+    $this->add('text', 'height_image_1', ts('Height (mm)'), array('size' => 6));
 
     $this->add('text', 'image_2', ts('Image (top right)'),
       $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
-    $this->add('text', 'width_image_2', ts('Width'), array('size' => 6));
-    $this->add('text', 'height_image_2', ts('Height'), array('size' => 6));
+    $this->add('text', 'width_image_2', ts('Width (mm)'), array('size' => 6));
+    $this->add('text', 'height_image_2', ts('Height (mm)'), array('size' => 6));
 
     $this->add('checkbox', 'is_default', ts('Default?'));
     $this->add('checkbox', 'is_active', ts('Enabled?'));
@@ -158,7 +151,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if (isset($this->_id)) {
@@ -186,7 +179,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

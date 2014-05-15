@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * CiviCRM components
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -99,6 +99,10 @@ class CRM_Core_Component {
     return self::_info($force);
   }
 
+  static public function flushEnabledComponents() {
+    self::getEnabledComponents(TRUE);
+  }
+
   public static function &getNames($translated = FALSE) {
     $allComponents = self::getComponents();
 
@@ -130,10 +134,10 @@ class CRM_Core_Component {
           // also set the smarty variables to the current component
           $template = CRM_Core_Smarty::singleton();
           $template->assign('activeComponent', $name);
-          if (CRM_Utils_Array::value('formTpl', $comp->info[$name])) {
+          if (!empty($comp->info[$name]['formTpl'])) {
             $template->assign('formTpl', $comp->info[$name]['formTpl']);
           }
-          if (CRM_Utils_Array::value('css', $comp->info[$name])) {
+          if (!empty($comp->info[$name]['css'])) {
             $styleSheets = '<style type="text/css">@import url(' . "{$config->resourceBase}css/{$comp->info[$name]['css']});</style>";
             CRM_Utils_System::addHTMLHead($styleSheet);
           }
@@ -275,17 +279,6 @@ class CRM_Core_Component {
     }
   }
 
-  static function &addShowHide(&$showHide) {
-    $info = self::_info();
-
-    foreach ($info as $name => $comp) {
-      if ($comp->usesSearch()) {
-        $bqr = $comp->getBAOQueryObject();
-        $bqr->addShowHide($showHide);
-      }
-    }
-  }
-
   static function searchAction(&$row, $id) {
     $info = self::_info();
 
@@ -315,12 +308,15 @@ class CRM_Core_Component {
     return CRM_Core_DAO::$_nullObject;
   }
 
+  /**
+   * FIXME: This function does not appear to do anything. The is_array() check runs on a bunch of objects and (always?) returns false
+   */
   static function &taskList() {
     $info = self::_info();
 
     $tasks = array();
     foreach ($info as $name => $value) {
-      if (CRM_Utils_Array::value('task', $info[$name])) {
+      if (is_array($info[$name]) && isset($info[$name]['task'])) {
         $tasks += $info[$name]['task'];
       }
     }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -51,7 +51,9 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    *
    * @access public
    *
-   * @return None
+   * @param $form
+   *
+   * @return void
    */
   static function setDefaultValues(&$form) {
     $defaults = array();
@@ -91,6 +93,9 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    *
    * @param array $values posted values of the form
    *
+   * @param $files
+   * @param $form
+   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public
@@ -104,7 +109,10 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    *
    * @access public
    *
-   * @return None
+   * @param $form
+   * @param $params
+   *
+   * @return void
    */
   static function beginPostProcess(&$form, &$params) {
     if ($form->_context == 'case') {
@@ -117,26 +125,21 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    *
    * @access public
    *
-   * @return None
+   * @param $form
+   * @param $params
+   * @param $activity
+   *
+   * @return void
    */
   static function endPostProcess(&$form, &$params, $activity) {
-    if (CRM_Utils_Array::value('start_date', $params)) {
+    if (!empty($params['start_date'])) {
       $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
     }
 
     $caseType = $form->_caseType;
 
     if (!$caseType && $form->_caseId) {
-
-      $query = "
-SELECT  cov_type.label as case_type FROM civicrm_case
-LEFT JOIN  civicrm_option_group cog_type ON cog_type.name = 'case_type'
-LEFT JOIN civicrm_option_value cov_type ON
-( civicrm_case.case_type_id = cov_type.value AND cog_type.id = cov_type.option_group_id )
-WHERE civicrm_case.id=  %1";
-
-      $queryParams = array(1 => array($form->_caseId, 'Integer'));
-      $caseType = CRM_Core_DAO::singleValueQuery($query, $queryParams);
+      $caseType = CRM_Case_BAO_Case::getCaseType($form->_caseId, 'title');
     }
 
     if (!$form->_currentlyViewedContactId ||

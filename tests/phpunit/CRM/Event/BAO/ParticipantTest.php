@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,10 +32,6 @@ require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Event.php';
 require_once 'CiviTest/Participant.php';
 class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
-  //@todo make BAO enotice compliant  & remove the line below
-  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
-  // new test classes should be compliant.
-  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name' => 'Participant BAOs',
@@ -103,6 +99,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
   function testgetValuesWithValidParams() {
     $participantId = Participant::create($this->_contactId, $this->_eventId);
     $params = array('id' => $participantId);
+    $values = $ids = array();
 
     $fetchParticipant = CRM_Event_BAO_Participant::getValues($params, $values, $ids);
     $compareValues = $fetchParticipant[$participantId];
@@ -118,11 +115,15 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'source' => 'Event_' . $this->_eventId,
       'contact_id' => $this->_contactId,
       'id' => $participantId,
+      'campaign_id' => NULL,
       'fee_level' => NULL,
       'fee_amount' => NULL,
       'registered_by_id' => NULL,
       'discount_id' => NULL,
       'fee_currency' => NULL,
+      'discount_amount' => NULL,
+      'cart_id' => NULL,
+      'must_wait' => NULL,
     );
 
     foreach ($compareValues as $key => $value) {
@@ -349,7 +350,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
 
     $paramsSet['title'] = 'Price Set';
     $paramsSet['name'] = CRM_Utils_String::titleToVar('Price Set');
-    $paramsSet['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $paramsSet['is_active'] = FALSE;
     $paramsSet['extends'] = 1;
 
     $priceset = CRM_Price_BAO_PriceSet::create($paramsSet);

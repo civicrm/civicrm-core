@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -60,8 +60,11 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
-   */ function __construct($mode, &$paymentProcessor) {
+   * @param $paymentProcessor
+   *
+   * @return \org_civicrm_payment_googlecheckout
+   */
+  function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('Google Checkout');
@@ -72,9 +75,9 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param object $paymentProcessor
    * @return object
    * @static
-   *
    */
   static
   function &singleton($mode, &$paymentProcessor) {
@@ -119,11 +122,12 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
   /**
    * Sets appropriate parameters for checking out to google
    *
-   * @param array $params  name value pair of contribution datat
+   * @param array $params name value pair of contribution datat
    *
+   * @param $component
+   * @throws Exception
    * @return void
    * @access public
-   *
    */
   function doTransferCheckout(&$params, $component) {
     $component = strtolower($component);

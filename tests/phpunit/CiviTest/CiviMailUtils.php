@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -252,9 +252,12 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
 
   /**
    * Check contents of mail log
+   *
    * @param array $strings strings that should be included
    * @param array $absentStrings strings that should not be included
+   * @param string $prefix
    *
+   * @return \ezcMail|string
    */
   function checkMailLog($strings, $absentStrings = array(), $prefix = '') {
     $mail = $this->getMostRecentEmail('raw');

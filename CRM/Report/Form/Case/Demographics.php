@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -68,8 +68,10 @@ class CRM_Report_Form_Case_Demographics extends CRM_Report_Form {
         ),
         'filters' =>
         array(
-          'sort_name' =>
-          array('title' => ts('Contact Name')),
+          'sort_name' => array(
+            'title' => ts('Contact Name'),
+            'operatorType' => CRM_Report_Form::OP_STRING,
+          ),
           'contact_type' =>
           array('title' => ts('Contact Type'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
@@ -249,9 +251,7 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if ($tableName == 'civicrm_email') {
               $this->_emailField = TRUE;
             }
@@ -321,7 +321,7 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
             $from     = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
             $to       = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
 
-            $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to, CRM_Utils_type::T_DATE);
+            $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to, CRM_Utils_Type::T_DATE);
           }
           else {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);

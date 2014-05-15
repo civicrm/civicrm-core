@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  * add static functions to include some common functionality
@@ -51,10 +51,11 @@ class CRM_Core_BAO_Block {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param Object $block         typically a Phone|Email|IM|OpenID object
-   * @param string $blockName     name of the above object
-   * @param array  $params        input parameters to find object
-   * @param array  $values        output values of the object
+   * @param string $blockName name of the above object
+   * @param array $params input parameters to find object
+   *
+   * @internal param Object $block typically a Phone|Email|IM|OpenID object
+   * @internal param array $values output values of the object
    *
    * @return array of $block objects.
    * @access public
@@ -98,9 +99,10 @@ class CRM_Core_BAO_Block {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param Object $block         typically a Phone|Email|IM|OpenID object
-   * @param string $blockName     name of the above object
-   * @param array  $values        output values of the object
+   * @param Object $block typically a Phone|Email|IM|OpenID object
+   * @param string $blockName name of the above object
+   *
+   * @internal param array $values output values of the object
    *
    * @return array of $block objects.
    * @access public
@@ -157,7 +159,7 @@ class CRM_Core_BAO_Block {
    */
   static function blockExists($blockName, &$params) {
     // return if no data present
-    if (!CRM_Utils_Array::value($blockName, $params) || !is_array($params[$blockName])) {
+    if (empty($params[$blockName]) || !is_array($params[$blockName])) {
       return FALSE;
     }
 
@@ -168,7 +170,10 @@ class CRM_Core_BAO_Block {
    * Function to get all block ids for a contact
    *
    * @param string $blockName block name
-   * @param int    $contactId contact id
+   * @param int $contactId contact id
+   *
+   * @param null $entityElements
+   * @param bool $updateBlankLocInfo
    *
    * @return array $contactBlockIds formatted array of block ids
    *
@@ -207,9 +212,12 @@ class CRM_Core_BAO_Block {
   /**
    * takes an associative array and creates a block
    *
-   * @param string $blockName      block name
-   * @param array  $params         (reference ) an assoc array of name/value pairs
-   * @param array  $requiredFields fields that's are required in a block
+   * @param string $blockName block name
+   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param null $entity
+   * @param null $contactId
+   *
+   * @internal param array $requiredFields fields that's are required in a block
    *
    * @return object       CRM_Core_BAO_Block object on success, null otherwise
    * @access public
@@ -256,13 +264,11 @@ class CRM_Core_BAO_Block {
           }
         }
         //lets allow to update primary w/ more cleanly.
-        if (!$resetPrimaryId &&
-          CRM_Utils_Array::value('is_primary', $value)
-        ) {
+        if (!$resetPrimaryId && !empty($value['is_primary'])) {
           $primaryId = TRUE;
           if (is_array($blockIds)) {
             foreach ($blockIds as $blockId => $blockValue) {
-              if (CRM_Utils_Array::value('is_primary', $blockValue)) {
+              if (!empty($blockValue['is_primary'])) {
                 $resetPrimaryId = $blockId;
                 break;
               }
@@ -294,12 +300,12 @@ class CRM_Core_BAO_Block {
       );
 
       //check for update
-      if (!CRM_Utils_Array::value('id', $value) &&
+      if (empty($value['id']) &&
         is_array($blockIds) && !empty($blockIds)
       ) {
         foreach ($blockIds as $blockId => $blockValue) {
           if ($updateBlankLocInfo) {
-            if (CRM_Utils_Array::value($count, $blockIds)) {
+            if (!empty($blockIds[$count])) {
               $value['id'] = $blockIds[$count]['id'];
               unset($blockIds[$count]);
             }
@@ -327,7 +333,7 @@ class CRM_Core_BAO_Block {
               if ($valueId) {
                 //assigned id as first come first serve basis
                 $value['id'] = $blockValue['id'];
-                if (!$primaryId && CRM_Utils_Array::value('is_primary', $blockValue)) {
+                if (!$primaryId && !empty($blockValue['is_primary'])) {
                   $value['is_primary'] = $blockValue['is_primary'];
                 }
                 unset($blockIds[$blockId]);
@@ -343,7 +349,7 @@ class CRM_Core_BAO_Block {
       // Note there could be cases when block info already exist ($value[id] is set) for a contact/entity
       // BUT info is not present at this time, and therefore we should be really careful when deleting the block.
       // $updateBlankLocInfo will help take appropriate decision. CRM-5969
-      if (CRM_Utils_Array::value('id', $value) && !$dataExits && $updateBlankLocInfo) {
+      if (!empty($value['id']) && !$dataExits && $updateBlankLocInfo) {
         //delete the existing record
         self::blockDelete($blockName, array('id' => $value['id']));
         continue;
@@ -352,7 +358,7 @@ class CRM_Core_BAO_Block {
         continue;
       }
 
-      if ($isPrimary && CRM_Utils_Array::value('is_primary', $value)) {
+      if ($isPrimary && !empty($value['is_primary'])) {
         $contactFields['is_primary'] = $value['is_primary'];
         $isPrimary = FALSE;
       }
@@ -360,7 +366,7 @@ class CRM_Core_BAO_Block {
         $contactFields['is_primary'] = 0;
       }
 
-      if ($isBilling && CRM_Utils_Array::value('is_billing', $value)) {
+      if ($isBilling && !empty($value['is_billing'])) {
         $contactFields['is_billing'] = $value['is_billing'];
         $isBilling = FALSE;
       }
@@ -376,7 +382,7 @@ class CRM_Core_BAO_Block {
     // we need to delete blocks that were deleted during update
     if ($updateBlankLocInfo && !empty($blockIds)) {
       foreach ($blockIds as $deleteBlock) {
-        if (!CRM_Utils_Array::value('id', $deleteBlock)) {
+        if (empty($deleteBlock['id'])) {
           continue;
         }
         self::blockDelete($blockName, array('id' => $deleteBlock['id']));
@@ -424,13 +430,16 @@ class CRM_Core_BAO_Block {
    *            - if no other entry is 1 change to 1
    *            - if one other entry exists change that to 1
    *            - if more than one other entry exists change first one to 1
-   *              @fixme - perhaps should choose by location_type
+   * @fixme - perhaps should choose by location_type
    *  #  empty - same as 0 as once we have checked first step
    *             we know if it should be 1 or 0
    *
    *  if $params['id'] is set $params['contact_id'] may need to be retrieved
    *
-   *  @param array $params
+   * @param array $params
+   * @param $class
+   *
+   * @throws API_Exception
    * @static
    */
   public static function handlePrimary(&$params, $class) {
@@ -454,7 +463,7 @@ class CRM_Core_BAO_Block {
     }
 
     // if params is_primary then set all others to not be primary & exit out
-    if (CRM_Utils_Array::value('is_primary', $params)) {
+    if (!empty($params['is_primary'])) {
       $sql = "UPDATE $table SET is_primary = 0 WHERE contact_id = %1";
       $sqlParams = array(1 => array($contactId, 'Integer'));
       // we don't want to create unecessary entries in the log_ tables so exclude the one we are working on
@@ -499,7 +508,10 @@ class CRM_Core_BAO_Block {
 
   /**
    * Sort location array so primary element is first
-   * @param Array $location
+   *
+   * @param $locations
+   *
+   * @internal param Array $location
    */
   static function sortPrimaryFirst(&$locations){
     uasort($locations, 'self::primaryComparison');

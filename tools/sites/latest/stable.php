@@ -63,7 +63,7 @@ function process_get_request() {
   // Save to entities table
   $entities = array(
     'Activity', 'Case', 'Contact', 'Contribution', 'ContributionPage',
-    'ContributionProduct', 'Discount', 'Event', 'Friend', 'Grant', 'Mailing', 'Membership', 
+    'ContributionProduct', 'Discount', 'Event', 'Friend', 'Grant', 'Mailing', 'Membership',
     'MembershipBlock', 'Participant', 'Pledge', 'PledgeBlock', 'PriceSetEntity',
     'Relationship', 'UFGroup', 'Widget',
   );
@@ -98,8 +98,13 @@ function insert_stats() {
 
 /**
  * Insert the child records
- * @param table: table name
- * @param id: primary record id
+ *
+ * @param $table
+ * @param $data
+ * @param $id
+ *
+ * @internal param $table : table name
+ * @internal param $id : primary record id
  */
 function insert_children($table, $data, $id) {
   global $link;

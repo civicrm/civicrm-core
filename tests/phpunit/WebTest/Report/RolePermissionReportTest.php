@@ -1,9 +1,9 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.4                                                |
+   | CiviCRM version 4.5                                                |
    +--------------------------------------------------------------------+
-   | Copyright CiviCRM LLC (c) 2004-2013                                |
+   | Copyright CiviCRM LLC (c) 2004-2014                                |
    +--------------------------------------------------------------------+
    | This file is a part of CiviCRM.                                    |
    |                                                                    |
@@ -129,7 +129,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->openCiviPage('report/instance/1', 'reset=1');
 
     //check if the reserved report field is frozen
-    $this->assertTrue($this->isElementPresent("xpath=//div[@id='instanceForm']//table[3]/tbody//tr/td[2]/tt[text()='[ ]']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@id='instanceForm']//table[3]/tbody//tr/td[2]/span/tt[text()='[ ]']"));
 
     // let's give full CiviReport permissions.
     $permissions = array(

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -50,16 +50,6 @@ class CRM_Report_Form_Contribute_LoggingDetail extends CRM_Logging_ReportDetail 
 
     // link back to summary report
     $this->assign('backURL', CRM_Report_Utils_Report::getNextUrl('logging/contribute/summary', 'reset=1', FALSE, TRUE));
-  }
-
-  protected function whoWhomWhenSql() {
-    return "
-            SELECT who.id who_id, who.display_name who_name, whom.id whom_id, whom.display_name whom_name
-            FROM `{$this->db}`.log_civicrm_contribution l
-            LEFT JOIN civicrm_contact who ON (l.log_user_id = who.id)
-            LEFT JOIN civicrm_contact whom ON (l.contact_id = whom.id)
-            WHERE log_action = 'Update' AND log_conn_id = %1 AND log_date = %2 ORDER BY log_date DESC LIMIT 1
-        ";
   }
 }
 

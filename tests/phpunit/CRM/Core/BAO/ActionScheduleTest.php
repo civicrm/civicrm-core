@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * @var object see CiviTest/CiviMailUtils
    */
   var $mut;
-  public $_eNoticeCompliant = FALSE;
+
   function get_info() {
     return array(
       'name' => 'Action-Schedule BAO',
@@ -254,7 +254,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   function testActivityDateTime_Match_NonRepeatableSchedule() {
-    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($this->fixtures['sched_activity_1day'], $ids);
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($this->fixtures['sched_activity_1day']);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
 
     $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
@@ -285,7 +285,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   function testActivityDateTime_Match_RepeatableSchedule() {
-    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($this->fixtures['sched_activity_1day_r'], $ids);
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($this->fixtures['sched_activity_1day_r']);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
 
     $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
@@ -343,7 +343,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $contact = civicrm_api('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
     $actionSchedule = $this->fixtures['sched_membership_join_2week'];
     $actionSchedule['entity_value'] = $membership->membership_type_id;
-    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule, $ids);
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
 
     // start_date=2012-03-15 ; schedule is 2 weeks after start_date
@@ -377,7 +377,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     // Add an alternative membership type, and only send messages for that type
     $extraMembershipType = $this->createTestObject('CRM_Member_DAO_MembershipType', array());
     $this->assertTrue(is_numeric($extraMembershipType->id));
-    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($this->fixtures['sched_membership_join_2week'], $ids);
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($this->fixtures['sched_membership_join_2week']);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
     $actionScheduleDao->entity_value = $extraMembershipType->id;
     $actionScheduleDao->save();
@@ -409,7 +409,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     $actionSchedule = $this->fixtures['sched_membership_end_2week'];
     $actionSchedule['entity_value'] = $membership->membership_type_id;
-    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule, $ids);
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
 
     // end_date=2012-06-15 ; schedule is 2 weeks before end_date
@@ -445,7 +445,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     $actionSchedule = $this->fixtures['sched_membership_end_2month'];
     $actionSchedule['entity_value'] = $membership->membership_type_id;
-    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule, $ids);
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
 
     // end_date=2012-06-15 ; schedule is 2 weeks before end_date
@@ -473,7 +473,9 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Run a series of cron jobs and make an assertion about email deliveries
    *
-   * @param $jobSchedule array specifying when to run cron and what messages to expect; each item is an array with keys:
+   * @param $cronRuns
+   *
+   * @internal param array $jobSchedule specifying when to run cron and what messages to expect; each item is an array with keys:
    *  - time: string, e.g. '2012-06-15 21:00:01'
    *  - recipients: array(array(string)), list of email addresses which should receive messages
    */

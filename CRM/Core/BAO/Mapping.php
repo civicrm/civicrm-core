@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -119,6 +119,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @params string  $mappingTypeId  mapping type id
    *
+   * @param $mappingTypeId
+   *
    * @return array $mapping array of mapping name
    * @access public
    * @static
@@ -141,10 +143,11 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @params int $mappingId  mapping id
    *
+   * @param $mappingId
+   *
    * @return array $mappingFields array of mapping fields
    * @access public
    * @static
-   *
    */
   static function getMappingFields($mappingId) {
     //mapping is to be loaded from database
@@ -202,8 +205,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @params $mapTypeId string mapping Type
    *
-   * @return boolean
+   * @param $nameField
+   * @param $mapTypeId
    *
+   * @return boolean
    */
   static function checkMapping($nameField, $mapTypeId) {
     $mapping = new CRM_Core_DAO_Mapping();
@@ -222,9 +227,9 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @params int $smartGroupId smart group id
    *
-   * @return $returnFields  associated array of elements
+   * @param $smartGroupId
    *
-   * @static
+   * @return array $returnFields  associated array of elements@static
    * @public
    */
   static function getFormattedFields($smartGroupId) {
@@ -258,7 +263,14 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @params mixed  $columnCount column count is int for and array for search builder
    * @params int    $blockCount  block count (no of blocks shown)
    *
-   * @return none
+   * @param $form
+   * @param string $mappingType
+   * @param null $mappingId
+   * @param $columnNo
+   * @param int $blockCount
+   * @param null $exportMode
+   *
+   * @return void
    * @access public
    * @static
    */
@@ -376,9 +388,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       //build the common contact fields array.
       $fields['Contact'] = array();
       foreach ($fields['Individual'] as $key => $value) {
-        if (CRM_Utils_Array::value($key, $fields['Household']) &&
-            CRM_Utils_Array::value($key, $fields['Organization'])
-            ) {
+        if (!empty($fields['Household'][$key]) && !empty($fields['Organization'][$key])) {
           $fields['Contact'][$key] = $value;
           unset($fields['Organization'][$key],
                 $fields['Household'][$key],
@@ -560,6 +570,11 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     foreach ($sel1 as $key => $sel) {
       if ($key) {
+        // sort everything BUT the contactType which is sorted seperately by
+        // an initial commit of CRM-13278 (check ksort above)
+        if (!in_array($key, $contactType)) {
+          asort($mapperFields[$key]);
+        }
         $sel2[$key] = array('' => ts('- select field -')) + $mapperFields[$key];
       }
     }
@@ -847,22 +862,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
         if ($mappingType == 'Search Builder') {
           //CRM -2292, restricted array set
-          $operatorArray = array(
-            '' => ts('-operator-'),
-            '=' => '=',
-            '!=' => '≠',
-            '>' => '>',
-            '<' => '<',
-            '>=' => '≥',
-            '<=' => '≤',
-            'IN' => ts('In'),
-            'LIKE' => ts('Like'),
-            'RLIKE' => ts('Regex'),
-            'IS EMPTY' => ts('Is Empty'),
-            'IS NOT EMPTY' => ts('Not Empty'),
-            'IS NULL' => ts('Is Null'),
-            'IS NOT NULL' => ts('Not Null'),
-          );
+          $operatorArray = array('' => ts('-operator-')) + CRM_Core_SelectValues::getSearchBuilderOperators();
 
           $form->add('select', "operator[$x][$i]", '', $operatorArray);
           $form->add('text', "value[$x][$i]", '');
@@ -953,9 +953,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   /**
    * Function returns all  Custom group Names
    *
-   * @param customfieldId related custom field id
-   * @return $customGroupName all custom group names
-   * @static
+   * @param related $customfieldId
+   *
+   * @internal param \related $customfieldId custom field id
+   * @return null|string $customGroupName all custom group names@static
    */
   static function getCustomGroupName($customfieldId) {
     if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($customfieldId)) {
@@ -976,9 +977,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @params array   $params associated array of submitted values
    * @params boolean $row    row no of the fields
    *
-   * @return $returnFields  formatted associated array of elements
+   * @param $params
+   * @param bool $row
    *
-   * @static
+   * @return array $returnFields  formatted associated array of elements@static
    * @public
    */
   static function &formattedFields(&$params, $row = FALSE) {
@@ -1000,7 +1002,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           }
           $contactType = $v[0];
         }
-        if (CRM_Utils_Array::value('1', $v)) {
+        if (!empty($v['1'])) {
           $fldName = $v[1];
           $v2 = CRM_Utils_Array::value('2', $v);
           if ($v2 && trim($v2)) {
@@ -1029,6 +1031,29 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
             && substr($fldName, 0, 10) != 'financial_') {
             if (substr($fldName, 0, 13) != 'contribution_') {
               $fldName = 'contribution_' . $fldName;
+            }
+          }
+
+          // CRM-14563: we store checkbox, multi-select and adv-multi select custom field using separator, hence it
+          // needs special handling.
+          if ($cfID = CRM_Core_BAO_CustomField::getKeyID($v[1])) {
+            $customFieldType = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $cfID, 'html_type');
+            $specialHTMLType = array(
+              'CheckBox',
+              'Multi-Select',
+              'AdvMulti-Select',
+              'Multi-Select State/Province',
+              'Multi-Select Country'
+            );
+
+            // override the operator to handle separator ( note: this might have some performance issues )
+            if (in_array($customFieldType, $specialHTMLType)) {
+              // FIX ME: != and few other operators are not handled
+              $specialOperators = array('=', 'IN', 'LIKE');
+
+              if (in_array($params['operator'][$key][$k], $specialOperators)) {
+                $params['operator'][$key][$k] = 'RLIKE';
+              }
             }
           }
 
@@ -1157,7 +1182,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       $colCnt = 0;
       foreach ($value as $k => $v) {
 
-        if (CRM_Utils_Array::value('1', $v)) {
+        if (!empty($v['1'])) {
           $saveMappingFields = new CRM_Core_DAO_MappingField();
 
           $saveMappingFields->mapping_id = $mappingId;
@@ -1173,10 +1198,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
             $saveMappingFields->im_provider_id = CRM_Utils_Array::value('3', $v);
           }
 
-          if (CRM_Utils_Array::value('operator', $params)) {
+          if (!empty($params['operator'])) {
             $saveMappingFields->operator = CRM_Utils_Array::value($k, $params['operator'][$key]);
           }
-          if (CRM_Utils_Array::value('value', $params)) {
+          if (!empty($params['value'])) {
             $saveMappingFields->value = CRM_Utils_Array::value($k, $params['value'][$key]);
           }
           // Handle mapping for 'related contact' fields
@@ -1184,10 +1209,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
             list($id, $first, $second) = explode('_', CRM_Utils_Array::value('1', $v));
             if (($first == 'a' && $second == 'b') || ($first == 'b' && $second == 'a')) {
 
-              if (CRM_Utils_Array::value('2', $v)) {
+              if (!empty($v['2'])) {
                 $saveMappingFields->name = CRM_Utils_Array::value('2', $v);
               }
-              elseif (CRM_Utils_Array::value('4', $v)) {
+              elseif (!empty($v['4'])) {
                 $saveMappingFields->name = CRM_Utils_Array::value('4', $v);
               }
 

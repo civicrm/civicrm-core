@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * it need to be defined here first.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -332,6 +332,13 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $versionCheck = TRUE;
 
   /**
+   * Whether public pages should display "empowered by CiviCRM"
+   *
+   * @var boolean
+   */
+  public $empoweredBy = TRUE;
+
+  /**
    * Array of enabled add-on components (e.g. CiviContribute, CiviMail...)
    *
    * @var array
@@ -585,7 +592,12 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
       $country = array();
       if (is_array($this->provinceLimit)) {
         foreach ($this->provinceLimit as $val) {
-          $country[] = $countryIsoCodes[$val];
+          // CRM-12007
+          // some countries have disappeared and hence they might be in country limit
+          // but not in the country table
+          if (isset($countryIsoCodes[$val])) {
+            $country[] = $countryIsoCodes[$val];
+          }
         }
       }
       else {

@@ -94,6 +94,8 @@ class CRM_Core_Region {
    *   - jquery: string, Javascript code which runs inside a jQuery(function($){...}); block
    *   - style: string, CSS code
    *   - styleUrl: string, URL of a CSS file
+   *
+   * @return array
    */
   public function add($snippet) {
     static $types = array('markup', 'template', 'callback', 'scriptUrl', 'script', 'jquery', 'style', 'styleUrl');
@@ -175,7 +177,7 @@ class CRM_Core_Region {
           }
           break;
         case 'jquery':
-          $snippet['script'] = sprintf("cj(function(\$){\n%s\n});", $snippet['jquery']);
+          $snippet['script'] = sprintf("CRM.\$(function(\$) {\n%s\n});", $snippet['jquery']);
           // no break - continue processing as script
         case 'script':
           if (!$allowCmsOverride || !$cms->addScript($snippet['script'], $this->_name)) {

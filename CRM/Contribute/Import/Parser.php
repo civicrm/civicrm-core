@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -420,6 +420,11 @@ pppp   * @return void
     }
   }
 
+  function setActiveFieldSoftCreditType($elements) {
+    for ($i = 0; $i < count($elements); $i++) {
+      $this->_activeFields[$i]->_softCreditType = $elements[$i];
+    }
+  }
   /**
    * function to format the field values for input to the api
    *
@@ -434,7 +439,10 @@ pppp   * @return void
           if (!isset($params[$this->_activeFields[$i]->_name])) {
             $params[$this->_activeFields[$i]->_name] = array();
           }
-          $params[$this->_activeFields[$i]->_name][$this->_activeFields[$i]->_softCreditField] = $this->_activeFields[$i]->_value;
+          $params[$this->_activeFields[$i]->_name][$i][$this->_activeFields[$i]->_softCreditField] = $this->_activeFields[$i]->_value;
+          if(isset($this->_activeFields[$i]->_softCreditType)){
+            $params[$this->_activeFields[$i]->_name][$i]['soft_credit_type_id'] = $this->_activeFields[$i]->_softCreditType;
+          }
         }
 
         if (!isset($params[$this->_activeFields[$i]->_name])) {
@@ -468,6 +476,8 @@ pppp   * @return void
    * Store parser values
    *
    * @param CRM_Core_Session $store
+   *
+   * @param int $mode
    *
    * @return void
    * @access public
@@ -535,10 +545,11 @@ pppp   * @return void
   /**
    * Export data to a CSV file
    *
-   * @param string $filename
+   * @param $fileName
    * @param array $header
    * @param data $data
    *
+   * @internal param string $filename
    * @return void
    * @access public
    */
@@ -554,7 +565,7 @@ pppp   * @return void
 
     foreach ($data as $datum) {
       foreach ($datum as $key => $value) {
-        if (is_array($value[0])) {
+        if (isset($value[0]) && is_array($value)) {
           foreach ($value[0] as $k1 => $v1) {
             if ($k1 == 'location_type_id') {
               continue;

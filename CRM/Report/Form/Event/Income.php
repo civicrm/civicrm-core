@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -304,7 +304,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
       $this->_setVariable = FALSE;
 
       $events = CRM_Event_PseudoConstant::event(NULL, NULL,
-        "is_template IS NULL OR is_template = 0"
+        "is_template = 0"
       );
       if (empty($events)) {
         return FALSE;
@@ -338,7 +338,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
         }
       } elseif ($this->_params['id_op'] == 'notin') {
         $events = CRM_Event_PseudoConstant::event(NULL, NULL,
-          "is_template IS NULL OR is_template = 0"
+          "is_template = 0"
         );
 
         $showEvents = array_diff(array_keys($events), $this->_params['id_value']);

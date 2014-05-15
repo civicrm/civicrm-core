@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -60,7 +60,9 @@ class CRM_Contribute_Page_DashBoard extends CRM_Core_Page {
       'now', 'yearDate', 'monthDate') as $date) {
       $$date = $dates[$date];
     }
-    $yearNow = $yearDate + 10000;
+    // fiscal years end date
+    $yearNow = date('Ymd', strtotime('+1 year -1 day', strtotime($yearDate)));
+
     foreach ($prefixes as $prefix) {
       $aName = $prefix . 'ToDate';
       $dName = $prefix . 'Date';
@@ -69,8 +71,12 @@ class CRM_Contribute_Page_DashBoard extends CRM_Core_Page {
         $now = $yearNow;
       }
 
+      // appending end date i.e $now with time
+      // to also calculate records of end date till mid-night
+      $nowWithTime = $now . '235959';
+
       foreach ($status as $s) {
-        ${$aName}[$s] = CRM_Contribute_BAO_Contribution::getTotalAmountAndCount($s, $$dName, $now);
+        ${$aName}[$s] = CRM_Contribute_BAO_Contribution::getTotalAmountAndCount($s, $$dName, $nowWithTime);
         ${$aName}[$s]['url'] = CRM_Utils_System::url('civicrm/contribute/search',
           "reset=1&force=1&status=1&start={$$dName}&end=$now&test=0"
         );

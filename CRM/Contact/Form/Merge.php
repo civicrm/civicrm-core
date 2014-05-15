@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -110,7 +110,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $this->assign('mainUfName', $mainUser ? $mainUser->name : NULL);
     }
 
-    $flipUrl = CRM_Utils_system::url('civicrm/contact/merge',
+    $flipUrl = CRM_Utils_System::url('civicrm/contact/merge',
       "reset=1&action=update&cid={$oid}&oid={$cid}&rgid={$rgid}&gid={$gid}"
     );
     if (!$flip) {
@@ -132,7 +132,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
             $urlParam .= "&gid={$gid}";
           }
 
-          $this->$position = CRM_Utils_system::url('civicrm/contact/merge', $urlParam);
+          $this->$position = CRM_Utils_System::url('civicrm/contact/merge', $urlParam);
           $this->assign($position, $this->$position);
         }
       }
@@ -166,7 +166,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       if ($gid) {
         $urlParam .= "&gid={$gid}";
       }
-      $session->pushUserContext(CRM_Utils_system::url('civicrm/contact/dedupefind', $urlParam));
+      $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/dedupefind', $urlParam));
     }
 
     // ensure that oid is not the current user, if so refuse to do the merge
@@ -179,8 +179,8 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
 
     $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($cid, $oid);
-    $main                = &$rowsElementsAndInfo['main_details'];
-    $other               = &$rowsElementsAndInfo['other_details'];
+    $main = $this->_mainDetails = &$rowsElementsAndInfo['main_details'];
+    $other = $this->_otherDetails = &$rowsElementsAndInfo['other_details'];
 
     if ($main['contact_id'] != $cid) {
       CRM_Core_Error::fatal(ts('The main contact record does not exist'));
@@ -207,12 +207,13 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->assign('other_name', $other['display_name']);
     $this->assign('main_cid', $main['contact_id']);
     $this->assign('other_cid', $other['contact_id']);
+    $this->assign('rgid', $rgid);
 
     $this->_cid         = $cid;
     $this->_oid         = $oid;
     $this->_rgid        = $rgid;
     $this->_contactType = $main['contact_type'];
-    $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('onclick' => "return toggleCheckboxVals('move_',this);"));
+    $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows'));
 
     $this->assign('mainLocBlock', json_encode($rowsElementsAndInfo['main_loc_block']));
     $this->assign('rows', $rowsElementsAndInfo['rows']);
@@ -292,6 +293,19 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
 
     $this->addButtons($button);
+    $this->addFormRule(array('CRM_Contact_Form_Merge', 'formRule'), $this);
+  }
+
+  static function formRule($fields, $files, $self) {
+    $errors = array();
+    $link = CRM_Utils_System::href(ts('Flip between the original and duplicate contacts.'),
+      'civicrm/contact/merge',
+      'reset=1&action=update&cid=' . $self->_oid . '&oid=' . $self->_cid . '&rgid=' . $self->_rgid . '&flip=1'
+    );
+    if (CRM_Contact_BAO_Contact::checkDomainContact($self->_oid)) {
+      $errors['_qf_default'] = ts("The Default Organization contact cannot be merged into another contact record. It is associated with the CiviCRM installation for this domain and contains information used for system functions. If you want to merge these records, you can: %1", array(1 => $link));
+    }
+    return $errors;
   }
 
   public function postProcess() {
@@ -304,16 +318,14 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $session->resetScope('selectedSearchContactIds');
     }
 
-    $formValues['main_details'] = $formValues['other_details'] = array();
-    $formValues['main_details']['contact_type'] = $this->_contactType;
-    $formValues['main_details']['loc_block_ids'] = $this->_locBlockIds['main'];
-    $formValues['other_details']['loc_block_ids'] = $this->_locBlockIds['other'];
+    $formValues['main_details'] = $this->_mainDetails;
+    $formValues['other_details'] = $this->_otherDetails;
 
     CRM_Dedupe_Merger::moveAllBelongings($this->_cid, $this->_oid, $formValues);
 
     CRM_Core_Session::setStatus(ts('Contact id %1 has been updated and contact id %2 has been deleted.', array(1 => $this->_cid, 2 => $this->_oid)), ts('Contacts Merged'), 'success');
     $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->_cid}");
-    if (CRM_Utils_Array::value('_qf_Merge_submit', $formValues)) {
+    if (!empty($formValues['_qf_Merge_submit'])) {
       $listParamsURL = "reset=1&action=update&rgid={$this->_rgid}";
       if ($this->_gid) {
         $listParamsURL .= "&gid={$this->_gid}";
@@ -323,7 +335,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       );
       CRM_Utils_System::redirect($lisitingURL);
     }
-     if (CRM_Utils_Array::value('_qf_Merge_done', $formValues)) {
+     if (!empty($formValues['_qf_Merge_done'])) {
       CRM_Utils_System::redirect($url);
     }
 
@@ -351,7 +363,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
           $urlParam .= "&gid={$this->_gid}";
         }
 
-        $url = CRM_Utils_system::url('civicrm/contact/merge', $urlParam);
+        $url = CRM_Utils_System::url('civicrm/contact/merge', $urlParam);
       }
     }
 

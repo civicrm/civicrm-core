@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -52,6 +52,8 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * Function to get events Summary
    *
    * @static
+   *
+   * @param bool $admin
    *
    * @return array Array of event summary values
    */
@@ -113,6 +115,8 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *
    * @static
    *
+   * @param bool $admin
+   *
    * @return array Array of grant summary statistics
    */
   static function getGrantStatistics($admin = FALSE) {
@@ -156,7 +160,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    */
   static function add(&$params, &$ids) {
 
-    if (CRM_Utils_Array::value('grant_id', $ids)) {
+    if (!empty($ids['grant_id'])) {
       CRM_Utils_Hook::pre('edit', 'Grant', $ids['grant_id'], $params);
     }
     else {
@@ -205,7 +209,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     );
 
     $grantTypes = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id');
-    if (!CRM_Utils_Array::value('skipRecentView', $params)) {
+    if (empty($params['skipRecentView'])) {
       if(!isset($grant->contact_id) || !isset($grant->grant_type_id)){
         $grant->find(TRUE);
       }
@@ -234,7 +238,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       );
     }
 
-    if (CRM_Utils_Array::value('grant', $ids)) {
+    if (!empty($ids['grant'])) {
       CRM_Utils_Hook::post('edit', 'Grant', $grant->id, $grant);
     }
     else {
@@ -248,8 +252,9 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * function to create the event
    *
    * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @param array $ids reference array contains the id
    *
+   * @return object
    * @access public
    * @static
    *
@@ -269,7 +274,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     if (!$id) {
       $id = CRM_Utils_Array::value('contact_id', $params);
     }
-    if (CRM_Utils_Array::value('note', $params) || CRM_Utils_Array::value('id', CRM_Utils_Array::value('note',$ids))) {
+    if (!empty($params['note']) || CRM_Utils_Array::value('id', CRM_Utils_Array::value('note',$ids))) {
       $noteParams = array(
         'entity_table' => 'civicrm_grant',
         'note' => $params['note'] = $params['note'] ? $params['note'] : "null",
@@ -291,7 +296,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     CRM_Core_BAO_Log::add($logParams);
 
     // add custom field values
-    if (CRM_Utils_Array::value('custom', $params) && is_array($params['custom'])) {
+    if (!empty($params['custom']) && is_array($params['custom'])) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_grant', $grant->id);
     }
 
@@ -309,11 +314,13 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Function to delete the Contact
    *
-   * @param int $cid  contact id
+   * @param $id
+   *
+   * @return bool
+   * @internal param int $cid contact id
    *
    * @access public
    * @static
-   *
    */
   static function deleteContact($id) {
     $grant = new CRM_Grant_DAO_Grant();
@@ -325,8 +332,9 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Function to delete the grant
    *
-   * @param int $id  grant id
+   * @param int $id grant id
    *
+   * @return bool|mixed
    * @access public
    * @static
    *
@@ -412,7 +420,9 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Function to get grant record count for a Contact
    *
-   * @param int $contactId Contact ID
+   * @param $contactID
+   *
+   * @internal param int $contactId Contact ID
    *
    * @return int count of grant records
    * @access public

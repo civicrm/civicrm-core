@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -65,17 +65,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   }
 
   function tearDown() {
-  // $this->paymentProcessor->delete($this->processorParams->id);
-    $tablesToTruncate = array(
-      'civicrm_contribution',
-      'civicrm_financial_trxn',
-      'civicrm_contribution_recur',
-      'civicrm_line_item',
-      'civicrm_contribution_page',
-      'civicrm_payment_processor',
-      'civicrm_entity_financial_trxn',
-    );
-    $this->quickCleanup($tablesToTruncate);
+    $this->quickCleanUpFinancialEntities();
   }
 
   /**
@@ -97,6 +87,33 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'get', array('contribution_recur_id' => $this->_contributionRecurID, 'sequential' => 1));
     $this->assertEquals(2, $contribution['count']);
     $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
+  }
+
+  /**
+   * CRM-13743 test IPN edge case where the first transaction fails and the second succeeds
+   * We are checking that the created contribution has the same date as IPN says it should
+   * Note that only one contribution will be created (no evidence of the failed contribution is left)
+   * It seems likely that may change in future & this test will start failing (I point this out in the hope it
+   * will help future debuggers)
+   */
+  function testIPNPaymentCRM13743() {
+    $this->setupPaymentProcessorTransaction();
+    $firstPaymentParams = $this->getPaypalProRecurTransaction();
+    $firstPaymentParams['txn_type'] = 'recurring_payment_failed';
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($firstPaymentParams);
+    $paypalIPN->main();
+
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
+    $this->assertEquals(2, $contribution['contribution_status_id']);
+    $this->assertEquals('', $contribution['trxn_id']);
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $this->_contributionRecurID));
+    $this->assertEquals(2, $contributionRecur['contribution_status_id']);
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurSubsequentTransaction());
+    $paypalIPN->main();
+    $contribution = $this->callAPISuccess('contribution', 'get', array('contribution_recur_id' => $this->_contributionRecurID, 'sequential' => 1));
+    $this->assertEquals(1, $contribution['count']);
+    $this->assertEquals('secondone', $contribution['values'][0]['trxn_id']);
+    $this->assertEquals(strtotime('03:59:05 Jul 14, 2013 PDT'), strtotime($contribution['values'][0]['receive_date']));
   }
 
   /**

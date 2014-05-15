@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -52,8 +52,8 @@
       </tr>
 
       <tr class="crm-membership-type-form-block-member_org">
-        <td class="label">{$form.member_of_contact.label}</td>
-        <td><label>{$form.member_of_contact.html}</label><br />
+        <td class="label">{$form.member_of_contact_id.label}</td>
+        <td>{$form.member_of_contact_id.html}<br />
           <span class="description">{ts}Members assigned this membership type belong to which organization (e.g. this is for membership in 'Save the Whales - Northwest Chapter'). NOTE: This organization/group/chapter must exist as a CiviCRM Organization type contact.{/ts}</span>
         </td>
       </tr>
@@ -65,7 +65,7 @@
         </td>
       </tr>
       <tr class="crm-membership-type-form-block-financial_type_id">
-        <td class="label">{$form.financial_type_id.label}<span class="marker"> *</span></td>
+        <td class="label">{$form.financial_type_id.label}</td>
         <td>{$form.financial_type_id.html}<br />
           <span class="description">{ts}Select the financial type assigned to fees for this membership type (for example 'Membership Fees'). This is required for all membership types - including free or complimentary memberships.{/ts}</span>
         </td>
@@ -79,13 +79,13 @@
         {/if}
       </tr>
       <tr class="crm-membership-type-form-block-duration_unit_interval">
-        <td class="label">{$form.duration_unit.label}&nbsp;<span class="marker">*</span></td>
+        <td class="label">{$form.duration_unit.label}</td>
         <td>{$form.duration_interval.html}&nbsp;&nbsp;{$form.duration_unit.html}<br />
           <span class="description">{ts}Duration of this membership (e.g. 30 days, 2 months, 5 years, 1 lifetime){/ts}</span>
         </td>
       </tr>
       <tr class="crm-membership-type-form-block-period_type">
-        <td class="label">{$form.period_type.label}<span class="marker"> *</span></td>
+        <td class="label">{$form.period_type.label}</td>
         <td>{$form.period_type.html}<br />
           <span class="description">{ts}Select 'rolling' if membership periods begin at date of signup. Select 'fixed' if membership periods begin on a set calendar date.{/ts} {help id="period-type" file="CRM/Member/Page/MembershipType.hlp"}</span>
         </td>
@@ -159,41 +159,7 @@
 
 {literal}
 <script type="text/javascript">
-cj(function(){
-  // start of member org autocomplete
-  var orgDataUrl = "{/literal}{$dataUrl}{literal}";
-  var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name of an existing contact.{/ts}{literal}";
-  cj('#member_of_contact').autocomplete( orgDataUrl,
-    { width : 200, selectFirst : false, hintText: hintText, matchContains: true, minChars: 1, max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal}
-  }).result(
-    function(event, data, formatted) {
-      ( parseInt( data[1] ) ) ? cj( "#member_of_contact_id" ).val( data[1] ) : cj( "#member_of_contact_id" ).val('');
-    }).bind('click', function( ) {
-      cj('#member_of_contact_id').val('');
-    });
-
-  {/literal}
-  {if $member_org}
-    {literal} cj('#member_of_contact').val( "{/literal}{$member_org}{literal}");{/literal}
-  {/if}
-
-  {* setdefault in edit mode *}
-  {if $action eq 2}
-    var memberOrgId = "{$member_org_id}";
-    {literal}
-    var dataUrl = "{/literal}{crmURL p='civicrm/ajax/rest' h=0
-    q="className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=contact&org=1&id=" }{literal}" + memberOrgId;
-
-    cj.ajax({
-      url     : dataUrl,
-      success : function(html){
-        htmlText = html.split( '|' , 2);
-        cj('input#member_of_contact').val(htmlText[0]);
-      }
-    });
-  {/literal}{/if}{literal}
-  // end of member org autocomplete
-
+CRM.$(function($) {
   showHidePeriodSettings();
   cj('#duration_unit').change(function(){
     showHidePeriodSettings();
@@ -203,10 +169,19 @@ cj(function(){
     showHidePeriodSettings();
   });
 
-  showHideMaxRelated(cj('#relationship_type_id :selected').val());
-  cj('#relationship_type_id').change(function(){
+  {/literal}
+  {if $action eq 2}
+  {literal}
+    showHideMaxRelated(cj('#relationship_type_id').val());
+    cj('#relationship_type_id').change(function(){
+      showHideMaxRelated(cj('#relationship_type_id').val());
+    });
+  {/literal}{else}{literal}
     showHideMaxRelated(cj('#relationship_type_id :selected').val());
-  });
+    cj('#relationship_type_id').change(function(){
+      showHideMaxRelated(cj('#relationship_type_id :selected').val());
+    });
+  {/literal}{/if}{literal}
 });
 
 function showHidePeriodSettings() {
@@ -222,7 +197,7 @@ function showHidePeriodSettings() {
     }
     if (!cj("#fixed_period_rollover_day_d").val()) {
       cj("#fixed_period_rollover_day_d").val("31");
-    }  
+    }
     cj("#month_fixed_rollover_day_row").val("");
   }
   else if ((cj("#period_type :selected").val() == "fixed" ) &&
@@ -242,7 +217,7 @@ function showHidePeriodSettings() {
 
 //load the auto renew msg if recur allow.
 {/literal}{if $authorize and $allowAutoRenewMsg}{literal}
-cj( function(){
+CRM.$(function($) {
   setReminder( null );
 });
 {/literal}{/if}{literal}

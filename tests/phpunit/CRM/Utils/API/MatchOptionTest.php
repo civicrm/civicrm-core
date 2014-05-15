@@ -6,12 +6,45 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
 
+  /**
+   * @var array
+   */
+  var $noise;
+
   function setUp() {
     parent::setUp();
     $this->assertDBQuery(0, "SELECT count(*) FROM civicrm_contact WHERE first_name='Jeffrey' and last_name='Lebowski'");
 
     // Create noise to ensure we don't accidentally/coincidentally match the first record
-    $this->individualCreate(array('email' => 'ignore1@example.com'));
+    $this->noise['individual'] = $this->individualCreate(array(
+      'email' => 'ignore1@example.com',
+      // 'street_address-1' => 'Irrelevant'
+      'api.Address.create' => array(
+       'location_type_id' => 1,
+        'street_address' => '123 Irrelevant Str',
+        'supplemental_address_1' => 'Room 987',
+      ),
+    ));
+  }
+
+  function tearDown() {
+    $noise = $this->callAPISuccess('Contact', 'get', array(
+      'id' => $this->noise['individual'],
+      'return' => array('email'),
+      'api.Address.get' => 1,
+    ));
+    $this->assertEquals(1, count($noise['values']));
+    foreach ($noise['values'] as $value) {
+      $this->assertEquals('ignore1@example.com', $value['email']);
+      $this->assertEquals(1, count($value['api.Address.get']['values']));
+    }
+    CRM_core_DAO::executeQuery('DELETE FROM civicrm_address WHERE contact_id=%1', array(
+      1 => array($this->noise['individual'], 'Positive')
+    ));
+    $this->callAPISuccess('Contact', 'delete', array(
+      'id' => $this->noise['individual'],
+    ));
+    parent::tearDown();
   }
 
   /**
@@ -137,7 +170,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
    * When replacing one set with another set, match items within
    * the set using a key.
    */
-  function testReplaceMatch() {
+  function testReplaceMatch_Email() {
     // Create contact with two emails (j1,j2)
     $createResult = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',
@@ -208,6 +241,83 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
     $this->assertEquals($updateEmailValues[1]['id'], $getValues[1]['id']);
     $this->assertEquals('j3@example.com', $getValues[1]['email']);
     $this->assertTrue(empty($getValues[1]['signature_text']));
+  }
+
+  /**
+   * When replacing one set with another set, match items within
+   * the set using a key.
+   */
+  function testReplaceMatch_Address() {
+    // Create contact with two addresses (j1,j2)
+    $createResult = $this->callAPISuccess('contact', 'create', array(
+      'contact_type' => 'Individual',
+      'first_name' => 'Jeffrey',
+      'last_name' => 'Lebowski',
+      'api.Address.replace' => array(
+        'options' => array('match' => 'location_type_id'),
+        'values' => array(
+          array('location_type_id' => 1, 'street_address' => 'j1-a Example Ave', 'supplemental_address_1' => 'The Dude abides.'),
+          array('location_type_id' => 2, 'street_address' => 'j2 Example Ave', 'supplemental_address_1' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.'),
+        ),
+      ),
+    ));
+    $this->assertEquals(1, $createResult['count']);
+    foreach ($createResult['values'] as $value) {
+      $this->assertAPISuccess($value['api.Address.replace']);
+      $this->assertEquals(2, $value['api.Address.replace']['count']);
+      foreach ($value['api.Address.replace']['values'] as $v2) {
+        $this->assertEquals($createResult['id'], $v2['contact_id']);
+      }
+      $createAddressValues = array_values($value['api.Address.replace']['values']);
+    }
+
+    // Update contact's addresses -- specifically, modify j1, delete j2, add j3
+    $updateResult = $this->callAPISuccess('contact', 'create', array(
+      'id' => $createResult['id'],
+      'nick_name' => 'The Dude',
+      'api.Address.replace' => array(
+        'options' => array('match' => 'location_type_id'),
+        'values' => array(
+          array('location_type_id' => 1, 'street_address' => 'j1-b Example Ave'),
+          array('location_type_id' => 3, 'street_address' => 'j3 Example Ave'),
+        ),
+      ),
+    ));
+    $this->assertEquals(1, $updateResult['count']);
+    foreach ($updateResult['values'] as $value) {
+      $this->assertAPISuccess($value['api.Address.replace']);
+      $this->assertEquals(2, $value['api.Address.replace']['count']);
+      foreach ($value['api.Address.replace']['values'] as $v2) {
+        $this->assertEquals($createResult['id'], $v2['contact_id']);
+      }
+      $updateAddressValues = array_values($value['api.Address.replace']['values']);
+    }
+
+    // Re-read from DB
+    $getResult = $this->callAPISuccess('Address', 'get', array(
+      'contact_id' => $createResult['id'],
+    ));
+    $this->assertEquals(2, $getResult['count']);
+    $getValues = array_values($getResult['values']);
+
+    // The first street_address (j1 Example Ave) is updated (same ID#) because it matched on contact_id+location_type_id.
+    $this->assertTrue(is_numeric($createAddressValues[0]['id']));
+    $this->assertTrue(is_numeric($updateAddressValues[0]['id']));
+    $this->assertTrue(is_numeric($getValues[0]['id']));
+    $this->assertEquals($createAddressValues[0]['id'], $updateAddressValues[0]['id']);
+    $this->assertEquals($createAddressValues[0]['id'], $getValues[0]['id']);
+    $this->assertEquals('j1-b Example Ave', $getValues[0]['street_address']);
+    $this->assertEquals('The Dude abides.', $getValues[0]['supplemental_address_1']); // preserved from original creation; proves that we updated existing record
+
+    // The second street_address (j2 Example Ave) is deleted because contact_id+location_type_id doesn't appear in new list.
+    // The third street_address (j3 Example Ave) is inserted (new ID#) because it doesn't match an existing contact_id+location_type_id.
+    $this->assertTrue(is_numeric($createAddressValues[1]['id']));
+    $this->assertTrue(is_numeric($updateAddressValues[1]['id']));
+    $this->assertTrue(is_numeric($getValues[1]['id']));
+    $this->assertNotEquals($createAddressValues[1]['id'], $updateAddressValues[1]['id']);
+    $this->assertEquals($updateAddressValues[1]['id'], $getValues[1]['id']);
+    $this->assertEquals('j3 Example Ave', $getValues[1]['street_address']);
+    $this->assertTrue(empty($getValues[1]['supplemental_address_1']));
   }
 
 }
