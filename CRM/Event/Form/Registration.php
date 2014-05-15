@@ -243,7 +243,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       );
 
       // this is the first time we are hitting this, so check for permissions here
-      if (!CRM_Core_Permission::event(CRM_Core_Permission::EDIT, $this->_eventId)) {
+      if (!CRM_Core_Permission::event(CRM_Core_Permission::EDIT, $this->_eventId, 'register for events')) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to register for this event'), $infoUrl);
       }
 
@@ -1327,6 +1327,13 @@ WHERE  v.option_group_id = g.id
     }
   }
 
+  /**
+   * @todo - combine this with CRM_Event_BAO_Event::validRegistrationRequest
+   * (probably extract relevant values here & call that with them & handle bounces & redirects here -as
+   * those belong in the form layer)
+   *
+   * @param string $redirect
+   */
   function checkValidEvent($redirect = NULL) {
     // is the event active (enabled)?
     if (!$this->_values['event']['is_active']) {
