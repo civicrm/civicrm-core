@@ -141,7 +141,8 @@ class CRM_Core_Form_Tag {
       // in that case we create empty tagset params so that below logic works and tagset are
       // deleted correctly
       foreach ($form->_tagsetInfo as $tagsetName => $tagsetInfo) {
-        $tagsetId = substr($tagsetName, strlen('parentId_'));
+        $tagsetId = explode('parentId_', $tagsetName);
+        $tagsetId = $tagsetId[1];
         if (empty($params[$tagsetId])) {
           $params[$tagsetId] = '';
         }
