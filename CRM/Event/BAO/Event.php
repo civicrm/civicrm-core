@@ -809,6 +809,12 @@ WHERE civicrm_event.is_active = 1
     }
 
     // check 'view event info' permission
+    //@todo - per CRM-14626 we have resolved that 'view event info' means 'view ALL event info'
+    // and passing in the specific permission here will short-circuit the evaluation of permission to
+    // see specific events (doesn't seem relevant to this call
+    // however, since this function is accessed only by a convoluted call from a joomla block function
+    // it seems safer not to touch here. Suggestion is that CRM_Core_Permission::check(array or relevant permissions) would
+    // be clearer & safer here
     $permissions = CRM_Core_Permission::event(CRM_Core_Permission::VIEW);
 
     // check if we're in shopping cart mode for events
@@ -1800,10 +1806,17 @@ WHERE  ce.loc_block_id = $locBlockId";
     return CRM_Core_DAO::singleValueQuery($query);
   }
 
-  static function validRegistrationRequest($values, $contactID) {
+  /**
+   * Check if event registration is valid according to permissions AND Dates
+   *
+   * @param array $values
+   * @param integer $eventID
+   * @return boolean
+   */
+  static function validRegistrationRequest($values, $eventID) {
     // check that the user has permission to register for this event
     $hasPermission = CRM_Core_Permission::event(CRM_Core_Permission::EDIT,
-      $contactID
+      $eventID, 'register for events'
     );
 
     return $hasPermission && self::validRegistrationDate($values);

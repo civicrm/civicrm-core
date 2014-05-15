@@ -313,7 +313,12 @@ class CRM_Core_Permission {
     }
   }
 
-  public static function event($type = CRM_Core_Permission::VIEW, $eventID = NULL) {
+  public static function event($type = CRM_Core_Permission::VIEW, $eventID = NULL, $context = '') {
+    if(!empty($context)) {
+      if(CRM_Core_Permission::check($context)) {
+        return TRUE;
+      }
+    }
     $events = CRM_Event_PseudoConstant::event(NULL, TRUE);
     $includeEvents = array();
 
