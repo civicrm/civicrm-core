@@ -208,7 +208,7 @@ function display( totalfee ) {
     // go as a float - CRM-13491
     totalfee = Math.round(totalfee*100)/100;
     var totalEventFee  = formatMoney( totalfee, 2, seperator, thousandMarker);
-    document.getElementById('pricevalue').innerHTML = "<b>"+symbol+"</b> "+totalEventFee;
+    document.getElementById('pricevalue').innerHTML = "<b>"+symbol+"</b>"+totalEventFee;
     scriptfee   = totalfee;
     scriptarray = price;
     cj('#total_amount').val( totalfee );
