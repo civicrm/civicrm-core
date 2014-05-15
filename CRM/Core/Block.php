@@ -525,6 +525,8 @@ class CRM_Core_Block {
       $session = CRM_Core_Session::singleton();
       // check if registration link should be displayed
       foreach ($info as $id => $event) {
+        //@todo FIXME  - validRegistraionRequest takes eventID not contactID as a param
+        // this is called via an obscure patch from Joomla event block rendering (only)
         $info[$id]['onlineRegistration'] = CRM_Event_BAO_Event::validRegistrationRequest($event,
           $session->get('userID')
         );
