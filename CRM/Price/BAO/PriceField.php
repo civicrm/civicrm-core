@@ -420,8 +420,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
           //CRM-14512
           if ($field->is_display_amounts) {
-            $opt['label'] = '&nbsp;-&nbsp;' . $opt['label'];
-            $opt['label'] = '<strong>' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</strong>' .  $opt['label'];
+            $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span> <span class="crm-price-amount-label">' .  $opt['label'];
           }	
 			
           $count = CRM_Utils_Array::value('count', $opt, '');
@@ -458,8 +457,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
           //CRM-14512			
           if ($field->is_display_amounts) {
-            $opt['label'] = '&nbsp;-&nbsp;' . $opt['label'];
-            $opt['label'] = '<strong>' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</strong>' .  $opt['label'];
+            $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span> <span class="crm-price-amount-label">' .  $opt['label'];
           }	
           $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
