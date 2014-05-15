@@ -2043,7 +2043,7 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
    *
    * @return $defaults an array of custom data defaults.
    */
-  public function getTemplateDefaultValues($templateId) {
+  static function getTemplateDefaultValues($templateId) {
     $defaults = array();
     if (!$templateId) {
       return $defaults;
