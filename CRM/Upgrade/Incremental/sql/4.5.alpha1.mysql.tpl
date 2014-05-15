@@ -528,6 +528,10 @@ ALTER TABLE civicrm_line_item ADD contribution_id INT(10) COMMENT 'Contribution 
 ALTER TABLE civicrm_line_item
 ADD CONSTRAINT `FK_civicrm_contribution_id` FOREIGN KEY (`contribution_id`) REFERENCES civicrm_contribution (`id`) ON DELETE SET NULL;
 
+ALTER TABLE `civicrm_line_item`
+DROP INDEX `UI_line_item_value`,
+ADD UNIQUE INDEX `UI_line_item_value` (`entity_table`, `entity_id`, `contribution_id`, `price_field_value_id`, `price_field_id`);
+
 -- store contribution id for participant records
 UPDATE  civicrm_line_item li LEFT JOIN civicrm_participant_payment pp ON pp.participant_id = li.entity_id
 SET li.contribution_id = pp.contribution_id
