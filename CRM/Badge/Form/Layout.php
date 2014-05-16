@@ -89,6 +89,8 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $fontStyles = CRM_Core_BAO_LabelFormat::getFontStyles();
     $fontNames = CRM_Core_BAO_LabelFormat::getFontNames('name_badge');
     $textAlignment = CRM_Core_BAO_LabelFormat::getTextAlignments();
+    $imageAlignment = $textAlignment;
+    unset($imageAlignment['C']); 
 
     $rowCount = self::FIELD_ROWCOUNT;
     for ( $i =1; $i <= $rowCount; $i++ ) {
@@ -118,6 +120,12 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->add('text', 'width_image_2', ts('Width (mm)'), array('size' => 6));
     $this->add('text', 'height_image_2', ts('Height (mm)'), array('size' => 6));
 
+
+    $this->add('checkbox', 'show_participant_image', ts('Use Participant Image?'));
+    $this->add('text', 'width_participant_image', ts('Width (mm)'), array('size' => 6));
+    $this->add('text', 'height_participant_image', ts('Height (mm)'), array('size' => 6));
+    $this->add('select', "alignment_participant_image", ts('Image Alignment'), $imageAlignment);
+
     $this->add('checkbox', 'is_default', ts('Default?'));
     $this->add('checkbox', 'is_active', ts('Enabled?'));
     $this->add('checkbox', 'is_reserved', ts('Reserved?'));
@@ -126,6 +134,8 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->addRule('width_image_2', ts('Enter valid width'), 'positiveInteger');
     $this->addRule('height_image_1', ts('Enter valid height'), 'positiveInteger');
     $this->addRule('height_image_2', ts('Enter valid height'), 'positiveInteger');
+    $this->addRule('height_participant_image', ts('Enter valid height'), 'positiveInteger');
+    $this->addRule('width_participant_image', ts('Enter valid height'), 'positiveInteger');
 
     $this->addButtons(array(
         array(
