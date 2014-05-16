@@ -321,7 +321,9 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $this->preProcess();
 
     // check if we can process credit card membership
-    $newCredit = CRM_Core_Payment::allowBackofficeCreditCard($this);
+    $newCredit = CRM_Core_Config::isEnabledBackOfficeCreditCardPayments();
+    $this->assign('newCredit', $newCredit);
+
     if ($newCredit) {
       $this->_isPaymentProcessor = TRUE;
     }

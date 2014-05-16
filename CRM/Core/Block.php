@@ -368,7 +368,7 @@ class CRM_Core_Block {
 
       if (!empty($config->enableComponents)) {
         // check if we can process credit card contribs
-        $newCredit = CRM_Core_Payment::allowBackofficeCreditCard();
+        $newCredit = CRM_Core_Config::isEnabledBackOfficeCreditCardPayments();
 
         foreach ($components as $componentName => $obj) {
           if (in_array($componentName, $config->enableComponents)) {

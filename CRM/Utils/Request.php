@@ -57,12 +57,12 @@ class CRM_Utils_Request {
   /**
    * Retrieve a value from the request (GET/POST/REQUEST)
    *
-   * @param $name    name of the variable to be retrieved
-   * @param $type    type of the variable (see CRM_Utils_Type for details)
-   * @param $store   session scope where variable is stored
-   * @param bool|\is $abort is this variable required
-   * @param $default default value of the variable if not present
-   * @param string|\where $method where should we look for the variable
+   * @param string $name name of the variable to be retrieved
+   * @param string $type  type of the variable (see CRM_Utils_Type for details)
+   * @param stdClass $store session scope where variable is stored
+   * @param bool $abort is this variable required
+   * @param mixed $default default value of the variable if not present
+   * @param string $method where should we look for the variable
    *
    * @return mixed the value of the variable
    * @access public

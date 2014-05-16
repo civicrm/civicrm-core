@@ -78,13 +78,16 @@ abstract class CRM_Core_Payment {
 
   protected $_paymentProcessor;
 
+  /**
+   * @var CRM_Core_Form
+   */
   protected $_paymentForm = NULL;
 
   /**
    * singleton function used to manage this object
    *
    * @param string  $mode the mode of operation: live or test
-   * @param object  $paymentProcessor the details of the payment processor being invoked
+   * @param array  $paymentProcessor the details of the payment processor being invoked
    * @param object  $paymentForm      reference to the form object if available
    * @param boolean $force            should we force a reload of this payment object
    *
@@ -145,7 +148,7 @@ abstract class CRM_Core_Payment {
   /**
    * Setter for the payment form that wants to use the processor
    *
-   * @param obj $paymentForm
+   * @param CRM_Core_Form $paymentForm
    *
    */
   function setForm(&$paymentForm) {
@@ -155,7 +158,7 @@ abstract class CRM_Core_Payment {
   /**
    * Getter for payment form that is using the processor
    *
-   * @return obj  A form object
+   * @return CRM_Core_Form  A form object
    */
   function getForm() {
     return $this->_paymentForm;
@@ -228,8 +231,10 @@ abstract class CRM_Core_Payment {
    * Load requested payment processor and call that processor's handle<$method> method
    *
    * @public
+   * @param $method
+   * @param array $params
    */
-  static function handlePaymentMethod($method, $params = array( )) {
+  static function handlePaymentMethod($method, $params = array()) {
     if (!isset($params['processor_id']) && !isset($params['processor_name'])) {
       CRM_Core_Error::fatal("Either 'processor_id' or 'processor_name' param is required for payment callback");
     }
@@ -388,24 +393,4 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     }
     return $this->_paymentProcessor['url_recur'];
   }
-
-  /**
-   * Check for presence of type 1 or type 3 enabled processors (means we can do back-office submit credit/debit card trxns)
-   * @public
-   */
-  static function allowBackofficeCreditCard($template = NULL, $variableName = 'newCredit') {
-    $newCredit = FALSE;
-    // restrict to type=1 (credit card) payment processor payment_types and only include billing mode types 1 and 3
-    $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE,
-      "billing_mode IN ( 1, 3 ) AND payment_type = 1"
-    );
-    if (count($processors) > 0) {
-      $newCredit = TRUE;
-    }
-    if ($template) {
-      $template->assign($variableName, $newCredit);
-    }
-    return $newCredit;
-  }
-
 }
