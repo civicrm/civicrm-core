@@ -421,11 +421,11 @@ invert              = 0
 
         var addtlPartc = $(this).data('addtlPartc');
 
-        if (addtlPartc) {
-            profileBottomCount++;
+        if ($(this).closest("tr").attr("class").indexOf("additional_custom_post") > -1 || addtlPartc) {
+            profileBottomCountAdd++
             urlPath = CRM.url('civicrm/event/manage/registration', { addProfileBottomAdd: 1, addProfileNumAdd: profileBottomCountAdd, snippet: 4 } ) ;
         } else {
-            profileBottomCountAdd++;
+            profileBottomCount++;
             urlPath = CRM.url('civicrm/event/manage/registration', { addProfileBottom: 1 , addProfileNum : profileBottomCount, snippet: 4 } ) ;
         }
 
