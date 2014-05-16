@@ -330,7 +330,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param bool $ccContribution
    * @access public.
    *
-   * @return void.
+   * @return array
    */
   static function emailReceipt(&$form, &$params, $ccContribution = FALSE) {
     $form->assign('receiptType', 'contribution');
