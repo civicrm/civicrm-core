@@ -128,6 +128,19 @@ class CRM_Badge_BAO_Badge {
     if (!empty($layout['data']['height_image_2'])) {
       $formattedRow['height_image_2'] = $layout['data']['height_image_2'];
     }
+    if (!empty($row['image_URL']) && $layout['data']['show_participant_image'])
+     {
+      $formattedRow['participant_image'] = $row['image_URL'];
+    }
+    if (!empty($layout['data']['width_participant_image'])) {
+      $formattedRow['width_participant_image'] = $layout['data']['width_participant_image'];
+    }
+    if (!empty($layout['data']['height_participant_image'])) {
+      $formattedRow['height_participant_image'] = $layout['data']['height_participant_image'];
+    }
+    if (!empty($layout['data']['alignment_participant_image'])) {
+      $formattedRow['alignment_participant_image'] = $layout['data']['alignment_participant_image'];
+    }    
 
     if (!empty($layout['data']['add_barcode'])) {
       $formattedRow['barcode'] = array(
@@ -185,6 +198,24 @@ class CRM_Badge_BAO_Badge {
       $startOffset = CRM_Utils_Array::value('height_image_2', $formattedRow);
     }
 
+    if (CRM_Utils_Array::value('participant_image', $formattedRow)){
+      $imageAlign = 0;
+      switch (CRM_Utils_Array::value('alignment_participant_image', $formattedRow)){
+        case 'R':
+          $imageAlign = 68;
+          break;
+        case 'L':
+          $imageAlign = 0;
+          break;
+        default:
+          break;
+      }
+      $this->pdf->Image($formattedRow['participant_image'], $x+$imageAlign, $y + $startOffset, CRM_Utils_Array::value('width_participant_image', $formattedRow), CRM_Utils_Array::value('height_participant_image', $formattedRow));
+      if ($startOffset == NULL && CRM_Utils_Array::value('height_participant_image', $formattedRow)){
+        $startOffset = CRM_Utils_Array::value('height_participant_image', $formattedRow);        
+      }
+    }
+
     $this->pdf->SetLineStyle(array(
       'width' => 0.1,
       'cap' => 'round',
@@ -199,14 +230,22 @@ class CRM_Badge_BAO_Badge {
         $value = '';
         if ($formattedRow['token'][$i]['token'] != 'spacer') {
           $value = $formattedRow['token'][$i]['value'];
+        }        
+        
+        $xAlign = $x;
+        $rowWidth = $this->pdf->width;
+        if (!empty($formattedRow['participant_image']) && !empty($formattedRow['width_participant_image']))
+        {
+          $rowWidth = $this->pdf->width - $formattedRow['width_participant_image'];
+          if ($formattedRow['alignment_participant_image']== 'L')
+            $xAlign = $x + $formattedRow['width_participant_image'] + $imageAlign;
         }
-
         $offset = $this->pdf->getY() + $startOffset + $cellspacing;
 
         $this->pdf->SetFont($formattedRow['token'][$i]['font_name'], $formattedRow['token'][$i]['font_style'],
           $formattedRow['token'][$i]['font_size']);
-        $this->pdf->MultiCell($this->pdf->width, 0, $value,
-          $this->border, $formattedRow['token'][$i]['text_alignment'], 0, 1, $x, $offset);
+        $this->pdf->MultiCell($rowWidth, 0, $value,
+          $this->border, $formattedRow['token'][$i]['text_alignment'], 0, 1, $xAlign, $offset);
 
         // set this to zero so that it is added only for first element
         $startOffset = 0;
@@ -356,7 +395,7 @@ class CRM_Badge_BAO_Badge {
     // get name badge layout info
     $layoutInfo = CRM_Badge_BAO_Layout::buildLayout($params);
 
-    // spit / get actual field names from token
+    // spit / get actual field names from tokeni and individual contact image URLs
     $returnProperties = array();
     if (!empty($layoutInfo['data']['token'])) {
       foreach ($layoutInfo['data']['token'] as $index => $value) {
@@ -387,7 +426,7 @@ class CRM_Badge_BAO_Badge {
     }
 
     // add additional required fields for query execution
-    $additionalFields = array('participant_register_date', 'participant_id', 'event_id', 'contact_id');
+    $additionalFields = array('participant_register_date', 'participant_id', 'event_id', 'contact_id', 'image_URL');
     foreach ($additionalFields as $field) {
       $returnProperties[$field] = 1;
     }

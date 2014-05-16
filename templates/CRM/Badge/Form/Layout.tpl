@@ -86,6 +86,28 @@
          </table> 
         </td>
       </tr>
+      <tr class="crm-badge-layout-form-block-participant_image">
+        <td class="label">{$form.show_participant_image.label}</td>
+        <td>
+         <table>
+           <tr>
+            <td>{$form.show_participant_image.html}
+             <br/>
+             <span class="description">{ts}Select this option if you want to use a contact's image on their name badge.{/ts}</span>
+            </td>
+            <td>
+             {$form.width_participant_image.html}<br/>{$form.width_participant_image.label}
+            </td>
+           <td>
+              {$form.height_participant_image.html}</br>{$form.height_participant_image.label}
+            </td>
+           <td>
+              {$form.alignment_participant_image.html}</br>{$form.alignment_participant_image.label}
+            </td>
+           </tr>
+         </table> 
+        </td>
+      </tr>
       <tr class="crm-badge-layout-form-block-elements">
         <td class="label">{ts}Elements{/ts}</td>
         <td>
