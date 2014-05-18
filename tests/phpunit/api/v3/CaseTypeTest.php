@@ -57,7 +57,7 @@ class api_v3_CaseTypeTest extends CiviUnitTestCase {
    * check with empty array
    */
   function testCaseTypeCreateEmpty() {
-    $result = $this->callAPIFailure('CaseType', 'create', array());
+    $this->callAPIFailure('CaseType', 'create', array());
   }
 
   /**
@@ -67,13 +67,13 @@ class api_v3_CaseTypeTest extends CiviUnitTestCase {
     $params = array(
       'name' => 'this case should fail',
     );
-    $result = $this->callAPIFailure('CaseType', 'create', $params);
+    $this->callAPIFailure('CaseType', 'create', $params);
 
     $params = array(
       'name' => 'this case should fail',
       'weight' => 4,
     );
-    $result = $this->callAPIFailure('CaseType', 'create', $params);
+    $this->callAPIFailure('CaseType', 'create', $params);
   }
 
   /*
@@ -117,7 +117,7 @@ class api_v3_CaseTypeTest extends CiviUnitTestCase {
     // Update Case Type
     $params = array('id' => $id);
     $params['title'] = $caseType['title'] = 'Something Else';
-    $result = $this->callAPISuccess('CaseType', 'create', $params);
+    $this->callAPISuccess('CaseType', 'create', $params);
 
     // Verify that updated case Type is exactly equal to the original with new title
     $result = $this->callAPISuccess('CaseType', 'get', array('id' => $id));
@@ -138,7 +138,7 @@ class api_v3_CaseTypeTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('CaseType', 'create', $params);
 
     $id = $result['id'];
-    $result = $this->callAPISuccess('CaseType', 'delete', array('id' => $id));
+    $this->callAPISuccess('CaseType', 'delete', array('id' => $id));
 
     // Check result - case type should no longer exist
     $result = $this->callAPISuccess('CaseType', 'get', array('id' => $id));
