@@ -128,7 +128,7 @@ class CRM_Badge_BAO_Badge {
     if (!empty($layout['data']['height_image_2'])) {
       $formattedRow['height_image_2'] = $layout['data']['height_image_2'];
     }
-    if (!empty($row['image_URL']) && $layout['data']['show_participant_image']) {
+    if (!empty($row['image_URL']) && !empty($layout['data']['show_participant_image'])) {
       $formattedRow['participant_image'] = $row['image_URL'];
     }
     if (!empty($layout['data']['width_participant_image'])) {
