@@ -60,7 +60,8 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
    * @return void
    * @access public
    *
-   */ function preProcess() {
+   */
+  function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE
     );
