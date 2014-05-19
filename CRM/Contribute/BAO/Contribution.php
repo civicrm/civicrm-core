@@ -69,6 +69,15 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   /*
    * construct method
    */
+  /**
+   * class constructor
+   *
+   * @access public
+   * @return \CRM_Contribute_DAO_Contribution
+   */
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
@@ -561,6 +570,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     return self::$_importableFields;
   }
 
+  /**
+   * @return array
+   */
   static function &exportableFields() {
     if (!self::$_exportableFields) {
       if (!self::$_exportableFields) {
@@ -642,6 +654,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     return self::$_exportableFields;
   }
 
+  /**
+   * @param null $status
+   * @param null $startDate
+   * @param null $endDate
+   *
+   * @return array|null
+   */
   static function getTotalAmountAndCount($status = NULL, $startDate = NULL, $endDate = NULL) {
     $where = array();
     switch ($status) {
@@ -905,6 +924,11 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
     return $extraFields;
   }
 
+  /**
+   * @param $pageID
+   *
+   * @return array
+   */
   static function getCurrentandGoalAmount($pageID) {
     $query = "
 SELECT p.goal_amount as goal, sum( c.total_amount ) as total
@@ -987,6 +1011,11 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
     return CRM_Core_DAO::singleValueQuery($query, CRM_Core_DAO::$_nullArray);
   }
 
+  /**
+   * @param $contactID
+   *
+   * @return array
+   */
   static function annual($contactID) {
     if (is_array($contactID)) {
       $contactIDs = implode(',', $contactID);
@@ -1687,6 +1716,12 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     return $componentDetails;
   }
 
+  /**
+   * @param $contactId
+   * @param bool $includeSoftCredit
+   *
+   * @return null|string
+   */
   static function contributionCount($contactId, $includeSoftCredit = TRUE) {
     if (!$contactId) {
       return 0;
@@ -1833,6 +1868,15 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @param boolean $required Is Payment processor / contribution page required
    * @param boolean $loadAll - load all related objects - even where id not passed in? (allows API to call this)
    * Note that the unit test for the BaseIPN class tests this function
+   */
+  /**
+   * @param $input
+   * @param $ids
+   * @param bool $required
+   * @param bool $loadAll
+   *
+   * @return bool
+   * @throws Exception
    */
   function loadRelatedObjects(&$input, &$ids, $required = FALSE, $loadAll = false) {
     if($loadAll){
@@ -2006,6 +2050,15 @@ WHERE  contribution_id = %1 ";
    *   function doing emails / pdfs with it
    * @return array $messageArray - messages
    */
+  /**
+   * @param $input
+   * @param $ids
+   * @param $values
+   * @param bool $recur
+   * @param bool $returnMessageText
+   *
+   * @throws Exception
+   */
   function composeMessageArray(&$input, &$ids, &$values, $recur = FALSE, $returnMessageText = TRUE) {
     if (empty($this->_relatedObjects)) {
       $this->loadRelatedObjects($input, $ids);
@@ -2134,6 +2187,13 @@ WHERE  contribution_id = %1 ";
    * @return array $values
    *
    * NB don't add direct calls to the function as we intend to change the signature
+   */
+  /**
+   * @param $input
+   * @param $values
+   * @param array $ids
+   *
+   * @return mixed
    */
   function _gatherMessageValues($input, &$values, $ids = array()) {
     // set display address of contributor
@@ -3012,6 +3072,14 @@ WHERE  contribution_id = %1 ";
    * @param array $trxnData : to take user provided input of transaction details.
    * @param string $paymentType 'owed' for purpose of recording partial payments, 'refund' for purpose of recording refund payments
    */
+  /**
+   * @param $contributionId
+   * @param $trxnsData
+   * @param string $paymentType
+   * @param null $participantId
+   *
+   * @return null|object
+   */
   static function recordAdditionalPayment($contributionId, $trxnsData, $paymentType = 'owed', $participantId = NULL) {
     $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     $getInfoOf['id'] = $contributionId;
@@ -3152,6 +3220,15 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     return $financialTrxn;
   }
 
+  /**
+   * @param $entityObj
+   * @param $trxnObj
+   * @param $activityType
+   * @param $component
+   * @param $contributionId
+   *
+   * @throws CRM_Core_Exception
+   */
   static function addActivityForPayment($entityObj, $trxnObj, $activityType, $component, $contributionId) {
     if ($component == 'event') {
       $date = CRM_Utils_Date::isoToMysql($trxnObj->trxn_date);
@@ -3190,6 +3267,14 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     CRM_Activity_BAO_Activity::create($activityParams);
   }
 
+  /**
+   * @param $id
+   * @param $component
+   * @param bool $getTrxnInfo
+   * @param bool $usingLineTotal
+   *
+   * @return mixed
+   */
   static function getPaymentInfo($id, $component, $getTrxnInfo = FALSE, $usingLineTotal = FALSE) {
     if ($component == 'event') {
       $entity = 'participant';

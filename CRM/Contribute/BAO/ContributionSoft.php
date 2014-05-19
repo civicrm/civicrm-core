@@ -103,6 +103,12 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     $contributionSoft->delete();
   }
 
+  /**
+   * @param $contact_id
+   * @param int $isTest
+   *
+   * @return array
+   */
   static function getSoftContributionTotals($contact_id, $isTest = 0) {
     $query = '
     SELECT SUM(amount) as amount, AVG(total_amount) as average, cc.currency
@@ -197,6 +203,12 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     return $softContribution;
   }
 
+  /**
+   * @param $contributionID
+   * @param bool $isPCP
+   *
+   * @return array
+   */
   static function getSoftCreditIds($contributionID , $isPCP = FALSE) {
     $query = "
   SELECT id
@@ -306,6 +318,12 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *  @static
    */
 
+  /**
+   * @param $form
+   * @param $params
+   * @param $honoreeprofileId
+   * @param null $honorId
+   */
   static function formatHonoreeProfileFields($form, $params, $honoreeprofileId, $honorId = NULL) {
     $profileContactType = CRM_Core_BAO_UFGroup::getContactType($honoreeprofileId);
     $profileFields = CRM_Core_BAO_UFGroup::getFields($honoreeprofileId);

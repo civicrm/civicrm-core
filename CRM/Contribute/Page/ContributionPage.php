@@ -554,6 +554,12 @@ ORDER BY title asc
     $form->run();
   }
 
+  /**
+   * @param $params
+   * @param bool $sortBy
+   *
+   * @return int|string
+   */
   function whereClause(&$params, $sortBy = TRUE) {
     $values    = $clauses = array();
     $title     = $this->get('title');
@@ -614,6 +620,10 @@ ORDER BY title asc
     return implode(' AND ', $clauses);
   }
 
+  /**
+   * @param $whereClause
+   * @param $whereParams
+   */
   function pager($whereClause, $whereParams) {
 
     $params['status'] = ts('Contribution %%StatusMessage%%');
@@ -636,6 +646,10 @@ SELECT count(id)
     $this->assign_by_ref('pager', $this->_pager);
   }
 
+  /**
+   * @param $whereClause
+   * @param $whereParams
+   */
   function pagerAtoZ($whereClause, $whereParams) {
 
     $query = "
@@ -650,6 +664,11 @@ SELECT count(id)
     $this->assign('aToZ', $aToZBar);
   }
 
+  /**
+   * @param $sectionsInfo
+   *
+   * @return array
+   */
   function formatConfigureLinks($sectionsInfo) {
     //build the formatted configure links.
     $formattedConfLinks = self::configureActionLinks();

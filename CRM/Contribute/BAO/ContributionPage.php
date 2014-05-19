@@ -74,6 +74,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_ContributionPage', $id, 'is_active', $is_active);
   }
 
+  /**
+   * @param $id
+   * @param $values
+   */
   static function setValues($id, &$values) {
     $params = array(
       'id' => $id,
@@ -414,6 +418,13 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
      * Construct the message to be sent by the send function
      *
      */
+  /**
+   * @param $tplParams
+   * @param $contactID
+   * @param $isTest
+   *
+   * @return array
+   */
   function composeMessage($tplParams, $contactID, $isTest) {
     $sendTemplateParams = array(
       'groupName' => $tplParams['membershipID'] ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
