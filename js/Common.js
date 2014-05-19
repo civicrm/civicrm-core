@@ -247,7 +247,8 @@ CRM.validate = CRM.validate || {
     var isDirty = false;
     $(':input:visible, :input.select2-offscreen', el).each(function () {
       var initialValue = $(this).data('crm-initial-value');
-      if (initialValue !== undefined && initialValue != $(this).val()) {
+      // skip change of value for submit buttons
+      if (initialValue !== undefined && !$(this).hasClass('form-submit') && initialValue != $(this).val()) {
         isDirty = true;
       }
     });
