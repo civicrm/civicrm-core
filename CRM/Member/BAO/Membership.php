@@ -1273,7 +1273,6 @@ AND civicrm_membership.is_test = %2";
     }
     else {
       $paymentDone        = TRUE;
-      $params['amount']   = $minimumFee;
       $contributionTypeId = CRM_Utils_Array::value( 'financial_type_id', $membershipDetails );
       if (!$contributionTypeId) {
         $contributionTypeId = CRM_Utils_Array::value('financial_type_id' ,$membershipParams);
