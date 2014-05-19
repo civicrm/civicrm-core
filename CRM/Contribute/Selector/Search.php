@@ -545,10 +545,16 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     return self::$_columnHeaders;
   }
 
+  /**
+   * @return mixed
+   */
   function alphabetQuery() {
     return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
   }
 
+  /**
+   * @return string
+   */
   function &getQuery() {
     return $this->_query;
   }
@@ -564,6 +570,9 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     return ts('CiviCRM Contribution Search');
   }
 
+  /**
+   * @return mixed
+   */
   function getSummary() {
     return $this->_query->summaryContribution($this->_context);
   }

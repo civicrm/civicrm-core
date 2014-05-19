@@ -160,6 +160,9 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   protected $_formType;
   protected $_cdType;
 
+  /**
+   * @param $id
+   */
   public function showRecordLinkMesssage($id) {
     $statusId = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $id, 'contribution_status_id');
     if (CRM_Contribute_PseudoConstant::contributionStatus($statusId, 'name') == 'Partially paid') {
@@ -172,6 +175,10 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @param $id
+   * @param $values
+   */
   public function buildValuesAndAssignOnline_Note_Type($id, &$values) {
     $ids = array();
     $params = array('id' => $id);
@@ -403,6 +410,11 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     $this->assign('hidePayPalExpress', TRUE);
   }
 
+  /**
+   * @param $submittedValues
+   *
+   * @return mixed
+   */
   public function getCurrency($submittedValues) { // get current currency from DB or use default currency
     $config = CRM_Core_Config::singleton();
 
@@ -419,6 +431,11 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     return $result;
   }
 
+  /**
+   * @param $financialTypeId
+   *
+   * @return array
+   */
   public function getFinancialAccounts($financialTypeId) {
     $financialAccounts = array();
     CRM_Core_PseudoConstant::populate($financialAccounts,
@@ -430,6 +447,12 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     return $financialAccounts;
   }
 
+  /**
+   * @param $financialTypeId
+   * @param $relationTypeId
+   *
+   * @return mixed
+   */
   public function getFinancialAccount($financialTypeId, $relationTypeId) {
     $financialAccounts = $this->getFinancialAccounts($financialTypeId);
     return CRM_Utils_Array::value($relationTypeId, $financialAccounts);
@@ -511,6 +534,11 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     }
   }
 
+  /**
+   * @param $submittedValues
+   *
+   * @return mixed
+   */
   public function unsetCreditCardFields($submittedValues) {
     //Offline Contribution.
     $unsetParams = array(

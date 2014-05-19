@@ -428,6 +428,11 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     return $params;
   }
 
+  /**
+   * @param $params
+   * @param $contactID
+   * @param $mail
+   */
   static function createCMSUser(&$params, $contactID, $mail) {
     // lets ensure we only create one CMS user
     static $created = FALSE;
@@ -445,6 +450,12 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     }
   }
 
+  /**
+   * @param $params
+   * @param string $type
+   *
+   * @return bool
+   */
   static function _fillCommonParams(&$params, $type = 'paypal') {
     if (array_key_exists('transaction', $params)) {
       $transaction = &$params['transaction'];
@@ -509,6 +520,14 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     return TRUE;
   }
 
+  /**
+   * @param $apiParams
+   * @param $mapper
+   * @param string $type
+   * @param bool $category
+   *
+   * @return array
+   */
   static function formatAPIParams($apiParams, $mapper, $type = 'paypal', $category = TRUE) {
     $type = strtolower($type);
 
@@ -702,6 +721,11 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     }
   }
 
+  /**
+   * @param $params
+   *
+   * @return bool
+   */
   static function processAPIContribution($params) {
     if (empty($params) || array_key_exists('error', $params)) {
       return FALSE;
@@ -780,6 +804,11 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     return TRUE;
   }
 
+  /**
+   * @param $contactID
+   *
+   * @return mixed
+   */
   static function getFirstLastDetails($contactID) {
     static $_cache;
 

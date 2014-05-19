@@ -170,6 +170,15 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
   }
 
+  /**
+   * set the default values
+   *
+   * @return void
+   * @access public
+   */
+  /**
+   *
+   */
   function setDefaultValues() {
     // check if the user is registered and we have a contact ID
     $contactID = $this->getContactID();
@@ -1027,6 +1036,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * @param $params
+   * @param $form
+   *
+   * @return int|mixed|null|string
+   */
   public static function computeAmount(&$params, &$form) {
     $amount = NULL;
 
