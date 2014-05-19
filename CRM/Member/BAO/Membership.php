@@ -1294,11 +1294,9 @@ AND civicrm_membership.is_test = %2";
       // Save the contribution ID so that I can be used in email receipts
       // For example, if you need to generate a tax receipt for the donation only.
       $form->_values['contribution_other_id'] = $result[1]->id;
-      $contribution[1] = $result[1];
+      $membershipContribution = $result[1];
     }
 
-
-    $memBlockDetails = CRM_Member_BAO_Membership::getMembershipBlock($form->_id);
     if ($isProcessSeparateMembershipTransaction) {
       $lineItems = $form->_lineItem = $form->_memLineItem;
       $contributionType = new CRM_Financial_DAO_FinancialType( );
@@ -1352,7 +1350,7 @@ AND civicrm_membership.is_test = %2";
         //so for differentiating membership contributon from
         //main contribution.
         $form->_params['separate_membership_payment'] = 1;
-        $contribution[2] = CRM_Contribute_Form_Contribution_Confirm::processContribution($form,
+        $membershipContribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($form,
           $tempParams,
           $result,
           $contactID,
@@ -1365,10 +1363,11 @@ AND civicrm_membership.is_test = %2";
       }
     }
 
-    $index = !empty($memBlockDetails['is_separate_payment']) ? 2 : 1;
     $createdMemberships = array();
     $membership = NULL;
-    if (empty($errors[$index])) {
+    if (!empty($membershipContribution) && !is_a($membershipContribution, 'CRM_Core_Error')) { {
+      $membershipContributionID = $membershipContribution->id;
+    }
       if (isset($membershipParams['onbehalf']) && !empty($membershipParams['onbehalf']['member_campaign_id'])) {
         $form->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
       }
@@ -1385,14 +1384,14 @@ AND civicrm_membership.is_test = %2";
           );
 
           // update recurring id for membership record
-          self::updateRecurMembership($membership, $contribution[$index]);
+          self::updateRecurMembership($membership, $membershipContribution);
 
           $createdMemberships[$memType] = $membership;
-          if (isset($contribution[$index])) {
+          if (!empty($membershipContribution)) {
             //insert payment record
             $dao = new CRM_Member_DAO_MembershipPayment();
             $dao->membership_id = $membership->id;
-            $dao->contribution_id = $contribution[$index]->id;
+            $dao->contribution_id = $membershipContribution->id;
             //Fixed for avoiding duplicate entry error when user goes
             //back and forward during payment mode is notify
             if (!$dao->find(TRUE)) {
@@ -1427,13 +1426,13 @@ AND civicrm_membership.is_test = %2";
         );
 
         // update recurring id for membership record
-        self::updateRecurMembership($membership, $contribution[$index]);
+        self::updateRecurMembership($membership, $membershipContribution);
 
-        if (isset($contribution[$index])) {
+        if (!empty($membershipContributionID)) {
           //insert payment record
           $dao = new CRM_Member_DAO_MembershipPayment();
           $dao->membership_id = $membership->id;
-          $dao->contribution_id = $contribution[$index]->id;
+          $dao->contribution_id = $membershipContributionID;
           //Fixed for avoiding duplicate entry error when user goes
           //back and forward during payment mode is notify
           if (!$dao->find(TRUE)) {
@@ -1471,7 +1470,7 @@ AND civicrm_membership.is_test = %2";
     $form->_params['membershipID'] = $membership->id;
     if ($form->_contributeMode == 'notify') {
       if ($form->_values['is_monetary'] && $form->_amount > 0.0 && !$form->_params['is_pay_later']) {
-        // call postprocess hook before leaving
+        // call postProcess hook before leaving
         $form->postProcessHook();
         // this does not return
         $payment = CRM_Core_Payment::singleton($form->_mode, $form->_paymentProcessor, $form);
@@ -1480,8 +1479,8 @@ AND civicrm_membership.is_test = %2";
     }
 
     $form->_values['membership_id'] = $membership->id;
-    if (isset($contribution[$index]->id)) {
-      $form->_values['contribution_id'] = $contribution[$index]->id;
+    if (isset($membershipContributionID)) {
+      $form->_values['contribution_id'] = $membershipContributionID;
     }
 
     // Do not send an email if Recurring transaction is done via Direct Mode
