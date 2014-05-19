@@ -83,6 +83,11 @@ function _civicrm_api3_dashboard_contact_create_spec(&$params) {
   unset($params['version']);
 }
 
+/**
+ * @param $params
+ *
+ * @return array|null
+ */
 function _civicrm_api3_dashboard_contact_check_params(&$params) {
   $dashboard_id = CRM_Utils_Array::value('dashboard_id', $params);
   if ($dashboard_id) {

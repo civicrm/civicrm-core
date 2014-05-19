@@ -1398,17 +1398,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
-/**
- * Get contact if for a form object. Prioritise
- *  - cid in URL if 0 (on behalf on someoneelse)
- *      (@todo consider setting a variable if onbehalf for clarity of downstream 'if's
- *  - logged in user id if it matches the one in the cid in the URL
- *  - contact id validated from a checksum from a checksum
- *  - cid from the url if the caller has ACL permission to view
- *  - fallback is logged in user (or ? NULL if no logged in user) (@todo wouldn't 0 be more intuitive?)
- *
- * @return Ambigous <mixed, NULL, value, unknown, array, number>|unknown
- */
+  /**
+   * Get contact if for a form object. Prioritise
+   *  - cid in URL if 0 (on behalf on someoneelse)
+   *      (@todo consider setting a variable if onbehalf for clarity of downstream 'if's
+   *  - logged in user id if it matches the one in the cid in the URL
+   *  - contact id validated from a checksum from a checksum
+   *  - cid from the url if the caller has ACL permission to view
+   *  - fallback is logged in user (or ? NULL if no logged in user) (@todo wouldn't 0 be more intuitive?)
+   *
+   * @return mixed NULL|integer
+   */
   function getContactID() {
     $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     if(isset($this->_params) && isset($this->_params['select_contact_id'])) {

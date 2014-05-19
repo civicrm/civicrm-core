@@ -128,6 +128,9 @@ function civicrm_api3_constant_get($params) {
   return civicrm_api3_create_error('Unknown civicrm constant or method not callable');
 }
 
+/**
+ * @param $params
+ */
 function _civicrm_api3_constant_get_spec(&$params) {
 
   $params = (array
