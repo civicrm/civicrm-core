@@ -78,14 +78,14 @@
   </tr>
 
   <tr class="crm-activity-form-block-target_contact_id">
-      <td class="label">{$form.target_contact_id.label}</td>
-      <td class="view-value">
-        {$form.target_contact_id.html}
-        {if $action eq 1}
-        <br/>
-        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
-        {/if}
-      </td>
+  <td class="label">{$form.target_contact_id.label}</td>
+    <td class="view-value">
+      {$form.target_contact_id.html}
+      {if $action eq 1 or $single eq false}
+      <br/>
+      {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
+      {/if}
+    </td>
   </tr>
 
   <tr class="crm-activity-form-block-assignee_contact_id">
