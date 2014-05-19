@@ -1074,7 +1074,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param $params
    * @param $result
    * @param $contactID
-   * @param $contributionType
+   * @param $financialType
    * @param bool $deductibleMode
    * @param bool $pending
    * @param bool $online
@@ -1087,7 +1087,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $params,
     $result,
     $contactID,
-    $contributionType,
+    $financialType,
     $deductibleMode = TRUE,
     $pending        = FALSE,
     $online         = TRUE
@@ -1097,7 +1097,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $recurringContributionID = NULL;
 
     // add these values for the recurringContrib function ,CRM-10188
-    $params['financial_type_id'] = $contributionType->id;
+    $params['financial_type_id'] = $financialType->id;
     //@todo - this is being set from the form to resolve CRM-10188 - an
     // eNotice caused by it not being set @ the front end
     // however, we then get it being over-written with null for backend contributions
@@ -1107,7 +1107,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if(!isset($params['is_email_receipt'])){
       $params['is_email_receipt'] = CRM_Utils_Array::value( 'is_email_receipt', $form->_values );
     }
-    $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $contributionType, $online);
+    $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $financialType, $online);
 
     // CRM-11885
     // if non_deductible_amount exists i.e. Additional Details fieldset was opened [and staff typed something] -> keep it.
@@ -1118,7 +1118,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // $contributionType->is_deductible and whether there is a product (premium).
     else {
       //if ($contributionType->is_deductible && $deductibleMode) {
-      if ($contributionType->is_deductible) {
+      if ($financialType->is_deductible) {
         if ($online && isset($params['selectProduct'])) {
           $selectProduct = CRM_Utils_Array::value('selectProduct', $params);
         }
@@ -1176,7 +1176,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // first create the contribution record
     $contribParams = array(
       'contact_id' => $contactID,
-      'financial_type_id'  => $contributionType->id,
+      'financial_type_id'  => $financialType->id,
       'contribution_page_id' => $contributionPageId,
       'receive_date' => (CRM_Utils_Array::value('receive_date', $params)) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
       'non_deductible_amount' => $nonDeductibleAmount,
