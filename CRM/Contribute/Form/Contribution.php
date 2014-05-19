@@ -1419,7 +1419,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         unset($submittedValues[$key]);
       }
     }
-
+    $isTest = ($this->_mode == 'test') ? 1 : 0;
     // CRM-12680 set $_lineItem if its not set
     if (empty($this->_lineItem) && !empty($lineItem)) {
       $this->_lineItem = $lineItem;
@@ -1552,26 +1552,26 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paymentParams['receive_date'] = $this->_params['receive_date'];
     }
 
-    $result = NULL;
-
     // For recurring contribution, create Contribution Record first.
     // Contribution ID, Recurring ID and Contact ID needed
     // When we get a callback from the payment processor, CRM-7115
     if (!empty($paymentParams['is_recur'])) {
       $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($this,
         $this->_params,
-        $result,
+        NULL,
         $this->_contactID,
         $contributionType,
         TRUE,
-        FALSE
+        FALSE,
+        $isTest,
+        $this->_lineItem
       );
       $paymentParams['contributionID'] = $contribution->id;
       $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
       $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
       $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
     }
-
+    $result = NULL;
     if ($paymentParams['amount'] > 0.0) {
       // force a re-get of the payment processor in case the form changed it, CRM-7179
       $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this, TRUE);
@@ -1656,7 +1656,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $result,
         $this->_contactID,
         $contributionType,
-        FALSE, FALSE
+        FALSE, FALSE,
+        $isTest,
+        $this->_lineItem
       );
     }
 

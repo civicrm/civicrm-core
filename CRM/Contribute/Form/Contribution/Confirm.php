@@ -1091,7 +1091,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $contactID,
     $financialType,
     $pending,
-    $online
+    $online,
+    $isTest,
+    $lineItems
   ) {
     $transaction = new CRM_Core_Transaction();
     $className   = get_class($form);

@@ -1091,6 +1091,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       return;
     }
 
+    $isTest = ($this->_mode == 'test') ? 1 : 0;
+    $lineItems = $this->_lineItem;
+
     $config = CRM_Core_Config::singleton();
     // get the submitted form values.
     $this->_params = $formValues = $this->controller->exportValues($this->_name);
@@ -1447,7 +1450,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $this->_contributorContactID,
           $contributionType,
           TRUE,
-          FALSE
+          FALSE,
+          $isTest,
+          $lineItems
         );
 
         //create new soft-credit record, CRM-13981
