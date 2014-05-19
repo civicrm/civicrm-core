@@ -519,3 +519,35 @@ WHERE co.id IS NULL;
     WHERE v.name = 'Awaiting Information';
 {/if}
 
+-- CRM-14197 Add contribution_id to civicrm_line_item
+
+ALTER TABLE civicrm_line_item ADD contribution_id INT(10) COMMENT 'Contribution ID' NULL AFTER entity_id;
+
+-- FK to civicrm_contribution
+
+ALTER TABLE civicrm_line_item
+ADD CONSTRAINT `FK_civicrm_contribution_id` FOREIGN KEY (`contribution_id`) REFERENCES civicrm_contribution (`id`) ON DELETE SET NULL;
+
+ALTER TABLE `civicrm_line_item`
+DROP INDEX `UI_line_item_value`,
+ADD UNIQUE INDEX `UI_line_item_value` (`entity_table`, `entity_id`, `contribution_id`, `price_field_value_id`, `price_field_id`);
+
+-- store contribution id for participant records
+UPDATE  civicrm_line_item li LEFT JOIN civicrm_participant_payment pp ON pp.participant_id = li.entity_id
+SET li.contribution_id = pp.contribution_id
+WHERE li.entity_table = 'civicrm_participant';
+
+-- update membership line items to hold correct entity table & id & contribution id
+UPDATE  civicrm_line_item li
+LEFT JOIN civicrm_membership_payment mp ON mp.contribution_id = li.entity_id
+LEFT JOIN civicrm_price_field_value pv ON pv.id = li.price_field_value_id
+SET li.entity_table = 'civicrm_membership', li.contribution_id = mp.contribution_id, li.entity_id = mp.membership_id
+WHERE li.entity_table = 'civicrm_contribution'
+AND pv.membership_type_id IS NOT NULL
+AND membership_id IS NOT NULL;
+
+-- update line items for contributions with contribution id
+UPDATE civicrm_line_item
+SET contribution_id = entity_id
+WHERE contribution_id IS NULL;
+
