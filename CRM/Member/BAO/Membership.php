@@ -73,12 +73,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @access public
    * @static
    */
-  static function &add(&$params, &$ids) {
-
-    if (!empty($ids['membership'])) {
+  static function add(&$params, &$ids) {
+    $oldStatus = $oldType = NULL;
+     if (!empty($ids['membership'])) {
       CRM_Utils_Hook::pre('edit', 'Membership', $ids['membership'], $params);
-      $oldStatus         = NULL;
-      $oldType           = NULL;
+
       $membershipObj     = new CRM_Member_DAO_Membership();
       $membershipObj->id = $ids['membership'];
       $membershipObj->find();
@@ -237,7 +236,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @access public
    * @static
    */
-  static function &create(&$params, &$ids, $skipRedirect = FALSE, $activityType = 'Membership Signup') {
+  static function create(&$params, &$ids, $skipRedirect = FALSE, $activityType = 'Membership Signup') {
     // always calculate status if is_override/skipStatusCal is not true.
     // giving respect to is_override during import.  CRM-4012
 
@@ -2002,7 +2001,7 @@ SELECT c.contribution_page_id as pageID
    *
    * @param null $mode
    *
-   * @return return the list of membership fields
+   * @return array the list of membership fields
    * @static
    * @access public
    */
@@ -2425,7 +2424,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param int $endDate date on which to end counting
    * @param bool|int $isTest if true, membership is for a test site
    *
-   * @return returns the number of members of type $membershipTypeId
+   * @return integer returns the number of members of type $membershipTypeId
    *         whose join_date is before $startDate and
    *         whose start_date is between $startDate and $endDate
    */
