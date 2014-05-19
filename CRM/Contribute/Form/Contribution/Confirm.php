@@ -953,6 +953,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @access public
    */
   public function postProcessPremium($premiumParams, $contribution) {
+    $hour = $minute = $second = 0;
     // assigning Premium information to receipt tpl
     $selectProduct = CRM_Utils_Array::value('selectProduct', $premiumParams);
     if ($selectProduct &&

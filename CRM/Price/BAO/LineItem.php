@@ -384,7 +384,7 @@ AND li.entity_id = {$entityId}
 
    /**
    * Function to build line items array.
-   * @param int $params form values
+   * @param array $params form values
    *
    * @param string $entityId entity id
    *
