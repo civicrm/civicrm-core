@@ -73,7 +73,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @access public
    * @static
    */
-  static function add(&$params, &$ids) {
+  static function add(&$params, $ids = array()) {
     $oldStatus = $oldType = NULL;
      if (!empty($ids['membership'])) {
       CRM_Utils_Hook::pre('edit', 'Membership', $ids['membership'], $params);
@@ -2520,13 +2520,11 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
      * @access public
      */
   static function updateAllMembershipStatus() {
-    require_once 'api/api.php';
 
     //get all active statuses of membership, CRM-3984
     $allStatus     = CRM_Member_PseudoConstant::membershipStatus();
     $statusLabels  = CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label');
     $allTypes      = CRM_Member_PseudoConstant::membershipType();
-    $contribStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
     // get only memberships with active membership types
     $query = "
@@ -2724,7 +2722,7 @@ WHERE      civicrm_membership.is_test = 0";
    * @param array  $params array of submitted params
    * @param array  $ids (param in process of being removed - try to use params)   array of ids
    *
-   * @return void
+   * @return CRM_Contribute_BAO_Contribution
    * @static
    */
   static function recordMembershipContribution( &$params, $ids = array()) {
