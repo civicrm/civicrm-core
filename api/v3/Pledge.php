@@ -83,6 +83,9 @@ function civicrm_api3_pledge_delete($params) {
   }
 }
 
+/**
+ * @param $params
+ */
 function _civicrm_api3_pledge_delete_spec(&$params) {
   // set as not required as pledge_id also acceptable & no either/or std yet
   $params['id']['api.aliases'] = array('pledge_id');

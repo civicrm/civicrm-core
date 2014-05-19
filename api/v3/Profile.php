@@ -138,6 +138,9 @@ function civicrm_api3_profile_get($params) {
   }
 }
 
+/**
+ * @param $params
+ */
 function _civicrm_api3_profile_get_spec(&$params) {
   $params['profile_id']['api.required'] = TRUE;
   $params['contact_id']['description'] = 'If no contact is specified an array of defaults will be returned';
@@ -599,6 +602,12 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
   return $profileFields[$profileID];
 }
 
+/**
+ * @param $a
+ * @param $b
+ *
+ * @return bool
+ */
 function _civicrm_api3_order_by_weight($a, $b) {
   return CRM_Utils_Array::value('weight', $b) < CRM_Utils_Array::value('weight', $a) ? TRUE : FALSE;
 }
