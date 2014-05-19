@@ -301,6 +301,11 @@ AND    co.id IN ( $contribIDs )";
     CRM_Core_Session::setStatus(ts('Contribution status has been updated for selected record(s).'), ts('Status Updated'), 'success');
   }
 
+  /**
+   * @param $contributionIDs
+   *
+   * @return array
+   */
   static function &getDetails($contributionIDs) {
     $query = "
 SELECT    c.id              as contribution_id,

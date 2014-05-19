@@ -91,6 +91,14 @@ class CRM_Contribute_Import_Field {
    */
   public $_softCreditField;
 
+  /**
+   * @param $name
+   * @param $title
+   * @param int $type
+   * @param string $headerPattern
+   * @param string $dataPattern
+   * @param null $softCreditField
+   */
   function __construct($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//', $softCreditField = NULL) {
     $this->_name = $name;
     $this->_title = $title;
@@ -113,6 +121,9 @@ class CRM_Contribute_Import_Field {
     $this->_value = $value;
   }
 
+  /**
+   * @return bool
+   */
   function validate() {
 
     if (CRM_Utils_System::isNull($this->_value)) {

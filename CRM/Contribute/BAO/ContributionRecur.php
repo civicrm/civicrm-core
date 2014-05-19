@@ -154,6 +154,12 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     return $result;
   }
 
+  /**
+   * @param $id
+   * @param $mode
+   *
+   * @return array|null
+   */
   static function getPaymentProcessor($id, $mode) {
     //FIX ME:
     $sql = "
@@ -371,6 +377,12 @@ SELECT r.payment_processor_id
     return FALSE;
   }
 
+  /**
+   * @param $entityID
+   * @param string $entity
+   *
+   * @return null|Object
+   */
   static function getSubscriptionDetails($entityID, $entity = 'recur') {
     $sql = "
 SELECT rec.id                   as recur_id,
