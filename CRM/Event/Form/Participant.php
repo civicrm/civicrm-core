@@ -1162,7 +1162,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
       $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $fields, $this->_contactId, NULL, NULL, $ctype);
     }
 
-    if ($this->_params['participant_role_id']) {
+    if (!empty($this->_params['participant_role_id'])) {
       $customFieldsRole = array();
       foreach ($this->_params['participant_role_id'] as $roleKey) {
         $customFieldsRole = CRM_Utils_Array::crmArrayMerge(CRM_Core_BAO_CustomField::getFields('Participant',
