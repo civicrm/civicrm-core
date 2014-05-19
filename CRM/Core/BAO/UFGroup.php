@@ -297,10 +297,10 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $gids = implode(',', $profileIds);
     $params = array();
     if ($restrict) {
-      $query = "SELECT g.* from civicrm_uf_group g, civicrm_uf_join j
+      $query = "SELECT g.* from civicrm_uf_group g
+                LEFT JOIN civicrm_uf_join j ON (j.uf_group_id = g.id)
                 WHERE g.id IN ( {$gids} )
-                AND j.uf_group_id IN ( {$gids} )
-                AND j.module      = %1
+                AND ((j.uf_group_id IN ( {$gids} ) AND j.module = %1) OR g.is_reserved = 1 )
                 ";
       $params = array(1 => array($restrict, 'String'));
     }
