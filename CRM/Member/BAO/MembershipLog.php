@@ -71,6 +71,9 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
     return $membershipLog->delete();
   }
 
+  /**
+   * @param $contactID
+   */
   static function resetModifiedID($contactID) {
     $query = "
 UPDATE civicrm_membership_log

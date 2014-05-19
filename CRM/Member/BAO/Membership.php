@@ -46,6 +46,15 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
   static $_signupActType = NULL;
 
+  /**
+   * class constructor
+   *
+   * @access public
+   * @return \CRM_Member_DAO_Membership
+   */
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
@@ -2222,6 +2231,12 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
     return $membesrshipPayment;
   }
 
+  /**
+   * @param $form
+   * @param null $membershipTypeID
+   *
+   * @return array
+   */
   static function &buildMembershipTypeValues(&$form, $membershipTypeID = NULL) {
     $whereClause = " WHERE domain_id = ". CRM_Core_Config::domainID();
 

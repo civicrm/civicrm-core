@@ -104,6 +104,10 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *  @param integer $ufID User ID in CMS
    *  @param string $ufName User name
    */
+  /**
+   * @param $ufID
+   * @param $ufName
+   */
   function updateCMSName($ufID, $ufName) {
     // CRM-5555
     if (function_exists('user_load')) {
@@ -181,6 +185,11 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @param object $form Form object representing the 'current' form - to which the user will be returned
    * @return string $destination destination value for URL
    *
+   */
+  /**
+   * @param $form
+   *
+   * @return null|string
    */
   function getLoginDestination(&$form) {
     $args = NULL;
@@ -532,6 +541,11 @@ AND    u.status = 1
   /*
    * Load user into session
    */
+  /**
+   * @param $username
+   *
+   * @return bool
+   */
   function loadUser($username) {
     global $user;
 
@@ -589,6 +603,9 @@ AND    u.status = 1
     drupal_set_message($message);
   }
 
+  /**
+   * @return mixed
+   */
   function logout() {
     module_load_include('inc', 'user', 'user.pages');
     return user_logout();
@@ -640,6 +657,9 @@ AND    u.status = 1
     return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->language, 0, 2));
   }
 
+  /**
+   * @return string
+   */
   function getVersion() {
     return defined('VERSION') ? VERSION : 'Unknown';
   }
