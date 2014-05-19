@@ -69,10 +69,16 @@ abstract class CRM_Utils_System_Base {
     }
   }
 
+  /**
+   * @return string
+   */
   function getDefaultBlockLocation() {
     return 'left';
   }
 
+  /**
+   * @return string
+   */
   function getVersion() {
     return 'Unknown';
   }
