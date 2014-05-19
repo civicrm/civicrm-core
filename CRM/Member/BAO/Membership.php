@@ -2493,19 +2493,20 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
-   * retrieve the contribution record for the associated Membership id
+   * retrieve the contribution id for the associated Membership id
+   * @todo we should get this off the line item
    *
-   * @param  int  $membershipId  membsership id.
+   * @param  int  $membershipId  membership id.
    *
-   * @return contribution id
+   * @return integer contribution id
    * @access public
    */
   static function getMembershipContributionId($membershipId) {
 
-    $membesrshipPayment = new CRM_Member_DAO_MembershipPayment();
-    $membesrshipPayment->membership_id = $membershipId;
-    if ($membesrshipPayment->find(TRUE)) {
-      return $membesrshipPayment->contribution_id;
+    $membershipPayment = new CRM_Member_DAO_MembershipPayment();
+    $membershipPayment->membership_id = $membershipId;
+    if ($membershipPayment->find(TRUE)) {
+      return $membershipPayment->contribution_id;
     }
     return NULL;
   }
