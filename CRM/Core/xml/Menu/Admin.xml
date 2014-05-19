@@ -461,7 +461,6 @@
      <desc>Payment Processor setup for CiviCRM transactions</desc>
      <page_callback>CRM_Admin_Page_PaymentProcessor</page_callback>
      <adminGroup>System Settings</adminGroup>
-     <access_arguments>administer payment processors</access_arguments>
      <icon>admin/small/online_contribution_pages.png</icon>
      <weight>30</weight>
   </item>
@@ -476,7 +475,7 @@
   <item>
      <path>civicrm/admin/setting/misc</path>
      <title>Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)</title>
-   <desc>Enable undelete/move to trash feature, detailed change logging, ReCAPTCHA to protect forms.</desc>
+   	 <desc>Enable undelete/move to trash feature, detailed change logging, ReCAPTCHA to protect forms.</desc>
      <page_callback>CRM_Admin_Form_Setting_Miscellaneous</page_callback>
      <adminGroup>System Settings</adminGroup>
      <icon>admin/small/36.png</icon>
