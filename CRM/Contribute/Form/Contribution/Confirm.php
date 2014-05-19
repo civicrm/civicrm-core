@@ -583,7 +583,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // fix currency ID
     $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
-    $premiumParams = $membershipParams = $tempParams = $params = $this->_params;
+    $premiumParams = $membershipParams = $params = $this->_params;
 
     //carry payment processor id.
     if ($paymentProcessorId = CRM_Utils_Array::value('id', $this->_paymentProcessor)) {
@@ -593,15 +593,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         ${$p}['payment_processor_id'] = $paymentProcessorId;
       }
     }
-
-    $fields = array();
-
     if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
 
-    // set email for primary location.
-    $fields['email-Primary'] = 1;
+    $fields = array('email-Primary' => 1);
 
     // get the add to groups
     $addToGroups = array();
@@ -736,38 +732,30 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
 
       // if we find more than one contact, use the first one
-      $contact_id = CRM_Utils_Array::value(0, $ids);
+      $contactID = CRM_Utils_Array::value(0, $ids);
 
       // Fetch default greeting id's if creating a contact
-      if (!$contact_id) {
+      if (!$contactID) {
         foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
           if (!isset($params[$greeting])) {
             $params[$greeting] = CRM_Contact_BAO_Contact_Utils::defaultGreeting('Individual', $greeting);
           }
         }
       }
-      $contactID = CRM_Contact_BAO_Contact::createProfileContact(
-        $params,
-        $fields,
-        $contact_id,
-        $addToGroups,
-        NULL,
-        NULL,
-        TRUE
-      );
+      $contactType = NULL;
     }
     else {
-      $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'contact_type');
-      $contactID = CRM_Contact_BAO_Contact::createProfileContact(
-        $params,
-        $fields,
-        $contactID,
-        $addToGroups,
-        NULL,
-        $ctype,
-        TRUE
-      );
+      $contactType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'contact_type');
     }
+    $contactID = CRM_Contact_BAO_Contact::createProfileContact(
+      $params,
+      $fields,
+      $contactID,
+      $addToGroups,
+      NULL,
+      $contactType,
+      TRUE
+    );
 
     // Make the contact ID associated with the contribution available at the Class level.
     // Also make available to the session.
