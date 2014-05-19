@@ -108,7 +108,7 @@ DELETE FROM civicrm_acl_cache
 WHERE contact_id = %1
 ";
     $params = array(1 => array($id, 'Integer'));
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    CRM_Core_DAO::executeQuery($query, $params);
   }
 
   static function updateEntry($id) {

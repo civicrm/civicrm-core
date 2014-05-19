@@ -353,8 +353,8 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * Construct an associative array of an ACL rule's properties
    *
-   * @param   string  sprintf format for array
-   * @param   bool    empty only return elemnts that have a value set.
+   * @param   string $format sprintf format for array
+   * @param   bool $hideEmpty only return elements that have a value set.
    *
    * @return array    - Assoc. array of the ACL rule's properties
    * @access public
