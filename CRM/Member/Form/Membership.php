@@ -1427,7 +1427,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           TRUE,
           FALSE
         );
-        $paymentParams['contactID'] = $contactID;
+        $paymentParams['contactID'] = $this->_contactID;
         $paymentParams['contributionID'] = $contribution->id;
         $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
         $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
