@@ -1520,8 +1520,8 @@ AND civicrm_membership.is_test = %2";
    * @static
    * @access public
    */
-  static public function updateRecurMembership(CRM_Member_DAO_Membership &$membership,
-    CRM_Contribute_BAO_Contribution &$contribution) {
+  static public function updateRecurMembership(CRM_Member_DAO_Membership $membership,
+    CRM_Contribute_BAO_Contribution $contribution) {
 
     if (empty($contribution->contribution_recur_id)) {
       return;
