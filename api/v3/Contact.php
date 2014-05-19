@@ -154,6 +154,11 @@ function civicrm_api3_contact_get($params) {
   return civicrm_api3_create_success($contacts, $params, 'contact');
 }
 
+/**
+ * @param $params
+ *
+ * @return int
+ */
 function civicrm_api3_contact_getcount($params) {
   $options = array();
   _civicrm_api3_contact_get_supportanomalies($params, $options);
@@ -286,6 +291,17 @@ function civicrm_api3_contact_delete($params) {
 }
 
 
+/**
+ * @param $params
+ * @param bool $dupeCheck
+ * @param bool $dupeErrorArray
+ * @param bool $obsoletevalue
+ * @param null $dedupeRuleGroupID
+ *
+ * @return null
+ * @throws API_Exception
+ * @throws CiviCRM_API3_Exception
+ */
 function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeErrorArray = false, $obsoletevalue = true, $dedupeRuleGroupID = null )
 {
 
@@ -857,12 +873,21 @@ function civicrm_api3_contact_merge($params) {
   }
 }
 
+/**
+ * @param $params
+ */
 function _civicrm_api3_contact_proximity_spec(&$params) {
   $params['latitude']['api.required'] = 1;
   $params['longitude']['api.required'] = 1;
   $params['unit']['api.default'] = 'meter';
 }
 
+/**
+ * @param $params
+ *
+ * @return array
+ * @throws Exception
+ */
 function civicrm_api3_contact_proximity($params) {
   $latitude  = CRM_Utils_Array::value('latitude', $params);
   $longitude = CRM_Utils_Array::value('longitude', $params);

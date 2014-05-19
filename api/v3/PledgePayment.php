@@ -128,6 +128,13 @@ function civicrm_api3_pledge_payment_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * @param $pledgeId
+ * @param $paymentStatusId
+ * @param $paymentIds
+ *
+ * @return mixed
+ */
 function updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds) {
 
   $result = updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds = NULL);

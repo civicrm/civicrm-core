@@ -220,6 +220,10 @@ function civicrm_api3_event_delete($params) {
  * @param int $event_id Id of the event to be updated
  *
  */
+/**
+ * @param $event
+ * @param $event_id
+ */
 function _civicrm_api3_event_getisfull(&$event, $event_id) {
   $eventFullResult = CRM_Event_BAO_Participant::eventFull($event_id, 1);
   if (!empty($eventFullResult) && is_int($eventFullResult)) {
