@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Interface API_Wrapper
+ */
 interface API_Wrapper {
 
   /**

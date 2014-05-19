@@ -403,6 +403,9 @@ function civicrm_api3_contribution_completetransaction(&$params) {
   }
 }
 
+/**
+ * @param $params
+ */
 function _civicrm_api3_contribution_completetransaction(&$params) {
   $params['id'] = array(
     'title' => 'Contribution ID',
