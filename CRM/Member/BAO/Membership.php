@@ -1370,8 +1370,8 @@ AND civicrm_membership.is_test = %2";
           $result,
           $contactID,
           $contributionType,
-          TRUE,
-          $pending
+          $pending,
+          TRUE
         );
       }
     }
