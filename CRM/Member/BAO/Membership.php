@@ -1301,6 +1301,7 @@ AND civicrm_membership.is_test = %2";
     if (!empty($membershipContribution) && !is_a($membershipContribution, 'CRM_Core_Error')) { {
       $membershipContributionID = $membershipContribution->id;
     }
+      //@todo - why is this nested so deep? it seems like it could be just set on the calling function on the form layer
       if (isset($membershipParams['onbehalf']) && !empty($membershipParams['onbehalf']['member_campaign_id'])) {
         $form->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
       }
@@ -1309,20 +1310,7 @@ AND civicrm_membership.is_test = %2";
         $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
         foreach ($membershipTypeID as $memType) {
           $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
-          $membership = self::renewMembership($contactID, $memType,
-            $isTest, $form, NULL,
-            CRM_Utils_Array::value('cms_contactID', $membershipParams),
-            $customFieldsFormatted, CRM_Utils_Array::value($memType, $typesTerms, 1),
-            $membershipID
-          );
-
-          // update recurring id for membership record
-          self::updateRecurMembership($membership, $membershipContribution);
-
-          $createdMemberships[$memType] = $membership;
-          if (!empty($membershipContribution)) {
-            self::linkMembershipPayment($membership, $membershipContribution);
-          }
+          $createdMemberships[$memType] = self::createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, $createdMemberships);
         }
         if ($form->_priceSetId && !empty($form->_useForMember) && !empty($form->_lineItem)) {
           foreach ($form->_lineItem[$form->_priceSetId] as & $priceFieldOp) {
@@ -2461,6 +2449,39 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       $dao->save();
       CRM_Utils_Hook::post('create', 'MembershipPayment', $dao->id, $dao);
     }
+  }
+
+  /**
+   * @param $membershipParams
+   * @param $contactID
+   * @param $customFieldsFormatted
+   * @param $membershipID
+   * @param $memType
+   * @param $isTest
+   * @param $numTerms
+   * @param $membershipContribution
+   * @param $form
+   *
+   * @internal param $createdMemberships
+   *
+   * @return array
+   */
+  public static function createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution,  &$form)
+  {
+    $membership = self::renewMembership($contactID, $memType,
+      $isTest, $form, NULL,
+      CRM_Utils_Array::value('cms_contactID', $membershipParams),
+      $customFieldsFormatted, $numTerms,
+      $membershipID
+    );
+
+    // update recurring id for membership record
+    self::updateRecurMembership($membership, $membershipContribution);
+
+    if (!empty($membershipContribution)) {
+      self::linkMembershipPayment($membership, $membershipContribution);
+    }
+    return $membership;
   }
 
   /**
