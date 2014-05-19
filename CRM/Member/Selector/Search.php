@@ -525,10 +525,16 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     return self::$_columnHeaders;
   }
 
+  /**
+   * @return mixed
+   */
   function alphabetQuery() {
     return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
   }
 
+  /**
+   * @return string
+   */
   function &getQuery() {
     return $this->_query;
   }

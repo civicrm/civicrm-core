@@ -37,6 +37,9 @@
  * Joomla specific stuff goes here
  */
 class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
+  /**
+   *
+   */
   function __construct() {
     $this->is_drupal = FALSE;
   }
@@ -575,6 +578,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     return;
   }
 
+  /**
+   * @param $user
+   *
+   * @return bool
+   */
   function loadUser($user) {
     return TRUE;
   }
@@ -602,6 +610,9 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     return NULL;
   }
 
+  /**
+   * @return string
+   */
   function getVersion() {
     if (class_exists('JVersion')) {
       $version = new JVersion;
@@ -756,6 +767,9 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     return $loginURL;
   }
 
+  /**
+   * @param $form
+   */
   public function getLoginDestination(&$form) {
     return;
   }
