@@ -1446,7 +1446,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $result,
           $this->_contributorContactID,
           $contributionType,
-          FALSE,
           TRUE,
           FALSE
         );

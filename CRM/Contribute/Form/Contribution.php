@@ -1563,7 +1563,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $result,
         $this->_contactID,
         $contributionType,
-        FALSE,
         TRUE,
         FALSE
       );
@@ -1657,7 +1656,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $result,
         $this->_contactID,
         $contributionType,
-        FALSE, FALSE, FALSE
+        FALSE, FALSE
       );
     }
 

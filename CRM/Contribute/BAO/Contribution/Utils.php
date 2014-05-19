@@ -111,7 +111,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         NULL,
         $contactID,
         $contributionType,
-        TRUE, TRUE, TRUE
+        TRUE, TRUE
       );
 
       if ($contribution) {
@@ -230,7 +230,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
           NULL,
           $contactID,
           $contributionType,
-          TRUE, TRUE, TRUE
+          TRUE, TRUE
         );
 
         // restore cached values (part of fix for CRM-14354)
@@ -307,7 +307,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($form,
           $form->_params, $result,
           $contactID, $contributionType,
-          TRUE, $pending, TRUE
+          $pending, TRUE
         );
       }
       $form->postProcessPremium($premiumParams, $contribution);

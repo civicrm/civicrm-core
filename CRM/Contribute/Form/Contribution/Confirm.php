@@ -1072,14 +1072,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Process the contribution
    *
    * @param $form
-   * @param $params
-   * @param $result
-   * @param $contactID
-   * @param $financialType
-   * @param bool $deductibleMode
+   * @param array $params
+   * @param array $result
+   * @param integer $contactID
+   * @param CRM_Contribute_BAO_FinancialType $financialType
    * @param bool $pending
    * @param bool $online
    *
+   * @throws Exception
+   * @internal param bool $deductibleMode
    * @return CRM_Contribute_DAO_Contribution
    * @access public
    */
@@ -1089,9 +1090,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $result,
     $contactID,
     $financialType,
-    $deductibleMode = TRUE,
-    $pending        = FALSE,
-    $online         = TRUE
+    $pending,
+    $online
   ) {
     $transaction = new CRM_Core_Transaction();
     $className   = get_class($form);
