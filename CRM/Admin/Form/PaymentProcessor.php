@@ -48,7 +48,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
   function preProcess() {
     if(!CRM_Core_Permission::check('administer payment processors')) {
-      CRM_Core_Error::fatal('The \'administer payment processors\' permission is required to add or edit a payment processor.');
+      CRM_Core_Error::statusBounce('The \'administer payment processors\' permission is required to add or edit a payment processor.');
     }
     parent::preProcess();
 
