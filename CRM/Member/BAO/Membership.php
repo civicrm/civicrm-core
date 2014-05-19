@@ -1242,28 +1242,24 @@ AND civicrm_membership.is_test = %2";
    * @param null $customFieldsFormatted
    * @param null $includeFieldTypes
    *
+   * @param $membershipDetails
+   *
+   * @param $membershipTypeID
+   *
    * @throws CRM_Core_Exception
+   * @throws Exception
+   * @internal param $singleMembershipTypeID
+   *
    * @return void
    * @access public
    */
-  public static function postProcessMembership($membershipParams, $contactID, &$form, &$premiumParams,
-    $customFieldsFormatted = NULL, $includeFieldTypes = NULL
+  public static function postProcessMembership($membershipParams, $contactID, &$form, $premiumParams,
+    $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeID
   ) {
     $tempParams  = $membershipParams;
     $paymentDone = FALSE;
     $result      = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
-    $form->assign('membership_assign', TRUE);
-
-    $form->set('membershipTypeID', $membershipParams['selectMembership']);
-
-    $singleMembershipTypeID = $membershipTypeID = $membershipParams['selectMembership'];
-    if (is_array($membershipTypeID) && count($membershipTypeID) == 1) {
-      $singleMembershipTypeID = $membershipTypeID[0];
-    }
-
-    $membershipDetails = self::buildMembershipTypeValues($form, $singleMembershipTypeID);
-    $form->assign('membership_name', CRM_Utils_Array::value('name', $membershipDetails));
 
     $minimumFee = CRM_Utils_Array::value('minimum_fee', $membershipDetails);
     $contributionTypeId = NULL;
