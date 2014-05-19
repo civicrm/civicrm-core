@@ -248,7 +248,7 @@ AND li.entity_id = {$entityId}
         'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $options[$oid]),
       );
 
-      if ($values[$oid]['membership_type_id'] && !isset($values[$oid]['auto_renew'])) {
+      if ($values[$oid]['membership_type_id'] && empty($values[$oid]['auto_renew'])) {
         $values[$oid]['auto_renew'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values[$oid]['membership_type_id'], 'auto_renew');
       }
     }
