@@ -1555,7 +1555,7 @@ AND civicrm_membership.is_test = %2";
    * @param int $numRenewTerms how many membership terms are being added to end date (default is 1)
    *
    * @internal param array $ipnParams array of name value pairs, to be used (for e.g source) when $form not present
-   * @return object $membership          object of membership
+   * @return CRM_Member_DAO_Membership $membership          object of membership
    *
    * @static
    * @access public
