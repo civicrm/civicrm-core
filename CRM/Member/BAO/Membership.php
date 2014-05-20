@@ -1242,9 +1242,12 @@ AND civicrm_membership.is_test = %2";
    * @param null $customFieldsFormatted
    * @param null $includeFieldTypes
    *
-   * @param $membershipDetails
+   * @param array $membershipDetails
    *
-   * @param $membershipTypeID
+   * @param array $membershipTypeID
+   *
+   * @param bool $isPaidMembership
+   * @param integer $membershipID
    *
    * @throws CRM_Core_Exception
    * @throws Exception
@@ -1254,7 +1257,7 @@ AND civicrm_membership.is_test = %2";
    * @access public
    */
   public static function postProcessMembership($membershipParams, $contactID, &$form, $premiumParams,
-    $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeID
+    $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeID, $isPaidMembership, $membershipID
   ) {
     $tempParams  = $membershipParams;
     $paymentDone = FALSE;
@@ -1274,23 +1277,11 @@ AND civicrm_membership.is_test = %2";
       }
     }
 
-    //amount must be greater than zero for
-    //adding contribution record  to contribution table.
-    //this condition arises when separate membership payment is
-    //enabled and contribution amount is not selected. fix for CRM-3010
-    if ($form->_amount > 0.0 && $membershipParams['amount']) {
+    if ($isPaidMembership) {
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
         $premiumParams, $contactID,
         $contributionTypeId,
         'membership'
-      );
-    }
-    else {
-      // we need to explicitly create a CMS user in case of free memberships
-      // since the below has already been done under processConfirm for paid memberships
-      CRM_Contribute_BAO_Contribution_Utils::createCMSUser($membershipParams,
-        $membershipParams['cms_contactID'],
-        'email-' . $form->_bltID
       );
     }
 
@@ -1387,7 +1378,8 @@ AND civicrm_membership.is_test = %2";
           $membership = self::renewMembership($contactID, $memType,
             $isTest, $form, NULL,
             CRM_Utils_Array::value('cms_contactID', $membershipParams),
-            $customFieldsFormatted, CRM_Utils_Array::value($memType, $typesTerms, 1)
+            $customFieldsFormatted, CRM_Utils_Array::value($memType, $typesTerms, 1),
+            $membershipID
           );
 
           // update recurring id for membership record
@@ -1548,12 +1540,14 @@ AND civicrm_membership.is_test = %2";
    * @param null $customFieldsFormatted
    * @param int $numRenewTerms how many membership terms are being added to end date (default is 1)
    *
+   * @param integer $membershipID Membership ID, this should always be passed in & optionality should be removed
+   *
+   * @throws CRM_Core_Exception
    * @internal param array $ipnParams array of name value pairs, to be used (for e.g source) when $form not present
    * @return CRM_Member_DAO_Membership $membership          object of membership
    *
    * @static
    * @access public
-   *
    */
   static function renewMembership(
     $contactID,
@@ -1563,11 +1557,16 @@ AND civicrm_membership.is_test = %2";
     $changeToday = NULL,
     $modifiedID = NULL,
     $customFieldsFormatted = NULL,
-    $numRenewTerms = 1
+    $numRenewTerms = 1,
+    $membershipID = NULL
   ) {
     $statusFormat = '%Y-%m-%d';
     $format       = '%Y%m%d';
     $ids          = array();
+    //@todo would be better to make $membershipID a compulsory function param & make form layer responsible for extracting it
+    if(!$membershipID && isset($form->_membershipId)) {
+      $membershipID = $form->_membershipId;
+    }
 
     //get all active statuses of membership.
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
@@ -1593,11 +1592,7 @@ AND civicrm_membership.is_test = %2";
 
     //decide status here, if needed.
     $updateStatusId = NULL;
-    $membershipID = NULL;
-    //@todo would be better to accept $membershipID as an FN param & make form layer responsible for extracting it
-    if(isset($form->_membershipId)) {
-      $membershipID = $form->_membershipId;
-    }
+
     // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
     // is the same as the parent org of an existing membership of the contact
     $currentMembership = CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
