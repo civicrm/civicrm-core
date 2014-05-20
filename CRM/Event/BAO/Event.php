@@ -358,12 +358,13 @@ WHERE      civicrm_event.is_active = 1 AND
     }
 
     //get the participant status type values.
-    $query = 'SELECT id, name, class FROM civicrm_participant_status_type';
+    $query = 'SELECT id, name, label, class FROM civicrm_participant_status_type';
     $status = CRM_Core_DAO::executeQuery($query);
     $statusValues = array();
     while ($status->fetch()) {
       $statusValues[$status->id]['id'] = $status->id;
       $statusValues[$status->id]['name'] = $status->name;
+      $statusValues[$status->id]['label'] = $status->label;
       $statusValues[$status->id]['class'] = $status->class;
     }
 
@@ -531,6 +532,7 @@ LIMIT      0, 10
           $urlString = "reset=1&force=1&event={$dao->id}&status=$statusId";
           $statusInfo = array('url' => CRM_Utils_System::url('civicrm/event/search', $urlString),
             'name' => $statusValue['name'],
+            'label' => $statusValue['label'],
             'count' => $statusCount,
           );
           $eventSummary['events'][$dao->id]['statuses'][$class][] = $statusInfo;

@@ -90,7 +90,7 @@
             {foreach from=$values.statuses item=class}
                 {if $class}
                     {foreach from=$class item=status}
-                        <a href="{$status.url}" title="{ts 1=$status.name}List %1 participants{/ts}">{$status.name}: {$status.count}</a>
+                        <a href="{$status.url}" title="{ts 1=$status.label}List %1 participants{/ts}">{$status.label}: {$status.count}</a>
                     {/foreach}
                     <hr />
                 {/if}
