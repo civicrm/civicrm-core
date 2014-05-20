@@ -1027,7 +1027,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'financial_type_id' => 1,
       'is_active' => 1,
       'sequential' => 1,
-      'visibility' => 1,
+      'visibility' => 'Public',
     ), $params);
 
     $result = $this->callAPISuccess('MembershipType', 'Create', $params);
