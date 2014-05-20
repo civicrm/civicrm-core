@@ -1321,17 +1321,7 @@ AND civicrm_membership.is_test = %2";
 
           $createdMemberships[$memType] = $membership;
           if (!empty($membershipContribution)) {
-            //insert payment record
-            $dao = new CRM_Member_DAO_MembershipPayment();
-            $dao->membership_id = $membership->id;
-            $dao->contribution_id = $membershipContribution->id;
-            //Fixed for avoiding duplicate entry error when user goes
-            //back and forward during payment mode is notify
-            if (!$dao->find(TRUE)) {
-              CRM_Utils_Hook::pre('create', 'MembershipPayment', NULL, $dao);
-              $dao->save();
-              CRM_Utils_Hook::post('create', 'MembershipPayment', $dao->id, $dao);
-            }
+            self::linkMembershipPayment($membership, $membershipContribution);
           }
         }
         if ($form->_priceSetId && !empty($form->_useForMember) && !empty($form->_lineItem)) {
@@ -1362,17 +1352,7 @@ AND civicrm_membership.is_test = %2";
         self::updateRecurMembership($membership, $membershipContribution);
 
         if (!empty($membershipContributionID)) {
-          //insert payment record
-          $dao = new CRM_Member_DAO_MembershipPayment();
-          $dao->membership_id = $membership->id;
-          $dao->contribution_id = $membershipContributionID;
-          //Fixed for avoiding duplicate entry error when user goes
-          //back and forward during payment mode is notify
-          if (!$dao->find(TRUE)) {
-            CRM_Utils_Hook::pre('create', 'MembershipPayment', NULL, $dao);
-            $dao->save();
-            CRM_Utils_Hook::post('create', 'MembershipPayment', $dao->id, $dao);
-          }
+          self::linkMembershipPayment($membership, $membershipContribution);
         }
       }
     }
@@ -2461,6 +2441,25 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         $lineItems
       );
       return $membershipContribution;
+    }
+  }
+
+  /**
+   * Create linkages between membership & contribution - note this is the wrong place for this code but this is a
+   * refactoring step. This should be BAO functionality
+   * @param $membership
+   * @param $membershipContribution
+   */
+  public static function linkMembershipPayment($membership, $membershipContribution) {
+    $dao = new CRM_Member_DAO_MembershipPayment();
+    $dao->membership_id = $membership->id;
+    $dao->contribution_id = $membershipContribution->id;
+    //Fixed for avoiding duplicate entry error when user goes
+    //back and forward during payment mode is notify
+    if (!$dao->find(TRUE)) {
+      CRM_Utils_Hook::pre('create', 'MembershipPayment', NULL, $dao);
+      $dao->save();
+      CRM_Utils_Hook::post('create', 'MembershipPayment', $dao->id, $dao);
     }
   }
 
