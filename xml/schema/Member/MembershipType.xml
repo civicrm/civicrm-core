@@ -183,7 +183,7 @@
     <length>64</length>
     <add>1.5</add>
     <pseudoconstant>
-      <callback>CRM_Core_SelectValues::memberVisibility</callback>
+      <optionGroupName>visibility</optionGroupName>
     </pseudoconstant>
     <html>
       <type>Select</type>
