@@ -1309,7 +1309,7 @@ AND civicrm_membership.is_test = %2";
         $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
         foreach ($membershipTypeID as $memType) {
           $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
-          $createdMemberships[$memType] = self::createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, $createdMemberships);
+          $createdMemberships[$memType] = self::createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, $form);
         }
         if ($form->_priceSetId && !empty($form->_useForMember) && !empty($form->_lineItem)) {
           foreach ($form->_lineItem[$form->_priceSetId] as & $priceFieldOp) {
@@ -1327,10 +1327,6 @@ AND civicrm_membership.is_test = %2";
           $form->_values['lineItem'] = $form->_lineItem;
           $form->assign('lineItem', $form->_lineItem);
         }
-      }
-      else {
-        $numTerms = CRM_Utils_Array::value('types_terms', $membershipParams, 1);
-        $createdMemberships[$membershipTypeID] = self::createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $membershipTypeID, $isTest, $numTerms, $membershipContribution, $createdMemberships);
       }
     }
 
@@ -1352,8 +1348,11 @@ AND civicrm_membership.is_test = %2";
       );
       $form->_params['createdMembershipIDs'][] = $createdMembership->id;
     }
+    if(count($createdMemberships) == 1) {
+      //presumably this is only relevant for exactly 1 membership
+      $form->_params['membershipID'] = $form->_values['membership_id'] = $createdMembership->id;
+    }
 
-    $form->_params['membershipID'] = $membership->id;
     if ($form->_contributeMode == 'notify') {
       if ($form->_values['is_monetary'] && $form->_amount > 0.0 && !$form->_params['is_pay_later']) {
         // call postProcess hook before leaving
@@ -1364,7 +1363,6 @@ AND civicrm_membership.is_test = %2";
       }
     }
 
-    $form->_values['membership_id'] = $membership->id;
     if (isset($membershipContributionID)) {
       $form->_values['contribution_id'] = $membershipContributionID;
     }
@@ -1467,7 +1465,7 @@ AND civicrm_membership.is_test = %2";
     // check is it pending. - CRM-4555
     list($pending, $contributionRecurID, $changeToday, $membershipSource, $isPayLater, $campaignId) = self::extractFormValues($form, $changeToday, $membershipTypeDetails);
     list($membership, $renewalMode, $dates) = self::renewMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $allStatus, $membershipTypeDetails, $contributionRecurID, $format, $membershipSource, $ids, $statusFormat, $isPayLater, $campaignId);
-    $form->set('renewal_mode', TRUE);
+    $form->set('renewal_mode', $renewalMode);
     if (!empty($dates)) {
       $form->assign('mem_start_date',
         CRM_Utils_Date::customFormat($dates['start_date'], $format)
