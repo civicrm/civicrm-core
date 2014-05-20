@@ -66,6 +66,10 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
    */
   function setDefaultValues() {
     $mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
+    // CRM-
+    if (!$mailingID) {
+      $mailingID = $this->get('mailing_id');
+    }
     $count = $this->get('count');
     $this->assign('count', $count);
     $defaults = array();
@@ -92,6 +96,7 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
       $dao->storeValues($dao, $defaults);
       $defaults['visibility'] = $dao->visibility;
     }
+    
     return $defaults;
   }
 
