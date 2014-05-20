@@ -1760,8 +1760,18 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       $isProcessSeparateMembershipTransaction = $this->isSeparateMembershipTransaction($this->_id, $this->_values['amount_block_is_active']);
 
+      if ($form->_values['amount_block_is_active']) {
+        $contributionTypeId = $form->_values['financial_type_id'];
+      }
+      else {
+        $contributionTypeId = CRM_Utils_Array::value( 'financial_type_id', $membershipDetails );
+        if (!$contributionTypeId) {
+          $contributionTypeId = CRM_Utils_Array::value('financial_type_id' ,$membershipParams);
+        }
+      }
+
       CRM_Member_BAO_Membership::postProcessMembership($membershipParams, $contactID,
-        $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipDetails,  $membershipTypeID, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction
+        $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipDetails,  $membershipTypeID, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction, $contributionTypeId
       );
       $this->assign('membership_assign', TRUE);
       $this->set('membershipTypeID', $membershipParams['selectMembership']);
