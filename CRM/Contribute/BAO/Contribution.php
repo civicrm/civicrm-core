@@ -2302,6 +2302,14 @@ WHERE  contribution_id = %1 ";
    * function & breaking it down into manageable chunks. Eventually it will be refactored into something else
    * Note we send directly from this function in some cases because it is only partly refactored
    * Don't call this function directly as the signature will change
+   *
+   * @param $values
+   * @param $input
+   * @param $template CRM_Core_SMARTY
+   * @param bool $recur
+   * @param bool $returnMessageText
+   *
+   * @return mixed
    */
   function _assignMessageVariablesToTemplate(&$values, $input, &$template, $recur = FALSE, $returnMessageText = True) {
     $template->assign('first_name', $this->_relatedObjects['contact']->first_name);
@@ -2310,7 +2318,7 @@ WHERE  contribution_id = %1 ";
     if (!empty($values['lineItem']) && !empty($this->_relatedObjects['membership'])) {
       $template->assign('useForMember', true);
     }
-    //assign honor infomation to receiptmessage
+    //assign honor information to receipt message
     $softRecord = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id);
 
     if (isset($softRecord['soft_credit'])) {
@@ -2543,16 +2551,15 @@ WHERE  contribution_id = %1 ";
    * @param array $params contribution object, line item array and params for trxn
    *
    *
-   * @param null $financialTrxnVals
+   * @param array $financialTrxnValues
    *
    * @return null|object
    * @access public
    * @static
    */
-  static function recordFinancialAccounts(&$params, $financialTrxnVals = NULL) {
-    $skipRecords = $update = FALSE;
-    // in few scenarios we require the trxn record details which has got created
-    $return = NULL;
+  static function recordFinancialAccounts(&$params, $financialTrxnValues = NULL) {
+    $skipRecords = $update = $return = FALSE;
+
     $additionalParticipantId = array();
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
@@ -2674,8 +2681,8 @@ WHERE  contribution_id = %1 ";
       }
 
       // consider external values passed for recording transaction entry
-      if (!empty($financialTrxnVals)) {
-        $trxnParams = array_merge($trxnParams, $financialTrxnVals);
+      if (!empty($financialTrxnValues)) {
+        $trxnParams = array_merge($trxnParams, $financialTrxnValues);
       }
 
       $params['trxnParams'] = $trxnParams;
