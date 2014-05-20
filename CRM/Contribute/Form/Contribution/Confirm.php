@@ -1009,8 +1009,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             }
           }
         }
-
         $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams);
+        if (!$this->_amount > 0.0 || !$membershipParams['amount']) {
+          // we need to explicitly create a CMS user in case of free memberships
+          // since it is done under processConfirm for paid memberships
+          CRM_Contribute_BAO_Contribution_Utils::createCMSUser($membershipParams,
+            $membershipParams['cms_contactID'],
+            'email-' . $this->_bltID
+          );
+        }
       }
     }
     else {
@@ -1741,8 +1748,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       $membershipDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $singleMembershipTypeID);
       $this->assign('membership_name', CRM_Utils_Array::value('name', $membershipDetails));
+      $isPaidMembership = FALSE;
+      if($this->_amount > 0.0 && $membershipParams['amount']) {
+        //amount must be greater than zero for
+        //adding contribution record  to contribution table.
+        //this condition arises when separate membership payment is
+        //enabled and contribution amount is not selected. fix for CRM-3010
+        $isPaidMembership = TRUE;
+      }
+
       CRM_Member_BAO_Membership::postProcessMembership($membershipParams, $contactID,
-        $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipDetails,  $membershipTypeID
+        $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipDetails,  $membershipTypeID, $isPaidMembership, $this->_membershipId
       );
       $this->assign('membership_assign', TRUE);
       $this->set('membershipTypeID', $membershipParams['selectMembership']);
