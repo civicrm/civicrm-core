@@ -166,14 +166,13 @@ function loadPetitionList( )
      var count = 0;
      var searchQill = new Array( );
      for ( param in searchParams ) {
-        if ( val = CRM.$( '#' + param ).val( ) ) {
-      if ( param == 'petition_campaign_id' ) val = campaigns[val];
-      searchQill[count++] = searchParams[param] + ' : ' + val;
-  }
+       if ( val = CRM.$( '#' + param ).val( ) ) {
+         if ( param == 'petition_campaign_id' ) val = campaigns[val];
+         searchQill[count++] = searchParams[param] + ' : ' + val;
+       }
      }
      noRecordFoundMsg += searchQill.join( '<span class="font-italic"> ...AND... </span></div><div class="qill">' );
-     var $context = CRM.$('#petitionList');
-     CRM.$( 'table.petitions', $context ).dataTable({
+     CRM.$( 'table.petitions', '#petitionList').dataTable({
              "bFilter"    : false,
              "bAutoWidth" : false,
              "bProcessing": false,

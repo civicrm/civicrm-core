@@ -195,8 +195,7 @@
       }
     }
     noRecordFoundMsg += searchQill.join('<span class="font-italic"> ...AND... </span></div><div class="qill">');
-    var $context = CRM.$('#campaignList');
-    CRM.$('table.campaigns', $context).dataTable({
+    CRM.$('table.campaigns', '#campaignList').dataTable({
       "bFilter": false,
       "bAutoWidth": false,
       "bProcessing": false,

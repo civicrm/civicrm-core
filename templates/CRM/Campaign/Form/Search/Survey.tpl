@@ -175,15 +175,14 @@ function loadSurveyList( )
      var count = 0;
      var searchQill = new Array( );
      for ( param in searchParams ) {
-        if ( val = CRM.$( '#' + param ).val( ) ) {
-      if ( param == 'activity_type_id' ) val = surveyTypes[val];
-      if ( param == 'survey_campaign_id' ) val = surveyCampaigns[val];
-      searchQill[count++] = searchParams[param] + ' : ' + val;
-  }
+       if ( val = CRM.$( '#' + param ).val( ) ) {
+         if ( param == 'activity_type_id' ) val = surveyTypes[val];
+         if ( param == 'survey_campaign_id' ) val = surveyCampaigns[val];
+         searchQill[count++] = searchParams[param] + ' : ' + val;
+       }
      }
      noRecordFoundMsg += searchQill.join( '<span class="font-italic"> ...AND... </span></div><div class="qill">' );
-     var $context = CRM.$('#surveyList');
-     CRM.$( 'table.surveys', $context).dataTable({
+     CRM.$( 'table.surveys', '#surveyList').dataTable({
              "bFilter"    : false,
              "bAutoWidth" : false,
              "bProcessing": false,
