@@ -1330,33 +1330,19 @@ AND civicrm_membership.is_test = %2";
         }
       }
       else {
-        $membership = $createdMemberships[$membershipTypeID] = self::renewMembership($contactID, $membershipTypeID,
-          $isTest, $form, NULL,
-          CRM_Utils_Array::value('cms_contactID', $membershipParams),
-          $customFieldsFormatted, CRM_Utils_Array::value('types_terms', $membershipParams, 1)
-        );
-
-        // update recurring id for membership record
-        self::updateRecurMembership($membership, $membershipContribution);
-
-        if (!empty($membershipContributionID)) {
-          self::linkMembershipPayment($membership, $membershipContribution);
-        }
+        $numTerms = CRM_Utils_Array::value('types_terms', $membershipParams, 1);
+        $createdMemberships[$membershipTypeID] = self::createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $membershipTypeID, $isTest, $numTerms, $membershipContribution, $createdMemberships);
       }
     }
 
     if (!empty($errors)) {
-      foreach ($errors as $error) {
-        if (is_string($error)) {
-          $message[] = $error;
-        }
-      }
-      $message = ts('Payment Processor Error message') . ': ' . implode('<br/>', $message);
+      $message = self::compileErrorMessage($errors);
       throw new CRM_Core_Exception($message);
     }
     $form->_params['createdMembershipIDs'] = array();
 
     // CRM-7851 - Moved after processing Payment Errors
+    //@todo - the reasoning for this being here seems a little outdated
     foreach ($createdMemberships as $createdMembership) {
       CRM_Core_BAO_CustomValueTable::postProcess(
         $form->_params,
@@ -2466,8 +2452,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @return array
    */
-  public static function createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution,  &$form)
-  {
+  public static function createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution,  &$form) {
     $membership = self::renewMembership($contactID, $memType,
       $isTest, $form, NULL,
       CRM_Utils_Array::value('cms_contactID', $membershipParams),
@@ -2482,6 +2467,25 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       self::linkMembershipPayment($membership, $membershipContribution);
     }
     return $membership;
+  }
+
+  /**
+   * Turn array of errors into message string
+   *
+   * @param array $errors
+   *
+   * @internal param $message
+   *
+   * @return string
+   */
+  public static function compileErrorMessage($errors)
+  {
+    foreach($errors as $error) {
+      if (is_string($error)) {
+        $message[] = $error;
+      }
+    }
+    return ts('Payment Processor Error message') . ': ' . implode('<br/>', $message);
   }
 
   /**
