@@ -2168,16 +2168,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param $membershipContribution
    */
   public static function linkMembershipPayment($membership, $membershipContribution) {
-    $dao = new CRM_Member_DAO_MembershipPayment();
-    $dao->membership_id = $membership->id;
-    $dao->contribution_id = $membershipContribution->id;
-    //Fixed for avoiding duplicate entry error when user goes
-    //back and forward during payment mode is notify
-    if (!$dao->find(TRUE)) {
-      CRM_Utils_Hook::pre('create', 'MembershipPayment', NULL, $dao);
-      $dao->save();
-      CRM_Utils_Hook::post('create', 'MembershipPayment', $dao->id, $dao);
-    }
+    CRM_Member_BAO_MembershipPayment::create(array('membership_id' => $membership->id, 'contribution_id' => $membershipContribution->id));
   }
 
   /**
