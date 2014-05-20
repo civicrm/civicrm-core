@@ -1091,6 +1091,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       return;
     }
 
+    $isTest = ($this->_mode == 'test') ? 1 : 0;
+    $lineItems = $this->_lineItem;
+
     $config = CRM_Core_Config::singleton();
     // get the submitted form values.
     $this->_params = $formValues = $this->controller->exportValues($this->_name);
@@ -1397,7 +1400,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         );
       }
 
-      // add all the additioanl payment params we need
+      // add all the additional payment params we need
       $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
       $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
 
@@ -1447,7 +1450,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $this->_contributorContactID,
           $contributionType,
           TRUE,
-          FALSE
+          FALSE,
+          $isTest,
+          $lineItems
         );
 
         //create new soft-credit record, CRM-13981
