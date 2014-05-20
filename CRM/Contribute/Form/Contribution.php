@@ -1419,7 +1419,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         unset($submittedValues[$key]);
       }
     }
-
+    $isTest = ($this->_mode == 'test') ? 1 : 0;
     // CRM-12680 set $_lineItem if its not set
     if (empty($this->_lineItem) && !empty($lineItem)) {
       $this->_lineItem = $lineItem;
@@ -1562,7 +1562,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $this->_contactID,
         $contributionType,
         TRUE,
-        FALSE
+        FALSE,
+        $isTest,
+        $this->_lineItem
       );
       $paymentParams['contributionID'] = $contribution->id;
       $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
@@ -1654,7 +1656,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $result,
         $this->_contactID,
         $contributionType,
-        FALSE, FALSE
+        FALSE, FALSE,
+        $isTest,
+        $this->_lineItem
       );
     }
 
