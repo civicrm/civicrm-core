@@ -904,15 +904,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           }
         }
 
-        try {
-          CRM_Member_BAO_Membership::postProcessMembership($membershipParams, $contactID,
-            $this, $premiumParams, $customFieldsFormatted,
-            $fieldTypes
-          );
-        } catch (CRM_Core_Exception $e) {
-          CRM_Core_Session::singleton()->setStatus($e->getMessage());
-          CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"));
-        }
+        $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams);
       }
     }
     else {
@@ -1075,9 +1067,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $params
    * @param array $result
    * @param integer $contactID
-   * @param CRM_Contribute_BAO_FinancialType $financialType
+   * @param CRM_Financial_DAO_FinancialType $financialType
    * @param bool $pending
    * @param bool $online
+   *
+   * @param bool $isTest
+   * @param array $lineItems
    *
    * @throws Exception
    * @internal param bool $deductibleMode
@@ -1700,5 +1695,35 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     return $params;
+  }
+
+  /**
+   * @param $membershipParams
+   * @param $contactID
+   * @param $customFieldsFormatted
+   * @param $fieldTypes
+   * @param $premiumParams
+   */
+  public function processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams)
+  {
+    try {
+
+      $singleMembershipTypeID = $membershipTypeID = $membershipParams['selectMembership'];
+      if (is_array($membershipTypeID) && count($membershipTypeID) == 1) {
+        $singleMembershipTypeID = $membershipTypeID[0];
+      }
+
+      $membershipDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $singleMembershipTypeID);
+      $this->assign('membership_name', CRM_Utils_Array::value('name', $membershipDetails));
+      CRM_Member_BAO_Membership::postProcessMembership($membershipParams, $contactID,
+        $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipDetails,  $membershipTypeID
+      );
+      $this->assign('membership_assign', TRUE);
+      $this->set('membershipTypeID', $membershipParams['selectMembership']);
+    }
+    catch (CRM_Core_Exception $e) {
+      CRM_Core_Session::singleton()->setStatus($e->getMessage());
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"));
+    }
   }
 }
