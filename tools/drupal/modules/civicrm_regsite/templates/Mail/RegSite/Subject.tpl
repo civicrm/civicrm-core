@@ -1,1 +1,0 @@
-Thank you for registering your CiviCRM site for {$displayValues.organizationName}.
