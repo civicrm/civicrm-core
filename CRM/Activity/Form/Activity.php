@@ -516,7 +516,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     $defaults = $this->_values;
-
     // if we're editing...
     if (isset($this->_activityId)) {
       if (empty($defaults['activity_date_time'])) {
@@ -559,6 +558,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     if ($this->_activityTypeId) {
       $defaults['activity_type_id'] = $this->_activityTypeId;
+    }
+
+    if (!$this->_single && !empty($this->_contactIds)) {
+      $defaults['target_contact_id'] = $this->_contactIds;
     }
 
     if ($this->_action & (CRM_Core_Action::DELETE | CRM_Core_Action::RENEW)) {
