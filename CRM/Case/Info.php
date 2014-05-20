@@ -52,6 +52,29 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     );
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  public function getAngularModules() {
+    $result = array();
+    $result['crmCaseType'] = array(
+      'ext' => 'civicrm',
+      'js' => array('js/angular-crmCaseType.js'),
+      'css' => array('css/angular-crmCaseType.css'),
+    );
+    // Need full OptionValue records
+    $actStatuses = civicrm_api3('OptionValue', 'get', array('option_group_id' => 'activity_status'));
+    $actTypes = civicrm_api3('OptionValue', 'get', array('option_group_id' => 'activity_type'));
+    CRM_Core_Resources::singleton()->addSetting(array(
+      'crmCaseType' => array(
+        'actStatuses' => array_values($actStatuses['values']),
+        'actTypes' => array_values($actTypes['values']),
+        //CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name'),
+      ),
+    ));
+    return $result;
+  }
+
   // docs inherited from interface
   public function getManagedEntities() {
     // Use hook_civicrm_caseTypes to build a list of OptionValues

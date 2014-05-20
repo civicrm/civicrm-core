@@ -1728,6 +1728,7 @@ editor specific classes
   color: #2786C2;
 }
 .crm-container .crm-hover-button .icon {
+  cursor: pointer;
   margin-left: 3px;
   position: relative;
   top: 2px;
@@ -4671,4 +4672,11 @@ span.crm-status-icon {
 
 .crm-container .survey-completed {
   text-decoration: line-through;
+}
+
+.crm-container .ng-invalid {
+    border: 1px solid red;
+}
+.crm-container .ng-valid {
+    border: 1px solid #666;
 }
