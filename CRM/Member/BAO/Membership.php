@@ -1251,8 +1251,9 @@ AND civicrm_membership.is_test = %2";
    *
    * @param $isProcessSeparateMembershipTransaction
    *
+   * @param $defaultContributionTypeID
+   *
    * @throws CRM_Core_Exception
-   * @throws Exception
    * @internal param \isProcessSeparateMembershipTransaction $bool $
    *
    * @internal param $singleMembershipTypeID
@@ -1261,27 +1262,15 @@ AND civicrm_membership.is_test = %2";
    * @access public
    */
   public static function postProcessMembership($membershipParams, $contactID, &$form, $premiumParams,
-    $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeID, $isPaidMembership, $membershipID, $isProcessSeparateMembershipTransaction) {
-    $tempParams  = $membershipParams;
+    $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeID, $isPaidMembership, $membershipID,
+    $isProcessSeparateMembershipTransaction, $defaultContributionTypeID) {
     $result      = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
-
-    $minimumFee = CRM_Utils_Array::value('minimum_fee', $membershipDetails);
-    $contributionTypeId = NULL;
-    if ($form->_values['amount_block_is_active']) {
-      $contributionTypeId = $form->_values['financial_type_id'];
-    }
-    else {
-      $contributionTypeId = CRM_Utils_Array::value( 'financial_type_id', $membershipDetails );
-      if (!$contributionTypeId) {
-        $contributionTypeId = CRM_Utils_Array::value('financial_type_id' ,$membershipParams);
-      }
-    }
 
     if ($isPaidMembership) {
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
         $premiumParams, $contactID,
-        $contributionTypeId,
+        $defaultContributionTypeID,
         'membership'
       );
     }
@@ -1298,7 +1287,7 @@ AND civicrm_membership.is_test = %2";
     }
 
     if ($isProcessSeparateMembershipTransaction) {
-      $membershipContribution = self::processSecondaryFinancialTransaction($contactID, $form, $membershipDetails, $minimumFee, $tempParams, $errors, $isTest);
+      $membershipContribution = self::processSecondaryFinancialTransaction($contactID, $form, $membershipDetails, $membershipParams, $errors, $isTest);
     }
 
     $createdMemberships = array();
@@ -2392,19 +2381,20 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
 
   /**
    * Where a second separate financial transaction is supported we will process it here
+   *
    * @param $contactID
    * @param $form
    * @param $membershipDetails
-   * @param $minimumFee
    * @param $tempParams
    * @param $errors
    * @param $isTest
    *
-   * @return CRM_Contribute_BAO_Contribution
    * @throws Exception
+   * @internal param $minimumFee
+   * @return CRM_Contribute_BAO_Contribution
    */
-  public static function processSecondaryFinancialTransaction($contactID, &$form, $membershipDetails, $minimumFee, $tempParams, &$errors, $isTest)
-  {
+  public static function processSecondaryFinancialTransaction($contactID, &$form, $membershipDetails, $tempParams, &$errors, $isTest) {
+    $minimumFee = CRM_Utils_Array::value('minimum_fee', $membershipDetails);
     $lineItems = $form->_lineItem = $form->_memLineItem;
     $contributionType = new CRM_Financial_DAO_FinancialType();
     $contributionType->id = CRM_Utils_Array::value('financial_type_id', $membershipDetails);
