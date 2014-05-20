@@ -1300,7 +1300,7 @@ AND civicrm_membership.is_test = %2";
 
     $memBlockDetails = CRM_Member_BAO_Membership::getMembershipBlock($form->_id);
     if ($isProcessSeparateMembershipTransaction) {
-      $form->_lineItem = $form->_memLineItem;
+      $lineItems = $form->_lineItem = $form->_memLineItem;
       $contributionType = new CRM_Financial_DAO_FinancialType( );
       $contributionType->id = CRM_Utils_Array::value('financial_type_id', $membershipDetails);
       if (!$contributionType->find(TRUE)) {
@@ -1358,7 +1358,9 @@ AND civicrm_membership.is_test = %2";
           $contactID,
           $contributionType,
           $pending,
-          TRUE
+          TRUE,
+          $isTest,
+          $lineItems
         );
       }
     }
