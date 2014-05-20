@@ -1249,18 +1249,20 @@ AND civicrm_membership.is_test = %2";
    * @param bool $isPaidMembership
    * @param integer $membershipID
    *
+   * @param $isProcessSeparateMembershipTransaction
+   *
    * @throws CRM_Core_Exception
    * @throws Exception
+   * @internal param \isProcessSeparateMembershipTransaction $bool $
+   *
    * @internal param $singleMembershipTypeID
    *
    * @return void
    * @access public
    */
   public static function postProcessMembership($membershipParams, $contactID, &$form, $premiumParams,
-    $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeID, $isPaidMembership, $membershipID
-  ) {
+    $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeID, $isPaidMembership, $membershipID, $isProcessSeparateMembershipTransaction) {
     $tempParams  = $membershipParams;
-    $paymentDone = FALSE;
     $result      = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
 
@@ -1270,7 +1272,6 @@ AND civicrm_membership.is_test = %2";
       $contributionTypeId = $form->_values['financial_type_id'];
     }
     else {
-      $paymentDone        = TRUE;
       $contributionTypeId = CRM_Utils_Array::value( 'financial_type_id', $membershipDetails );
       if (!$contributionTypeId) {
         $contributionTypeId = CRM_Utils_Array::value('financial_type_id' ,$membershipParams);
@@ -1298,7 +1299,7 @@ AND civicrm_membership.is_test = %2";
 
 
     $memBlockDetails = CRM_Member_BAO_Membership::getMembershipBlock($form->_id);
-    if (!empty($memBlockDetails['is_separate_payment']) && !$paymentDone) {
+    if ($isProcessSeparateMembershipTransaction) {
       $form->_lineItem = $form->_memLineItem;
       $contributionType = new CRM_Financial_DAO_FinancialType( );
       $contributionType->id = CRM_Utils_Array::value('financial_type_id', $membershipDetails);
