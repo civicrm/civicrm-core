@@ -1756,12 +1756,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         //enabled and contribution amount is not selected. fix for CRM-3010
         $isPaidMembership = TRUE;
       }
-      $isProcessSeparateMembershipTransaction = FALSE;
-      if (!empty($memBlockDetails['is_separate_payment']) && $this->_values['amount_block_is_active']) {
-        // ie the membership block supports a separate transactions AND the contribution form has been configured for both
-        // a membership transaction AND a contribution transaction (this feels pretty legacy)
-        $isProcessSeparateMembershipTransaction = TRUE;
-      }
+      $isProcessSeparateMembershipTransaction = $this->isSeparateMembershipTransaction($this->_id, $this->_values['amount_block_is_active']);
 
       CRM_Member_BAO_Membership::postProcessMembership($membershipParams, $contactID,
         $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipDetails,  $membershipTypeID, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction
@@ -1773,5 +1768,24 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       CRM_Core_Session::singleton()->setStatus($e->getMessage());
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"));
     }
+  }
+
+  /**
+   * Are we going to do 2 financial transactions?
+   * ie the membership block supports a separate transactions AND the contribution form has been configured for a contribution
+   * transaction AND a membership transaction AND the payment processor supports double financial transactions (ie. NOT doTransferPayment style)
+   *
+   *
+   * @param integer $formID
+   * @param bool $amountBlockActiveOnForm
+   *
+   * @return bool
+   */
+  public function isSeparateMembershipTransaction($formID, $amountBlockActiveOnForm) {
+    $memBlockDetails = CRM_Member_BAO_Membership::getMembershipBlock($formID);
+    if (!empty($memBlockDetails['is_separate_payment']) && $amountBlockActiveOnForm) {
+      return TRUE;
+    }
+    return FALSE;
   }
 }
