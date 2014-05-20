@@ -1760,7 +1760,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       $isProcessSeparateMembershipTransaction = $this->isSeparateMembershipTransaction($this->_id, $this->_values['amount_block_is_active']);
 
-      if ($form->_values['amount_block_is_active']) {
+      if ($this->_values['amount_block_is_active']) {
         $contributionTypeId = $form->_values['financial_type_id'];
       }
       else {
