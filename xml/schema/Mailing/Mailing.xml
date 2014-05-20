@@ -300,7 +300,7 @@
        <name>visibility</name>
        <type>varchar</type>
        <length>40</length>
-       <default>'User and User Admin Only'</default>
+       <default>'Public Pages'</default>
        <comment>In what context(s) is the mailing contents visible (online viewing)</comment>
        <pseudoconstant>
          <callback>CRM_Core_SelectValues::groupVisibility</callback>
