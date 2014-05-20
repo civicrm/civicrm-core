@@ -116,6 +116,16 @@ abstract class CRM_Core_Component_Info {
   }
 
   /**
+   * EXPERIMENTAL: Get a list of AngularJS modules
+   *
+   * @return array list of modules; same format as CRM_Utils_Hook::angularModules(&$angularModules)
+   * @see CRM_Utils_Hook::angularModules
+   */
+  public function getAngularModules() {
+    return array();
+  }
+
+  /**
    * Provides base information about the component.
    * Needs to be implemented in component's information
    * class.

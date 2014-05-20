@@ -1,0 +1,17 @@
+<!--
+Directive: crmAddName
+-->
+Add:
+<input
+        ui-jq="autocomplete"
+        ui-options="{source:crmOptions}"
+        ng-model="crmVar"
+        class="add-activity"
+        />
+
+<button
+        ng-class="{disabled: (crmVar == '' || crmVar == null)}"
+        ng-disabled="crmVar == '' || crmVar == null"
+        ng-click="crmOnAdd(); crmVar = ''"
+        >Add
+</button>
