@@ -56,6 +56,112 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   public $_contributionID;
 
   /**
+   * Set the parameters to be passed to contribution create function
+   *
+   * @param array $params
+   * @param integer $contactID
+   * @param $financialTypeID
+   * @param $online
+   * @param $contributionPageId
+   * @param $nonDeductibleAmount
+   * @param $campaignId
+   *
+   * @param $isMonetary
+   *
+   * @param $pending
+   * @param $paymentProcessorOutcome
+   * @param $receiptDate
+   *
+   * @param $recurringContributionID
+   * @param $isTest
+   *
+   * @param $addressID
+   *
+   * @param $softCreditToID
+   *
+   * @param $lineItems
+   *
+   * @internal param $financialType
+   * @return array
+   */
+  public static function getContributionParams($params, $contactID, $financialTypeID, $online, $contributionPageId, $nonDeductibleAmount, $campaignId, $isMonetary, $pending,
+    $paymentProcessorOutcome, $receiptDate, $recurringContributionID, $isTest, $addressID, $softCreditToID, $lineItems)
+  {
+    $contributionParams = array(
+      'contact_id' => $contactID,
+      'financial_type_id' => $financialTypeID,
+      'contribution_page_id' => $contributionPageId,
+      'receive_date' => (CRM_Utils_Array::value('receive_date', $params)) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
+      'non_deductible_amount' => $nonDeductibleAmount,
+      'total_amount' => $params['amount'],
+      'amount_level' => CRM_Utils_Array::value('amount_level', $params),
+      'invoice_id' => $params['invoiceID'],
+      'currency' => $params['currencyID'],
+      'source' =>
+        (!$online || !empty($params['source'])) ?
+          CRM_Utils_Array::value('source', $params) :
+          CRM_Utils_Array::value('description', $params),
+      'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
+      //configure cancel reason, cancel date and thankyou date
+      //from 'contribution' type profile if included
+      'cancel_reason' => CRM_Utils_Array::value('cancel_reason', $params, 0),
+      'cancel_date' =>
+        isset($params['cancel_date']) ?
+          CRM_Utils_Date::format($params['cancel_date']) :
+          NULL,
+      'thankyou_date' =>
+        isset($params['thankyou_date']) ?
+          CRM_Utils_Date::format($params['thankyou_date']) :
+          NULL,
+      'campaign_id' => $campaignId,
+      'is_test' => $isTest,
+      'address_id' => $addressID,
+      //setting to make available to hook - although seems wrong to set on form for BAO hook availability
+      'soft_credit_to' => $softCreditToID,
+      'line_item' => $lineItems
+    );
+    if (!$online && isset($params['thankyou_date'])) {
+      $contributionParam['thankyou_date'] = $params['thankyou_date'];
+    }
+    if (!$online || $isMonetary) {
+      if (empty($params['is_pay_later'])) {
+        $contributionParams['payment_instrument_id'] = 1;
+      }
+    }
+    if (!$pending && $paymentProcessorOutcome) {
+      $contributionParams += array(
+        'fee_amount' => CRM_Utils_Array::value('fee_amount', $paymentProcessorOutcome),
+        'net_amount' => CRM_Utils_Array::value('net_amount', $paymentProcessorOutcome, $params['amount']),
+        'trxn_id' => $paymentProcessorOutcome['trxn_id'],
+        'receipt_date' => $receiptDate,
+        // also add financial_trxn details as part of fix for CRM-4724
+        'trxn_result_code' => CRM_Utils_Array::value('trxn_result_code', $paymentProcessorOutcome),
+        'payment_processor' => CRM_Utils_Array::value('payment_processor', $paymentProcessorOutcome),
+      );
+    }
+
+    // CRM-4038: for non-en_US locales, CRM_Contribute_BAO_Contribution::add() expects localised amounts
+    $contributionParams['non_deductible_amount'] = trim(CRM_Utils_Money::format($contributionParams['non_deductible_amount'], ' '));
+    $contributionParams['total_amount'] = trim(CRM_Utils_Money::format($contributionParams['total_amount'], ' '));
+
+    if ($recurringContributionID) {
+      $contributionParams['contribution_recur_id'] = $recurringContributionID;
+    }
+
+    $contributionParams['contribution_status_id'] = $pending ? 2 : 1;
+    if (isset($contributionParams['invoice_id'])) {
+      $contributionParams['id'] = CRM_Core_DAO::getFieldValue(
+        'CRM_Contribute_DAO_Contribution',
+        $contributionParams['invoice_id'],
+        'id',
+        'invoice_id'
+      );
+    }
+
+    return $contributionParams;
+  }
+
+  /**
    * Function to set variables up before form is built
    *
    * @return void
@@ -903,8 +1009,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             }
           }
         }
-
         $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams);
+        if (!$this->_amount > 0.0 || !$membershipParams['amount']) {
+          // we need to explicitly create a CMS user in case of free memberships
+          // since it is done under processConfirm for paid memberships
+          CRM_Contribute_BAO_Contribution_Utils::createCMSUser($membershipParams,
+            $membershipParams['cms_contactID'],
+            'email-' . $this->_bltID
+          );
+        }
       }
     }
     else {
@@ -1089,11 +1202,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $online
   ) {
     $transaction = new CRM_Core_Transaction();
-    $className   = get_class($form);
-    $recurringContributionID = NULL;
+    $recurringContributionID =  $contribSoftContactId = $addressID = NULL;
 
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $financialType->id;
+
+    //create an contribution address
+    if (
+      $form->_contributeMode != 'notify' && empty($params['is_pay_later']) && !empty($form->_values['is_monetary'])) {
+      $addressID = CRM_Contribute_BAO_Contribution::createAddress($params, $form->_bltID);
+    }
+
     //@todo - this is being set from the form to resolve CRM-10188 - an
     // eNotice caused by it not being set @ the front end
     // however, we then get it being over-written with null for backend contributions
@@ -1169,94 +1288,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $campaignId = CRM_Utils_Array::value('campaign_id', $params);
     }
 
-    // first create the contribution record
-    $contribParams = array(
-      'contact_id' => $contactID,
-      'financial_type_id'  => $financialType->id,
-      'contribution_page_id' => $contributionPageId,
-      'receive_date' => (CRM_Utils_Array::value('receive_date', $params)) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
-      'non_deductible_amount' => $nonDeductibleAmount,
-      'total_amount' => $params['amount'],
-      'amount_level' => CRM_Utils_Array::value('amount_level', $params),
-      'invoice_id' => $params['invoiceID'],
-      'currency' => $params['currencyID'],
-      'source' =>
-      (!$online || !empty($params['source'])) ?
-      CRM_Utils_Array::value('source', $params) :
-      CRM_Utils_Array::value('description', $params),
-      'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
-      //configure cancel reason, cancel date and thankyou date
-      //from 'contribution' type profile if included
-      'cancel_reason' => CRM_Utils_Array::value('cancel_reason', $params, 0),
-      'cancel_date' =>
-      isset($params['cancel_date']) ?
-      CRM_Utils_Date::format($params['cancel_date']) :
-      NULL,
-      'thankyou_date' =>
-      isset($params['thankyou_date']) ?
-      CRM_Utils_Date::format($params['thankyou_date']) :
-      NULL,
-      'campaign_id' => $campaignId,
-    );
-
-    if (!$online && isset($params['thankyou_date'])) {
-      $contribParams['thankyou_date'] = $params['thankyou_date'];
-    }
-
-    if (!$online || $form->_values['is_monetary']) {
-      if (empty($params['is_pay_later'])) {
-        $contribParams['payment_instrument_id'] = 1;
-      }
-    }
-
-    if (!$pending && $result) {
-      $contribParams += array(
-        'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
-        'net_amount' => CRM_Utils_Array::value('net_amount', $result, $params['amount']),
-        'trxn_id' => $result['trxn_id'],
-        'receipt_date' => $receiptDate,
-        // also add financial_trxn details as part of fix for CRM-4724
-        'trxn_result_code' => CRM_Utils_Array::value('trxn_result_code', $result),
-        'payment_processor' => CRM_Utils_Array::value('payment_processor', $result),
-      );
-    }
-
-    if ($recurringContributionID) {
-      $contribParams['contribution_recur_id'] = $recurringContributionID;
-    }
-
-    $contribParams['contribution_status_id'] = $pending ? 2 : 1;
-
-    $contribParams['is_test'] = 0;
-    if ($form->_mode == 'test') {
-      $contribParams['is_test'] = 1;
-    }
-
-    $ids = array();
-    if (isset($contribParams['invoice_id'])) {
-      $contribID = CRM_Core_DAO::getFieldValue(
-        'CRM_Contribute_DAO_Contribution',
-        $contribParams['invoice_id'],
-        'id',
-        'invoice_id'
-      );
-      if (isset($contribID)) {
-        $ids['contribution'] = $contribID;
-        $contribParams['id'] = $contribID;
-      }
-    }
-
-
-    //create an contribution address
-    if (
-      $form->_contributeMode != 'notify' && empty($params['is_pay_later']) && !empty($form->_values['is_monetary'])) {
-      $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params, $form->_bltID);
-    }
-
-    // CRM-4038: for non-en_US locales, CRM_Contribute_BAO_Contribution::add() expects localised amounts
-    $contribParams['non_deductible_amount'] = trim(CRM_Utils_Money::format($contribParams['non_deductible_amount'], ' '));
-    $contribParams['total_amount'] = trim(CRM_Utils_Money::format($contribParams['total_amount'], ' '));
-
     // Prepare soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
     if (!empty($params['pcp_made_through_id']) || !empty($params['soft_credit_to'])) {
       // if its due to pcp
@@ -1273,13 +1304,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       // Pass these details onto with the contribution to make them
       // available at hook_post_process, CRM-8908
-      $contribParams['soft_credit_to'] = $params['soft_credit_to'] = $contribSoftContactId;
+      $params['soft_credit_to'] = $contribSoftContactId;
     }
 
     if (isset($params['amount'])) {
-      $contribParams['line_item'] = $form->_lineItem;
-      //add contribution record
-      $contribution = CRM_Contribute_BAO_Contribution::add($contribParams, $ids);
+      $contribParams = self::getContributionParams(
+        $params, $contactID, $financialType->id, $online, $contributionPageId, $nonDeductibleAmount, $campaignId, $form->_values['is_monetary'], $pending, $result, $receiptDate,
+        $recurringContributionID, $isTest, $addressID, $contribSoftContactId, $lineItems
+      );
+      $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
       if (is_a($contribution, 'CRM_Core_Error')) {
         $message = CRM_Core_Error::getMessages($contribution);
         CRM_Core_Error::fatal($message);
@@ -1715,8 +1748,18 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       $membershipDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $singleMembershipTypeID);
       $this->assign('membership_name', CRM_Utils_Array::value('name', $membershipDetails));
+      $isPaidMembership = FALSE;
+      if($this->_amount > 0.0 && $membershipParams['amount']) {
+        //amount must be greater than zero for
+        //adding contribution record  to contribution table.
+        //this condition arises when separate membership payment is
+        //enabled and contribution amount is not selected. fix for CRM-3010
+        $isPaidMembership = TRUE;
+      }
+      $isProcessSeparateMembershipTransaction = $this->isSeparateMembershipTransaction($this->_id, $this->_values['amount_block_is_active']);
+
       CRM_Member_BAO_Membership::postProcessMembership($membershipParams, $contactID,
-        $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipDetails,  $membershipTypeID
+        $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipDetails,  $membershipTypeID, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction
       );
       $this->assign('membership_assign', TRUE);
       $this->set('membershipTypeID', $membershipParams['selectMembership']);
@@ -1725,5 +1768,24 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       CRM_Core_Session::singleton()->setStatus($e->getMessage());
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"));
     }
+  }
+
+  /**
+   * Are we going to do 2 financial transactions?
+   * ie the membership block supports a separate transactions AND the contribution form has been configured for a contribution
+   * transaction AND a membership transaction AND the payment processor supports double financial transactions (ie. NOT doTransferPayment style)
+   *
+   *
+   * @param integer $formID
+   * @param bool $amountBlockActiveOnForm
+   *
+   * @return bool
+   */
+  public function isSeparateMembershipTransaction($formID, $amountBlockActiveOnForm) {
+    $memBlockDetails = CRM_Member_BAO_Membership::getMembershipBlock($formID);
+    if (!empty($memBlockDetails['is_separate_payment']) && $amountBlockActiveOnForm) {
+      return TRUE;
+    }
+    return FALSE;
   }
 }
