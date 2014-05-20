@@ -1756,9 +1756,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         //enabled and contribution amount is not selected. fix for CRM-3010
         $isPaidMembership = TRUE;
       }
+      $isProcessSeparateMembershipTransaction = FALSE;
+      if (!empty($memBlockDetails['is_separate_payment']) && $this->_values['amount_block_is_active']) {
+        // ie the membership block supports a separate transactions AND the contribution form has been configured for both
+        // a membership transaction AND a contribution transaction (this feels pretty legacy)
+        $isProcessSeparateMembershipTransaction = TRUE;
+      }
 
       CRM_Member_BAO_Membership::postProcessMembership($membershipParams, $contactID,
-        $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipDetails,  $membershipTypeID, $isPaidMembership, $this->_membershipId
+        $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipDetails,  $membershipTypeID, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction
       );
       $this->assign('membership_assign', TRUE);
       $this->set('membershipTypeID', $membershipParams['selectMembership']);
