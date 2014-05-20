@@ -1266,6 +1266,7 @@ AND civicrm_membership.is_test = %2";
     $isProcessSeparateMembershipTransaction, $defaultContributionTypeID) {
     $result      = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
+    $errors = array();
 
     if ($isPaidMembership) {
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
@@ -1273,21 +1274,26 @@ AND civicrm_membership.is_test = %2";
         $defaultContributionTypeID,
         'membership'
       );
-    }
-
-    $errors = array();
-    if (is_a($result[1], 'CRM_Core_Error')) {
-      $errors[1] = CRM_Core_Error::getMessages($result[1]);
-    }
-    elseif (!empty($result[1])) {
-      // Save the contribution ID so that I can be used in email receipts
-      // For example, if you need to generate a tax receipt for the donation only.
-      $form->_values['contribution_other_id'] = $result[1]->id;
-      $membershipContribution = $result[1];
+      if (is_a($result[1], 'CRM_Core_Error')) {
+        $errors[1] = CRM_Core_Error::getMessages($result[1]);
+      }
+      elseif (!empty($result[1])) {
+        // Save the contribution ID so that I can be used in email receipts
+        // For example, if you need to generate a tax receipt for the donation only.
+        $form->_values['contribution_other_id'] = $result[1]->id;
+        //note that this will be over-written if we are using a separate membership transaction. Otherwise there is only one
+        $membershipContribution = $result[1];
+      }
     }
 
     if ($isProcessSeparateMembershipTransaction) {
-      $membershipContribution = self::processSecondaryFinancialTransaction($contactID, $form, $membershipDetails, $membershipParams, $errors, $isTest);
+      try {
+        $membershipContribution = self::processSecondaryFinancialTransaction($contactID, $form, $membershipDetails, $membershipParams, $isTest);
+      }
+      catch (CRM_Core_Exception $e) {
+        $errors[2] = $e->getMessage();
+        $membershipContribution = NULL;
+      }
     }
 
     $createdMemberships = array();
@@ -2393,7 +2399,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @internal param $minimumFee
    * @return CRM_Contribute_BAO_Contribution
    */
-  public static function processSecondaryFinancialTransaction($contactID, &$form, $membershipDetails, $tempParams, &$errors, $isTest) {
+  public static function processSecondaryFinancialTransaction($contactID, &$form, $membershipDetails, $tempParams, $isTest) {
     $minimumFee = CRM_Utils_Array::value('minimum_fee', $membershipDetails);
     $lineItems = $form->_lineItem = $form->_memLineItem;
     $contributionType = new CRM_Financial_DAO_FinancialType();
@@ -2417,8 +2423,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     }
 
     if (is_a($result, 'CRM_Core_Error')) {
-      $errors[2] = CRM_Core_Error::getMessages($result);
-      return;
+      throw new CRM_Core_Exception(CRM_Core_Error::getMessages($result));
     }
     else {
       //assign receive date when separate membership payment
