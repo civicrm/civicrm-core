@@ -1738,4 +1738,58 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access AJAX API');
     $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'b', 'check_permissions' => TRUE));
   }
+
+  function testGetReferenceCounts() {
+    $result = $this->callAPISuccess('Contact', 'create', array(
+      'first_name' => 'Testily',
+      'last_name' => 'McHaste',
+      'contact_type' => 'Individual',
+      'api.Address.replace' => array(
+        'values' => array(),
+      ),
+      'api.Email.replace' => array(
+        'values' => array(
+          array(
+            'email' => 'spam@dev.null',
+            'is_primary' => 0,
+            'location_type_id' => 1,
+          )
+        ),
+      ),
+      'api.Phone.replace' => array(
+        'values' => array(
+          array(
+            'phone' => '234-567-0001',
+            'is_primary' => 1,
+            'location_type_id' => 1,
+          ),
+          array(
+            'phone' => '234-567-0002',
+            'is_primary' => 0,
+            'location_type_id' => 1,
+          ),
+        ),
+      ),
+    ));
+
+    //$dao = new CRM_Contact_BAO_Contact();
+    //$dao->id = $result['id'];
+    //$this->assertTrue((bool) $dao->find(TRUE));
+    //
+    //$refCounts = $dao->getReferenceCounts();
+    //$this->assertTrue(is_array($refCounts));
+    //$refCountsIdx = CRM_Utils_Array::index(array('name'), $refCounts);
+
+    $refCounts = $this->callAPISuccess('Contact', 'getrefcount', array(
+      'id' => $result['id']
+    ));
+    $refCountsIdx = CRM_Utils_Array::index(array('name'), $refCounts['values']);
+
+    $this->assertEquals(1, $refCountsIdx['sql:civicrm_email:contact_id']['count']);
+    $this->assertEquals('civicrm_email', $refCountsIdx['sql:civicrm_email:contact_id']['table']);
+    $this->assertEquals(2, $refCountsIdx['sql:civicrm_phone:contact_id']['count']);
+    $this->assertEquals('civicrm_phone', $refCountsIdx['sql:civicrm_phone:contact_id']['table']);
+    $this->assertTrue(!isset($refCountsIdx['sql:civicrm_address:contact_id']));
+  }
+
 }
