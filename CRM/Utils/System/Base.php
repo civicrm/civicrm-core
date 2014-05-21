@@ -295,5 +295,22 @@ abstract class CRM_Utils_System_Base {
     }
     return $this->getLoggedInUniqueIdentifier();
   }
+
+  /**
+   * Get Url to view user record
+   * @param integer $contactID Contact ID
+   *
+   * @return string
+   */
+  function getUserRecordUrl($contactID) {
+    return NULL;
+  }
+  /**
+   * Is the current user permitted to add a user
+   * @return bool
+   */
+  function checkPermissionAddUser() {
+    return FALSE;
+  }
 }
 

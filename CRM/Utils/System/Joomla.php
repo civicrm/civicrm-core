@@ -798,5 +798,33 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     );
     return array($url, NULL, $siteRoot);
   }
+
+  /**
+   * Get Url to view user record
+   * @param integer $contactID Contact ID
+   *
+   * @return string
+   */
+  function getUserRecordUrl($contactID) {
+    $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
+    $userRecordUrl = NULL;
+    // if logged in user is super user, then he can view other users joomla profile
+    if (JFactory::getUser()->authorise('core.admin')) {
+      return CRM_Core_Config::singleton()->userFrameworkBaseURL . "index.php?option=com_users&view=user&task=user.edit&id=" . $uid;
+    }
+    elseif (CRM_Core_Session::singleton()->get('userID') == $contactID) {
+      return CRM_Core_Config::singleton()->userFrameworkBaseURL . "index.php?option=com_admin&view=profile&layout=edit&id=" . $uid;
+    }
+  }
+
+  /**
+   * Is the current user permitted to add a user
+   * @return bool
+   */
+  function checkPermissionAddUser() {
+    if (JFactory::getUser()->authorise('core.create', 'com_users')) {
+      return TRUE;
+    }
+  }
 }
 
