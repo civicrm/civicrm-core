@@ -76,10 +76,10 @@ class api_v3_CaseTypeTest extends CiviUnitTestCase {
     $this->callAPIFailure('CaseType', 'create', $params);
   }
 
-  /*
-     * test create methods with valid data
-     * success expected
-     */
+  /**
+   * test create methods with valid data
+   * success expected
+   */
   function testCaseTypeCreate() {
     // Create Case Type
     $params = array(
@@ -143,6 +143,32 @@ class api_v3_CaseTypeTest extends CiviUnitTestCase {
     // Check result - case type should no longer exist
     $result = $this->callAPISuccess('CaseType', 'get', array('id' => $id));
     $this->assertEquals(0, $result['count']);
+  }
+
+  /**
+   * test create methods with xml file
+   * success expected
+   */
+  function testCaseTypeCreateWithXML() {
+    $caseXMLFile = dirname(__FILE__) . '/dataset/sample_case.xml';
+
+    // Create Case Type
+    $params = array(
+      'title' => 'Application with XML',
+      'name' => 'Application_with_XML',
+      'is_active' => 1,
+      'weight' => 4,
+      'xml_definition' => file_get_contents($caseXMLFile),
+    );
+
+    $result = $this->callAPISuccess('CaseType', 'create', $params);
+    $id = $result['id'];
+
+    // Check result
+    $result = $this->callAPISuccess('CaseType', 'get', array('id' => $id));
+    $this->assertEquals($result['values'][$id]['id'], $id, 'in line ' . __LINE__);
+    $this->assertEquals($result['values'][$id]['title'], $params['title'], 'in line ' . __LINE__);
+    $this->assertEquals($result['values'][$id]['xml_definition'], $params['xml_definition'], 'in line ' . __LINE__);
   }
 }
 
