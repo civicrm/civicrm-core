@@ -1528,7 +1528,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'forward_replies' => FALSE,
         'open_tracking'   => TRUE,
         'url_tracking'    => TRUE,
-        'visibility'      => 'User and User Admin Only',
+        'visibility'      => 'Public Pages',
         'replyto_email'   => $domain_email,
         'header_id'       => CRM_Mailing_PseudoConstant::defaultComponent('header_id', ''),
         'footer_id'       => CRM_Mailing_PseudoConstant::defaultComponent('footer_id', ''),
