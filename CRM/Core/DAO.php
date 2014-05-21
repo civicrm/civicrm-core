@@ -1732,6 +1732,29 @@ SELECT contact_id
   }
 
   /**
+   * Given a list of fields, create a list of references.
+   *
+   * @param string $className BAO/DAO class name
+   * @return array<CRM_Core_Reference_Interface>
+   */
+  static function createReferenceColumns($className) {
+    $result = array();
+    $fields = $className::fields();
+    foreach ($fields as $field) {
+      if (isset($field['pseudoconstant'], $field['pseudoconstant']['optionGroupName'])) {
+        $result[] = new CRM_Core_Reference_OptionValue(
+          $className::getTableName(),
+          $field['name'],
+          'civicrm_option_value',
+          CRM_Utils_Array::value('keyColumn', $field['pseudoconstant'], 'value'),
+          $field['pseudoconstant']['optionGroupName']
+        );
+      }
+    }
+    return $result;
+  }
+
+  /**
    * Find all records which refer to this entity.
    *
    * @return array of objects referencing this
@@ -1744,10 +1767,12 @@ SELECT contact_id
       /** @var $refSpec CRM_Core_Reference_Interface */
       $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($refSpec->getReferenceTable());
       $result = $refSpec->findReferences($this);
-      while ($result->fetch()) {
-        $obj = new $daoName();
-        $obj->id = $result->id;
-        $occurrences[] = $obj;
+      if ($result) {
+        while ($result->fetch()) {
+          $obj = new $daoName();
+          $obj->id = $result->id;
+          $occurrences[] = $obj;
+        }
       }
     }
 
