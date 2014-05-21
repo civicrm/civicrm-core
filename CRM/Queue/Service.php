@@ -40,10 +40,12 @@
  *
  * // Some time later...
  * $item = $queue->claimItem();
- * if (my_process($item->data)) {
- *   $myMessage->deleteItem();
- * } else {
- *   $myMessage->releaseItem();
+ * if ($item) {
+ *   if (my_process($item->data)) {
+ *     $myMessage->deleteItem($item);
+ *   } else {
+ *     $myMessage->releaseItem($item);
+ *   }
  * }
  * @endcode
  */
