@@ -380,6 +380,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
     }
 
+    // rectify params to what proximity search expects if there is a value for prox_distance
+    // CRM-7021
+    if (!empty($params)) {
+      CRM_Contact_BAO_ProximityQuery::fixInputParams($params);
+    }
+
     $query = new CRM_Contact_BAO_Query($params, $returnProperties, NULL,
       FALSE, FALSE, $queryMode,
       FALSE, TRUE, TRUE, NULL, $queryOperator
