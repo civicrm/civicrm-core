@@ -988,7 +988,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     if ($onlySameParentOrg && $memType) {
       // require the same parent org as the $memType
       $params = array('id' => $memType);
-      $defaults = $membershipType = array();
+      $membershipType = array();
       if (CRM_Member_BAO_MembershipType::retrieve($params, $membershipType)) {
         $memberTypesSameParentOrg = CRM_Member_BAO_MembershipType::getMembershipTypesByOrg($membershipType['member_of_contact_id']);
         $memberTypesSameParentOrgList = implode(',', array_keys($memberTypesSameParentOrg));
@@ -1307,8 +1307,7 @@ AND civicrm_membership.is_test = %2";
         CRM_Core_Error::fatal(ts("Could not find a system table"));
       }
       $tempParams['amount'] = $minimumFee;
-      $invoiceID = md5(uniqid(rand(), TRUE));
-      $tempParams['invoiceID'] = $invoiceID;
+      $tempParams['invoiceID'] = md5(uniqid(rand(), TRUE));
 
       $result = NULL;
       if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
@@ -1342,7 +1341,7 @@ AND civicrm_membership.is_test = %2";
         $form->assign('membership_trx_id', $result['trxn_id']);
         $form->assign('membership_amount', $minimumFee);
 
-        // we dont need to create the user twice, so lets disable cms_create_account
+        // we don't need to create the user twice, so let's disable cms_create_account
         // irrespective of the value, CRM-2888
         $tempParams['cms_create_account'] = 0;
 
@@ -1486,7 +1485,7 @@ AND civicrm_membership.is_test = %2";
     // Do not send an email if Recurring transaction is done via Direct Mode
     // Email will we sent when the IPN is received.
     if (!empty($form->_params['is_recur']) && $form->_contributeMode == 'direct') {
-      return TRUE;
+      return;
     }
 
     //finally send an email receipt
@@ -1501,7 +1500,7 @@ AND civicrm_membership.is_test = %2";
    * Function for updating a membership record's contribution_recur_id
    *
    * @param object CRM_Member_DAO_Membership $membership
-   * @param object CRM_Contribute_BAO_Contribution $contribution
+   * @param \CRM_Contribute_BAO_Contribution|\CRM_Contribute_DAO_Contribution $contribution
    *
    * @return void
    * @static
@@ -2541,7 +2540,6 @@ WHERE      civicrm_membership.is_test = 0";
     $params = array();
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
-    $today         = date('Y-m-d');
     $processCount  = 0;
     $updateCount   = 0;
 
