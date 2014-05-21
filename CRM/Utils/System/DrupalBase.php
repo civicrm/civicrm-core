@@ -237,4 +237,27 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   function permissionDenied() {
     drupal_access_denied();
   }
+
+  /**
+   * Get Url to view user record
+   * @param integer $contactID Contact ID
+   *
+   * @return string
+   */
+  function getUserRecordUrl($contactID) {
+    $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
+    if (CRM_Core_Session::singleton()->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(array('cms:administer users', 'cms:view user account'))) {
+      return CRM_Utils_System::url('user/' . $uid);
+    };
+  }
+
+  /**
+   * Is the current user permitted to add a user
+   * @return bool
+   */
+  function checkPermissionAddUser() {
+    if (CRM_Core_Permission::check('administer users')) {
+      return TRUE;
+    }
+  }
 }
