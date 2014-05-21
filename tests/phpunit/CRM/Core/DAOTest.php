@@ -69,6 +69,50 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals($contact->id, $refDao->contact_id);
   }
 
+  function testGetReferenceCounts() {
+    $result = $this->callAPISuccess('Contact', 'create', array(
+      'first_name' => 'Testily',
+      'last_name' => 'McHaste',
+      'contact_type' => 'Individual',
+      'api.Email.replace' => array(
+        'values' => array(
+          array(
+            'email' => 'spam@dev.null',
+            'is_primary' => 0,
+            'location_type_id' => 1,
+          )
+        ),
+      ),
+      'api.Phone.replace' => array(
+        'values' => array(
+          array(
+            'phone' => '234-567-0001',
+            'is_primary' => 1,
+            'location_type_id' => 1,
+          ),
+          array(
+            'phone' => '234-567-0002',
+            'is_primary' => 0,
+            'location_type_id' => 1,
+          ),
+        ),
+      ),
+    ));
+
+    $dao = new CRM_Contact_BAO_Contact();
+    $dao->id = $result['id'];
+    $this->assertTrue((bool) $dao->find(TRUE));
+
+    $refCounts = $dao->getReferenceCounts();
+    $this->assertTrue(is_array($refCounts));
+    $refCountsIdx = CRM_Utils_Array::index(array('name'), $refCounts);
+    $this->assertEquals(1, $refCountsIdx['sql:civicrm_email:contact_id']['count']);
+    $this->assertEquals('civicrm_email', $refCountsIdx['sql:civicrm_email:contact_id']['table']);
+    $this->assertEquals(2, $refCountsIdx['sql:civicrm_phone:contact_id']['count']);
+    $this->assertEquals('civicrm_phone', $refCountsIdx['sql:civicrm_phone:contact_id']['table']);
+    $this->assertTrue(!isset($refCountsIdx['sql:civicrm_address:contact_id']));
+  }
+
   function composeQueryExamples() {
     $cases = array();
     // $cases[] = array('Input-SQL', 'Input-Params', 'Expected-SQL');

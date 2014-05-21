@@ -30,6 +30,17 @@ class CRM_Core_Reference_OptionValue extends CRM_Core_Reference_Basic {
     }
   }
 
+  public function getReferenceCount($targetDao) {
+    if (! ($targetDao instanceof CRM_Core_DAO_OptionValue)) {
+      throw new CRM_Core_Exception("Mismatched reference: expected OptionValue but received " . get_class($targetDao));
+    }
+    if ($targetDao->option_group_id == $this->getTargetOptionGroupId()) {
+      return parent::getReferenceCount($targetDao);
+    } else {
+      return NULL;
+    }
+  }
+
   public function getTargetOptionGroupId() {
     if ($this->targetOptionGroupId === NULL) {
       $this->targetOptionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $this->targetOptionGroupName, 'id', 'name');
