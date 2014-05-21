@@ -46,4 +46,32 @@ class CRM_Core_EntityReference {
   function isGeneric() {
     return ($this->refTypeColumn !== NULL);
   }
+
+  /**
+   * Create a query to find references to a particular record
+   *
+   * @param CRM_Core_DAO $targetDao the instance for which we want references
+   * @return CRM_Core_DAO a query-handle (like the result of CRM_Core_DAO::executeQuery)
+   */
+  public function findReferences($targetDao) {
+    $refColumn = $this->getReferenceKey();
+    $targetColumn = $this->getTargetKey();
+    $params = array(1 => array($targetDao->$targetColumn, 'String'));
+    $sql = <<<EOS
+SELECT id
+FROM {$this->getReferenceTable()}
+WHERE {$refColumn} = %1
+EOS;
+    if ($this->isGeneric()) {
+      // If anyone complains about $dao::getTableName(), then could use
+      // "$daoClass=get_class($dao); $daoClass::getTableName();"
+      $params[2] = array($targetDao::getTableName(), 'String');
+      $sql .= <<<EOS
+    AND {$this->getTypeColumn()} = %2
+EOS;
+    }
+    $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($this->getReferenceTable());
+    $result = CRM_Core_DAO::executeQuery($sql, $params, TRUE, $daoName);
+    return $result;
+  }
 }

@@ -1741,22 +1741,9 @@ SELECT contact_id
 
     $occurrences = array();
     foreach ($links as $refSpec) {
-      $refColumn = $refSpec->getReferenceKey();
-      $targetColumn = $refSpec->getTargetKey();
-      $params = array(1 => array($this->$targetColumn, 'String'));
-      $sql = <<<EOS
-SELECT id
-FROM {$refSpec->getReferenceTable()}
-WHERE {$refColumn} = %1
-EOS;
-      if ($refSpec->isGeneric()) {
-        $params[2] = array(static::getTableName(), 'String');
-        $sql .= <<<EOS
-    AND {$refSpec->getTypeColumn()} = %2
-EOS;
-      }
+      /** @var $refSpec CRM_Core_EntityReference */
       $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($refSpec->getReferenceTable());
-      $result = self::executeQuery($sql, $params, TRUE, $daoName);
+      $result = $refSpec->findReferences($this);
       while ($result->fetch()) {
         $obj = new $daoName();
         $obj->id = $result->id;
