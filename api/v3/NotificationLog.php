@@ -47,10 +47,12 @@ function civicrm_api3_notification_log_retrysearch($params) {
       $resut['success'][] = $id;
     }
     catch (Exception $e) {
-      throw new Exception( $e->getMessage() . $id);
       $errors[]= $e->getMessage() . "  on  id " . $id;
       $resut['errors'][] = $id;
     }
+  }
+  if(!empty($errors)) {
+    throw new Exception(implode("\n ", $errors));
   }
   return civicrm_api3_create_success($result, $params);
 }
