@@ -40,4 +40,31 @@ EOS;
     $result = CRM_Core_DAO::executeQuery($sql, $params, TRUE, $daoName);
     return $result;
   }
+
+  public function getReferenceCount($targetDao) {
+    $targetColumn = $this->getTargetKey();
+    $params = array(
+      1 => array($targetDao->$targetColumn, 'String'),
+
+      // If anyone complains about $targetDao::getTableName(), then could use
+      // "{get_class($targetDao)}::getTableName();"
+      2 => array($targetDao::getTableName(), 'String'),
+    );
+
+    $sql = <<<EOS
+SELECT count(id)
+FROM {$this->getReferenceTable()}
+WHERE {$this->getReferenceKey()} = %1
+AND {$this->getTypeColumn()} = %2
+EOS;
+
+    return array(
+      'name' => implode(':', array('sql', $this->getReferenceTable(), $this->getReferenceKey())),
+      'type' => get_class($this),
+      'table' => $this->getReferenceTable(),
+      'key' => $this->getReferenceKey(),
+      'count' => CRM_Core_DAO::singleValueQuery($sql, $params)
+    );
+  }
+
 }

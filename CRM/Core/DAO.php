@@ -1779,6 +1779,21 @@ SELECT contact_id
     return $occurrences;
   }
 
+  function getReferenceCounts() {
+    $links = self::getReferencesToTable(static::getTableName());
+
+    $counts = array();
+    foreach ($links as $refSpec) {
+      /** @var $refSpec CRM_Core_Reference_Interface */
+      $count = $refSpec->getReferenceCount($this);
+      if ($count['count'] != 0) {
+        $counts[] = $count;
+      }
+    }
+
+    return $counts;
+  }
+
   /**
    * List all tables which have hard foreign keys to this table.
    *
