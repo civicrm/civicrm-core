@@ -42,9 +42,9 @@
  * $item = $queue->claimItem();
  * if ($item) {
  *   if (my_process($item->data)) {
- *     $myMessage->deleteItem($item);
+ *     $queue->deleteItem($item);
  *   } else {
- *     $myMessage->releaseItem($item);
+ *     $queue->releaseItem($item);
  *   }
  * }
  * @endcode
