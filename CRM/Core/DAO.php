@@ -238,7 +238,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @static
    * @access public
    *
-   * @return array of CRM_Core_EntityReference
+   * @return array of CRM_Core_Reference_Interface
    */
   static function getReferenceColumns() {
     return array();
@@ -1741,7 +1741,7 @@ SELECT contact_id
 
     $occurrences = array();
     foreach ($links as $refSpec) {
-      /** @var $refSpec CRM_Core_EntityReference */
+      /** @var $refSpec CRM_Core_Reference_Interface */
       $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($refSpec->getReferenceTable());
       $result = $refSpec->findReferences($this);
       while ($result->fetch()) {
@@ -1775,9 +1775,8 @@ SELECT contact_id
       $daoTableName = $daoClassName::getTableName();
 
       foreach ($links as $refSpec) {
-        if ($refSpec->getTargetTable() === $tableName
-              or $refSpec->isGeneric()
-        ) {
+        /** @var $refSpec CRM_Core_Reference_Interface */
+        if ($refSpec->matchesTargetTable($tableName)) {
           $refsFound[] = $refSpec;
         }
       }
