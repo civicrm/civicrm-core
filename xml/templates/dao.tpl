@@ -137,17 +137,17 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
      *
      * @static
      * @access public
-     * @return array of CRM_Core_EntityReference
+     * @return array of CRM_Core_Reference_Interface
      */
     static function getReferenceColumns() {ldelim}
       if (!self::$_links) {ldelim}
         self::$_links = array(
 {foreach from=$table.foreignKey item=foreign}
-          new CRM_Core_EntityReference(self::getTableName(), '{$foreign.name}', '{$foreign.table}', '{$foreign.key}'),
+          new CRM_Core_Reference_Basic(self::getTableName(), '{$foreign.name}', '{$foreign.table}', '{$foreign.key}'),
 {/foreach}
 
 {foreach from=$table.dynamicForeignKey item=foreign}
-          new CRM_Core_EntityReference(self::getTableName(), '{$foreign.idColumn}', NULL, '{$foreign.key|default:'id'}', '{$foreign.typeColumn}'),
+          new CRM_Core_Reference_Dynamic(self::getTableName(), '{$foreign.idColumn}', NULL, '{$foreign.key|default:'id'}', '{$foreign.typeColumn}'),
 {/foreach}
         );
       {rdelim}

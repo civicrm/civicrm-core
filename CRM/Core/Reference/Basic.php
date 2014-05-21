@@ -3,9 +3,9 @@
 /**
  * Description of a one-way link between two entities
  *
- * This could be a foreign key or a generic (entity_id, entity_table) pointer
+ * This is a basic SQL foreign key.
  */
-class CRM_Core_EntityReference {
+class CRM_Core_Reference_Basic implements CRM_Core_Reference_Interface {
   protected $refTable;
   protected $refKey;
   protected $refTypeColumn;
@@ -40,36 +40,21 @@ class CRM_Core_EntityReference {
     return $this->targetKey;
   }
 
-  /**
-   * @return true if the reference can point to more than one type
-   */
-  function isGeneric() {
-    return ($this->refTypeColumn !== NULL);
+  public function matchesTargetTable($tableName) {
+    return ($this->getTargetTable() === $tableName);
   }
 
-  /**
-   * Create a query to find references to a particular record
-   *
-   * @param CRM_Core_DAO $targetDao the instance for which we want references
-   * @return CRM_Core_DAO a query-handle (like the result of CRM_Core_DAO::executeQuery)
-   */
   public function findReferences($targetDao) {
-    $refColumn = $this->getReferenceKey();
     $targetColumn = $this->getTargetKey();
-    $params = array(1 => array($targetDao->$targetColumn, 'String'));
+    $params = array(
+      1 => array($targetDao->$targetColumn, 'String')
+    );
     $sql = <<<EOS
 SELECT id
 FROM {$this->getReferenceTable()}
-WHERE {$refColumn} = %1
+WHERE {$this->getReferenceKey()} = %1
 EOS;
-    if ($this->isGeneric()) {
-      // If anyone complains about $dao::getTableName(), then could use
-      // "$daoClass=get_class($dao); $daoClass::getTableName();"
-      $params[2] = array($targetDao::getTableName(), 'String');
-      $sql .= <<<EOS
-    AND {$this->getTypeColumn()} = %2
-EOS;
-    }
+
     $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($this->getReferenceTable());
     $result = CRM_Core_DAO::executeQuery($sql, $params, TRUE, $daoName);
     return $result;
