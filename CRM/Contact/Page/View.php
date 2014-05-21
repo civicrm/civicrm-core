@@ -276,6 +276,10 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     );
   }
 
+  /**
+   * @param $page
+   * @param null $contactID
+   */
   static function checkUserPermission($page, $contactID = NULL) {
     // check for permissions
     $page->_permission = NULL;

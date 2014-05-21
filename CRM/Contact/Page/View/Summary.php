@@ -417,9 +417,12 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
   }
 
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     if ($this->_contactId) {
-      $contactSubtypes = $this->get('contactSubtype') ? 
+      $contactSubtypes = $this->get('contactSubtype') ?
         explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->get('contactSubtype')) : array();
 
       // there could be multiple subtypes. We check templates for each of the subtype, and return the first one found.
