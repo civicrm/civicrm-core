@@ -202,9 +202,15 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     //set transaction type
     $txnType = $this->retrieve('txn_type', 'String');
     //Changes for paypal pro recurring payment
-
+    $contributionStatuses = civicrm_api3('contribution', 'getoptions', array('field' => 'contribution_status_id'));
+    $contributionStatuses = $contributionStatuses['values'];
     switch ($txnType) {
       case 'recurring_payment_profile_created':
+        if(in_array($recur->contribution_status_id, array(array_search('Pending',$contributionStatuses), array_search('In Progress',$contributionStatuses)))
+        && !empty($recur->processor_id)) {
+          echo "already handled";
+          return;
+        }
         $recur->create_date = $now;
         $recur->contribution_status_id = 2;
         $recur->processor_id = $this->retrieve('recurring_payment_id', 'String');
@@ -223,6 +229,10 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
         //contribution installment is completed
         if ($this->retrieve('profile_status', 'String') == 'Expired') {
+          if(!empty($recur->end_date)) {
+            echo "already handled";
+            return;
+          }
           $recur->contribution_status_id = 1;
           $recur->end_date = $now;
           $sendNotification = TRUE;
