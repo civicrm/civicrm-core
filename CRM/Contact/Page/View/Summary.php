@@ -275,7 +275,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       //for birthdate format with respect to birth format set
       $this->assign('birthDateViewFormat', CRM_Utils_Array::value('qfMapping', CRM_Utils_Date::checkBirthDateFormat()));
     }
-    
+
     $defaults['external_identifier'] = $contact->external_identifier;
     $this->assign($defaults);
 

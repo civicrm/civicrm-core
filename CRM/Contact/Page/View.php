@@ -311,6 +311,12 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     }
   }
 
+  /**
+   * @param $contactId
+   * @param bool $isDeleted
+   *
+   * @return string
+   */
   static function setTitle($contactId, $isDeleted = FALSE) {
     static $contactDetails;
     $displayName = $contactImage = NULL;
@@ -340,47 +346,19 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
 
   /**
    * Add urls for display in the actions menu
+   * @param CRM_Core_Page $obj
+   * @param integer $cid
    */
   static function addUrls(&$obj, $cid) {
-    // TODO rewrite without so many hard-coded CMS bits; use abstractions like CRM_Core_Permission::check('cms:...') and CRM_Utils_System
+     $uid = CRM_Core_BAO_UFMatch::getUFId($cid);
 
-    $config = CRM_Core_Config::singleton();
-    $session = CRM_Core_Session::singleton();
-    $uid = CRM_Core_BAO_UFMatch::getUFId($cid);
-    $userRecordUrl = NULL;
     if ($uid) {
-      if ($config->userSystem->is_drupal == '1' &&
-        ($session->get('userID') == $cid || CRM_Core_Permission::checkAnyPerm(array('cms:administer users', 'cms:view user account')))
-      ) {
-        $userRecordUrl = CRM_Utils_System::url('user/' . $uid);
-      }
-      elseif ($config->userFramework == 'Joomla') {
-        $userRecordUrl = NULL;
-        // if logged in user is super user, then he can view other users joomla profile
-        if (JFactory::getUser()->authorise('core.admin')) {
-          $userRecordUrl = $config->userFrameworkBaseURL . "index.php?option=com_users&view=user&task=user.edit&id=" . $uid;
-        }
-        elseif ($session->get('userID') == $cid) {
-          $userRecordUrl = $config->userFrameworkBaseURL . "index.php?option=com_admin&view=profile&layout=edit&id=" . $uid;
-        }
-      }
-      // For WordPress, provide link to user profile is contact belongs to logged in user OR user has administrator role
-      elseif ($config->userFramework == 'WordPress' &&
-        ($session->get('userID') == $cid || CRM_Core_Permission::checkAnyPerm(array('cms:administer users')))
-        ) {
-          $userRecordUrl = $config->userFrameworkBaseURL . "wp-admin/user-edit.php?user_id=" . $uid;
-      }
+      $userRecordUrl = CRM_Core_Config::singleton()->userSystem->getUserRecordUrl($cid);
       $obj->assign('userRecordUrl', $userRecordUrl);
       $obj->assign('userRecordId', $uid);
     }
-    elseif (($config->userSystem->is_drupal == '1' && CRM_Core_Permission::check('administer users')) ||
-      ($config->userFramework == 'Joomla' &&
-        JFactory::getUser()->authorise('core.create', 'com_users')
-      )
-    ) {
-      $userAddUrl = CRM_Utils_System::url('civicrm/contact/view/useradd',
-        'reset=1&action=add&cid=' . $cid
-      );
+    elseif (CRM_Core_Config::singleton()->userSystem->checkPermissionAddUser()) {
+      $userAddUrl = CRM_Utils_System::url('civicrm/contact/view/useradd', 'reset=1&action=add&cid=' . $cid);
       $obj->assign('userAddUrl', $userAddUrl);
     }
 
