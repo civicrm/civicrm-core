@@ -4606,6 +4606,14 @@ span.crm-status-icon {
   color: #222222;
 }
 
+#crm-container.crm-public .price-set-option-content > tt {
+  display: none;
+}
+
+#crm-container.crm-public .price_set-section .sold-out-option {
+  font-weight: bold;
+  font-style: italic;
+}
 #crm-container .crm-extensions-upgrade {
   background: #ffb;
   border: 1px solid #000;
