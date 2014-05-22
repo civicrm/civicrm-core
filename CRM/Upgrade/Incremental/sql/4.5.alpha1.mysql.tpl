@@ -318,7 +318,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_case_type` (
   `is_active` tinyint(4) DEFAULT NULL COMMENT 'Is this entry active?',
   `is_reserved` tinyint(4) DEFAULT NULL COMMENT 'Is this case type a predefined system type?',
   `weight` int(11) NOT NULL DEFAULT '1' COMMENT 'Ordering of the case types',
-  `xml_definition` blob    COMMENT 'xml definition of case type',
+  `definition` blob    COMMENT 'xml definition of case type',
   PRIMARY KEY (`id`),
   UNIQUE KEY `case_type_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
