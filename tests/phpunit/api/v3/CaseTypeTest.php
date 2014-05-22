@@ -158,7 +158,7 @@ class api_v3_CaseTypeTest extends CiviUnitTestCase {
       'name' => 'Application_with_XML',
       'is_active' => 1,
       'weight' => 4,
-      'xml_definition' => file_get_contents($caseXMLFile),
+      'definition' => file_get_contents($caseXMLFile),
     );
 
     $result = $this->callAPISuccess('CaseType', 'create', $params);
