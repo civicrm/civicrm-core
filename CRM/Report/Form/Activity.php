@@ -308,7 +308,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   function select($recordType = NULL) {
     if (!array_key_exists("contact_{$recordType}", $this->_params['fields']) && $recordType != 'final') {
       $this->_nonDisplayFields[] = "civicrm_contact_contact_{$recordType}";
-      $this->_params['fields']["contact_{$recordType}"] = 1;
     }
     parent::select();
 
@@ -583,10 +582,10 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy}";
     $nullFilters = array();
     foreach (array('target', 'source', 'assignee') as $type) {
       if (CRM_Utils_Array::value("contact_{$type}_op", $this->_params) == 'nnll' || !empty($this->_params["contact_{$type}_value"])) {
-        $nullFilters[] = " civicrm_contact_contact_{$type} IS NOT NULL ";
+        $nullFilters[] = " civicrm_contact_contact_{$type}_id IS NOT NULL ";
       }
       else if (CRM_Utils_Array::value("contact_{$type}_op", $this->_params) == 'nll') {
-        $nullFilters[] = " civicrm_contact_contact_{$type} IS NULL ";
+        $nullFilters[] = " civicrm_contact_contact_{$type}_id IS NULL ";
       }
     }
 
