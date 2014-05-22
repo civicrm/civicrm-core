@@ -44,6 +44,7 @@
       'click .crm-profile-selector-edit': 'doEdit',
       'click .crm-profile-selector-copy': 'doCopy',
       'click .crm-profile-selector-create': 'doCreate',
+      'click .crm-profile-selector-preview': 'doShowPreview',
       // prevent interaction with preview form
       'click .crm-profile-selector-preview-pane': false,
       'crmLoad .crm-profile-selector-preview-pane': 'disableForm'
@@ -58,6 +59,7 @@
       this.setUfGroupId(this.options.ufGroupId, {silent: true});
       this.toggleButtons();
       this.$('.crm-profile-selector-select select').css('width', '25em').crmSelect2();
+      this.doShowPreview();
     },
     onChangeUfGroupId: function(event) {
       this.options.ufGroupId = $(event.target).val();
@@ -85,6 +87,17 @@
         $pane.html($('#profile_selector_empty_preview_template').html());
       } else {
         CRM.loadPage(CRM.url("civicrm/ajax/inline", {class_name: 'CRM_UF_Form_Inline_PreviewById', id: this.getUfGroupId()}), {target: $pane});
+      }
+    },
+    doShowPreview: function() {
+      var $preview = this.$('.crm-profile-selector-preview');
+      var $pane = this.$('.crm-profile-selector-preview-pane');
+      if ($preview.hasClass('crm-profile-selector-preview-show')) {
+        $preview.removeClass('crm-profile-selector-preview-show');
+        $pane.show();
+      } else {
+        $preview.addClass('crm-profile-selector-preview-show');
+        $pane.hide();
       }
     },
     disableForm: function() {
