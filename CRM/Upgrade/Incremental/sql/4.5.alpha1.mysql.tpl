@@ -519,3 +519,13 @@ WHERE co.id IS NULL;
     WHERE v.name = 'Awaiting Information';
 {/if}
 
+-- Financial account relationship
+SELECT @option_group_id_arel           := max(id) from civicrm_option_group where name = 'account_relationship';
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
+VALUES
+(@option_group_id_arel, {localize}'{ts escape="sql"}Sales Tax Account is{/ts}'{/localize}, 10, 'Sales Tax Account is', NULL, 0, 0, 10, {localize}'Sales Tax Account is'{/localize}, 0, 1, 1, 2, NULL);
+
+-- Add new column tax_amount in contribution and lineitem table
+ALTER TABLE `civicrm_contribution` ADD `tax_amount` DECIMAL( 20, 2 ) NOT NULL DEFAULT '0.00' COMMENT 'Total tax amount of this contribution.';
+ALTER TABLE `civicrm_line_item` ADD `tax_amount` DECIMAL( 20, 2 ) NOT NULL DEFAULT '0.00' COMMENT 'tax of each item';
