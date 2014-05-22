@@ -168,5 +168,17 @@
       <type>Text</type>
     </html>
   </field>
+  <field>
+    <name>tax_amount</name>
+    <type>decimal</type>
+    <import>true</import>
+    <headerPattern>/tax(.?am(ou)?nt)?/i</headerPattern>
+    <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
+    <comment>tax of each item</comment>
+    <add>4.5</add>
+    <html>
+     <type>Text</type>
+   </html>
+  </field>
 </table>
 

@@ -2725,7 +2725,7 @@ WHERE      civicrm_membership.is_test = 0";
     $recordContribution = array(
       'contact_id', 'total_amount', 'receive_date', 'financial_type_id',
       'payment_instrument_id', 'trxn_id', 'invoice_id', 'is_test',
-      'contribution_status_id', 'check_number', 'campaign_id', 'is_pay_later',
+      'contribution_status_id', 'check_number', 'campaign_id', 'is_pay_later', 'tax_amount'
     );
     foreach ($recordContribution as $f) {
       $contributionParams[$f] = CRM_Utils_Array::value($f, $params);

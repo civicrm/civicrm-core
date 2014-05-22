@@ -1069,6 +1069,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       else {
         $lineItem = array();
         CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem);
+        if ($params['tax_amount']) {
+          $this->set('tax_amount', $params['tax_amount']);
+        }
         $this->set('lineItem', array($lineItem));
         $this->set('lineItemParticipantsCount', array($primaryParticipantCount));
       }
