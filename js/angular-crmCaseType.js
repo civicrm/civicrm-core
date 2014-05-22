@@ -2,7 +2,7 @@
 
   var partialUrl = function(relPath) {
     return CRM.resourceUrls['civicrm'] + '/partials/crmCaseType/' + relPath;
-  } ;
+  };
 
   var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils']);
 
@@ -17,7 +17,7 @@
 
   // Add a new record by name.
   // Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
-  crmCaseType.directive('crmAddName', function(){
+  crmCaseType.directive('crmAddName', function() {
     return {
       restrict: 'AE',
       scope: {
@@ -173,7 +173,7 @@
 
     $scope.$watchCollection('caseType.definition.activitySets', function() {
       _.defer(function() {
-          $('.crmCaseType-acttab').tabs('refresh');
+        $('.crmCaseType-acttab').tabs('refresh');
       });
     });
   });
