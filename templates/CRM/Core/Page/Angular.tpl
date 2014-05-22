@@ -13,6 +13,12 @@
         });
       }
     ]);
+    crmApp.factory('crmApi', function(){
+      return function(entity, action, params, message) {
+        // JSON serialization in CRM.api3 is not aware of Angular metadata like $$hash
+        return CRM.api3(entity, action, eval('('+angular.toJson(params)+')'), message);
+      };
+    });
   })();
 </script>
 
