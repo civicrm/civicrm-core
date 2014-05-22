@@ -933,11 +933,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $this->_activityId
     );
 
-    // format target params
-    if (!$this->_single) {
-      $params['target_contact_id'] = $this->_contactIds;
-    }
-
     $activity = array();
     if (!empty($params['is_multi_activity']) &&
       !CRM_Utils_Array::crmIsEmptyArray($params['target_contact_id'])
