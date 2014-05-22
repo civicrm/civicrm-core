@@ -29,7 +29,7 @@
     };
   });
 
-  crmCaseType.controller('CaseTypeCtrl', function($scope) {
+  crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi) {
     $scope.partialUrl = partialUrl;
 
     $scope.activityStatuses = CRM.crmCaseType.actStatuses;
@@ -169,6 +169,10 @@
 
     $scope.dump = function() {
       console.log($scope.caseType);
+    };
+
+    $scope.save = function() {
+      crmApi('CaseType', 'create', $scope.caseType, true);
     };
 
     $scope.$watchCollection('caseType.definition.activitySets', function() {
