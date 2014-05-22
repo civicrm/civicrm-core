@@ -3368,4 +3368,19 @@ WHERE con.id = {$contributionId}
     }
     return $info;
   }
+
+  /**
+   * Function to retreive the admin page data for contribution
+   *
+   */
+  static function getContributionSettings() {
+    $fields = array('invoice_prefix','due_date','due_date_period','notes','credit_notes_prefix','tax_display_settings');
+    foreach ($fields as $values) {
+      $fieldName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Setting',$values, 'value','name');
+      if (preg_match('/"([^"]+)"/', $fieldName, $fieldData)) {
+        $fieldValue[$values] = $fieldData[1];
+      }
+    }
+    return $fieldValue;
+  }
 }
