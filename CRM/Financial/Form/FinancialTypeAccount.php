@@ -283,6 +283,13 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
       );
       $defaults = array();
       if ($self->_action == CRM_Core_Action::ADD) {
+        $relationshipId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
+        $isTax = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $values['financial_account_id'], 'is_tax');
+        if ($values['account_relationship'] == $relationshipId) {
+          if (!($isTax)) {
+            $errorMsg['financial_account_id'] = ts('Is Tax? must be set for respective financial account');
+          }
+        }
         $result = CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $defaults);
         if ($result) {
           $errorFlag = TRUE;
