@@ -1392,6 +1392,10 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           }
         }
 
+        if (CRM_Utils_Array::value('tax_amount', $this->_params)) {
+          $contributionParams['tax_amount'] = $this->_params['tax_amount'];
+        }
+
         if ($this->_single) {
           if (empty($ids)) {
             $ids = array();
@@ -1445,6 +1449,9 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
                 ($params['status_id'] != array_search('Partially paid', $participantStatus))
               ) {
                 $line['unit_price'] = $line['line_total'] = $params['total_amount'];
+                if (!empty($params['tax_amount'])) {
+                  $line['unit_price'] = $line['unit_price'] - $params['tax_amount'];
+                }
               }
               $lineItem[$this->_priceSetId][$lineKey] = $line;
             }
