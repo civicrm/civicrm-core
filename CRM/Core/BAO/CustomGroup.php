@@ -1144,6 +1144,7 @@ ORDER BY civicrm_custom_group.weight,
         }
         break;
 
+      case 'Case':
       case 'Location':
       case 'Address':
       case 'Activity':
