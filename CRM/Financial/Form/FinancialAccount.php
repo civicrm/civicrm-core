@@ -146,9 +146,31 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    */
   static function formRule( $values, $files, $self ) {
     $errorMsg = array( );
-    if (!empty( $values['tax_rate'])) {
-      if ($values['tax_rate'] <= 0 || $values['tax_rate'] > 100) {
+    $financialAccountTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Liability' "));
+    if (isset($values['is_tax'])) {
+      if ($values['financial_account_type_id'] !=  $financialAccountTypeId) {
+        $errorMsg['financial_account_type_id'] = ts('Taxable accounts should have Financial Account Type set to Liability.');
+      }
+      if (CRM_Utils_Array::value('tax_rate', $values) == NULL) {
+        $errorMsg['tax_rate'] = ts('Please enter value for tax rate');
+      }
+    }
+    if ((CRM_Utils_Array::value('tax_rate', $values) != NULL))  {
+      if ($values['tax_rate'] < 0 || $values['tax_rate'] >= 100) {
         $errorMsg['tax_rate'] = ts('Tax Rate Should be between 0 - 100');
+      }
+    }
+    if ($self->_action & CRM_Core_Action::UPDATE) {
+      if (!(isset($values['is_tax']))) {
+        $relationshipId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
+        $params = array(
+          'financial_account_id'  => $self->_id,
+          'account_relationship'=> $relationshipId
+        );
+        $result = CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $defaults);       
+        if ($result) {
+          $errorMsg['is_tax'] = ts('Is Tax? must be set for this financial account');
+        }
       }
     }
     return CRM_Utils_Array::crmIsEmptyArray( $errorMsg ) ? true : $errorMsg;
