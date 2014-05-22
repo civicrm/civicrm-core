@@ -1700,7 +1700,7 @@ AND cc.sort_name LIKE '%$name%'";
         $contactRelationships[$relationshipId]['name'] = CRM_Utils_System::href(
           $values['name'],
           'civicrm/contact/view',
-          "reset=1&cid={$values['contact_id_b']}");
+          "reset=1&cid={$values['cid']}");
 
         $contactRelationships[$relationshipId]['relation'] = CRM_Utils_System::href(
           $values['relation'],
