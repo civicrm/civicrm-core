@@ -653,7 +653,7 @@ WHERE  id = %1";
 
   static function processAmount(&$fields, &$params, &$lineItem, $component = '') {
     // using price set
-    $totalPrice = 0;
+    $totalPrice = $totalTax = 0;
     $radioLevel = $checkboxLevel = $selectLevel = $textLevel = array();
     if ($component) {
       $autoRenew = array();
@@ -671,6 +671,10 @@ WHERE  id = %1";
         case 'Text':
           $params["price_{$id}"] = array(key($field['options']) => $params["price_{$id}"]);
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
+          if (CRM_Utils_Array::value('tax_rate', $field['options'][key($field['options'])])) {
+            $lineItem = self::setLineItem($field, $lineItem, key($field['options']));
+            $totalTax += $field['options'][key($field['options'])]['tax_amount'] * $lineItem[key($field['options'])]['qty'];
+          }
           $totalPrice += $lineItem[key($field['options'])]['line_total'];
           break;
 
@@ -693,6 +697,10 @@ WHERE  id = %1";
             $radioLevel = array_keys($params['amount_priceset_level_radio']);
           }
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
+          if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
+            $lineItem = self::setLineItem($field, $lineItem, $optionValueId);
+            $totalTax += $field['options'][$optionValueId]['tax_amount'];
+          }
           $totalPrice += $lineItem[$optionValueId]['line_total'];
           if (
             $component &&
@@ -718,6 +726,10 @@ WHERE  id = %1";
             $selectLevel = array_keys($params['amount_priceset_level_select']);
           }
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
+          if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
+            $lineItem = self::setLineItem($field, $lineItem, $optionValueId);
+            $totalTax += $field['options'][$optionValueId]['tax_amount'];
+          }
           $totalPrice += $lineItem[$optionValueId]['line_total'];
           if (
             $component &&
@@ -747,6 +759,10 @@ WHERE  id = %1";
           }
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
           foreach ($optionIds as $optionId) {
+            if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionId])) {
+              $lineItem = self::setLineItem($field, $lineItem, $optionId);
+              $totalTax += $field['options'][$optionId]['tax_amount'];
+            }
             $totalPrice += $lineItem[$optionId]['line_total'];
             if (
               $component &&
@@ -779,6 +795,7 @@ WHERE  id = %1";
     }
     $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
     $params['amount'] = $totalPrice;
+    $params['tax_amount'] = $totalTax;
     if ($component) {
       foreach ($autoRenew as $dontCare => $eachAmount) {
         if (!$eachAmount) {
@@ -1256,6 +1273,26 @@ WHERE       ps.id = %1
         }
       }
     }
+  }
+
+  /*
+   * Function to set tax_amount and tax_rate in LineItem
+   *
+   *
+   */
+  static function setLineItem($field, $lineItem, $optionValueId) {
+    if ($field['html_type'] == 'Text') {
+      $taxAmount = $field['options'][$optionValueId]['tax_amount'] * $lineItem[$optionValueId]['qty'];
+    }
+    else {
+      $taxAmount = $field['options'][$optionValueId]['tax_amount'];
+    }
+    $taxRate = $field['options'][$optionValueId]['tax_rate'];
+    $lineItem[$optionValueId]['line_total'] = $lineItem[$optionValueId]['line_total'] + $taxAmount;
+    $lineItem[$optionValueId]['tax_amount'] = $taxAmount;
+    $lineItem[$optionValueId]['tax_rate'] = $taxRate;
+
+    return $lineItem;
   }
 }
 
