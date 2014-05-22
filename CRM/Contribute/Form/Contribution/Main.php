@@ -1230,10 +1230,16 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $component = 'membership';
       }
       CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem[$priceSetId], $component);
+      if ($params['tax_amount']) {
+        $this->set('tax_amount', $params['tax_amount']);
+      }
 
       if ($proceFieldAmount) {
-        $lineItem[$params['priceSetId']][$fieldOption]['line_total'] = $proceFieldAmount;
         $lineItem[$params['priceSetId']][$fieldOption]['unit_price'] = $proceFieldAmount;
+        if (isset($lineItem[$params['priceSetId']][$fieldOption]['tax_amount'])) {
+          $proceFieldAmount += $lineItem[$params['priceSetId']][$fieldOption]['tax_amount'];
+        }
+        $lineItem[$params['priceSetId']][$fieldOption]['line_total'] = $proceFieldAmount;
         if (!$this->_membershipBlock['is_separate_payment']) {
           $params['amount'] = $proceFieldAmount; //require when separate membership not used
         }
