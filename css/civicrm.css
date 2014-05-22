@@ -225,9 +225,36 @@ input.crm-form-entityref {
   color: #3E3E3E;
 }
 
+.crm-container .replace-plain,
 .crm-container textarea,
 .crm-container select.crm-form-multiselect {
   border: 1px solid #999;
+}
+
+.crm-container .replace-plain {
+  cursor: pointer;
+  background: rgba(255,255,255,0.6);
+  min-height: 2em;
+  position: relative;
+  padding: 2px;
+}
+
+.crm-container .replace-plain:focus,
+.crm-container .replace-plain:hover {
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
+  background: rgba(255,255,255,0.8);
+}
+
+.crm-container .replace-plain .icon.edit-icon {
+  position: absolute;
+  top: .5em;
+  right: .5em;
+}
+
+.crm-container .replace-plain a:active .icon.edit-icon,
+.crm-container .replace-plain:focus .icon.edit-icon,
+.crm-container .replace-plain:hover .icon.edit-icon {
+  background-image: url("../i/icons/jquery-ui-2786C2.png");
 }
 
 /*

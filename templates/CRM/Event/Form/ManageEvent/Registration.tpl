@@ -32,14 +32,13 @@
                                                       data-addtlPartc="{$addProfileBottomAdd}"><span
           class="icon ui-icon-trash"></span>{ts}remove profile{/ts}</a></span>&nbsp;&nbsp;<span
       class='profile_bottom_link'>&nbsp;<a href="#" class="crm-hover-button crm-button-add-profile"><span
-          class="icon ui-icon-plus"></span>{ts}add profile{/ts}</a></span>
-    <br/>
+          class="icon ui-icon-plus"></span>{ts}add another profile (bottom of page){/ts}</a></span>
     {if $addProfileBottomAdd }
-      <span
-        class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}</span>
+      <div
+        class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}</div>
     {else}
-      <span
-        class="description">{ts}Include additional fields on this registration form by configuring and selecting a CiviCRM Profile to be included at the bottom of the page.{/ts}</span>
+      <div
+        class="description">{ts}Include additional fields on this registration form by selecting and configuring a CiviCRM Profile to be included at the bottom of the page.{/ts}</div>
     {/if}
     <br/><span class="profile-links"></span>
   </td>
@@ -139,20 +138,20 @@
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-custom_pre_id">
         <td scope="row" class="label" width="20%">{$form.custom_pre_id.label}</td>
-        <td>{$form.custom_pre_id.html}<br/>
-          <span
-            class="description">{ts}Include additional fields on this registration form by configuring and selecting a CiviCRM Profile to be included at the top of the page (immediately after the introductory message).{/ts}{help id="event-profile"}</span><br/>
+        <td>{$form.custom_pre_id.html}
+          <div
+            class="description">{ts}Include additional fields on this registration form by selecting and configuring a CiviCRM Profile to be included at the top of the page (immediately after the introductory message).{/ts}{help id="event-profile"}</div>
         </td>
       </tr>
       <tr id="profile_post" class="crm-event-manage-registration-form-block-custom_post_id">
         <td scope="row" class="label" width="20%">{$form.custom_post_id.label}</td>
         <td>{$form.custom_post_id.html}
-          &nbsp;<span class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'>&nbsp;<a href="#"
-                                                                                                            class="crm-hover-button crm-button-add-profile"><span
-                class="icon ui-icon-plus"></span>{ts}add profile{/ts}</a></span>
+          <div
+            class="description">{ts}Include additional fields on this registration form by selecting and configuring a CiviCRM Profile to be included at the bottom of the page.{/ts}</div>
+          &nbsp;<span class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'>&nbsp;<a href="#" 
+class="crm-hover-button crm-button-add-profile"><span
+                class="icon ui-icon-plus"></span>{ts}add another profile (bottom of page){/ts}</a></span>
           <br/>
-          <span
-            class="description">{ts}Include additional fields on this registration form by configuring and selecting a CiviCRM Profile to be included at the bottom of the page.{/ts}</span>
         </td>
       </tr>
 
@@ -168,7 +167,7 @@
               {if $smarty.foreach.profilePostIdName.last}
                 &nbsp;&nbsp;
                 <span class='profile_bottom_link'><a href="#" class="crm-hover-button crm-button-add-profile"><span
-                      class="icon ui-icon-plus"></span>{ts}add profile{/ts}</a></span>
+                      class="icon ui-icon-plus"></span>{ts}add another profile (bottom of page){/ts}</a></span>
               {/if}
               <br/><span class="profile-links"></span>
             </td>
@@ -179,21 +178,21 @@
     <table class="form-layout-compressed">
       <tr id="additional_profile_pre" class="crm-event-manage-registration-form-block-additional_custom_pre_id">
         <td scope="row" class="label" width="20%">{$form.additional_custom_pre_id.label}</td>
-        <td>{$form.additional_custom_pre_id.html}<br/>
-              <span
-                class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}</span>
+        <td>{$form.additional_custom_pre_id.html}
+              <div
+                class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}</div>
           <br/><span class="profile-links"></span>
         </td>
       </tr>
       <tr id="additional_profile_post" class="crm-event-manage-registration-form-block-additional_custom_post_id">
         <td scope="row" class="label" width="20%">{$form.additional_custom_post_id.label}</td>
         <td>{$form.additional_custom_post_id.html}
-          &nbsp;<span class='profile_bottom_add_link_main {if $profilePostMultipleAdd}hiddenElement{/if}'><a
+          <div
+            class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}
+					</div>
+          &nbsp;<span class='profile_bottom_add_link_main{if $profilePostMultipleAdd} hiddenElement{/if}'><a
               href="#" class="crm-hover-button crm-button-add-profile"><span
-                class="icon ui-icon-plus"></span>{ts}add profile{/ts}</a></span>
-          <br/>
-              <span
-                class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}</span>
+                class="icon ui-icon-plus"></span>{ts}add another profile (bottom of page){/ts}</a></span>
           <br/><span class="profile-links"></span>
         </td>
       </tr>
@@ -211,7 +210,7 @@
                 &nbsp;&nbsp;
                 <span class='profile_bottom_add_link'><a href="#"
                                                          class="crm-hover-button crm-button-add-profile"><span
-                      class="icon ui-icon-plus"></span>{ts}add profile{/ts}</a></span>
+                      class="icon ui-icon-plus"></span>{ts}add another profile (bottom of page){/ts}</a></span>
               {/if}
               <br/><span class="profile-links"></span>
             </td>
@@ -432,6 +431,8 @@ invert              = 0
         $(this).closest('tbody').append('<tr class="additional_profile"></tr>');
         var $el = $(this).closest('tbody').find('tr:last');
         $el.load(urlPath, function() { $(this).trigger('crmLoad') });
+        $(this).closest(".profile_bottom_link_main, .profile_bottom_link, .profile_bottom_add_link_main").hide();
+        $el.find(".profile_bottom_link_main, .profile_bottom_link, .profile_bottom_add_link_main").show();
     }
 
     function removeBottomProfile( e ) {
@@ -439,6 +440,7 @@ invert              = 0
 
         $(e.target).parents('tr').find('.crm-profile-selector').val('');
         $(e.target).parents('tr').hide();
+        $(e.target).parents('tbody').find('tr:visible:last .profile_bottom_link_main, tr:visible:last .profile_bottom_link, tr:visible:last .profile_bottom_add_link_main').show();
     }
 
     var strSameAs = ' - '+ts('same as for main contact')+' - ';
