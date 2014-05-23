@@ -47,7 +47,7 @@
        </script>
        {/literal}
 
-       <table id="gotvVoterRecords">
+       <table class="gotvVoterRecords">
            <thead>
               <tr class="columnheader">
             <th></th>
@@ -98,20 +98,20 @@ function searchVoters( qfKey )
 
       //carry survey and interviewer id,
       //might be helpful if user jump from current tab to interview tab.
-      var surveyId = cj( '#campaign_survey_id' ).val();
-      var interviewerId = cj( '#survey_interviewer_id' ).val();
+      var surveyId = CRM.$( '#campaign_survey_id' ).val();
+      var interviewerId = CRM.$( '#survey_interviewer_id' ).val();
       if ( surveyId ) dataUrl = dataUrl + '&sid=' + surveyId;
       if ( interviewerId ) dataUrl = dataUrl + '&cid=' + interviewerId;
 
       //lets carry qfKey to retain form session.
       if ( qfKey ) dataUrl = dataUrl + '&qfKey=' + qfKey;
 
-      cj.get( dataUrl, null, function( voterList ) {
-        cj( '#voterList' ).html( voterList ).trigger('crmLoad');
+      CRM.$.get( dataUrl, null, function( voterList ) {
+        CRM.$( '#voterList' ).html( voterList ).trigger('crmLoad');
 
         //collapse the search form.
         var searchFormName = '#search_form_' + {/literal}'{$searchVoterFor}'{literal};
-        cj( searchFormName + '.crm-accordion-wrapper:not(.collapsed)').crmAccordionToggle();
+        CRM.$( searchFormName + '.crm-accordion-wrapper:not(.collapsed)').crmAccordionToggle();
       }, 'html' );
 }
 
@@ -120,8 +120,7 @@ function loadVoterList( )
      var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='snippet=4&className=CRM_Campaign_Page_AJAX&fnName=voterList' }"{literal};
 
      var searchVoterFor = {/literal}'{$searchVoterFor}'{literal};
-
-     cj( '#gotvVoterRecords' ).dataTable({
+     CRM.$( 'table.gotvVoterRecords', 'form#{/literal}{$form.formName}{literal}').dataTable({
                "bFilter"    : false,
     "bAutoWidth" : false,
         "bProcessing": true,
@@ -132,7 +131,7 @@ function loadVoterList( )
     "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
        "bServerSide": true,
        "sAjaxSource": sourceUrl,
-    "fnDrawCallback": function() { cj().crmtooltip(); },
+    "fnDrawCallback": function() { CRM.$().crmtooltip(); },
 
     "fnServerData": function ( sSource, aoData, fnCallback ) {
       var dataLength = aoData.length;
@@ -143,7 +142,7 @@ function loadVoterList( )
       //get the search criteria.
                         var searchParams = {/literal}{$searchParams}{literal};
                         for ( param in searchParams ) {
-                            if ( val = cj( '#' + param ).val( ) ) {
+                            if ( val = CRM.$( '#' + param ).val( ) ) {
             aoData[dataLength++] = {name: param , value: val };
           }
           searchCriteria[count++] = param;
@@ -155,7 +154,7 @@ function loadVoterList( )
       //lets transfer search criteria.
       aoData[dataLength++] = {name: 'searchCriteria', value:searchCriteria.join(',')};
 
-      cj.ajax( {
+      CRM.$.ajax( {
         "dataType": 'json',
         "type": "POST",
         "url": sSource,
@@ -174,20 +173,20 @@ function processVoterData( element, operation )
   var data = new Object;
   if ( operation == 'release' ) {
          data['operation']   = operation;
-  data['activity_id'] = cj( element ).val( );
-  data['isDelete']    = cj( element ).prop('checked') ? 1:0;
+  data['activity_id'] = CRM.$( element ).val( );
+  data['isDelete']    = CRM.$( element ).prop('checked') ? 1:0;
   } else if ( operation == 'reserve' ) {
-        var interviewerId           = cj( '#survey_interviewer_id' ).val( );
+        var interviewerId           = CRM.$( '#survey_interviewer_id' ).val( );
         data['operation']           = operation;
-        data['source_record_id']    = cj( '#campaign_survey_id' ).val( );
-  data['target_contact_id']   = cj( element ).val( );
+        data['source_record_id']    = CRM.$( '#campaign_survey_id' ).val( );
+  data['target_contact_id']   = CRM.$( element ).val( );
         data['source_contact_id']   = interviewerId;
         data['assignee_contact_id'] = interviewerId;
-  data['isReserved']          = cj( element ).prop('checked') ? 1:0;
+  data['isReserved']          = CRM.$( element ).prop('checked') ? 1:0;
   } else if ( operation == 'gotv' ) {
          data['operation']   = operation;
-  data['activity_id'] = cj( element ).val( );
-  data['hasVoted']    = cj( element ).prop('checked') ? 1: 0;
+  data['activity_id'] = CRM.$( element ).val( );
+  data['hasVoted']    = CRM.$( element ).prop('checked') ? 1: 0;
   }
   data['surveyTitle'] = {/literal}'{$surveyTitle|escape:javascript}'{literal};
 
@@ -196,20 +195,20 @@ function processVoterData( element, operation )
          {literal};
 
   //post data to save voter as voted/non voted.
-  cj.post( actUrl,
+  CRM.$.post( actUrl,
        data,
      function( response ) {
          if ( response.status == 'success' ) {
-                   var msgId = '#success_msg_' + cj( element ).val( );
-       cj( msgId ).fadeIn('slow').fadeOut('slow');
+                   var msgId = '#success_msg_' + CRM.$( element ).val( );
+       CRM.$( msgId ).fadeIn('slow').fadeOut('slow');
        if ( operation == 'release' ) {
                  msg = '{/literal}{ts escape='js'}Save as voted.{/ts}{literal}';
-           var isDeleted = cj( element ).prop('checked') ? 1:0;
+           var isDeleted = CRM.$( element ).prop('checked') ? 1:0;
            if ( !isDeleted ) msg = '{/literal}{ts escape='js'}Save as non voted.{/ts}{literal}';
        } else if ( operation == 'gotv' ) {
            msg = '{/literal}{ts escape='js'}Vote Recorded.{/ts}{literal}';
-           var hasVoted = cj( element ).prop('checked') ? 1:0;
-           var trObject = cj( '[id^="survey_activity['+ cj( element ).val() +']"]' ).parents('tr' );
+           var hasVoted = CRM.$( element ).prop('checked') ? 1:0;
+           var trObject = CRM.$( '[id^="survey_activity['+ CRM.$( element ).val() +']"]' ).parents('tr' );
            var methodName = 'addClass';
            if ( !hasVoted ) {
         msg = '{/literal}{ts escape='js'}Vote Cancelled.{/ts}{literal}';
@@ -217,13 +216,13 @@ function processVoterData( element, operation )
            }
            eval( 'trObject.' + methodName + "( 'name disabled' )" );
        } else if ( operation == 'reserve' ) {
-           if ( cj( element ).prop('checked') ) {
+           if ( CRM.$( element ).prop('checked') ) {
                msg = '{/literal}{ts escape='js'}Reserved.{/ts}{literal}';
            } else {
                msg = '{/literal}{ts escape='js'}Released.{/ts}{literal}';
            }
        }
-       cj( msgId ).html( msg );
+       CRM.$( msgId ).html( msg );
          }
      }, 'json' );
 
