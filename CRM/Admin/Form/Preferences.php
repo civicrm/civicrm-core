@@ -188,6 +188,13 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
                 array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>')
               );
               break;
+            case 'select':
+              $this->addElement('select',
+                $fieldName,
+                $fieldValue['title'],
+                $fieldValue['option_values']
+              );
+              break;
           }
         }
 

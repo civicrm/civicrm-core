@@ -375,6 +375,14 @@ WHERE      civicrm_event.is_active = 1 AND
       $optionGroupId = $optionGroupDAO->id;
     }
 
+    // Get the event summary display preferences
+    $show_events = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
+      'show_events'
+    );
+    if ($show_events == NULL) {
+      $show_events = 10;
+    }
+
     $query = "
 SELECT     civicrm_event.id as id, civicrm_event.title as event_title, civicrm_event.is_public as is_public,
            civicrm_event.max_participants as max_participants, civicrm_event.start_date as start_date,
@@ -394,7 +402,7 @@ WHERE      civicrm_event.is_active = 1 AND
            $validEventIDs
 GROUP BY   civicrm_event.id
 ORDER BY   civicrm_event.start_date ASC
-LIMIT      0, 10
+LIMIT      0, $show_events
 ";
     $eventParticipant = array();
 
