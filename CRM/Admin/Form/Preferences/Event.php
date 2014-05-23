@@ -42,18 +42,9 @@ class CRM_Admin_Form_Preferences_Event extends CRM_Admin_Form_Preferences {
     CRM_Utils_System::setTitle(ts('CiviEvent Component Settings'));
     // pass "wiki" as 6th param to docURL2 if you are linking to a page in wiki.civicrm.org
     $docLink = CRM_Utils_System::docURL2("CiviEvent Cart Checkout", NULL, NULL, NULL, NULL, "wiki");
-    // build an array containing all selectable option values
+    // build an array containing all selectable option values for show_events
     $optionValues = array();
-    for ($i=1; $i < 20; $i+=1) {
-      $optionValues[$i] = $i;
-    }
-    for ($i=20; $i <= 150; $i+=5) {
-      $optionValues[$i] = $i;
-    }
-    for ($i=150; $i <= 250; $i+=10) {
-      $optionValues[$i] = $i;
-    }
-    for ($i=250; $i <= 500; $i+=50) {
+    for ($i=10; $i <= 100; $i+=10) {
       $optionValues[$i] = $i;
     }
     $this->_varNames = array(
@@ -71,7 +62,7 @@ class CRM_Admin_Form_Preferences_Event extends CRM_Admin_Form_Preferences {
           'title' => ts('Dashboard entries'),
           'weight' => 2,
           'description' => ts('Configure how many events should be shown on the dashboard. This overrides the default value of 10 entries.'),
-          'option_values' => array('' => ts('- select -')) + $optionValues
+          'option_values' => array('' => ts('- select -')) + $optionValues + array(-1 => ts('show all'))
           )
       ),
     );
