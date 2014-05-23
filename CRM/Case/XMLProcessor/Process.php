@@ -253,6 +253,52 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     return $result;
   }
 
+  /**
+   * @param SimpleXMLElement $caseTypeXML
+   * @return array<string> symbolic activity-type names
+   */
+  function getDeclaredActivityTypes($caseTypeXML) {
+    $result = array();
+
+    if ($caseTypeXML->ActivityTypes && $caseTypeXML->ActivityTypes->ActivityType) {
+      foreach ($caseTypeXML->ActivityTypes->ActivityType as $activityTypeXML) {
+        $result[] = (string) $activityTypeXML->name;
+      }
+    }
+
+    if ($caseTypeXML->ActivitySets && $caseTypeXML->ActivitySets->ActivitySet) {
+      foreach ($caseTypeXML->ActivitySets->ActivitySet as $activitySetXML) {
+        if ($activitySetXML->ActivityTypes && $activitySetXML->ActivityTypes->ActivityType) {
+          foreach ($activitySetXML->ActivityTypes->ActivityType as $activityTypeXML) {
+            $result[] = (string) $activityTypeXML->name;
+          }
+        }
+      }
+    }
+
+    $result = array_unique($result);
+    sort($result);
+    return $result;
+  }
+
+  /**
+   * @param SimpleXMLElement $caseTypeXML
+   * @return array<string> symbolic relationship-type names
+   */
+  function getDeclaredRelationshipTypes($caseTypeXML) {
+    $result = array();
+
+    if ($caseTypeXML->CaseRoles && $caseTypeXML->CaseRoles->RelationshipType) {
+      foreach ($caseTypeXML->CaseRoles->RelationshipType as $relTypeXML) {
+        $result[] = (string) $relTypeXML->name;
+      }
+    }
+
+    $result = array_unique($result);
+    sort($result);
+    return $result;
+  }
+
   function deleteEmptyActivity(&$params) {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
