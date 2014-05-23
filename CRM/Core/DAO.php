@@ -238,7 +238,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @static
    * @access public
    *
-   * @return array of CRM_Core_EntityReference
+   * @return array of CRM_Core_Reference_Interface
    */
   static function getReferenceColumns() {
     return array();
@@ -1732,6 +1732,29 @@ SELECT contact_id
   }
 
   /**
+   * Given a list of fields, create a list of references.
+   *
+   * @param string $className BAO/DAO class name
+   * @return array<CRM_Core_Reference_Interface>
+   */
+  static function createReferenceColumns($className) {
+    $result = array();
+    $fields = $className::fields();
+    foreach ($fields as $field) {
+      if (isset($field['pseudoconstant'], $field['pseudoconstant']['optionGroupName'])) {
+        $result[] = new CRM_Core_Reference_OptionValue(
+          $className::getTableName(),
+          $field['name'],
+          'civicrm_option_value',
+          CRM_Utils_Array::value('keyColumn', $field['pseudoconstant'], 'value'),
+          $field['pseudoconstant']['optionGroupName']
+        );
+      }
+    }
+    return $result;
+  }
+
+  /**
    * Find all records which refer to this entity.
    *
    * @return array of objects referencing this
@@ -1741,30 +1764,40 @@ SELECT contact_id
 
     $occurrences = array();
     foreach ($links as $refSpec) {
-      $refColumn = $refSpec->getReferenceKey();
-      $targetColumn = $refSpec->getTargetKey();
-      $params = array(1 => array($this->$targetColumn, 'String'));
-      $sql = <<<EOS
-SELECT id
-FROM {$refSpec->getReferenceTable()}
-WHERE {$refColumn} = %1
-EOS;
-      if ($refSpec->isGeneric()) {
-        $params[2] = array(static::getTableName(), 'String');
-        $sql .= <<<EOS
-    AND {$refSpec->getTypeColumn()} = %2
-EOS;
-      }
+      /** @var $refSpec CRM_Core_Reference_Interface */
       $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($refSpec->getReferenceTable());
-      $result = self::executeQuery($sql, $params, TRUE, $daoName);
-      while ($result->fetch()) {
-        $obj = new $daoName();
-        $obj->id = $result->id;
-        $occurrences[] = $obj;
+      $result = $refSpec->findReferences($this);
+      if ($result) {
+        while ($result->fetch()) {
+          $obj = new $daoName();
+          $obj->id = $result->id;
+          $occurrences[] = $obj;
+        }
       }
     }
 
     return $occurrences;
+  }
+
+  function getReferenceCounts() {
+    $links = self::getReferencesToTable(static::getTableName());
+
+    $counts = array();
+    foreach ($links as $refSpec) {
+      /** @var $refSpec CRM_Core_Reference_Interface */
+      $count = $refSpec->getReferenceCount($this);
+      if ($count['count'] != 0) {
+        $counts[] = $count;
+      }
+    }
+
+    foreach (CRM_Core_Component::getEnabledComponents() as $component) {
+      /** @var $component CRM_Core_Component_Info */
+      $counts = array_merge($counts, $component->getReferenceCounts($this));
+    }
+    CRM_Utils_Hook::referenceCounts($this, $counts);
+
+    return $counts;
   }
 
   /**
@@ -1788,9 +1821,8 @@ EOS;
       $daoTableName = $daoClassName::getTableName();
 
       foreach ($links as $refSpec) {
-        if ($refSpec->getTargetTable() === $tableName
-              or $refSpec->isGeneric()
-        ) {
+        /** @var $refSpec CRM_Core_Reference_Interface */
+        if ($refSpec->matchesTargetTable($tableName)) {
           $refsFound[] = $refSpec;
         }
       }

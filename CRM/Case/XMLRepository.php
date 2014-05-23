@@ -53,7 +53,7 @@ class CRM_Case_XMLRepository {
 
   /**
    * @param bool $fresh
-   * @return CRM_Case_XMLProcessor
+   * @return CRM_Case_XMLRepository
    */
   public static function singleton($fresh = FALSE) {
     if (!self::$singleton || $fresh) {
@@ -65,7 +65,8 @@ class CRM_Case_XMLRepository {
   /**
    * @param array<String,SimpleXMLElement> $xml
    */
-  public function __construct($xml = array()) {
+  public function __construct($allCaseTypes = NULL, $xml = array()) {
+    $this->allCaseTypes = $allCaseTypes;
     $this->xml = $xml;
   }
 
@@ -153,4 +154,53 @@ class CRM_Case_XMLRepository {
     }
     return $this->hookCache;
   }
+
+  /**
+   * @return array<string> symbolic names of case-types
+   */
+  public function getAllCaseTypes() {
+    if ($this->allCaseTypes === NULL) {
+      $this->allCaseTypes = CRM_Case_PseudoConstant::caseType("name");
+    }
+    return $this->allCaseTypes;
+  }
+
+  /**
+   * Determine the number of times a particular activity-type is
+   * referenced in CiviCase XML.
+   *
+   * @param string $activityType symbolic-name of an activity type
+   * @return int
+   */
+  function getActivityReferenceCount($activityType) {
+    $p = new CRM_Case_XMLProcessor_Process();
+    $count = 0;
+    foreach ($this->getAllCaseTypes() as $caseTypeName) {
+      $caseTypeXML = $this->retrieve($caseTypeName);
+      if (in_array($activityType, $p->getDeclaredActivityTypes($caseTypeXML))) {
+        $count++;
+      }
+    }
+    return $count;
+  }
+
+  /**
+   * Determine the number of times a particular activity-type is
+   * referenced in CiviCase XML.
+   *
+   * @param string $relationshipTypeName symbolic-name of a relationship-type
+   * @return int
+   */
+  function getRelationshipReferenceCount($relationshipTypeName) {
+    $p = new CRM_Case_XMLProcessor_Process();
+    $count = 0;
+    foreach ($this->getAllCaseTypes() as $caseTypeName) {
+      $caseTypeXML = $this->retrieve($caseTypeName);
+      if (in_array($relationshipTypeName, $p->getDeclaredRelationshipTypes($caseTypeXML))) {
+        $count++;
+      }
+    }
+    return $count;
+  }
+
 }

@@ -21,7 +21,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $contactRef = $refsByTarget['civicrm_contact'];
     $this->assertEquals('contact_id', $contactRef->getReferenceKey());
     $this->assertEquals('id', $contactRef->getTargetKey());
-    $this->assertEquals(FALSE, $contactRef->isGeneric());
+    $this->assertEquals('CRM_Core_Reference_Basic', get_class($contactRef));
   }
 
   function testGetReferencesToTable() {
@@ -35,7 +35,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals('entity_id', $genericRef->getReferenceKey());
     $this->assertEquals('entity_table', $genericRef->getTypeColumn());
     $this->assertEquals('id', $genericRef->getTargetKey());
-    $this->assertEquals(TRUE, $genericRef->isGeneric());
+    $this->assertEquals('CRM_Core_Reference_Dynamic', get_class($genericRef));
   }
 
   function testFindReferences() {
