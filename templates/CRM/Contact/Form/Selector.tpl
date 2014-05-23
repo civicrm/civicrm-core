@@ -172,9 +172,6 @@ function countSelections(obj) {
       label.prepend('<span>' + obj.getCount + '</span> ');
     }
     else {
-      if(obj.getCount > 0) {
-        cj('input[name=radio_ts][value=ts_sel]').prop('checked', true);
-      }
       cj('span', label).html(obj.getCount);
     }
     toggleTaskAction(obj.getCount);
