@@ -452,6 +452,13 @@ CRM.validate = CRM.validate || {
   // Initialize widgets
   $(document)
     .on('crmLoad', function(e) {
+      $('table.form-layout-compressed')
+	 .on('change', 'input.select-rows', function () {
+	   if ($(this).prop('checked')) {
+	     $('input#toggleSelect:checked').prop('checked', false);
+	     $('input.select-row:checked').prop('checked', false);
+	   }
+	  })
       $('table.row-highlight', e.target)
         .off('.rowHighlight')
         .on('change.rowHighlight', 'input.select-row, input.select-rows', function (e, data) {
@@ -465,6 +472,9 @@ CRM.validate = CRM.validate || {
             if (data !== 'master-selected') {
               $('input.select-rows', $table).prop('checked', $(".select-row:not(':checked')", $table).length < 1);
             }
+	    if ($(this).prop('checked')) {
+	      $('input[value=ts_sel]:radio').prop('checked', true);
+	    }
           }
         })
         .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
