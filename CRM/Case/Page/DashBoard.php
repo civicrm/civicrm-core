@@ -91,6 +91,11 @@ class CRM_Case_Page_DashBoard extends CRM_Core_Page {
     $upcoming = CRM_Case_BAO_Case::getCases($allCases, $userID, 'upcoming');
     $recent   = CRM_Case_BAO_Case::getCases($allCases, $userID, 'recent');
 
+    $upcoming_pop = array_pop($upcoming);
+    if (strtotime($upcoming_pop['case_scheduled_activity_date']) < time()) {
+      $upcoming_pop['activity_status'] = 'status-overdue';
+    }
+    array_push($upcoming, $upcoming_pop);
     $this->assign('casesSummary', $summary);
     if (!empty($upcoming)) {
       $this->assign('upcomingCases', $upcoming);
