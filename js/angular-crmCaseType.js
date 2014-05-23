@@ -2,22 +2,48 @@
 
   var partialUrl = function(relPath) {
     return CRM.resourceUrls['civicrm'] + '/partials/crmCaseType/' + relPath;
-  } ;
+  };
 
   var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils']);
+
+  var newCaseTypeDefinitionTemplate = {
+    activityTypes: [
+      {name: 'Open Case', max_instances: 1 },
+      {name: 'Example activity'}
+    ],
+    activitySets: [
+      {
+        name: 'standard_timeline',
+        label: 'Standard Timeline',
+        timeline: '1', // Angular won't bind checkbox correctly with numeric 1
+        activityTypes: [
+          {name: 'Open Case', status: 'Completed' },
+          {name: 'Example activity', reference_activity: 'Open Case', reference_offset: 3, reference_select: 'newest'}
+        ]
+      }
+    ],
+    caseRoles: [
+      { name: 'Case Coordinator', creator: '1', manager: '1'}
+    ]
+  };
 
   crmCaseType.config(['$routeProvider',
     function($routeProvider) {
       $routeProvider.when('/caseType/:id', {
         templateUrl: partialUrl('edit.html'),
-        controller: 'CaseTypeCtrl'
+        controller: 'CaseTypeCtrl',
+        resolve: {
+          selectedCaseType: function($route, crmApi) {
+            return crmApi('CaseType', 'getsingle', {id: $route.current.params.id});
+          }
+        }
       });
     }
   ]);
 
   // Add a new record by name.
   // Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
-  crmCaseType.directive('crmAddName', function(){
+  crmCaseType.directive('crmAddName', function() {
     return {
       restrict: 'AE',
       scope: {
@@ -29,7 +55,7 @@
     };
   });
 
-  crmCaseType.controller('CaseTypeCtrl', function($scope) {
+  crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, selectedCaseType) {
     $scope.partialUrl = partialUrl;
 
     $scope.activityStatuses = CRM.crmCaseType.actStatuses;
@@ -41,46 +67,11 @@
       'pipeline': 'Sequence'
     };
 
-    $scope.caseType = {
-      id: 123,
-      label: 'Adult Day Care Referral',
-      description: 'Superkalafragalisticexpialitotious',
-      is_active: '1', // Angular won't bind checkbox correctly with numeric 1
-      definition: {  // This is the serialized field
-        name: 'Adult Day Care Referral',
-        activityTypes: [
-          {name: 'Open Case', max_instances: 1 },
-          {name: 'Medical evaluation'}
-        ],
-        activitySets: [
-          {
-            name: 'standard_timeline',
-            label: 'Standard Timeline',
-            timeline: '1', // Angular won't bind checkbox correctly with numeric 1
-            activityTypes: [
-              {name: 'Open Case', status: 'Completed' },
-              {name: 'Medical evaluation', reference_activity: 'Open Case', reference_offset: 3, reference_select: 'newest'}
-            ]
-          },
-          {
-            name: 'my_sequence',
-            label: 'My Sequence',
-            pipeline: '1', // Angular won't bind checkbox correctly with numeric 1
-            activityTypes: [
-              {name: 'Medical evaluation'},
-              {name: 'Meeting'},
-              {name: 'Phone Call'}
-            ]
-          }
-
-        ],
-        caseRoles: [
-          { name: 'Senior Services Coordinator', creator: '1', manager: '1' },
-          { name: 'Health Services Coordinator' },
-          { name: 'Benefits Specialist' }
-        ]
-      }
-    };
+    $scope.caseType = selectedCaseType;
+    $scope.caseType.definition = $scope.caseType.definition || _.extend({}, newCaseTypeDefinitionTemplate);
+    $scope.caseType.definition.activityTypes = $scope.caseType.definition.activityTypes || [];
+    $scope.caseType.definition.activitySets = $scope.caseType.definition.activitySets || [];
+    $scope.caseType.definition.caseRoles = $scope.caseType.definition.caseRoles || [];
     window.ct = $scope.caseType;
 
     $scope.addActivitySet = function(workflow) {
@@ -171,9 +162,13 @@
       console.log($scope.caseType);
     };
 
+    $scope.save = function() {
+      crmApi('CaseType', 'create', $scope.caseType, true);
+    };
+
     $scope.$watchCollection('caseType.definition.activitySets', function() {
       _.defer(function() {
-          $('.crmCaseType-acttab').tabs('refresh');
+        $('.crmCaseType-acttab').tabs('refresh');
       });
     });
   });
