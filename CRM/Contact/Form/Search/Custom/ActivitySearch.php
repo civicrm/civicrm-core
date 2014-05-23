@@ -187,7 +187,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity', $form, NULL, NULL, '', NULL);
 
     foreach ($groupTree as $key) {
-      if ($key['extends'] == 'Activity') {
+      if (!empty($key['extends']) && $key['extends'] == 'Activity') {
         $select .= ", " . $key['table_name'] . ".*";
         $from .= " LEFT JOIN " . $key['table_name'] . " ON " . $key['table_name'] . ".entity_id = activity.id";
       }
@@ -211,6 +211,9 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
       else {
         $sql .= 'ORDER BY contact_a.sort_name, activity.activity_date_time DESC, activity.activity_type_id, activity.status_id, activity.subject';
       }
+    }
+    else {
+      $sql .= ' ORDER BY contact_a.sort_name';
     }
 
     if ($rowcount > 0 && $offset >= 0) {
