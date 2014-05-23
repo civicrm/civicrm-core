@@ -1705,7 +1705,7 @@ AND cc.sort_name LIKE '%$name%'";
         $contactRelationships[$relationshipId]['relation'] = CRM_Utils_System::href(
           $values['relation'],
           'civicrm/contact/view/rel',
-          "action=view&reset=1&cid={$values['contact_id_a']}&id={$values['id']}&rtype={$values['rtype']}");
+          "action=view&reset=1&cid={$values['cid']}&id={$values['id']}&rtype={$values['rtype']}");
 
         if ($params['context'] == 'current') {
           if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
