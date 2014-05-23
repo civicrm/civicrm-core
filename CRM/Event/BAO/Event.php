@@ -385,11 +385,11 @@ WHERE      civicrm_event.is_active = 1 AND
     }
     // show all events if show_events is set to a negative value
     if ($show_max_events >= 0) {
-      $event_summary_limit = "LIMIT      0, $show_max_events";  
+      $event_summary_limit = "LIMIT      0, $show_max_events";
     }else{
       $event_summary_limit = "";
     }
-    
+
     $query = "
 SELECT     civicrm_event.id as id, civicrm_event.title as event_title, civicrm_event.is_public as is_public,
            civicrm_event.max_participants as max_participants, civicrm_event.start_date as start_date,
