@@ -457,6 +457,23 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Determine how many other records refer to a given record
+   *
+   * @param CRM_Core_DAO $dao the item for which we want a reference count
+   * @param array $refCounts each item in the array is an array with keys:
+   *   - name: string, eg "sql:civicrm_email:contact_id"
+   *   - type: string, eg "sql"
+   *   - count: int, eg "5" if there are 5 email addresses that refer to $dao
+   * @return void
+   */
+  static function referenceCounts($dao, &$refCounts) {
+    return self::singleton()->invoke(2, $dao, $refCounts,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_referenceCounts'
+    );
+  }
+
+  /**
    * This hook is called when building the amount structure for a Contribution or Event Page
    *
    * @param int    $pageType - is this a contribution or event page

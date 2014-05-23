@@ -128,6 +128,41 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getReferenceCounts($dao) {
+    $result = array();
+    if ($dao instanceof CRM_Core_DAO_OptionValue) {
+      /** @var $dao CRM_Core_DAO_OptionValue */
+      $activity_type_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'activity_type', 'id', 'name');
+      if ($activity_type_gid == $dao->option_group_id) {
+        $count = CRM_Case_XMLRepository::singleton()
+          ->getActivityReferenceCount($dao->name);
+        if ($count > 0) {
+          $result[] = array(
+            'name' => 'casetypexml:activities',
+            'type' => 'casetypexml',
+            'count' => $count,
+          );
+        }
+      }
+    }
+    elseif ($dao instanceof CRM_Contact_DAO_RelationshipType) {
+      /** @var $dao CRM_Contact_DAO_RelationshipType */
+      $count = CRM_Case_XMLRepository::singleton()
+        ->getRelationshipReferenceCount($dao->{CRM_Case_XMLProcessor::REL_TYPE_CNAME});
+      if ($count > 0) {
+        $result[] = array(
+          'name' => 'casetypexml:relationships',
+          'type' => 'casetypexml',
+          'count' => $count,
+        );
+      }
+    }
+    return $result;
+  }
+
   // docs inherited from interface
   public function getUserDashboardElement() {
     return array();

@@ -34,6 +34,16 @@
  */
 class CRM_Case_XMLProcessor {
 
+  /**
+   * Relationship-types have four name fields (name_a_b, name_b_a, label_a_b,
+   * label_b_a), but CiviCase XML refers to reltypes by a single name.
+   * REL_TYPE_CNAME identifies the canonical name field as used by CiviCase XML.
+   *
+   * This appears to be "label_b_a", but IMHO "name_b_a" would be more
+   * sensible.
+   */
+  const REL_TYPE_CNAME = 'label_b_a';
+
   public function retrieve($caseType) {
     return CRM_Case_XMLRepository::singleton()->retrieve($caseType);
   }
@@ -61,7 +71,7 @@ class CRM_Case_XMLProcessor {
 
       $relationshipTypes = array();
       foreach ($relationshipInfo as $id => $info) {
-        $relationshipTypes[$id] = $info['label_b_a'];
+        $relationshipTypes[$id] = $info[CRM_Case_XMLProcessor::REL_TYPE_CNAME];
       }
     }
 
