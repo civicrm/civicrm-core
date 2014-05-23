@@ -119,7 +119,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     $this->_caseDetails = array(
       'case_type' => $caseType,
-      'case_status' => $statuses[$values['case_status_id']],
+      'case_status' => CRM_Utils_Array::value($values['case_status_id'], $statuses),
       'case_subject' => CRM_Utils_Array::value('subject', $values),
       'case_start_date' => $values['case_start_date'],
     );
@@ -264,7 +264,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       else if ($type == $pdfActivityType ) {
          $url = CRM_Utils_System::url('civicrm/activity/pdf/add',
           "action=add&context=standalone&reset=1&cid={$this->_contactID}&caseid={$this->_caseID}&atype=$type",
-          FALSE, NULL, FALSE ); 
+          FALSE, NULL, FALSE );
       }
       else {
         $url = CRM_Utils_System::url('civicrm/case/activity',
