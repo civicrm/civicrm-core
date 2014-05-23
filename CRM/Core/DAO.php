@@ -1791,6 +1791,12 @@ SELECT contact_id
       }
     }
 
+    foreach (CRM_Core_Component::getEnabledComponents() as $component) {
+      /** @var $component CRM_Core_Component_Info */
+      $counts = array_merge($counts, $component->getReferenceCounts($this));
+    }
+    CRM_Utils_Hook::referenceCounts($this, $counts);
+
     return $counts;
   }
 
