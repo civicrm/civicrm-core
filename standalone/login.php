@@ -27,4 +27,4 @@ if ($auth_email) {
 }
 
 // Go to the SSO login page
-header("Location: /sso/login.php");
+header("Location: /login.php");
