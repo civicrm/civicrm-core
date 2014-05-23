@@ -106,9 +106,9 @@ function buildCaseActivities(filterSearch , CaseId) {
   sourceUrl = sourceUrl + '&cid={/literal}{$contactID}{literal}';
   sourceUrl = sourceUrl + '&userID={/literal}{$userID}{literal}';
 
-  cj('#case_id_'+CaseId+' th').each(function( ) {
-    if (cj(this).attr('id') != 'nosort') {
-      columns += '{"sClass": "' + cj(this).attr('class') +'"},';
+  CRM.$('#case_id_'+CaseId+' th').each(function( ) {
+    if (CRM.$(this).attr('id') != 'nosort') {
+      columns += '{"sClass": "' + CRM.$(this).attr('class') +'"},';
     }
     else {
       columns += '{ "bSortable": false },';
@@ -119,7 +119,7 @@ function buildCaseActivities(filterSearch , CaseId) {
   columns    = columns.substring(0, columns.length - 1 );
   eval('columns =[' + columns + ']');
 
-  oTable = cj('#case_id_'+CaseId).dataTable({
+  oTable = CRM.$('#case_id_'+CaseId).dataTable({
     "bFilter"    : false,
     "bAutoWidth" : false,
     "aaSorting"  : [],
@@ -138,19 +138,19 @@ function buildCaseActivities(filterSearch , CaseId) {
 
       if ( filterSearch ) {
         var activity_deleted = 0;
-        if ( cj("#activity_deleted_"+CaseId+":checked").val() == 1 ) {
+        if ( CRM.$("#activity_deleted_"+CaseId+":checked").val() == 1 ) {
           activity_deleted = 1;
         }
         aoData.push(
-          {name:'status_id', value: cj("select#status_id_"+CaseId).val()},
-          {name:'reporter_id', value: cj("select#reporter_id_"+CaseId).val()},
-          {name:'activity_type_id', value: cj("select#activity_type_filter_id_"+CaseId).val()},
-          {name:'activity_date_low', value: cj("#activity_date_low_"+CaseId).val()},
-          {name:'activity_date_high', value: cj("#activity_date_high_"+CaseId).val() },
+          {name:'status_id', value: CRM.$("select#status_id_"+CaseId).val()},
+          {name:'reporter_id', value: CRM.$("select#reporter_id_"+CaseId).val()},
+          {name:'activity_type_id', value: CRM.$("select#activity_type_filter_id_"+CaseId).val()},
+          {name:'activity_date_low', value: CRM.$("#activity_date_low_"+CaseId).val()},
+          {name:'activity_date_high', value: CRM.$("#activity_date_high_"+CaseId).val() },
           {name:'activity_deleted', value: activity_deleted }
         );
       }
-      cj.ajax( {
+      CRM.$.ajax( {
         "dataType": 'json',
         "type": "POST",
         "url": sSource,
@@ -162,8 +162,8 @@ function buildCaseActivities(filterSearch , CaseId) {
 }
 
 function setSelectorClass(CaseId) {
-  cj("#case_id_"+CaseId+" td:last-child").each( function( ) {
-    cj(this).parent().addClass(cj(this).text() );
+  CRM.$("#case_id_"+CaseId+" td:last-child").each( function( ) {
+    CRM.$(this).parent().addClass(CRM.$(this).text() );
   });
 }
 </script>

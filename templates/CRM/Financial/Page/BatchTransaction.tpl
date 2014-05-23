@@ -52,7 +52,7 @@
   <p></p>
   <div class="form-item">
   {strip}
-    <table id="crm-transaction-selector-remove" cellpadding="0" cellspacing="0" border="0">
+    <table id="crm-transaction-selector-remove-{$entityID}" cellpadding="0" cellspacing="0" border="0">
       <thead>
         <tr>
           <th class="crm-transaction-checkbox">{if $statusID eq 1}{$form.toggleSelects.html}{/if}</th>
@@ -79,11 +79,11 @@
 CRM.$(function($) {
   var entityID = {/literal}{$entityID}{literal};
   batchSummary(entityID);
-  cj('#close_batch').click( function() {
+  CRM.$('#close_batch').click( function() {
     assignRemove(entityID, 'close');
     return false;
   });
-  cj('#export_batch').click( function() {
+  CRM.$('#export_batch').click( function() {
     assignRemove(entityID, 'export');
     return false;
   });
@@ -95,10 +95,10 @@ function assignRemove(recordID, op) {
     var mismatch = checkMismatch();
   }
   else {
-    cj('#mark_x_' + recordID).closest('tr').block({message: {/literal}'{ts escape="js"}Updating{/ts}'{literal}});
+    CRM.$('#mark_x_' + recordID).closest('tr').block({message: {/literal}'{ts escape="js"}Updating{/ts}'{literal}});
   }
   if (op == 'close' || (op == 'export' && mismatch.length)) {
-    cj("#enableDisableStatusMsg").dialog({
+    CRM.$("#enableDisableStatusMsg").dialog({
       title: {/literal}'{ts escape="js"}Close Batch{/ts}'{literal},
       modal: true,
       open:function() {
@@ -108,14 +108,14 @@ function assignRemove(recordID, op) {
         else {
           var msg = {/literal}'{ts escape="js"}Are you sure you want to close and export this batch?{/ts}'{literal};
         }
-        cj('#enableDisableStatusMsg').show().html(msg + mismatch);
+        CRM.$('#enableDisableStatusMsg').show().html(msg + mismatch);
       },
       buttons: {
         {/literal}"{ts escape='js'}Cancel{/ts}"{literal}: function() {
-          cj(this).dialog("close");
+          CRM.$(this).dialog("close");
         },
         {/literal}"{ts escape='js'}OK{/ts}"{literal}: function() {
-          cj(this).dialog("close");
+          CRM.$(this).dialog("close");
           saveRecord(recordID, op, recordBAO, entityID);
         }
       }
@@ -137,7 +137,7 @@ function saveRecord(recordID, op, recordBAO, entityID) {
   }
   var postUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=assignRemove'}"{literal};
   //post request and get response
-  cj.post( postUrl, { records: [recordID], recordBAO: recordBAO, op:op, entityID:entityID, key: {/literal}"{crmKey name='civicrm/ajax/ar'}"{literal}  }, function( html ){
+  CRM.$.post( postUrl, { records: [recordID], recordBAO: recordBAO, op:op, entityID:entityID, key: {/literal}"{crmKey name='civicrm/ajax/ar'}"{literal}  }, function( html ){
     //this is custom status set when record update success.
     if (html.status == 'record-updated-success') {
        if (op == 'close') {
@@ -159,9 +159,9 @@ function saveRecord(recordID, op, recordBAO, entityID) {
 function batchSummary(entityID) {
   var postUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=getBatchSummary'}"{literal};
   //post request and get response
-  cj.post( postUrl, {batchID: entityID}, function(html) {
-    cj.each(html, function(i, val) {
-      cj("#row_" + i).html(val);
+  CRM.$.post( postUrl, {batchID: entityID}, function(html) {
+    CRM.$.each(html, function(i, val) {
+      CRM.$("#row_" + i).html(val);
     });
   },
   'json');
@@ -169,10 +169,10 @@ function batchSummary(entityID) {
 
 function checkMismatch() {
   var txt = '';
-  var enteredItem = cj("#row_item_count").text();
-  var assignedItem = cj("#row_assigned_item_count").text();
-  var enteredTotal = cj("#row_total").text();
-  var assignedTotal = cj("#row_assigned_total").text();
+  var enteredItem = CRM.$("#row_item_count").text();
+  var assignedItem = CRM.$("#row_assigned_item_count").text();
+  var enteredTotal = CRM.$("#row_total").text();
+  var assignedTotal = CRM.$("#row_assigned_total").text();
   if (enteredItem != "" && enteredItem != assignedItem) {
      txt = '{/literal}<div class="messages crm-error"><strong>Item Count mismatch:</strong><br/>{ts escape="js"}Expected{/ts}:' + enteredItem +'<br/>{ts escape="js"}Current Total{/ts}:' + assignedItem + '</div>{literal}';
   }
