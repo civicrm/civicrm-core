@@ -34,82 +34,8 @@
  */
 class CRM_Case_XMLProcessor {
 
-  static protected $_xml;
-
-  static protected $_hookCache = NULL;
-
-  function retrieve($caseType) {
-    $caseType = self::mungeCaseType($caseType);
-
-    if (!CRM_Utils_Array::value($caseType, self::$_xml)) {
-      if (!self::$_xml) {
-        self::$_xml = array();
-      }
-
-      // first check custom templates directory
-      $fileName = NULL;
-      $config = CRM_Core_Config::singleton();
-      if (isset($config->customTemplateDir) &&
-        $config->customTemplateDir
-      ) {
-        // check if the file exists in the custom templates directory
-        $fileName = implode(DIRECTORY_SEPARATOR,
-          array(
-            $config->customTemplateDir,
-            'CRM',
-            'Case',
-            'xml',
-            'configuration',
-            "$caseType.xml",
-          )
-        );
-      }
-
-      if (!$fileName ||
-        !file_exists($fileName)
-      ) {
-        // check if file exists locally
-        $fileName = implode(DIRECTORY_SEPARATOR,
-          array(dirname(__FILE__),
-            'xml',
-            'configuration',
-            "$caseType.xml",
-          )
-        );
-
-        if (!file_exists($fileName)) {
-          // check if file exists locally
-          $fileName = implode(DIRECTORY_SEPARATOR,
-            array(dirname(__FILE__),
-              'xml',
-              'configuration.sample',
-              "$caseType.xml",
-            )
-          );
-        }
-
-        if (!file_exists($fileName)) {
-          if (self::$_hookCache === NULL) {
-            self::$_hookCache = array();
-            CRM_Utils_Hook::caseTypes(self::$_hookCache);
-          }
-          if (isset(self::$_hookCache[$caseType], self::$_hookCache[$caseType]['file'])) {
-            $fileName = self::$_hookCache[$caseType]['file'];
-          }
-        }
-
-        if (!file_exists($fileName)) {
-          return FALSE;
-        }
-      }
-
-      // read xml file
-      $dom = new DomDocument();
-      $dom->load($fileName);
-      $dom->xinclude();
-      self::$_xml[$caseType] = simplexml_import_dom($dom);
-    }
-    return self::$_xml[$caseType];
+  public function retrieve($caseType) {
+    return CRM_Case_XMLRepository::singleton()->retrieve($caseType);
   }
 
   public static function mungeCaseType($caseType) {
