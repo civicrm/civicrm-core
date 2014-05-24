@@ -26,6 +26,10 @@
 */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_CaseTypeTest
+ */
 class api_v3_CaseTypeTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 

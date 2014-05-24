@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_TaskActionAddToGroupTest
+ */
 class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

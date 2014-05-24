@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_MultipleEventRegistrationbyCartTest
+ */
 class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

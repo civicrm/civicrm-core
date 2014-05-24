@@ -7,6 +7,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class RequestTest extends \CiviUnitTestCase {
 
+  /**
+   * @return array
+   */
   function v4options() {
     $cases = array(); // array(0 => $requestParams, 1 => $expectedOptions, 2 => $expectedData, 3 => $expectedChains)
     $cases[] = array(

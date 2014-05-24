@@ -28,6 +28,10 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
+
+/**
+ * Class CRM_Core_BAO_AddressTest
+ */
 class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   /**
    * @return array

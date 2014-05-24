@@ -26,6 +26,9 @@
 */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Extension_ManagerTest
+ */
 class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   const TESTING_TYPE = 'report';
   const OTHER_TESTING_TYPE = 'module';

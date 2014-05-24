@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_AddParticipationTest
+ */
 class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

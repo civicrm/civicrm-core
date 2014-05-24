@@ -26,6 +26,10 @@
 
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Financial_FinancialBatchExport
+ */
 class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
 
   protected function setUp() {

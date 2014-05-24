@@ -6,12 +6,18 @@ require_once 'CiviTest/CiviMailUtils.php';
  * @see also WebTest_Mailing_SpoolTest
  */
 
+/**
+ * Class CRM_Mailing_BAO_SpoolTest
+ */
 class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
 
   protected $_mut = null;
 
   protected static $bodytext = 'Unit tests keep children safe.';
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Spool (redirect to database) Mailing Test',

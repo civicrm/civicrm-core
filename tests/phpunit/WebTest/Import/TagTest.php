@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_TagTest
+ */
 class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {

@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Pledge_StandaloneAddDeleteTest
+ */
 class WebTest_Pledge_StandaloneAddDeleteTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

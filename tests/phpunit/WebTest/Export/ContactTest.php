@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Export/ExportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Export_ContactTest
+ */
 class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
   protected function setUp() {

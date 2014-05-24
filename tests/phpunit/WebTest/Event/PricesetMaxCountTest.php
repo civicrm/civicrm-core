@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_PricesetMaxCountTest
+ */
 class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

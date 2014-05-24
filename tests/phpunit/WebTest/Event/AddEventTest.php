@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_AddEventTest
+ */
 class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

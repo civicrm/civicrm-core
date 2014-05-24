@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Report_LoggingReportTest
+ */
 class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

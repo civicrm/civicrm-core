@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Campaign_OfflineEventRegistrationTest
+ */
 class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -220,6 +224,9 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     $this->assertTrue($this->isTextPresent("$campaignTitle"));
   }
 
+  /**
+   * @return mixed
+   */
   function registerUrl() {
     $this->openCiviPage("event/manage", "reset=1");
     $eventId = explode('-', $this->getAttribute("//div[@id='event_status_id']//div[2]/table/tbody/tr@id"));

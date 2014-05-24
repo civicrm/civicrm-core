@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_DuplicateMatchingTest
+ */
 class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
