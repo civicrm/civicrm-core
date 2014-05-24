@@ -271,6 +271,9 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
   /*
    *  Helper function to create Household Subtype.
    */
+  /**
+   * @return string
+   */
   function _createHouseholdSubtype() {
 
     // Visit to create contact subtype
@@ -287,6 +290,9 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
 
   /*
    *  Helper function to provide data for contact import for Individuals Subtype.
+   */
+  /**
+   * @return array
    */
   function _individualSubtypeCSVData() {
     $headers = array(
@@ -333,6 +339,9 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
   /*
    *  Helper function to provide data for contact import for Organizations Subtype.
    */
+  /**
+   * @return array
+   */
   function _organizationSubtypeCSVData() {
     $headers = array(
       'organization_name' => 'Organization Name',
@@ -371,6 +380,9 @@ class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
 
   /*
    *  Helper function to provide data for contact import for Household Subtype.
+   */
+  /**
+   * @return array
    */
   function _householdSubtypeCSVData() {
     $headers = array(

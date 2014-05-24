@@ -85,11 +85,20 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     }
   }
 
+  /**
+   * @param string $key
+   * @param mixed $value
+   */
   function set($key, &$value) {
     CRM_Core_BAO_Cache::setItem($value, $this->group, $key, $this->componentID);
     $this->frontCache[$key] = $value;
   }
 
+  /**
+   * @param string $key
+   *
+   * @return mixed
+   */
   function get($key) {
     if (! array_key_exists($key, $this->frontCache)) {
       $this->frontCache[$key] = CRM_Core_BAO_Cache::getItem($this->group, $key, $this->componentID);
@@ -97,10 +106,19 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     return $this->frontCache[$key];
   }
 
+  /**
+   * @param $key
+   * @param null $default
+   *
+   * @return mixed
+   */
   function getFromFrontCache($key, $default = NULL) {
     return CRM_Utils_Array::value($key, $this->frontCache, $default);
   }
 
+  /**
+   * @param string $key
+   */
   function delete($key) {
     CRM_Core_BAO_Cache::deleteGroup($this->group, $key);
     unset($this->frontCache[$key]);

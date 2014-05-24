@@ -31,7 +31,14 @@ require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/ContributionPage.php';
 require_once 'CiviTest/Custom.php';
 require_once 'CiviTest/PaypalPro.php';
+
+/**
+ * Class CRM_Contribute_BAO_ContributionPageTest
+ */
 class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Contribution BAOs',

@@ -98,6 +98,9 @@ class RequestTest extends \CiviUnitTestCase {
     Request::create('MyEntity', 'bad!action', array('version' => 4), NULL);
   }
 
+  /**
+   * @return array
+   */
   function validEntityActionPairs() {
     $cases = array();
     $cases[] = array(
@@ -124,6 +127,9 @@ class RequestTest extends \CiviUnitTestCase {
     $this->assertEquals($expected, array($apiRequest['entity'], $apiRequest['action'], $apiRequest['version']));
   }
 
+  /**
+   * @return array
+   */
   function invalidEntityActionPairs() {
     $cases = array();
     $cases[] = array('My+Entity', 'MyAction', 4);

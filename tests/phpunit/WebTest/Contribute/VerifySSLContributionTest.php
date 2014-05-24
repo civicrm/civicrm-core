@@ -99,6 +99,9 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
     }
   }
 
+  /**
+   * @param $name
+   */
   function _tryPaymentProcessor($name) {
     // load contribution page
     $this->openCiviPage("contribute/transact", "reset=1&action=preview&id={$this->pageId}", "_qf_Main_upload-bottom");

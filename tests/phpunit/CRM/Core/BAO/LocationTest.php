@@ -36,7 +36,14 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Event.php';
+
+/**
+ * Class CRM_Core_BAO_LocationTest
+ */
 class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Location BAOs',

@@ -48,11 +48,17 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   protected $_domainID2;
   protected $_domainID3;
 
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
 
   }
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Settings Tests',

@@ -31,6 +31,10 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
+  /**
+   * @param bool $useTokens
+   * @param null $msgTitle
+   */
   function testTemplateAdd($useTokens = FALSE, $msgTitle = NULL) {
     $this->webtestLogin();
 

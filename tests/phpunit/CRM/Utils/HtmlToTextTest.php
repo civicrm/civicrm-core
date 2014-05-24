@@ -30,6 +30,9 @@ Links:
 ',
   );
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'HtmlToText Test',

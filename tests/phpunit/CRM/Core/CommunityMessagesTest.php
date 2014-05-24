@@ -39,6 +39,9 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    */
   protected static $webResponses = NULL;
 
+  /**
+   * @return array
+   */
   public static function initWebResponses() {
     if (self::$webResponses === NULL) {
       self::$webResponses = array(

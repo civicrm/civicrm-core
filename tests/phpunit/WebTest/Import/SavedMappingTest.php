@@ -81,6 +81,9 @@ class WebTest_Import_SavedMapping extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide csv data for Individuals contact import.
      */
+  /**
+   * @return array
+   */
   function _individualCSVData() {
     $headers = array(
       'individual_prefix' => 'Individual Prefix',

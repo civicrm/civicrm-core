@@ -108,6 +108,19 @@ abstract class CRM_Utils_Hook {
     $fnSuffix
   );
 
+  /**
+   * @param $numParams
+   * @param $arg1
+   * @param $arg2
+   * @param $arg3
+   * @param $arg4
+   * @param $arg5
+   * @param $arg6
+   * @param $fnSuffix
+   * @param $fnPrefix
+   *
+   * @return array|bool
+   */
   function commonInvoke($numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix, $fnPrefix
@@ -216,6 +229,9 @@ abstract class CRM_Utils_Hook {
     return empty($result) ? TRUE : $result;
   }
 
+  /**
+   * @param $moduleList
+   */
   function requireCiviModules(&$moduleList) {
     $civiModules = CRM_Core_PseudoConstant::getModuleExtensions();
     foreach ($civiModules as $civiModule) {
@@ -884,6 +900,13 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * @param $recordBAO
+   * @param $recordID
+   * @param $isActive
+   *
+   * @return mixed
+   */
   static function enableDisable($recordBAO, $recordID, $isActive) {
     return self::singleton()->invoke(3, $recordBAO, $recordID, $isActive,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
@@ -1047,6 +1070,11 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * @param $dao
+   *
+   * @return mixed
+   */
   static function postSave(&$dao) {
     $hookName = 'civicrm_postSave_' . $dao->getTableName();
     return self::singleton()->invoke(1, $dao,
@@ -1290,6 +1318,13 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * @param $varType
+   * @param $var
+   * @param $object
+   *
+   * @return mixed
+   */
   static function alterReportVar($varType, &$var, &$object) {
     return self::singleton()->invoke(3, $varType, $var, $object,
       self::$_nullObject,

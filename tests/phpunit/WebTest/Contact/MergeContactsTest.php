@@ -195,6 +195,11 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertChecked("check_3");
   }
 
+  /**
+   * @param $firstName
+   * @param $lastName
+   * @param $subject
+   */
   function addActivity($firstName, $lastName, $subject) {
     $withContact = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($withContact, "Anderson", $withContact . "@anderson.name");

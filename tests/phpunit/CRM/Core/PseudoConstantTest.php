@@ -31,6 +31,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Tests for pseudoconstant retrieval
  */
 class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name'    => 'PseudoConstant',

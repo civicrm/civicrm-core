@@ -89,6 +89,11 @@ class CRM_Utils_XML {
     return array($xml, $error);
   }
 
+  /**
+   * @param $errors
+   *
+   * @return string
+   */
   protected static function formatErrors($errors) {
     $messages = array();
 

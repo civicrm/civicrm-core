@@ -137,6 +137,12 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     $this->assertStringsPresent($checkFieldValues);
   }
 
+  /**
+   * @param $fields
+   * @param $profileName
+   *
+   * @return null
+   */
   function _testCreateContactProfile($fields, $profileName) {
     // Add new profile.
     $this->openCiviPage("admin/uf/group", "reset=1");

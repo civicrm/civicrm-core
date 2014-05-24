@@ -25,11 +25,14 @@
  +--------------------------------------------------------------------+
 */
 
+/**
+ * Class CRM_Utils_Constant
+ */
 class CRM_Utils_Constant {
 
   /**
    * Determine the value of a constant, if any.
-   * 
+   *
    * If the specified constant is undefined, return a default value.
    *
    * @param string $name

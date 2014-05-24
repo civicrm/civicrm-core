@@ -109,7 +109,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   }
 
   public function testGetFieldsLineItem() {
-    $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create', 'action' => 'create'));
+    $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create',));
     $this->assertEquals(1, $result['values']['entity_id']['api.required']);
   }
 

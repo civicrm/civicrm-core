@@ -178,6 +178,10 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $test->assertContactsExist($cids, FALSE);
   }
 
+  /**
+   * @param $cids
+   * @param bool $exist
+   */
   public function assertContactsExist($cids, $exist = TRUE) {
     foreach ($cids as $cid) {
       $this->assertTrue(is_numeric($cid));
