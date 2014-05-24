@@ -65,6 +65,18 @@ abstract class CRM_Event_Import_Parser extends CRM_Import_Parser {
    */
   protected $_haveColumnHeader;
 
+  /**
+   * @param $fileName
+   * @param string $seperator
+   * @param $mapper
+   * @param bool $skipColumnHeader
+   * @param int $mode
+   * @param int $contactType
+   * @param int $onDuplicate
+   *
+   * @return mixed
+   * @throws Exception
+   */
   function run($fileName,
     $seperator = ',',
     &$mapper,
@@ -317,6 +329,13 @@ abstract class CRM_Event_Import_Parser extends CRM_Import_Parser {
     return $params;
   }
 
+  /**
+   * @param $name
+   * @param $title
+   * @param int $type
+   * @param string $headerPattern
+   * @param string $dataPattern
+   */
   function addField($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
     if (empty($name)) {
       $this->_fields['doNotImport'] = new CRM_Event_Import_Field($name, $title, $type, $headerPattern, $dataPattern);

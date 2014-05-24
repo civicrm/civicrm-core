@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_Form_Checkout_ConferenceEvents
+ */
 class CRM_Event_Cart_Form_Checkout_ConferenceEvents extends CRM_Event_Cart_Form_Cart {
   public $conference_event = NULL;
   public $events_by_slot = array();

@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_Page_RemoveFromCart
+ */
 class CRM_Event_Cart_Page_RemoveFromCart extends CRM_Core_Page {
   function run() {
     $transaction = new CRM_Core_Transaction();
