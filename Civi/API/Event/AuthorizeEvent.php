@@ -27,6 +27,10 @@
 
 namespace Civi\API\Event;
 
+/**
+ * Class AuthorizeEvent
+ * @package Civi\API\Event
+ */
 class AuthorizeEvent extends Event {
   /**
    * @var bool
