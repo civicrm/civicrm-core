@@ -1647,6 +1647,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
 
+  /**
+   * test that permissions are respected when creating contacts
+   */
   function testContactCreationPermissions() {
     $params = array(
       'contact_type' => 'Individual', 'first_name' => 'Foo',
@@ -1732,6 +1735,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'getquick', array('name' => 'b', 'check_permissions' => TRUE));
   }
 
+  /**
+   * test get ref api - gets a list of references to an entity
+   */
   function testGetReferenceCounts() {
     $result = $this->callAPISuccess('Contact', 'create', array(
       'first_name' => 'Testily',
