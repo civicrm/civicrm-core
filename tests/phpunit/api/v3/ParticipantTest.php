@@ -34,6 +34,10 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 require_once 'CRM/Utils/DeprecatedUtils.php';
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_ParticipantTest
+ */
 class api_v3_ParticipantTest extends CiviUnitTestCase {
 
   protected $_apiversion;
@@ -46,6 +50,9 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   protected $_individualId;
   protected $_params;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Participant Create',

@@ -105,6 +105,9 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * @return array
+   */
   public function parsePrefixData() {
     $cases = array();
     $cases[] = array('administer CiviCRM', NULL, array(NULL, 'administer CiviCRM'));

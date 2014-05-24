@@ -415,6 +415,11 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $firstName
+   * @param $lastName
+   * @param $processorId
+   */
   function _fillParticipantDetails($firstName, $lastName, $processorId) {
     $this->webtestNewDialogContact($firstName, $lastName);
 

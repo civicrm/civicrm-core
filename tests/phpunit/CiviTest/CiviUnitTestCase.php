@@ -166,10 +166,16 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
   }
 
+  /**
+   * @return bool
+   */
   function requireDBReset() {
     return $this->DBResetRequired;
   }
 
+  /**
+   * @return string
+   */
   static function getDBName() {
     $dbName = !empty($GLOBALS['mysql_db']) ? $GLOBALS['mysql_db'] : 'civicrm_tests_dev';
     return $dbName;
@@ -515,6 +521,16 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   // Request a record from the DB by seachColumn+searchValue. Success if a record is found.
+  /**
+   * @param $daoName
+   * @param $searchValue
+   * @param $returnColumn
+   * @param $searchColumn
+   * @param $message
+   *
+   * @return null|string
+   * @throws PHPUnit_Framework_AssertionFailedError
+   */
   function assertDBNotNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
     if (empty($searchValue)) {
       $this->fail("empty value passed to assertDBNotNull");
@@ -526,12 +542,24 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   // Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
+  /**
+   * @param $daoName
+   * @param $searchValue
+   * @param $returnColumn
+   * @param $searchColumn
+   * @param $message
+   */
   function assertDBNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
     $value = CRM_Core_DAO::getFieldValue($daoName, $searchValue, $returnColumn, $searchColumn, TRUE);
     $this->assertNull($value, $message);
   }
 
   // Request a record from the DB by id. Success if row not found.
+  /**
+   * @param $daoName
+   * @param $id
+   * @param null $message
+   */
   function assertDBRowNotExist($daoName, $id, $message = NULL) {
     $message = $message ? $message : "$daoName (#$id) should not exist";
     $value = CRM_Core_DAO::getFieldValue($daoName, $id, 'id', 'id', TRUE);
@@ -539,6 +567,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   // Request a record from the DB by id. Success if row not found.
+  /**
+   * @param $daoName
+   * @param $id
+   * @param null $message
+   */
   function assertDBRowExist($daoName, $id, $message = NULL) {
     $message = $message ? $message : "$daoName (#$id) should exist";
     $value = CRM_Core_DAO::getFieldValue($daoName, $id, 'id', 'id', TRUE);
@@ -546,6 +579,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   // Compare a single column value in a retrieved DB record to an expected value
+  /**
+   * @param $daoName
+   * @param $searchValue
+   * @param $returnColumn
+   * @param $searchColumn
+   * @param $expectedValue
+   * @param $message
+   */
   function assertDBCompareValue($daoName, $searchValue, $returnColumn, $searchColumn,
                                 $expectedValue, $message
   ) {
@@ -554,6 +595,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   // Compare all values in a single retrieved DB record to an array of expected values
+  /**
+   * @param $daoName
+   * @param $searchParams
+   * @param $expectedValues
+   */
   function assertDBCompareValues($daoName, $searchParams, $expectedValues) {
     //get the values from db
     $dbValues = array();
@@ -614,6 +660,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $this->assertTrue(abs($actual - $expected) < $tolerance, $message);
   }
 
+  /**
+   * @param $expectedValues
+   * @param $actualValues
+   * @param null $message
+   *
+   * @throws PHPUnit_Framework_AssertionFailedError
+   */
   function assertAttributesEquals($expectedValues, $actualValues, $message = NULL) {
     foreach ($expectedValues as $paramName => $paramValue) {
       if (isset($actualValues[$paramName])) {
@@ -625,6 +678,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
   }
 
+  /**
+   * @param $key
+   * @param $list
+   */
   function assertArrayKeyExists($key, &$list) {
     $result = isset($list[$key]) ? TRUE : FALSE;
     $this->assertTrue($result, ts("%1 element exists?",
@@ -632,6 +689,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     ));
   }
 
+  /**
+   * @param $key
+   * @param $list
+   */
   function assertArrayValueNotNull($key, &$list) {
     $this->assertArrayKeyExists($key, $list);
 
@@ -683,6 +744,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $this->assertNotEmpty($apiResult['error_message']);
   }
 
+  /**
+   * @param $expected
+   * @param $actual
+   * @param string $message
+   */
   function assertType($expected, $actual, $message = '') {
     return $this->assertInternalType($expected, $actual, $message);
   }
@@ -989,6 +1055,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return $result['id'];
   }
 
+  /**
+   * @param $contactID
+   *
+   * @return array|int
+   */
   function contactDelete($contactID) {
     $params = array(
       'id' => $contactID,
@@ -1006,6 +1077,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return  $result;
   }
 
+  /**
+   * @param $contactTypeId
+   *
+   * @throws Exception
+   */
   function contactTypeDelete($contactTypeId) {
     require_once 'CRM/Contact/BAO/ContactType.php';
     $result = CRM_Contact_BAO_ContactType::del($contactTypeId);
@@ -1014,6 +1090,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
   }
 
+  /**
+   * @param array $params
+   *
+   * @return mixed
+   */
   function membershipTypeCreate($params = array()) {
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Core_Config::clearDBCache();
@@ -1039,6 +1120,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return $result['id'];
   }
 
+  /**
+   * @param $params
+   *
+   * @return mixed
+   */
   function contactMembershipCreate($params) {
     $pre = array(
       'join_date' => '2007-01-21',
@@ -1068,12 +1154,20 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return;
   }
 
+  /**
+   * @param $membershipID
+   */
   function membershipDelete($membershipID) {
     $deleteParams = array('id' => $membershipID);
     $result = $this->callAPISuccess('Membership', 'Delete', $deleteParams);
     return;
   }
 
+  /**
+   * @param string $name
+   *
+   * @return mixed
+   */
   function membershipStatusCreate($name = 'test member status') {
     $params['name'] = $name;
     $params['start_event'] = 'start_date';
@@ -1086,6 +1180,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return $result['id'];
   }
 
+  /**
+   * @param $membershipStatusID
+   */
   function membershipStatusDelete($membershipStatusID) {
     if (!$membershipStatusID) {
       return;
@@ -1094,6 +1191,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return;
   }
 
+  /**
+   * @param array $params
+   *
+   * @return mixed
+   */
   function relationshipTypeCreate($params = array()) {
     $params = array_merge(array(
         'name_a_b' => 'Relation 1 for relationship type create',
@@ -1122,6 +1224,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $this->callAPISuccess('relationship_type', 'delete', $params);
   }
 
+  /**
+   * @param null $params
+   *
+   * @return mixed
+   */
   function paymentProcessorTypeCreate($params = NULL) {
     if (is_null($params)) {
       $params = array(
@@ -2171,6 +2278,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return $this->callAPISuccess('custom_field', 'create', $params);
   }
 
+  /**
+   * @param $entities
+   *
+   * @return bool
+   */
   function confirmEntitiesDeleted($entities) {
     foreach ($entities as $entity) {
 
@@ -2182,6 +2294,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
   }
 
+  /**
+   * @param $tablesToTruncate
+   * @param bool $dropCustomValueTables
+   */
   function quickCleanup($tablesToTruncate, $dropCustomValueTables = FALSE) {
     if ($dropCustomValueTables) {
       $tablesToTruncate[] = 'civicrm_custom_group';
@@ -2246,6 +2362,15 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @param bool $delete should the entity be deleted as part of this check
    * @param string $errorText text to print on error
    *
+   */
+  /**
+   * @param $params
+   * @param $id
+   * @param $entity
+   * @param int $delete
+   * @param string $errorText
+   *
+   * @throws Exception
    */
   function getAndCheck($params, $id, $entity, $delete = 1, $errorText = '') {
 
@@ -2445,6 +2570,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     }
   }
 
+  /**
+   * @param $name
+   */
   function financialAccountDelete($name) {
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
     $financialAccount->name = $name;
@@ -2742,7 +2870,11 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
  }
 
 
-function CiviUnitTestCase_fatalErrorHandler($message) {
+  /**
+   * @param $message
+   *
+   * @throws Exception
+   */function CiviUnitTestCase_fatalErrorHandler($message) {
   throw new Exception("{$message['message']}: {$message['code']}");
 }
 }

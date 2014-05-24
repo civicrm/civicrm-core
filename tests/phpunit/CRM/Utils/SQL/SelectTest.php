@@ -155,6 +155,11 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * @param $expected
+   * @param $actual
+   * @param string $message
+   */
   function assertLike($expected, $actual, $message = '') {
     $expected = trim((preg_replace('/[ \r\n\t]+/', ' ', $expected)));
     $actual = trim((preg_replace('/[ \r\n\t]+/', ' ', $actual)));

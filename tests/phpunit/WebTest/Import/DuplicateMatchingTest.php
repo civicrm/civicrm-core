@@ -323,6 +323,11 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Household', 'No Duplicate Checking');
   }
 
+  /**
+   * @param $originalHeaders
+   * @param $originalRows
+   * @param $checkSummary
+   */
   function checkDuplicateContacts($originalHeaders, $originalRows, $checkSummary) {
     $this->assertTrue($this->isTextPresent('CiviCRM has detected one record which is a duplicate of existing CiviCRM contact record. These records have not been imported.'));
 
@@ -340,6 +345,11 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
   /*
    *  Helper function to provide data for contact import for
    *  Individual Duplicate Matching.
+   */
+  /**
+   * @param $individualFields
+   *
+   * @return array
    */
   function _individualDuplicateMatchingCSVData($individualFields) {
     $headers = array(
@@ -387,6 +397,11 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
    *  Helper function to provide data for contact import for
    *  Organizations Duplicate Matching.
    */
+  /**
+   * @param $organizationFields
+   *
+   * @return array
+   */
   function _organizationDuplicateMatchingCSVData($organizationFields) {
     $headers = array(
       'organization_name' => 'Organization Name',
@@ -425,6 +440,11 @@ class WebTest_Import_DuplicateMatchingTest extends ImportCiviSeleniumTestCase {
   /*
    *  Helper function to provide data for contact import for Household
    *  Duplicate Matching.
+   */
+  /**
+   * @param $householdFields
+   *
+   * @return array
    */
   function _householdDuplicateMatchingCSVData($householdFields) {
     $headers = array(

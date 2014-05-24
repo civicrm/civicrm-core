@@ -41,6 +41,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   protected $_profileID = 0;
   protected $_membershipTypeID;
   protected $_contactID;
+
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Profile Test',
@@ -700,6 +704,11 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /*
      * Helper function to create an Individual with address/email/phone info. Import UF Group and UF Fields
      */
+  /**
+   * @param array $params
+   *
+   * @return mixed
+   */
   function _createIndividualContact($params = array()) {
     $contactParams = array_merge(array(
       'first_name' => 'abc1',
@@ -742,6 +751,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     return $profileData;
   }
 
+  /**
+   * @return array
+   */
   function _createContactWithActivity() {
     // @TODO: Create profile with custom fields
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -889,6 +901,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->_profileID = $profile['id'];
   }
 
+  /**
+   * @param $profileID
+   */
   function _addCustomFieldToProfile($profileID) {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, '');
     $this->uFFieldCreate(array('uf_group_id' => $profileID, 'field_name' => 'custom_' . $ids['custom_field_id'], 'contact_type' => 'Contact'));

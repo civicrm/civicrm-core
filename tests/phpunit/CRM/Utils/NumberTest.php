@@ -32,6 +32,9 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * @return array
+   */
   function truncDecimalCases() {
     $cases = array();
     // array($value, $precision, $expectedValue)

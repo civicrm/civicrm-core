@@ -183,7 +183,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
       'is_reserved' => FALSE,
       'is_deductible' => FALSE,
     );
-    
+
     $this->addeditFinancialType($financialType);
     $this->addStandaloneContribution($financialType);
     $this->addStandaloneContribution($financialType);
@@ -194,11 +194,11 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Search_refresh");
     $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[1]", "2 Result");
     $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[2]", "Financial Type IN {$financialType['name']}");
-    
+
     $this->openCiviPage("contact/search/advanced", "reset=1", "_qf_Advanced_refresh-top");
     $this->click('CiviContribute');
     $this->waitForElementPresent("financial_type_id");
-    
+
     // select group
     $this->select("financial_type_id", "label={$financialType['name']}");
     $this->clickLink("_qf_Advanced_refresh-top");
@@ -206,8 +206,11 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("xpath=//div[@id='search-status']//table/tbody/tr[1]/td[2]", "Financial Type IN {$financialType['name']}");
   }
 
+  /**
+   * @param $financialType
+   */
   function addStandaloneContribution($financialType) {
-    
+
     $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
     // create new contact using dialog

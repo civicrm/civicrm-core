@@ -98,6 +98,11 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->mailingAddTest($groupName, $campaignTitle, $id);
   }
 
+  /**
+   * @param $groupName
+   * @param $campaignTitle
+   * @param $id
+   */
   function mailingAddTest($groupName, $campaignTitle, $id) {
     //---- create mailing contact and add to mailing Group
     $firstName = substr(sha1(rand()), 0, 7);

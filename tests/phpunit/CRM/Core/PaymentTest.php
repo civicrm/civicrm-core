@@ -29,6 +29,9 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 class CRM_Core_PaymentTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Payment Test',

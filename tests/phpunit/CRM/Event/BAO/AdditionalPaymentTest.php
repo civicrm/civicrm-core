@@ -31,7 +31,14 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Event.php';
 require_once 'CiviTest/Participant.php';
+
+/**
+ * Class CRM_Event_BAO_AdditionalPaymentTest
+ */
 class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Additional Payment BAOs test',
@@ -64,6 +71,13 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
   }
 
   // helper function to record participant with paid contribution
+  /**
+   * @param $feeTotal
+   * @param $actualPaidAmt
+   *
+   * @return array
+   * @throws Exception
+   */
   function _addParticipantWithPayment($feeTotal, $actualPaidAmt) {
     // creating price set, price field
     $paramsSet['title'] = 'Price Set';

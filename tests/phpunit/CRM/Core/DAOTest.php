@@ -69,6 +69,9 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals($contact->id, $refDao->contact_id);
   }
 
+  /**
+   * @return array
+   */
   function composeQueryExamples() {
     $cases = array();
     // $cases[] = array('Input-SQL', 'Input-Params', 'Expected-SQL');
@@ -160,6 +163,9 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertFalse(($expectSql == $actualSql));
   }
 
+  /**
+   * @return array
+   */
   function sqlNameDataProvider() {
     return array(
       array('this is a long string', 30, FALSE, 'this is a long string'),

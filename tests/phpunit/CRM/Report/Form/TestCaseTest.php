@@ -46,6 +46,9 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
     'civicrm_contribution',
   );
 
+  /**
+   * @return array
+   */
   public function dataProvider() {
     $testCaseA = array(
       'CRM_Report_Form_Contribute_Detail',
@@ -77,6 +80,9 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
     );
   }
 
+  /**
+   * @return array
+   */
   public function badDataProvider() {
     return array(
       // This test-case is bad because the dataset-ascii.sql does not match the

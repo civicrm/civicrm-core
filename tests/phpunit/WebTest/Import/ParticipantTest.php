@@ -97,6 +97,9 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide data for participant import for Individuals.
      */
+  /**
+   * @return array
+   */
   function _participantIndividualCSVData() {
     $eventInfo = $this->_addNewEvent();
 
@@ -142,6 +145,9 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide data for participant import for Household.
      */
+  /**
+   * @return array
+   */
   function _participantHouseholdCSVData() {
     $eventInfo = $this->_addNewEvent();
 
@@ -185,6 +191,9 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide data for participant import for Organization.
      */
+  /**
+   * @return array
+   */
   function _participantOrganizationCSVData() {
     $eventInfo = $this->_addNewEvent();
 
@@ -232,6 +241,11 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
      *
      * @return array $params event details of newly created event
      */
+  /**
+   * @param array $params
+   *
+   * @return array
+   */
   function _addNewEvent($params = array(
     )) {
 

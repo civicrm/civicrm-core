@@ -80,6 +80,9 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
     );
   }
 
+  /**
+   * @return array
+   */
   function addMembershipType() {
     $membershipTitle = substr(sha1(rand()), 0, 7);
     $membershipOrg = $membershipTitle . ' memorg';

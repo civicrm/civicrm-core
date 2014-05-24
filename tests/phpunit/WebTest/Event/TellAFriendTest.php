@@ -166,6 +166,10 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     );
   }
 
+  /**
+   * @param $eventTitle
+   * @param $eventDescription
+   */
   function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
@@ -191,6 +195,9 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->click("_qf_EventInfo_upload-bottom");
   }
 
+  /**
+   * @param $streetAddress
+   */
   function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -211,6 +218,10 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("'Event Location' information has been saved.");
   }
 
+  /**
+   * @param $registerIntro
+   * @param bool $multipleRegistrations
+   */
   function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
     // Go to Online Registration tab
     $this->click("link=Online Registration");
@@ -235,6 +246,11 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("'Online Registration' information has been saved.");
   }
 
+  /**
+   * @param $subject
+   * @param $thankYouMsg
+   * @param $eventTitle
+   */
   function _testAddTellAFriend($subject, $thankYouMsg, $eventTitle) {
     // Go to Tell A Friend Tab
     $this->click('link=Tell a Friend');

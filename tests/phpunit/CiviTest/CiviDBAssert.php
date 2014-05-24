@@ -140,6 +140,11 @@ class CiviDBAssert {
     self::assertAttributesEquals($testCase, $expectedValues, $dbValues);
   }
 
+  /**
+   * @param $testCase
+   * @param $expectedValues
+   * @param $actualValues
+   */
   function assertAttributesEquals(&$testCase, &$expectedValues, &$actualValues) {
     foreach ($expectedValues as $paramName => $paramValue) {
       if (isset($actualValues[$paramName])) {

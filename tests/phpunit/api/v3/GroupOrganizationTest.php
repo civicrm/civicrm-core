@@ -36,6 +36,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   protected $_apiversion;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Group Organization',

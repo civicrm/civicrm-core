@@ -46,6 +46,9 @@ class WebTest_Import_ActivityTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Activity', $headers, $rows, NULL, NULL, $fieldMapper);
   }
 
+  /**
+   * @return array
+   */
   function _activityCSVData() {
 
     $firstName1 = substr(sha1(rand()), 0, 7);
