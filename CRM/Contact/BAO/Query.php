@@ -1337,12 +1337,12 @@ class CRM_Contact_BAO_Query {
 
     $having = '';
     if (!empty($this->_having)) {
-      foreach ($this->_having as $havingsets) {
-        foreach ($havingsets as $havingset) {
-          $havingvalue[] = $havingset;
+      foreach ($this->_having as $havingSets) {
+        foreach ($havingSets as $havingSet) {
+          $havingValue[] = $havingSet;
         }
       }
-      $having = ' HAVING ' . implode(' AND ', $havingvalue);
+      $having = ' HAVING ' . implode(' AND ', $havingValue);
     }
 
     // if we are doing a transform, do it here
