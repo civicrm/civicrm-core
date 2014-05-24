@@ -33,6 +33,11 @@
  *
  */
 class CRM_Upgrade_ThreeZero_ThreeZero extends CRM_Upgrade_Form {
+  /**
+   * @param $errorMessage
+   *
+   * @return bool
+   */
   function verifyPreDBState(&$errorMessage) {
     $latestVer = CRM_Utils_System::version();
 
@@ -84,6 +89,9 @@ class CRM_Upgrade_ThreeZero_ThreeZero extends CRM_Upgrade_Form {
     return TRUE;
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade($rev) {
 
     // fix CRM-5270: if civicrm_report_instance.description is localised,

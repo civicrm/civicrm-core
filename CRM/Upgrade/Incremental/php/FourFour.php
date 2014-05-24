@@ -36,6 +36,11 @@ class CRM_Upgrade_Incremental_php_FourFour {
 
   const MAX_WORD_REPLACEMENT_SIZE = 255;
 
+  /**
+   * @param $errors
+   *
+   * @return bool
+   */
   function verifyPreDBstate(&$errors) {
     return TRUE;
   }
@@ -103,6 +108,11 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
     }
   }
 
+  /**
+   * @param $rev
+   *
+   * @return bool
+   */
   function upgrade_4_4_alpha1($rev) {
     // task to process sql
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.alpha1')), 'task_4_4_x_runSql', $rev);
@@ -113,6 +123,9 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
     return TRUE;
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_4_beta1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.beta1')), 'task_4_4_x_runSql', $rev);
 
@@ -139,6 +152,9 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
     $this->addTask('Migrate custom word-replacements', 'wordReplacements');
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_4_1($rev) {
     $config = CRM_Core_Config::singleton();
     // CRM-13327 upgrade handling for the newly added name badges
@@ -236,6 +252,11 @@ VALUES {$insertStatus}";
     $this->addTask('Patch word-replacement schema', 'wordReplacements_patch', $rev);
   }
 
+  /**
+   * @param $rev
+   *
+   * @return bool
+   */
   function upgrade_4_4_4($rev) {
     $fkConstraint = array();
     if (!CRM_Core_DAO::checkFKConstraintInFormat('civicrm_activity_contact', 'activity_id')) {
@@ -310,6 +331,9 @@ ALTER TABLE civicrm_dashboard
     return TRUE;
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_4_6($rev){
     $minId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(min(id),0) FROM civicrm_contact');
     $maxId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_contact');
@@ -320,6 +344,13 @@ ALTER TABLE civicrm_dashboard
     }
   }
 
+  /**
+   * @param CRM_Queue_TaskContext $ctx
+   * @param $startId
+   * @param $endId
+   *
+   * @return bool
+   */
   static function upgradeImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId){
     $sql = "CREATE INDEX index_image_url ON civicrm_contact (image_url);";
     $dao = CRM_Core_DAO::executeQuery($sql);

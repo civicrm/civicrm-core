@@ -124,6 +124,15 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Use the form name to create the tpl file name
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   public function getTemplateFileName() {
     return 'CRM/UF/Form/Preview.tpl';
   }
