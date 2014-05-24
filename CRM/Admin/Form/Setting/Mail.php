@@ -67,6 +67,11 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
     parent::buildQuickForm($check);
   }
 
+  /**
+   * @param $fields
+   *
+   * @return array|bool
+   */
   static function formRule($fields) {
     $errors = array();
 

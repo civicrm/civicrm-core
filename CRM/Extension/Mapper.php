@@ -84,6 +84,13 @@ class CRM_Extension_Mapper {
 
   protected $civicrmUrl;
 
+  /**
+   * @param CRM_Extension_Container_Interface $container
+   * @param CRM_Utils_Cache_Interface $cache
+   * @param null $cacheKey
+   * @param null $civicrmPath
+   * @param null $civicrmUrl
+   */
   public function __construct(CRM_Extension_Container_Interface $container, CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $civicrmPath = NULL, $civicrmUrl = NULL) {
     $this->container = $container;
     $this->cache = $cache;
@@ -323,6 +330,11 @@ class CRM_Extension_Mapper {
     return $urls;
   }
 
+  /**
+   * @param $name
+   *
+   * @return bool
+   */
   public function isActiveModule($name) {
     $activeModules = $this->getActiveModuleFiles();
     foreach ($activeModules as $activeModule) {

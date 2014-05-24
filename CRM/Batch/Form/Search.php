@@ -33,6 +33,9 @@
  *
  */
 class CRM_Batch_Form_Search extends CRM_Core_Form {
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array();
 

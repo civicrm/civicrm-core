@@ -61,11 +61,19 @@ class CRM_Financial_BAO_ExportFormat {
   }
 
   // Override to assemble the appropriate subset of financial data for the specific export format
+  /**
+   * @param $exportParams
+   *
+   * @return mixed
+   */
   function export($exportParams) {
     $this->_exportParams = $exportParams;
     return $exportParams;
   }
 
+  /**
+   * @param null $fileName
+   */
   function output($fileName = NULL) {
     switch ($this->getFileExtension()) {
       case 'csv':
@@ -81,23 +89,39 @@ class CRM_Financial_BAO_ExportFormat {
     }
   }
 
+  /**
+   * @return string
+   */
   function getMimeType() {
     return 'text/plain';
   }
 
+  /**
+   * @return string
+   */
   function getFileExtension() {
     return 'txt';
   }
 
   // Override this if appropriate
+  /**
+   * @return null
+   */
   function getTemplateFileName() {
     return null;
   }
 
+  /**
+   * @return object
+   */
   static function &getTemplate() {
     return self::$_template;
   }
 
+  /**
+   * @param $var
+   * @param null $value
+   */
   function assign($var, $value = NULL) {
     self::$_template->assign($var, $value);
   }
@@ -107,6 +131,12 @@ class CRM_Financial_BAO_ExportFormat {
    *
    * Depending on the output format might want to override this, e.g. for IIF tabs need to be escaped etc,
    * but for CSV it doesn't make sense because php has built in csv output functions.
+   */
+  /**
+   * @param $s
+   * @param string $type
+   *
+   * @return null
    */
   static function format($s, $type = 'string') {
     if (!empty($s)) {
@@ -145,6 +175,12 @@ class CRM_Financial_BAO_ExportFormat {
     }
   }
 
+  /**
+   * @param $batchIds
+   * @param $fileName
+   *
+   * @throws CRM_Core_Exception
+   */
   static function createActivityExport($batchIds, $fileName) {
     $session = CRM_Core_Session::singleton();
     $values = array();
@@ -190,6 +226,13 @@ class CRM_Financial_BAO_ExportFormat {
     CRM_Activity_BAO_Activity::create($activityParams);
   }
 
+  /**
+   * @param array $files
+   * @param null $destination
+   * @param bool $overwrite
+   *
+   * @return bool
+   */
   function createZip($files = array(), $destination = NULL, $overwrite = FALSE) {
     //if the zip file already exists and overwrite is false, return false
     if (file_exists($destination) && !$overwrite) {

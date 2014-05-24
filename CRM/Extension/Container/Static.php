@@ -36,6 +36,9 @@
  * scanned for extensions.
  */
 class CRM_Extension_Container_Static implements CRM_Extension_Container_Interface {
+  /**
+   * @param $exts
+   */
   public function __construct($exts) {
     $this->exts = $exts;
   }
@@ -83,6 +86,11 @@ class CRM_Extension_Container_Static implements CRM_Extension_Container_Interfac
   public function refresh() {
   }
 
+  /**
+   * @param $key
+   *
+   * @throws CRM_Extension_Exception_MissingException
+   */
   protected function getExt($key) {
     if (isset($this->exts[$key])) {
       return $this->exts[$key];

@@ -216,6 +216,9 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
   // post process to determine if the parent job
   // as well as the mailing is complete after the run
+  /**
+   * @param null $mode
+   */
   public static function runJobs_post($mode = NULL) {
 
     $job = new CRM_Mailing_BAO_MailingJob();
@@ -284,6 +287,10 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
 
   // before we run jobs, we need to split the jobs
+  /**
+   * @param int $offset
+   * @param null $mode
+   */
   public static function runJobs_pre($offset = 200, $mode = NULL) {
     $job = new CRM_Mailing_BAO_MailingJob();
 
@@ -372,6 +379,9 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
   // Split the parent job into n number of child job based on an offset
   // If null or 0 , we create only one child job
+  /**
+   * @param int $offset
+   */
   public function split_job($offset = 200) {
     $recipient_count = CRM_Mailing_BAO_Recipients::mailingSize($this->mailing_id);
 
@@ -411,6 +421,9 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     }
   }
 
+  /**
+   * @param null $testParams
+   */
   public function queue($testParams = NULL) {
     $mailing = new CRM_Mailing_BAO_Mailing();
     $mailing->id = $this->mailing_id;
@@ -593,6 +606,16 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     return $isDelivered;
   }
 
+  /**
+   * @param $fields
+   * @param $mailing
+   * @param $mailer
+   * @param $job_date
+   * @param $attachments
+   *
+   * @return bool|null
+   * @throws Exception
+   */
   public function deliverGroup(&$fields, &$mailing, &$mailer, &$job_date, &$attachments) {
     static $smtpConnectionErrors = 0;
 
@@ -863,6 +886,16 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
     return '';
   }
 
+  /**
+   * @param $deliveredParams
+   * @param $targetParams
+   * @param $mailing
+   * @param $job_date
+   *
+   * @return bool
+   * @throws CRM_Core_Exception
+   * @throws Exception
+   */
   public function writeToDB(
     &$deliveredParams,
     &$targetParams,

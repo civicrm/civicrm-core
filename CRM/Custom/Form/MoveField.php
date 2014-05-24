@@ -141,6 +141,13 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
     $this->addFormRule(array('CRM_Custom_Form_MoveField', 'formRule'), $this);
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array|bool
+   */
   static function formRule($fields, $files, $self) {
     $self->_dstGID = $fields['dst_group_id'];
     $tmp           = CRM_Core_BAO_CustomField::_moveFieldValidate($self->_srcFID, $self->_dstGID);

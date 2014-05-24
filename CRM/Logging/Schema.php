@@ -261,6 +261,11 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     return TRUE;
   }
 
+  /**
+   * @param $table
+   *
+   * @return array
+   */
   private function _getCreateQuery($table) {
     $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE {$table}");
     $dao->fetch();
@@ -268,6 +273,12 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     return $create;
   }
 
+  /**
+   * @param $col
+   * @param $createQuery
+   *
+   * @return array|mixed|string
+   */
   private function _getColumnQuery($col, $createQuery) {
     $line = preg_grep("/^  `$col` /", $createQuery);
     $line = rtrim(array_pop($line), ',');
@@ -276,6 +287,9 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     return $line;
   }
 
+  /**
+   * @param bool $rebuildTrigger
+   */
   function fixSchemaDifferencesForAll($rebuildTrigger = FALSE) {
     $diffs = array();
     foreach ($this->tables as $table) {
@@ -301,6 +315,11 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
    * log_civicrm_contact.modified_date for example would always be copied from civicrm_contact.modified_date,
    * so there's no need for a default timestamp and therefore we remove such default timestamps
    * also eliminate the NOT NULL constraint, since we always copy and schema can change down the road)
+   */
+  /**
+   * @param $query
+   *
+   * @return mixed
    */
   function fixTimeStampAndNotNullSQL($query) {
     $query = str_ireplace("TIMESTAMP NOT NULL", "TIMESTAMP NULL", $query);
@@ -399,6 +418,12 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     return $columnSpecs[$table];
   }
 
+  /**
+   * @param $civiTable
+   * @param $logTable
+   *
+   * @return array
+   */
   function columnsWithDiffSpecs($civiTable, $logTable) {
     $civiTableSpecs = $this->columnSpecsOf($civiTable);
     $logTableSpecs  = $this->columnSpecsOf($logTable);
@@ -534,6 +559,11 @@ COLS;
     return (bool) CRM_Core_DAO::singleValueQuery("SHOW TRIGGERS LIKE 'civicrm_contact'");
   }
 
+  /**
+   * @param $info
+   * @param null $tableName
+   * @param bool $force
+   */
   function triggerInfo(&$info, $tableName = NULL, $force = FALSE) {
     // check if we have logging enabled
     $config =& CRM_Core_Config::singleton();

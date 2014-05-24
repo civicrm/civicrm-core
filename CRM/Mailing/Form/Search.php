@@ -75,6 +75,9 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
       ));
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = $statusVals = array();
     $parent = $this->controller->getParent();
@@ -106,7 +109,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
 
     $parent = $this->controller->getParent();
     if (!empty($params)) {
-      $fields = array('mailing_name', 'mailing_from', 'mailing_to', 'sort_name', 
+      $fields = array('mailing_name', 'mailing_from', 'mailing_to', 'sort_name',
                 'campaign_id', 'mailing_status', 'sms', 'status_unscheduled', 'is_archived', 'hidden_find_mailings');
       foreach ($fields as $field) {
         if (isset($params[$field]) &&

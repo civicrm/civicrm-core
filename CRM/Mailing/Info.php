@@ -42,6 +42,9 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function getInfo() {
     return array(
       'name' => 'CiviMail',
@@ -52,6 +55,9 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     );
   }
 
+  /**
+   * @return bool
+   */
   static function workflowEnabled() {
     $config = CRM_Core_Config::singleton();
 
@@ -78,6 +84,11 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @param bool $getAllUnconditionally
+   *
+   * @return array
+   */
   public function getPermissions($getAllUnconditionally = FALSE) {
     $permissions = array(
       'access CiviMail',
@@ -97,17 +108,26 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
 
   // docs inherited from interface
+  /**
+   * @return null
+   */
   public function getUserDashboardElement() {
     // no dashboard element for this component
     return NULL;
   }
 
+  /**
+   * @return null
+   */
   public function getUserDashboardObject() {
     // no dashboard element for this component
     return NULL;
   }
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function registerTab() {
     return array(
       'title' => ts('Mailings'),
@@ -118,6 +138,9 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function registerAdvancedSearchPane() {
     return array('title' => ts('Mailings'),
       'weight' => 20,
@@ -125,11 +148,17 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @return null
+   */
   public function getActivityTypes() {
     return NULL;
   }
 
   // add shortcut to Create New
+  /**
+   * @param $shortCuts
+   */
   public function creatNewShortcut(&$shortCuts) {}
 }
 
