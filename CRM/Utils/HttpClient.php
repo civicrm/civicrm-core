@@ -54,6 +54,9 @@ class CRM_Utils_HttpClient {
    */
   protected $connectionTimeout;
 
+  /**
+   * @return CRM_Utils_HttpClient
+   */
   public static function singleton() {
     if (!self::$singleton) {
       self::$singleton = new CRM_Utils_HttpClient();
@@ -61,6 +64,9 @@ class CRM_Utils_HttpClient {
     return self::$singleton;
   }
 
+  /**
+   * @param null $connectionTimeout
+   */
   public function __construct($connectionTimeout = NULL) {
     $this->connectionTimeout = $connectionTimeout;
   }
@@ -207,6 +213,9 @@ class CRM_Utils_HttpClient {
     return array($ch, $caConfig);
   }
 
+  /**
+   * @return bool
+   */
   public function isRedirectSupported() {
     return (ini_get('open_basedir') == '') && (ini_get('safe_mode') == 'Off' || ini_get('safe_mode') === FALSE);
   }

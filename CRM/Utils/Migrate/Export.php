@@ -52,6 +52,9 @@ class CRM_Utils_Migrate_Export {
    */
   protected $_xml;
 
+  /**
+   *
+   */
   function __construct() {
     $this->_xml = array(
       'customGroup' => array(
@@ -392,6 +395,11 @@ class CRM_Utils_Migrate_Export {
     return $result;
   }
 
+  /**
+   * @param $groupName
+   * @param $daoName
+   * @param null $sql
+   */
   function fetch($groupName, $daoName, $sql = NULL) {
     $idNameFields = isset($this->_xml[$groupName]['idNameFields']) ? $this->_xml[$groupName]['idNameFields'] : NULL;
     $mappedFields = isset($this->_xml[$groupName]['mappedFields']) ? $this->_xml[$groupName]['mappedFields'] : NULL;
