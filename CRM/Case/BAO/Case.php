@@ -1369,7 +1369,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param int $caseID case id
    * @param boolean $skipDetails if true include details of contacts
    *
-   * @return returns $searchRows array of returnproperties
+   * @return array $searchRows array of return properties
    *
    * @static
    */

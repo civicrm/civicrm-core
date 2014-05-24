@@ -1,7 +1,7 @@
 <?php
 /**
  * Test Generated example of using participant create API
- * single function to create contact w partipation & contribution. Note that in the
+ * single function to create contact w participation & contribution. Note that in the
       case of 'contribution' the 'create' is implied (api.contribution.create) *
  */
 function participant_create_example(){
