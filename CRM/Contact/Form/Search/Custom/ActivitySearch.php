@@ -350,8 +350,9 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
     return implode(' AND ', $clauses);
   }
 
-  /*
+  /**
    * Functions below generally don't need to be modified
+   * @return integer
    */
   function count() {
     $sql = $this->all();

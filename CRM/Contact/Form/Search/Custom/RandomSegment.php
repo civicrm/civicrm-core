@@ -363,6 +363,9 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
   /**
    * @return mixed
    */
+  /**
+   * @return mixed
+   */
   function count() {
     $sql = $this->all();
 
