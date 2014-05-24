@@ -84,43 +84,11 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @throws CRM_Core_Exception
    */
   public function getManagedEntities() {
-    // Use hook_civicrm_caseTypes to build a list of OptionValues
-    // In the long run, we may want more specialized logic for this, but
-    // this design is fairly convenient and will allow us to replace it
-    // without changing the hook_civicrm_caseTypes interface.
-    $entities = array();
-
-    $caseTypes = array();
-    CRM_Utils_Hook::caseTypes($caseTypes);
-
-    $proc = new CRM_Case_XMLProcessor();
-    foreach ($caseTypes as $name => $caseType) {
-      $xml = $proc->retrieve($name);
-      if (!$xml) {
-        throw new CRM_Core_Exception("Failed to load XML for case type (" . $name . ")");
-      }
-
-      if (isset($caseType['module'], $caseType['name'], $caseType['file'])) {
-        $entities[] = array(
-          'module' => $caseType['module'],
-          'name' => $caseType['name'],
-          'entity' => 'CaseType',
-          'params' => array(
-            'version' => 3,
-            'name' => $caseType['name'],
-            'title' => (string) $xml->name,
-            'description' => (string) $xml->description,
-            'is_reserved' => 1,
-            'is_active' => 1,
-            'weight' => $xml->weight ? $xml->weight : 1,
-          ),
-        );
-      }
-      else {
-        throw new CRM_Core_Exception("Invalid case type");
-      }
-    }
-
+    $entities = array_merge(
+      CRM_Case_ManagedEntities::createManagedCaseTypes(),
+      CRM_Case_ManagedEntities::createManagedActivityTypes(CRM_Case_XMLRepository::singleton(), CRM_Core_ManagedEntities::singleton()),
+      CRM_Case_ManagedEntities::createManagedRelationshipTypes(CRM_Case_XMLRepository::singleton(), CRM_Core_ManagedEntities::singleton())
+    );
     return $entities;
   }
 
