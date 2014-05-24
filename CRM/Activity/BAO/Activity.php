@@ -630,6 +630,12 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     return $result;
   }
 
+  /**
+   * @param $activity
+   * @param null $logMessage
+   *
+   * @return bool
+   */
   public static function logActivityAction($activity, $logMessage = NULL) {
     $session = CRM_Core_Session::singleton();
     $id = $session->get('userID');
@@ -1349,6 +1355,16 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     return array($sent, $activity->id);
   }
 
+  /**
+   * @param $contactDetails
+   * @param $activityParams
+   * @param array $smsParams
+   * @param $contactIds
+   * @param null $userID
+   *
+   * @return array
+   * @throws CRM_Core_Exception
+   */
   static function sendSMS(&$contactDetails,
     &$activityParams,
     &$smsParams = array(),
@@ -2587,6 +2603,9 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
    * Used to copy custom fields and attachments from an existing activity to another.
    * see CRM_Case_Page_AJAX::_convertToCaseActivity() for example
    */
+  /**
+   * @param $params
+   */
   static function copyExtendedActivityData($params) {
     // attach custom data to the new activity
     $customParams = $htmlType = array();
@@ -2624,6 +2643,13 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     CRM_Core_BAO_File::copyEntityFile('civicrm_activity', $params['activityID'], 'civicrm_activity', $params['mainActivityId']);
   }
 
+  /**
+   * @param $activityId
+   * @param null $recordTypeID
+   * @param string $column
+   *
+   * @return null
+   */
   public static function getActivityContact($activityId, $recordTypeID = NULL, $column = 'contact_id') {
     $activityContact = new CRM_Activity_BAO_ActivityContact();
     $activityContact->activity_id = $activityId;
@@ -2636,6 +2662,11 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     return NULL;
   }
 
+  /**
+   * @param $activityId
+   *
+   * @return null
+   */
   public static function getSourceContactID($activityId) {
     static $sourceID = NULL;
     if (!$sourceID) {
@@ -2646,6 +2677,9 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     return self::getActivityContact($activityId, $sourceID);
   }
 
+  /**
+   * @param $params
+   */
   function setApiFilter(&$params) {
     if (CRM_Utils_Array::value('target_contact_id', $params)) {
       $this->selectAdd();

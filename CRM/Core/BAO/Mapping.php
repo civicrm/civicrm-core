@@ -939,6 +939,11 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @relationshipTypeId related relationship type id
    * @return $groupTitle all custom field titles
    */
+  /**
+   * @param $relationshipTypeId
+   *
+   * @return array
+   */
   function getRelationTypeCustomGroupData($relationshipTypeId) {
 
     $customFields = CRM_Core_BAO_CustomField::getFields('Relationship', NULL, NULL, $relationshipTypeId, NULL, NULL);
@@ -1103,6 +1108,11 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     return $fields;
   }
 
+  /**
+   * @param $params
+   *
+   * @return array
+   */
   static function &returnProperties(&$params) {
     $fields = array(
       'contact_type' => 1,

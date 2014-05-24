@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class CRM_Core_CodeGen_Main
+ */
 class CRM_Core_CodeGen_Main {
   var $buildVersion;
   var $db_version;

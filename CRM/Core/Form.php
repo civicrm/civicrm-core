@@ -355,6 +355,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   function addRules() {}
 
+  /**
+   * Performs the server side validation
+   * @access    public
+   * @since     1.0
+   * @return    boolean   true if no error found
+   * @throws    HTML_QuickForm_Error
+   */
   function validate() {
     $error = parent::validate();
 

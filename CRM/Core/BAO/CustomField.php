@@ -92,6 +92,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     return self::$_dataType;
   }
 
+  /**
+   * @return array
+   */
   static function dataToHtml() {
     if (!self::$_dataToHtml) {
       self::$_dataToHtml = array(
@@ -1177,6 +1180,17 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     );
   }
 
+  /**
+   * @param $value
+   * @param $option
+   * @param $html_type
+   * @param $data_type
+   * @param null $format
+   * @param null $contactID
+   * @param null $fieldID
+   *
+   * @return array|mixed|null|string
+   */
   static function getDisplayValueCommon($value,
     &$option,
     $html_type,
@@ -1492,6 +1506,22 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
   }
 
+  /**
+   * @param $contactID
+   * @param $cfID
+   * @param null $fileID
+   * @param bool $absolute
+   *
+   * @return array
+   */
+  /**
+   * @param $contactID
+   * @param $cfID
+   * @param null $fileID
+   * @param bool $absolute
+   *
+   * @return array
+   */
   static function getFileURL($contactID, $cfID, $fileID = NULL, $absolute = FALSE) {
     if ($contactID) {
       if (!$fileID) {
@@ -1802,6 +1832,11 @@ SELECT $columnName
     return $customFormatted;
   }
 
+  /**
+   * @param $params
+   *
+   * @return array
+   */
   static function &defaultCustomTableSchema(&$params) {
     // add the id and extends_id
     $table = array(
@@ -1840,6 +1875,12 @@ SELECT $columnName
     return $table;
   }
 
+  /**
+   * @param $field
+   * @param $operation
+   * @param bool $indexExist
+   * @param bool $triggerRebuild
+   */
   static function createField($field, $operation, $indexExist = FALSE, $triggerRebuild = TRUE) {
     $tableName = CRM_Core_DAO::getFieldValue(
       'CRM_Core_DAO_CustomGroup',
@@ -2166,6 +2207,12 @@ WHERE  option_group_id = {$optionGroupId}";
     }
   }
 
+  /**
+   * @param $optionGroupId
+   * @param $htmlType
+   *
+   * @return null|string
+   */
   static function getOptionGroupDefault($optionGroupId, $htmlType) {
     $query = "
 SELECT   default_value, html_type
@@ -2207,6 +2254,15 @@ ORDER BY html_type";
     return $defaultValue;
   }
 
+  /**
+   * @param $params
+   * @param $customFields
+   * @param $entityID
+   * @param $customFieldExtends
+   * @param bool $inline
+   *
+   * @return array
+   */
   static function postProcess(&$params,
     &$customFields,
     $entityID,
@@ -2241,6 +2297,12 @@ ORDER BY html_type";
     return $customData;
   }
 
+  /**
+   * @param $field
+   * @param $options
+   *
+   * @throws Exception
+   */
   static function buildOption($field, &$options) {
     // Fixme - adding anything but options to the $options array is a bad idea
     // What if an option had the key 'attributes'?
@@ -2289,6 +2351,12 @@ SELECT label, value
     }
   }
 
+  /**
+   * @param $fieldLabel
+   * @param null $groupTitle
+   *
+   * @return null
+   */
   static function getCustomFieldID($fieldLabel, $groupTitle = NULL) {
     $params = array(1 => array($fieldLabel, 'String'));
     if ($groupTitle) {
@@ -2454,6 +2522,11 @@ WHERE      f.id IN ($ids)";
     return $errors;
   }
 
+  /**
+   * @param $customId
+   *
+   * @return bool
+   */
   static function isMultiRecordField($customId) {
     $isMultipleWithGid = FALSE;
     if (!is_numeric($customId)) {

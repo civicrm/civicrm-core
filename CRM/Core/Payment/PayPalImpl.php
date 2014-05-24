@@ -412,6 +412,14 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
   }
 
+  /**
+   * Function to check whether a method is present ( & supported ) by the payment processor object.
+   *
+   * @param  string $method method to check for.
+   *
+   * @return boolean
+   * @public
+   */
   function isSupported($method = 'cancelSubscription') {
     if ($this->_paymentProcessor['payment_processor_type'] != 'PayPal') {
       // since subscription methods like cancelSubscription or updateBilling is not yet implemented / supported

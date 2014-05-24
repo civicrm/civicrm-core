@@ -51,6 +51,21 @@ class CRM_Core_Exception extends PEAR_Exception {
   public function getErrorCode() {
     return $this->errorData['error_code'];
   }
+
+  /**
+   * Return specific error information that can be used for more detailed
+   * error messages or translation.
+   *
+   * This method may be overridden in child exception classes in order
+   * to add functionality not present in PEAR_Exception and is a placeholder
+   * to define API
+   *
+   * The returned array must be an associative array of parameter => value like so:
+   * <pre>
+   * array('name' => $name, 'context' => array(...))
+   * </pre>
+   * @return array
+   */
   public function getErrorData() {
     return $this->errorData;
   }

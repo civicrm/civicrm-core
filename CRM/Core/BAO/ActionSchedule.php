@@ -39,6 +39,11 @@
  */
 class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
+  /**
+   * @param null $id
+   *
+   * @return array
+   */
   static function getMapping($id = NULL) {
     static $_action_mapping;
 
@@ -225,6 +230,11 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     );
   }
 
+  /**
+   * @param null $id
+   *
+   * @return array
+   */
   static function getSelection1($id = NULL) {
     $mapping = self::getMapping($id);
     $sel4 = $sel5 = array();
@@ -370,6 +380,16 @@ WHERE   cas.entity_value = $id AND
     return $list;
   }
 
+  /**
+   * @param $contactId
+   * @param $to
+   * @param $scheduleID
+   * @param $from
+   * @param $tokenParams
+   *
+   * @return bool|null
+   * @throws CRM_Core_Exception
+   */
   static function sendReminder($contactId, $to, $scheduleID, $from, $tokenParams) {
     $email = $to['email'];
     $phoneNumber = $to['phone'];
@@ -601,6 +621,12 @@ WHERE   cas.entity_value = $id AND
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_ActionSchedule', $id, 'is_active', $is_active);
   }
 
+  /**
+   * @param $mappingID
+   * @param $now
+   *
+   * @throws CRM_Core_Exception
+   */
   static function sendMailings($mappingID, $now) {
     $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
     $fromEmailAddress = "$domainValues[0] <$domainValues[1]>";
@@ -814,6 +840,13 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
     }
   }
 
+  /**
+   * @param $mappingID
+   * @param $now
+   * @param array $params
+   *
+   * @throws API_Exception
+   */
   static function buildRecipientContacts($mappingID, $now, $params = array()) {
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();
     $actionSchedule->mapping_id = $mappingID;
@@ -1195,6 +1228,11 @@ GROUP BY reminder.contact_id
     }
   }
 
+  /**
+   * @param $field
+   *
+   * @return null|string
+   */
   static function permissionedRelationships($field) {
     $query = '
 SELECT    cm.id AS owner_id, cm.contact_id AS owner_contact, m.id AS slave_id, m.contact_id AS slave_contact, cmt.relationship_type_id AS relation_type, rel.contact_id_a, rel.contact_id_b, rel.is_permission_a_b, rel.is_permission_b_a
@@ -1225,6 +1263,12 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     return NULL;
   }
 
+  /**
+   * @param null $now
+   * @param array $params
+   *
+   * @return array
+   */
   static function processQueue($now = NULL, $params = array()) {
     $now = $now ? CRM_Utils_Time::setTime($now) : CRM_Utils_Time::getTime();
 
@@ -1259,6 +1303,12 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     return CRM_Core_DAO::singleValueQuery($queryString, $params);
   }
 
+  /**
+   * @param $mappingID
+   * @param $recipientType
+   *
+   * @return array
+   */
   static function getRecipientListing($mappingID, $recipientType) {
     $options = array();
     if (!$mappingID || !$recipientType) {

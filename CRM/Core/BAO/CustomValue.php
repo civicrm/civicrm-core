@@ -160,6 +160,9 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
   }
 
 
+  /**
+   * @param $formValues
+   */
   public static function fixFieldValueOfTypeMemo(&$formValues) {
     if (empty($formValues)) {
       return NULL;

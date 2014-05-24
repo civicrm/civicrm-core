@@ -814,6 +814,11 @@ ORDER BY parent_id, weight";
     }
   }
 
+  /**
+   * @param $cid
+   *
+   * @return object|string
+   */
   static function getCacheKey($cid) {
     $key = CRM_Core_BAO_Setting::getItem(
       CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,

@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class CRM_Core_CodeGen_BaseTask
+ */
 abstract class CRM_Core_CodeGen_BaseTask implements CRM_Core_CodeGen_ITask {
   protected $config;
 
