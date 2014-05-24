@@ -32,6 +32,8 @@
  * $Id$
  *
  * The XMLRepository is responsible for loading XML for case-types.
+ * It includes any bulk operations that apply across the list of all XML
+ * documents of all case-types.
  */
 class CRM_Case_XMLRepository {
   private static $singleton;
@@ -163,6 +165,40 @@ class CRM_Case_XMLRepository {
       $this->allCaseTypes = CRM_Case_PseudoConstant::caseType("name");
     }
     return $this->allCaseTypes;
+  }
+
+  /**
+   * @return array<string> symbolic-names of activity-types
+   */
+  public function getAllDeclaredActivityTypes() {
+    $result = array();
+
+    $p = new CRM_Case_XMLProcessor_Process();
+    foreach ($this->getAllCaseTypes() as $caseTypeName) {
+      $caseTypeXML = $this->retrieve($caseTypeName);
+      $result = array_merge($result, $p->getDeclaredActivityTypes($caseTypeXML));
+    }
+
+    $result = array_unique($result);
+    sort($result);
+    return $result;
+  }
+
+  /**
+   * @return array<string> symbolic-names of relationship-types
+   */
+  public function getAllDeclaredRelationshipTypes() {
+    $result = array();
+
+    $p = new CRM_Case_XMLProcessor_Process();
+    foreach ($this->getAllCaseTypes() as $caseTypeName) {
+      $caseTypeXML = $this->retrieve($caseTypeName);
+      $result = array_merge($result, $p->getDeclaredRelationshipTypes($caseTypeXML));
+    }
+
+    $result = array_unique($result);
+    sort($result);
+    return $result;
   }
 
   /**
