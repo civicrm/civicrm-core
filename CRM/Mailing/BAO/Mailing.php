@@ -33,6 +33,10 @@
  *
  */
 require_once 'Mail/mime.php';
+
+/**
+ * Class CRM_Mailing_BAO_Mailing
+ */
 class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
 
   /**
@@ -91,6 +95,13 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     parent::__construct();
   }
 
+  /**
+   * @param $job_id
+   * @param null $mailing_id
+   * @param null $mode
+   *
+   * @return int
+   */
   static function &getRecipientsCount($job_id, $mailing_id = NULL, $mode = NULL) {
     // need this for backward compatibility, so we can get count for old mailings
     // please do not use this function if possible
@@ -100,6 +111,17 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
 
   // note that $job_id is used only as a variable in the temp table construction
   // and does not play a role in the queries generated
+  /**
+   * @param $job_id
+   * @param null $mailing_id
+   * @param null $offset
+   * @param null $limit
+   * @param bool $storeRecipients
+   * @param bool $dedupeEmail
+   * @param null $mode
+   *
+   * @return CRM_Mailing_Event_BAO_Queue|string
+   */
   static function &getRecipients(
     $job_id,
     $mailing_id = NULL,
@@ -519,6 +541,11 @@ ORDER BY   i.contact_id, i.{$tempColumn}
     return $eq;
   }
 
+  /**
+   * @param string $type
+   *
+   * @return array
+   */
   private function _getMailingGroupIds($type = 'Include') {
     $mailingGroup = new CRM_Mailing_DAO_MailingGroup();
     $group = CRM_Contact_DAO_Group::getTableName();
@@ -2143,6 +2170,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     return $this->count;
   }
 
+  /**
+   * @param $id
+   *
+   * @throws Exception
+   */
   static function checkPermission($id) {
     if (!$id) {
       return;
@@ -2159,6 +2191,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     return;
   }
 
+  /**
+   * @param null $alias
+   *
+   * @return string
+   */
   static function mailingACL($alias = NULL) {
     $mailingACL = " ( 0 ) ";
 
@@ -2623,6 +2660,11 @@ SELECT  $mailing.id as mailing_id
     return $report;
   }
 
+  /**
+   * @param $jobID
+   *
+   * @return mixed
+   */
   static function overrideVerp($jobID) {
     static $_cache = array();
 
@@ -2639,6 +2681,12 @@ WHERE  civicrm_mailing_job.id = %1
     return $_cache[$jobID];
   }
 
+  /**
+   * @param null $mode
+   *
+   * @return bool
+   * @throws Exception
+   */
   static function processQueue($mode = NULL) {
     $config = &CRM_Core_Config::singleton();
     //   CRM_Core_Error::debug_log_message("Beginning processQueue run: {$config->mailerJobsMax}, {$config->mailerJobSize}");
@@ -2692,6 +2740,9 @@ WHERE  civicrm_mailing_job.id = %1
     return TRUE;
   }
 
+  /**
+   * @param $mailingID
+   */
   private static function addMultipleEmails($mailingID) {
     $sql = "
 INSERT INTO civicrm_mailing_recipients
@@ -2708,6 +2759,11 @@ AND    e.id NOT IN ( SELECT email_id FROM civicrm_mailing_recipients mr WHERE ma
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
   }
 
+  /**
+   * @param bool $isSMS
+   *
+   * @return mixed
+   */
   static function getMailingsList($isSMS = FALSE) {
     static $list = array();
     $where = " WHERE ";
@@ -2734,6 +2790,11 @@ ORDER BY civicrm_mailing.name";
     return $list;
   }
 
+  /**
+   * @param $mid
+   *
+   * @return null|string
+   */
   static function hiddenMailingGroup($mid) {
     $sql = "
 SELECT     g.id
