@@ -47,6 +47,9 @@ class CRM_Case_Form_Activity_OpenCase {
    */
   public $_contactID;
 
+  /**
+   * @param $form
+   */
   static function preProcess(&$form) {
     //get multi client case configuration
     $xmlProcessorProcess = new CRM_Case_XMLProcessor_Process();

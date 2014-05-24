@@ -32,6 +32,10 @@
  * Grateful acknowledgements go to Donald Lobo for invaluable assistance
  * in creating this payment processor module
  */
+
+/**
+ * Class CRM_Core_Payment_PaymentExpressUtils
+ */
 class CRM_Core_Payment_PaymentExpressUtils {
 
   static function _valueXml($element, $value = NULL) {

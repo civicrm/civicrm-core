@@ -44,10 +44,20 @@ class CRM_Case_XMLProcessor {
    */
   const REL_TYPE_CNAME = 'label_b_a';
 
+  /**
+   * @param $caseType
+   *
+   * @return FALSE|SimpleXMLElement
+   */
   public function retrieve($caseType) {
     return CRM_Case_XMLRepository::singleton()->retrieve($caseType);
   }
 
+  /**
+   * @param $caseType
+   *
+   * @return mixed|string
+   */
   public static function mungeCaseType($caseType) {
     // trim all spaces from $caseType
     $caseType = str_replace('_', ' ', $caseType);
@@ -55,6 +65,12 @@ class CRM_Case_XMLProcessor {
     return $caseType;
   }
 
+  /**
+   * @param bool $indexName
+   * @param bool $all
+   *
+   * @return array
+   */
   function &allActivityTypes($indexName = TRUE, $all = FALSE) {
     static $activityTypes = NULL;
     if (!$activityTypes) {
@@ -63,6 +79,9 @@ class CRM_Case_XMLProcessor {
     return $activityTypes;
   }
 
+  /**
+   * @return array
+   */
   function &allRelationshipTypes() {
     static $relationshipTypes = array();
 

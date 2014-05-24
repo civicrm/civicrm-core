@@ -33,6 +33,10 @@
  *
  */
 require_once 'CRM/Campaign/DAO/Survey.php';
+
+/**
+ * Class CRM_Campaign_BAO_Survey
+ */
 class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
 
   /**
