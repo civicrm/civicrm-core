@@ -416,14 +416,26 @@ class CRM_Core_Page {
     return $this->_print;
   }
 
+  /**
+   * @return CRM_Core_Smarty
+   */
   static function &getTemplate() {
     return self::$_template;
   }
 
+  /**
+   * @param $name
+   *
+   * @return null
+   */
   function getVar($name) {
     return isset($this->$name) ? $this->$name : NULL;
   }
 
+  /**
+   * @param $name
+   * @param $value
+   */
   function setVar($name, $value) {
     $this->$name = $value;
   }

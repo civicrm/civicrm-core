@@ -577,7 +577,14 @@
     }
   }
 
-  static function deleteURLArgs($entityTable, $entityID, $fileID) {
+   /**
+    * @param $entityTable
+    * @param $entityID
+    * @param $fileID
+    *
+    * @return string
+    */
+   static function deleteURLArgs($entityTable, $entityID, $fileID) {
     $params['entityTable'] = $entityTable;
     $params['entityID']    = $entityID;
     $params['fileID']      = $fileID;

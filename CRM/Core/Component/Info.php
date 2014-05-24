@@ -107,6 +107,11 @@ abstract class CRM_Core_Component_Info {
    * @access public
    *
    */
+  /**
+   * @param $name
+   * @param $namespace
+   * @param $componentID
+   */
   public function __construct($name, $namespace, $componentID) {
     $this->name        = $name;
     $this->namespace   = $namespace;

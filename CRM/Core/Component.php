@@ -46,6 +46,11 @@ class CRM_Core_Component {
 
   static $_contactSubTypes = NULL;
 
+  /**
+   * @param bool $force
+   *
+   * @return array|null
+   */
   private static function &_info($force = FALSE) {
     if (self::$_info == NULL || $force) {
       self::$_info = array();
@@ -64,6 +69,12 @@ class CRM_Core_Component {
     return self::$_info;
   }
 
+  /**
+   * @param $name
+   * @param null $attribute
+   *
+   * @return mixed
+   */
   static function get($name, $attribute = NULL) {
     $comp = CRM_Utils_Array::value($name, self::_info());
     if ($attribute) {
@@ -72,6 +83,12 @@ class CRM_Core_Component {
     return $comp;
   }
 
+  /**
+   * @param bool $force
+   *
+   * @return array
+   * @throws Exception
+   */
   public static function &getComponents($force = FALSE) {
     static $_cache = NULL;
 
@@ -95,6 +112,11 @@ class CRM_Core_Component {
     return $_cache;
   }
 
+  /**
+   * @param bool $force
+   *
+   * @return array|null
+   */
   static public function &getEnabledComponents($force = FALSE) {
     return self::_info($force);
   }
@@ -103,6 +125,11 @@ class CRM_Core_Component {
     self::getEnabledComponents(TRUE);
   }
 
+  /**
+   * @param bool $translated
+   *
+   * @return array
+   */
   public static function &getNames($translated = FALSE) {
     $allComponents = self::getComponents();
 
@@ -118,6 +145,12 @@ class CRM_Core_Component {
     return $names;
   }
 
+  /**
+   * @param $args
+   * @param $type
+   *
+   * @return bool
+   */
   static function invoke(&$args, $type) {
     $info = self::_info();
     $config = CRM_Core_Config::singleton();
@@ -150,6 +183,9 @@ class CRM_Core_Component {
     return FALSE;
   }
 
+  /**
+   * @return array
+   */
   static function xmlMenu() {
 
     // lets build the menu for all components
@@ -165,6 +201,9 @@ class CRM_Core_Component {
     return $files;
   }
 
+  /**
+   * @return array
+   */
   static function &menu() {
     $info = self::_info();
     $items = array();
@@ -180,6 +219,10 @@ class CRM_Core_Component {
     return $items;
   }
 
+  /**
+   * @param $config
+   * @param bool $oldMode
+   */
   static function addConfig(&$config, $oldMode = FALSE) {
     $info = self::_info();
 
@@ -190,12 +233,22 @@ class CRM_Core_Component {
     return;
   }
 
+  /**
+   * @param $componentName
+   *
+   * @return mixed
+   */
   static function getComponentID($componentName) {
     $info = self::_info();
 
     return $info[$componentName]->componentID;
   }
 
+  /**
+   * @param $componentID
+   *
+   * @return int|null|string
+   */
   static function getComponentName($componentID) {
     $info = self::_info();
 
@@ -210,6 +263,9 @@ class CRM_Core_Component {
     return $componentName;
   }
 
+  /**
+   * @return array
+   */
   static function &getQueryFields() {
     $info = self::_info();
     $fields = array();
@@ -223,6 +279,10 @@ class CRM_Core_Component {
     return $fields;
   }
 
+  /**
+   * @param $query
+   * @param $fnName
+   */
   static function alterQuery(&$query, $fnName) {
     $info = self::_info();
 
@@ -234,6 +294,13 @@ class CRM_Core_Component {
     }
   }
 
+  /**
+   * @param $fieldName
+   * @param $mode
+   * @param $side
+   *
+   * @return null
+   */
   static function from($fieldName, $mode, $side) {
     $info = self::_info();
 
@@ -250,6 +317,12 @@ class CRM_Core_Component {
     return $from;
   }
 
+  /**
+   * @param $mode
+   * @param bool $includeCustomFields
+   *
+   * @return null
+   */
   static function &defaultReturnProperties($mode,
     $includeCustomFields = TRUE
   ) {
@@ -268,6 +341,9 @@ class CRM_Core_Component {
     return $properties;
   }
 
+  /**
+   * @param $form
+   */
   static function &buildSearchForm(&$form) {
     $info = self::_info();
 
@@ -279,6 +355,10 @@ class CRM_Core_Component {
     }
   }
 
+  /**
+   * @param $row
+   * @param $id
+   */
   static function searchAction(&$row, $id) {
     $info = self::_info();
 
@@ -290,6 +370,9 @@ class CRM_Core_Component {
     }
   }
 
+  /**
+   * @return array|null
+   */
   static function &contactSubTypes() {
     if (self::$_contactSubTypes == NULL) {
       self::$_contactSubTypes = array();
@@ -298,6 +381,12 @@ class CRM_Core_Component {
   }
 
 
+  /**
+   * @param $subType
+   * @param $op
+   *
+   * @return null
+   */
   static function &contactSubTypeProperties($subType, $op) {
     $properties = self::contactSubTypes();
     if (array_key_exists($subType, $properties) &&

@@ -193,6 +193,11 @@ abstract class CRM_Core_Payment {
    */
   abstract function checkConfig();
 
+  /**
+   * @param $paymentProcessor
+   *
+   * @return bool
+   */
   static function paypalRedirect(&$paymentProcessor) {
     if (!$paymentProcessor) {
       return FALSE;
@@ -337,6 +342,13 @@ abstract class CRM_Core_Payment {
     return method_exists(CRM_Utils_System::getClassName($this), $method);
   }
 
+  /**
+   * @param null $entityID
+   * @param null $entity
+   * @param string $action
+   *
+   * @return string
+   */
   function subscriptionURL($entityID = NULL, $entity = NULL, $action = 'cancel') {
     if ($action == 'cancel') {
       $url = 'civicrm/contribute/unsubscribe';

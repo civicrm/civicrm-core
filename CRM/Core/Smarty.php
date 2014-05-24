@@ -204,6 +204,10 @@ class CRM_Core_Smarty extends Smarty {
     return $output;
   }
 
+  /**
+   * @param $name
+   * @param $value
+   */
   function appendValue($name, $value) {
     $currentValue = $this->get_template_vars($name);
     if (!$currentValue) {
@@ -230,6 +234,9 @@ class CRM_Core_Smarty extends Smarty {
     civicrm_smarty_register_string_resource();
   }
 
+  /**
+   * @param $path
+   */
   function addTemplateDir($path) {
     if ( is_array( $this->template_dir ) ) {
       array_unshift( $this->template_dir, $path );

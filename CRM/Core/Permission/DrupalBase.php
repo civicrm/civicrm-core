@@ -218,6 +218,11 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
     return NULL;
   }
 
+  /**
+   * @param $uids
+   *
+   * @return string
+   */
   function getContactEmails($uids) {
     if (empty($uids)) {
       return '';
