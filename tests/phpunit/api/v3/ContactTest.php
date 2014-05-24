@@ -1745,4 +1745,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access AJAX API');
     $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'b', 'check_permissions' => TRUE));
   }
+
+  function testSQLOperatorsOnContactAPI() {
+    $this->individualCreate();
+    $this->organizationCreate();
+    $this->householdCreate();
+    $contacts = $this->callAPISuccess('contact', 'get', array('legal_name' => array('IS NOT NULL' => TRUE)));
+    $this->assertEquals($contacts['count'], CRM_Core_DAO::singleValueQuery('select count(*) FROM civicrm_contact WHERE legal_name IS NOT NULL'));
+    $contacts = $this->callAPISuccess('contact', 'get', array('legal_name' => array('IS NULL' => TRUE)));
+    $this->assertEquals($contacts['count'], CRM_Core_DAO::singleValueQuery('select count(*) FROM civicrm_contact WHERE legal_name IS NULL'));
+  }
 }
