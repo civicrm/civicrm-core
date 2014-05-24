@@ -812,6 +812,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * - array
    * - object
    *
+   * @throws Exception
    * @return array|int
    */
   function callAPISuccessGetSingle($entity, $params, $checkAgainst = NULL) {

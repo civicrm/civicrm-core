@@ -201,6 +201,8 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
 
   /**
    * @param string $type 'raw'|'ezc'
+   *
+   * @throws Exception
    * @return array(ezcMail)|array(string)
    */
   function getAllMessages($type = 'raw') {
