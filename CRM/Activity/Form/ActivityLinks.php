@@ -42,6 +42,9 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
     self::commonBuildQuickForm($this);
   }
 
+  /**
+   * @param $self
+   */
   static function commonBuildQuickForm($self) {
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $self);
     if (!$contactId) {

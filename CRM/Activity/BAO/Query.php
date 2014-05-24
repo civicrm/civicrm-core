@@ -152,7 +152,7 @@ class CRM_Activity_BAO_Query {
       $query->_element['result'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
-    
+
     if (CRM_Utils_Array::value('parent_id', $query->_returnProperties)) {
       $query->_tables['parent_id'] = 1;
       $query->_whereTables['parent_id'] = 1;
@@ -380,7 +380,7 @@ class CRM_Activity_BAO_Query {
           $query->_qill[$grouping][] = ts('Activities without Followup Activities');
         }
         break;
-        
+
       case 'followup_parent_id':
         if ($value == 1) {
           $query->_where[$grouping][] = "civicrm_activity.parent_id IS NOT NULL";
@@ -394,6 +394,13 @@ class CRM_Activity_BAO_Query {
     }
   }
 
+  /**
+   * @param $name
+   * @param $mode
+   * @param $side
+   *
+   * @return null|string
+   */
   static function from($name, $mode, $side) {
     $from = NULL;
     switch ($name) {
@@ -435,7 +442,7 @@ class CRM_Activity_BAO_Query {
                       ON ( ac.activity_id = civicrm_activity_contact.activity_id AND ac.record_type_id = {$sourceID})
         INNER JOIN civicrm_contact source_contact ON (ac.contact_id = source_contact.id)";
         break;
-      
+
       case 'parent_id':
         $from = "$side JOIN civicrm_activity AS parent_id ON civicrm_activity.id = parent_id.parent_id";
         break;
@@ -572,6 +579,12 @@ class CRM_Activity_BAO_Query {
     $form->setDefaults(array('activity_test' => 0));
   }
 
+  /**
+   * @param $mode
+   * @param bool $includeCustomFields
+   *
+   * @return array|null
+   */
   static function defaultReturnProperties($mode, $includeCustomFields = TRUE) {
     $properties = NULL;
     if ($mode & CRM_Contact_BAO_Query::MODE_ACTIVITY) {
@@ -612,6 +625,16 @@ class CRM_Activity_BAO_Query {
     return $properties;
   }
 
+  /**
+   * @param $query
+   * @param $value
+   * @param $pseudoconstantType
+   * @param $op
+   * @param $grouping
+   * @param $params
+   *
+   * @return array
+   */
   static function buildWhereAndQill(&$query, $value, $pseudoconstantType, $op, $grouping, $params) {
     $matches = $val = $clause = array();
 
