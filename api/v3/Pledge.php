@@ -124,9 +124,9 @@ function _civicrm_api3_pledge_create_spec(&$params) {
 /**
  * Retrieve a set of pledges, given a set of input params
  *
- * @param  array   $params           (reference ) input parameters. Use interogate for possible fields
+ * @param  array $params input parameters. Use interrogate for possible fields
  *
- * @return array (reference )        array of pledges, if error an array with an error id and error message
+ * @return array  array of pledges, if error an array with an error id and error message
  * {@getfields pledge_get}
  * @example PledgeGet.php
  * @access public
