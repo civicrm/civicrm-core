@@ -39,6 +39,9 @@
  */
 class CRM_Report_Page_List extends CRM_Core_Page {
 
+  /**
+   * @return array
+   */
   public static function &info() {
     $sql = "
 SELECT  v.id, v.value, v.label, v.description, v.component_id,

@@ -35,6 +35,11 @@
  */
 class CRM_Report_Utils_Report {
 
+  /**
+   * @param null $instanceID
+   *
+   * @return null|string
+   */
   static function getValueFromUrl($instanceID = NULL) {
     if ($instanceID) {
       $optionVal = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance',
@@ -57,6 +62,11 @@ class CRM_Report_Utils_Report {
     return $optionVal;
   }
 
+  /**
+   * @param null $instanceID
+   *
+   * @return array|bool
+   */
   static function getValueIDFromUrl($instanceID = NULL) {
     $optionVal = self::getValueFromUrl($instanceID);
 
@@ -68,6 +78,11 @@ class CRM_Report_Utils_Report {
     return FALSE;
   }
 
+  /**
+   * @param $optionVal
+   *
+   * @return mixed
+   */
   static function getInstanceIDForValue($optionVal) {
     static $valId = array();
 
@@ -82,6 +97,11 @@ WHERE  report_id = %1";
     return $valId[$optionVal];
   }
 
+  /**
+   * @param null $path
+   *
+   * @return mixed
+   */
   static function getInstanceIDForPath($path = NULL) {
     static $valId = array();
 
@@ -99,6 +119,15 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
     return CRM_Utils_Array::value($path, $valId);
   }
 
+  /**
+   * @param $urlValue
+   * @param string $query
+   * @param bool $absolute
+   * @param null $instanceID
+   * @param array $drilldownReport
+   *
+   * @return bool|string
+   */
   static function getNextUrl($urlValue, $query = 'reset=1', $absolute = FALSE, $instanceID = NULL, $drilldownReport = array()) {
     if ($instanceID) {
       $drilldownInstanceID = false;
@@ -125,6 +154,11 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
   }
 
   // get instance count for a template
+  /**
+   * @param $optionVal
+   *
+   * @return int|null|string
+   */
   static function getInstanceCount($optionVal) {
     if (empty($optionVal)) return 0;
 
@@ -138,6 +172,14 @@ WHERE  inst.report_id = %1";
     return $count;
   }
 
+  /**
+   * @param $fileContent
+   * @param null $instanceID
+   * @param string $outputMode
+   * @param array $attachments
+   *
+   * @return bool
+   */
   static function mailReport($fileContent, $instanceID = NULL, $outputMode = 'html', $attachments = array(
     )) {
     if (!$instanceID) {
@@ -173,6 +215,10 @@ WHERE  inst.report_id = %1";
     return CRM_Utils_Mail::send($params);
   }
 
+  /**
+   * @param $form
+   * @param $rows
+   */
   static function export2csv(&$form, &$rows) {
     //Mark as a CSV file.
     header('Content-Type: text/csv');
@@ -246,6 +292,9 @@ WHERE  inst.report_id = %1";
     return $csv;
   }
 
+  /**
+   * @return mixed
+   */
   static function getInstanceID() {
 
     $config = CRM_Core_Config::singleton();
@@ -260,6 +309,9 @@ WHERE  inst.report_id = %1";
     }
   }
 
+  /**
+   * @return string
+   */
   static function getInstancePath() {
     $config = CRM_Core_Config::singleton();
     $arg = explode('/', $_GET[$config->userFrameworkURLVar]);
@@ -273,6 +325,11 @@ WHERE  inst.report_id = %1";
     }
   }
 
+  /**
+   * @param $instanceId
+   *
+   * @return bool
+   */
   static function isInstancePermissioned($instanceId) {
     if (!$instanceId) {
       return TRUE;
@@ -332,6 +389,11 @@ WHERE  inst.report_id = %1";
     return TRUE;
   }
 
+  /**
+   * @param $params
+   *
+   * @return array
+   */
   static function processReport($params) {
     $instanceId = CRM_Utils_Array::value('instanceId', $params);
 
@@ -471,6 +533,11 @@ WHERE  inst.report_id = %1";
     return $query_string;
   }
 
+  /**
+   * @param $reportUrl
+   *
+   * @return mixed
+   */
   static function getInstanceList($reportUrl) {
     static $instanceDetails = array();
 

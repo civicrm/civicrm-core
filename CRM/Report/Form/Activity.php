@@ -41,6 +41,12 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
   protected $_nonDisplayFields = array();
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     // There could be multiple contacts. We not clear on which contact id to display.
     // Lets hide it for now.
@@ -305,6 +311,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     parent::__construct();
   }
 
+  /**
+   * @param null $recordType
+   */
   function select($recordType = NULL) {
     if (!array_key_exists("contact_{$recordType}", $this->_params['fields']) && $recordType != 'final') {
       $this->_nonDisplayFields[] = "civicrm_contact_contact_{$recordType}";
@@ -375,6 +384,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $recordType
+   */
   function from($recordType) {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
@@ -440,6 +452,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     $this->addAddressFromClause();
   }
 
+  /**
+   * @param null $recordType
+   */
   function where($recordType = NULL) {
     $this->_where = " WHERE {$this->_aliases['civicrm_activity']}.is_test = 0 AND
                                 {$this->_aliases['civicrm_activity']}.is_deleted = 0 AND
@@ -517,6 +532,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_activity']}.id";
   }
 
+  /**
+   * @param string $tableAlias
+   */
   function buildACLClause($tableAlias = 'contact_a') {
     //override for ACL( Since Contact may be source
     //contact/assignee or target also it may be null )
@@ -543,6 +561,11 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     $this->_aclWhere = NULL;
   }
 
+  /**
+   * @param $groupID
+   *
+   * @throws Exception
+   */
   function add2group($groupID) {
     if (CRM_Utils_Array::value("contact_target_op", $this->_params) == 'nll') {
       CRM_Core_Error::fatal(ts('Current filter criteria didn\'t have any target contact to add to group'));
@@ -660,6 +683,9 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
 

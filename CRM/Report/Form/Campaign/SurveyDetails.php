@@ -47,6 +47,12 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
 
   private static $_surveyRespondentStatus;
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     //filter options for survey activity status.
     $responseStatus = array('' => '- Any -');
@@ -497,6 +503,9 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
 
   }
 
+  /**
+   * @return bool|mixed|null|string
+   */
   private function _surveyCoverSheet() {
     $coverSheet = NULL;
     $surveyIds = CRM_Utils_Array::value('survey_id_value', $this->_params);
@@ -569,6 +578,9 @@ INNER JOIN  civicrm_option_value val ON ( val.option_group_id = survey.result_id
     return $coverSheet;
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
 
     //format the survey result data.
@@ -634,6 +646,9 @@ INNER JOIN  civicrm_option_value val ON ( val.option_group_id = survey.result_id
     }
   }
 
+  /**
+   * @param $rows
+   */
   private function _formatSurveyResult(&$rows) {
     $surveyIds = CRM_Utils_Array::value('survey_id_value', $this->_params);
     if (CRM_Utils_System::isNull($surveyIds) || empty($this->_params['fields']['result']) ||
@@ -681,6 +696,9 @@ INNER JOIN  civicrm_survey survey ON ( survey.result_id = grp.id )
     }
   }
 
+  /**
+   * @param $rows
+   */
   private function _formatSurveyResponseData(&$rows) {
     $surveyIds = CRM_Utils_Array::value('survey_id_value', $this->_params);
     if (CRM_Utils_System::isNull($surveyIds) || empty($this->_params['fields']['survey_response'])) {

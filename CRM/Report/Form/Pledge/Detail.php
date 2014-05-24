@@ -52,6 +52,13 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     'Pledge',
     'Individual'
   );
+
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
   $this->_pledgeStatuses = CRM_Contribute_PseudoConstant::contributionStatus();
   // Check if CiviCampaign is a) enabled and b) has active campaigns
@@ -237,6 +244,14 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
   /*
    * If we are retrieving total paid we need to define the inclusion of pledge_payment
    */
+  /**
+   * @param $tableName
+   * @param $tableKey
+   * @param $fieldName
+   * @param $field
+   *
+   * @return bool|string
+   */
   function selectClause(&$tableName, $tableKey, &$fieldName, &$field) {
     if($fieldName == 'total_paid'){
       $this->_totalPaid = TRUE; // add pledge_payment join
@@ -294,6 +309,11 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
    //regenerate the from field without extra left join on pledge payments
@@ -514,6 +534,9 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound   = FALSE;

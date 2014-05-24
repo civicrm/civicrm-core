@@ -43,6 +43,12 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
   protected $_customGroupExtends = array(
     'Membership');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -442,6 +448,11 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     parent::postProcess();
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -477,6 +488,9 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     return $statistics;
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
