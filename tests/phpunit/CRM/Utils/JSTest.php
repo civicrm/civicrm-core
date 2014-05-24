@@ -31,6 +31,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Tests for linking to resource files
  */
 class CRM_Utils_JSTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function translateExamples() {
     $cases = array();
     $cases[] = array(

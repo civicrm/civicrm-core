@@ -33,6 +33,9 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    */
   var $mut;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Action-Schedule BAO',

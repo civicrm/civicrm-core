@@ -47,6 +47,9 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   protected $objects;
   public $DBResetRequired = FALSE;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'BaseIPN test',
@@ -444,6 +447,9 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     /*
      * Prepare for contribution Test - involving only contribution objects
      */
+  /**
+   * @param bool $contributionPage
+   */
   function _setUpContributionObjects($contributionPage = FALSE) {
 
 

@@ -180,6 +180,9 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide csv data with Valid Street Address.
      */
+  /**
+   * @return array
+   */
   function _validStreetAddressCSVData() {
     $headers = array(
       'first_name' => 'First Name',
@@ -228,6 +231,9 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide csv data with Invalid Street Address.
      */
+  /**
+   * @return array
+   */
   function _invalidStreetAddressCSVData() {
     $headers = array(
       'first_name' => 'First Name',

@@ -149,6 +149,10 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     $this->assertStringsPresent("This event is currently full.");
   }
 
+  /**
+   * @param $eventTitle
+   * @param $eventInfoStrings
+   */
   function _testVerifyEventInfo($eventTitle, $eventInfoStrings) {
     // verify event input on info page
     // start at Manage Events listing
@@ -159,6 +163,11 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     $this->assertStringsPresent($eventInfoStrings);
   }
 
+  /**
+   * @param $registerStrings
+   *
+   * @return string
+   */
   function _testVerifyRegisterPage($registerStrings) {
     // Go to Register page and check for intro text and fee levels
     $this->click("link=Register Now");
@@ -167,6 +176,11 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
     return $this->getLocation();
   }
 
+  /**
+   * @param $registerUrl
+   * @param int $numberRegistrations
+   * @param bool $anonymous
+   */
   function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE) {
     if ($anonymous) {
       $this->webtestLogout();

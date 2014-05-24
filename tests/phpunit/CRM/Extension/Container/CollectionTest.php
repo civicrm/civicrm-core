@@ -93,6 +93,12 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
     $this->assertEquals('b', $cacheData['test.whiz']); // 'test.whiz' was defined in the 'b' container
   }
 
+  /**
+   * @param CRM_Utils_Cache_Interface $cache
+   * @param null $cacheKey
+   *
+   * @return CRM_Extension_Container_Collection
+   */
   function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
     $containers = array();
     $containers['a'] = new CRM_Extension_Container_Static(array(

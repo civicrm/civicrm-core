@@ -35,6 +35,11 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   protected $session_id;
   protected $nocms_contact_id;
 
+  /**
+   * @param $apiResult
+   * @param $cmpvar
+   * @param string $prefix
+   */
   protected function assertAPIErrorCode($apiResult, $cmpvar, $prefix = '') {
     if (!empty($prefix)) {
       $prefix .= ': ';

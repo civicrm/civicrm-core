@@ -72,6 +72,11 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->verifyText("xpath=id('contributionSearch')/table[1]/tbody/tr[2]/td[9]", preg_quote($status));
   }
 
+  /**
+   * @param $firstName
+   * @param $lastName
+   * @param $email
+   */
   function _testOfflineContribution($firstName, $lastName, $email) {
     // Create a contact to be used as soft creditor
     $softCreditFname = substr(sha1(rand()), 0, 7);
@@ -175,6 +180,11 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     }
   }
 
+  /**
+   * @param $firstName
+   * @param $lastName
+   * @param $email
+   */
   function _testOnlineContribution($firstName, $lastName, $email) {
 
     // We need a payment processor

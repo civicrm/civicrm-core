@@ -35,6 +35,9 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   protected $_contributionPageID;
   protected $_paymentProcessorID;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'PaypalPro IPN processing',
@@ -334,6 +337,10 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'residence_country' => 'US'
     );
   }
+
+  /**
+   * @return array
+   */
   function getPaypalProRecurSubsequentTransaction() {
     return array_merge($this->getPaypalProRecurTransaction(), array('txn_id' => 'secondone'));
     ;

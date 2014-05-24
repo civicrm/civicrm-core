@@ -92,6 +92,9 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide data for contact import for Individuals.
      */
+  /**
+   * @return array
+   */
   function _individualGroupCSVData() {
     $headers = array(
       'first_name' => 'First Name',

@@ -70,6 +70,13 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
     $this->assertEquals(rtrim($config->resourceBase, '/'), $this->mapperWithSlash->keyToUrl('civicrm'));
   }
 
+  /**
+   * @param CRM_Utils_Cache_Interface $cache
+   * @param null $cacheKey
+   * @param string $appendPathGarbage
+   *
+   * @return array
+   */
   function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $appendPathGarbage = '') {
     /*
     $container = new CRM_Extension_Container_Static(array(

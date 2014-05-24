@@ -110,6 +110,9 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.crm-search-results table.selector', "Anderson, $contact2");
   }
 
+  /**
+   * @return array
+   */
   function _testAddTagSet() {
     // Go to add tag set url.
     $this->openCiviPage('admin/tag', 'action=add&reset=1&tagset=1');

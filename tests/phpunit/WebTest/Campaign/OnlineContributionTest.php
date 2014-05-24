@@ -113,6 +113,10 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->onlineContributionAddTest($campaignTitle, $id);
   }
 
+  /**
+   * @param $campaignTitle
+   * @param $id
+   */
   function onlineContributionAddTest($campaignTitle, $id) {
     // We need a payment processor
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);

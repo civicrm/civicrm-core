@@ -149,6 +149,9 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
   /*
    *  Helper function to provide data for contact import for Individuals and yyyy-mm-dd OR yyyymmdd dateformat.
    */
+  /**
+   * @return array
+   */
   function _individualCSVData_yyyy_mm_dd() {
     $headers = array(
       'first_name' => 'First Name',
@@ -196,6 +199,9 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
 
   /*
    *  Helper function to provide data for contact import for Individuals and mm/dd/yy OR mm-dd-yy dateformat.
+   */
+  /**
+   * @return array
    */
   function _individualCSVData_mm_dd_yy() {
     $headers = array(
@@ -245,6 +251,9 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
   /*
    *  Helper function to provide data for contact import for Individuals and mm/dd/yyyy OR mm-dd-yyyy dateformat.
    */
+  /**
+   * @return array
+   */
   function _individualCSVData_mm_dd_yyyy() {
     $headers = array(
       'first_name' => 'First Name',
@@ -292,6 +301,9 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
 
   /*
    *  Helper function to provide data for contact import for Individuals and Month dd, yyyy dateformat.
+   */
+  /**
+   * @return array
    */
   function _individualCSVData_Month_dd_yyyy() {
     $headers = array(
@@ -341,6 +353,9 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
   /*
    *  Helper function to provide data for contact import for Individuals and dd-mon-yy OR dd/mm/yy dateformat.
    */
+  /**
+   * @return array
+   */
   function _individualCSVData_dd_mon_yy() {
     $headers = array(
       'first_name' => 'First Name',
@@ -388,6 +403,9 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
 
   /*
    *  Helper function to provide data for contact import for Individuals and dd/mm/yyyy dateformat.
+   */
+  /**
+   * @return array
    */
   function _individualCSVData_dd_mm_yyyy() {
     $headers = array(

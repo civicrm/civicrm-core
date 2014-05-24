@@ -109,6 +109,11 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("The block settings have been updated.");
   }
 
+  /**
+   * @param $eventTitle
+   * @param $startdate
+   * @param $enddate
+   */
   function _testCreateEvent($eventTitle, $startdate, $enddate) {
 
     $this->openCiviPage("event/add", "reset=1&action=add");

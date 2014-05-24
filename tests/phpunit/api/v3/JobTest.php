@@ -36,6 +36,10 @@
  *
  */
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_JobTest
+ */
 class api_v3_JobTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
@@ -279,6 +283,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->contactDelete($orgID);
   }
 
+  /**
+   * @param $op
+   * @param $objectName
+   * @param $id
+   * @param $params
+   */
   function hookPreRelationship($op, $objectName, $id, &$params ) {
     if($op == 'delete') {
       return;

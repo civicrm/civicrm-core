@@ -94,6 +94,9 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     // has changed a bit. No point in adding test for external page as we 'll test with fake transactions.
   }
 
+  /**
+   * @return null
+   */
   function _configureMembershipPage() {
     static $pageId = NULL;
 

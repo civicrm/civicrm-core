@@ -87,6 +87,9 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide data for contact import for sample.
      */
+  /**
+   * @return array
+   */
   function _contactTagCSVData() {
     $headers = array(
       'first_name' => 'First Name',

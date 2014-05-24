@@ -33,7 +33,13 @@ require_once 'CiviTest/ContributionPage.php';
 require_once 'CiviTest/Membership.php';
 require_once 'CRM/Core/Controller.php';
 
+/**
+ * Class CRM_Member_BAO_MembershipTest
+ */
 class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Membership BAOs',

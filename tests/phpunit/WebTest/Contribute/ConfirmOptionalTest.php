@@ -56,6 +56,9 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
     $this->assertFalse($this->isTextPresent("Your contribution will not be completed until"), "Loaded confirmation page");
   }
 
+  /**
+   * @param $isConfirmEnabled
+   */
   protected function _addContributionPage($isConfirmEnabled) {
     // log in
     $this->webtestLogin();

@@ -200,12 +200,20 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     $this->assertTrue($results['count'] == 1);
   }
 
+  /**
+   * @param $username
+   * @param $password
+   * @param $confirm_password
+   */
   function _fillCMSUserForm($username, $password, $confirm_password) {
     $this->type("cms_name", $username);
     $this->type("cms_pass", $password);
     $this->type("cms_confirm_pass", $confirm_password);
   }
 
+  /**
+   * @return array
+   */
   function _createUserAndGoToForm() {
     $firstName = substr(sha1(rand()), 0, 7) . "John";
     $lastName = substr(sha1(rand()), 0, 7) . "Smith";

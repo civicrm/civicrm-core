@@ -183,6 +183,11 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->_roleDelete($role);
   }
 
+  /**
+   * @param $roleid
+   *
+   * @return string
+   */
   function _testCreateUser($roleid) {
     $this->open($this->sboxPath . "admin/people/create");
 
@@ -216,6 +221,9 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     return $name;
   }
 
+  /**
+   * @param $role
+   */
   function _roleDelete($role) {
     $this->waitForElementPresent("xpath=//table[@id='user-roles']/tbody//tr/td[text()='{$role}']/..//td/a[text()='edit role']");
     $this->click("xpath=//table[@id='user-roles']/tbody//tr/td[text()='{$role}']/..//td/a[text()='edit role']");

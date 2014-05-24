@@ -85,6 +85,13 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     $this->assertEquals('/foo/bar', $cacheData['test.foo.bar']);
   }
 
+  /**
+   * @param CRM_Utils_Cache_Interface $cache
+   * @param null $cacheKey
+   * @param string $appendPathGarbage
+   *
+   * @return array
+   */
   function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $appendPathGarbage = '') {
     $basedir = rtrim($this->createTempDir('ext-'), '/');
     mkdir("$basedir/foo");

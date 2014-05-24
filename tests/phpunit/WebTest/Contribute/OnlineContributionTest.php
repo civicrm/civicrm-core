@@ -247,6 +247,10 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->_doContributionAndVerifyData($pageId, TRUE);
   }
 
+  /**
+   * @param $pageId
+   * @param bool $priceSet
+   */
   function _doContributionAndVerifyData($pageId, $priceSet = FALSE) {
     //logout
     $this->webtestLogout();

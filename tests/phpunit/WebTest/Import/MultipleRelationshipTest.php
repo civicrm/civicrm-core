@@ -49,6 +49,9 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
    * for Individuals.
 
    */
+  /**
+   * @return array
+   */
   function _individualRelationshipCSVData() {
 
     $headers = array(
