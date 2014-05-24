@@ -74,7 +74,7 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
    *
    * @internal param int $id ID of the activity
    *
-   * @return void
+   * @return array
    *
    * @access public
    */

@@ -875,7 +875,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param bool $isPcpApprovalNeeded
    * @param bool $isSeparatePayment
    * @param bool $honoreeSection
-   * @param bool $allowOtherAmmount
+   * @param bool $allowOtherAmount
    * @param bool $isConfirmEnabled
    * @param string $financialType
    * @param bool $fixedAmount
@@ -905,7 +905,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
                                       $isPcpApprovalNeeded = FALSE,
                                       $isSeparatePayment = FALSE,
                                       $honoreeSection = TRUE,
-                                      $allowOtherAmmount = TRUE,
+                                      $allowOtherAmount = TRUE,
                                       $isConfirmEnabled = TRUE,
                                       $financialType = 'Donation',
                                       $fixedAmount = TRUE,
@@ -1009,7 +1009,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         $this->click("is_recur_interval");
         $this->click("is_recur_installments");
       }
-      if ($allowOtherAmmount) {
+      if ($allowOtherAmount) {
 
         $this->click('is_allow_other_amount');
 
@@ -1017,7 +1017,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         //$this->type('min_amount', $rand / 2);
         //$this->type('max_amount', $rand * 10);
       }
-      if ($fixedAmount || !$allowOtherAmmount) {
+      if ($fixedAmount || !$allowOtherAmount) {
         $this->type('label_1', "Label $hash");
         $this->type('value_1', "$rand");
       }
