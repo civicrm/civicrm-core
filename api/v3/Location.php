@@ -1,7 +1,5 @@
 <?php
 
-require_once 'api/v3/utils.php';
-
 /**
  *  Functions to inform caller that Location is obsolete and Address, Phone, Email, Website should be used
  */
