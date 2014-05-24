@@ -18,12 +18,12 @@ class CRM_Core_ManagedEntities {
   /**
    * @var array($status => array($name => CRM_Core_Module))
    */
-  public $moduleIndex;
+  protected $moduleIndex;
 
   /**
    * @var array per hook_civicrm_managed
    */
-  public $declarations;
+  protected $declarations;
 
   /**
    * Get an instance
@@ -31,13 +31,7 @@ class CRM_Core_ManagedEntities {
   public static function singleton($fresh = FALSE) {
     static $singleton;
     if ($fresh || !$singleton) {
-      $declarations = array();
-      foreach (CRM_Core_Component::getEnabledComponents() as $component) {
-        /** @var CRM_Core_Component_Info $component */
-        $declarations = array_merge($declarations, $component->getManagedEntities());
-      }
-      CRM_Utils_Hook::managed($declarations);
-      $singleton = new CRM_Core_ManagedEntities(CRM_Core_Module::getAll(), $declarations);
+      $singleton = new CRM_Core_ManagedEntities(CRM_Core_Module::getAll(), NULL);
     }
     return $singleton;
   }
@@ -48,7 +42,12 @@ class CRM_Core_ManagedEntities {
    */
   public function __construct($modules, $declarations) {
     $this->moduleIndex = self::createModuleIndex($modules);
-    $this->declarations = self::cleanDeclarations($declarations);
+
+    if ($declarations !== NULL) {
+      $this->declarations = self::cleanDeclarations($declarations);
+    } else {
+      $this->declarations = NULL;
+    }
   }
 
   /**
@@ -69,7 +68,7 @@ class CRM_Core_ManagedEntities {
         $result = civicrm_api3($dao->entity_type, 'getsingle', $params);
       }
       catch (Exception $e) {
-        $this->onApiError($params, $result);
+        $this->onApiError($dao->entity_type, 'getsingle', $params, $result);
       }
       return $result;
     } else {
@@ -78,7 +77,7 @@ class CRM_Core_ManagedEntities {
   }
 
   public function reconcile() {
-    if ($error = $this->validate($this->declarations)) {
+    if ($error = $this->validate($this->getDeclarations())) {
       throw new Exception($error);
     }
     $this->reconcileEnabledModules();
@@ -92,7 +91,7 @@ class CRM_Core_ManagedEntities {
     // an active module -- because we got it from a hook!
 
     // index by moduleName,name
-    $decls = self::createDeclarationIndex($this->moduleIndex, $this->declarations);
+    $decls = self::createDeclarationIndex($this->moduleIndex, $this->getDeclarations());
     foreach ($decls as $moduleName => $todos) {
       if (isset($this->moduleIndex[TRUE][$moduleName])) {
         $this->reconcileEnabledModule($this->moduleIndex[TRUE][$moduleName], $todos);
@@ -175,7 +174,7 @@ class CRM_Core_ManagedEntities {
   public function insertNewEntity($todo) {
     $result = civicrm_api($todo['entity'], 'create', $todo['params']);
     if ($result['is_error']) {
-      $this->onApiError($todo['params'], $result);
+      $this->onApiError($todo['entity'], 'create', $todo['params'], $result);
     }
 
     $dao = new CRM_Core_DAO_Managed();
@@ -205,7 +204,7 @@ class CRM_Core_ManagedEntities {
       $params = array_merge($defaults, $todo['params']);
       $result = civicrm_api($dao->entity_type, 'create', $params);
       if ($result['is_error']) {
-        $this->onApiError($params, $result);
+        $this->onApiError($dao->entity_type, 'create',$params, $result);
       }
     }
 
@@ -232,7 +231,7 @@ class CRM_Core_ManagedEntities {
       );
       $result = civicrm_api($dao->entity_type, 'create', $params);
       if ($result['is_error']) {
-        $this->onApiError($params, $result);
+        $this->onApiError($dao->entity_type, 'create',$params, $result);
       }
     }
   }
@@ -275,13 +274,26 @@ class CRM_Core_ManagedEntities {
       );
       $result = civicrm_api($dao->entity_type, 'delete', $params);
       if ($result['is_error']) {
-        $this->onApiError($params, $result);
+        $this->onApiError($dao->entity_type, 'delete', $params, $result);
       }
 
       CRM_Core_DAO::executeQuery('DELETE FROM civicrm_managed WHERE id = %1', array(
         1 => array($dao->id, 'Integer')
       ));
     }
+  }
+
+  public function getDeclarations() {
+    if ($this->declarations === NULL) {
+      $this->declarations = array();
+      foreach (CRM_Core_Component::getEnabledComponents() as $component) {
+        /** @var CRM_Core_Component_Info $component */
+        $this->declarations = array_merge($this->declarations, $component->getManagedEntities());
+      }
+      CRM_Utils_Hook::managed($this->declarations);
+      $this->declarations = self::cleanDeclarations($this->declarations);
+    }
+    return $this->declarations;
   }
 
   /**
@@ -353,13 +365,17 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param $params
-   * @param $result
+   * @param string $entity
+   * @param string $action
+   * @param array $params
+   * @param array $result
    *
    * @throws Exception
    */
-  protected function onApiError($params, $result) {
+  protected function onApiError($entity, $action, $params, $result) {
     CRM_Core_Error::debug_var('ManagedEntities_failed', array(
+      'entity' => $entity,
+      'action' => $action,
       'params' => $params,
       'result' => $result,
     ));
