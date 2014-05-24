@@ -66,7 +66,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    * for this user
    *
    * @param string $groupType type of group(Access/Mailing)
-   * @param bool|\boolen $excludeHidden exclude hidden groups.
+   * @param bool $excludeHidden exclude hidden groups.
    *
    * @access public
    *

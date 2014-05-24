@@ -67,7 +67,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @param string $group (required) The group name of the item
    * @param string $name (required) The name of the setting
-   * @param int $componentID The optional component ID (so componenets can share the same name space)
+   * @param int $componentID The optional component ID (so components can share the same name space)
    * @param int $contactID If set, this is a contactID specific setting, else its a global setting
    * @param bool|int $load if true, load from local cache (typically memcache)
    *

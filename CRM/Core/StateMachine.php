@@ -87,7 +87,7 @@ class CRM_Core_StateMachine {
    *
    * @param object $controller the controller for this state machine
    *
-   * @param const $action
+   * @param \const|int $action
    *
    * @return \CRM_Core_StateMachine
   @access public
