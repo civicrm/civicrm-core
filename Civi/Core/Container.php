@@ -13,6 +13,10 @@ use Symfony\Component\DependencyInjection\Reference;
 
 // TODO use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
+/**
+ * Class Container
+ * @package Civi\Core
+ */
 class Container {
 
   const SELF = 'civi_container_factory';

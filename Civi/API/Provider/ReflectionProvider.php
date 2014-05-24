@@ -33,6 +33,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * This class defines operations for inspecting the API's metadata.
  */
 class ReflectionProvider implements EventSubscriberInterface, ProviderInterface {
+  /**
+   * @return array
+   */
   public static function getSubscribedEvents() {
     return array(
       Events::RESOLVE => array(
@@ -65,6 +68,9 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
     );
   }
 
+  /**
+   * @param \Civi\API\Event\ResolveEvent $event
+   */
   public function onApiResolve(\Civi\API\Event\ResolveEvent $event) {
     $apiRequest = $event->getApiRequest();
     $actions = isset($this->actions[$apiRequest['entity']]) ? $this->actions[$apiRequest['entity']] : $this->actions['*'];
@@ -76,6 +82,9 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
     }
   }
 
+  /**
+   * @param \Civi\API\Event\AuthorizeEvent $event
+   */
   public function onApiAuthorize(\Civi\API\Event\AuthorizeEvent $event) {
     $apiRequest = $event->getApiRequest();
     if (isset($apiRequest['is_metadata'])) {
