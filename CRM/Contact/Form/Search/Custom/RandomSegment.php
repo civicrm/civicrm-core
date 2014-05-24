@@ -360,6 +360,9 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     }
   }
 
+  /**
+   * @return mixed
+   */
   function count() {
     $sql = $this->all();
 
@@ -369,7 +372,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
 
   function __destruct() {
     // the temporary tables are dropped automatically
-    // so we dont do it here
+    // so we don't do it here
     // but let mysql clean up
     return;
   }
