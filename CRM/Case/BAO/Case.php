@@ -327,7 +327,7 @@ WHERE civicrm_case.id = %1";
    *
    * @param bool $moveToTrash
    *
-   * @return void
+   * @return bool is successful
    * @access public
    * @static
    */
@@ -2321,7 +2321,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    *
    * @param bool $changeClient
    *
-   * @return void.
+   * @return integer|NULL
    * @static
    */
   static function mergeCases($mainContactId, $mainCaseId = NULL, $otherContactId = NULL,

@@ -232,7 +232,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @throws CRM_Core_Exception
    * @internal param bool $callFromAPI Is this function called from API?
    *
-   * @return object CRM_Member_BAO_Membership object
+   * @return CRM_Member_BAO_Membership object
    * @access public
    * @static
    */
