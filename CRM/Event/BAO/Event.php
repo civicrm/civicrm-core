@@ -1772,6 +1772,9 @@ WHERE  id = $cfID
    *
    * @return array $events array of all events.
    */
+  /**
+   * @return array
+   */
   static function getLocationEvents() {
     $events = array();
 
@@ -1792,6 +1795,11 @@ ORDER BY sp.name, ca.city, ca.street_address ASC
     return $events;
   }
 
+  /**
+   * @param $locBlockId
+   *
+   * @return int|null|string
+   */
   static function countEventsUsingLocBlockId($locBlockId) {
     if (!$locBlockId) {
       return 0;
@@ -1822,6 +1830,11 @@ WHERE  ce.loc_block_id = $locBlockId";
     return $hasPermission && self::validRegistrationDate($values);
   }
 
+  /**
+   * @param $values
+   *
+   * @return bool
+   */
   static function validRegistrationDate(&$values) {
     // make sure that we are between  registration start date and registration end date
     $startDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('registration_start_date', $values));
@@ -1847,6 +1860,11 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @param  array   $values key/value event info
    * @return boolean true if allow registration otherwise false
    * @access public
+   */
+  /**
+   * @param $values
+   *
+   * @return bool
    */
   static function showHideRegistrationLink($values) {
 
@@ -1879,6 +1897,11 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @param  array   $params key/value participant info
    * @return boolean $alreadyRegistered true/false
    * @access public
+   */
+  /**
+   * @param $params
+   *
+   * @return bool
    */
   static function checkRegistration($params) {
     $alreadyRegistered = FALSE;
@@ -2056,6 +2079,11 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
    *
    * @return $defaults an array of custom data defaults.
    */
+  /**
+   * @param $templateId
+   *
+   * @return array
+   */
   static function getTemplateDefaultValues($templateId) {
     $defaults = array();
     if (!$templateId) {
@@ -2077,6 +2105,11 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     return $defaults;
   }
 
+  /**
+   * @param $event_id
+   *
+   * @return object
+   */
   static function get_sub_events($event_id) {
     $params = array('parent_event_id' => $event_id);
     $defaults = array();
@@ -2089,6 +2122,10 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
    * @params int $eventID event id.
    * @params int $eventCampaignID campaign id of that event
    *
+   */
+  /**
+   * @param $eventID
+   * @param $eventCampaignID
    */
   static function updateParticipantCampaignID($eventID, $eventCampaignID) {
     $params = array();

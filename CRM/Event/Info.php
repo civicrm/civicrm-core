@@ -41,6 +41,9 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   protected $keyword = 'event';
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function getInfo() {
     return array(
       'name' => 'CiviEvent',
@@ -52,6 +55,11 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @param bool $getAllUnconditionally
+   *
+   * @return array
+   */
   public function getPermissions($getAllUnconditionally = FALSE) {
     return array(
       'access CiviEvent',
@@ -64,6 +72,9 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
     );
   }
 
+  /**
+   * @return array
+   */
   public function getAnonymousPermissionWarnings() {
     return array(
       'access CiviEvent',
@@ -71,6 +82,9 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function getUserDashboardElement() {
     return array('name' => ts('Events'),
       'title' => ts('Your Event(s)'),
@@ -80,6 +94,9 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function registerTab() {
     return array('title' => ts('Events'),
       'id' => 'participant',
@@ -89,6 +106,9 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function registerAdvancedSearchPane() {
     return array('title' => ts('Events'),
       'weight' => 40,
@@ -96,6 +116,9 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function getActivityTypes() {
     $types = array();
     $types['Event'] = array('title' => ts('Event'),
@@ -105,6 +128,10 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   // add shortcut to Create New
+  /**
+   * @param $shortCuts
+   * @param $newCredit
+   */
   public function creatNewShortcut(&$shortCuts, $newCredit) {
     if (CRM_Core_Permission::check('access CiviEvent') &&
       CRM_Core_Permission::check('edit event participants')

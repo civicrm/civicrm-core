@@ -66,6 +66,10 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     'Awaiting approval' => array('Cancelled', 'Pending from approval'),
     'Pending from approval' => array('Registered', 'Cancelled'),
   );
+
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
@@ -1811,6 +1815,15 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
     }
   }
 
+  /**
+   * @param $params
+   * @param $participantId
+   * @param $contributionId
+   * @param $feeBlock
+   * @param $lineItems
+   * @param $paidAmount
+   * @param $priceSetId
+   */
   static function changeFeeSelections($params, $participantId, $contributionId, $feeBlock, $lineItems, $paidAmount, $priceSetId) {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
@@ -1945,6 +1958,11 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     self::addActivityForSelection($participantId, 'Change Registration');
   }
 
+  /**
+   * @param $updatedAmount
+   * @param $paidAmount
+   * @param $contributionId
+   */
   static function recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId) {
     $balanceAmt = $updatedAmount - $paidAmount;
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -1996,6 +2014,12 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     }
   }
 
+  /**
+   * @param $participantId
+   * @param $activityType
+   *
+   * @throws CRM_Core_Exception
+   */
   static function addActivityForSelection($participantId, $activityType) {
     $eventId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantId, 'event_id');
     $contactId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantId, 'contact_id');

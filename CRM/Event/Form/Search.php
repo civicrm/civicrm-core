@@ -528,6 +528,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     }
   }
 
+  /**
+   * @return null
+   */
   function getFormValues() {
     return NULL;
   }

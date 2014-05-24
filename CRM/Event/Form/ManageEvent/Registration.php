@@ -437,6 +437,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $form->addRule('confirm_from_email', ts('Email is not valid.'), 'email');
   }
 
+  /**
+   * @param $form
+   */
   function buildThankYouBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
     $attributes['thankyou_text']['click_wysiwyg'] = true;
