@@ -47,6 +47,9 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    */
   static $_exportableFields = NULL;
 
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
@@ -550,6 +553,14 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
     return $caseArray;
   }
 
+  /**
+   * @param string $type
+   * @param null $userID
+   * @param null $condition
+   * @param int $isDeleted
+   *
+   * @return string
+   */
   static function getCaseActivityQuery($type = 'upcoming', $userID = NULL, $condition = NULL, $isDeleted = 0) {
     if (!$userID) {
       $session = CRM_Core_Session::singleton();
@@ -1757,6 +1768,16 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     return TRUE;
   }
 
+  /**
+   * @param $groupInfo
+   * @param null $sort
+   * @param null $showLinks
+   * @param bool $returnOnlyCount
+   * @param int $offset
+   * @param int $rowCount
+   *
+   * @return array
+   */
   static function getGlobalContacts(&$groupInfo, $sort = NULL, $showLinks = NULL, $returnOnlyCount = FALSE, $offset = 0, $rowCount = 25) {
     $globalContacts = array();
 
@@ -1792,6 +1813,11 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
   /*
    * Convenience function to get both case contacts and global in one array
+   */
+  /**
+   * @param $caseId
+   *
+   * @return array
    */
   static function getRelatedAndGlobalContacts($caseId) {
     $relatedContacts = self::getRelatedContacts($caseId);
@@ -2080,6 +2106,12 @@ SELECT civicrm_contact.id as casemanager_id,
     return $unclosedCases;
   }
 
+  /**
+   * @param null $contactId
+   * @param bool $excludeDeleted
+   *
+   * @return null|string
+   */
   static function caseCount($contactId = NULL, $excludeDeleted = TRUE) {
     $whereConditions = array();
     if ($excludeDeleted) {

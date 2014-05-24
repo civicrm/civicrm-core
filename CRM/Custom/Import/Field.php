@@ -24,5 +24,9 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 */
+
+/**
+ * Class CRM_Custom_Import_Field
+ */
 class CRM_Custom_Import_Field extends CRM_Contact_Import_Field{}
 

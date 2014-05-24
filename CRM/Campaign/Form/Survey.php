@@ -171,6 +171,9 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     if ($this->controller->getPrint() || $this->getVar('_surveyId') <= 0 ) {
       return parent::getTemplateFileName();

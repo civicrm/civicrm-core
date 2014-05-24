@@ -27,6 +27,10 @@
 
 
 require_once "PEAR.php";
+
+/**
+ * Class CRM_Core_Session
+ */
 class CRM_Core_Session {
 
   /**

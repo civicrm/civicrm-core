@@ -1,6 +1,9 @@
 <?php
 
 // TODO: How to handle NULL values/records?
+/**
+ * Class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral
+ */
 class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral extends CRM_Dedupe_BAO_QueryBuilder {
   static function record($rg) {
     $civicrm_contact = CRM_Utils_Array::value('civicrm_contact', $rg->params);

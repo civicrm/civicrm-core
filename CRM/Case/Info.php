@@ -42,6 +42,9 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   protected $keyword = 'case';
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function getInfo() {
     return array(
       'name' => 'CiviCase',
@@ -76,6 +79,10 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @return array
+   * @throws CRM_Core_Exception
+   */
   public function getManagedEntities() {
     // Use hook_civicrm_caseTypes to build a list of OptionValues
     // In the long run, we may want more specialized logic for this, but
@@ -118,6 +125,11 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @param bool $getAllUnconditionally
+   *
+   * @return array
+   */
   public function getPermissions($getAllUnconditionally = FALSE) {
     return array(
       'delete in CiviCase',
@@ -164,11 +176,17 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function getUserDashboardElement() {
     return array();
   }
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function registerTab() {
     return array('title' => ts('Cases'),
       'url' => 'case',
@@ -177,6 +195,9 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function registerAdvancedSearchPane() {
     return array('title' => ts('Cases'),
       'weight' => 50,
@@ -184,11 +205,17 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @return null
+   */
   public function getActivityTypes() {
     return NULL;
   }
 
   // add shortcut to Create New
+  /**
+   * @param $shortCuts
+   */
   public function creatNewShortcut(&$shortCuts) {
     if (CRM_Core_Permission::check('access all cases and activities') ||
       CRM_Core_Permission::check('add cases')

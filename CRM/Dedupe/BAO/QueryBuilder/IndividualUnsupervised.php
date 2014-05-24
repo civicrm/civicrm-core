@@ -24,6 +24,10 @@
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
 */
+
+/**
+ * Class CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised
+ */
 class CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised extends CRM_Dedupe_BAO_QueryBuilder {
 
   static function record($rg) {

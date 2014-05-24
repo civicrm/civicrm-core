@@ -47,6 +47,9 @@ class CRM_Campaign_Page_Petition extends CRM_Core_Page {
     $this->assign('signatures', $signatures);
   }
 
+  /**
+   * @return string
+   */
   function run() {
     $action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE, 0

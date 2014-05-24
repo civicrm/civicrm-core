@@ -86,6 +86,9 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     return self::$_campaignActionLinks;
   }
 
+  /**
+   * @return array
+   */
   function &surveyActionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_surveyActionLinks)) {
@@ -118,6 +121,9 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     return self::$_surveyActionLinks;
   }
 
+  /**
+   * @return array
+   */
   function &petitionActionLinks() {
     if (!isset(self::$_petitionActionLinks)) {
       self::$_petitionActionLinks = self::surveyActionLinks();
@@ -186,6 +192,11 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     return $controller->run();
   }
 
+  /**
+   * @param array $params
+   *
+   * @return array
+   */
   public static function getCampaignSummary($params = array(
     )) {
     $campaignsData = array();
@@ -272,6 +283,11 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     return $controller->run();
   }
 
+  /**
+   * @param array $params
+   *
+   * @return array
+   */
   function getSurveySummary($params = array(
     )) {
     $surveysData = array();
@@ -368,6 +384,11 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     return $controller->run();
   }
 
+  /**
+   * @param array $params
+   *
+   * @return array
+   */
   function getPetitionSummary($params = array(
     )) {
     $config = CRM_Core_Config::singleton();
@@ -446,6 +467,9 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
       )));
   }
 
+  /**
+   * @return string
+   */
   function run() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();

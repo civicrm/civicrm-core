@@ -24,6 +24,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 */
+
+/**
+ * Class CRM_Core_HTMLInputCoder
+ */
 class CRM_Core_HTMLInputCoder {
 
   /**
