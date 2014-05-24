@@ -8,6 +8,10 @@
    | Written & Contributed by Eileen McNaughton - 2009                          |
    +---------------------------------------------------------------------------+
   */
+
+/**
+ * Class CRM_Core_Payment_PayflowPro
+ */
 class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   // (not used, implicit in the API, might need to convert?)
   CONST

@@ -37,6 +37,10 @@
  */
 
 require_once 'HTML/QuickForm/Page.php';
+
+/**
+ * Class CRM_Core_Form
+ */
 class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
