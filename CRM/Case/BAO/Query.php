@@ -34,6 +34,11 @@
  */
 class CRM_Case_BAO_Query {
 
+  /**
+   * @param bool $excludeActivityFields
+   *
+   * @return array
+   */
   static function &getFields($excludeActivityFields = FALSE) {
     $fields = array();
     $fields = CRM_Case_BAO_Case::exportableFields();
@@ -515,6 +520,13 @@ class CRM_Case_BAO_Query {
     }
   }
 
+  /**
+   * @param $name
+   * @param $mode
+   * @param $side
+   *
+   * @return string
+   */
   static function from($name, $mode, $side) {
     $from = "";
 
@@ -592,6 +604,12 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     return (isset($this->_qill)) ? $this->_qill : "";
   }
 
+  /**
+   * @param $mode
+   * @param bool $includeCustomFields
+   *
+   * @return array|null
+   */
   static function defaultReturnProperties($mode,
     $includeCustomFields = TRUE
   ) {
@@ -655,6 +673,9 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     return $properties;
   }
 
+  /**
+   * @param $tables
+   */
   static function tableNames(&$tables) {
     if (!empty($tables['civicrm_case'])) {
       $tables = array_merge(array('civicrm_case_contact' => 1), $tables);
@@ -741,6 +762,10 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     $form->setDefaults(array('case_owner' => 1));
   }
 
+  /**
+   * @param $row
+   * @param $id
+   */
   static function searchAction(&$row, $id) {}
 }
 

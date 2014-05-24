@@ -153,6 +153,11 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     return $caseType;
   }
 
+  /**
+   * @param $caseTypeId
+   *
+   * @return mixed
+   */
   static function del($caseTypeId) {
     $caseType = new CRM_Case_DAO_CaseType();
     $caseType->id = $caseTypeId;

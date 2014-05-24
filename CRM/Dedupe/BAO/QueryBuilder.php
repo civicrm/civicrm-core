@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class CRM_Dedupe_BAO_QueryBuilder
+ */
 class CRM_Dedupe_BAO_QueryBuilder {
   static function internalFilters( $rg, $strID1 = 'contact1.id', $strID2 = 'contact2.id' ) {
     // Add a contact id filter for dedupe by group requests and add logic
