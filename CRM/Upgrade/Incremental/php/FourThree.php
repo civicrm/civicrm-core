@@ -35,6 +35,11 @@
 class CRM_Upgrade_Incremental_php_FourThree {
   const BATCH_SIZE = 5000;
 
+  /**
+   * @param $errors
+   *
+   * @return bool
+   */
   function verifyPreDBstate(&$errors) {
     return TRUE;
   }
@@ -236,6 +241,11 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
     }
   }
 
+  /**
+   * @param $rev
+   *
+   * @return bool
+   */
   function upgrade_4_3_alpha1($rev) {
     self::task_4_3_alpha1_checkDBConstraints();
 
@@ -271,6 +281,9 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
     return TRUE;
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_3_alpha2($rev) {
     //CRM-11847
     $isColumnPresent = CRM_Core_DAO::checkFieldExists('civicrm_dedupe_rule_group', 'is_default');
@@ -280,10 +293,16 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.alpha2')), 'task_4_3_x_runSql', $rev);
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_3_alpha3($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.alpha3')), 'task_4_3_x_runSql', $rev);
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_3_beta2($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta2')), 'task_4_3_x_runSql', $rev);
 
@@ -296,6 +315,9 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
     }
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_3_beta3($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta3')), 'task_4_3_x_runSql', $rev);
     // CRM-12065
@@ -305,6 +327,9 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
     $this->addTask('Replace contribution_type to financial_type in table civicrm_saved_search', 'replaceContributionTypeId', $query, 'savedSearch');
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_3_beta4($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta4')), 'task_4_3_x_runSql', $rev);
     // add indexes for civicrm_entity_financial_trxn
@@ -312,6 +337,9 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
     $this->addTask('Check/Add indexes for civicrm_entity_financial_trxn', 'task_4_3_x_checkIndexes', $rev);
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_3_beta5($rev) {
     // CRM-12205
     if (
@@ -336,10 +364,16 @@ ADD COLUMN   premiums_nothankyou_label varchar(255) COLLATE utf8_unicode_ci DEFA
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta5')), 'task_4_3_x_runSql', $rev);
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_3_4($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.4')), 'task_4_3_x_runSql', $rev);
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_3_5($rev) {
     // CRM-12156
     $config = CRM_Core_Config::singleton();
@@ -365,6 +399,9 @@ ADD CONSTRAINT `FK_civicrm_financial_item_contact_id` FOREIGN KEY (`contact_id`)
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.5')), 'task_4_3_x_runSql', $rev);
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_3_6($rev) {
     //CRM-13094
     $this->addTask(ts('Add missing constraints'), 'addMissingConstraints', $rev);
@@ -378,6 +415,9 @@ ADD CONSTRAINT `FK_civicrm_financial_item_contact_id` FOREIGN KEY (`contact_id`)
   }
 
   //CRM-11636
+  /**
+   * @return bool
+   */
   function assignFinancialTypeToPriceRecords() {
     $upgrade = new CRM_Upgrade_Form();
     //here we update price set entries
@@ -419,6 +459,9 @@ INNER JOIN civicrm_price_set ps ON (pf.price_set_id = ps.id)
     return TRUE;
   }
 
+  /**
+   * @return bool
+   */
   static function _checkAndMigrateDefaultFinancialTypes() {
     $modifiedDefaults = FALSE;
     //insert types if not exists
@@ -448,6 +491,9 @@ ON DUPLICATE KEY UPDATE  is_active = 1
     return $modifiedDefaults;
   }
 
+  /**
+   * @return bool
+   */
   function createFinancialRecords() {
     $upgrade = new CRM_Upgrade_Form();
 
@@ -789,6 +835,9 @@ FROM   civicrm_financial_item fi";
     return TRUE;
   }
 
+  /**
+   * @return array
+   */
   function createDomainContacts() {
     $domainParams = $context = array();
     $query = "

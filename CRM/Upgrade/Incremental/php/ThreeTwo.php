@@ -32,10 +32,18 @@
  *
  */
 class CRM_Upgrade_Incremental_php_ThreeTwo {
+  /**
+   * @param $errors
+   *
+   * @return bool
+   */
   function verifyPreDBstate(&$errors) {
     return TRUE;
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_3_2_alpha1($rev) {
     //CRM-5666 -if user already have 'access CiviCase'
     //give all new permissions and drop access CiviCase.
@@ -79,6 +87,9 @@ class CRM_Upgrade_Incremental_php_ThreeTwo {
     $upgrade->processSQL($rev);
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_3_2_beta4($rev) {
     $upgrade = new CRM_Upgrade_Form;
 
@@ -250,6 +261,9 @@ UPDATE  civicrm_membership_status
     }
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_3_2_1($rev) {
     //CRM-6565 check if Activity Index is already exists or not.
     $addActivityTypeIndex = TRUE;
