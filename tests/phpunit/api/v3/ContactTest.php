@@ -1791,4 +1791,13 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertTrue(!isset($refCountsIdx['sql:civicrm_address:contact_id']));
   }
 
+  function testSQLOperatorsOnContactAPI() {
+    $this->individualCreate();
+    $this->organizationCreate();
+    $this->householdCreate();
+    $contacts = $this->callAPISuccess('contact', 'get', array('legal_name' => array('IS NOT NULL' => TRUE)));
+    $this->assertEquals($contacts['count'], CRM_Core_DAO::singleValueQuery('select count(*) FROM civicrm_contact WHERE legal_name IS NOT NULL'));
+    $contacts = $this->callAPISuccess('contact', 'get', array('legal_name' => array('IS NULL' => TRUE)));
+    $this->assertEquals($contacts['count'], CRM_Core_DAO::singleValueQuery('select count(*) FROM civicrm_contact WHERE legal_name IS NULL'));
+  }
 }

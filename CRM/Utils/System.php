@@ -183,6 +183,8 @@ class CRM_Utils_System {
    * @param bool $maintenance
    *   (optional) For maintenance mode.
    *
+   * @return string
+   *
    * @access public
    */
   static function theme(
