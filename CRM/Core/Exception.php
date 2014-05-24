@@ -38,12 +38,22 @@
 
 class CRM_Core_Exception extends PEAR_Exception {
   private $errorData = array();
+
+  /**
+   * @param $message
+   * @param int $error_code
+   * @param array $errorData
+   * @param null $previous
+   */
   public function __construct($message, $error_code = 0, $errorData = array(), $previous = null) {
     parent::__construct(ts($message));
     $this->errorData = $errorData + array('error_code' => $error_code);
   }
 
   // custom string representation of object
+  /**
+   * @return string
+   */
   public function __toString() {
     return __CLASS__ . ": [{$this->errorData['error_code']}: {$this->message}\n";
   }

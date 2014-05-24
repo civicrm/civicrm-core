@@ -45,6 +45,10 @@ function smarty_block_crmScope($params, $content, &$smarty, &$repeat) {
   return $content;
 }
 
+/**
+ * @param $smarty
+ * @param $frame
+ */
 function _smarty_block_crmScope_applyFrame(&$smarty, $frame) {
   foreach ($frame as $key => $value) {
     $smarty->assign($key, $value);

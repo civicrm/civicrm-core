@@ -24,6 +24,9 @@ class CRM_Core_Page_Angular extends CRM_Core_Page {
     return parent::run();
   }
 
+  /**
+   * @param CRM_Core_Resources $res
+   */
   public function registerResources(CRM_Core_Resources $res) {
     $modules = self::getAngularModules();
 

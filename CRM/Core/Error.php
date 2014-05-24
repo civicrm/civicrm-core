@@ -66,6 +66,9 @@ class CRM_Exception extends PEAR_Exception {
   }
 }
 
+/**
+ * Class CRM_Core_Error
+ */
 class CRM_Core_Error extends PEAR_ErrorStack {
 
   /**
@@ -130,6 +133,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $this->setDefaultCallback(array($this, 'handlePES'));
   }
 
+  /**
+   * @param $error
+   * @param string $separator
+   *
+   * @return array|null|string
+   */
   static public function getMessages(&$error, $separator = '<br />') {
     if (is_a($error, 'CRM_Core_Error')) {
       $errors = $error->getErrors();
@@ -244,6 +253,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   // this function is used to trap and print errors
   // during system initialization time. Hence the error
   // message is quite ugly
+  /**
+   * @param $pearError
+   */
   public static function simpleHandler($pearError) {
 
     // create the error array
@@ -643,6 +655,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     return Log::singleton('file', $fileName);
   }
 
+  /**
+   * @param string $msg
+   * @param bool $log
+   */
   static function backtrace($msg = 'backTrace', $log = FALSE) {
     $backTrace = debug_backtrace();
     $message = self::formatBacktrace($backTrace);
@@ -793,6 +809,14 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     return $msg;
   }
 
+  /**
+   * @param $message
+   * @param int $code
+   * @param string $level
+   * @param null $params
+   *
+   * @return object
+   */
   static function createError($message, $code = 8000, $level = 'Fatal', $params = NULL) {
     $error = CRM_Core_Error::singleton();
     $error->push($code, $level, array($params), $message);
@@ -864,6 +888,13 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * This function is no longer used by v3 api.
    * @fixme Some core files call it but it should be re-thought & renamed or removed
    */
+  /**
+   * @param $msg
+   * @param null $data
+   *
+   * @return array
+   * @throws Exception
+   */
   public static function &createAPIError($msg, $data = NULL) {
     if (self::$modeException) {
       throw new Exception($msg, $data);
@@ -879,6 +910,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     return $values;
   }
 
+  /**
+   * @param $file
+   */
   public static function movedSiteError($file) {
     $url = CRM_Utils_System::url('civicrm/admin/setting/updateConfigBackend',
       'reset=1',
@@ -899,6 +933,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     CRM_Utils_System::civiExit($code);
   }
 
+  /**
+   * @param $error
+   * @param const $type
+   *
+   * @return bool
+   */
   public static function isAPIError($error, $type = CRM_Core_Error::FATAL_ERROR) {
     if (is_array($error) && !empty($error['is_error'])) {
       $code = $error['error_message']['code'];
