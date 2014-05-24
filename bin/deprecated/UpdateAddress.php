@@ -132,6 +132,13 @@ function run() {
   processContacts($config, $processGeocode, $parseStreetAddress, $start, $end);
 }
 
+/**
+ * @param $config
+ * @param $processGeocode
+ * @param $parseStreetAddress
+ * @param null $start
+ * @param null $end
+ */
 function processContacts(&$config, $processGeocode, $parseStreetAddress, $start = NULL, $end = NULL) {
   // build where clause.
   $clause = array('( c.id = a.contact_id )');

@@ -112,6 +112,9 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Se
     // @TODO: Add rule to ensure that exclusion dates are not in the inclusion range
   }
 
+  /**
+   * @return mixed
+   */
   function count() {
     $sql = $this->all();
 
