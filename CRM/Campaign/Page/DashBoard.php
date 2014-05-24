@@ -262,6 +262,9 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     return $campaignsData;
   }
 
+  /**
+   * @return mixed
+   */
   function browseSurvey() {
     // ensure valid javascript - this must have a value set
     $this->assign('searchParams', json_encode(NULL));
