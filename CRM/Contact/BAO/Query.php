@@ -1462,7 +1462,6 @@ class CRM_Contact_BAO_Query {
   static function &fixWhereValues($id, &$values, $wildcard = 0, $useEquals = FALSE) {
     // skip a few search variables
     static $skipWhere = NULL;
-    static $arrayValues = NULL;
     static $likeNames = NULL;
     $result = NULL;
 
