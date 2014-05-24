@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class test_extension_manager_paymenttest
+ */
 class test_extension_manager_paymenttest extends CRM_Core_Payment {
   static private $_singleton = NULL;
 

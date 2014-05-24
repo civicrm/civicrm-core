@@ -2,6 +2,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Extension_MapperTest
+ */
 class CRM_Extension_MapperTest extends CiviUnitTestCase {
   function setUp() {
     parent::setUp();

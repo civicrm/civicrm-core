@@ -2,8 +2,14 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Utils_TypeTest
+ */
 class CRM_Utils_TypeTest extends CiviUnitTestCase {
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name'      => 'Type Test',

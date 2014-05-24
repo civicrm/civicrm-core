@@ -2,6 +2,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Case_XMLRepositoryTest
+ */
 class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
   protected $fixtures = array();
 
