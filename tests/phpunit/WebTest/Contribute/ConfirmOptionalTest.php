@@ -91,7 +91,7 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
       $isPcpApprovalNeeded = FALSE,
       $isSeparatePayment = FALSE,
       $honoreeSection = FALSE,
-      $allowOtherAmmount = TRUE,
+      $allowOtherAmount = TRUE,
       $isConfirmEnabled = $isConfirmEnabled
     );
   }

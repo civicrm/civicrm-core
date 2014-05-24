@@ -121,7 +121,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * construcor
+   * constructor
    */
   function __construct() {
     parent::__construct('CiviCRM');
