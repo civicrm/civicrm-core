@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class CRM_Core_DAO_Factory
+ */
 class CRM_Core_DAO_Factory {
 
   static $_classes = array(

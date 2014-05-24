@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Interface CRM_Core_Reference_Interface
+ */
 interface CRM_Core_Reference_Interface {
   public function getReferenceTable();
 

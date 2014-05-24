@@ -44,6 +44,12 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    *
    * @param array $params input parameters
    */
+  /**
+   * @param $params
+   *
+   * @return object
+   * @throws API_Exception
+   */
   static function create($params) {
     // Ensure mysql phone function exists
     CRM_Core_DAO::checkSqlFunctionsExist();

@@ -35,6 +35,10 @@
 class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
   static $_paymentProcessor = NULL;
+
+  /**
+   * Constructor
+   */
   function __construct() {
     parent::__construct();
   }
