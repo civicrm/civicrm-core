@@ -289,7 +289,7 @@ class CRM_Activity_Page_AJAX {
     }
     $iFilteredTotal = $iTotal = $params['total'] = count($allCaseRelationships);
     $selectorElements = array('relation', 'name', 'phone', 'email', 'actions');
-   
+
     echo CRM_Utils_JSON::encodeDataTableSelector($caseRelationships, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -306,6 +306,11 @@ class CRM_Activity_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 
+  /**
+   * @param $params
+   *
+   * @return array
+   */
   static function _convertToCaseActivity($params) {
     if (!$params['activityID'] || !$params['caseID']) {
       return (array('error_msg' => 'required params missing.'));

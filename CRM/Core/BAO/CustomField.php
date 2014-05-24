@@ -2454,6 +2454,11 @@ WHERE      f.id IN ($ids)";
     return $errors;
   }
 
+  /**
+   * @param $customId
+   *
+   * @return bool
+   */
   static function isMultiRecordField($customId) {
     $isMultipleWithGid = FALSE;
     if (!is_numeric($customId)) {
