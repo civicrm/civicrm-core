@@ -37,6 +37,10 @@ require_once 'Google/library/googlecart.php';
 require_once 'Google/library/googleitem.php';
 require_once 'Google/library/googlesubscription.php';
 require_once 'Google/library/googlerequest.php';
+
+/**
+ * Class CRM_Core_Payment_Google
+ */
 class CRM_Core_Payment_Google extends CRM_Core_Payment {
 
   /**

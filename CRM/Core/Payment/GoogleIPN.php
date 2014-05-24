@@ -35,6 +35,10 @@
 
 
 define('GOOGLE_DEBUG_PP', 0);
+
+/**
+ * Class CRM_Core_Payment_GoogleIPN
+ */
 class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
   /**

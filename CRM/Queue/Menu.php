@@ -37,6 +37,10 @@
  */
 
 require_once 'CRM/Core/I18n.php';
+
+/**
+ * Class CRM_Queue_Menu
+ */
 class CRM_Queue_Menu {
 
   static function alter($path, &$menuPath) {
