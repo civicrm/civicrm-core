@@ -1720,7 +1720,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that Ajax API permission is suffient to access getquick api
+   * Test that Ajax API permission is sufficient to access getquick api
    * (note that getquick api is required for autocomplete & has ACL permissions applied)
    */
   function testGetquickPermission_CRM_13744() {
