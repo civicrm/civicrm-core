@@ -417,10 +417,16 @@ class CRM_Core_Resources {
     return $this->extMapper->keyToUrl($ext) . '/' . $file;
   }
 
+  /**
+   * @return string
+   */
   public function getCacheCode() {
     return $this->cacheCode;
   }
 
+  /**
+   * @param $value
+   */
   public function setCacheCode($value) {
     $this->cacheCode = $value;
     if ($this->cacheCodeKey) {

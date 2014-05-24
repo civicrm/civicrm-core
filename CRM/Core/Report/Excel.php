@@ -151,6 +151,13 @@ class CRM_Core_Report_Excel {
     }
   }
 
+  /**
+   * @param $fileName
+   * @param $header
+   * @param $rows
+   * @param null $titleHeader
+   * @param bool $outputHeader
+   */
   function writeHTMLFile($fileName, &$header, &$rows, $titleHeader = NULL, $outputHeader = TRUE) {
     if ($outputHeader) {
       CRM_Utils_System::download(CRM_Utils_String::munge($fileName),

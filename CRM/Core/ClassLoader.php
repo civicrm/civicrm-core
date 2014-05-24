@@ -43,6 +43,11 @@ class CRM_Core_ClassLoader {
    */
   private static $_singleton = NULL;
 
+  /**
+   * @param bool $force
+   *
+   * @return object
+   */
   static function &singleton($force = FALSE) {
     if ($force || self::$_singleton === NULL) {
       self::$_singleton = new CRM_Core_ClassLoader();
@@ -55,6 +60,9 @@ class CRM_Core_ClassLoader {
    */
   protected $_registered;
 
+  /**
+   *
+   */
   protected function __construct() {
     $this->_registered = FALSE;
   }
@@ -114,6 +122,9 @@ class CRM_Core_ClassLoader {
     require_once "$civicrm_base_path/packages/vendor/autoload.php";
   }
 
+  /**
+   * @param $class
+   */
   function loadClass($class) {
     if (
       // Only load classes that clearly belong to CiviCRM.

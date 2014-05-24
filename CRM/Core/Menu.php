@@ -68,6 +68,9 @@ class CRM_Core_Menu {
   static $_menuCache = NULL;
   CONST MENU_ITEM = 1;
 
+  /**
+   * @return array
+   */
   static function &xmlItems() {
     if (!self::$_items) {
       $config = CRM_Core_Config::singleton();
@@ -95,6 +98,12 @@ class CRM_Core_Menu {
     return self::$_items;
   }
 
+  /**
+   * @param $name
+   * @param $menu
+   *
+   * @throws Exception
+   */
   static function read($name, &$menu) {
 
     $config = CRM_Core_Config::singleton();
@@ -156,6 +165,11 @@ class CRM_Core_Menu {
     return self::xmlItems();
   }
 
+  /**
+   * @param $values
+   *
+   * @return bool
+   */
   static function isArrayTrue(&$values) {
     foreach ($values as $name => $value) {
       if (!$value) {
@@ -165,6 +179,12 @@ class CRM_Core_Menu {
     return TRUE;
   }
 
+  /**
+   * @param $menu
+   * @param $path
+   *
+   * @throws Exception
+   */
   static function fillMenuValues(&$menu, $path) {
     $fieldsToPropagate = array(
       'access_callback',
@@ -234,6 +254,9 @@ class CRM_Core_Menu {
     self::buildAdminLinks($menu);
   }
 
+  /**
+   * @param bool $truncate
+   */
   static function store($truncate = TRUE) {
     // first clean up the db
     if ($truncate) {
@@ -271,6 +294,9 @@ class CRM_Core_Menu {
     }
   }
 
+  /**
+   * @param $menu
+   */
   static function buildAdminLinks(&$menu) {
     $values = array();
 
@@ -310,6 +336,12 @@ class CRM_Core_Menu {
     $menu['admin'] = array('breadcrumb' => $values);
   }
 
+  /**
+   * @param bool $all
+   *
+   * @return mixed
+   * @throws Exception
+   */
   static function &getNavigation($all = FALSE) {
     CRM_Core_Error::fatal();
 
@@ -416,6 +448,9 @@ class CRM_Core_Menu {
     return $values;
   }
 
+  /**
+   * @return null
+   */
   static function &getAdminLinks() {
     $links = self::get('admin');
 
@@ -479,12 +514,22 @@ class CRM_Core_Menu {
     return $crumbs;
   }
 
+  /**
+   * @param $menu
+   * @param $path
+   */
   static function buildReturnUrl(&$menu, $path) {
     if (!isset($menu[$path]['return_url'])) {
       list($menu[$path]['return_url'], $menu[$path]['return_url_args']) = self::getReturnUrl($menu, $path);
     }
   }
 
+  /**
+   * @param $menu
+   * @param $path
+   *
+   * @return array
+   */
   static function getReturnUrl(&$menu, $path) {
     if (!isset($menu[$path]['return_url'])) {
       $pathElements = explode('/', $path);
@@ -509,6 +554,10 @@ class CRM_Core_Menu {
     }
   }
 
+  /**
+   * @param $menu
+   * @param $path
+   */
   static function fillComponentIds(&$menu, $path) {
     static $cache = array();
 
@@ -542,6 +591,11 @@ class CRM_Core_Menu {
     }
   }
 
+  /**
+   * @param $path
+   *
+   * @return null
+   */
   static function get($path) {
     // return null if menu rebuild
     $config = CRM_Core_Config::singleton();
@@ -644,6 +698,11 @@ UNION (
     return $menuPath;
   }
 
+  /**
+   * @param $pathArgs
+   *
+   * @return mixed
+   */
   static function getArrayForPathArgs($pathArgs) {
     if (!is_string($pathArgs)) {
       return;

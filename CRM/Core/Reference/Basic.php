@@ -12,6 +12,13 @@ class CRM_Core_Reference_Basic implements CRM_Core_Reference_Interface {
   protected $targetTable;
   protected $targetKey;
 
+  /**
+   * @param $refTable
+   * @param $refKey
+   * @param null $targetTable
+   * @param string $targetKey
+   * @param null $refTypeColumn
+   */
   function __construct($refTable, $refKey, $targetTable = NULL, $targetKey = 'id', $refTypeColumn = NULL) {
     $this->refTable = $refTable;
     $this->refKey = $refKey;
@@ -20,30 +27,55 @@ class CRM_Core_Reference_Basic implements CRM_Core_Reference_Interface {
     $this->refTypeColumn = $refTypeColumn;
   }
 
+  /**
+   * @return mixed
+   */
   function getReferenceTable() {
     return $this->refTable;
   }
 
+  /**
+   * @return mixed
+   */
   function getReferenceKey() {
     return $this->refKey;
   }
 
+  /**
+   * @return null
+   */
   function getTypeColumn() {
     return $this->refTypeColumn;
   }
 
+  /**
+   * @return null
+   */
   function getTargetTable() {
     return $this->targetTable;
   }
 
+  /**
+   * @return string
+   */
   function getTargetKey() {
     return $this->targetKey;
   }
 
+  /**
+   * @param string $tableName
+   *
+   * @return bool
+   */
   public function matchesTargetTable($tableName) {
     return ($this->getTargetTable() === $tableName);
   }
 
+  /**
+   * @param CRM_Core_DAO $targetDao
+   *
+   * @return Object
+   */
   public function findReferences($targetDao) {
     $targetColumn = $this->getTargetKey();
     $params = array(
@@ -60,6 +92,11 @@ EOS;
     return $result;
   }
 
+  /**
+   * @param CRM_Core_DAO $targetDao
+   *
+   * @return array
+   */
   public function getReferenceCount($targetDao) {
     $targetColumn = $this->getTargetKey();
     $params = array(

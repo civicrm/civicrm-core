@@ -135,6 +135,11 @@ class CRM_Core_DAO extends DB_DataObject {
     $this->joinAdd();
   }
 
+  /**
+   * @param $tableName
+   *
+   * @return string
+   */
   static function getLocaleTableName($tableName) {
     global $dbLocale;
     if ($dbLocale) {
@@ -283,6 +288,9 @@ class CRM_Core_DAO extends DB_DataObject {
     return $table;
   }
 
+  /**
+   * @return $this
+   */
   function save() {
     if (!empty($this->id)) {
       $this->update();
@@ -297,6 +305,9 @@ class CRM_Core_DAO extends DB_DataObject {
     return $this;
   }
 
+  /**
+   * @param bool $created
+   */
   function log($created = FALSE) {
     static $cid = NULL;
 
@@ -471,6 +482,11 @@ class CRM_Core_DAO extends DB_DataObject {
     return NULL;
   }
 
+  /**
+   * @param $type
+   *
+   * @throws Exception
+   */
   static function transaction($type) {
     CRM_Core_Error::fatal('This function is obsolete, please use CRM_Core_Transaction');
   }
@@ -574,6 +590,11 @@ LIKE %1
     return $values;
   }
 
+  /**
+   * @param int $maxTablesToCheck
+   *
+   * @return bool
+   */
   static function isDBMyISAM($maxTablesToCheck = 10) {
     // show error if any of the tables, use 'MyISAM' storage engine.
     $engines = self::getStorageValues(NULL, $maxTablesToCheck);
@@ -731,6 +752,11 @@ LIKE %1
     return $result;
   }
 
+  /**
+   * @param $version
+   *
+   * @return bool
+   */
   function checkVersion($version) {
     $query = "
 SELECT version
@@ -986,6 +1012,14 @@ FROM   civicrm_domain
     return $ret;
   }
 
+  /**
+   * @param $query
+   * @param $params
+   * @param bool $abort
+   *
+   * @return string
+   * @throws Exception
+   */
   static function composeQuery($query, &$params, $abort = TRUE) {
     $tr = array();
     foreach ($params as $key => $item) {
@@ -1030,6 +1064,9 @@ FROM   civicrm_domain
     return strtr($query, $tr);
   }
 
+  /**
+   * @param null $ids
+   */
   static function freeResult($ids = NULL) {
     global $_DB_DATAOBJECT;
 
@@ -1239,6 +1276,11 @@ SELECT contact_id
     );
   }
 
+  /**
+   * @param $string
+   *
+   * @return string
+   */
   static function escapeString($string) {
     static $_dao = NULL;
 
@@ -1270,6 +1312,11 @@ SELECT contact_id
     return '"' . implode('","', $escapes) . '"';
   }
 
+  /**
+   * @param $string
+   *
+   * @return string
+   */
   static function escapeWildCardString($string) {
     // CRM-9155
     // ensure we escape the single characters % and _ which are mysql wild
@@ -1506,6 +1553,13 @@ SELECT contact_id
   }
   }
 
+  /**
+   * @param string $prefix
+   * @param bool $addRandomString
+   * @param null $string
+   *
+   * @return string
+   */
   static function createTempTableName($prefix = 'civicrm', $addRandomString = TRUE, $string = NULL) {
     $tableName = $prefix . "_temp";
 
@@ -1520,6 +1574,12 @@ SELECT contact_id
     return $tableName;
   }
 
+  /**
+   * @param bool $view
+   * @param bool $trigger
+   *
+   * @return bool
+   */
   static function checkTriggerViewPermission($view = TRUE, $trigger = TRUE) {
     // test for create view and trigger permissions and if allowed, add the option to go multilingual
     // and logging
@@ -1561,6 +1621,10 @@ SELECT contact_id
     return TRUE;
   }
 
+  /**
+   * @param null $message
+   * @param bool $printDAO
+   */
   static function debugPrint($message = NULL, $printDAO = TRUE) {
     CRM_Utils_System::xMemory("{$message}: ");
 
@@ -1790,6 +1854,9 @@ SELECT contact_id
     return $occurrences;
   }
 
+  /**
+   * @return array
+   */
   function getReferenceCounts() {
     $links = self::getReferencesToTable(static::getTableName());
 
@@ -2073,6 +2140,9 @@ SELECT contact_id
     return substr($string, 0, $length - 8) . "_{$md5string}";
   }
 
+  /**
+   * @param $params
+   */
   function setApiFilter(&$params) {}
 
 }
