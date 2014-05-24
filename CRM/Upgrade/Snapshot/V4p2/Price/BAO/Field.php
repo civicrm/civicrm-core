@@ -475,6 +475,12 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
     return $options[$fieldId];
   }
 
+  /**
+   * @param $optionLabel
+   * @param $fid
+   *
+   * @return mixed
+   */
   public static function getOptionId($optionLabel, $fid) {
     if (!$optionLabel || !$fid) {
       return;
@@ -531,6 +537,9 @@ WHERE
     return NULL;
   }
 
+  /**
+   * @return array
+   */
   static function &htmlTypes() {
     static $htmlTypes = NULL;
     if (!$htmlTypes) {

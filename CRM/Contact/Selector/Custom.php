@@ -383,6 +383,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     return NULL;
   }
 
+  /**
+   * @return mixed
+   */
   public function getSummary() {
     return $this->_search->summary();
   }
@@ -398,10 +401,22 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     return ts('CiviCRM Custom Search');
   }
 
+  /**
+   * @return null
+   */
   function alphabetQuery() {
     return NULL;
   }
 
+  /**
+   * @param $params
+   * @param $action
+   * @param $sortID
+   * @param null $displayRelationshipType
+   * @param string $queryOperator
+   *
+   * @return Object
+   */
   function &contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
     $params = array();
     $sql = $this->_search->contactIDs($params);
@@ -409,6 +424,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     return CRM_Core_DAO::executeQuery($sql, $params);
   }
 
+  /**
+   * @param $rows
+   */
   function addActions(&$rows) {
     $links = self::links();
 
@@ -431,6 +449,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     }
   }
 
+  /**
+   * @param $rows
+   */
   function removeActions(&$rows) {
     foreach ($rows as $rid => & $rValue) {
       unset($rValue['action']);

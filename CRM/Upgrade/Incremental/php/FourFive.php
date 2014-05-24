@@ -34,6 +34,11 @@
 class CRM_Upgrade_Incremental_php_FourFive {
   const BATCH_SIZE = 5000;
 
+  /**
+   * @param $errors
+   *
+   * @return bool
+   */
   function verifyPreDBstate(&$errors) {
     return TRUE;
   }
@@ -69,6 +74,11 @@ class CRM_Upgrade_Incremental_php_FourFive {
     }
   }
 
+  /**
+   * @param $rev
+   *
+   * @return bool
+   */
   function upgrade_4_5_alpha1($rev) {
     // task to process sql
     $this->addTask(ts('Migrate honoree information to module_data'), 'migrateHonoreeInfo');

@@ -46,6 +46,12 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
 
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
     $this->_columns = array(
@@ -182,7 +188,7 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
         'dao' => 'CRM_Core_DAO_Phone',
         'fields' =>
         array(
-          'phone' => NULL,   
+          'phone' => NULL,
           'phone_ext' =>
           array(
             'title' => ts('Phone Extension')
@@ -246,6 +252,13 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     return $errors;
@@ -297,6 +310,9 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

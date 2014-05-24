@@ -553,6 +553,15 @@ WHERE  id = %1";
     return $setTree;
   }
 
+  /**
+   * @param $form
+   * @param $id
+   * @param string $entityTable
+   * @param bool $validOnly
+   * @param null $priceSetId
+   *
+   * @return bool|false|int|null
+   */
   static function initSet(&$form, $id, $entityTable = 'civicrm_event', $validOnly = FALSE, $priceSetId = NULL) {
     if (!$priceSetId) {
       $priceSetId = self::getFor($entityTable, $id);
@@ -645,6 +654,11 @@ WHERE  id = %1";
     return FALSE;
   }
 
+  /**
+   * @param $fields
+   * @param $params
+   * @param $lineItem
+   */
   static function processAmount(&$fields, &$params, &$lineItem) {
     // using price set
     $totalPrice = 0;
@@ -1014,7 +1028,11 @@ $pricesetFieldCount[$sid] = ($count) ? $count : 0;
 return $pricesetFieldCount[$sid];
 }
 
-public static function getMembershipCount($ids) {
+  /**
+   * @param $ids
+   *
+   * @return array
+   */public static function getMembershipCount($ids) {
 $queryString = "
 SELECT       count( pfv.id ) AS count, pfv.id AS id
 FROM         civicrm_price_field_value pfv
@@ -1101,6 +1119,9 @@ return 0;
      return array($dao->duration_interval, $dao->duration_unit);
    }
 
+  /**
+   * @return object
+   */
   static function eventPriceSetDomainID() {
     return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
            'event_price_set_domain_id',

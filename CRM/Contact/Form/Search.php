@@ -245,6 +245,11 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     return self::$_validContext;
   }
 
+  /**
+   * @param $context
+   *
+   * @return bool
+   */
   static function isSearchContext($context) {
     $searchContext = CRM_Utils_Array::value($context, self::validContext());
     return $searchContext ? TRUE : FALSE;
@@ -329,6 +334,11 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
   }
 
+  /**
+   * @param int $mode
+   *
+   * @return mixed
+   */
   static function getModeValue($mode = 1) {
     self::setModeValues();
 
@@ -339,6 +349,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     return self::$_modeValues[$mode];
   }
 
+  /**
+   * @return array
+   */
   static function getModeSelect() {
     self::setModeValues();
 
@@ -795,6 +808,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $controller->moveFromSessionToTemplate();
   }
 
+  /**
+   * @return array
+   */
   function &getFormValues() {
     return $this->_formValues;
   }
@@ -931,6 +947,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
   }
 
+  /**
+   * @return null
+   */
   function &returnProperties() {
     return CRM_Core_DAO::$_nullObject;
   }

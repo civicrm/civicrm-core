@@ -302,10 +302,18 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
   public function normalizeFormValues() {}
 
+  /**
+   * @param $formValues
+   *
+   * @return array
+   */
   public function &convertFormValues(&$formValues) {
     return CRM_Core_BAO_Mapping::formattedFields($formValues);
   }
 
+  /**
+   * @return array
+   */
   public function &returnProperties() {
     return CRM_Core_BAO_Mapping::returnProperties($this->_formValues);
   }
@@ -398,6 +406,9 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     parent::postProcess();
   }
 
+  /**
+   * @return array
+   */
   static function fields() {
     $fields = array_merge(
       CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE),

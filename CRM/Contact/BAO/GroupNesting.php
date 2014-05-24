@@ -58,6 +58,9 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
     $this->_styleIndent = $styleIndent;
   }
 
+  /**
+   * @param $sortOrder
+   */
   function setSortOrder($sortOrder) {
     switch ($sortOrder) {
       case 'ASC':
@@ -73,10 +76,16 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
     }
   }
 
+  /**
+   * @return string
+   */
   function getSortOrder() {
     return self::$_sortOrder;
   }
 
+  /**
+   * @return int
+   */
   function getCurrentNestingLevel() {
     return count($this->_parentStack);
   }
@@ -115,6 +124,9 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
     return $this->_current;
   }
 
+  /**
+   * @return string
+   */
   function key() {
     $group = &$this->_current;
     $ids = array();
@@ -129,6 +141,9 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
     return $key;
   }
 
+  /**
+   * @return CRM_Contact_BAO_Group|null
+   */
   function next() {
     $currentGroup = &$this->_current;
     $childGroup = $this->_getNextChildGroup($currentGroup);
@@ -160,6 +175,9 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
     return $nextGroup;
   }
 
+  /**
+   * @return bool
+   */
   function valid() {
     if ($this->_current) {
       return TRUE;
@@ -169,6 +187,11 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
     }
   }
 
+  /**
+   * @param null $group
+   *
+   * @return CRM_Contact_BAO_Group|null
+   */
   function _getNextParentlessGroup(&$group = NULL) {
     $lastParentlessGroup = $this->_lastParentlessGroup;
     $nextGroup           = new CRM_Contact_BAO_Group();
@@ -191,6 +214,12 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
     return NULL;
   }
 
+  /**
+   * @param $parentGroup
+   * @param null $group
+   *
+   * @return CRM_Contact_BAO_Group|null
+   */
   function _getNextChildGroup(&$parentGroup, &$group = NULL) {
     $children = self::getChildGroupIds($parentGroup->id);
     if (count($children) > 0) {
@@ -217,6 +246,11 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
     return NULL;
   }
 
+  /**
+   * @param $group
+   *
+   * @return CRM_Contact_BAO_Group|null
+   */
   function _getNextSiblingGroup(&$group) {
     $parentGroup = end($this->_parentStack);
     if ($parentGroup) {
@@ -664,6 +698,12 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
     return $potentialChildGroupIds;
   }
 
+  /**
+   * @param $contactId
+   * @param $parentGroupId
+   *
+   * @return array
+   */
   static function getContainingGroups($contactId, $parentGroupId) {
     $groups = CRM_Contact_BAO_Group::getGroups();
     $containingGroups = array();

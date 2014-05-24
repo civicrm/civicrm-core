@@ -63,6 +63,9 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
 
   protected $_foundRows = array();
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     $this->_text = CRM_Utils_Array::value('text', $formValues);
     $this->_table = CRM_Utils_Array::value('table', $formValues);
@@ -302,6 +305,10 @@ WHERE      t.table_name = 'Activity' AND
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 
+  /**
+   * @param $tables
+   * @param $extends
+   */
   function fillCustomInfo(&$tables, $extends) {
     $sql = "
 SELECT     cg.table_name, cf.column_name
@@ -326,6 +333,9 @@ AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
     }
   }
 
+  /**
+   * @param $tables
+   */
   function runQueries(&$tables) {
     $sql = "TRUNCATE {$this->_entityIDTableName}";
     CRM_Core_DAO::executeQuery($sql);
@@ -701,6 +711,9 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
     $this->runQueries($tables);
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
     $config = CRM_Core_Config::singleton();
 
@@ -761,6 +774,9 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
     $this->setTitle(ts('Full-text Search'));
   }
 
+  /**
+   * @return array
+   */
   function &columns() {
     $this->_columns = array(
       ts('Contact Id') => 'contact_id',
@@ -770,6 +786,9 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
     return $this->_columns;
   }
 
+  /**
+   * @return array
+   */
   function summary() {
     $this->initialize();
 
@@ -827,6 +846,9 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
     return $summary;
   }
 
+  /**
+   * @return null|string
+   */
   function count() {
     $this->initialize();
 
@@ -838,6 +860,14 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
     }
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $returnSQL
+   *
+   * @return null|string
+   */
   function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     $this->initialize();
 
@@ -850,6 +880,15 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
     }
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return string
+   */
   function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
     $this->initialize();
 
@@ -871,25 +910,45 @@ FROM   {$this->_tableName} contact_a
     return $sql;
   }
 
+  /**
+   * @return null
+   */
   function from() {
     return NULL;
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return null
+   */
   function where($includeContactIDs = FALSE) {
     return NULL;
   }
 
+  /**
+   * @return string
+   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Custom/FullText.tpl';
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     return array();
   }
 
+  /**
+   * @param $row
+   */
   function alterRow(&$row) {
   }
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
