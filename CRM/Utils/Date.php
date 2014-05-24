@@ -250,6 +250,11 @@ class CRM_Utils_Date {
     return $fullMonthNames;
   }
 
+  /**
+   * @param $string
+   *
+   * @return int
+   */
   static function unixTime($string) {
     if (empty($string)) {
       return 0;
@@ -656,6 +661,11 @@ class CRM_Utils_Date {
     return FALSE;
   }
 
+  /**
+   * @param $date
+   *
+   * @return bool
+   */
   static function isDate(&$date) {
     if (CRM_Utils_System::isNull($date)) {
       return FALSE;
@@ -663,10 +673,21 @@ class CRM_Utils_Date {
     return TRUE;
   }
 
+  /**
+   * @param null $timeStamp
+   *
+   * @return bool|string
+   */
   static function currentDBDate($timeStamp = NULL) {
     return $timeStamp ? date('YmdHis', $timeStamp) : date('YmdHis');
   }
 
+  /**
+   * @param $date
+   * @param null $now
+   *
+   * @return bool
+   */
   static function overdue($date, $now = NULL) {
     $mysqlDate = self::isoToMysql($date);
     if (!$now) {
@@ -1580,6 +1601,12 @@ class CRM_Utils_Date {
   }
 
 
+  /**
+   * @param $date
+   * @param $dateType
+   *
+   * @return null|string
+   */
   static function formatDate($date, $dateType) {
     $formattedDate = NULL;
     if (empty($date)) {

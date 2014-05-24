@@ -878,6 +878,13 @@ class CRM_Utils_Array {
    * @return mixed
    *   The value found.
    */
+  /**
+   * @param $regexKey
+   * @param $list
+   * @param null $default
+   *
+   * @return null
+   */
   static function valueByRegexKey($regexKey, $list, $default = NULL) {
     if (is_array($list) && $regexKey) {
       $matches = preg_grep($regexKey, array_keys($list));

@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class CRM_Utils_Number
+ */
 class CRM_Utils_Number {
   /**
    * Create a random number with a given precision

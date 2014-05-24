@@ -252,6 +252,18 @@ class CRM_Utils_System {
     return $config->userSystem->url($path, $query, $absolute, $fragment, $htmlize, $frontend, $forceBackend);
   }
 
+  /**
+   * @param $text
+   * @param null $path
+   * @param null $query
+   * @param bool $absolute
+   * @param null $fragment
+   * @param bool $htmlize
+   * @param bool $frontend
+   * @param bool $forceBackend
+   *
+   * @return string
+   */
   static function href($text, $path = NULL, $query = NULL, $absolute = TRUE,
     $fragment = NULL, $htmlize = TRUE, $frontend = FALSE, $forceBackend = FALSE
   ) {
@@ -259,11 +271,17 @@ class CRM_Utils_System {
     return "<a href=\"$url\">$text</a>";
   }
 
+  /**
+   * @return mixed
+   */
   static function permissionDenied() {
     $config = CRM_Core_Config::singleton();
     return $config->userSystem->permissionDenied();
   }
 
+  /**
+   * @return mixed
+   */
   static function logout() {
     $config = CRM_Core_Config::singleton();
     return $config->userSystem->logout();
@@ -1188,6 +1206,11 @@ class CRM_Utils_System {
    * @return string
    *   IP address of logged in user.
    */
+  /**
+   * @param bool $strictIPV4
+   *
+   * @return mixed|string
+   */
   static function ipAddress($strictIPV4 = TRUE) {
     $address = CRM_Utils_Array::value('REMOTE_ADDR', $_SERVER);
 
@@ -1816,6 +1839,9 @@ class CRM_Utils_System {
     return $cache;
   }
 
+  /**
+   * @return bool
+   */
   static function isInUpgradeMode() {
     $args = explode('/', $_GET['q']);
     $upgradeInProcess = CRM_Core_Session::singleton()->get('isUpgradePending');

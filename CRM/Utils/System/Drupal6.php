@@ -567,6 +567,9 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     drupal_set_message($message);
   }
 
+  /**
+   * @return mixed
+   */
   function logout() {
     module_load_include('inc', 'user', 'user.pages');
     return user_logout();

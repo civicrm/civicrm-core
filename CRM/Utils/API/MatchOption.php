@@ -54,6 +54,10 @@
  */
 
 require_once 'api/Wrapper.php';
+
+/**
+ * Class CRM_Utils_API_MatchOption
+ */
 class CRM_Utils_API_MatchOption implements API_Wrapper {
 
   /**

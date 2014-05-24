@@ -37,6 +37,10 @@
 // before the 4.1 release
 define('EMAIL_ACTIVITY_TYPE_ID', NULL);
 define('MAIL_BATCH_SIZE', 50);
+
+/**
+ * Class CRM_Utils_Mail_EmailProcessor
+ */
 class CRM_Utils_Mail_EmailProcessor {
 
   /**
@@ -126,6 +130,12 @@ class CRM_Utils_Mail_EmailProcessor {
     }
   }
 
+  /**
+   * @param $civiMail
+   * @param $dao
+   *
+   * @throws Exception
+   */
   static function _process($civiMail, $dao) {
     // 0 = activities; 1 = bounce;
     $usedfor = $dao->is_default;

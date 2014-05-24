@@ -177,6 +177,10 @@ class CRM_Utils_File {
     }
   }
 
+  /**
+   * @param $source
+   * @param $destination
+   */
   static function copyDir($source, $destination) {
     $dir = opendir($source);
     @mkdir($destination);
@@ -260,6 +264,13 @@ class CRM_Utils_File {
     return $name;
   }
 
+  /**
+   * @param $dsn
+   * @param $fileName
+   * @param null $prefix
+   * @param bool $isQueryString
+   * @param bool $dieOnErrors
+   */
   static function sourceSQLFile($dsn, $fileName, $prefix = NULL, $isQueryString = FALSE, $dieOnErrors = TRUE) {
     require_once 'DB.php';
 
@@ -302,6 +313,11 @@ class CRM_Utils_File {
     }
   }
 
+  /**
+   * @param $ext
+   *
+   * @return bool
+   */
   static function isExtensionSafe($ext) {
     static $extensions = NULL;
     if (!$extensions) {
@@ -353,6 +369,11 @@ class CRM_Utils_File {
     return $name;
   }
 
+  /**
+   * @param $name
+   *
+   * @return string
+   */
   static function makeFileName($name) {
     $uniqID   = md5(uniqid(rand(), TRUE));
     $info     = pathinfo($name);
@@ -370,6 +391,12 @@ class CRM_Utils_File {
     }
   }
 
+  /**
+   * @param $path
+   * @param $ext
+   *
+   * @return array
+   */
   static function getFilesByExtension($path, $ext) {
     $path  = self::addTrailingSlash($path);
     $dh    = opendir($path);
@@ -466,6 +493,11 @@ HTACCESS;
     return $_path;
   }
 
+  /**
+   * @param $directory
+   *
+   * @return string
+   */
   static function relativeDirectory($directory) {
     // Do nothing on windows
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -489,6 +521,11 @@ HTACCESS;
     return $directory;
   }
 
+  /**
+   * @param $directory
+   *
+   * @return string
+   */
   static function absoluteDirectory($directory) {
     // Do nothing on windows - config will need to specify absolute path
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
