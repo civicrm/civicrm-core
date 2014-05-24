@@ -67,6 +67,9 @@ class CRM_Utils_ReCAPTCHA {
     return self::$_singleton;
   }
 
+  /**
+   *
+   */
   function __construct() {}
 
   /**
@@ -111,6 +114,12 @@ class CRM_Utils_ReCAPTCHA {
     );
   }
 
+  /**
+   * @param $value
+   * @param $form
+   *
+   * @return mixed
+   */
   static function validate($value, $form) {
     $config = CRM_Core_Config::singleton();
 

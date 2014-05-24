@@ -802,7 +802,16 @@ class CRM_Utils_Token {
     }
     return $tokenHtml;
   }
-  public static function getHookTokenReplacement(
+
+  /**
+   * @param $token
+   * @param $contact
+   * @param $category
+   * @param bool $html
+   * @param bool $escapeSmarty
+   *
+   * @return mixed|string
+   */public static function getHookTokenReplacement(
     $token,
     &$contact,
     $category,
@@ -1358,6 +1367,11 @@ class CRM_Utils_Token {
     }
   }
 
+  /**
+   * @param $tokens
+   *
+   * @return array
+   */
   static function flattenTokens(&$tokens) {
     $flattenTokens = array();
 

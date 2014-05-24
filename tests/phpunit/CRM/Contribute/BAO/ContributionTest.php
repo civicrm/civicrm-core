@@ -29,7 +29,14 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Custom.php';
+
+/**
+ * Class CRM_Contribute_BAO_ContributionTest
+ */
 class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Contribution BAOs',

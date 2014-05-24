@@ -177,6 +177,9 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   /*
    * data provider for test process membership
    */
+  /**
+   * @return array
+   */
   function getMembershipData() {
 
     /*

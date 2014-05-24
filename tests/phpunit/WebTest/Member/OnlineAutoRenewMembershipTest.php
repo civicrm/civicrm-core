@@ -121,6 +121,9 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]", $text, 'Missing text: ' . $text);
   }
 
+  /**
+   * @return null
+   */
   function _configureMembershipPage() {
     static $pageId = NULL;
 

@@ -308,6 +308,12 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
   }
 
   //common function for doing offline contribution
+  /**
+   * @param $params
+   * @param $firstName
+   * @param $lastName
+   * @param $processorName
+   */
   function _doOfflineContribution($params, $firstName, $lastName, $processorName) {
 
     $this->waitForElementPresent("css=li#tab_contribute a");
@@ -359,6 +365,9 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
   }
 
   //common function for verifing total_amount, and non_deductible_amount
+  /**
+   * @param $verifyData
+   */
   function _verifyAmounts($verifyData) {
     // since we are doing test contributions we need to search for test contribution and select first contribution
     // record for the contact

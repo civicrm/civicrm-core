@@ -269,6 +269,11 @@ class CRM_Utils_Address {
     return $finalFormatted;
   }
 
+  /**
+   * @param $format
+   *
+   * @return array
+   */
   static function sequence($format) {
     // also compute and store the address sequence
     $addressSequence = array(

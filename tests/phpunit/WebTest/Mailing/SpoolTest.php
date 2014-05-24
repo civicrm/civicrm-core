@@ -77,6 +77,10 @@ class WebTest_Mailing_SpoolTest extends CiviSeleniumTestCase {
     $mut->stop();
   }
 
+  /**
+   * @param $context
+   * @param $mailPart
+   */
   public static function mailWalkCallback($context, $mailPart) {
     if ($mailPart instanceof ezcMailText) {
       self::assertEquals($mailPart->subType, 'html');

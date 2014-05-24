@@ -117,6 +117,10 @@ class WebTest_Campaign_OfflineEventRegistrationTest extends CiviSeleniumTestCase
     $this->offlineParticipantAddTest($campaignTitle, $id);
   }
 
+  /**
+   * @param $campaignTitle
+   * @param $id
+   */
   function offlineParticipantAddTest($campaignTitle, $id) {
     // connect campaign with event
     $this->openCiviPage("event/manage", "reset=1");

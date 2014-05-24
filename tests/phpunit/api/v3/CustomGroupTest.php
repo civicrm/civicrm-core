@@ -42,6 +42,9 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
   public $DBResetRequired = TRUE;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Custom Group Create',

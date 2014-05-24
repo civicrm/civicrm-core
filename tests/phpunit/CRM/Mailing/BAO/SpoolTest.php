@@ -77,6 +77,10 @@ class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
     $mail->walkParts( $context, $mail );
   }
 
+  /**
+   * @param $context
+   * @param $mailPart
+   */
   public static function mailWalkCallback( $context, $mailPart ) {
     if ( $mailPart instanceof ezcMailText ) {
       switch ( $mailPart->subType ) {

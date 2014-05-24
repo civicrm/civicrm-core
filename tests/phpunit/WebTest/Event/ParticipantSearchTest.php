@@ -31,6 +31,9 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
+  /**
+   * @param $strings
+   */
   function _checkStrings(&$strings) {
     // search for elements
     foreach ($strings as $string) {

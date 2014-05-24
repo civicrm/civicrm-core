@@ -107,6 +107,10 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     $this->memberAddTest($campaignTitle, $id);
   }
 
+  /**
+   * @param $campaignTitle
+   * @param $id
+   */
   function memberAddTest($campaignTitle, $id) {
     //Add new memebershipType
     $memTypeParams = $this->webtestAddMembershipType();

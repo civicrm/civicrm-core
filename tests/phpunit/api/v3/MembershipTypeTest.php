@@ -34,6 +34,9 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   protected $_entity = 'MembershipType';
 
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'MembershipType Create',

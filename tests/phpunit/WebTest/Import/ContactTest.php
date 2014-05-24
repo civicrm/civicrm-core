@@ -283,6 +283,9 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
   /*
    *  Helper function to provide data for contact import for Individuals.
    */
+  /**
+   * @return array
+   */
   function _individualCSVData() {
     $headers = array(
       'first_name' => 'First Name',
@@ -328,6 +331,9 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
   /*
    *  Helper function to provide data for contact import for Organizations.
    */
+  /**
+   * @return array
+   */
   function _organizationCSVData() {
     $headers = array(
       'organization_name' => 'Organization Name',
@@ -366,6 +372,9 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
 
   /*
    *  Helper function to provide data for contact import for Household.
+   */
+  /**
+   * @return array
    */
   function _householdCSVData() {
     $headers = array(

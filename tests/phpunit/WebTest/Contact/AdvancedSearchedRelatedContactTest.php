@@ -136,6 +136,10 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->_testSearchResult($relType);
   }
 
+  /**
+   * @param $eventTitle
+   * @param $eventDescription
+   */
   function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
@@ -161,6 +165,9 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->click("_qf_EventInfo_upload-bottom");
   }
 
+  /**
+   * @param $streetAddress
+   */
   function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -181,6 +188,11 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->waitForText('crm-notification-container', "'Event Location' information has been saved.");
   }
 
+  /**
+   * @param bool $discount
+   * @param bool $priceSet
+   * @param $processorId
+   */
   function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorId) {
     // Go to Fees tab
     $this->click("link=Fees");
@@ -211,6 +223,11 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->waitForTextPresent("'Fees' information has been saved.");
   }
 
+  /**
+   * @param $ContactName
+   * @param $relatedName
+   * @param $relType
+   */
   function _testAddRelationship($ContactName, $relatedName, $relType) {
 
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
@@ -263,6 +280,9 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->assertElementContainsText("xpath=//table[@class='crm-info-panel']", $relType);
   }
 
+  /**
+   * @param $relType
+   */
   function _testSearchResult($relType) {
 
     //search related contact using Advanced Search

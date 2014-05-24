@@ -37,6 +37,9 @@ class test_extension_manager_reporttest extends CRM_Core_Report {
     }
   }
 
+  /**
+   * @return string
+   */
   protected function whoWhomWhenSql() {
     return "
             SELECT who.id who_id, who.display_name who_name, whom.id whom_id, whom.display_name whom_name, l.is_deleted

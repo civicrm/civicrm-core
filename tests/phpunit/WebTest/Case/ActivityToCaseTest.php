@@ -82,6 +82,12 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->_testAddNewActivity($firstName, $subject, $customGroupTitle, $contactName);
   }
 
+  /**
+   * @param $firstName
+   * @param $caseSubject
+   * @param $customGroupTitle
+   * @param $contactName
+   */
   function _testAddNewActivity($firstName, $caseSubject, $customGroupTitle, $contactName) {
     $customDataParams = $this->_addCustomData($customGroupTitle);
     //$customDataParams = array( 'optionLabel_47d58', 'custom_8_-1' );
@@ -216,6 +222,11 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=table#crm-activity-view-table tr.crm-case-activityview-form-block-groupTitle");
   }
 
+  /**
+   * @param $customGroupTitle
+   *
+   * @return array
+   */
   function _addCustomData($customGroupTitle) {
 
     $this->openCiviPage('admin/custom/group', 'reset=1');

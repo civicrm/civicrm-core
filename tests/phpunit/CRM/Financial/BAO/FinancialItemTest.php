@@ -30,6 +30,9 @@ require_once 'CRM/Financial/BAO/FinancialAccount.php';
 
 class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name'        => 'FinancialItem BAOs',

@@ -109,6 +109,10 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->activityAddTest($campaignTitle, $id);
   }
 
+  /**
+   * @param $campaignTitle
+   * @param $id
+   */
   function activityAddTest($campaignTitle, $id) {
     // Adding Adding contact with randomized first name for test testContactContextActivityAdd
     // We're using Quick Add block on the main page for this.

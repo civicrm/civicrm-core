@@ -115,6 +115,10 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
     $this->pledgeAddTest($campaignTitle, $id);
   }
 
+  /**
+   * @param $campaignTitle
+   * @param $id
+   */
   function pledgeAddTest($campaignTitle, $id) {
     // create unique name
     $name = substr(sha1(rand()), 0, 7);

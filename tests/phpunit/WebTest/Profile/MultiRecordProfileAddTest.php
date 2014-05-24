@@ -60,6 +60,13 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->_deleteProfile($id, $profileTitle);
   }
 
+  /**
+   * @param bool $checkMultiRecord
+   * @param bool $checkSearchable
+   * @param bool $userCheck
+   *
+   * @return array
+   */
   function _addNewProfile($checkMultiRecord = TRUE, $checkSearchable = FALSE, $userCheck = FALSE) {
     $params = $this->_testCustomAdd($checkSearchable);
 
@@ -287,6 +294,10 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     return array($gid, $profileTitle);
   }
 
+  /**
+   * @param $gid
+   * @param $profileTitle
+   */
   function _deleteProfile($gid, $profileTitle) {
     $this->webtestLogin();
     $this->openCiviPage("admin/uf/group", "action=delete&id={$gid}", '_qf_Group_next-bottom');
@@ -295,6 +306,11 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('crm-container', "Your CiviCRM Profile '{$profileTitle}' has been deleted.");
   }
 
+  /**
+   * @param $checkSearchable
+   *
+   * @return mixed
+   */
   function _testCustomAdd($checkSearchable) {
 
     $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
@@ -360,6 +376,12 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     return $params;
   }
 
+  /**
+   * @param string $context
+   * @param string $parentElement
+   *
+   * @return mixed
+   */
   function _addRecords($context = 'Edit', $parentElement = '//') {
     $params['text'] = 'text' . substr(sha1(rand()), 0, 3);
     $this->waitForElementPresent("//div[@id='crm-profile-block']/div/div[2]/input[@class='crm-form-text required']");

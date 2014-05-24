@@ -572,6 +572,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
+  /**
+   * @param $profileTitle
+   * @param $customDataArr
+   * @param $profileFor
+   */
   function _addProfile($profileTitle, $customDataArr, $profileFor) {
 
     $this->openCiviPage('admin/uf/group', 'reset=1');
@@ -599,6 +604,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $profileFor
+   *
+   * @return array
+   */
   function _addCustomData($profileFor) {
     $returnArray = array();
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 4);

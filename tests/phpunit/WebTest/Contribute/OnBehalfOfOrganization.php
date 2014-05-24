@@ -554,6 +554,11 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
      $this->_testOrganization($pageId, $cid, $pageTitle);
   }
 
+  /**
+   * @param $pageId
+   * @param $cid
+   * @param $pageTitle
+   */
   function _testOrganization($pageId, $cid, $pageTitle) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
@@ -580,6 +585,11 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
   }
 
+  /**
+   * @param $pageId
+   * @param $cid
+   * @param $pageTitle
+   */
   function _testAnomoyousOganization($pageId, $cid, $pageTitle) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
@@ -650,6 +660,11 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $pageId
+   * @param $cid
+   * @param $pageTitle
+   */
   function _testUserWithOneRelationship($pageId, $cid, $pageTitle) {
     $this->webtestLogin('admin');
 
@@ -891,6 +906,11 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent('Selected Profile Field has been deleted.'), "Status message didn't show up after saving!");
   }
 
+  /**
+   * @param $pageId
+   * @param $cid
+   * @param $pageTitle
+   */
   function _testUserWithMoreThanOneRelationship($pageId, $cid, $pageTitle) {
     $this->webtestLogin('admin');
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -1362,6 +1382,11 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Selected Profile Field has been deleted.");
   }
 
+  /**
+   * @param $pageId
+   * @param $cid
+   * @param $pageTitle
+   */
   function _testOrganizationWithImageUpload($pageId, $cid, $pageTitle) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", '_qf_Main_upload-bottom');
