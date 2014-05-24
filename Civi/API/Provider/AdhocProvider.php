@@ -34,6 +34,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
 
+  /**
+   * @return array
+   */
   public static function getSubscribedEvents() {
     return array(
       Events::RESOLVE => array(
@@ -83,6 +86,9 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
     return $this;
   }
 
+  /**
+   * @param \Civi\API\Event\ResolveEvent $event
+   */
   public function onApiResolve(\Civi\API\Event\ResolveEvent $event) {
     $apiRequest = $event->getApiRequest();
     if ($this->matchesRequest($apiRequest)) {
@@ -92,6 +98,9 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
     }
   }
 
+  /**
+   * @param \Civi\API\Event\AuthorizeEvent $event
+   */
   public function onApiAuthorize(\Civi\API\Event\AuthorizeEvent $event) {
     $apiRequest = $event->getApiRequest();
     if ($this->matchesRequest($apiRequest) && \CRM_Core_Permission::check($this->actions[strtolower($apiRequest['action'])]['perm'])) {
@@ -126,6 +135,11 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
     }
   }
 
+  /**
+   * @param $apiRequest
+   *
+   * @return bool
+   */
   public function matchesRequest($apiRequest) {
     return $apiRequest['entity'] == $this->entity && $apiRequest['version'] == $this->version && isset($this->actions[strtolower($apiRequest['action'])]);
   }
