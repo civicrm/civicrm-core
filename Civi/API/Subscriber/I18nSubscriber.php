@@ -29,13 +29,25 @@ namespace Civi\API\Subscriber;
 use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Class I18nSubscriber
+ * @package Civi\API\Subscriber
+ */
 class I18nSubscriber implements EventSubscriberInterface {
+  /**
+   * @return array
+   */
   public static function getSubscribedEvents() {
     return array(
       Events::PREPARE => array('onApiPrepare', Events::W_MIDDLE)
     );
   }
 
+  /**
+   * @param \Civi\API\Event\Event $event
+   *
+   * @throws \API_Exception
+   */
   public function onApiPrepare(\Civi\API\Event\Event $event) {
     $apiRequest = $event->getApiRequest();
 

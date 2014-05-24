@@ -27,12 +27,21 @@
 
 namespace Civi\API\Event;
 
+/**
+ * Class RespondEvent
+ * @package Civi\API\Event
+ */
 class RespondEvent extends Event {
   /**
    * @var mixed
    */
   private $response;
 
+  /**
+   * @param $apiProvider
+   * @param $apiRequest
+   * @param $response
+   */
   function __construct($apiProvider, $apiRequest, $response) {
     $this->response = $response;
     parent::__construct($apiProvider, $apiRequest);
