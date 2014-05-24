@@ -2,8 +2,14 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Utils_RuleTest
+ */
 class CRM_Utils_RuleTest extends CiviUnitTestCase {
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name'      => 'Rule Test',

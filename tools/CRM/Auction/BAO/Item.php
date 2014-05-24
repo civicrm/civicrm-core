@@ -35,6 +35,10 @@
 
 
 require_once 'CRM/Auction/DAO/Auction.php';
+
+/**
+ * Class CRM_Auction_BAO_Item
+ */
 class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
 
   /**

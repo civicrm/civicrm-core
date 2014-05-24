@@ -21,9 +21,9 @@ define('CCRM_EXTVALID_XMLFILE_FIELD', 'field_extension_release_xml');
   function ccrm_extensionvalidation_node_validate($node, $form, &$form_state) {
     // Make sure author of extension is in maintainers
     if ('extension' == $node->type) {
-      $authornid = $node->uid;  $delta = 0;  $foundauthor = FALSE; 
+      $authornid = $node->uid;  $delta = 0;  $foundauthor = FALSE;
       foreach ($form_state['values']['field_maintainers'][LANGUAGE_NONE] as $index => $ref) {
-        if (is_numeric($ref['target_id']) 
+        if (is_numeric($ref['target_id'])
             && $form_state['values']['field_maintainers'][LANGUAGE_NONE][$index]['target_id'] == $authornid) {
           $foundauthor = TRUE;
         }
@@ -39,7 +39,7 @@ define('CCRM_EXTVALID_XMLFILE_FIELD', 'field_extension_release_xml');
       $parentnid = $node->field_extension_nr_crm[LANGUAGE_NONE][0]['nid'];
     }
     if ($node->type == 'extension_release_cms') {
-      $parentnid = $node->field_extension_nr_cms[LANGUAGE_NONE][0]['nid'];      
+      $parentnid = $node->field_extension_nr_cms[LANGUAGE_NONE][0]['nid'];
     }
     if ($node->type == 'extension_release_civicrm' || $node->type == 'extension_release_cms') {
       $parent_node = is_numeric($parentnid) ? node_load($parentnid) : NULL;
@@ -54,7 +54,7 @@ define('CCRM_EXTVALID_XMLFILE_FIELD', 'field_extension_release_xml');
         if (is_numeric($ref['target_id'])) {
           $form_state['values']['field_extension_release_na_mains'][LANGUAGE_NONE][$index]['target_id'] = NULL;
         }
-      } 
+      }
       // Check parent node has maintainers set and add maintainers from parent
       $delta = 0;
       foreach ($parent_node->field_maintainers[LANGUAGE_NONE] as $index => $ref) {
@@ -84,11 +84,17 @@ define('CCRM_EXTVALID_XMLFILE_FIELD', 'field_extension_release_xml');
       _ccrmextvalid_validatexml($node, $form, &$form_state, $parent_node);
     }
   }
-  
-  function _ccrmextvalid_validatexml($node, $form, &$form_state, $parent_node) {    
-    $keeperrors =  array();    
+
+/**
+ * @param $node
+ * @param $form
+ * @param $form_state
+ * @param $parent_node
+ */
+function _ccrmextvalid_validatexml($node, $form, &$form_state, $parent_node) {
+    $keeperrors =  array();
     $file_id = $form_state['values'][CCRM_EXTVALID_XMLFILE_FIELD][LANGUAGE_NONE][0]['fid'];
-  
+
     if ($file_id != 0) {
       $file = file_load($file_id);
       if ($file) {
@@ -96,7 +102,7 @@ define('CCRM_EXTVALID_XMLFILE_FIELD', 'field_extension_release_xml');
         $doc = new DOMDocument();
         $doc->recover = TRUE;
         $doc->strictErrorChecking = FALSE;
-   
+
         if ($doc->load(drupal_realpath($file->uri))) {
           // Initialize variables to be read
           $got = array('version' => FALSE, 'releaseDate' => FALSE, 'develStage' => FALSE,
@@ -133,7 +139,19 @@ define('CCRM_EXTVALID_XMLFILE_FIELD', 'field_extension_release_xml');
   }
 
   // return whether we had a
-  function _ccrmextvalid_validateTag($node, $form, &$form_state, $doc, $tag, &$tagcontents, &$keeperrors, $parent_node) {
+/**
+ * @param $node
+ * @param $form
+ * @param $form_state
+ * @param $doc
+ * @param $tag
+ * @param $tagcontents
+ * @param $keeperrors
+ * @param $parent_node
+ *
+ * @return bool
+ */
+function _ccrmextvalid_validateTag($node, $form, &$form_state, $doc, $tag, &$tagcontents, &$keeperrors, $parent_node) {
     $gotit = FALSE; $tagcount = 0; $contents = '';
     switch ($tag) {
       case 'version':
@@ -225,7 +243,13 @@ define('CCRM_EXTVALID_XMLFILE_FIELD', 'field_extension_release_xml');
     return $gotit;
   }
 
-  function _ccrmextvalid_assignTag($form, &$form_state, $tag, &$tagcontents) {
+/**
+ * @param $form
+ * @param $form_state
+ * @param $tag
+ * @param $tagcontents
+ */
+function _ccrmextvalid_assignTag($form, &$form_state, $tag, &$tagcontents) {
     // Add $tagcontents to $form_state
     switch ($tag) {
       case 'version':
@@ -252,7 +276,14 @@ define('CCRM_EXTVALID_XMLFILE_FIELD', 'field_extension_release_xml');
   }
 
   // Get the value of a single tag from the XML that should only have one value
-  function _ccrmextvalid_getOneReqdByTag($doc, $tagname, &$values) {
+/**
+ * @param $doc
+ * @param $tagname
+ * @param $values
+ *
+ * @return mixed
+ */
+function _ccrmextvalid_getOneReqdByTag($doc, $tagname, &$values) {
     $defaultval = $values;
     $tagcount = _ccrmextvalid_getByTag($doc, $tagname, &$values);
     if ($tagcount > 1) {
@@ -263,7 +294,14 @@ define('CCRM_EXTVALID_XMLFILE_FIELD', 'field_extension_release_xml');
   }
 
   // Get all tags by value from the XML
-  function _ccrmextvalid_getByTag($doc, $tagname, &$values) {
+/**
+ * @param $doc
+ * @param $tagname
+ * @param $values
+ *
+ * @return mixed
+ */
+function _ccrmextvalid_getByTag($doc, $tagname, &$values) {
     $domnodes = $doc->getElementsByTagName($tagname);
     $nodecount = $domnodes->length;
     if ($nodecount > 0) {
@@ -282,7 +320,13 @@ define('CCRM_EXTVALID_XMLFILE_FIELD', 'field_extension_release_xml');
   }
 
   // Compare a value with the allowed values (lower case)
-  function _ccrmextvalid_checkallowedval($vals, $fieldname) {
+/**
+ * @param $vals
+ * @param $fieldname
+ *
+ * @return array
+ */
+function _ccrmextvalid_checkallowedval($vals, $fieldname) {
     $retvals = array();
     $vals = !is_array($vals) ? array($vals) : $vals;
     $fld = field_info_field($fieldname);
@@ -312,21 +356,39 @@ define('CCRM_EXTVALID_XMLFILE_FIELD', 'field_extension_release_xml');
   }
 
   // Little helper function for array_map
-  function _ccrmextvalid_mapversionval($val) {
+/**
+ * @param $val
+ *
+ * @return string
+ */
+function _ccrmextvalid_mapversionval($val) {
     return "civicrm {$val}";
   }
 
   // Little helper function for array_map
-  function _ccrmextvalid_mapversionvaltid($val) {
+/**
+ * @param $val
+ *
+ * @return array
+ */
+function _ccrmextvalid_mapversionvaltid($val) {
     return array( 'tid' => $val);
   }
 
-  function _ccrmextvalid_seterror( $name, $message, &$keeperrors) {
+/**
+ * @param $name
+ * @param $message
+ * @param $keeperrors
+ */
+function _ccrmextvalid_seterror( $name, $message, &$keeperrors) {
     // Form_set_error can only happen once on an element so collect the errors
     $keeperrors[$name] = empty($keeperrors[$name]) ? $message : $keeperrors[$name] . " " . $message;
   }
 
-  function _ccrmextvalid_formseterror($errors) {
+/**
+ * @param $errors
+ */
+function _ccrmextvalid_formseterror($errors) {
     foreach ($errors as $name => $err) {
       // No other field is working reliably, tried the file upload button & others so usually use title
       form_set_error(check_plain($name), check_plain($err));

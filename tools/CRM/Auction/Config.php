@@ -37,5 +37,9 @@
  */
 
 require_once 'CRM/Core/Component/Config.php';
+
+/**
+ * Class CRM_Auction_Config
+ */
 class CRM_Auction_Config extends CRM_Core_Component_Config {}
 

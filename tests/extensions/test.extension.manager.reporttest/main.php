@@ -1,6 +1,12 @@
 <?php
 
+/**
+ * Class test_extension_manager_reporttest
+ */
 class test_extension_manager_reporttest extends CRM_Core_Report {
+  /**
+   *
+   */
   function __construct() {
     $logging        = new CRM_Logging_Schema;
     $this->tables[] = 'civicrm_contact';

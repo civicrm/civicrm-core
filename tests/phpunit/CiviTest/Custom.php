@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class Custom
+ */
 class Custom extends CiviUnitTestCase {
   /**
    * Helper function to create Custom Group

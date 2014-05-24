@@ -2,6 +2,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Core_Smarty_plugins_CrmScopeTest
+ */
 class CRM_Core_Smarty_plugins_CrmScopeTest extends CiviUnitTestCase {
   function setUp() {
     parent::setUp();
