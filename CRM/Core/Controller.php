@@ -46,6 +46,9 @@
 require_once 'HTML/QuickForm/Controller.php';
 require_once 'HTML/QuickForm/Action/Direct.php';
 
+/**
+ * Class CRM_Core_Controller
+ */
 class CRM_Core_Controller extends HTML_QuickForm_Controller {
 
   /**

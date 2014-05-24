@@ -110,6 +110,11 @@ SELECT object_table
     $this->addFormRule(array('CRM_ACL_Form_ACLBasic', 'formRule'));
   }
 
+  /**
+   * @param $params
+   *
+   * @return array|bool
+   */
   static function formRule($params) {
     if ($params['entity_id'] == -1) {
       $errors = array('entity_id' => ts('Role is a required field'));

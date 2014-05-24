@@ -37,6 +37,10 @@ require_once 'Google/library/googlecart.php';
 require_once 'Google/library/googleitem.php';
 require_once 'Google/library/googlesubscription.php';
 require_once 'Google/library/googlerequest.php';
+
+/**
+ * Class CRM_Core_Payment_Google
+ */
 class CRM_Core_Payment_Google extends CRM_Core_Payment {
 
   /**
@@ -161,6 +165,10 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
     $this->submitPostParams($params, $component, $cart);
   }
 
+  /**
+   * @param $params
+   * @param $component
+   */
   function doRecurCheckout(&$params, $component) {
     $intervalUnit = CRM_Utils_Array::value('frequency_unit', $params);
     if ($intervalUnit == 'week') {
@@ -345,6 +353,11 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
     return self::getArrayFromXML($xmlResponse);
   }
 
+  /**
+   * @param $searchParams
+   *
+   * @return string
+   */
   static function buildXMLQuery($searchParams) {
     $xml = '<?xml version="1.0" encoding="UTF-8"?>
 <notification-history-request xmlns="http://checkout.google.com/schema/2">';
@@ -378,6 +391,11 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
     return $xml;
   }
 
+  /**
+   * @param $xmlData
+   *
+   * @return array
+   */
   static function getArrayFromXML($xmlData) {
     require_once 'Google/library/xml-processing/gc_xmlparser.php';
     $xmlParser = new gc_XmlParser($xmlData);
@@ -387,6 +405,12 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
     return array($root, $data);
   }
 
+  /**
+   * @param null $errorCode
+   * @param null $errorMessage
+   *
+   * @return object
+   */
   function &error($errorCode = NULL, $errorMessage = NULL) {
     $e = &CRM_Core_Error::singleton();
     if ($errorCode) {
@@ -398,10 +422,19 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
     return $e;
   }
 
+  /**
+   * @return string
+   */
   function accountLoginURL() {
     return ($this->_mode == 'test') ? 'https://sandbox.google.com/checkout/sell' : 'https://checkout.google.com/';
   }
 
+  /**
+   * @param string $message
+   * @param array $params
+   *
+   * @return bool|object
+   */
   function cancelSubscription(&$message = '', $params = array(
     )) {
     $orderNo = CRM_Utils_Array::value('subscriptionId', $params);

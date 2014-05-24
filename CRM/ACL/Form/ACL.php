@@ -186,6 +186,11 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     $this->addFormRule(array('CRM_ACL_Form_ACL', 'formRule'));
   }
 
+  /**
+   * @param $params
+   *
+   * @return bool
+   */
   static function formRule($params) {
     $showHide = new CRM_Core_ShowHideBlocks();
 

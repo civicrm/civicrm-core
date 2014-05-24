@@ -25,6 +25,17 @@ class CRM_Core_CodeGen_Main {
    */
   var $digest;
 
+  /**
+   * @param $CoreDAOCodePath
+   * @param $sqlCodePath
+   * @param $phpCodePath
+   * @param $tplCodePath
+   * @param $smartyPluginDirs
+   * @param $argCms
+   * @param $argVersion
+   * @param $schemaPath
+   * @param $digestPath
+   */
   function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $smartyPluginDirs, $argCms, $argVersion, $schemaPath, $digestPath) {
     $this->CoreDAOCodePath = $CoreDAOCodePath;
     $this->sqlCodePath = $sqlCodePath;
@@ -159,6 +170,9 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     return $this->digest;
   }
 
+  /**
+   * @return array
+   */
   function getExpectedFiles() {
     return array(
       $this->sqlCodePath . '/civicrm.mysql',
@@ -166,6 +180,9 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     );
   }
 
+  /**
+   * @return bool
+   */
   function hasExpectedFiles() {
     foreach ($this->getExpectedFiles() as $file) {
       if (!file_exists($file)) {
