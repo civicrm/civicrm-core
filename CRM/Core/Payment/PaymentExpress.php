@@ -115,14 +115,29 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
     }
   }
 
+  /**
+   * @param $params
+   *
+   * @throws Exception
+   */
   function setExpressCheckOut(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
+  /**
+   * @param $token
+   *
+   * @throws Exception
+   */
   function getExpressCheckoutDetails($token) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
+  /**
+   * @param $params
+   *
+   * @throws Exception
+   */
   function doExpressCheckout(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }

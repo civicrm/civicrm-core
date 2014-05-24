@@ -74,6 +74,12 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     }
   }
 
+  /**
+   * @param string $mode
+   * @param array $paymentProcessor
+   *
+   * @return mixed
+   */
   static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
@@ -255,6 +261,11 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     }
   }
 
+  /**
+   * @param null $error
+   *
+   * @return object
+   */
   function &error($error = NULL) {
     $e = CRM_Core_Error::singleton();
     if (is_object($error)) {
@@ -281,6 +292,11 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     return $e;
   }
 
+  /**
+   * @param $error_id
+   *
+   * @return string
+   */
   function errorString($error_id) {
     $errors = array(
       1 => 'Agent Code has not been set up on the authorization system.',
