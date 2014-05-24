@@ -111,6 +111,10 @@ require_once 'CRM/Contact/DAO/Relationship.php';
 require_once 'CRM/Event/DAO/Participant.php';
 require_once 'CRM/Contribute/DAO/ContributionSoft.php';
 require_once 'CRM/Member/DAO/MembershipPayment.php';
+
+/**
+ * Class CRM_GCD
+ */
 class CRM_GCD {
 
   /*******************************************************
@@ -255,24 +259,43 @@ class CRM_GCD {
     return $string;
   }
 
+  /**
+   * @return string
+   */
   private function _getRandomChar() {
     return chr(mt_rand(65, 90));
   }
 
+  /**
+   * @return int
+   */
   private function getRandomBoolean() {
     return mt_rand(0, 1);
   }
 
+  /**
+   * @param $array1
+   *
+   * @return mixed
+   */
   private function _getRandomElement(&$array1) {
     return $array1[mt_rand(1, count($array1)) - 1];
   }
 
+  /**
+   * @param $array1
+   *
+   * @return int
+   */
   private function _getRandomIndex(&$array1) {
     return mt_rand(1, count($array1));
   }
 
 
   // country state city combo
+  /**
+   * @return array
+   */
   private function _getRandomCSC() {
     $array1 = array();
 
@@ -347,6 +370,9 @@ class CRM_GCD {
 
 
   // insert data into db's
+  /**
+   * @param $dao
+   */
   private function _insert(&$dao) {
     if (self::ADD_TO_DB) {
       if (!$dao->insert()) {
@@ -358,6 +384,9 @@ class CRM_GCD {
   }
 
   // update data into db's
+  /**
+   * @param $dao
+   */
   private function _update($dao) {
     if (self::ADD_TO_DB) {
       if (!$dao->update()) {
@@ -523,6 +552,11 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @param $id
+   *
+   * @return string
+   */
   public function getContactType($id) {
     if (in_array($id, $this->individual)) {
       return 'Individual';
@@ -613,6 +647,9 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @return string
+   */
   public function randomName() {
     $prefix      = $this->_getRandomIndex($this->prefix);
     $first_name  = ucfirst($this->_getRandomElement($this->firstName));
@@ -861,6 +898,12 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @param $locationTypeId
+   * @param $contactId
+   * @param bool $domain
+   * @param bool $isPrimary
+   */
   private function _addLocation($locationTypeId, $contactId, $domain = FALSE, $isPrimary = TRUE) {
     $this->_addAddress($locationTypeId, $contactId, $isPrimary);
 
@@ -882,6 +925,13 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @param $locationTypeId
+   * @param $contactId
+   * @param bool $isPrimary
+   * @param null $locationBlockID
+   * @param int $offset
+   */
   private function _addAddress($locationTypeId, $contactId, $isPrimary = FALSE, $locationBlockID = NULL, $offset = 1) {
     $addressDAO = new CRM_Core_DAO_Address();
 
@@ -910,11 +960,24 @@ class CRM_GCD {
     $this->_insert($addressDAO);
   }
 
+  /**
+   * @param $sortName
+   *
+   * @return mixed
+   */
   private function _sortNameToEmail($sortName) {
     $email = preg_replace("([^a-zA-Z0-9_-]*)", "", $sortName);
     return $email;
   }
 
+  /**
+   * @param $locationTypeId
+   * @param $contactId
+   * @param $phoneType
+   * @param bool $isPrimary
+   * @param null $locationBlockID
+   * @param int $offset
+   */
   private function _addPhone($locationTypeId, $contactId, $phoneType, $isPrimary = FALSE, $locationBlockID = NULL, $offset = 1) {
     if ($contactId % 3) {
       $phone = new CRM_Core_DAO_Phone();
@@ -927,6 +990,14 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @param $locationTypeId
+   * @param $contactId
+   * @param $sortName
+   * @param bool $isPrimary
+   * @param null $locationBlockID
+   * @param int $offset
+   */
   private function _addEmail($locationTypeId, $contactId, $sortName, $isPrimary = FALSE, $locationBlockID = NULL, $offset = 1) {
     if ($contactId % 2) {
       $email = new CRM_Core_DAO_Email();
@@ -1160,6 +1231,9 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @return array
+   */
   static function getZipCodeInfo() {
     $stateID = mt_rand(1000, 5132);
     $offset = mt_rand(1, 4132);
@@ -1174,6 +1248,11 @@ class CRM_GCD {
     return array();
   }
 
+  /**
+   * @param $zipCode
+   *
+   * @return array
+   */
   static function getLatLong($zipCode) {
     $query = "http://maps.google.com/maps?q=$zipCode&output=js";
     $userAgent = "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.7.5) Gecko/20041107 Firefox/1.0";
@@ -1297,6 +1376,11 @@ VALUES
     CRM_Core_DAO::executeQuery($activity, CRM_Core_DAO::$_nullArray);
   }
 
+  /**
+   * @param $date
+   *
+   * @return string
+   */
   static function repairDate($date) {
     $dropArray = array('-' => '', ':' => '', ' ' => '');
     return strtr($date, $dropArray);
@@ -1603,10 +1687,18 @@ VALUES
   }
 }
 
+/**
+ * @param null $str
+ *
+ * @return bool
+ */
 function user_access($str = NULL) {
   return TRUE;
 }
 
+/**
+ * @return array
+ */
 function module_list() {
   return array();
 }

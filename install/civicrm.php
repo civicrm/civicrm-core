@@ -56,6 +56,10 @@ function civicrm_setup($filesDirectory) {
   $compileDir = addslashes($compileDir);
 }
 
+/**
+ * @param $name
+ * @param $buffer
+ */
 function civicrm_write_file($name, &$buffer) {
   $fd = fopen($name, "w");
   if (!$fd) {
@@ -65,6 +69,9 @@ function civicrm_write_file($name, &$buffer) {
   fclose($fd);
 }
 
+/**
+ * @param $config
+ */
 function civicrm_main(&$config) {
   global $sqlPath, $crmPath, $cmsPath, $installType;
 
@@ -115,6 +122,11 @@ function civicrm_main(&$config) {
 
 }
 
+/**
+ * @param $dsn
+ * @param $fileName
+ * @param bool $lineMode
+ */
 function civicrm_source($dsn, $fileName, $lineMode = FALSE) {
   global $crmPath;
   require_once "$crmPath/packages/DB.php";
@@ -167,6 +179,11 @@ function civicrm_source($dsn, $fileName, $lineMode = FALSE) {
   }
 }
 
+/**
+ * @param $config
+ *
+ * @return string
+ */
 function civicrm_config(&$config) {
   global $crmPath, $comPath;
   global $compileDir;
@@ -219,6 +236,9 @@ function civicrm_config(&$config) {
   return trim($str);
 }
 
+/**
+ * @return string
+ */
 function civicrm_cms_base() {
   global $installType;
 
@@ -269,6 +289,9 @@ function civicrm_cms_base() {
   return $url . $baseURL;
 }
 
+/**
+ * @return string
+ */
 function civicrm_home_url() {
   $drupalURL = civicrm_cms_base();
   return $drupalURL . 'index.php?q=civicrm';

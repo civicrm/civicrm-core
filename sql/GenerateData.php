@@ -93,6 +93,10 @@ require_once '../civicrm.config.php';
 // autoload
 require_once 'CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
+
+/**
+ * Class CRM_GCD
+ */
 class CRM_GCD {
 
   /**
@@ -275,6 +279,9 @@ class CRM_GCD {
     return $string;
   }
 
+  /**
+   * @return string
+   */
   private function randomChar() {
     return chr(mt_rand(65, 90));
   }
@@ -300,15 +307,30 @@ class CRM_GCD {
     return $items[mt_rand(0, count($items) - 1)];
   }
 
+  /**
+   * @param $items
+   *
+   * @return mixed
+   */
   private function randomIndex($items) {
     return $this->randomItem(array_keys($items));
   }
 
+  /**
+   * @param $items
+   *
+   * @return array
+   */
   private function randomKeyValue($items) {
     $key = $this->randomIndex($items);
     return array($key, $items[$key]);
   }
 
+  /**
+   * @param $chance
+   *
+   * @return int
+   */
   private function probability($chance) {
     if (mt_rand(0, 100) < ($chance * 100)) {
       return 1;
@@ -457,6 +479,9 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @return string
+   */
   public function randomName() {
     $first_name = $this->randomItem(($this->probability(.5) ? 'fe' : '') . 'male_name');
     $middle_name = ucfirst($this->randomChar());
@@ -1188,6 +1213,9 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @return array
+   */
   function getZipCodeInfo() {
 
     if (!$this->stateMap) {
@@ -1219,6 +1247,11 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @param $zipCode
+   *
+   * @return array
+   */
   static function getLatLong($zipCode) {
     $query = "http://maps.google.com/maps?q=$zipCode&output=js";
     $userAgent = "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.7.5) Gecko/20041107 Firefox/1.0";
@@ -1364,6 +1397,11 @@ VALUES
     $this->_query($activityContact);
   }
 
+  /**
+   * @param $date
+   *
+   * @return string
+   */
   static function repairDate($date) {
     $dropArray = array('-' => '', ':' => '', ' ' => '');
     return strtr($date, $dropArray);
@@ -1805,6 +1843,10 @@ WHERE cefa.account_relationship = 1";
     $this->addFinancialItem($result);
   }
 
+  /**
+   * @param $result
+   * @param null $financialAccountId
+   */
   private function addFinancialItem($result, $financialAccountId = NULL) {
     $defaultFinancialAccount = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1");
     while($result->fetch()){
@@ -1915,10 +1957,18 @@ AND    a.details = 'Participant Payment'
   }
 }
 
+/**
+ * @param null $str
+ *
+ * @return bool
+ */
 function user_access($str = NULL) {
   return TRUE;
 }
 
+/**
+ * @return array
+ */
 function module_list() {
   return array();
 }

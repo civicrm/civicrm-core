@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class AuthorizeNet
+ */
 class AuthorizeNet extends PHPUnit_Framework_Testcase {
   /*
      * Helper function to create
