@@ -169,6 +169,9 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     return self::$_petitionActionLinks;
   }
 
+  /**
+   * @return mixed
+   */
   function browseCampaign() {
     // ensure valid javascript (these must have a value set)
     $this->assign('searchParams', json_encode(NULL));
