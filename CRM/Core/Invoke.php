@@ -416,4 +416,3 @@ class CRM_Core_Invoke {
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }
 }
-

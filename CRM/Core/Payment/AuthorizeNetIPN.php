@@ -83,10 +83,12 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * @param $input
-   * @param $ids
+   * @param array $input
+   * @param array $ids
    * @param $objects
    * @param $first
+   *
+   * @return bool
    */
   function recur(&$input, &$ids, &$objects, $first) {
     $recur = &$objects['contributionRecur'];
@@ -179,7 +181,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
       // the recurring contribution has declined a payment or has failed
       // so we just fix the recurring contribution and not change any of
-      // the existing contribiutions
+      // the existing contributions
       // CRM-9036
       return TRUE;
     }

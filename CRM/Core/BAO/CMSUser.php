@@ -260,7 +260,7 @@ class CRM_Core_BAO_CMSUser {
    * @param object $form
    * @param integer $gid id of group of profile
    * @param bool $emailPresent true if the profile field has email(primary)
-   * @param const $action
+   * @param \const|int $action
    *
    * @return FALSE|void WTF
    *

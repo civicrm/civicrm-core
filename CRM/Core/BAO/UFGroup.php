@@ -3456,7 +3456,7 @@ SELECT  group_id
   }
 
   /**
-   * Funtion to determine of we show overlay profile or not
+   * Function to determine of we show overlay profile or not
    *
    * @return boolean true if profile should be shown else false
    * @static

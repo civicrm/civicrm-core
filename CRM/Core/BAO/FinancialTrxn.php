@@ -155,7 +155,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *
    * @internal param string $entityTable name of the entity table usually 'civicrm_contact'
    * @internal param int $entityID id of the entity usually the contactID.
-   * @return array( ) reference $tag array of catagory id's the contact belongs to.
+   * @return array( ) reference $tag array of category id's the contact belongs to.
    *
    * @access public
    * @static
