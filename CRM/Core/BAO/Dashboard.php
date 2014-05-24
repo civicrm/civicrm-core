@@ -120,6 +120,12 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     return $defaultDashlet ? $defaultDashlet : $dashlets;
   }
 
+  /**
+   * @param $hasDashlets
+   *
+   * @return bool
+   * @throws CiviCRM_API3_Exception
+   */
   static function initializeDashlets($hasDashlets) {
     $getDashlets = civicrm_api3("Dashboard", "get", array('domain_id' => CRM_Core_Config::domainID()));
     $contactID = CRM_Core_Session::singleton()->get('userID');
@@ -421,6 +427,11 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     return $dashlet;
   }
 
+  /**
+   * @param $url
+   *
+   * @return string
+   */
   static function getDashletName($url) {
     $urlElements = explode('/', $url);
     if ($urlElements[1] == 'dashlet') {

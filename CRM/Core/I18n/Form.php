@@ -78,6 +78,15 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
     $this->assign('context', CRM_Utils_Request::retrieve('context', 'String', $this));
   }
 
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array reference to the array of default values
+   *
+   */
   function setDefaultValues() {
     return $this->_defaults;
   }

@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class CRM_Core_CodeGen_Util_File
+ */
 class CRM_Core_CodeGen_Util_File {
   static function createDir($dir, $perm = 0755) {
     if (!is_dir($dir)) {
