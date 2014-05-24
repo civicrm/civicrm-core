@@ -32,6 +32,10 @@
  * Grateful acknowledgements go to Donald Lobo for invaluable assistance
  * in creating this payment processor module
  */
+
+/**
+ * Class CRM_Core_Payment_PaymentExpress
+ */
 class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
   CONST CHARSET = 'iso-8859-1';
 

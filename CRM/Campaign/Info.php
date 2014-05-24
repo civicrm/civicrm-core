@@ -41,6 +41,9 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
   protected $keyword = 'campaign';
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function getInfo() {
     return array(
       'name' => 'CiviCampaign',
@@ -53,6 +56,11 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
 
 
   // docs inherited from interface
+  /**
+   * @param bool $getAllUnconditionally
+   *
+   * @return array
+   */
   public function getPermissions($getAllUnconditionally = FALSE) {
     return array(
       'administer CiviCampaign',
@@ -67,34 +75,52 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
 
 
   // docs inherited from interface
+  /**
+   * @return null
+   */
   public function getUserDashboardElement() {
     // no dashboard element for this component
     return NULL;
   }
 
+  /**
+   * @return null
+   */
   public function getUserDashboardObject() {
     // no dashboard element for this component
     return NULL;
   }
 
   // docs inherited from interface
+  /**
+   * @return null
+   */
   public function registerTab() {
     // this component doesn't use contact record tabs
     return NULL;
   }
 
   // docs inherited from interface
+  /**
+   * @return null
+   */
   public function registerAdvancedSearchPane() {
     // this component doesn't use advanced search
     return NULL;
   }
 
   // docs inherited from interface
+  /**
+   * @return null
+   */
   public function getActivityTypes() {
     return NULL;
   }
 
   // add shortcut to Create New
+  /**
+   * @param $shortCuts
+   */
   public function creatNewShortcut(&$shortCuts) {
     if (CRM_Core_Permission::check('manage campaign') ||
       CRM_Core_Permission::check('administer CiviCampaign')

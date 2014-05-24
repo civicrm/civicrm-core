@@ -32,6 +32,10 @@
    * Grateful acknowledgements go to Donald Lobo for invaluable assistance
    * in creating this payment processor module
    */
+
+/**
+ * Class CRM_Core_Payment_PaymentExpressIPN
+ */
 class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
