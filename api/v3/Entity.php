@@ -1,7 +1,5 @@
 <?php
 
-require_once 'api/v3/utils.php';
-
 /**
  *  Placeholder function. This should never be called, as it doesn't have any meaning
  */

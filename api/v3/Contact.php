@@ -412,11 +412,10 @@ function _civicrm_api3_contact_update($params, $contactID = NULL) {
 /**
  * Validate the addressee or email or postal greetings
  *
- * @param  $params                   Associative array of property name/value
+ * @param  array $params  Associative array of property name/value
  *                                   pairs to insert in new contact.
  *
  * @throws API_Exception
- * @return array (reference )        null on success, error message otherwise
  *
  * @access public
  */

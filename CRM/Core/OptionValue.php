@@ -178,7 +178,7 @@ class CRM_Core_OptionValue {
    * @param  integer $optionValueID has the id of the optionValue being edited, disabled ..etc
    *
    * @internal param string $orderBy for orderBy clause
-   * @return array of option-values
+   * @return CRM_Core_DAO_OptionValue
    *
    * @access public
    * @static

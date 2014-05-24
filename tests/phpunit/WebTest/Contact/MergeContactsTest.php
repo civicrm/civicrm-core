@@ -677,7 +677,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
   /**
    * Helper FN
-   * to create new membershiptype
+   * to create new membership type
    */
   function addMembershipType($membershipOrganization) {
     $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");

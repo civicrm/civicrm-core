@@ -1607,11 +1607,11 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called before a case merge (or a case reassign)
    *
-   * @param type $mainContactId
-   * @param type $mainCaseId
-   * @param type $otherContactId
-   * @param type $otherCaseId
-   * @param bool|\type $changeClient
+   * @param integer $mainContactId
+   * @param integer $mainCaseId
+   * @param integer $otherContactId
+   * @param integer $otherCaseId
+   * @param bool $changeClient
    *
    * @return void
    */
@@ -1622,11 +1622,11 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called after a case merge (or a case reassign)
    *
-   * @param type $mainContactId
-   * @param type $mainCaseId
-   * @param type $otherContactId
-   * @param type $otherCaseId
-   * @param bool|\type $changeClient
+   * @param integer $mainContactId
+   * @param integer $mainCaseId
+   * @param integer $otherContactId
+   * @param integer $otherCaseId
+   * @param bool $changeClient
    *
    * @return void
    */

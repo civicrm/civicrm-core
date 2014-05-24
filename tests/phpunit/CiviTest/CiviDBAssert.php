@@ -119,6 +119,14 @@ class CiviDBAssert {
 
   /**
    * Compare a single column value in a retrieved DB record to an expected value
+   *
+   * @param $testCase
+   * @param $daoName
+   * @param $searchValue
+   * @param $returnColumn
+   * @param $searchColumn
+   * @param $expectedValue
+   * @param string $message
    */
   function assertDBCompareValue(&$testCase, $daoName, $searchValue, $returnColumn, $searchColumn,
     $expectedValue, $message

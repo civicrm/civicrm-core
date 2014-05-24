@@ -1119,6 +1119,12 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
 /**
  * Function to do a 'standard' api del - when the api is only doing a $bao::del then use this
  * if api::del doesn't exist it will try DAO delete method
+ *
+ * @param $bao_name
+ * @param $params
+ *
+ * @return array API result array
+ * @throws API_Exception
  */
 function _civicrm_api3_basic_delete($bao_name, &$params) {
 
