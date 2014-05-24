@@ -7,6 +7,11 @@
  */
 class CRM_Core_Reference_Dynamic extends CRM_Core_Reference_Basic {
 
+  /**
+   * @param string $tableName
+   *
+   * @return bool
+   */
   public function matchesTargetTable($tableName) {
     return TRUE;
   }
@@ -41,6 +46,11 @@ EOS;
     return $result;
   }
 
+  /**
+   * @param CRM_Core_DAO $targetDao
+   *
+   * @return array
+   */
   public function getReferenceCount($targetDao) {
     $targetColumn = $this->getTargetKey();
     $params = array(

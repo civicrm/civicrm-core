@@ -420,6 +420,9 @@ class CRM_Core_Selector_Controller {
     return $this->_object->getQill();
   }
 
+  /**
+   * @return mixed
+   */
   public function getSummary() {
     return $this->_object->getSummary();
   }
@@ -531,10 +534,16 @@ class CRM_Core_Selector_Controller {
     return $this->_print;
   }
 
+  /**
+   * @param $value
+   */
   function setDynamicAction($value) {
     $this->_dynamicAction = $value;
   }
 
+  /**
+   * @return bool
+   */
   function getDynamicAction() {
     return $this->_dynamicAction;
   }

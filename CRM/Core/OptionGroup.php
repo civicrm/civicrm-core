@@ -46,6 +46,15 @@ class CRM_Core_OptionGroup {
     'grant_type',
   );
 
+  /**
+   * @param $dao
+   * @param bool $flip
+   * @param bool $grouping
+   * @param bool $localize
+   * @param string $valueColumnName
+   *
+   * @return array
+   */
   static function &valuesCommon(
     $dao, $flip = FALSE, $grouping = FALSE,
     $localize = FALSE, $valueColumnName = 'label'
@@ -172,6 +181,9 @@ WHERE  v.option_group_id = g.id
     unset(self::$_cache[$cacheKey]);
   }
 
+  /**
+   * @return string
+   */
   protected static function createCacheKey() {
     $cacheKey = "CRM_OG_" . serialize(func_get_args());
     return $cacheKey;
@@ -305,6 +317,13 @@ WHERE  v.option_group_id = g.id
     }
   }
 
+  /**
+   * @param $groupName
+   * @param $value
+   * @param bool $onlyActiveValue
+   *
+   * @return null
+   */
   static function getLabel($groupName, $value, $onlyActiveValue = TRUE) {
     if (empty($groupName) ||
       empty($value)
@@ -334,6 +353,15 @@ WHERE  v.option_group_id = g.id
     return NULL;
   }
 
+  /**
+   * @param $groupName
+   * @param $label
+   * @param string $labelField
+   * @param string $labelType
+   * @param string $valueField
+   *
+   * @return null
+   */
   static function getValue($groupName,
     $label,
     $labelField = 'label',
@@ -458,6 +486,12 @@ WHERE  v.option_group_id = g.id
     return $group->id;
   }
 
+  /**
+   * @param $groupName
+   * @param $values
+   * @param bool $flip
+   * @param string $field
+   */
   static function getAssoc($groupName, &$values, $flip = FALSE, $field = 'name') {
     $query = "
 SELECT v.id as amount_id, v.value, v.label, v.name, v.description, v.weight
@@ -498,6 +532,10 @@ ORDER BY v.weight
     }
   }
 
+  /**
+   * @param $groupName
+   * @param string $operator
+   */
   static function deleteAssoc($groupName, $operator = "=") {
     $query = "
 DELETE g, v
@@ -511,6 +549,12 @@ DELETE g, v
     $dao = CRM_Core_DAO::executeQuery($query, $params);
   }
 
+  /**
+   * @param $groupName
+   * @param $value
+   *
+   * @return null|string
+   */
   static function optionLabel($groupName, $value) {
     $query = "
 SELECT v.label
@@ -525,6 +569,15 @@ SELECT v.label
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
+  /**
+   * @param $groupName
+   * @param $fieldValue
+   * @param string $field
+   * @param string $fieldType
+   * @param bool $active
+   *
+   * @return array
+   */
   static function getRowValues($groupName, $fieldValue, $field = 'name',
     $fieldType = 'String', $active = TRUE
   ) {
@@ -565,6 +618,10 @@ WHERE  v.option_group_id = g.id
    * (for example CRM_Contribution_Pseudoconstant::paymentInstrument doesn't specify isActive
    * which is part of the cache key
    * will do a couple of variations & aspire to someone cleaning it up later
+   */
+  /**
+   * @param $name
+   * @param array $params
    */
   static function flush($name, $params = array()){
     $defaults = array(

@@ -257,6 +257,11 @@ class CRM_Core_ManagedEntities {
     return FALSE;
   }
 
+  /**
+   * @param $declarations
+   *
+   * @return mixed
+   */
   protected static function cleanDeclarations($declarations) {
     foreach ($declarations as $name => &$declare) {
       if (!array_key_exists('name', $declare)) {
@@ -266,6 +271,12 @@ class CRM_Core_ManagedEntities {
     return $declarations;
   }
 
+  /**
+   * @param $params
+   * @param $result
+   *
+   * @throws Exception
+   */
   protected function onApiError($params, $result) {
     CRM_Core_Error::debug_var('ManagedEntities_failed', array(
       'params' => $params,

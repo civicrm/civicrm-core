@@ -14,11 +14,24 @@ class CRM_Core_Reference_OptionValue extends CRM_Core_Reference_Basic {
    */
   protected $targetOptionGroupId;
 
+  /**
+   * @param $refTable
+   * @param $refKey
+   * @param null $targetTable
+   * @param string $targetKey
+   * @param null $optionGroupName
+   */
   function __construct($refTable, $refKey, $targetTable = NULL, $targetKey = 'id', $optionGroupName) {
     parent::__construct($refTable, $refKey, $targetTable, $targetKey, NULL);
     $this->targetOptionGroupName = $optionGroupName;
   }
 
+  /**
+   * @param CRM_Core_DAO $targetDao
+   *
+   * @return null|Object
+   * @throws CRM_Core_Exception
+   */
   public function findReferences($targetDao) {
     if (! ($targetDao instanceof CRM_Core_DAO_OptionValue)) {
       throw new CRM_Core_Exception("Mismatched reference: expected OptionValue but received " . get_class($targetDao));
@@ -30,6 +43,12 @@ class CRM_Core_Reference_OptionValue extends CRM_Core_Reference_Basic {
     }
   }
 
+  /**
+   * @param CRM_Core_DAO $targetDao
+   *
+   * @return array|null
+   * @throws CRM_Core_Exception
+   */
   public function getReferenceCount($targetDao) {
     if (! ($targetDao instanceof CRM_Core_DAO_OptionValue)) {
       throw new CRM_Core_Exception("Mismatched reference: expected OptionValue but received " . get_class($targetDao));
@@ -41,6 +60,9 @@ class CRM_Core_Reference_OptionValue extends CRM_Core_Reference_Basic {
     }
   }
 
+  /**
+   * @return int|NULL
+   */
   public function getTargetOptionGroupId() {
     if ($this->targetOptionGroupId === NULL) {
       $this->targetOptionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $this->targetOptionGroupName, 'id', 'name');
