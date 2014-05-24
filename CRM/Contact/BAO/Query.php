@@ -1255,8 +1255,7 @@ class CRM_Contact_BAO_Query {
    * @param boolean $sortByChar
    * @param boolean $groupContacts
    *
-   * @return the sql string for that query (this will most likely
-   * change soon)
+   * @return array sql query parts as an array
    * @access public
    */
   function query($count = FALSE, $sortByChar = FALSE, $groupContacts = FALSE) {
@@ -1463,7 +1462,6 @@ class CRM_Contact_BAO_Query {
   static function &fixWhereValues($id, &$values, $wildcard = 0, $useEquals = FALSE) {
     // skip a few search variables
     static $skipWhere = NULL;
-    static $arrayValues = NULL;
     static $likeNames = NULL;
     $result = NULL;
 
@@ -1772,7 +1770,7 @@ class CRM_Contact_BAO_Query {
    * Given a list of conditions in params generate the required
    * where clause
    *
-   * @return void
+   * @return string
    * @access public
    */
   function whereClause() {
@@ -4164,7 +4162,7 @@ civicrm_relationship.is_permission_a_b = 0
    *
    * @param int $mode
    *
-   * @return void
+   * @return array derault return properties
    * @access public
    */
   static function &defaultReturnProperties($mode = 1) {
@@ -4246,7 +4244,7 @@ civicrm_relationship.is_permission_a_b = 0
    *
    * @param int $value
    *
-   * @return void
+   * @return string|NULL
    * @access public
    */
   static function getPrimaryCondition($value) {
@@ -4807,7 +4805,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
   /**
    * default set of return default hier return properties
    *
-   * @return void
+   * @return array
    * @access public
    */
   static function &defaultHierReturnProperties() {
@@ -5430,7 +5428,7 @@ AND   displayRelType.is_active = 1
   /**
    * convert the pseudo constants id's to their names
    *
-   * @param  reference parameter $dao
+   * @param CRM_Core_DAO reference $dao
    * @param bool $return
    *
    * @return array
@@ -5499,7 +5497,7 @@ AND   displayRelType.is_active = 1
 
   /**
    * include pseudo fields LEFT JOIN
-   * @param  $sort  can be a object or string
+   * @param string|array $sort  can be a object or string
    *
    * @return array
    */
