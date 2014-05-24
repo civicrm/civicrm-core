@@ -109,6 +109,9 @@ class CRM_Activity_BAO_ICalendar {
   }
 
   // TODO: Is there a better way to do this?
+  /**
+   * @return string
+   */
   private function getPrimaryEmail() {
     $session = &CRM_Core_Session::singleton();
     $uid = $session->get('userID');

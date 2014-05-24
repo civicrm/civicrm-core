@@ -612,6 +612,13 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     return TRUE;
   }
 
+  /**
+   * @param $showAll
+   * @param $profileType
+   * @param $contactActivityProfile
+   *
+   * @return array
+   */
   protected static function getImportableFields($showAll, $profileType, $contactActivityProfile) {
     if (!$showAll) {
       $importableFields = CRM_Contact_BAO_Contact::importableFields('All', FALSE, FALSE, FALSE, TRUE, TRUE);
@@ -659,6 +666,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     return $locationFields;
   }
 
+  /**
+   * @param $ctype
+   *
+   * @return mixed
+   */
   protected static function getCustomFields($ctype) {
     static $customFieldCache = array();
     if (!isset($customFieldCache[$ctype])) {
@@ -3520,6 +3532,9 @@ SELECT  group_id
     return $groupTypeValue;
   }
 
+  /**
+   * @return bool|object
+   */
   static function isProfileDoubleOptin() {
     // check for double optin
     $config = CRM_Core_Config::singleton();
@@ -3531,6 +3546,9 @@ SELECT  group_id
     return FALSE;
   }
 
+  /**
+   * @return bool|object
+   */
   static function isProfileAddToGroupDoubleOptin() {
     // check for add to group double optin
     $config = CRM_Core_Config::singleton();

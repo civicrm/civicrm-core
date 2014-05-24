@@ -256,6 +256,13 @@ class CRM_Core_DAO extends DB_DataObject {
     return $result;
   }
 
+  /**
+   * get/set an associative array of table columns
+   *
+   * @access public
+   * @param  array key=>type array
+   * @return array (associative)
+   */
   function table() {
     $fields = &$this->fields();
 

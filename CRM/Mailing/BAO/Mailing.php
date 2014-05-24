@@ -2380,6 +2380,9 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     $dao->delete();
   }
 
+  /**
+   * @return array
+   */
   function getReturnProperties() {
     $tokens = &$this->getTokens();
 

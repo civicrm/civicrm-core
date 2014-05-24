@@ -59,7 +59,16 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * the processor. It is the main function for processing on-server
    * credit card transactions
    */
-   function doDirectPayment(&$params) {
+  /**
+   * This function collects all the information from a web/api form and invokes
+   * the relevant payment processor specific functions to perform the transaction
+   *
+   * @param  array $params assoc array of input parameters for this transaction
+   *
+   * @return array the result in an nice formatted array (or an error object)
+   * @abstract
+   */
+  function doDirectPayment(&$params) {
     if (!defined('CURLOPT_SSLCERT')) {
       CRM_Core_Error::fatal(ts('PayFlowPro requires curl with SSL support'));
     }
@@ -400,6 +409,14 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   //  function checkConfig( $mode )          // CiviCRM V1.9 Declaration
 
   // CiviCRM V2.0 Declaration
+  /**
+   * This function checks to see if we have the right config values
+   *
+   * @internal param string $mode the mode we are operating in (live or test)
+   *
+   * @return string the error message if any
+   * @public
+   */
   function checkConfig() {
     $errorMsg = array();
     if (empty($this->_paymentProcessor['user_name'])) {

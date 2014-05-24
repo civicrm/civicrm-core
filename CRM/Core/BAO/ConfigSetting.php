@@ -366,6 +366,9 @@ class CRM_Core_BAO_ConfigSetting {
     }
   }
 
+  /**
+   * @return array
+   */
   static function getConfigSettings() {
     $config = CRM_Core_Config::singleton();
 
@@ -469,6 +472,12 @@ class CRM_Core_BAO_ConfigSetting {
     return array($url, $dir, $siteName, $siteRoot);
   }
 
+  /**
+   * @param array $defaultValues
+   *
+   * @return string
+   * @throws Exception
+   */
   static function doSiteMove($defaultValues = array() ) {
     $moveStatus = ts('Beginning site move process...') . '<br />';
     // get the current and guessed values
@@ -648,6 +657,9 @@ WHERE  option_group_id = (
     return TRUE;
   }
 
+  /**
+   * @return array
+   */
   static function skipVars() {
     return array(
       'dsn', 'templateCompileDir',

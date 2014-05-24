@@ -85,6 +85,12 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
     return $persistentDAO;
   }
 
+  /**
+   * @param $context
+   * @param null $name
+   *
+   * @return mixed
+   */
   static function getContext($context, $name = NULL) {
     static $contextNameData = array();
 

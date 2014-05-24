@@ -61,6 +61,9 @@ class CRM_Activity_Controller_Search extends CRM_Core_Controller {
     $this->addActions();
   }
 
+  /**
+   * @return mixed
+   */
   public function selectorName() {
     return $this->get('selectorName');
   }

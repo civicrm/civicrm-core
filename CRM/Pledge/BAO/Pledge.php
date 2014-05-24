@@ -799,6 +799,11 @@ GROUP BY  currency
     return CRM_Core_DAO::singleValueQuery($query);
   }
 
+  /**
+   * @param $params
+   *
+   * @return array
+   */
   public static function updatePledgeStatus($params) {
 
     $returnMessages = array();

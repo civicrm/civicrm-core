@@ -1082,6 +1082,9 @@ SELECT  id
     return isset($availableFields[$fieldName]);
   }
 
+  /**
+   * @return array|null
+   */
   static function getContribBatchEntryFields() {
     if (self::$_contriBatchEntryFields === NULL) {
       self::$_contriBatchEntryFields = array(
@@ -1110,6 +1113,9 @@ SELECT  id
     return self::$_contriBatchEntryFields;
   }
 
+  /**
+   * @return array|null
+   */
   public static function getMemberBatchEntryFields() {
     if (self::$_memberBatchEntryFields === NULL) {
       self::$_memberBatchEntryFields = array(
