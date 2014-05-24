@@ -38,6 +38,9 @@
  */
 class CRM_Core_Permission_Base {
 
+  // permission mapping to stub check() calls
+  public $permissions = NULL;
+
   /**
    * Translate permission
    *
