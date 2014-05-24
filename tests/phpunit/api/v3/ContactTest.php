@@ -1662,7 +1662,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('API permission check failed for contact/create call; insufficient permission: require access CiviCRM and add contacts', $result['error_message'], 'lacking permissions should not be enough to create a contact');
 
     $config->userPermissionClass->permissions = array('access CiviCRM', 'add contacts', 'import contacts');
-    $result = $this->callAPISuccess('contact', 'create', $params, NULL, 'overfluous permissions should be enough to create a contact');
+    $this->callAPISuccess('contact', 'create', $params, NULL, 'overfluous permissions should be enough to create a contact');
   }
 
   function testContactUpdatePermissions() {
@@ -1676,7 +1676,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('API permission check failed for contact/update call; insufficient permission: require access CiviCRM and edit all contacts', $result['error_message'], 'lacking permissions should not be enough to update a contact');
 
     $config->userPermissionClass->permissions = array('access CiviCRM', 'add contacts', 'view all contacts', 'edit all contacts', 'import contacts');
-    $result = $this->callAPISuccess('contact', 'update', $params, NULL, 'overfluous permissions should be enough to update a contact');
+    $this->callAPISuccess('contact', 'update', $params, NULL, 'overfluous permissions should be enough to update a contact');
   }
 
   function createContactFromXML() {
