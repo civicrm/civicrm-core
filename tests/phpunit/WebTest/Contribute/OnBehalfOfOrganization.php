@@ -25,6 +25,10 @@
   */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_OnBehalfOfOrganization
+ */
 class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
   protected $pageno = '';
   protected function setUp() {

@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_DefaultMembershipPricesetTest
+ */
 class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

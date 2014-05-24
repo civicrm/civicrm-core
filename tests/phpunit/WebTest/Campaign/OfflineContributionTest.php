@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Campaign_OfflineContributionTest
+ */
 class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

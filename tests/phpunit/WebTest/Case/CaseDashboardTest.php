@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Case_CaseDashboardTest
+ */
 class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

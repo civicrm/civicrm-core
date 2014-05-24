@@ -27,6 +27,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CiviReportTestCase
+ */
 class CiviReportTestCase extends CiviUnitTestCase {
   function setUp() {
     parent::setUp();

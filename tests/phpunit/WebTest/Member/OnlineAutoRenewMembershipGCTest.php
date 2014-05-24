@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_OnlineAutoRenewMembershipGCTest
+ */
 class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

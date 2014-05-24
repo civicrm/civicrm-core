@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_AdditionalPaymentTest
+ */
 class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
   protected function setUp() {
     parent::setUp();

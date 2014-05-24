@@ -26,6 +26,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Generic_CheckDashboardTest
+ */
 class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

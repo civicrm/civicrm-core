@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Mailing_AddMessageTemplateTest
+ */
 class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

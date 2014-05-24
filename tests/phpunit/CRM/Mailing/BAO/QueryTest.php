@@ -6,6 +6,9 @@ require_once 'CiviTest/Contact.php';
  *  Include dataProvider for tests
  */
 class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Mailing BAO Query',
@@ -14,6 +17,9 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * @return CRM_Mailing_BAO_QueryTestDataProvider
+   */
   public function dataProvider() {
     return new CRM_Mailing_BAO_QueryTestDataProvider;
   }

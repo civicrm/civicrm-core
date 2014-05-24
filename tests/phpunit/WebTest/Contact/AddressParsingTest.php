@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_AddressParsingTest
+ */
 class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

@@ -12,6 +12,9 @@ class CRM_Core_Smarty_plugins_CrmScopeTest extends CiviUnitTestCase {
     civicrm_smarty_register_string_resource();
   }
 
+  /**
+   * @return array
+   */
   function scopeCases() {
     $cases = array();
     $cases[] = array('', '{crmScope}{/crmScope}');

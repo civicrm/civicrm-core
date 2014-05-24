@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_MatchExternalIdTest
+ */
 class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {

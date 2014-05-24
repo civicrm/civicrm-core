@@ -23,6 +23,9 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::integer($inputData));
   }
 
+  /**
+   * @return array
+   */
   function integerDataProvider() {
     return array(
       array(10, true),

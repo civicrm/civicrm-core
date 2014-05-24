@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_ChangeParticipantStatus
+ */
 class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
 
   protected function setUp() {

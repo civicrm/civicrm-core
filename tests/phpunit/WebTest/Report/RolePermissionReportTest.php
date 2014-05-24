@@ -25,6 +25,10 @@
   */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Report_RolePermissionReportTest
+ */
 class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

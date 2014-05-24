@@ -25,7 +25,14 @@
 +--------------------------------------------------------------------+
 */
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Utils_ZipTest
+ */
 class CRM_Utils_ZipTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Zip Test',

@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_AddressParsingTest
+ */
 class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
