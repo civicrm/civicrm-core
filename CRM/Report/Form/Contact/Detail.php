@@ -40,6 +40,12 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   protected $_customGroupExtends = array(
     'Contact', 'Individual', 'Household', 'Organization');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
     $this->_columns = array(
@@ -371,7 +377,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         'dao' => 'CRM_Core_DAO_Phone',
         'fields' =>
         array(
-          'phone' => NULL,   
+          'phone' => NULL,
           'phone_ext' =>
           array(
             'title' => ts('Phone Extension')
@@ -443,6 +449,13 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = array();
     return $errors;
@@ -598,6 +611,9 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     $this->_where .= " GROUP BY {$this->_aliases['civicrm_contact']}.id ";
   }
 
+  /**
+   * @return array
+   */
   function clauseComponent() {
     $selectedContacts = implode(',', $this->_contactSelected);
     $contribution     = $membership = $participant = NULL;
@@ -734,6 +750,11 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     return $rows;
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = array();
 
@@ -749,11 +770,17 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   }
 
   //Override to set limit is 10
+  /**
+   * @param int $rowCount
+   */
   function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);
   }
 
   //Override to set pager with limit is 10
+  /**
+   * @param int $rowCount
+   */
   function setPager($rowCount = self::ROW_COUNT_LIMIT) {
     parent::setPager($rowCount);
   }
@@ -800,6 +827,9 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     $this->endPostProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
 
@@ -838,6 +868,9 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $componentRows
+   */
   function alterComponentDisplay(&$componentRows) {
     // custom code to alter rows
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);

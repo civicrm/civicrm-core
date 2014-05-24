@@ -50,6 +50,13 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   protected $_yearStatisticsFrom = '';
 
   protected $_yearStatisticsTo = '';
+
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $yearsInPast = 4;
     $date        = CRM_Core_SelectValues::date('custom', NULL, $yearsInPast, 0);
@@ -440,15 +447,26 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   }
 
   //Override to set limit is 10
+  /**
+   * @param int $rowCount
+   */
   function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);
   }
 
   //Override to set pager with limit is 10
+  /**
+   * @param int $rowCount
+   */
   function setPager($rowCount = self::ROW_COUNT_LIMIT) {
     parent::setPager($rowCount);
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     $count = 0;
@@ -470,6 +488,13 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     return $statistics;
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = array();
     if (!empty($fields['this_year_value']) && !empty($fields['other_year_value']) &&
@@ -516,6 +541,9 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   */
   function buildRows(&$rows) {
     $contactIds = array();
 
@@ -604,6 +632,11 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $contactIds
+   *
+   * @return array
+   */
   function buildContributionRows($contactIds) {
     $rows = array();
     if (empty($contactIds)) {
@@ -647,6 +680,11 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     return $rows;
   }
 
+  /**
+   * @param $contactIds
+   *
+   * @return array
+   */
   function buildRelationshipRows($contactIds) {
     $relationshipRows = $relatedContactIds = array();
     if (empty($contactIds)) {
@@ -685,6 +723,12 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   }
 
   // Override "This Year" $op options
+  /**
+   * @param string $type
+   * @param null $fieldName
+   *
+   * @return array
+   */
   function getOperationPair($type = "string", $fieldName = NULL) {
     if ($fieldName == 'this_year' || $fieldName == 'other_year') {
       return array('calendar' => ts('Is Calendar Year'), 'fiscal' => ts('Fiscal Year Starting'));
@@ -692,6 +736,9 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     return parent::getOperationPair($type, $fieldName);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     if (empty($rows)) {
       return;

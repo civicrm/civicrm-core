@@ -45,6 +45,12 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     'pieChart' => 'Pie Chart',
   );
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -240,6 +246,13 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $this->_select = " SELECT * FROM ( SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = array();
 
@@ -374,6 +387,9 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $groupID
+   */
   function add2group($groupID) {
     if (is_numeric($groupID)) {
 
@@ -394,10 +410,13 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
     }
   }
 
+  /**
+   * @param int $rowCount
+   */
   function limit($rowCount = CRM_Report_Form::ROW_COUNT_LIMIT) {
     // lets do the pager if in html mode
     $this->_limit = NULL;
-    
+
     // CRM-14115, over-ride row count if rowCount is specified in URL
     if ($this->_dashBoardRowCount) {
       $rowCount = $this->_dashBoardRowCount;
@@ -427,6 +446,9 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
     }
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
 

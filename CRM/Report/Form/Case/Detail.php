@@ -54,6 +54,12 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
   protected $_caseDetailExtra = array(
     );
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->case_statuses = CRM_Case_PseudoConstant::caseStatus();
     $this->case_types    = CRM_Case_PseudoConstant::caseType();
@@ -458,6 +464,11 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_case']}.id";
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -562,6 +573,9 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     $entryFound = FALSE;
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);

@@ -44,6 +44,12 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     'Relationship');
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
     $contact_type = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, '_');
@@ -155,12 +161,12 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         'alias' => 'phone_a',
         'fields' =>
         array(
-          'phone_a' => 
+          'phone_a' =>
           array(
             'title' => ts('Phone (Contact A)'),
             'name' => 'phone',
           ),
-          'phone_ext_a' =>   
+          'phone_ext_a' =>
           array(
             'title' => ts('Phone Ext (Contact A)'),
             'name' => 'phone_ext',
@@ -174,12 +180,12 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         'alias' => 'phone_b',
         'fields' =>
         array(
-          'phone_b' =>   
+          'phone_b' =>
           array(
             'title' => ts('Phone (Contact B)'),
             'name' => 'phone'
           ),
-          'phone_ext_b' =>   
+          'phone_ext_b' =>
           array(
             'title' => ts('Phone Ext (Contact B)'),
             'name' => 'phone_ext'
@@ -508,6 +514,11 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -592,6 +603,9 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
