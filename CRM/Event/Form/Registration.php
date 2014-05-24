@@ -678,6 +678,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @param $form
+   * @param $eventID
+   *
+   * @throws Exception
+   */
   static function initEventFee(&$form, $eventID) {
     // get price info
 
@@ -940,6 +946,13 @@ WHERE  v.option_group_id = g.id
    * @return $totalCount total participant count.
    * @access public
    */
+  /**
+   * @param $form
+   * @param $params
+   * @param bool $skipCurrent
+   *
+   * @return int|string
+   */
   public static function getParticipantCount(&$form, $params, $skipCurrent = FALSE) {
     $totalCount = 0;
     if (!is_array($params) || empty($params)) {
@@ -1032,6 +1045,12 @@ WHERE  v.option_group_id = g.id
    * @return array $formatted, formatted price set params.
    * @access public
    */
+  /**
+   * @param $form
+   * @param $params
+   *
+   * @return mixed
+   */
   public static function formatPriceSetParams(&$form, $params) {
     if (!is_array($params) || empty($params)) {
       return $params;
@@ -1075,6 +1094,11 @@ WHERE  v.option_group_id = g.id
    *
    * @return array $optionsCount, array of each option w/ count total.
    * @access public
+   */
+  /**
+   * @param $form
+   *
+   * @return array
    */
   public static function getPriceSetOptionCount(&$form) {
     $params     = $form->get('params');
@@ -1141,6 +1165,11 @@ WHERE  v.option_group_id = g.id
     return $optionsCount;
   }
 
+  /**
+   * @param string $suffix
+   *
+   * @return null|string
+   */
   function checkTemplateFileExists($suffix = '') {
     if ($this->_eventId) {
       $templateName = $this->_name;
@@ -1157,11 +1186,17 @@ WHERE  v.option_group_id = g.id
     return NULL;
   }
 
+  /**
+   * @return null|string
+   */
   function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
 
+  /**
+   * @return null|string
+   */
   function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
@@ -1307,6 +1342,9 @@ WHERE  v.option_group_id = g.id
   }
 
   // set the first participant ID if not set, CRM-10032
+  /**
+   * @param $participantID
+   */
   function processFirstParticipant($participantID) {
     $this->_participantId = $participantID;
     $this->set('participantId', $this->_participantId);

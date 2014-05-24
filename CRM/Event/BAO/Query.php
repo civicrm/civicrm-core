@@ -35,6 +35,9 @@
  */
 class CRM_Event_BAO_Query {
 
+  /**
+   * @return array
+   */
   static function &getFields() {
     $fields = array();
     $fields = array_merge($fields, CRM_Event_DAO_Event::import());
@@ -44,6 +47,9 @@ class CRM_Event_BAO_Query {
     return $fields;
   }
 
+  /**
+   * @return array
+   */
   static function &getParticipantFields() {
     $fields = CRM_Event_BAO_Participant::importableFields('Individual', TRUE, TRUE);
     return $fields;
@@ -201,6 +207,9 @@ class CRM_Event_BAO_Query {
     }
   }
 
+  /**
+   * @param $query
+   */
   static function where(&$query) {
     $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
@@ -219,6 +228,10 @@ class CRM_Event_BAO_Query {
     }
   }
 
+  /**
+   * @param $values
+   * @param $query
+   */
   static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
     switch ($name) {
@@ -445,6 +458,13 @@ class CRM_Event_BAO_Query {
     }
   }
 
+  /**
+   * @param $name
+   * @param $mode
+   * @param $side
+   *
+   * @return null|string
+   */
   static function from($name, $mode, $side) {
     $from = NULL;
     switch ($name) {
@@ -494,6 +514,12 @@ class CRM_Event_BAO_Query {
     return (isset($this->_qill)) ? $this->_qill : "";
   }
 
+  /**
+   * @param $mode
+   * @param bool $includeCustomFields
+   *
+   * @return array|null
+   */
   static function defaultReturnProperties($mode,
     $includeCustomFields = TRUE
   ) {
@@ -610,8 +636,15 @@ class CRM_Event_BAO_Query {
     $form->setDefaults(array('participant_test' => 0));
   }
 
+  /**
+   * @param $row
+   * @param $id
+   */
   static function searchAction(&$row, $id) {}
 
+  /**
+   * @param $tables
+   */
   static function tableNames(&$tables) {
     //add participant table
     if (!empty($tables['civicrm_event'])) {

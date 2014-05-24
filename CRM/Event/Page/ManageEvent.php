@@ -416,6 +416,13 @@ ORDER BY start_date desc
     $form->run();
   }
 
+  /**
+   * @param $params
+   * @param bool $sortBy
+   * @param $force
+   *
+   * @return string
+   */
   function whereClause(&$params, $sortBy = TRUE, $force) {
     $values    = array();
     $clauses   = array();
@@ -504,6 +511,10 @@ ORDER BY start_date desc
     return !empty($clauses) ? implode(' AND ', $clauses) : '(1)';
   }
 
+  /**
+   * @param $whereClause
+   * @param $whereParams
+   */
   function pager($whereClause, $whereParams) {
 
     $params['status'] = ts('Event %%StatusMessage%%');
@@ -526,6 +537,10 @@ SELECT count(id)
     $this->assign_by_ref('pager', $this->_pager);
   }
 
+  /**
+   * @param $whereClause
+   * @param $whereParams
+   */
   function pagerAtoZ($whereClause, $whereParams) {
 
     $query = "

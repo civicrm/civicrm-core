@@ -385,7 +385,7 @@ class CRM_Contact_BAO_Query {
   );
 
   /**
-   * Rememeber if we handle either end of a number or date range
+   * Remember if we handle either end of a number or date range
    * so we can skip the other
    */
   protected $_rangeCache = array();
@@ -1337,12 +1337,12 @@ class CRM_Contact_BAO_Query {
 
     $having = '';
     if (!empty($this->_having)) {
-      foreach ($this->_having as $havingsets) {
-        foreach ($havingsets as $havingset) {
-          $havingvalue[] = $havingset;
+      foreach ($this->_having as $havingSets) {
+        foreach ($havingSets as $havingSet) {
+          $havingValue[] = $havingSet;
         }
       }
-      $having = ' HAVING ' . implode(' AND ', $havingvalue);
+      $having = ' HAVING ' . implode(' AND ', $havingValue);
     }
 
     // if we are doing a transform, do it here
@@ -2778,7 +2778,7 @@ class CRM_Contact_BAO_Query {
    *
    * @param $values
    *
-   * @return void
+   * @return string|NULL
    * @access public
    */
   function savedSearch(&$values) {
@@ -4260,9 +4260,9 @@ civicrm_relationship.is_permission_a_b = 0
    *
    * @param array $params
    * @param array $returnProperties
-   * @param \bolean|bool $count
+   * @param bool $count
    *
-   * @return void
+   * @return string
    * @access public
    */
   static function getQuery($params = NULL, $returnProperties = NULL, $count = FALSE) {
@@ -5092,7 +5092,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
    * @param string  $value       value
    * @param string  $dataType    data type of the field
    *
-   * @return where clause for the query
+   * @return string where clause for the query
    * @access public
    */
   static function buildClause($field, $op, $value = NULL, $dataType = NULL) {
@@ -5306,7 +5306,7 @@ AND   displayRelType.is_active = 1
    *
    * @param $name     string the name of the field
    * @param $op       string the sql operator, this function should handle ALL SQL operators
-   * @param $value    any    string / integer / array depends on the operator and whos calling the query builder
+   * @param $value string|integer|array depends on the operator and who's calling the query builder
    * @param $grouping int    the index where to place the where clause
    * @param $selectValues
    * @param $field    array  an array that contains various properties of the field identified by $name
@@ -5388,10 +5388,10 @@ AND   displayRelType.is_active = 1
    * this was the protocol used by search builder in the old old days before we had
    * super nice js widgets to do the hard work
    *
-   * @param the $string
+   * @param string $string
    * @param string $dataType the dataType we should check for the values, default integer
    *
-   * @return FALSE if string does not match the patter
+   * @return bool|array if string does not match the patter
    *         array of numeric values if string does match the pattern
    * @static
    */
@@ -5428,7 +5428,7 @@ AND   displayRelType.is_active = 1
   /**
    * convert the pseudo constants id's to their names
    *
-   * @param CRM_Core_DAO reference $dao
+   * @param CRM_Core_DAO dao
    * @param bool $return
    *
    * @return array
