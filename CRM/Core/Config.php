@@ -86,6 +86,11 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   public $userSystem = NULL;
 
   /**
+   * @var CRM_Core_Permission_Base
+   */
+  public $userPermissionClass;
+
+  /**
    * The root directory where Smarty should store compiled files
    *
    * @var string
