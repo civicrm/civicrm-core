@@ -30,6 +30,9 @@
  * recipients mentioned for that report
  */
 class CiviReportMail {
+  /**
+   *
+   */
   function __construct() {
     $this->initialize();
 

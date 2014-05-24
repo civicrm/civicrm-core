@@ -38,7 +38,14 @@
  *
  * Save the file as UpdateMembershipRecord.php prior to running this script.
  */
+
+/**
+ * Class CRM_UpdateMembershipRecord
+ */
 class CRM_UpdateMembershipRecord {
+  /**
+   *
+   */
   function __construct() {
     // you can run this program either from an apache command, or from the cli
     if (php_sapi_name() == "cli") {

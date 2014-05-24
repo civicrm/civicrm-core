@@ -30,7 +30,14 @@
  * This file updates the Reminder dates of all valid membership records.
  *
  */
+
+/**
+ * Class CRM_UpdateMembershipReminderDate
+ */
 class CRM_UpdateMembershipReminderDate {
+  /**
+   *
+   */
   function __construct() {
     // you can run this program either from an apache command, or from the cli
     if (php_sapi_name() == "cli") {
