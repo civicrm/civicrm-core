@@ -57,9 +57,13 @@ class CRM_Exception extends PEAR_Exception {
    *  - PEAR_Exception(string $message, PEAR_Error $cause, int $code);
    *  - PEAR_Exception(string $message, array $causes);
    *  - PEAR_Exception(string $message, array $causes, int $code);
+   *
    * @param string exception message
-   * @param int|Exception|PEAR_Error|array|null exception cause
-   * @param int|null exception code or null
+   * @param int $code
+   * @param Exception $previous
+   *
+   * @internal param array|\Exception|int|null|\PEAR_Error $exception cause
+   * @internal param int|null $exception code or null
    */
   public function __construct($message = NULL, $code = 0, Exception$previous = NULL) {
     parent::__construct($message, $code, $previous);

@@ -44,7 +44,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @param string $entityTable name of the entity table usually 'civicrm_contact'
    *
    * @return array(
-     ) reference $tag array of catagory id's the contact belongs to.
+     ) reference $tag array of category id's the contact belongs to.
    *
    * @access public
    * @static
