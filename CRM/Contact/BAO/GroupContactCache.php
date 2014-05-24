@@ -190,6 +190,9 @@ AND    g.refresh_date IS NULL
     }
   }
 
+  /**
+   * @param $groupID
+   */
   static function add($groupID) {
     // first delete the current cache
     self::remove($groupID);
@@ -205,6 +208,10 @@ AND    g.refresh_date IS NULL
     }
   }
 
+  /**
+   * @param $groupID
+   * @param $values
+   */
   static function store(&$groupID, &$values) {
     $processed = FALSE;
 
@@ -533,6 +540,9 @@ AND  civicrm_group_contact.group_id = $groupID ";
     $lock->release();
   }
 
+  /**
+   * @return int
+   */
   static function smartGroupCacheTimeout() {
     $config = CRM_Core_Config::singleton();
 

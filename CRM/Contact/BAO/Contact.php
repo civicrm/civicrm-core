@@ -88,6 +88,16 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @static
    */
   static $_exportableFields = NULL;
+
+  /**
+   * class constructor
+   *
+   * @access public
+   * @return \CRM_Contact_DAO_Contact
+   */
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
@@ -1845,6 +1855,16 @@ ORDER BY civicrm_email.is_primary DESC";
     return $contactID;
   }
 
+  /**
+   * @param $params
+   * @param $fields
+   * @param null $contactID
+   * @param null $ufGroupId
+   * @param null $ctype
+   * @param bool $skipCustom
+   *
+   * @return array
+   */
   static function formatProfileContactParams(
     &$params,
     &$fields,

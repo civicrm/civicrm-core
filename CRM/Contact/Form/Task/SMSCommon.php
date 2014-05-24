@@ -47,6 +47,9 @@ class CRM_Contact_Form_Task_SMSCommon {
   public $_toContactPhone = array();
 
 
+  /**
+   * @param $form
+   */
   static function preProcessProvider(&$form) {
     $form->_single = FALSE;
     $className = CRM_Utils_System::getClassName($form);

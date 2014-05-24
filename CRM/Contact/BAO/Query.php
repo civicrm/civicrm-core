@@ -618,7 +618,7 @@ class CRM_Contact_BAO_Query {
 
       // redirect to activity select clause
       if (
-        (substr($name, 0, 9) == 'activity_') || 
+        (substr($name, 0, 9) == 'activity_') ||
         ($name == 'parent_id')
       ) {
         CRM_Activity_BAO_Query::select($this);
@@ -1355,6 +1355,12 @@ class CRM_Contact_BAO_Query {
     return array($select, $from, $where, $having);
   }
 
+  /**
+   * @param $name
+   * @param $grouping
+   *
+   * @return null
+   */
   function &getWhereValues($name, $grouping) {
     $result = NULL;
     foreach ($this->_params as $values) {
@@ -1366,12 +1372,24 @@ class CRM_Contact_BAO_Query {
     return $result;
   }
 
+  /**
+   * @param $relative
+   * @param $from
+   * @param $to
+   */
   static function fixDateValues($relative, &$from, &$to) {
     if ($relative) {
       list($from, $to) = CRM_Utils_Date::getFromTo($relative, $from, $to);
     }
   }
 
+  /**
+   * @param $formValues
+   * @param int $wildcard
+   * @param bool $useEquals
+   *
+   * @return array
+   */
   static function convertFormValues(&$formValues, $wildcard = 0, $useEquals = FALSE) {
     $params = array();
     if (empty($formValues)) {
@@ -1434,6 +1452,14 @@ class CRM_Contact_BAO_Query {
     return $params;
   }
 
+  /**
+   * @param $id
+   * @param $values
+   * @param int $wildcard
+   * @param bool $useEquals
+   *
+   * @return array|null
+   */
   static function &fixWhereValues($id, &$values, $wildcard = 0, $useEquals = FALSE) {
     // skip a few search variables
     static $skipWhere = NULL;
@@ -1515,6 +1541,9 @@ class CRM_Contact_BAO_Query {
     return $result;
   }
 
+  /**
+   * @param $values
+   */
   function whereClauseSingle(&$values) {
     // do not process custom fields or prefixed contact ids or component params
     if (CRM_Core_BAO_CustomField::getKeyID($values[0]) ||
@@ -1826,6 +1855,11 @@ class CRM_Contact_BAO_Query {
     return implode(' AND ', $andClauses);
   }
 
+  /**
+   * @param $values
+   *
+   * @throws Exception
+   */
   function restWhere(&$values) {
     $name = CRM_Utils_Array::value(0, $values);
     $op = CRM_Utils_Array::value(1, $values);
@@ -2135,6 +2169,13 @@ class CRM_Contact_BAO_Query {
   }
 
 
+  /**
+   * @param $where
+   * @param $locType
+   *
+   * @return array
+   * @throws Exception
+   */
   static function getLocationTableName(&$where, &$locType) {
     if (isset($locType[1]) && is_numeric($locType[1])) {
       list($tbName, $fldName) = explode(".", $where);
@@ -2232,6 +2273,9 @@ class CRM_Contact_BAO_Query {
     return $this->_tables;
   }
 
+  /**
+   * @return array
+   */
   function whereTables() {
     return $this->_whereTables;
   }
@@ -2591,6 +2635,10 @@ class CRM_Contact_BAO_Query {
     $this->includeContactSubTypes($value, $grouping);
   }
 
+  /**
+   * @param $value
+   * @param $grouping
+   */
   function includeContactSubTypes($value, $grouping) {
 
     $clause = array();
@@ -2712,6 +2760,11 @@ class CRM_Contact_BAO_Query {
   }
   /*
    * Function translates selection of group type into a list of groups
+   */
+  /**
+   * @param $value
+   *
+   * @return array
    */
   function getGroupsFromTypeCriteria($value){
     $groupIds = array();
@@ -3015,6 +3068,13 @@ WHERE  id IN ( $groupIDs )
     $this->_qill[$grouping][] = $label . " $op - '$n'";
   }
 
+  /**
+   * @param $name
+   * @param $op
+   * @param $grouping
+   *
+   * @return bool
+   */
   function nameNullOrEmptyOp($name, $op, $grouping) {
     switch ( $op ) {
       case 'IS NULL':
@@ -3466,6 +3526,12 @@ WHERE  id IN ( $groupIDs )
     }
   }
 
+  /**
+   * @param $values
+   * @param bool $fromStateProvince
+   *
+   * @return array
+   */
   function country(&$values, $fromStateProvince = TRUE) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
@@ -3735,6 +3801,9 @@ WHERE  id IN ( $groupIDs )
     $this->_qill[$grouping][] = ts('Modified by') . ": $name";
   }
 
+  /**
+   * @param $values
+   */
   function modifiedDates($values) {
     $this->_useDistinct = TRUE;
 
@@ -3756,6 +3825,9 @@ WHERE  id IN ( $groupIDs )
     self::$_openedPanes[ts('Change Log')] = TRUE;
   }
 
+  /**
+   * @param $values
+   */
   function demographics(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
@@ -3775,6 +3847,9 @@ WHERE  id IN ( $groupIDs )
     self::$_openedPanes[ts('Demographics')] = TRUE;
   }
 
+  /**
+   * @param $values
+   */
   function privacy(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
     //fixed for profile search listing CRM-4633
@@ -3791,6 +3866,9 @@ WHERE  id IN ( $groupIDs )
     $this->_qill[$grouping][] = "$title $op $value";
   }
 
+  /**
+   * @param $values
+   */
   function privacyOptions($values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
@@ -3828,6 +3906,9 @@ WHERE  id IN ( $groupIDs )
     $this->_qill[$grouping][] = implode($operator, $qill);
   }
 
+  /**
+   * @param $values
+   */
   function preferredCommunication(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
@@ -4573,10 +4654,18 @@ civicrm_relationship.is_permission_a_b = 0
     }
   }
 
+  /**
+   * @param $val
+   */
   function setSkipPermission($val) {
     $this->_skipPermission = $val;
   }
 
+  /**
+   * @param null $context
+   *
+   * @return array
+   */
   function &summaryContribution($context = NULL) {
     list($innerselect, $from, $where, $having) = $this->query(TRUE);
 
@@ -4799,6 +4888,14 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
     return self::$_defaultHierReturnProperties;
   }
 
+  /**
+   * @param $values
+   * @param $tableName
+   * @param $fieldName
+   * @param $dbFieldName
+   * @param $fieldTitle
+   * @param bool $appendTimeStamp
+   */
   function dateQueryBuilder(
     &$values, $tableName, $fieldName,
     $dbFieldName, $fieldTitle,
@@ -4904,6 +5001,14 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
     }
   }
 
+  /**
+   * @param $values
+   * @param $tableName
+   * @param $fieldName
+   * @param $dbFieldName
+   * @param $fieldTitle
+   * @param null $options
+   */
   function numberRangeBuilder(&$values,
     $tableName, $fieldName,
     $dbFieldName, $fieldTitle,
@@ -5043,6 +5148,11 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
     }
   }
 
+  /**
+   * @param bool $reset
+   *
+   * @return array
+   */
   function openedSearchPanes($reset = FALSE) {
     if (!$reset || empty($this->_whereTables)) {
       return self::$_openedPanes;
@@ -5074,6 +5184,9 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
     return self::$_openedPanes;
   }
 
+  /**
+   * @param $operator
+   */
   function setOperator($operator) {
     $validOperators = array('AND', 'OR');
     if (!in_array($operator, $validOperators)) {
@@ -5082,10 +5195,18 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
     $this->_operator = $operator;
   }
 
+  /**
+   * @return string
+   */
   function getOperator() {
     return $this->_operator;
   }
 
+  /**
+   * @param $from
+   * @param $where
+   * @param $having
+   */
   function filterRelatedContacts(&$from, &$where, &$having) {
     static $_rTypeProcessed = NULL;
     static $_rTypeFrom = NULL;
@@ -5157,11 +5278,22 @@ AND   displayRelType.is_active = 1
     $having = NULL;
   }
 
+  /**
+   * @param $op
+   *
+   * @return bool
+   */
   static function caseImportant( $op ) {
     return
       in_array($op, array('LIKE', 'IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY')) ? FALSE : TRUE;
   }
 
+  /**
+   * @param $returnProperties
+   * @param $prefix
+   *
+   * @return bool
+   */
   static function componentPresent( &$returnProperties, $prefix ) {
     foreach ($returnProperties as $name => $dontCare ) {
       if (substr($name, 0, strlen($prefix)) == $prefix) {

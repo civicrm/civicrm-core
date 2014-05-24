@@ -37,6 +37,15 @@
  * BAO object for crm_email table
  */
 class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHistory {
+  /**
+   * class constructor
+   *
+   * @access public
+   * @return \CRM_Contact_DAO_SubscriptionHistory
+   */
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }

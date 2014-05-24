@@ -174,6 +174,17 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * the default values are retrieved from the database
+   *
+   * @access public
+   *
+   * @return array
+   */
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     return $this->_defaults;
   }
