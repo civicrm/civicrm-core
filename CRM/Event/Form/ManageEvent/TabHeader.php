@@ -38,6 +38,11 @@
  */
 class CRM_Event_Form_ManageEvent_TabHeader {
 
+  /**
+   * @param $form
+   *
+   * @return array
+   */
   static function build(&$form) {
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
@@ -62,6 +67,12 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     return $tabs;
   }
 
+  /**
+   * @param $form
+   *
+   * @return array
+   * @throws Exception
+   */
   static function process(&$form) {
     if ($form->getVar('_id') <= 0) {
       return NULL;
@@ -98,7 +109,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
 
     $eventID = $form->getVar('_id');
     if ($eventID) {
-      // disable tabs based on their configuration status 
+      // disable tabs based on their configuration status
       $sql = "
 SELECT     e.loc_block_id as is_location, e.is_online_registration, e.is_monetary, taf.is_active, pcp.is_active as is_pcp, sch.id as is_reminder
 FROM       civicrm_event e
@@ -187,11 +198,19 @@ WHERE      e.id = %1
     return $tabs;
   }
 
+  /**
+   * @param $form
+   */
   static function reset(&$form) {
     $tabs = self::process($form);
     $form->set('tabHeader', $tabs);
   }
 
+  /**
+   * @param $tabs
+   *
+   * @return int|string
+   */
   static function getCurrentTab($tabs) {
     static $current = FALSE;
 
