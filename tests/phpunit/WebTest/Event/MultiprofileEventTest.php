@@ -25,6 +25,10 @@
   */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_MultiprofileEventTest
+ */
 class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

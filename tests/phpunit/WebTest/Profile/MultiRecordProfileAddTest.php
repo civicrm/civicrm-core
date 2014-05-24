@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Profile_MultiRecordProfileAddTest
+ */
 class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

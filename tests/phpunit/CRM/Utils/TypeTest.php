@@ -23,6 +23,9 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Utils_Type::validate($inputData, $inputType, FALSE));
   }
 
+  /**
+   * @return array
+   */
   function validateDataProvider() {
     return array(
       array(10, 'Int', 10),

@@ -23,6 +23,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_EventWaitListTest
+ */
 class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

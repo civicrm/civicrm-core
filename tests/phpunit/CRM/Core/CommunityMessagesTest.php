@@ -28,6 +28,10 @@
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Core_CommunityMessagesTest
+ */
 class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
   /**
    * @var CRM_Utils_Cache_Interface

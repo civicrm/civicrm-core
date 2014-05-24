@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_DateFormatTest
+ */
 class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {

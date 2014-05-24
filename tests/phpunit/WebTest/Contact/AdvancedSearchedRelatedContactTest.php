@@ -25,6 +25,10 @@
   */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_AdvancedSearchedRelatedContactTest
+ */
 class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

@@ -26,6 +26,10 @@
 
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Admin_CustomAddTestSameField
+ */
 class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
 
   protected function setUp() {

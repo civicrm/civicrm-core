@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_OnlineRecurContributionTest
+ */
 class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

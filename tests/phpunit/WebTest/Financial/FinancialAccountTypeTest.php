@@ -27,6 +27,9 @@
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
+/**
+ * Class WebTest_Financial_FinancialAccountTypeTest
+ */
 class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
 
   function testFinancialAccount() {
@@ -60,15 +63,15 @@ class WebTest_Financial_FinancialAccountTypeTest extends CiviSeleniumTestCase {
         'account_relationship' => 'Cost of Sales Account is',
       ),
     );
-    
+
     $this->waitForElementPresent('newFinancialType');
     $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[7]/span/a[text()='Accounts']");
     $this->waitForElementPresent('newfinancialTypeAccount');
-    
+
     foreach ($expected as  $value => $label) {
       $this->verifyText("xpath=//div[@id='ltype']/div/table/tbody/tr/td[2][text()='$label[financial_account]']/../td[1]", preg_quote($label['account_relationship']));
     }
-    
+
     $this->openCiviPage('admin/financial/financialType', 'reset=1', 'newFinancialType');
     $this->verifyText("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[3]", 'Accounts Receivable,Banking Fees,Premiums,' . $financialType['name']);
     $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[7]/span/a[text()='Accounts']");

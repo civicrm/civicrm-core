@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_VerifySSLContributionTest
+ */
 class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase {
 
   protected $initialized = FALSE;

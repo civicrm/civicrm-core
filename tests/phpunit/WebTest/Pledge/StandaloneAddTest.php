@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Pledge_StandaloneAddTest
+ */
 class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

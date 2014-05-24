@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Generic_CheckFindTest
+ */
 class WebTest_Generic_CheckFindTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

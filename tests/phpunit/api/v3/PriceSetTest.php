@@ -27,6 +27,10 @@
 */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_PriceSetTest
+ */
 class api_v3_PriceSetTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params;

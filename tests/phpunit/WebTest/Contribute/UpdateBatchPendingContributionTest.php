@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_UpdateBatchPendingContributionTest
+ */
 class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

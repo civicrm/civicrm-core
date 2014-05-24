@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_SavedMapping
+ */
 class WebTest_Import_SavedMapping extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {

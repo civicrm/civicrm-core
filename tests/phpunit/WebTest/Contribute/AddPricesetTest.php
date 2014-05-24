@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_AddPricesetTest
+ */
 class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
