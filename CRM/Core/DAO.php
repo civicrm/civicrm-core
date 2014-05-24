@@ -2026,7 +2026,7 @@ SELECT contact_id
    *
    * @throws Exception
    * @internal param string $fieldname name of fields
-   * @todo a better solutution would be for the query object to apply these filters based on the
+   * @todo a better solution would be for the query object to apply these filters based on the
    *  api supported format (but we don't want to risk breakage in alpha stage & query class is scary
    * @todo @time of writing only IN & NOT IN are supported for the array style syntax (as test is
    *  required to extend further & it may be the comments per above should be implemented. It may be
@@ -2049,7 +2049,7 @@ SELECT contact_id
               return (sprintf('%s %s', $fieldName, $operator));
             }
             else{
-              return NULL;  // not yet implemented (tests required to implement)
+              return (sprintf('%s %s ', $fieldName, $operator));
             }
             break;
 
@@ -2103,7 +2103,7 @@ SELECT contact_id
    * @return array
    */
   public static function acceptedSQLOperators() {
-    return array('=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=", "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN');
+    return array('=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=", "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'IS NOT NULL', 'IS NULL');
   }
 
   /**

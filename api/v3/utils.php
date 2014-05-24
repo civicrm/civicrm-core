@@ -538,6 +538,13 @@ function _civicrm_api3_get_query_object($params, $mode, $entity) {
 
 /**
  * Function transfers the filters being passed into the DAO onto the params object
+ * @param CRM_Core_DAO $dao
+ * @param array $params
+ * @param bool $unique
+ * @param string $entity
+ *
+ * @throws API_Exception
+ * @throws Exception
  */
 function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
   $entity = substr($dao->__table, 8);
@@ -1658,11 +1665,10 @@ function _civicrm_api3_validate_html(&$params, &$fieldName, &$fieldInfo) {
  * Validate string fields being passed into API.
  * @param array $params params from civicrm_api
  * @param string $fieldName uniquename of field being checked
- * @param $fieldInfo
+ * @param array $fieldInfo array of fields from getfields function
  * @param $entity
  * @throws API_Exception
  * @throws Exception
- * @internal param array $fieldinfo array of fields from getfields function
  */
 function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $entity) {
   // If fieldname exists in params
