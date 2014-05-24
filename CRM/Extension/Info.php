@@ -80,6 +80,13 @@ class CRM_Extension_Info {
     return $instance;
   }
 
+  /**
+   * @param null $key
+   * @param null $type
+   * @param null $name
+   * @param null $label
+   * @param null $file
+   */
   function __construct($key = NULL, $type = NULL, $name = NULL, $label = NULL, $file = NULL) {
     $this->key       = $key;
     $this->type      = $type;

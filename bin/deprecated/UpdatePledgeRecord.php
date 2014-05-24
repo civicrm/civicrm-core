@@ -35,7 +35,14 @@
 
 require_once '../civicrm.config.php';
 require_once 'CRM/Core/Config.php';
+
+/**
+ * Class CRM_UpdatePledgeRecord
+ */
 class CRM_UpdatePledgeRecord {
+  /**
+   *
+   */
   function __construct() {
     $config = CRM_Core_Config::singleton();
     // this does not return on failure
@@ -49,6 +56,11 @@ class CRM_UpdatePledgeRecord {
     CRM_Core_Error::debug_log_message('UpdatePledgeRecord.php');
   }
 
+  /**
+   * @param bool $sendReminders
+   *
+   * @throws Exception
+   */
   public function updatePledgeStatus($sendReminders = FALSE) {
 
     // *** Uncomment the next line if you want automated reminders to be sent

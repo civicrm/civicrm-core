@@ -267,6 +267,13 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
 
   // Function to determine if a given query set contains inclusive or exclusive set of weights.
   // The function assumes that the query set is already ordered by weight in desc order.
+  /**
+   * @param $tableQueries
+   * @param $threshold
+   * @param array $exclWeightSum
+   *
+   * @return array
+   */
   static function isQuerySetInclusive($tableQueries, $threshold, $exclWeightSum = array(
     )) {
     $input = array();
@@ -301,6 +308,9 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
   }
 
   // sort queries by number of records for the table associated with them
+  /**
+   * @param $tableQueries
+   */
   static function orderByTableCount(&$tableQueries) {
     static $tableCount = array();
 

@@ -35,6 +35,9 @@
 class CRM_Bridge_OG_Utils {
   CONST aclEnabled = 1, syncFromCiviCRM = 1;
 
+  /**
+   * @return int
+   */
   static function aclEnabled() {
     return self::aclEnabled;
   }
@@ -51,14 +54,31 @@ class CRM_Bridge_OG_Utils {
     return TRUE;
   }
 
+  /**
+   * @param $ogID
+   *
+   * @return string
+   */
   static function ogSyncName($ogID) {
     return "OG Sync Group :{$ogID}:";
   }
 
+  /**
+   * @param $ogID
+   *
+   * @return string
+   */
   static function ogSyncACLName($ogID) {
     return "OG Sync Group ACL :{$ogID}:";
   }
 
+  /**
+   * @param $groupID
+   * @param bool $abort
+   *
+   * @return int|null|string
+   * @throws Exception
+   */
   static function ogID($groupID, $abort = TRUE) {
     $source = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',
       $groupID,
@@ -77,6 +97,12 @@ class CRM_Bridge_OG_Utils {
     return NULL;
   }
 
+  /**
+   * @param $ufID
+   *
+   * @return int
+   * @throws Exception
+   */
   static function contactID($ufID) {
     $contactID = CRM_Core_BAO_UFMatch::getContactId($ufID);
     if ($contactID) {
@@ -94,6 +120,14 @@ class CRM_Bridge_OG_Utils {
     return $contactID;
   }
 
+  /**
+   * @param $source
+   * @param null $title
+   * @param bool $abort
+   *
+   * @return null|string
+   * @throws Exception
+   */
   static function groupID($source, $title = NULL, $abort = FALSE) {
     $query = "
 SELECT id

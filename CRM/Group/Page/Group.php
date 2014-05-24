@@ -35,6 +35,9 @@
 class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   protected $_sortByCharacter;
 
+  /**
+   * @return string
+   */
   function getBAOName() {
     return 'CRM_Contact_BAO_Group';
   }

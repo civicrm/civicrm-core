@@ -386,6 +386,10 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
   }
 
   //@TODO this function changed, debug this at runtime
+  /**
+   * @param $whereClause
+   * @param $whereParams
+   */
   function pagerAtoZ($whereClause, $whereParams) {
     $where = '';
     if ($whereClause) {

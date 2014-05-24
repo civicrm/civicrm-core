@@ -10,10 +10,18 @@
 class DirStack {
   protected $dirs;
 
+  /**
+   * @param array $dirs
+   */
   function __construct($dirs = array()) {
     $this->dirs = $dirs;
   }
 
+  /**
+   * @param $dir
+   *
+   * @throws Exception
+   */
   function push($dir) {
     $this->dirs[] = getcwd();
     if (!chdir($dir)) {
@@ -66,6 +74,9 @@ class PullRequest {
 
   protected $data;
 
+  /**
+   * @return mixed
+   */
   public function getNumber() {
     return $this->data->number;
   }
@@ -85,6 +96,9 @@ class PullRequest {
   }
 }
 
+/**
+ * Class Givi
+ */
 class Givi {
 
   /**
@@ -167,6 +181,9 @@ class Givi {
    */
   protected $dirStack;
 
+  /**
+   *
+   */
   function __construct() {
     $this->dirStack = new DirStack();
     $this->repos = array(
@@ -178,6 +195,11 @@ class Givi {
     );
   }
 
+  /**
+   * @param $args
+   *
+   * @throws Exception
+   */
   function main($args) {
     if (!$this->parseOptions($args)) {
       printf("Error parsing arguments\n");
@@ -350,6 +372,11 @@ class Givi {
     echo "local branches.\n";
   }
 
+  /**
+   * @param null $baseBranch
+   *
+   * @return bool
+   */
   function doCheckoutAll($baseBranch = NULL) {
     if (!$baseBranch) {
       return $this->returnError("Missing <branch>\n");
@@ -366,6 +393,9 @@ class Givi {
     return TRUE;
   }
 
+  /**
+   * @return bool
+   */
   function doStatusAll() {
     foreach ($this->repos as $repo => $relPath) {
       $this->run($repo, $relPath, 'git', 'status');
@@ -373,6 +403,11 @@ class Givi {
     return TRUE;
   }
 
+  /**
+   * @param null $baseBranch
+   *
+   * @return bool
+   */
   function doBegin($baseBranch = NULL) {
     if (!$baseBranch) {
       return $this->returnError("Missing <base-branch>\n");
@@ -400,6 +435,12 @@ class Givi {
     return TRUE;
   }
 
+  /**
+   * @param null $baseBranch
+   *
+   * @return bool
+   * @throws Exception
+   */
   function doResume($baseBranch = NULL) {
     if (!$baseBranch) {
       return $this->returnError("Missing <base-branch>\n");
@@ -426,6 +467,11 @@ class Givi {
     return TRUE;
   }
 
+  /**
+   * @param null $baseBranch
+   *
+   * @return bool
+   */
   function doReview($baseBranch = NULL) {
     if (! $this->doCheckoutAll($baseBranch)) {
       return FALSE;
@@ -491,6 +537,12 @@ class Givi {
   }
   */
 
+  /**
+   * @param $newBranchRepo
+   * @param $newBranchNames
+   *
+   * @return bool
+   */
   function doPush($newBranchRepo, $newBranchNames) {
     if (!$newBranchRepo) {
       return $this->returnError("Missing <remote>\n");
@@ -608,6 +660,12 @@ class Givi {
     return $branches;
   }
 
+  /**
+   * @param $repoName
+   * @param $branchName
+   *
+   * @return string
+   */
   function filterBranchName($repoName, $branchName) {
     if ($branchName == '') {
       return '';
@@ -645,6 +703,11 @@ class Givi {
     return $repos;
   }
 
+  /**
+   * @param $message
+   *
+   * @return bool
+   */
   function returnError($message) {
     echo "\nERROR: ", $message, "\n\n";
     $this->doHelp();
@@ -652,7 +715,16 @@ class Givi {
   }
 }
 
+/**
+ * Class HttpClient
+ */
 class HttpClient {
+  /**
+   * @param $url
+   * @param $file
+   *
+   * @return bool
+   */
   static function download($url, $file) {
     // PHP native client is unreliable PITA for HTTPS
     if (exec("which wget")) {
@@ -665,6 +737,11 @@ class HttpClient {
     return TRUE;
   }
 
+  /**
+   * @param $url
+   *
+   * @return mixed
+   */
   static function getJson($url) {
     $file = tempnam(sys_get_temp_dir(), 'givi-json-');
     HttpClient::download($url, $file);

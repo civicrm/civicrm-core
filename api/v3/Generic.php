@@ -205,6 +205,9 @@ function civicrm_api3_generic_getvalue($apiRequest) {
   return civicrm_api3_create_error("missing param return=field you want to read the value of", array('error_type' => 'mandatory_missing', 'missing_param' => 'return'));
 }
 
+/**
+ * @param $params
+ */
 function _civicrm_api3_generic_getrefcount_spec(&$params) {
   $params['id']['api.required'] = 1;
 }

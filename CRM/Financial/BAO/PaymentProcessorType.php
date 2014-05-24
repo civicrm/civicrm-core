@@ -206,6 +206,11 @@ WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
     }
   }
 
+  /**
+   * @param $attr
+   *
+   * @return array
+   */
   static private function getAllPaymentProcessorTypes($attr) {
     $ppt = array();
     $dao = new CRM_Financial_DAO_PaymentProcessorType();

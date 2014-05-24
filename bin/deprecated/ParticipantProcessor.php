@@ -34,7 +34,14 @@
 
 require_once '../civicrm.config.php';
 require_once 'CRM/Core/Config.php';
+
+/**
+ * Class CRM_ParticipantProcessor
+ */
 class CRM_ParticipantProcessor {
+  /**
+   *
+   */
   function __construct() {
     $config = CRM_Core_Config::singleton();
 

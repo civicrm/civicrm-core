@@ -49,6 +49,9 @@ class CRM_Admin_Form_Persistent extends CRM_Core_Form {
     parent::preProcess();
   }
 
+  /**
+   * @return array
+   */
   public function setDefaultValues() {
     $defaults = array();
 
