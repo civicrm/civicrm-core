@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Pledge_ContactContextAddTest
+ */
 class WebTest_Pledge_ContactContextAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

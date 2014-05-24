@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Profile_DedupeTest
+ */
 class WebTest_Profile_DedupeTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

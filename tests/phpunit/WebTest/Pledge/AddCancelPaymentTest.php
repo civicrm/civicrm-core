@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Pledge_AddCancelPaymentTest
+ */
 class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -85,25 +89,25 @@ class WebTest_Pledge_AddCancelPaymentTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
 
-    //Check whether the next two payments are done or not   
+    //Check whether the next two payments are done or not
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='View Payment']");
     $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]","Completed");
     $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[4]/td[7]","Completed");
 
-    
+
     //Cancel the contribution made for amount of 300.00
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='View Payment']");
     $this->click("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a");
     $this->waitForElementPresent("xpath=//form[@id='ContributionView']//div[2]/div/div/a");
     $this->click("xpath=//form[@id='ContributionView']//div[2]/div/div/a");
-    $this->waitForElementPresent("_qf_Contribution_upload-bottom"); 
+    $this->waitForElementPresent("_qf_Contribution_upload-bottom");
     $this->select('contribution_status_id', 'value=3');
-    $this->click("_qf_Contribution_upload-bottom"); 
+    $this->click("_qf_Contribution_upload-bottom");
 
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']");
     $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[1]/span/a");
     $this->waitForElementPresent("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]");
-    
+
     // verify that first paayment is cancelled and the rest two payments are revert back to the pending status
     $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[7]","Cancelled");
     $this->verifyText("xpath=//div[@class='view-content']//table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[7]","Pending");

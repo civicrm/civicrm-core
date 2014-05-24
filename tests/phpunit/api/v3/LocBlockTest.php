@@ -26,6 +26,10 @@
 */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_LocBlockTest
+ */
 class api_v3_LocBlockTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_entity = 'loc_block';

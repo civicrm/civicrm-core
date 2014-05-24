@@ -17,6 +17,9 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
 
   protected $_params = array();
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Contact BAOs',

@@ -26,6 +26,10 @@
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 require_once 'CRM/Utils/Array.php';
+
+/**
+ * Class ImportCiviSeleniumTestCase
+ */
 class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
 
   /*

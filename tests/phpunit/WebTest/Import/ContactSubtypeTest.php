@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_ContactSubtypeTest
+ */
 class WebTest_Import_ContactSubtypeTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {

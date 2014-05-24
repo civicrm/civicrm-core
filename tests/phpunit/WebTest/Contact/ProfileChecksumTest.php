@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_ProfileChecksumTest
+ */
 class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

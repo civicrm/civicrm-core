@@ -28,6 +28,10 @@
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_GroupContactTest
+ */
 class api_v3_GroupContactTest extends CiviUnitTestCase {
 
   protected $_contactId;

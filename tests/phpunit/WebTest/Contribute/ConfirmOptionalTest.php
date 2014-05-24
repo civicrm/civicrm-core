@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_ConfirmOptionalTest
+ */
 class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
   protected $pageId = 0;
 

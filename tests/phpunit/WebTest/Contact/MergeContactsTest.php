@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_MergeContactsTest
+ */
 class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

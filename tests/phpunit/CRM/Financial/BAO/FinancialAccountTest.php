@@ -26,8 +26,14 @@
 */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Financial_BAO_FinancialAccountTest
+ */
 class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'FinancialAccount BAOs',

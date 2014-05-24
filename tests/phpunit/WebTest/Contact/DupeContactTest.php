@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_DupeContactTest
+ */
 class WebTest_Contact_DupeContactTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

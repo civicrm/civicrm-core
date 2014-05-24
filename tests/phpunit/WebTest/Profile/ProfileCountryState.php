@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Profile_ProfileCountryState
+ */
 class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -32,7 +36,7 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
   }
 
   function testStateCountry() {
-    $this->webtestLogin();    
+    $this->webtestLogin();
     $config = CRM_Core_Config::singleton();
     // Add new profile.
     $this->openCiviPage('admin/uf/group', 'reset=1');
@@ -46,7 +50,7 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
     //click on save
     $this->click('_qf_Group_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
 
     //check for  profile create
     $this->waitForText('crm-notification-container', "Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
@@ -99,7 +103,7 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
         $this->click("_qf_Localization_next-bottom");
         $this->waitForPageToLoad($this->getTimeoutMsec());
         $this->waitForText('crm-notification-container', "Saved");
-      } 
+      }
       $this->openCiviPage("profile/create", "gid=$gid&reset=1", NULL);
 
       $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/div/div[2]/select");

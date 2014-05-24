@@ -20,6 +20,9 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals('privately-modified', $fooNonReference['foo']);
   }
 
+  /**
+   * @return null
+   */
   private function &returnByReference() {
     static $foo;
     if ($foo === NULL) {

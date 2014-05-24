@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_TaskActionSendMassMailing
+ */
 class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
 
   protected function setUp() {
