@@ -137,7 +137,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * If u have multiple groups of checkboxes, you will need to give them different
    * ids to avoid potential name collision
    *
-   * @var const string / int
+   * @var string|int
    */
   CONST CB_PREFIX = 'mark_x_', CB_PREFIY = 'mark_y_', CB_PREFIZ = 'mark_z_', CB_PREFIX_LEN = 7;
 
@@ -148,12 +148,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * of default convenient functions, rules and buttons
    *
    * @param object $state State associated with this form
-   * @param \const|\enum $action The mode the form is operating in (None/Create/View/Update/Delete)
+   * @param \const|\enum|int $action The mode the form is operating in (None/Create/View/Update/Delete)
    * @param string $method The type of http method used (GET/POST)
    * @param string $name The name of the form if different from class name
    *
    * @return \CRM_Core_Form
-  @access public
+   * @access public
    */
   function __construct(
     $state = NULL,
