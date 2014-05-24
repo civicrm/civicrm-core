@@ -4,12 +4,19 @@
  * Class CRM_Core_CodeGen_Util_File
  */
 class CRM_Core_CodeGen_Util_File {
+  /**
+   * @param $dir
+   * @param int $perm
+   */
   static function createDir($dir, $perm = 0755) {
     if (!is_dir($dir)) {
       mkdir($dir, $perm, TRUE);
     }
   }
 
+  /**
+   * @param $dir
+   */
   static function removeDir($dir) {
     foreach (glob("$dir/*") as $tempFile) {
       unlink($tempFile);
@@ -17,6 +24,11 @@ class CRM_Core_CodeGen_Util_File {
     rmdir($dir);
   }
 
+  /**
+   * @param $prefix
+   *
+   * @return string
+   */
   static function createTempDir($prefix) {
     if (isset($_SERVER['TMPDIR'])) {
       $tempDir = $_SERVER['TMPDIR'];

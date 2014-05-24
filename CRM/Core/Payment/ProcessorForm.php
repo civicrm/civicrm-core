@@ -38,6 +38,13 @@
  */
 class CRM_Core_Payment_ProcessorForm {
 
+  /**
+   * @param $form
+   * @param null $type
+   * @param null $mode
+   *
+   * @throws Exception
+   */
   static function preProcess(&$form, $type = NULL, $mode = NULL ) {
     if ($type) {
       $form->_type = $type;
@@ -100,6 +107,9 @@ class CRM_Core_Payment_ProcessorForm {
     }
   }
 
+  /**
+   * @param $form
+   */
   static function buildQuickform(&$form) {
     $form->addElement('hidden', 'hidden_processor', 1);
 

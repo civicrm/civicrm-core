@@ -37,6 +37,10 @@
  */
 
 require_once 'CRM/Core/I18n.php';
+
+/**
+ * Class CRM_Core_Base
+ */
 class CRM_Core_Base {
 
   /**

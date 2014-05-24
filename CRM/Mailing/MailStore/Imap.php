@@ -35,6 +35,10 @@
 
 require_once 'ezc/Base/src/ezc_bootstrap.php';
 require_once 'ezc/autoload/mail_autoload.php';
+
+/**
+ * Class CRM_Mailing_MailStore_Imap
+ */
 class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
 
   /**

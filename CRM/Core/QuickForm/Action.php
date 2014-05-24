@@ -35,6 +35,10 @@
  *
  */
 require_once 'HTML/QuickForm/Action.php';
+
+/**
+ * Class CRM_Core_QuickForm_Action
+ */
 class CRM_Core_QuickForm_Action extends HTML_QuickForm_Action {
 
   /**

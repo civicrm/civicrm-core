@@ -41,6 +41,9 @@ require_once 'Mail.php';
 
 require_once 'api/api.php';
 
+/**
+ * Class CRM_Core_Config
+ */
 class CRM_Core_Config extends CRM_Core_Config_Variables {
   ///
   /// BASE SYSTEM PROPERTIES (CIVICRM.SETTINGS.PHP)

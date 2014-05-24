@@ -249,6 +249,11 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
     return $params;
   }
 
+  /**
+   * @param $response
+   *
+   * @return bool
+   */
   function isError(&$response) {
     $responseCode = $response->getResponseCode();
     if (is_null($responseCode)) {
@@ -264,6 +269,11 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
   }
 
   // ignore for now, more elaborate error handling later.
+  /**
+   * @param $response
+   *
+   * @return object
+   */
   function &checkResult(&$response) {
     return $response;
 
@@ -290,6 +300,11 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
     return $e;
   }
 
+  /**
+   * @param null $error
+   *
+   * @return object
+   */
   function &error($error = NULL) {
     $e = CRM_Core_Error::singleton();
     if (is_object($error)) {
