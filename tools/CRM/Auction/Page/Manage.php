@@ -260,6 +260,13 @@ ORDER BY start_date desc
     $form->run();
   }
 
+  /**
+   * @param $params
+   * @param bool $sortBy
+   * @param $force
+   *
+   * @return int|string
+   */
   function whereClause(&$params, $sortBy = TRUE, $force) {
     $values  = array();
     $clauses = array();
@@ -299,6 +306,10 @@ ORDER BY start_date desc
     return implode(' AND ', $clauses);
   }
 
+  /**
+   * @param $whereClause
+   * @param $whereParams
+   */
   function pager($whereClause, $whereParams) {
     require_once 'CRM/Utils/Pager.php';
 
@@ -322,6 +333,10 @@ SELECT count(id)
     $this->assign_by_ref('pager', $this->_pager);
   }
 
+  /**
+   * @param $whereClause
+   * @param $whereParams
+   */
   function pagerAtoZ($whereClause, $whereParams) {
     require_once 'CRM/Utils/PagerAToZ.php';
 

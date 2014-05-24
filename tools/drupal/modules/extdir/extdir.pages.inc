@@ -237,14 +237,36 @@ class ExtdirQueryHelper {
   function create($query, $entityAliases) {
     return new ExtdirQueryHelper($query, $entityAliases);
   }
+
+  /**
+   * @param $query
+   * @param $entityAliases
+   */
   function __construct($query, $entityAliases) {
     $this->query = $query;
     $this->entityAliases = $entityAliases;
   }
-  function innerJoinFieldAPI($entityAlias, $joinToField, $joinToAlias = NULL, $joinToColumn = 'entity_id') {
+
+  /**
+   * @param $entityAlias
+   * @param $joinToField
+   * @param null $joinToAlias
+   * @param string $joinToColumn
+   *
+   * @return $this
+   */function innerJoinFieldAPI($entityAlias, $joinToField, $joinToAlias = NULL, $joinToColumn = 'entity_id') {
     return $this->joinFieldAPI('INNER', $entityAlias, $joinToField, $joinToAlias, $joinToColumn);
   }
-  function joinFieldAPI($type, $entityAlias, $joinToField, $joinToAlias = NULL, $joinToColumn = 'entity_id') {
+
+  /**
+   * @param $type
+   * @param $entityAlias
+   * @param $joinToField
+   * @param null $joinToAlias
+   * @param string $joinToColumn
+   *
+   * @return $this
+   */function joinFieldAPI($type, $entityAlias, $joinToField, $joinToAlias = NULL, $joinToColumn = 'entity_id') {
     if ($joinToAlias === NULL) {
       $joinToAlias = $joinToField;
     }

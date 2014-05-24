@@ -35,7 +35,20 @@
 
 require_once 'CRM/Core/Form.php';
 require_once 'CRM/Core/OptionGroup.php';
+
+/**
+ * Class CRM_Auction_Form_SearchAuction
+ */
 class CRM_Auction_Form_SearchAuction extends CRM_Core_Form {
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array reference to the array of default values
+   *
+   */
   function setDefaultValues() {
     $defaults = array();
     $defaults['auctionsByDates'] = 0;

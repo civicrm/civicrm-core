@@ -74,6 +74,15 @@ class CRM_Auction_Form_ItemAccount extends CRM_Core_Form {
     $this->assign('displayRecent', FALSE);
   }
 
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array reference to the array of default values
+   *
+   */
   function setDefaultValues() {
     if (!$this->_donorID) {
       return;

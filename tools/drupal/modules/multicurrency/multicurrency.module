@@ -36,6 +36,10 @@ define('MULTICURRENCY_EVENT_ID_1', 4);
 define('MULTICURRENCY_EVENT_ID_2', 8);
 define('DISCOUNT_EVENT_ID_1', 4);
 define('DISCOUNT_EVENT_ID_2', 8);
+/**
+ * @param $formName
+ * @param $form
+ */
 function multicurrency_civicrm_buildForm($formName,
   &$form
 ) {
@@ -72,6 +76,11 @@ function multicurrency_civicrm_buildForm($formName,
   }
 }
 
+/**
+ * @param $form
+ *
+ * @return string
+ */
 function multicurrency_set_currency(&$form) {
   static $processed = FALSE;
 
@@ -92,6 +101,11 @@ function multicurrency_set_currency(&$form) {
   return $config->defaultCurrency;
 }
 
+/**
+ * @param $pageType
+ * @param $form
+ * @param $amount
+ */
 function multicurrency_civicrm_buildAmount($pageType,
   &$form,
   &$amount
@@ -136,6 +150,9 @@ function multicurrency_civicrm_buildAmount($pageType,
   }
 }
 
+/**
+ * @param $page
+ */
 function multicurrency_civicrm_pageRun(&$page) {
 
   if ($page->getVar('_name') == 'CRM_Event_Page_EventInfo' &&
@@ -148,6 +165,12 @@ function multicurrency_civicrm_pageRun(&$page) {
 }
 
 //---- Discount using codes ------//
+/**
+ * @param $eventID
+ * @param $discountCode
+ *
+ * @return array
+ */
 function _multicurrency_discountHelper($eventID, $discountCode) {
   $sql = "
 SELECT v.id as id, v.value as value, v.weight as weight
@@ -178,6 +201,10 @@ AND    g.name = %2
 
 /*
  * The hook updates the random code used with event signup.
+ */
+/**
+ * @param $class
+ * @param $form
  */
 function multicurrency_civicrm_postProcess($class, &$form) {
   $eventID = $form->getVar('_eventId');

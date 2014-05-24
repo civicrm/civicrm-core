@@ -37,6 +37,10 @@
 require_once 'CRM/Core/Payment/BaseIPN.php';
 
 define('GOOGLE_DEBUG_PP', 1);
+
+/**
+ * Class org_civicrm_payment_googlecheckout_GoogleIPN
+ */
 class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
@@ -56,6 +60,14 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    */
   static protected $_mode = NULL;
 
+  /**
+   * @param $name
+   * @param $type
+   * @param $object
+   * @param bool $abort
+   *
+   * @return mixed
+   */
   static function retrieve($name, $type, $object, $abort = TRUE) {
     $value = CRM_Utils_Array::value($name, $object);
     if ($abort && $value === NULL) {
@@ -524,7 +536,13 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
       }
     }
 
-    function getInput(&$input, &$ids) {
+  /**
+   * @param $input
+   * @param $ids
+   *
+   * @return bool
+   */
+  function getInput(&$input, &$ids) {
       if (!$this->getBillingID($ids)) {
         return FALSE;
       }
