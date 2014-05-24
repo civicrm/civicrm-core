@@ -1527,7 +1527,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $returnColumn
    * @param $searchColumn
    * @param $expectedValue
-   * @param $message
+   * @param string $message
    */
   function assertDBCompareValue($daoName, $searchValue, $returnColumn, $searchColumn,
                                 $expectedValue, $message
