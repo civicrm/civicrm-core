@@ -38,6 +38,9 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
   protected $_tables;
   protected $_options;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     parent::__construct($formValues);
 
@@ -88,6 +91,9 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
     }
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
 
     /**
@@ -128,10 +134,22 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
     }
   }
 
+  /**
+   * @return null
+   */
   function summary() {
     return NULL;
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return string
+   */
   function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
     //redirect if custom group not select in search criteria
     if (empty($this->_formValues['custom_group'])) {
@@ -168,6 +186,9 @@ contact_a.sort_name    as sort_name,
     );
   }
 
+  /**
+   * @return string
+   */
   function from() {
     $from = "FROM civicrm_contact contact_a";
     $customFrom = array();
@@ -193,6 +214,11 @@ contact_a.sort_name    as sort_name,
     return $from;
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     $count  = 1;
     $clause = array();
@@ -238,14 +264,23 @@ contact_a.sort_name    as sort_name,
     return $this->whereClause($where, $params);
   }
 
+  /**
+   * @return string
+   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Custom/MultipleValues.tpl';
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     return array();
   }
 
+  /**
+   * @param $row
+   */
   function alterRow(&$row) {
     foreach ($this->_options as $fieldID => $values) {
       $customVal = $valueSeparatedArray = array();
@@ -297,6 +332,9 @@ contact_a.sort_name    as sort_name,
     }
   }
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     CRM_Utils_System::setTitle($title);
   }

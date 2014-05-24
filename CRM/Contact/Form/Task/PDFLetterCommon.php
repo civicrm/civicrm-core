@@ -63,6 +63,10 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     CRM_Utils_System::setTitle('Create Printable Letters (PDF)');
   }
 
+  /**
+   * @param $form
+   * @param $cid
+   */
   static function preProcessSingle(&$form, $cid) {
     $form->_contactIds = array($cid);
     // put contact display name in title for single contact mode
@@ -382,6 +386,13 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     CRM_Utils_System::civiExit(1);
   }
 
+  /**
+   * @param $form
+   * @param $html_message
+   * @param $contactIds
+   *
+   * @throws CRM_Core_Exception
+   */
   static function createActivities($form, $html_message, $contactIds) {
     //Added for CRM-12682: Add activity subject and campaign fields
     $formValues     = $form->controller->exportValues($form->getName());
@@ -430,6 +441,9 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     }
   }
 
+  /**
+   * @param $message
+   */
   static function formatMessage(&$message) {
     $newLineOperators = array(
       'p' => array(

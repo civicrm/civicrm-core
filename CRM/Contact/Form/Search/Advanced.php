@@ -177,6 +177,15 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     }
   }
 
+  /**
+   * Use the form name to create the tpl file name
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     if (!$this->_searchPane) {
       return parent::getTemplateFileName();
@@ -350,7 +359,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
         $this->_formValues['contact_tags'][$value] = 1;
       }
     }
-    
+
     // CRM-13848
     $financialType = CRM_Utils_Array::value('financial_type_id', $this->_formValues);
     if ($financialType && is_array($financialType)) {
@@ -359,7 +368,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
         $this->_formValues['financial_type_id'][$typeID] = 1;
       }
     }
-    
+
     $taglist = CRM_Utils_Array::value('contact_taglist', $this->_formValues);
 
     if ($taglist && is_array($taglist)) {

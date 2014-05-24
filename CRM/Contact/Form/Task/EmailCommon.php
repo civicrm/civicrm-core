@@ -45,6 +45,9 @@ class CRM_Contact_Form_Task_EmailCommon {
   public $_allContactDetails = array();
   public $_toContactEmails = array();
 
+  /**
+   * @param $form
+   */
   static function preProcessFromAddress(&$form) {
     $form->_single = FALSE;
     $className = CRM_Utils_System::getClassName($form);

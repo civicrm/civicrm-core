@@ -40,18 +40,35 @@ class CRM_Contact_Form_Search_Custom_Base {
 
   protected $_stateID;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     $this->_formValues = &$formValues;
   }
 
+  /**
+   * @return null|string
+   */
   function count() {
     return CRM_Core_DAO::singleValueQuery($this->sql('count(distinct contact_a.id) as total'));
   }
 
+  /**
+   * @return null
+   */
   function summary() {
     return NULL;
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $returnSQL
+   *
+   * @return string
+   */
   function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     $sql = $this->sql(
       'contact_a.id as contact_id',
@@ -68,6 +85,16 @@ class CRM_Contact_Form_Search_Custom_Base {
     return CRM_Core_DAO::composeQuery($sql, CRM_Core_DAO::$_nullArray);
   }
 
+  /**
+   * @param $selectClause
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param null $groupBy
+   *
+   * @return string
+   */
   function sql(
     $selectClause,
     $offset   = 0,
@@ -97,6 +124,9 @@ class CRM_Contact_Form_Search_Custom_Base {
     return $sql;
   }
 
+  /**
+   * @return null
+   */
   function templateFile() {
     return NULL;
   }
@@ -105,6 +135,10 @@ class CRM_Contact_Form_Search_Custom_Base {
     return $this->_columns;
   }
 
+  /**
+   * @param $sql
+   * @param $formValues
+   */
   static function includeContactIDs(&$sql, &$formValues) {
     $contactIDs = array();
     foreach ($formValues as $id => $value) {
@@ -121,6 +155,12 @@ class CRM_Contact_Form_Search_Custom_Base {
     }
   }
 
+  /**
+   * @param $sql
+   * @param $offset
+   * @param $rowcount
+   * @param $sort
+   */
   function addSortOffset(&$sql, $offset, $rowcount, $sort) {
     if (!empty($sort)) {
       if (is_string($sort)) {
@@ -140,6 +180,12 @@ class CRM_Contact_Form_Search_Custom_Base {
     }
   }
 
+  /**
+   * @param $sql
+   * @param bool $onlyWhere
+   *
+   * @throws Exception
+   */
   function validateUserSQL(&$sql, $onlyWhere = FALSE) {
     $includeStrings = array('contact_a');
     $excludeStrings = array('insert', 'delete', 'update');
@@ -165,12 +211,21 @@ class CRM_Contact_Form_Search_Custom_Base {
     }
   }
 
+  /**
+   * @param $where
+   * @param $params
+   *
+   * @return string
+   */
   function whereClause(&$where, &$params) {
     return CRM_Core_DAO::composeQuery($where, $params, TRUE);
   }
 
   // override this method to define the contact query object
   // used for creating $sql
+  /**
+   * @return null
+   */
   function getQueryObj() {
     return NULL;
   }

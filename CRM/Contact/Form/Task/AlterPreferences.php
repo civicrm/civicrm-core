@@ -80,6 +80,12 @@ class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
     return $defaults;
   }
 
+  /**
+   * @param $form
+   * @param $rule
+   *
+   * @return array
+   */
   static function formRule($form, $rule) {
     $errors = array();
     if (empty($form['pref']) && empty($form['contact_taglist'])) {
