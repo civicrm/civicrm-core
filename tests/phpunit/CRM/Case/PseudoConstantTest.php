@@ -1,7 +1,13 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Case_PseudoConstantTest
+ */
 class CRM_Case_PseudoConstantTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Case PseudoConstants',

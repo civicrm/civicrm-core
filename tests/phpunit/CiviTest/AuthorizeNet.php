@@ -10,6 +10,9 @@ class AuthorizeNet extends PHPUnit_Framework_Testcase {
      *
      * @return $paymentProcessor id of created payment processor
      */
+  /**
+   * @return CRM_Financial_DAO_PaymentProcessor
+   */
   function create() {
 
     $paymentProcessor = new CRM_Financial_DAO_PaymentProcessor();

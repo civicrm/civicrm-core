@@ -199,6 +199,13 @@ class CRM_Auction_Page_Item extends CRM_Core_Page {
     $form->run();
   }
 
+  /**
+   * @param $params
+   * @param bool $sortBy
+   * @param $force
+   *
+   * @return int|string
+   */
   function whereClause(&$params, $sortBy = TRUE, $force) {
     $values  = array();
     $clauses = array();
@@ -238,6 +245,10 @@ class CRM_Auction_Page_Item extends CRM_Core_Page {
     return implode(' AND ', $clauses);
   }
 
+  /**
+   * @param $whereClause
+   * @param $whereParams
+   */
   function pager($whereClause, $whereParams) {
     require_once 'CRM/Utils/Pager.php';
 
@@ -261,6 +272,10 @@ SELECT count(id)
     $this->assign_by_ref('pager', $this->_pager);
   }
 
+  /**
+   * @param $whereClause
+   * @param $whereParams
+   */
   function pagerAtoZ($whereClause, $whereParams) {
     require_once 'CRM/Utils/PagerAToZ.php';
 

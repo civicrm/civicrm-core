@@ -1,5 +1,9 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Utils_ArrayTest
+ */
 class CRM_Utils_ArrayTest extends CiviUnitTestCase {
   function testBreakReference() {
     // Get a reference and make a change

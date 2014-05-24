@@ -1,5 +1,9 @@
 <?php
 require_once "CRM/Financial/DAO/PaymentProcessor.php";
+
+/**
+ * Class PaypalPro
+ */
 class PaypalPro extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to create

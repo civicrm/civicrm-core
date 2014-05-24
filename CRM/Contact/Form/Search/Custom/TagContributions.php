@@ -211,6 +211,9 @@ WHERE  $where
   /*
      * Functions below generally don't need to be modified
      */
+  /**
+   * @return mixed
+   */
   function count() {
     $sql = $this->all();
 

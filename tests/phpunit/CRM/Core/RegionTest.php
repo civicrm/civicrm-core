@@ -2,7 +2,13 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Core_RegionTest
+ */
 class CRM_Core_RegionTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name'    => 'Region',
