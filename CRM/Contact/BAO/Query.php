@@ -2116,7 +2116,9 @@ class CRM_Contact_BAO_Query {
             CRM_Core_Error::fatal();
           }
         }
-        $value = CRM_Core_DAO::createSQLFilter($name, $value, NULL);
+        $this->_where[$grouping][] = CRM_Core_DAO::createSQLFilter($name, $value, NULL);
+        //since this is not currently being called by the form layer we can skip worrying about the 'qill' for now
+        return;
       }
 
       if (!empty($field['where'])) {

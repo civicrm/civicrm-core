@@ -1800,4 +1800,25 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contacts = $this->callAPISuccess('contact', 'get', array('legal_name' => array('IS NULL' => TRUE)));
     $this->assertEquals($contacts['count'], CRM_Core_DAO::singleValueQuery('select count(*) FROM civicrm_contact WHERE legal_name IS NULL'));
   }
+
+  /**
+  /**
+   * CRM-14743 - test api respects search operators
+   */
+  function testGetModifiedDateByOperators() {
+    $preExistingContactCount = CRM_Core_DAO::singleValueQuery('select count(*) FROM civicrm_contact');
+    $contact1 = $this->individualCreate();
+    $sql = "UPDATE civicrm_contact SET created_date = '2012-01-01', modified_date = '2013-01-01' WHERE id = " . $contact1;
+    CRM_Core_DAO::executeQuery($sql);
+    $contact2 = $this->individualCreate();
+    $sql = "UPDATE civicrm_contact SET created_date = '2012-02-01', modified_date = '2013-02-01' WHERE id = " . $contact2;
+    CRM_Core_DAO::executeQuery($sql);
+    $contact3 = $this->householdCreate();
+    $sql = "UPDATE civicrm_contact SET created_date = '2012-03-01', modified_date = '2013-03-01' WHERE id = " . $contact3;
+    CRM_Core_DAO::executeQuery($sql);
+    $contacts = $this->callAPISuccess('contact', 'get', array('modified_date' => array('<' => '2014-01-01')));
+    $this->assertEquals($contacts['count'], 3);
+    $contacts = $this->callAPISuccess('contact', 'get', array('modified_date' => array('>' => '2014-01-01')));
+    $this->assertEquals($contacts['count'], $preExistingContactCount);
+  }
 }
