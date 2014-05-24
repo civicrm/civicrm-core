@@ -1,6 +1,9 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Utils_SQL_SelectTest
+ */
 class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
   function testGetDefault() {
     $select = CRM_Utils_SQL_Select::from('foo bar');

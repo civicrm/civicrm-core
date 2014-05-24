@@ -1,5 +1,9 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Utils_HookTest
+ */
 class CRM_Utils_HookTest extends CiviUnitTestCase {
 
   static $activeTest = NULL;

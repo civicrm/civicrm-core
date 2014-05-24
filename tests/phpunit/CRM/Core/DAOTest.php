@@ -1,7 +1,14 @@
 <?php
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Core_DAOTest
+ */
 class CRM_Core_DAOTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name'    => 'DAO',

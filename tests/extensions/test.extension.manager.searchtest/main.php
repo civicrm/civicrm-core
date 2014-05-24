@@ -1,6 +1,10 @@
 <?php
 
 require_once 'CRM/Contact/Form/Search/Custom/Base.php';
+
+/**
+ * Class test_extension_manager_searchtest
+ */
 class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
   /**
    * @param $formValues
