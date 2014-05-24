@@ -189,6 +189,12 @@ AND    $operationClause LIMIT 1";
     return (bool) CRM_Core_DAO::singleValueQuery($sql, $params);
   }
 
+  /**
+   * @param string $contactAlias
+   * @param null $contactID
+   *
+   * @return array
+   */
   static function cacheClause($contactAlias = 'contact_a', $contactID = NULL) {
     if (CRM_Core_Permission::check('view all contacts') ||
       CRM_Core_Permission::check('edit all contacts')
@@ -328,6 +334,13 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
   }
 
 
+  /**
+   * @param $contactID
+   * @param $form
+   * @param bool $redirect
+   *
+   * @return bool
+   */
   static function validateOnlyChecksum($contactID, &$form, $redirect = TRUE) {
     // check if this is of the format cs=XXX
     if (!CRM_Contact_BAO_Contact_Utils::validChecksum($contactID,
@@ -359,6 +372,10 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
     return TRUE;
   }
 
+  /**
+   * @param bool $checkSumValidationResult
+   * @param null $form
+   */
   static function initChecksumAuthSrc($checkSumValidationResult = FALSE, $form = NULL) {
     $session = CRM_Core_Session::singleton();
     if ($checkSumValidationResult && $form && CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)) {
@@ -371,6 +388,13 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
     }
   }
 
+  /**
+   * @param $contactID
+   * @param $form
+   * @param bool $redirect
+   *
+   * @return bool
+   */
   static function validateChecksumContact($contactID, &$form, $redirect = TRUE) {
     if (!self::allow($contactID, CRM_Core_Permission::EDIT)) {
       // check if this is of the format cs=XXX

@@ -87,6 +87,17 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
     $this->assign('single', $this->_single);
   }
 
+  /**
+   * This function sets the default values for the form. Relationship that in edit/view action
+   * the default values are retrieved from the database
+   *
+   * @access public
+   *
+   * @return void
+   */
+  /**
+   *
+   */
   function setDefaultValues() {
     $defaults = array();
     if (isset($this->_activityId)) {

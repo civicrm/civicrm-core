@@ -241,6 +241,12 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     return $dao->delete();
   }
 
+  /**
+   * @param $params
+   * @param $defaults
+   *
+   * @return CRM_Report_DAO_ReportInstance|null
+   */
   static function retrieve($params, &$defaults) {
     $instance = new CRM_Report_DAO_ReportInstance();
     $instance->copyValues($params);

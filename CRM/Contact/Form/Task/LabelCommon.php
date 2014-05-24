@@ -389,6 +389,11 @@ class CRM_Contact_Form_Task_LabelCommon {
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function mergeSameHousehold(&$rows) {
     # group selected contacts by type
     $individuals = array();

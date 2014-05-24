@@ -42,6 +42,12 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
 
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
     $this->_columns = array(
@@ -299,6 +305,9 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
     parent::postProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $checkList = array();

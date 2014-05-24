@@ -48,6 +48,12 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
     'Contact', 'Individual', 'Household', 'Organization'
   );
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -240,6 +246,9 @@ FROM       civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom
     parent::postProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

@@ -37,6 +37,13 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
 
   protected $_summary = NULL;
   protected $_relField = FALSE;
+
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->case_types    = CRM_Case_PseudoConstant::caseType();
     $this->case_statuses = CRM_Case_PseudoConstant::caseStatus();
@@ -201,6 +208,13 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     if (empty($fields['relationship_type_id_value']) && (array_key_exists('sort_name', $fields['fields']) || array_key_exists('label_b_a', $fields['fields']))) {
@@ -310,6 +324,9 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {

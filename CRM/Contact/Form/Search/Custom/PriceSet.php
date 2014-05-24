@@ -39,6 +39,9 @@ class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Cu
   protected $_tableName = NULL;
   public $_permissionedComponent;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     parent::__construct($formValues);
 
@@ -151,6 +154,11 @@ WHERE participant_id = $participantID;
     }
   }
 
+  /**
+   * @param null $eventID
+   *
+   * @return Object
+   */
   function priceSetDAO($eventID = NULL) {
 
     // get all the events that have a price set associated with it
@@ -177,6 +185,11 @@ AND    p.entity_id    = e.id
     return $dao;
   }
 
+  /**
+   * @param $form
+   *
+   * @throws Exception
+   */
   function buildForm(&$form) {
     $dao = $this->priceSetDAO();
 
@@ -247,10 +260,22 @@ AND    p.entity_id    = e.id
     }
   }
 
+  /**
+   * @return null
+   */
   function summary() {
     return NULL;
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return string
+   */
   function all($offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
@@ -279,6 +304,9 @@ contact_a.display_name   as display_name";
     );
   }
 
+  /**
+   * @return string
+   */
   function from() {
     return "
 FROM       civicrm_contact contact_a
@@ -286,20 +314,37 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
 ";
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     return ' ( 1 ) ';
   }
 
+  /**
+   * @return string
+   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     return array();
   }
 
+  /**
+   * @param $row
+   */
   function alterRow(&$row) {}
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);

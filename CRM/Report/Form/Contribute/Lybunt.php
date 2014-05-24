@@ -46,6 +46,12 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   protected $lifeTime_from = NULL;
   protected $lifeTime_where = NULL;
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $yearsInPast   = 10;
     $yearsInFuture = 1;
@@ -336,6 +342,11 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->assign('chartSupported', TRUE);
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     if (!empty($rows)) {
@@ -429,6 +440,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function buildChart(&$rows) {
 
     $graphRows = array();
@@ -458,6 +472,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
@@ -495,6 +512,12 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   }
 
   // Override "This Year" $op options
+  /**
+   * @param string $type
+   * @param null $fieldName
+   *
+   * @return array
+   */
   function getOperationPair($type = "string", $fieldName = NULL) {
     if ($fieldName == 'yid') {
       return array('calendar' => ts('Is Calendar Year'), 'fiscal' => ts('Fiscal Year Starting'));
