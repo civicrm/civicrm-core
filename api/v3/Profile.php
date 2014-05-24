@@ -686,7 +686,12 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
 
 /**
  * @todo this should be handled by the api wrapper using getfields info - need to check
- * how we add a a pseudoconstant to this pseudoapi to make that work
+ * how we add a a pseudoconstant to this pseudo api to make that work
+ *
+ * @param $profileID
+ *
+ * @return array
+ * @throws CiviCRM_API3_Exception
  */
 function _civicrm_api3_profile_getProfileID($profileID) {
   if(!empty($profileID) && strtolower($profileID) != 'billing' && !is_numeric($profileID)) {
