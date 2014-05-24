@@ -116,6 +116,9 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
     }
   }
 
+  /**
+   * @return array
+   */
   public function setDefaultValues() {
     $defaults = $this->_defaults;
     if (isset($this->_id)) {

@@ -161,6 +161,9 @@ class CRM_Utils_Cache_Memcached {
     return $key;
   }
 
+  /**
+   * @return mixed
+   */
   function flush() {
     return $this->_cache->flush();
   }

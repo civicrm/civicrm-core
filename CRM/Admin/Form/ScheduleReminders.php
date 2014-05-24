@@ -273,6 +273,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * @return int
+   */
   function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['is_active'] = 1;
