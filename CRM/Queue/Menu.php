@@ -43,6 +43,10 @@ require_once 'CRM/Core/I18n.php';
  */
 class CRM_Queue_Menu {
 
+  /**
+   * @param $path
+   * @param $menuPath
+   */
   static function alter($path, &$menuPath) {
     switch ($path) {
       case 'civicrm/queue/runner':

@@ -403,6 +403,9 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     }
   }
 
+  /**
+   * @return mixed
+   */
   function count() {
     $sql = $this->all();
 

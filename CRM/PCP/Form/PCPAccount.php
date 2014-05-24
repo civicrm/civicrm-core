@@ -116,6 +116,9 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $this->_defaults = array();
     if ($this->_contactID) {

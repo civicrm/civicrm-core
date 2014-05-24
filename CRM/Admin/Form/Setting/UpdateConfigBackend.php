@@ -91,6 +91,11 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
     return $this->_defaults;
   }
 
+  /**
+   * @param $fields
+   *
+   * @return array
+   */
   static function formRule($fields) {
     $tmpDir = trim($fields['newBaseDir']);
 

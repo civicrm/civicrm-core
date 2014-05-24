@@ -37,6 +37,9 @@ class CRM_Dedupe_Merger {
   // FIXME: consider creating a common structure with cidRefs() and eidRefs()
   // FIXME: the sub-pages references by the URLs should
   // be loaded dynamically on the merge form instead
+  /**
+   * @return array
+   */
   static function relTables() {
     static $relTables;
 
@@ -345,6 +348,15 @@ INNER JOIN  civicrm_participant participant ON ( participant.id = payment.partic
     return $sqls;
   }
 
+  /**
+   * @param $mainId
+   * @param $otherId
+   * @param $tableName
+   * @param array $tableOperations
+   * @param string $mode
+   *
+   * @return array
+   */
   static function operationSql($mainId, $otherId, $tableName, $tableOperations = array(), $mode = 'add') {
     $sqls = array();
     if (!$tableName || !$mainId || !$otherId) {

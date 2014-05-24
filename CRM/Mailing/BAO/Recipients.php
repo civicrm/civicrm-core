@@ -41,6 +41,11 @@ class CRM_Mailing_BAO_Recipients extends CRM_Mailing_DAO_Recipients {
     parent::__construct();
   }
 
+  /**
+   * @param $mailingID
+   *
+   * @return null|string
+   */
   static function mailingSize($mailingID) {
     $sql = "
 SELECT count(*) as count
@@ -51,6 +56,13 @@ WHERE  mailing_id = %1
     return CRM_Core_DAO::singleValueQuery($sql, $params);
   }
 
+  /**
+   * @param $mailingID
+   * @param null $offset
+   * @param null $limit
+   *
+   * @return Object
+   */
   static function mailingQuery($mailingID,
     $offset = NULL, $limit = NULL
   ) {

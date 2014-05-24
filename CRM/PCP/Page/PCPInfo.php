@@ -331,6 +331,9 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     parent::run();
   }
 
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     if ($this->_id) {
       $templateFile = "CRM/PCP/Page/{$this->_id}/PCPInfo.tpl";

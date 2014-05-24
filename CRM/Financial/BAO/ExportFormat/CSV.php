@@ -54,6 +54,9 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
     parent::__construct();
   }
 
+  /**
+   * @param $exportParams
+   */
   function export($exportParams) {
     $export = parent::export($exportParams);
 
@@ -71,6 +74,11 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
     $this->output($fileName);
   }
 
+  /**
+   * @param $batchId
+   *
+   * @return Object
+   */
   function generateExportQuery($batchId) {
     $sql = "SELECT
       ft.id as financial_trxn_id,
@@ -119,6 +127,11 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
     return $dao;
   }
 
+  /**
+   * @param $export
+   *
+   * @return string
+   */
   function putFile($export) {
     $config = CRM_Core_Config::singleton();
     $fileName = $config->uploadDir.'Financial_Transactions_'.$this->_batchIds.'_'.date('YmdHis').'.'.$this->getFileExtension();
@@ -201,6 +214,9 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
     parent::initiateDownload();
   }
 
+  /**
+   * @return string
+   */
   function getFileExtension() {
     return 'csv';
   }

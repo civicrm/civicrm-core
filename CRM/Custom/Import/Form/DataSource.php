@@ -56,6 +56,9 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
     $session->pushUserContext(CRM_Utils_System::url('civicrm/import/custom', $params));
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $config = CRM_Core_Config::singleton();
     $defaults = array(

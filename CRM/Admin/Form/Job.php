@@ -108,6 +108,12 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $this->addFormRule(array('CRM_Admin_Form_Job', 'formRule'));
   }
 
+  /**
+   * @param $fields
+   *
+   * @return array|bool
+   * @throws API_Exception
+   */
   static function formRule($fields) {
 
     $errors = array();
@@ -130,6 +136,9 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array();
 

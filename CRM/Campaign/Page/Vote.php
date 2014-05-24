@@ -53,6 +53,9 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
     return $controller->run();
   }
 
+  /**
+   * @return mixed
+   */
   function interview() {
     //build interview and release voter interface.
     $controller = new CRM_Core_Controller_Simple('CRM_Campaign_Form_Task_Interview', ts('Interview Respondents'));

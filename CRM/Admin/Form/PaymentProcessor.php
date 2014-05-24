@@ -228,6 +228,11 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $this->addFormRule(array('CRM_Admin_Form_PaymentProcessor', 'formRule'));
   }
 
+  /**
+   * @param $fields
+   *
+   * @return array|bool
+   */
   static function formRule($fields) {
 
     // make sure that at least one of live or test is present
@@ -248,6 +253,13 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * @param $fields
+   * @param $errors
+   * @param null $section
+   *
+   * @return bool
+   */
   static function checkSection(&$fields, &$errors, $section = NULL) {
     $names = array('user_name');
 
@@ -273,6 +285,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     return $present;
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array();
     if ($this->_ppType) {

@@ -430,10 +430,19 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
     return ts('CiviMail Mailings');
   }
 
+  /**
+   * @param $parent
+   */
   function setParent($parent) {
     $this->_parent = $parent;
   }
 
+  /**
+   * @param $params
+   * @param bool $sortBy
+   *
+   * @return int|string
+   */
   function whereClause(&$params, $sortBy = TRUE) {
     $values = $clauses = array();
     $isFormSubmitted   = $this->_parent->get('hidden_find_mailings');
