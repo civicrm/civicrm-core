@@ -168,7 +168,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @access public
    * @static
    *
-   * @return object
+   * @return CRM_Core_DAO_OptionValue
    */
   static function add(&$params, &$ids) {
     // CRM-10921: do not reset attributes to default if this is an update

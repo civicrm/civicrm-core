@@ -443,7 +443,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @throws api_Exception
    * @domains array an array of domains to get settings for. Default is the current domain
-   * @return void
+   * @return array
    * @static
    * @access public
    */

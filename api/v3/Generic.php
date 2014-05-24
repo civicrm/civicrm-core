@@ -289,7 +289,7 @@ function civicrm_api3_generic_getoptions($apiRequest) {
  * 2) the field is a pseudoconstant and is NOT an FK
  * - the reason for this is that checking / transformation is done on pseudoconstants but
  * - if the field is an FK then mysql will enforce the data quality (& we have handling on failure)
- * @todo - if may be we should define a 'resolve' key on the psuedoconstant for when these rules are not fine enough
+ * @todo - if may be we should define a 'resolve' key on the pseudoconstant for when these rules are not fine enough
  *
  * This function is only split out for the purpose of code clarity / comment block documentation
  *

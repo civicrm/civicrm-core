@@ -34,11 +34,6 @@
  */
 
 /**
- * Include utility functions
- */
-require_once 'api/v3/utils.php';
-
-/**
  * Get the list of signatories
  *
  * @param  array   $params           (reference ) input parameters
