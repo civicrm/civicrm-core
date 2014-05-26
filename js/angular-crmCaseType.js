@@ -61,6 +61,7 @@
     $scope.activityStatuses = CRM.crmCaseType.actStatuses;
     $scope.activityTypes = CRM.crmCaseType.actTypes;
     $scope.activityTypeNames = _.pluck(CRM.crmCaseType.actTypes, 'name');
+    $scope.relationshipTypeNames = _.pluck(CRM.crmCaseType.relTypes, 'label_b_a'); // label_b_a is CRM_Case_XMLProcessor::REL_TYPE_CNAME
 
     $scope.workflows = {
       'timeline': 'Timeline',
@@ -106,6 +107,13 @@
           name: activityType
         });
       }
+    };
+
+    /// Add a new role
+    $scope.addRole = function(roles, roleName) {
+      roles.push({
+        name: roleName
+      });
     };
 
     $scope.onManagerChange = function(managerRole) {
