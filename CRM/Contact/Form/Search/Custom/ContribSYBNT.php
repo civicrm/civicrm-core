@@ -163,7 +163,8 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Se
     $from = $this->from();
 
     if ($justIDs) {
-      $select = 'contact_a.id as contact_id';
+      $select = $this->select();
+      $select .= ', contact.id as contact_id, sort_name';
     }
     else {
       $select = $this->select();
@@ -188,7 +189,14 @@ GROUP BY   contact.id
 ORDER BY   donation_amount desc
 ";
 
-    // CRM_Core_Error::debug('sql',$sql); exit();
+
+    if ($justIDs) {
+      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS CustomSearch_SYBNT_temp");
+      $query = "CREATE TEMPORARY TABLE CustomSearch_SYBNT_temp AS ({$sql})";
+      $dao = CRM_Core_DAO::executeQuery($query);
+      $sql = "SELECT contact_id FROM CustomSearch_SYBNT_temp";
+    }
+
     return $sql;
   }
 
@@ -196,7 +204,7 @@ ORDER BY   donation_amount desc
    * @return string
    */
   function select() {
-    if ($this->start_date_2 || $this->end_date_2) {
+    if (!empty($this->start_date_2) || !empty($this->end_date_2)) {
       return "
 sum(contrib_1.total_amount) + sum(contrib_2.total_amount) AS donation_amount,
 count(contrib_1.id) + count(contrib_1.id) AS donation_count
@@ -215,13 +223,13 @@ count(contrib_1.id) AS donation_count
    */
   function from() {
     $from = NULL;
-    if ($this->start_date_2 || $this->end_date_2) {
+    if (!empty($this->start_date_2) || !empty($this->end_date_2)) {
       $from .= " LEFT JOIN civicrm_contribution contrib_2 ON contrib_2.contact_id = contact.id ";
     }
 
-    if ($this->exclude_start_date ||
-      $this->exclude_end_date ||
-      $this->is_first_amount
+    if (!empty($this->exclude_start_date) ||
+      !empty($this->exclude_end_date) ||
+      !empty($this->is_first_amount)
     ) {
       $from .= " LEFT JOIN XG_CustomSearch_SYBNT xg ON xg.contact_id = contact.id ";
     }
@@ -237,31 +245,29 @@ count(contrib_1.id) AS donation_count
   function where($includeContactIDs = FALSE) {
     $clauses = array();
 
-    if ($this->start_date_1) {
+    if (!empty($this->start_date_1)) {
       $clauses[] = "contrib_1.receive_date >= {$this->start_date_1}";
     }
 
-    if ($this->end_date_1) {
+    if (!empty($this->end_date_1)) {
       $clauses[] = "contrib_1.receive_date <= {$this->end_date_1}";
     }
 
-    if ($this->start_date_2 ||
-      $this->end_date_2
-    ) {
+    if (!empty($this->start_date_2) || !empty($this->end_date_2)) {
       $clauses[] = "contrib_2.is_test = 0";
 
-      if ($this->start_date_2) {
+      if (!empty($this->start_date_2)) {
         $clauses[] = "contrib_2.receive_date >= {$this->start_date_2}";
       }
 
-      if ($this->end_date_2) {
+      if (!empty($this->end_date_2)) {
         $clauses[] = "contrib_2.receive_date <= {$this->end_date_2}";
       }
     }
 
-    if ($this->exclude_start_date ||
-      $this->exclude_end_date ||
-      $this->is_first_amount
+    if (!empty($this->exclude_start_date) ||
+      !empty($this->exclude_end_date) ||
+      !empty($this->is_first_amount)
     ) {
 
       // first create temp table to store contact ids
