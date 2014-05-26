@@ -728,6 +728,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (CRM_Utils_Array::value('onbehalf[image_URL]', $params)) {
         $behalfOrganization['image_URL'] = $params['onbehalf[image_URL]'];
       }
+
+      foreach ($params as $k => $v) {
+        if (substr($k, 0, 16) == 'onbehalf[custom_') {
+          $key = trim(strstr($k, '['), '[]');
+          $behalfOrganization[$key] = $params[$k];
+          unset($params[$k]);
+        }
+      }
     }
 
     // check for profile double opt-in and get groups to be subscribed
