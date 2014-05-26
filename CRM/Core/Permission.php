@@ -280,7 +280,7 @@ class CRM_Core_Permission {
     }
 
     $groups = self::ufGroup($type);
-    return in_array($gid, $groups) ? TRUE : FALSE;
+    return !empty($groups) && in_array($gid, $groups) ? TRUE : FALSE;
   }
 
   /**
