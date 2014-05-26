@@ -68,11 +68,15 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     // Need full OptionValue records
     $actStatuses = civicrm_api3('OptionValue', 'get', array('option_group_id' => 'activity_status'));
     $actTypes = civicrm_api3('OptionValue', 'get', array('option_group_id' => 'activity_type'));
+    $relTypes = civicrm_api3('RelationshipType', 'get', array());
+
     CRM_Core_Resources::singleton()->addSetting(array(
       'crmCaseType' => array(
         'actStatuses' => array_values($actStatuses['values']),
         'actTypes' => array_values($actTypes['values']),
+        'relTypes' => array_values($relTypes['values']),
         //CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name'),
+
       ),
     ));
     return $result;
