@@ -108,6 +108,14 @@ function getValues(&$contactIDs, &$values) {
   return $values;
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ * @param $tableName
+ * @param $fields
+ * @param $whereField
+ * @param null $additionalWhereCond
+ */
 function getTableInfo(&$contactIDs, &$values, $tableName, &$fields, $whereField, $additionalWhereCond = NULL) {
   $selectString = implode(',', array_keys($fields));
   $idString = implode(',', $contactIDs);
@@ -136,6 +144,10 @@ SELECT $selectString, $whereField as contact_id
   }
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ */
 function getContactInfo(&$contactIDs, &$values) {
   $fields = array('sort_name' => NULL,
     'display_name' => NULL,
@@ -168,6 +180,10 @@ function getContactInfo(&$contactIDs, &$values) {
   getTableInfo($contactIDs, $values, 'civicrm_note', $fields, 'entity_id', "entity_table = 'civicrm_contact'");
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ */
 function getLocationInfo(&$contactIDs, &$values) {
   $ids = implode(',', $contactIDs);
 
@@ -175,7 +191,7 @@ function getLocationInfo(&$contactIDs, &$values) {
 SELECT
   l.entity_id as contact_id, l.name as location_name,
   a.street_address, a.supplemental_address_1, a.supplemental_address_2,
-  a.city, a.postal_code, 
+  a.city, a.postal_code,
   co.name as county, s.name as state, c.name as country,
   e.email, p.phone, i.name as im
 FROM
@@ -206,6 +222,9 @@ WHERE l.entity_table = 'civicrm_contact'
   }
 }
 
+/**
+ * @param $contactIDs
+ */
 function run(&$contactIDs) {
   $chunks = &splitContactIDs($contactIDs);
 
@@ -223,7 +242,7 @@ $config->userFrameworkClass = 'CRM_Utils_System_Soap';
 $config->userHookClass = 'CRM_Utils_Hook_Soap';
 
 $sql = <<<EOT
-SELECT id 
+SELECT id
 FROM civicrm_contact
 EOT;
 $dao = &CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);

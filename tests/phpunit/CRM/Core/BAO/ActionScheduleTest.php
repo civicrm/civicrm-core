@@ -27,12 +27,19 @@
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Core_BAO_ActionScheduleTest
+ */
 class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * @var object see CiviTest/CiviMailUtils
    */
   var $mut;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Action-Schedule BAO',

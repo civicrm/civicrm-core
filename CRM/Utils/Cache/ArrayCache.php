@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class CRM_Utils_Cache_Arraycache
+ */
 class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
 
   /**
@@ -17,14 +21,26 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
     $this->_cache = array();
   }
 
+  /**
+   * @param string $key
+   * @param mixed $value
+   */
   function set($key, &$value) {
     $this->_cache[$key] = $value;
   }
 
+  /**
+   * @param string $key
+   *
+   * @return mixed
+   */
   function get($key) {
     return CRM_Utils_Array::value($key, $this->_cache);
   }
 
+  /**
+   * @param string $key
+   */
   function delete($key) {
     unset($this->_cache[$key]);
   }

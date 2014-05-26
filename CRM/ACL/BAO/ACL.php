@@ -43,6 +43,9 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
 
   static $_fieldKeys = NULL;
 
+  /**
+   * @return array|null
+   */
   static function entityTable() {
     if (!self::$_entityTable) {
       self::$_entityTable = array(
@@ -53,6 +56,9 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     return self::$_entityTable;
   }
 
+  /**
+   * @return array|null
+   */
   static function objectTable() {
     if (!self::$_objectTable) {
       self::$_objectTable = array(
@@ -66,6 +72,9 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     return self::$_objectTable;
   }
 
+  /**
+   * @return array|null
+   */
   static function operation() {
     if (!self::$_operation) {
       self::$_operation = array(
@@ -647,6 +656,11 @@ SELECT $acl.*
     return $result;
   }
 
+  /**
+   * @param $params
+   *
+   * @return CRM_ACL_DAO_ACL
+   */
   static function create(&$params) {
     $dao = new CRM_ACL_DAO_ACL();
     $dao->copyValues($params);
@@ -654,6 +668,10 @@ SELECT $acl.*
     return $dao;
   }
 
+  /**
+   * @param $params
+   * @param $defaults
+   */
   static function retrieve(&$params, &$defaults) {
     CRM_Core_DAO::commonRetrieve('CRM_ACL_DAO_ACL', $params, $defaults);
   }
@@ -674,6 +692,12 @@ SELECT $acl.*
     return CRM_Core_DAO::setFieldValue('CRM_ACL_DAO_ACL', $id, 'is_active', $is_active);
   }
 
+  /**
+   * @param $str
+   * @param $contactID
+   *
+   * @return bool
+   */
   static function check($str, $contactID) {
 
     $acls = CRM_ACL_BAO_Cache::build($contactID);
@@ -700,6 +724,14 @@ SELECT count( a.id )
     return ($count) ? TRUE : FALSE;
   }
 
+  /**
+   * @param $type
+   * @param $tables
+   * @param $whereTables
+   * @param null $contactID
+   *
+   * @return null|string
+   */
   public static function whereClause($type, &$tables, &$whereTables, $contactID = NULL) {
     $acls = CRM_ACL_BAO_Cache::build($contactID);
     //CRM_Core_Error::debug( "a: $contactID", $acls );
@@ -817,6 +849,15 @@ SELECT g.*
     return $whereClause;
   }
 
+  /**
+   * @param $type
+   * @param null $contactID
+   * @param string $tableName
+   * @param null $allGroups
+   * @param null $includedGroups
+   *
+   * @return array
+   */
   public static function group($type,
     $contactID      = NULL,
     $tableName      = 'civicrm_saved_search',
@@ -879,6 +920,12 @@ ORDER BY a.object_id
     return $ids;
   }
 
+  /**
+   * @param $type
+   * @param $operation
+   *
+   * @return bool
+   */
   static function matchType($type, $operation) {
     $typeCheck = FALSE;
     switch ($operation) {

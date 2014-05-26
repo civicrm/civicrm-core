@@ -92,6 +92,12 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     return NULL;
   }
 
+  /**
+   * @param $entityId
+   * @param $entityTable
+   *
+   * @return null|string
+   */
   static function getLineTotal($entityId, $entityTable) {
     $sqlLineItemTotal = "SELECT SUM(li.line_total)
 FROM civicrm_line_item li
@@ -334,6 +340,12 @@ AND li.entity_id = {$entityId}
     }
   }
 
+  /**
+   * @param $entityId
+   * @param string $entityTable
+   * @param $amount
+   * @param null $otherParams
+   */
   public static function syncLineItems($entityId, $entityTable = 'civicrm_contribution', $amount, $otherParams = NULL) {
     if (!$entityId || CRM_Utils_System::isNull($amount))
       return;

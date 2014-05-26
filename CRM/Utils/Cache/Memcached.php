@@ -108,6 +108,13 @@ class CRM_Utils_Cache_Memcached {
     }
   }
 
+  /**
+   * @param $key
+   * @param $value
+   *
+   * @return bool
+   * @throws Exception
+   */
   function set($key, &$value) {
     $key = $this->cleanKey($key);
     if (!$this->_cache->set($key, $value, $this->_timeout)) {
@@ -118,17 +125,32 @@ class CRM_Utils_Cache_Memcached {
     return TRUE;
   }
 
+  /**
+   * @param $key
+   *
+   * @return mixed
+   */
   function &get($key) {
     $key = $this->cleanKey($key);
     $result = $this->_cache->get($key);
     return $result;
   }
 
+  /**
+   * @param $key
+   *
+   * @return mixed
+   */
   function delete($key) {
     $key = $this->cleanKey($key);
     return $this->_cache->delete($key);
   }
 
+  /**
+   * @param $key
+   *
+   * @return mixed|string
+   */
   function cleanKey($key) {
     $key = preg_replace('/\s+|\W+/', '_', $this->_prefix . $key);
     if ( strlen($key) > self::MAX_KEY_LEN ) {
@@ -139,6 +161,9 @@ class CRM_Utils_Cache_Memcached {
     return $key;
   }
 
+  /**
+   * @return mixed
+   */
   function flush() {
     return $this->_cache->flush();
   }

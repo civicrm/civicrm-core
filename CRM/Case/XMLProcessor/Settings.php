@@ -38,6 +38,11 @@ class CRM_Case_XMLProcessor_Settings extends CRM_Case_XMLProcessor {
 
   // Input: The base filename without the .xml extension
   // Output: An array of settings.
+  /**
+   * @param string $filename
+   *
+   * @return array
+   */
   function run($filename = 'settings') {
     $xml = $this->retrieve($filename);
 

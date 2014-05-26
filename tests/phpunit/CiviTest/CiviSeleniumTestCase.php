@@ -230,6 +230,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return json_decode($result, TRUE);
   }
 
+  /**
+   * @param $option_group_name
+   *
+   * @return array|int
+   */
   function webtestGetFirstValueForOptionGroup($option_group_name) {
     $result = $this->webtest_civicrm_api("OptionValue", "getvalue", array(
       'option_group_name' => $option_group_name,
@@ -239,6 +244,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return $result;
   }
 
+  /**
+   * @return mixed
+   */
   function webtestGetValidCountryID() {
     static $_country_id;
     if (is_null($_country_id)) {
@@ -248,6 +256,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return $_country_id;
   }
 
+  /**
+   * @param $entity
+   *
+   * @return mixed|null
+   */
   function webtestGetValidEntityID($entity) {
     // michaelmcandrew: would like to use getvalue but there is a bug
     // for e.g. group where option.limit not working at the moment CRM-9110
@@ -258,6 +271,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return NULL;
   }
 
+  /**
+   * @param $field
+   *
+   * @return mixed
+   */
   function webtestGetConfig($field) {
     static $_config_backend;
     if (is_null($_config_backend)) {
@@ -326,6 +344,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return $email;
   }
 
+  /**
+   * @param string $householdName
+   * @param null $email
+   *
+   * @return null|string
+   */
   function webtestAddHousehold($householdName = "Smith's Home", $email = NULL) {
 
     $this->openCiviPage("contact/add", "reset=1&ct=Household");
@@ -344,6 +368,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return $email;
   }
 
+  /**
+   * @param string $organizationName
+   * @param null $email
+   * @param null $contactSubtype
+   *
+   * @return null|string
+   */
   function webtestAddOrganization($organizationName = "Organization XYZ", $email = NULL, $contactSubtype = NULL) {
 
     $url = $this->sboxPath . 'civicrm/contact/add?reset=1&ct=Organization';
@@ -397,6 +428,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
      *        webtestFillDate('start_date',"next Thursday")
      *        webtestFillDate('start_date',"last Monday")
      */
+  /**
+   * @param $dateElement
+   * @param null $strToTimeArgs
+   */
   function webtestFillDate($dateElement, $strToTimeArgs = NULL) {
     $timeStamp = strtotime($strToTimeArgs ? $strToTimeArgs : '+1 month');
 
@@ -413,6 +448,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   // 1. set both date and time.
+  /**
+   * @param $dateElement
+   * @param null $strToTimeArgs
+   */
   function webtestFillDateTime($dateElement, $strToTimeArgs = NULL) {
     $this->webtestFillDate($dateElement, $strToTimeArgs);
 
@@ -672,6 +711,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->select('credit_card_exp_date[Y]', 'label=2019');
   }
 
+  /**
+   * @param null $firstName
+   * @param null $middleName
+   * @param null $lastName
+   *
+   * @return array
+   */
   function webtestAddBillingDetails($firstName = NULL, $middleName = NULL, $lastName = NULL) {
     if (!$firstName) {
       $firstName = 'John';
@@ -699,6 +745,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return array($firstName, $middleName, $lastName);
   }
 
+  /**
+   * @param $fieldLocator
+   * @param null $filePath
+   *
+   * @return null|string
+   */
   function webtestAttachFile($fieldLocator, $filePath = NULL) {
     if (!$filePath) {
       $filePath = '/tmp/testfile_' . substr(sha1(rand()), 0, 7) . '.txt';
@@ -714,6 +766,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return $filePath;
   }
 
+  /**
+   * @param $headers
+   * @param $rows
+   * @param null $filePath
+   *
+   * @return null|string
+   */
   function webtestCreateCSV($headers, $rows, $filePath = NULL) {
     if (!$filePath) {
       $filePath = '/tmp/testcsv_' . substr(sha1(rand()), 0, 7) . '.csv';
@@ -816,7 +875,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param bool $isPcpApprovalNeeded
    * @param bool $isSeparatePayment
    * @param bool $honoreeSection
-   * @param bool $allowOtherAmmount
+   * @param bool $allowOtherAmount
    * @param bool $isConfirmEnabled
    * @param string $financialType
    * @param bool $fixedAmount
@@ -846,7 +905,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
                                       $isPcpApprovalNeeded = FALSE,
                                       $isSeparatePayment = FALSE,
                                       $honoreeSection = TRUE,
-                                      $allowOtherAmmount = TRUE,
+                                      $allowOtherAmount = TRUE,
                                       $isConfirmEnabled = TRUE,
                                       $financialType = 'Donation',
                                       $fixedAmount = TRUE,
@@ -950,7 +1009,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         $this->click("is_recur_interval");
         $this->click("is_recur_installments");
       }
-      if ($allowOtherAmmount) {
+      if ($allowOtherAmount) {
 
         $this->click('is_allow_other_amount');
 
@@ -958,7 +1017,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         //$this->type('min_amount', $rand / 2);
         //$this->type('max_amount', $rand * 10);
       }
-      if ($fixedAmount || !$allowOtherAmmount) {
+      if ($fixedAmount || !$allowOtherAmount) {
         $this->type('label_1', "Label $hash");
         $this->type('value_1', "$rand");
       }
@@ -1204,6 +1263,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
+  /**
+   * @param string $period_type
+   * @param int $duration_interval
+   * @param string $duration_unit
+   * @param string $auto_renew
+   *
+   * @return array
+   */
   function webtestAddMembershipType($period_type = 'rolling', $duration_interval = 1, $duration_unit = 'year', $auto_renew = 'no') {
     $membershipTitle = substr(sha1(rand()), 0, 7);
     $membershipOrg = $membershipTitle . ' memorg';
@@ -1257,6 +1324,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return $memTypeParams;
   }
 
+  /**
+   * @param null $groupName
+   * @param null $parentGroupName
+   *
+   * @return null|string
+   */
   function WebtestAddGroup($groupName = NULL, $parentGroupName = NULL) {
     $this->openCiviPage('group/add', 'reset=1', '_qf_Edit_upload-bottom');
 
@@ -1291,6 +1364,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return $groupName;
   }
 
+  /**
+   * @param string $activityType
+   *
+   * @return null
+   */
   function WebtestAddActivity($activityType = "Meeting") {
     // Adding Adding contact with randomized first name for test testContactContextActivityAdd
     // We're using Quick Add block on the main page for this.
@@ -1362,6 +1440,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return $this->urlArg('id');
   }
 
+  /**
+   * @return bool
+   */
   static
   function checkDoLocalDBTest() {
     if (defined('CIVICRM_WEBTEST_LOCAL_DB') &&
@@ -1392,6 +1473,15 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   // Request a record from the DB by seachColumn+searchValue. Success if a record is found.
+  /**
+   * @param $daoName
+   * @param $searchValue
+   * @param $returnColumn
+   * @param $searchColumn
+   * @param $message
+   *
+   * @return null|string
+   */
   function assertDBNotNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
     if (!self::checkDoLocalDBTest()) {
       return;
@@ -1401,6 +1491,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   // Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
+  /**
+   * @param $daoName
+   * @param $searchValue
+   * @param $returnColumn
+   * @param $searchColumn
+   * @param $message
+   */
   function assertDBNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
     if (!self::checkDoLocalDBTest()) {
       return;
@@ -1410,6 +1507,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   // Request a record from the DB by id. Success if row not found.
+  /**
+   * @param $daoName
+   * @param $id
+   * @param $message
+   */
   function assertDBRowNotExist($daoName, $id, $message) {
     if (!self::checkDoLocalDBTest()) {
       return;
@@ -1419,6 +1521,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   // Compare a single column value in a retrieved DB record to an expected value
+  /**
+   * @param $daoName
+   * @param $searchValue
+   * @param $returnColumn
+   * @param $searchColumn
+   * @param $expectedValue
+   * @param string $message
+   */
   function assertDBCompareValue($daoName, $searchValue, $returnColumn, $searchColumn,
                                 $expectedValue, $message
   ) {
@@ -1432,6 +1542,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   // Compare all values in a single retrieved DB record to an array of expected values
+  /**
+   * @param $daoName
+   * @param $searchParams
+   * @param $expectedValues
+   */
   function assertDBCompareValues($daoName, $searchParams, $expectedValues) {
     if (!self::checkDoLocalDBTest()) {
       return;
@@ -1440,6 +1555,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return CiviDBAssert::assertDBCompareValues($this, $daoName, $searchParams, $expectedValues);
   }
 
+  /**
+   * @param $expectedValues
+   * @param $actualValues
+   */
   function assertAttributesEquals(&$expectedValues, &$actualValues) {
     if (!self::checkDoLocalDBTest()) {
       return;
@@ -1448,6 +1567,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return CiviDBAssert::assertAttributesEquals($expectedValues, $actualValues);
   }
 
+  /**
+   * @param $expected
+   * @param $actual
+   * @param string $message
+   */
   function assertType($expected, $actual, $message = '') {
     return $this->assertInternalType($expected, $actual, $message);
   }
@@ -1644,6 +1768,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
   }
 
+  /**
+   * @param $verifySelectFieldData
+   */
   function _assertSelectVerify($verifySelectFieldData) {
     foreach ($verifySelectFieldData as $key => $expectedvalue) {
       $actualvalue = $this->getSelectedLabel($key);
@@ -1651,6 +1778,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
   }
 
+  /**
+   * @param $financialType
+   * @param string $option
+   */
   function addeditFinancialType($financialType, $option = 'new') {
     $this->openCiviPage("admin/financial/financialType", "reset=1");
 
@@ -1716,6 +1847,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->assertTrue($this->isTextPresent('The changes have been saved.'));
   }
 
+  /**
+   * @param $profileTitle
+   * @param $profileFields
+   */
   function addProfile($profileTitle, $profileFields) {
     $this->openCiviPage('admin/uf/group', "reset=1");
 
@@ -1745,6 +1880,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
   }
 
+  /**
+   * @param $name
+   * @param $sku
+   * @param $amount
+   * @param $price
+   * @param $cost
+   * @param $financialType
+   */
   function addPremium($name, $sku, $amount, $price, $cost, $financialType) {
     $this->waitForElementPresent("_qf_ManagePremiums_upload-bottom");
     $this->type("name", $name);
@@ -1760,6 +1903,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
+  /**
+   * @param $label
+   * @param $financialAccount
+   */
   function addPaymentInstrument($label, $financialAccount) {
     $this->openCiviPage('admin/options/payment_instrument', 'action=add&reset=1', "_qf_Options_next-bottom");
     $this->type("label", $label);
@@ -1855,6 +2002,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
   }
 
+  /**
+   * @param $customSets
+   *
+   * @return array
+   */
   function addCustomGroupField($customSets) {
     foreach ($customSets as $customSet) {
       $this->openCiviPage("admin/custom/group", "action=add&reset=1");

@@ -40,6 +40,9 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
    */
   protected $mapper;
 
+  /**
+   * @param CRM_Extension_Mapper $mapper
+   */
   public function __construct(CRM_Extension_Mapper $mapper) {
     parent::__construct(TRUE);
     $this->mapper = $mapper;

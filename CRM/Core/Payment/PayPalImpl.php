@@ -224,6 +224,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   //LCD add new function for handling recurring payments for PayPal Express
+  /**
+   * @param $params
+   *
+   * @return mixed
+   */
   function createRecurringPayments(&$params) {
     $args = array();
 
@@ -277,6 +282,10 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     return $params;
   }
   //LCD end
+  /**
+   * @param $args
+   * @param $method
+   */
   function initialize(&$args, $method) {
     $args['user']      = $this->_paymentProcessor['user_name'];
     $args['pwd']       = $this->_paymentProcessor['password'];
@@ -403,6 +412,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
   }
 
+  /**
+   * @return null|string
+   */
   function cancelSubscriptionURL() {
     if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal_Standard') {
       return "{$this->_paymentProcessor['url_site']}cgi-bin/webscr?cmd=_subscr-find&alias=" . urlencode($this->_paymentProcessor['user_name']);
@@ -412,6 +424,14 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
   }
 
+  /**
+   * Function to check whether a method is present ( & supported ) by the payment processor object.
+   *
+   * @param  string $method method to check for.
+   *
+   * @return boolean
+   * @public
+   */
   function isSupported($method = 'cancelSubscription') {
     if ($this->_paymentProcessor['payment_processor_type'] != 'PayPal') {
       // since subscription methods like cancelSubscription or updateBilling is not yet implemented / supported
@@ -421,6 +441,12 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     return parent::isSupported($method);
   }
 
+  /**
+   * @param string $message
+   * @param array $params
+   *
+   * @return array|bool|object
+   */
   function cancelSubscription(&$message = '', $params = array(
     )) {
     if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal') {
@@ -441,6 +467,12 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     return FALSE;
   }
 
+  /**
+   * @param string $message
+   * @param array $params
+   *
+   * @return array|bool|object
+   */
   function updateSubscriptionBillingInfo(&$message = '', $params = array(
     )) {
     if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal') {
@@ -474,6 +506,12 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     return FALSE;
   }
 
+  /**
+   * @param string $message
+   * @param array $params
+   *
+   * @return array|bool|object
+   */
   function changeSubscriptionAmount(&$message = '', $params = array()) {
     if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal') {
       $config = CRM_Core_Config::singleton();
@@ -496,6 +534,12 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     return FALSE;
   }
 
+  /**
+   * @param $params
+   * @param string $component
+   *
+   * @throws Exception
+   */
   function doTransferCheckout(&$params, $component = 'contribute') {
     $config = CRM_Core_Config::singleton();
 

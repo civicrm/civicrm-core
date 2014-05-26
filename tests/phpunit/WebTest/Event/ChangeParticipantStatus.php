@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_ChangeParticipantStatus
+ */
 class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -98,6 +102,9 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData(array('Status' => 'Attended'));
   }
 
+  /**
+   * @param $firstName
+   */
   function addParticipant($firstName) {
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", '_qf_Participant_upload-bottom');
 

@@ -41,6 +41,9 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     'civicrm_contribution',
   );
 
+  /**
+   * @return array
+   */
   public function dataProvider() {
     return array(
       array(

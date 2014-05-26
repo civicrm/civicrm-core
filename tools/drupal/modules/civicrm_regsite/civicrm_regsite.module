@@ -51,6 +51,9 @@ define('CIVICRM_EVENT_SURVEY_EVENT_TYPE_ID', 3);
 // Note: Don't forget to change name of the template directory
 // when you change the profile id below
 define('CIVICRM_EVENT_SURVEY_PROFILE_ID', 9);
+/**
+ * @param $config
+ */
 function civicrm_regsite_civicrm_config(&$config) {
   $template = &CRM_Core_Smarty::singleton();
 
@@ -73,6 +76,10 @@ function civicrm_regsite_civicrm_config(&$config) {
   date_default_timezone_set('America/Los_Angeles');
 }
 
+/**
+ * @param $formName
+ * @param $form
+ */
 function civicrm_regsite_civicrm_buildForm($formName, &$form) {
   if ($formName == 'CRM_Profile_Form_Edit') {
     if ($form->getVar('_gid') == REGSITE_PROFILE_ID) {
@@ -84,6 +91,11 @@ function civicrm_regsite_civicrm_buildForm($formName, &$form) {
   }
 }
 
+/**
+ * @param $orgID
+ *
+ * @return Object
+ */
 function &_civicrm_regsite_get_permissioned_contacts($orgID) {
   $sql = "
 SELECT     c.first_name, c.last_name, c.display_name, e.email
@@ -102,6 +114,9 @@ AND   e.is_primary = 1
   return CRM_Core_DAO::executeQuery($sql, $params);
 }
 
+/**
+ * @param $form
+ */
 function _civicrm_regsite_civicrm_buildForm_Profile_RegSite(&$form) {
   // add first name, last name and email
   $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
@@ -155,6 +170,10 @@ function _civicrm_regsite_civicrm_buildForm_Profile_RegSite(&$form) {
   $form->setDefaults($defaults);
 }
 
+/**
+ * @param $class
+ * @param $form
+ */
 function civicrm_regsite_civicrm_postProcess($class, &$form) {
   if (is_a($form, 'CRM_Profile_Form_Edit')) {
     $gid = $form->getVar('_gid');
@@ -167,6 +186,9 @@ function civicrm_regsite_civicrm_postProcess($class, &$form) {
   }
 }
 
+/**
+ * @param $form
+ */
 function _civicrm_regsite_civicrm_postProcess_Profile_RegSite(&$form) {
   $params = $form->controller->exportValues($form->getName());
 
@@ -262,6 +284,9 @@ function _civicrm_regsite_civicrm_postProcess_Profile_RegSite(&$form) {
   CRM_Utils_Mail::send($params);
 }
 
+/**
+ * @param $page
+ */
 function civicrm_regsite_civicrm_pageRun(&$page) {
   $name = $page->getVar('_name');
   if ($name == 'CRM_Profile_Page_Dynamic') {
@@ -274,6 +299,9 @@ function civicrm_regsite_civicrm_pageRun(&$page) {
   }
 }
 
+/**
+ * @param $page
+ */
 function _civicrm_regsite_civicrm_pageRun_Profile_RegSite(&$page) {
   // get the id of the org
   $orgID = $page->getVar('_id');
@@ -291,6 +319,14 @@ function _civicrm_regsite_civicrm_pageRun_Profile_RegSite(&$page) {
   }
 }
 
+/**
+ * @param $op
+ * @param $objectName
+ * @param $objectId
+ * @param $links
+ *
+ * @return mixed
+ */
 function civicrm_regsite_civicrm_links($op, $objectName, $objectId, &$links) {
   if ($op != 'view.contact.userDashBoard') {
     return;
@@ -303,6 +339,10 @@ function civicrm_regsite_civicrm_links($op, $objectName, $objectId, &$links) {
   return $links;
 }
 
+/**
+ * @param $formName
+ * @param $form
+ */
 function _event_survey_civicrm_buildForm_Profile($formName, &$form) {
   $cgID = _event_survey_civicrm_getCustomGroupID(CIVICRM_EVENT_SURVEY_CG_TITLE);
   if (empty($cgID)) {
@@ -326,6 +366,10 @@ function _event_survey_civicrm_buildForm_Profile($formName, &$form) {
   }
 }
 
+/**
+ * @param $class
+ * @param $form
+ */
 function _event_survey_civicrm_postProcess_Profile($class, &$form) {
   $cgID = _event_survey_civicrm_getCustomGroupID(CIVICRM_EVENT_SURVEY_CG_TITLE);
   if (empty($cgID)) {
@@ -378,6 +422,9 @@ function _event_survey_civicrm_postProcess_Profile($class, &$form) {
   }
 }
 
+/**
+ * @param $page
+ */
 function _event_survey_civicrm_pageRun_Profile(&$page) {
   $cgID = _survey_civicrm_getCustomGroupID(CIVICRM_EVENT_SURVEY_CG_TITLE);
   if (empty($cgID)) {
@@ -400,6 +447,11 @@ function _event_survey_civicrm_pageRun_Profile(&$page) {
   );
 }
 
+/**
+ * @param $customGroupName
+ *
+ * @return null|string
+ */
 function _event_survey_civicrm_getCustomGroupID($customGroupName) {
   require_once 'CRM/Utils/Type.php';
   $customGroupName = CRM_Utils_Type::escape($customGroupName, 'String');

@@ -80,6 +80,12 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
     $this->addFormRule(array('CRM_Activity_Form_Task_AddToTag', 'formRule'));
   }
 
+  /**
+   * @param $form
+   * @param $rule
+   *
+   * @return array
+   */
   static function formRule($form, $rule) {
     $errors = array();
     if (empty($form['tag']) && empty($form['activity_taglist'])) {

@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Campaign_OfflineContributionTest
+ */
 class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -117,6 +121,11 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->pastCampaignsTest($groupName);
   }
 
+  /**
+   * @param $campaignTitle
+   * @param $id
+   * @param bool $past
+   */
   function offlineContributionTest($campaignTitle, $id, $past = FALSE) {
     // Create a contact to be used as soft creditor
     $softCreditFname = substr(sha1(rand()), 0, 7);
@@ -228,6 +237,9 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $groupName
+   */
   function pastCampaignsTest($groupName) {
     $this->openCiviPage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
 

@@ -87,7 +87,7 @@ class CRM_Core_StateMachine {
    *
    * @param object $controller the controller for this state machine
    *
-   * @param const $action
+   * @param \const|int $action
    *
    * @return \CRM_Core_StateMachine
   @access public
@@ -357,18 +357,30 @@ class CRM_Core_StateMachine {
     return $this->_controller->getContent();
   }
 
+  /**
+   * @return mixed
+   */
   function getDestination() {
     return $this->_controller->getDestination();
   }
 
+  /**
+   * @return mixed
+   */
   function getSkipRedirection() {
     return $this->_controller->getSkipRedirection();
   }
 
+  /**
+   * @return mixed
+   */
   function fini() {
     return $this->_controller->fini();
   }
 
+  /**
+   * @return mixed
+   */
   function cancelAction() {
     return $this->_controller->cancelAction();
   }

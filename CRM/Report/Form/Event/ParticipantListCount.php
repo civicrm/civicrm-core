@@ -44,6 +44,13 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
   );
 
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
+
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -285,6 +292,11 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
   }
 
   //Add The statistics
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
 
     $statistics = parent::statistics($rows);
@@ -363,6 +375,13 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     return $errors;
@@ -446,6 +465,9 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
 
     $entryFound = FALSE;

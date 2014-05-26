@@ -34,6 +34,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * and validates that the fields are provided correctly.
  */
 class APIv3SchemaAdapter implements EventSubscriberInterface {
+  /**
+   * @return array
+   */
   public static function getSubscribedEvents() {
     return array(
       Events::PREPARE => array(
@@ -43,6 +46,11 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
     );
   }
 
+  /**
+   * @param \Civi\API\Event\PrepareEvent $event
+   *
+   * @throws \API_Exception
+   */
   public function onApiPrepare(\Civi\API\Event\PrepareEvent $event) {
     $apiRequest = $event->getApiRequest();
     if ($apiRequest['version'] > 3) {
@@ -63,6 +71,11 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
     $event->setApiRequest($apiRequest);
   }
 
+  /**
+   * @param \Civi\API\Event\Event $event
+   *
+   * @throws \Exception
+   */
   public function onApiPrepare_validate(\Civi\API\Event\Event $event) {
      $apiRequest = $event->getApiRequest();
     // Not sure why this is omitted for generic actions. It would make sense to omit 'getfields', but that's only one generic action.

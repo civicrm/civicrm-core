@@ -293,6 +293,13 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     );
   }
 
+  /**
+   * @param $input
+   * @param $ids
+   * @param $objects
+   * @param bool $recur
+   * @param bool $first
+   */
   function single(&$input, &$ids, &$objects, $recur = FALSE, $first = FALSE) {
     $contribution = &$objects['contribution'];
 
@@ -433,6 +440,12 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     }
   }
 
+  /**
+   * @param $input
+   * @param $ids
+   *
+   * @throws CRM_Core_Exception
+   */
   function getInput(&$input, &$ids) {
 
     if (!$this->getBillingID($ids)) {

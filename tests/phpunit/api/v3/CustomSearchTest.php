@@ -2,6 +2,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class api_v3_CustomSearchTest
+ */
 class api_v3_CustomSearchTest extends CiviUnitTestCase {
   protected $_apiversion;
 

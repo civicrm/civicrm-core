@@ -34,6 +34,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * conventions.
  */
 class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterface {
+  /**
+   * @return array
+   */
   public static function getSubscribedEvents() {
     return array(
       Events::RESOLVE => array(
@@ -47,10 +50,16 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
    */
   private $cache;
 
+  /**
+   *
+   */
   function __construct() {
     $this->cache = array();
   }
 
+  /**
+   * @param \Civi\API\Event\ResolveEvent $event
+   */
   public function onApiResolve(\Civi\API\Event\ResolveEvent $event) {
     $apiRequest = $event->getApiRequest();
     $resolved = $this->resolve($apiRequest);

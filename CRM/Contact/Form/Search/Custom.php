@@ -89,6 +89,18 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     }
   }
 
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array reference to the array of default values
+   *
+   */
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     if (method_exists($this->_customSearchClass, 'setDefaultValues')) {
       return $this->_customClass->setDefaultValues();
@@ -102,6 +114,15 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     parent::buildQuickForm();
   }
 
+  /**
+   * Use the form name to create the tpl file name
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
 
     $ext = CRM_Extension_System::singleton()->getMapper();
@@ -135,10 +156,24 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     parent::postProcess();
   }
 
+  /**
+   * Return a descriptive name for the page, used in wizard header
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   public function getTitle() {
     return ts('Custom Search');
   }
 
+  /**
+   * @param $components
+   *
+   * @return bool
+   */
   function isPermissioned($components) {
     if (empty($components)) {
       return TRUE;

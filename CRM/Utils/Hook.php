@@ -108,6 +108,19 @@ abstract class CRM_Utils_Hook {
     $fnSuffix
   );
 
+  /**
+   * @param $numParams
+   * @param $arg1
+   * @param $arg2
+   * @param $arg3
+   * @param $arg4
+   * @param $arg5
+   * @param $arg6
+   * @param $fnSuffix
+   * @param $fnPrefix
+   *
+   * @return array|bool
+   */
   function commonInvoke($numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix, $fnPrefix
@@ -216,6 +229,9 @@ abstract class CRM_Utils_Hook {
     return empty($result) ? TRUE : $result;
   }
 
+  /**
+   * @param $moduleList
+   */
   function requireCiviModules(&$moduleList) {
     $civiModules = CRM_Core_PseudoConstant::getModuleExtensions();
     foreach ($civiModules as $civiModule) {
@@ -453,6 +469,23 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(1, $recentArray,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_recent'
+    );
+  }
+
+  /**
+   * Determine how many other records refer to a given record
+   *
+   * @param CRM_Core_DAO $dao the item for which we want a reference count
+   * @param array $refCounts each item in the array is an array with keys:
+   *   - name: string, eg "sql:civicrm_email:contact_id"
+   *   - type: string, eg "sql"
+   *   - count: int, eg "5" if there are 5 email addresses that refer to $dao
+   * @return void
+   */
+  static function referenceCounts($dao, &$refCounts) {
+    return self::singleton()->invoke(2, $dao, $refCounts,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_referenceCounts'
     );
   }
 
@@ -867,6 +900,13 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * @param $recordBAO
+   * @param $recordID
+   * @param $isActive
+   *
+   * @return mixed
+   */
   static function enableDisable($recordBAO, $recordID, $isActive) {
     return self::singleton()->invoke(3, $recordBAO, $recordID, $isActive,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
@@ -1030,6 +1070,11 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * @param $dao
+   *
+   * @return mixed
+   */
   static function postSave(&$dao) {
     $hookName = 'civicrm_postSave_' . $dao->getTableName();
     return self::singleton()->invoke(1, $dao,
@@ -1273,6 +1318,13 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * @param $varType
+   * @param $var
+   * @param $object
+   *
+   * @return mixed
+   */
   static function alterReportVar($varType, &$var, &$object) {
     return self::singleton()->invoke(3, $varType, $var, $object,
       self::$_nullObject,
@@ -1555,11 +1607,11 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called before a case merge (or a case reassign)
    *
-   * @param type $mainContactId
-   * @param type $mainCaseId
-   * @param type $otherContactId
-   * @param type $otherCaseId
-   * @param bool|\type $changeClient
+   * @param integer $mainContactId
+   * @param integer $mainCaseId
+   * @param integer $otherContactId
+   * @param integer $otherCaseId
+   * @param bool $changeClient
    *
    * @return void
    */
@@ -1570,11 +1622,11 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called after a case merge (or a case reassign)
    *
-   * @param type $mainContactId
-   * @param type $mainCaseId
-   * @param type $otherContactId
-   * @param type $otherCaseId
-   * @param bool|\type $changeClient
+   * @param integer $mainContactId
+   * @param integer $mainCaseId
+   * @param integer $otherContactId
+   * @param integer $otherCaseId
+   * @param bool $changeClient
    *
    * @return void
    */

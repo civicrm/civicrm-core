@@ -36,6 +36,9 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
 
   protected $_debug = 0;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     parent::__construct($formValues);
 
@@ -50,6 +53,9 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     );
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
     $form->addDate('start_date', ts('Start Date'), FALSE, array('formatType' => 'custom'));
     $form->addDate('end_date', ts('End Date'), FALSE, array('formatType' => 'custom'));
@@ -96,10 +102,22 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     $form->assign('elements', array('start_date', 'end_date', 'includeGroups', 'excludeGroups'));
   }
 
+  /**
+   * @return null
+   */
   function summary() {
     return NULL;
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return string
+   */
   function all($offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
@@ -138,6 +156,9 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     );
   }
 
+  /**
+   * @return string
+   */
   function from() {
     //define table name
     $randomNum = md5(uniqid());
@@ -354,14 +375,25 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     return $from;
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     return '(1)';
   }
 
+  /**
+   * @return string
+   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
@@ -371,6 +403,9 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     }
   }
 
+  /**
+   * @return mixed
+   */
   function count() {
     $sql = $this->all();
 

@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_InheritedMembershipTest
+ */
 class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
   protected function setUp() {
     parent::setUp();

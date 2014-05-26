@@ -33,6 +33,9 @@
  *
  */
 class CRM_Core_I18n_SchemaStructure_3_3_beta1 {
+  /**
+   * @return array
+   */
   static
   function &columns() {
     static $result = NULL;
@@ -198,6 +201,10 @@ class CRM_Core_I18n_SchemaStructure_3_3_beta1 {
     }
     return $result;
   }
+
+  /**
+   * @return array
+   */
   static
   function &indices() {
     static $result = NULL;
@@ -276,6 +283,10 @@ class CRM_Core_I18n_SchemaStructure_3_3_beta1 {
     }
     return $result;
   }
+
+  /**
+   * @return array
+   */
   static
   function &tables() {
     static $result = NULL;

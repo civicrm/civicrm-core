@@ -40,6 +40,12 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
   protected $_customGroupExtends = array(
     'Grant');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -339,6 +345,9 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

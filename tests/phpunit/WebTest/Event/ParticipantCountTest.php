@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_ParticipantCountTest
+ */
 class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -292,6 +296,10 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->_testPricesetDetailsCustomSearch($paramsEvent, $participants, $priceFieldOptionCounts);
   }
 
+  /**
+   * @param $setTitle
+   * @param string $financialType
+   */
   function _testAddSet($setTitle, $financialType = 'Event Fee') {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
@@ -305,6 +313,9 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
   }
 
+  /**
+   * @param $options
+   */
   function _testAddMultipleChoiceOptions($options) {
     foreach ($options as $oIndex => $oValue) {
       $this->type("option_label_{$oIndex}", $oValue['label']);
@@ -318,6 +329,11 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->click('CIVICRM_QFID_1_2');
   }
 
+  /**
+   * @param $params
+   *
+   * @return string
+   */
   function _testAddEvent($params) {
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
@@ -391,6 +407,9 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     return $this->getLocation();
   }
 
+  /**
+   * @param array $participant
+   */
   function _testRegisterWithBillingInfo($participant = array()) {
     $this->waitForElementPresent("credit_card_type");
     $this->select('credit_card_type', 'value=Visa');
@@ -415,6 +434,11 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->assertStringsPresent($thankStrings);
   }
 
+  /**
+   * @param $eventParams
+   * @param $participants
+   * @param $priceFieldOptionCounts
+   */
   function _testPricesetDetailsCustomSearch($eventParams, $participants, $priceFieldOptionCounts) {
     $this->openCiviPage('contact/search/custom', 'csid=9&reset=1');
 

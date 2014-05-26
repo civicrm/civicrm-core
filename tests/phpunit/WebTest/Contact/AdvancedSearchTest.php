@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_AdvancedSearchTest
+ */
 class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -227,6 +231,9 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   //function to check match for sumbit Advance Search
+  /**
+   * @param $firstName
+   */
   function submitSearch($firstName) {
     $this->clickLink("_qf_Advanced_refresh");
     // verify unique name
@@ -238,6 +245,10 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   // function to fill auto complete
+  /**
+   * @param $text
+   * @param $elementId
+   */
   function fillAutoComplete($text, $elementId) {
     $this->click("$elementId");
     $this->type("$elementId", "$text");
@@ -250,6 +261,11 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   // function to fill basic search detail
+  /**
+   * @param $firstName
+   * @param $groupName
+   * @param $tagName
+   */
   function addBasicSearchDetail($firstName, $groupName, $tagName) {
     // fill partial sort name
     $this->type("sort_name", "$firstName");
@@ -272,6 +288,9 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   // function to fill address search block values in advance search
+  /**
+   * @param $firstName
+   */
   function addAddressSearchDetail($firstName) {
     // select location type (home and main)
     $this->click("xpath=//div[@id='location']/table/tbody/tr[1]/td[1]//label[text()='Home']");
@@ -290,6 +309,9 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   // function to fill activity search block in advance search
+  /**
+   * @param $firstName
+   */
   function addActivitySearchDetail($firstName) {
     // check activity types
     $checkActivityTypes = array("Contribution", "Event Registration", "Membership Signup");
@@ -323,6 +345,9 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   //function to fill contribution search details
+  /**
+   * @param $firstName
+   */
   function addContributionSearchDetail($firstName) {
     // fill contribution date range
     $this->select("contribution_date_relative","value=0");
@@ -362,6 +387,9 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   // function to fill member search details
+  /**
+   * @param $firstName
+   */
   function addMemberSearchDetail($firstName) {
     // check membership type (Student)
     $this->click("xpath=//div[@id='memberForm']/table/tbody/tr[1]/td[1]/div[1]//div/label[text()='Student']");
@@ -386,6 +414,9 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   // function to fill member search details
+  /**
+   * @param $firstName
+   */
   function addPledgeSearchDetail($firstName) {
     // fill pledge schedule date range
     $this->select("pledge_payment_date_relative","value=0");
@@ -411,6 +442,9 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   }
 
   // function to create contact with details (contact details, address, Constituent information ...)
+  /**
+   * @param null $firstName
+   */
   function createDetailContact($firstName = NULL) {
     if (!$firstName) {
       $firstName = substr(sha1(rand()), 0, 7);

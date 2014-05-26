@@ -2,6 +2,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Extension_Manager_ModuleTest
+ */
 class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
   //@todo make BAO enotice compliant  & remove the line below
   // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
@@ -228,6 +231,10 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * @param $expectedIsActive
+   * @param $prefix
+   */
   function assertModuleActiveByName($expectedIsActive, $prefix) {
     $activeModules = CRM_Core_PseudoConstant::getModuleExtensions(TRUE); // FIXME
     foreach ($activeModules as $activeModule) {
@@ -239,6 +246,10 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     $this->assertEquals($expectedIsActive, FALSE);
   }
 
+  /**
+   * @param $expectedIsActive
+   * @param $key
+   */
   function assertModuleActiveByKey($expectedIsActive, $key) {
     foreach (CRM_Core_Module::getAll() as $module) {
       if ($module->name == $key) {
@@ -249,6 +260,12 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     $this->assertEquals($expectedIsActive, FALSE);
   }
 
+  /**
+   * @param $key
+   * @param $type
+   * @param $file
+   * @param string $template
+   */
   function _createExtension($key, $type, $file, $template = self::MODULE_TEMPLATE) {
     $basedir = $this->basedir;
     mkdir("$basedir/$key");
@@ -258,6 +275,10 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     $this->system->getManager()->refresh();
   }
 
+  /**
+   * @param $module
+   * @param $name
+   */
   public static function incHookCount($module, $name) {
     global $_test_extension_manager_moduletest_counts;
     $_test_extension_manager_moduletest_counts[$module][$name] = 1 + (int) $_test_extension_manager_moduletest_counts[$module][$name];

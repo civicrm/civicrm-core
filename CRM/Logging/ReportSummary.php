@@ -39,6 +39,9 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
 
   protected $loggingDB;
 
+  /**
+   *
+   */
   function __construct() {
     // don’t display the ‘Add these Contacts to Group’ button
     $this->_add2groupSupported = FALSE;
@@ -338,6 +341,11 @@ ORDER BY log_civicrm_entity_log_date DESC {$this->_limit}";
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $entity
+   *
+   * @return string
+   */
   function getLogType($entity) {
     if (!empty($this->_logTables[$entity]['log_type'])) {
       return $this->_logTables[$entity]['log_type'];
@@ -346,6 +354,13 @@ ORDER BY log_civicrm_entity_log_date DESC {$this->_limit}";
     return $logType;
   }
 
+  /**
+   * @param $id
+   * @param $entity
+   * @param $logDate
+   *
+   * @return mixed|null|string
+   */
   function getEntityValue($id, $entity, $logDate) {
     if (!empty($this->_logTables[$entity]['bracket_info'])) {
       if (!empty($this->_logTables[$entity]['bracket_info']['entity_column'])) {
@@ -391,6 +406,14 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
     return NULL;
   }
 
+  /**
+   * @param $id
+   * @param $connId
+   * @param $entity
+   * @param $oldAction
+   *
+   * @return null|string
+   */
   function getEntityAction($id, $connId, $entity, $oldAction) {
     if (!empty($this->_logTables[$entity]['action_column'])) {
       $sql = "select {$this->_logTables[$entity]['action_column']} from `{$this->loggingDB}`.{$entity} where id = %1 AND log_conn_id = %2";

@@ -48,7 +48,7 @@ class CRM_Core_Smarty extends Smarty {
   CONST
     // use print.tpl and bypass the CMS. Civi prints a valid html file
     PRINT_PAGE = 1,
-    // this and all the below bypasses the CMS html surronding it and assumes we will embed this within other pages
+    // this and all the below bypasses the CMS html surrounding it and assumes we will embed this within other pages
     PRINT_SNIPPET = 2,
     // sends the generated html to the chosen pdf engine
     PRINT_PDF = 3,
@@ -204,6 +204,10 @@ class CRM_Core_Smarty extends Smarty {
     return $output;
   }
 
+  /**
+   * @param $name
+   * @param $value
+   */
   function appendValue($name, $value) {
     $currentValue = $this->get_template_vars($name);
     if (!$currentValue) {
@@ -230,6 +234,9 @@ class CRM_Core_Smarty extends Smarty {
     civicrm_smarty_register_string_resource();
   }
 
+  /**
+   * @param $path
+   */
   function addTemplateDir($path) {
     if ( is_array( $this->template_dir ) ) {
       array_unshift( $this->template_dir, $path );

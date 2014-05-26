@@ -706,9 +706,9 @@ class CRM_Utils_Array {
       $node = &$result;
       foreach ($keys as $key) {
         if (is_array($record)) {
-          $keyvalue = $record[$key];
+          $keyvalue = isset($record[$key]) ? $record[$key] : NULL;
         } else {
-          $keyvalue = $record->{$key};
+          $keyvalue = isset($record->{$key}) ? $record->{$key} : NULL;
         }
         if (isset($node[$keyvalue]) && !is_array($node[$keyvalue])) {
           $node[$keyvalue] = array();
@@ -877,6 +877,13 @@ class CRM_Utils_Array {
    *
    * @return mixed
    *   The value found.
+   */
+  /**
+   * @param $regexKey
+   * @param $list
+   * @param null $default
+   *
+   * @return null
    */
   static function valueByRegexKey($regexKey, $list, $default = NULL) {
     if (is_array($list) && $regexKey) {

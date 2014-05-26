@@ -423,6 +423,12 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     return $relationshipType;
   }
 
+  /**
+   * @param $id
+   * @param $action
+   *
+   * @return CRM_Contact_DAO_Relationship
+   */
   static function clearCurrentEmployer($id, $action) {
     $relationship = new CRM_Contact_DAO_Relationship();
     $relationship->id = $id;

@@ -37,6 +37,10 @@
  */
 
 require_once 'HTML/QuickForm/Page.php';
+
+/**
+ * Class CRM_Core_Form
+ */
 class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
@@ -137,7 +141,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * If u have multiple groups of checkboxes, you will need to give them different
    * ids to avoid potential name collision
    *
-   * @var const string / int
+   * @var string|int
    */
   CONST CB_PREFIX = 'mark_x_', CB_PREFIY = 'mark_y_', CB_PREFIZ = 'mark_z_', CB_PREFIX_LEN = 7;
 
@@ -148,12 +152,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * of default convenient functions, rules and buttons
    *
    * @param object $state State associated with this form
-   * @param \const|\enum $action The mode the form is operating in (None/Create/View/Update/Delete)
+   * @param \const|\enum|int $action The mode the form is operating in (None/Create/View/Update/Delete)
    * @param string $method The type of http method used (GET/POST)
    * @param string $name The name of the form if different from class name
    *
    * @return \CRM_Core_Form
-  @access public
+   * @access public
    */
   function __construct(
     $state = NULL,
@@ -355,6 +359,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   function addRules() {}
 
+  /**
+   * Performs the server side validation
+   * @access    public
+   * @since     1.0
+   * @return    boolean   true if no error found
+   * @throws    HTML_QuickForm_Error
+   */
   function validate() {
     $error = parent::validate();
 
@@ -805,6 +816,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return self::$_template->get_template_vars($name);
   }
 
+  /**
+   * @param $name
+   * @param $title
+   * @param $values
+   * @param array $attributes
+   * @param null $separator
+   * @param bool $required
+   *
+   * @return HTML_QuickForm_group
+   */
   function &addRadio($name, $title, $values, $attributes = array(), $separator = NULL, $required = FALSE) {
     $options = array();
     $attributes = $attributes ? $attributes : array();
@@ -824,6 +845,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return $group;
   }
 
+  /**
+   * @param $id
+   * @param $title
+   * @param bool $allowClear
+   * @param null $required
+   * @param array $attributes
+   */
   function addYesNo($id, $title, $allowClear = FALSE, $required = NULL, $attributes = array()) {
     $attributes += array('id_suffix' => $id);
     $choice   = array();
@@ -839,6 +867,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
+  /**
+   * @param $id
+   * @param $title
+   * @param $values
+   * @param null $other
+   * @param null $attributes
+   * @param null $required
+   * @param null $javascriptMethod
+   * @param string $separator
+   * @param bool $flipValues
+   */
   function addCheckBox($id, $title, $values, $other = NULL,
     $attributes       = NULL, $required = NULL,
     $javascriptMethod = NULL,
@@ -921,6 +960,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->addButtons($buttons);
   }
 
+  /**
+   * @param $name
+   * @param string $from
+   * @param string $to
+   * @param string $label
+   * @param string $dateFormat
+   * @param bool $required
+   * @param bool $displayTime
+   */
   function addDateRange($name, $from = '_from', $to = '_to', $label = 'From:', $dateFormat = 'searchDate', $required = FALSE, $displayTime = FALSE) {
     if ($displayTime) {
       $this->addDateTime($name . $from, $label, $required, array('formatType' => $dateFormat));
@@ -1015,6 +1063,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     ));
   }
 
+  /**
+   * @param $name
+   * @param $label
+   * @param $attributes
+   * @param bool $forceTextarea
+   */
   function addWysiwyg($name, $label, $attributes, $forceTextarea = FALSE) {
     // 1. Get configuration option for editor (tinymce, ckeditor, pure textarea)
     // 2. Based on the option, initialise proper editor
@@ -1053,6 +1107,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->assign('includeWysiwygEditor', $includeWysiwygEditor);
   }
 
+  /**
+   * @param $id
+   * @param $title
+   * @param null $required
+   * @param null $extra
+   */
   function addCountry($id, $title, $required = NULL, $extra = NULL) {
     $this->addElement('select', $id, $title,
       array(
@@ -1063,6 +1123,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
+  /**
+   * @param $name
+   * @param $label
+   * @param $options
+   * @param $attributes
+   * @param null $required
+   * @param null $javascriptMethod
+   */
   function addSelectOther($name, $label, $options, $attributes, $required = NULL, $javascriptMethod = NULL) {
 
     $this->addElement('select', $name . '_id', $label, $options, $javascriptMethod);
@@ -1072,18 +1140,30 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
+  /**
+   * @return null
+   */
   public function getRootTitle() {
     return NULL;
   }
 
+  /**
+   * @return string
+   */
   public function getCompleteTitle() {
     return $this->getRootTitle() . $this->getTitle();
   }
 
+  /**
+   * @return CRM_Core_Smarty
+   */
   static function &getTemplate() {
     return self::$_template;
   }
 
+  /**
+   * @param $elementName
+   */
   function addUploadElement($elementName) {
     $uploadNames = $this->get('uploadNames');
     if (!$uploadNames) {
@@ -1109,6 +1189,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
+  /**
+   * @return string
+   */
   function buttonType() {
     $uploadNames = $this->get('uploadNames');
     $buttonType = (is_array($uploadNames) && !empty($uploadNames)) ? 'upload' : 'next';
@@ -1116,10 +1199,19 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return $buttonType;
   }
 
+  /**
+   * @param $name
+   *
+   * @return null
+   */
   function getVar($name) {
     return isset($this->$name) ? $this->$name : NULL;
   }
 
+  /**
+   * @param $name
+   * @param $value
+   */
   function setVar($name, $value) {
     $this->$name = $value;
   }
@@ -1364,6 +1456,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
+  /**
+   * @param $elementName
+   */
   function removeFileRequiredRules($elementName) {
     $this->_required = array_diff($this->_required, array($elementName));
     if (isset($this->_rules[$elementName])) {

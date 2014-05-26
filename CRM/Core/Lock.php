@@ -48,7 +48,7 @@ class CRM_Core_Lock {
    *                      e.g. civimail.cronjob.JOB_ID
    * @param int $timeout the number of seconds to wait to get the lock. 1 if not set
    * @param boolean $serverWideLock should this lock be applicable across your entire mysql server
-   *                                this is useful if you have mutliple sites running on the same
+   *                                this is useful if you have multiple sites running on the same
    *                                mysql server and you want to limit the number of parallel cron
    *                                jobs - CRM-91XX
    *
@@ -74,6 +74,9 @@ class CRM_Core_Lock {
     $this->release();
   }
 
+  /**
+   * @return bool
+   */
   function acquire() {
     if (!$this->_hasLock) {
       $query = "SELECT GET_LOCK( %1, %2 )";
@@ -88,6 +91,9 @@ class CRM_Core_Lock {
     return $this->_hasLock;
   }
 
+  /**
+   * @return null|string
+   */
   function release() {
     if ($this->_hasLock) {
       $this->_hasLock = FALSE;
@@ -98,12 +104,18 @@ class CRM_Core_Lock {
     }
   }
 
+  /**
+   * @return null|string
+   */
   function isFree() {
     $query = "SELECT IS_FREE_LOCK( %1 )";
     $params = array(1 => array($this->_name, 'String'));
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
+  /**
+   * @return bool
+   */
   function isAcquired() {
     return $this->_hasLock;
   }

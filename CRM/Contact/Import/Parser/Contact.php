@@ -2081,6 +2081,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     return $returnCode;
   }
 
+  /**
+   * @param $relKey
+   * @param $params
+   *
+   * @return bool
+   */
   function checkRelatedContactFields($relKey, $params) {
     //avoid blank contact creation.
     $allowToCreate = FALSE;

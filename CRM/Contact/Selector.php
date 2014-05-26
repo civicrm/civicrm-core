@@ -320,6 +320,12 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   }
   //end of function
 
+  /**
+   * @param null $action
+   * @param null $output
+   *
+   * @return array
+   */
   function &getColHeads($action = NULL, $output = NULL) {
     $colHeads = self::_getColumnHeaders();
     $colHeads[] = array('desc' => ts('Actions'), 'name' => ts('Action'));
@@ -818,6 +824,11 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     return $rows;
   }
 
+  /**
+   * @param $sort
+   *
+   * @return string
+   */
   function buildPrevNextCache($sort) {
     $cacheKey = 'civicrm search ' . $this->_key;
 
@@ -849,6 +860,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     return $cacheKey;
   }
 
+  /**
+   * @param $rows
+   */
   function addActions(&$rows) {
     $config = CRM_Core_Config::singleton();
 
@@ -941,6 +955,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     }
   }
 
+  /**
+   * @param $rows
+   */
   function removeActions(&$rows) {
     foreach ($rows as $rid => & $rValue) {
       unset($rValue['contact_type']);
@@ -1130,14 +1147,29 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
     return self::$_columnHeaders;
   }
 
+  /**
+   * @return CRM_Contact_BAO_Query
+   */
   function &getQuery() {
     return $this->_query;
   }
 
+  /**
+   * @return CRM_Contact_DAO_Contact
+   */
   function alphabetQuery() {
     return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
   }
 
+  /**
+   * @param $params
+   * @param $action
+   * @param $sortID
+   * @param null $displayRelationshipType
+   * @param string $queryOperator
+   *
+   * @return CRM_Contact_DAO_Contact
+   */
   function contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
     $sortOrder = &$this->getSortOrder($this->_action);
     $sort = new CRM_Utils_Sort($sortOrder, $sortID);
@@ -1170,6 +1202,11 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
     return $value;
   }
 
+  /**
+   * @param $returnProperties
+   *
+   * @return array
+   */
   function &makeProperties(&$returnProperties) {
     $properties = array();
     foreach ($returnProperties as $name => $value) {

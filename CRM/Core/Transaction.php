@@ -84,6 +84,10 @@ class CRM_Core_Transaction {
    * of CRM_Core_Transaction
    */
   private $_pseudoCommitted = FALSE;
+
+  /**
+   *
+   */
   function __construct() {
     if (!self::$_dao) {
       self::$_dao = new CRM_Core_DAO();
@@ -134,6 +138,9 @@ class CRM_Core_Transaction {
     }
   }
 
+  /**
+   * @param $flag
+   */
   static public function rollbackIfFalse($flag) {
     if ($flag === FALSE) {
       self::$_doCommit = FALSE;
@@ -167,6 +174,9 @@ class CRM_Core_Transaction {
     }
   }
 
+  /**
+   * @return bool
+   */
   static public function willCommit() {
     return self::$_doCommit;
   }
@@ -195,6 +205,10 @@ class CRM_Core_Transaction {
     );
   }
 
+  /**
+   * @param $phase
+   * @param $callbacks
+   */
   static protected function invokeCallbacks($phase, $callbacks) {
     if (is_array($callbacks[$phase])) {
       foreach ($callbacks[$phase] as $cb) {

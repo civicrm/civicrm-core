@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_OfflineMembershipAddPricesetTest
+ */
 class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -163,6 +167,12 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
 
   }
 
+  /**
+   * @param $setTitle
+   * @param $usedFor
+   * @param null $contributionType
+   * @param $setHelp
+   */
   function _testAddSet($setTitle, $usedFor, $contributionType = NULL, $setHelp) {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
@@ -187,6 +197,16 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->waitForText('crm-notification-container', "Your Set '{$setTitle}' has been added. You can add fields to this set now.");
   }
 
+  /**
+   * @param $fields
+   * @param $validateString
+   * @param bool $dateSpecificFields
+   * @param $title
+   * @param $sid
+   * @param $contributionType
+   *
+   * @return array
+   */
   function _testAddPriceFields(&$fields, &$validateString, $dateSpecificFields = FALSE, $title, $sid, $contributionType) {
     $memTypeParams1 = $this->webtestAddMembershipType();
     $memTypeTitle1  = $memTypeParams1['membership_type'];
@@ -249,6 +269,10 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     return array($memTypeTitle1, $memTypeTitle2);
   }
 
+  /**
+   * @param $validateStrings
+   * @param $sid
+   */
   function _testVerifyPriceSet($validateStrings, $sid) {
     // verify Price Set at Preview page
     // start at Manage Price Sets listing
@@ -264,6 +288,13 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->assertStringsPresent($validateStrings);
   }
 
+  /**
+   * @param $sid
+   * @param $contactParams
+   * @param $memTypeTitle1
+   * @param $memTypeTitle2
+   * @param bool $renew
+   */
   function _testSignUpOrRenewMembership($sid, $contactParams, $memTypeTitle1, $memTypeTitle2, $renew = FALSE) {
     //build the membership dates.
     require_once 'CRM/Core/Config.php';
@@ -342,6 +373,12 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr");
   }
 
+  /**
+   * @param $sid
+   * @param $contactParams
+   * @param $memTypeTitle1
+   * @param $term
+   */
   function _testMultilpeTermsMembershipRegistration($sid, $contactParams, $memTypeTitle1, $term){
     //build the membership dates.
     require_once 'CRM/Core/Config.php';

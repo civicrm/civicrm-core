@@ -64,6 +64,10 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     'civicrm_option_value',
     'civicrm_option_group',
   );
+
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Contact Custom Search Group',
@@ -72,6 +76,9 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * @return CRM_Contact_Form_Search_Custom_GroupTestDataProvider
+   */
   public function dataProvider() {
     return new CRM_Contact_Form_Search_Custom_GroupTestDataProvider;
   }

@@ -124,6 +124,9 @@ class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
     $this->assign('addCampaignUrl', CRM_Utils_System::url('civicrm/campaign/add', 'reset=1&action=add'));
   }
 
+  /**
+   * @return string
+   */
   function run() {
     if (!CRM_Core_Permission::check('administer CiviCampaign')) {
       CRM_Utils_System::permissionDenied();

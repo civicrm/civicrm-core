@@ -511,6 +511,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     return $options[$fieldId];
   }
 
+  /**
+   * @param $optionLabel
+   * @param $fid
+   *
+   * @return mixed
+   */
   public static function getOptionId($optionLabel, $fid) {
     if (!$optionLabel || !$fid) {
       return;
@@ -567,6 +573,9 @@ WHERE
     return NULL;
   }
 
+  /**
+   * @return array
+   */
   static function &htmlTypes() {
     static $htmlTypes = NULL;
     if (!$htmlTypes) {

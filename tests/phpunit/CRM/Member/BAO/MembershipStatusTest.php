@@ -27,7 +27,14 @@
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Member_BAO_MembershipStatusTest
+ */
 class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'MembershipStatus BAOs',

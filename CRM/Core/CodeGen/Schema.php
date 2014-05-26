@@ -4,6 +4,9 @@
  * Create SQL files to create and populate a new schema.
  */
 class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
     $this->locales = $this->findLocales();
@@ -25,6 +28,9 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
     $this->generateSample();
   }
 
+  /**
+   * @param string $fileName
+   */
   function generateCreateSql($fileName = 'civicrm.mysql') {
     echo "Generating sql file\n";
     $template = new CRM_Core_CodeGen_Util_Template('sql');
@@ -38,6 +44,9 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
     $template->run('schema.tpl', $this->config->sqlCodePath . $fileName);
   }
 
+  /**
+   * @param string $fileName
+   */
   function generateDropSql($fileName = 'civicrm_drop.mysql') {
     echo "Generating sql drop tables file\n";
     $dropOrder = array_reverse(array_keys($this->tables));
@@ -93,6 +102,9 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
     $template->run('case_sample.tpl', $this->config->sqlCodePath . 'case_sample.mysql');
   }
 
+  /**
+   * @return array
+   */
   function findLocales() {
     require_once 'CRM/Core/Config.php';
     $config = CRM_Core_Config::singleton(FALSE);

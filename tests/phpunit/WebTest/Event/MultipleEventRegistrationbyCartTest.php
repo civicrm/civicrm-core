@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_MultipleEventRegistrationbyCartTest
+ */
 class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -228,6 +232,10 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->_checkContributionsandEventRegistration($value[0], $value[1], $events);
   }
 
+  /**
+   * @param $eventTitle
+   * @param $eventDescription
+   */
   function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
@@ -253,6 +261,9 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->click("_qf_EventInfo_upload-bottom");
   }
 
+  /**
+   * @param $streetAddress
+   */
   function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -271,6 +282,11 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->waitForTextPresent("'Location' information has been saved.");
   }
 
+  /**
+   * @param bool $discount
+   * @param bool $priceSet
+   * @param string $processorName
+   */
   function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName = "PP Pro") {
     // Go to Fees tab
     $this->click("link=Fees");
@@ -309,6 +325,10 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->waitForTextPresent("'Fee' information has been saved.");
   }
 
+  /**
+   * @param $registerIntro
+   * @param bool $multipleRegistrations
+   */
   function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
     // Go to Online Registration tab
     $this->click("link=Online Registration");
@@ -333,6 +353,11 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->waitForTextPresent("'Registration' information has been saved.");
   }
 
+  /**
+   * @param $eventTitle
+   * @param $eventInfoStrings
+   * @param null $eventFees
+   */
   function _AddEventToCart($eventTitle, $eventInfoStrings, $eventFees = NULL) {
     // verify event input on info page
     // start at Manage Events listing
@@ -343,6 +368,13 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->assertTrue($this->isTextPresent("$eventTitle has been added to your cart"));
   }
 
+  /**
+   * @param $eventTitle
+   * @param $eventInfoStrings
+   * @param null $eventFees
+   *
+   * @return string
+   */
   function _testVerifyEventInfo($eventTitle, $eventInfoStrings, $eventFees = NULL) {
     // verify event input on info page
     // start at Manage Events listing
@@ -361,6 +393,11 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     return $this->getLocation();
   }
 
+  /**
+   * @param $registerUrl
+   * @param int $numberRegistrations
+   * @param bool $anonymous
+   */
   function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE) {
     if ($anonymous) {
       $this->webtestLogout();
@@ -372,6 +409,9 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
+  /**
+   * @return array
+   */
   function _testCheckOut() {
     //View the Cart
     $this->click("xpath=//div[@id='messages']/div/div/a[text()='View your cart.']");
@@ -411,6 +451,11 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     return array($firstName, $lastName);
   }
 
+  /**
+   * @param $firstName
+   * @param $lastName
+   * @param $events
+   */
   function _checkContributionsandEventRegistration($firstName, $lastName, $events) {
     //Type the registered participant's email in autocomplete.
     $this->click('sort_name_navigation');

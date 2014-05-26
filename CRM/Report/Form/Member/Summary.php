@@ -47,6 +47,12 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
   protected $_customGroupGroupBy = FALSE;
   public $_drilldownReport = array('member/detail' => 'Link to Detail Report');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
     // UI for selecting columns to appear in the report list
@@ -346,7 +352,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
   // end of from
 
   function where() {
-    $this->_whereClauses[] = "{$this->_aliases['civicrm_membership']}.is_test = 0 AND 
+    $this->_whereClauses[] = "{$this->_aliases['civicrm_membership']}.is_test = 0 AND
                               {$this->_aliases['civicrm_contact']}.is_deleted = 0";
     parent::where();
   }
@@ -390,6 +396,11 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     $select = "
@@ -445,6 +456,9 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
     parent::postProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function buildChart(&$rows) {
     $graphRows = array();
     $count = 0;
@@ -518,6 +532,9 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
     $this->assign('chartType', $this->_params['charts']);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

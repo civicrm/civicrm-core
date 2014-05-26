@@ -120,6 +120,9 @@ class CRM_Utils_Signer {
     return ($token == $newToken);
   }
 
+  /**
+   * @return string
+   */
   function createSalt() {
     // It would be more secure to generate a new value but liable to run this
     // many times on certain admin pages; so instead we'll re-use the hash.

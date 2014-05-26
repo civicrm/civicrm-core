@@ -213,6 +213,13 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $this->addFormRule(array('CRM_Event_Form_ParticipantFeeSelection', 'formRule'), $this);
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = array();
     return $errors;
@@ -256,6 +263,11 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @param $params
+   *
+   * @return mixed
+   */
   function emailReceipt(&$params) {
     $updatedLineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant', NULL, FALSE);
     $lineItem = array();

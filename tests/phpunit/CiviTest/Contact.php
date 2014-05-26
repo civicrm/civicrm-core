@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class Contact
+ */
 class Contact extends CiviUnitTestCase {
   /**
    * Helper function to create

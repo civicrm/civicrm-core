@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class CRM_Core_CodeGen_Util_Template
+ */
 class CRM_Core_CodeGen_Util_Template {
   protected $filetype;
 
@@ -81,6 +84,10 @@ class CRM_Core_CodeGen_Util_Template {
     }
   }
 
+  /**
+   * @param $key
+   * @param $value
+   */
   function assign($key, $value) {
     $this->smarty->assign_by_ref($key, $value);
   }

@@ -516,6 +516,9 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
   }
 
+  /**
+   * @return array
+   */
   function voterClause() {
     $params = array('campaign_search_voter_for' => $this->_operation);
 

@@ -112,6 +112,12 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     return $params;
   }
 
+  /**
+   * @param null $errorCode
+   * @param null $errorMessage
+   *
+   * @return object
+   */
   function &error($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
     if ($errorCode) {

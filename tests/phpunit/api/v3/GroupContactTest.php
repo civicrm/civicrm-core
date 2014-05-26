@@ -28,6 +28,10 @@
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_GroupContactTest
+ */
 class api_v3_GroupContactTest extends CiviUnitTestCase {
 
   protected $_contactId;
@@ -35,6 +39,9 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_groupId1;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Group Contact Create',

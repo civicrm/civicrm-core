@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_EditMembershipTest
+ */
 class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
   protected function setUp() {
     parent::setUp();

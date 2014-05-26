@@ -397,6 +397,14 @@ class CRM_Contact_Form_Edit_Address {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * @param $form
+   * @param $countryElementName
+   * @param $stateElementName
+   * @param $countyElementName
+   * @param $countryDefaultValue
+   * @param null $stateDefaultValue
+   */
   static function fixStateSelect(&$form,
     $countryElementName,
     $stateElementName,
@@ -570,6 +578,10 @@ class CRM_Contact_Form_Edit_Address {
   }
 
 
+  /**
+   * @param $form
+   * @param $groupTree
+   */
   static function storeRequiredCustomDataInfo(&$form, $groupTree) {
     if (CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Contact') {
       $requireOmission = NULL;

@@ -44,6 +44,10 @@
  */
 
 require_once 'Pager/Sliding.php';
+
+/**
+ * Class CRM_Utils_Pager
+ */
 class CRM_Utils_Pager extends Pager_Sliding {
 
   /**
@@ -261,12 +265,18 @@ class CRM_Utils_Pager extends Pager_Sliding {
     return array($offset, $this->_perPage);
   }
 
+  /**
+   * @return string
+   */
   function getCurrentLocation() {
     $config = CRM_Core_Config::singleton();
     $path = CRM_Utils_Array::value($config->userFrameworkURLVar, $_GET);
     return CRM_Utils_System::url($path, CRM_Utils_System::getLinksUrl(self::PAGE_ID, FALSE, TRUE), FALSE, NULL, FALSE) . $this->getCurrentPageID();
   }
 
+  /**
+   * @return string
+   */
   function getFirstPageLink() {
     if ($this->isFirstPage()) {
       return '';
@@ -280,6 +290,9 @@ class CRM_Utils_Pager extends Pager_Sliding {
     ) . $this->_spacesBefore . $this->_spacesAfter;
   }
 
+  /**
+   * @return string
+   */
   function getLastPageLink() {
     if ($this->isLastPage()) {
       return '';
@@ -293,6 +306,9 @@ class CRM_Utils_Pager extends Pager_Sliding {
     );
   }
 
+  /**
+   * @return string
+   */
   function getBackPageLink() {
     if ($this->_currentPage > 1) {
       $href = $this->makeURL(self::PAGE_ID, $this->getPreviousPageID());
@@ -304,6 +320,9 @@ class CRM_Utils_Pager extends Pager_Sliding {
     return '';
   }
 
+  /**
+   * @return string
+   */
   function getNextPageLink() {
     if ($this->_currentPage < $this->_totalPages) {
       $href = $this->makeURL(self::PAGE_ID, $this->getNextPageID());

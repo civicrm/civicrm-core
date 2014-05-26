@@ -53,6 +53,12 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
 
   public $campaignEnabled = False;
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array();
 
@@ -250,6 +256,9 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     parent::__construct();
   }
 
+  /**
+   * @return array
+   */
   function mailing_select() {
 
     $data = array();
@@ -433,6 +442,9 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @return array
+   */
   static function getChartCriteria() {
     return array('count' => array('civicrm_mailing_event_delivered_delivered_count' => ts('Delivered'),
         'civicrm_mailing_event_bounce_bounce_count' => ts('Bounce'),
@@ -449,6 +461,13 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     );
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   function formRule($fields, $files, $self) {
     $errors = array();
 
@@ -472,6 +491,9 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     return $errors;
   }
 
+  /**
+   * @param $rows
+   */
   function buildChart(&$rows) {
     if (empty($rows)) {
       return;
@@ -532,6 +554,9 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     $this->assign('chartType', $this->_params['charts']);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

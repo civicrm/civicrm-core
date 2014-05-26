@@ -2,8 +2,14 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Utils_RuleTest
+ */
 class CRM_Utils_RuleTest extends CiviUnitTestCase {
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name'      => 'Rule Test',
@@ -23,6 +29,9 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::integer($inputData));
   }
 
+  /**
+   * @return array
+   */
   function integerDataProvider() {
     return array(
       array(10, true),
@@ -41,6 +50,9 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::positiveInteger($inputData));
   }
 
+  /**
+   * @return array
+   */
   function positiveDataProvider() {
     return array(
       array(10, true),
@@ -59,6 +71,9 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::numeric($inputData));
   }
 
+  /**
+   * @return array
+   */
   function numericDataProvider() {
     return array(
       array(10, true),

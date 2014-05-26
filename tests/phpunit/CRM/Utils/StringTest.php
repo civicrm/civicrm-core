@@ -1,6 +1,13 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Utils_StringTest
+ */
 class CRM_Utils_StringTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'String Test',
@@ -105,6 +112,9 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * @return array
+   */
   public function parsePrefixData() {
     $cases = array();
     $cases[] = array('administer CiviCRM', NULL, array(NULL, 'administer CiviCRM'));

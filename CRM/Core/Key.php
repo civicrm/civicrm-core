@@ -56,6 +56,9 @@ class CRM_Core_Key {
     return self::$_key;
   }
 
+  /**
+   * @return mixed|null|string
+   */
   static function sessionID() {
     if (!self::$_sessionID) {
       $session = CRM_Core_Session::singleton();
@@ -131,6 +134,11 @@ class CRM_Core_Key {
     return $key;
   }
 
+  /**
+   * @param $key
+   *
+   * @return bool
+   */
   static function valid($key) {
     // a valid key is a 32 digit hex number
     // followed by an optional _ and a number between 1 and 10000

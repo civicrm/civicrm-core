@@ -34,6 +34,10 @@
  */
 
 require_once 'Mail/mime.php';
+
+/**
+ * Class CRM_Mailing_Event_BAO_Unsubscribe
+ */
 class CRM_Mailing_Event_BAO_Unsubscribe extends CRM_Mailing_Event_DAO_Unsubscribe {
 
   /**
@@ -562,6 +566,11 @@ WHERE  email = %2
     return $results;
   }
 
+  /**
+   * @param $queueID
+   *
+   * @return array
+   */
   public static function getContactInfo($queueID) {
     $query = "
 SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,

@@ -92,6 +92,11 @@ WHERE     pledge_id = %1
     return $paymentDetails;
   }
 
+  /**
+   * @param $params
+   *
+   * @return pledge
+   */
   static function create($params) {
     $transaction = new CRM_Core_Transaction();
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -715,6 +720,14 @@ LIMIT 0, %2
     return end($paymentDetails);
   }
 
+  /**
+   * @param $pledgeID
+   * @param $actualAmount
+   * @param $pledgeScheduledAmount
+   * @param null $paymentContributionId
+   * @param null $pPaymentId
+   * @param null $paymentStatusID
+   */
   static function adjustPledgePayment($pledgeID, $actualAmount, $pledgeScheduledAmount, $paymentContributionId = NULL, $pPaymentId = NULL, $paymentStatusID = NULL) {
     $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     if ($paymentStatusID == array_search('Cancelled', $allStatus) || $paymentStatusID == array_search('Refunded', $allStatus)) {

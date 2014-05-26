@@ -33,6 +33,10 @@
  *
  */
 require_once 'CRM/Campaign/DAO/Survey.php';
+
+/**
+ * Class CRM_Campaign_BAO_Survey
+ */
 class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
 
   /**
@@ -881,6 +885,11 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
     return CRM_Utils_Array::value($surveyId, $ufIds);
   }
 
+  /**
+   * @param $surveyId
+   *
+   * @return mixed
+   */
   public Static function getReportID($surveyId) {
     static $reportIds = array();
 

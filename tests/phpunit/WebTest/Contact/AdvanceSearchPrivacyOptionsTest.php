@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_AdvanceSearchPrivacyOptionsTest
+ */
 class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -121,6 +125,12 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
     $this->assertTrue($assertCheck, 'Do not trade / sms assertion failed using criteria(include , AND )');
   }
 
+  /**
+   * @param $inEx
+   * @param $privacyOptions
+   * @param $privacyOperator
+   * @param $allPrivacyOptions
+   */
   function _addPrivacyCriteria($inEx, $privacyOptions, $privacyOperator, $allPrivacyOptions) {
     $inExId = ($inEx == 'include') ? 'CIVICRM_QFID_2_privacy_toggle' : 'CIVICRM_QFID_1_privacy_toggle';
     $this->click($inExId);
@@ -144,6 +154,12 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
     }
   }
 
+  /**
+   * @param $firstName
+   * @param $lastName
+   *
+   * @return bool
+   */
   function _searchSortNameCriteria($firstName, $lastName) {
     //type in the criteria
     $this->type("sort_name", "{$lastName}, {$firstName}");
@@ -156,6 +172,11 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
     return $this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr/td[3]/a[text()='{$lastName}, {$firstName}']");
   }
 
+  /**
+   * @param $privacyOption
+   *
+   * @return string
+   */
   function getOptionVal($privacyOption) {
     if ($privacyOption == 'do_not_phone') {
       $privacyOptionVal = 'Do not phone';
@@ -175,6 +196,11 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
     return $privacyOptionVal;
   }
 
+  /**
+   * @param $firstName
+   * @param $lastName
+   * @param $options
+   */
   function _addIndividual($firstName, $lastName, $options) {
 
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');

@@ -42,6 +42,12 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
   protected $_addressField = FALSE;
   protected $_emailField = FALSE;
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -296,6 +302,11 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -386,6 +397,9 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
     parent::postProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound   = FALSE;

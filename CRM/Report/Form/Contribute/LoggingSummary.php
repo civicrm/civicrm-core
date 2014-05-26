@@ -34,6 +34,9 @@
  *
  */
 class CRM_Report_Form_Contribute_LoggingSummary extends CRM_Logging_ReportSummary {
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact_altered_contact' => array(
@@ -172,6 +175,9 @@ class CRM_Report_Form_Contribute_LoggingSummary extends CRM_Logging_ReportSummar
     parent::__construct();
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // cache for id → is_deleted mapping
     $isDeleted = array();

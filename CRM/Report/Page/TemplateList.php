@@ -39,6 +39,12 @@
  */
 class CRM_Report_Page_TemplateList extends CRM_Core_Page {
 
+  /**
+   * @param null $compID
+   * @param null $grouping
+   *
+   * @return array
+   */
   public static function &info($compID = NULL, $grouping = NULL) {
     $all = CRM_Utils_Request::retrieve('all', 'Boolean', CRM_Core_DAO::$_nullObject,
       FALSE, NULL, 'GET'

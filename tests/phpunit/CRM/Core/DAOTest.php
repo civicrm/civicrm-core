@@ -1,7 +1,14 @@
 <?php
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Core_DAOTest
+ */
 class CRM_Core_DAOTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name'    => 'DAO',
@@ -21,7 +28,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $contactRef = $refsByTarget['civicrm_contact'];
     $this->assertEquals('contact_id', $contactRef->getReferenceKey());
     $this->assertEquals('id', $contactRef->getTargetKey());
-    $this->assertEquals(FALSE, $contactRef->isGeneric());
+    $this->assertEquals('CRM_Core_Reference_Basic', get_class($contactRef));
   }
 
   function testGetReferencesToTable() {
@@ -35,7 +42,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals('entity_id', $genericRef->getReferenceKey());
     $this->assertEquals('entity_table', $genericRef->getTypeColumn());
     $this->assertEquals('id', $genericRef->getTargetKey());
-    $this->assertEquals(TRUE, $genericRef->isGeneric());
+    $this->assertEquals('CRM_Core_Reference_Dynamic', get_class($genericRef));
   }
 
   function testFindReferences() {
@@ -69,6 +76,9 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals($contact->id, $refDao->contact_id);
   }
 
+  /**
+   * @return array
+   */
   function composeQueryExamples() {
     $cases = array();
     // $cases[] = array('Input-SQL', 'Input-Params', 'Expected-SQL');
@@ -160,6 +170,9 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertFalse(($expectSql == $actualSql));
   }
 
+  /**
+   * @return array
+   */
   function sqlNameDataProvider() {
     return array(
       array('this is a long string', 30, FALSE, 'this is a long string'),

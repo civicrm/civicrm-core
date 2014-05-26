@@ -68,10 +68,16 @@ class CRM_Group_Controller extends CRM_Core_Controller {
     $this->addActions($uploadDir, $uploadNames);
   }
 
+  /**
+   * @return mixed
+   */
   function run() {
     return parent::run();
   }
 
+  /**
+   * @return mixed
+   */
   public function selectorName() {
     return $this->get('selectorName');
   }

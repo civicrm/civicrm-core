@@ -81,6 +81,9 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
     ), 'Failed to match existing record');
   }
 
+  /**
+   * @return array
+   */
   function apiOptionNames() {
     return array(
       array('match'),

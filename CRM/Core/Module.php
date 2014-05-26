@@ -47,6 +47,10 @@ class CRM_Core_Module {
    */
   public $is_active;
 
+  /**
+   * @param $name
+   * @param $is_active
+   */
   public function __construct($name, $is_active) {
     $this->name = $name;
     $this->is_active = $is_active;

@@ -34,10 +34,30 @@
  */
 class CRM_Case_XMLProcessor {
 
+  /**
+   * Relationship-types have four name fields (name_a_b, name_b_a, label_a_b,
+   * label_b_a), but CiviCase XML refers to reltypes by a single name.
+   * REL_TYPE_CNAME identifies the canonical name field as used by CiviCase XML.
+   *
+   * This appears to be "label_b_a", but IMHO "name_b_a" would be more
+   * sensible.
+   */
+  const REL_TYPE_CNAME = 'label_b_a';
+
+  /**
+   * @param $caseType
+   *
+   * @return FALSE|SimpleXMLElement
+   */
   public function retrieve($caseType) {
     return CRM_Case_XMLRepository::singleton()->retrieve($caseType);
   }
 
+  /**
+   * @param $caseType
+   *
+   * @return mixed|string
+   */
   public static function mungeCaseType($caseType) {
     // trim all spaces from $caseType
     $caseType = str_replace('_', ' ', $caseType);
@@ -45,6 +65,12 @@ class CRM_Case_XMLProcessor {
     return $caseType;
   }
 
+  /**
+   * @param bool $indexName
+   * @param bool $all
+   *
+   * @return array
+   */
   function &allActivityTypes($indexName = TRUE, $all = FALSE) {
     static $activityTypes = NULL;
     if (!$activityTypes) {
@@ -53,6 +79,9 @@ class CRM_Case_XMLProcessor {
     return $activityTypes;
   }
 
+  /**
+   * @return array
+   */
   function &allRelationshipTypes() {
     static $relationshipTypes = array();
 
@@ -61,7 +90,7 @@ class CRM_Case_XMLProcessor {
 
       $relationshipTypes = array();
       foreach ($relationshipInfo as $id => $info) {
-        $relationshipTypes[$id] = $info['label_b_a'];
+        $relationshipTypes[$id] = $info[CRM_Case_XMLProcessor::REL_TYPE_CNAME];
       }
     }
 

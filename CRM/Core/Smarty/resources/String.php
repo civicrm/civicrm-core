@@ -37,15 +37,32 @@ function civicrm_smarty_resource_string_get_template($tpl_name, &$tpl_source, &$
   return TRUE;
 }
 
+/**
+ * @param $tpl_name
+ * @param $tpl_timestamp
+ * @param $smarty_obj
+ *
+ * @return bool
+ */
 function civicrm_smarty_resource_string_get_timestamp($tpl_name, &$tpl_timestamp, &$smarty_obj) {
   $tpl_timestamp = time();
   return TRUE;
 }
 
+/**
+ * @param $tpl_name
+ * @param $smarty_obj
+ *
+ * @return bool
+ */
 function civicrm_smarty_resource_string_get_secure($tpl_name, &$smarty_obj) {
   return TRUE;
 }
 
+/**
+ * @param $tpl_name
+ * @param $smarty_obj
+ */
 function civicrm_smarty_resource_string_get_trusted($tpl_name, &$smarty_obj) {}
 
 function civicrm_smarty_register_string_resource() {

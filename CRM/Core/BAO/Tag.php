@@ -65,6 +65,12 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     return NULL;
   }
 
+  /**
+   * @param null $usedFor
+   * @param bool $excludeHidden
+   *
+   * @return mixed
+   */
   function getTree($usedFor = NULL, $excludeHidden = FALSE) {
     if (!isset($this->tree)) {
       $this->buildTree($usedFor, $excludeHidden);
@@ -72,6 +78,10 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     return $this->tree;
   }
 
+  /**
+   * @param null $usedFor
+   * @param bool $excludeHidden
+   */
   function buildTree($usedFor = NULL, $excludeHidden = FALSE) {
     $sql = "SELECT civicrm_tag.id, civicrm_tag.parent_id,civicrm_tag.name FROM civicrm_tag ";
 
@@ -129,6 +139,14 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     }
   }
 
+  /**
+   * @param array $usedFor
+   * @param bool $buildSelect
+   * @param bool $all
+   * @param null $parentId
+   *
+   * @return array
+   */
   static function getTagsUsedFor($usedFor = array('civicrm_contact'),
     $buildSelect = TRUE,
     $all         = FALSE,
@@ -182,6 +200,14 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     return $tags;
   }
 
+  /**
+   * @param string $usedFor
+   * @param array $tags
+   * @param null $parentId
+   * @param string $separator
+   *
+   * @return array
+   */
   static function getTags($usedFor = 'civicrm_contact',
     &$tags = array(),
     $parentId  = NULL,

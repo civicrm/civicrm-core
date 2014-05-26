@@ -27,6 +27,10 @@
 
 
 require_once "PEAR.php";
+
+/**
+ * Class CRM_Core_Session
+ */
 class CRM_Core_Session {
 
   /**
@@ -520,6 +524,9 @@ class CRM_Core_Session {
     }
   }
 
+  /**
+   * @param $names
+   */
   static function registerAndRetrieveSessionObjects($names) {
     if (!is_array($names)) {
       $names = array($names);
@@ -535,6 +542,9 @@ class CRM_Core_Session {
     CRM_Core_BAO_Cache::restoreSessionFromCache($names);
   }
 
+  /**
+   * @param bool $reset
+   */
   static function storeSessionObjects($reset = TRUE) {
     if (empty(self::$_managedNames)) {
       return;
@@ -559,6 +569,9 @@ class CRM_Core_Session {
     return $session->get('userID');
   }
 
+  /**
+   * @return bool
+   */
   function isEmpty() {
     // check if session is empty, if so we dont cache
     // stuff that we can get away with

@@ -35,6 +35,10 @@
  */
 
 require_once 'tcpdf/tcpdf.php';
+
+/**
+ * Class CRM_Utils_PDF_Label
+ */
 class CRM_Utils_PDF_Label extends TCPDF {
 
   // make these properties public due to
@@ -116,11 +120,21 @@ class CRM_Utils_PDF_Label extends TCPDF {
     $this->setPrintFooter(FALSE);
   }
 
+  /**
+   * @param $objectinstance
+   * @param string $methodname
+   */
   function SetGenerator($objectinstance, $methodname = 'generateLabel') {
     $this->generatorMethod = $methodname;
     $this->generatorObject = $objectinstance;
   }
 
+  /**
+   * @param $name
+   * @param bool $convert
+   *
+   * @return float|int|mixed
+   */
   function getFormatValue($name, $convert = FALSE) {
     if (isset($this->format[$name])) {
       $value = $this->format[$name];
@@ -138,6 +152,10 @@ class CRM_Utils_PDF_Label extends TCPDF {
 
   /*
    * Function to initialize label format settings
+   */
+  /**
+   * @param $format
+   * @param $unit
    */
   function LabelSetFormat(&$format, $unit) {
     $this->defaults = CRM_Core_BAO_LabelFormat::getDefaultValues();
@@ -167,6 +185,9 @@ class CRM_Utils_PDF_Label extends TCPDF {
 
   /*
    * function to Generate the pdf of one label (can be modified using SetGenerator)
+   */
+  /**
+   * @param $text
    */
   function generateLabel($text) {
     $args = array(
@@ -211,6 +232,9 @@ class CRM_Utils_PDF_Label extends TCPDF {
 
   /*
    * function to Print a label
+   */
+  /**
+   * @param $texte
    */
   function AddPdfLabel($texte) {
     if ($this->countX == $this->xNumber) {

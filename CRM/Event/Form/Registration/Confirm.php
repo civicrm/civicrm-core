@@ -1086,6 +1086,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     return $contactID;
   }
 
+  /**
+   * @param $form
+   */
   public static function assignProfiles(&$form) {
     $addParticipantProfile = $form->get('addParticipantProfile');
     $primaryParticipantProfile = $form->get('primaryParticipantProfile');

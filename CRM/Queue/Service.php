@@ -72,6 +72,10 @@ class CRM_Queue_Service {
    * @var array(queueName => CRM_Queue_Queue)
    */
   var $queues;
+
+  /**
+   *
+   */
   function __construct() {
     $this->queues = array();
   }

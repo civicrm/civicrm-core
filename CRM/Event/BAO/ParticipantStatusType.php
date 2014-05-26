@@ -33,6 +33,11 @@
  *
  */
 class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatusType {
+  /**
+   * @param $params
+   *
+   * @return $this|null
+   */
   static function add(&$params) {
     if (empty($params)) {
       return NULL;
@@ -42,6 +47,11 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
     return $dao->save();
   }
 
+  /**
+   * @param $params
+   *
+   * @return $this|null
+   */
   static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
     $statusType = self::add($params);
@@ -53,6 +63,11 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
     return $statusType;
   }
 
+  /**
+   * @param $id
+   *
+   * @return bool
+   */
   static function deleteParticipantStatusType($id) {
     // return early if there are participants with this status
     $participant = new CRM_Event_DAO_Participant;
@@ -70,6 +85,12 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
     return TRUE;
   }
 
+  /**
+   * @param $params
+   * @param $defaults
+   *
+   * @return CRM_Event_DAO_ParticipantStatusType|null
+   */
   static function retrieve(&$params, &$defaults) {
     $result = NULL;
 
@@ -83,10 +104,21 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
     return $result;
   }
 
+  /**
+   * @param $id
+   * @param $isActive
+   *
+   * @return bool
+   */
   static function setIsActive($id, $isActive) {
     return CRM_Core_DAO::setFieldValue('CRM_Event_BAO_ParticipantStatusType', $id, 'is_active', $isActive);
   }
 
+  /**
+   * @param $params
+   *
+   * @return array
+   */
   public function process($params) {
 
     $returnMessages = array();

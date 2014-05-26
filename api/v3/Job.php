@@ -40,11 +40,6 @@
  */
 
 /**
- * Include common API util functions
- */
-require_once 'api/v3/utils.php';
-
-/**
  * Adjust metadata for "Create" action
  *
  * The metadata is used for setting defaults, documentation & validation

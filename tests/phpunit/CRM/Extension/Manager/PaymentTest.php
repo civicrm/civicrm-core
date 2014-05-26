@@ -26,6 +26,9 @@
 */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Extension_Manager_PaymentTest
+ */
 class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
   //@todo make BAO enotice compliant  & remove the line below
   // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE

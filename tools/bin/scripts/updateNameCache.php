@@ -31,7 +31,14 @@
  * This script recaches the display_name and sort_name values
  *
  */
+
+/**
+ * Class CRM_UpdateNameCache
+ */
 class CRM_UpdateNameCache {
+  /**
+   *
+   */
   function __construct() {
     // you can run this program either from an apache command, or from the cli
     if (php_sapi_name() == "cli") {

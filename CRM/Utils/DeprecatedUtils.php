@@ -1325,6 +1325,15 @@ function _civicrm_api3_deprecated_contact_check_custom_params($params, $csType =
   }
 }
 
+/**
+ * @param $params
+ * @param bool $dupeCheck
+ * @param bool $dupeErrorArray
+ * @param bool $requiredCheck
+ * @param null $dedupeRuleGroupID
+ *
+ * @return array|null
+ */
 function _civicrm_api3_deprecated_contact_check_params(
   &$params,
   $dupeCheck = TRUE,

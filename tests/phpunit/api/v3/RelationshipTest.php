@@ -48,6 +48,10 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   protected $_params;
 
   protected $_entity;
+
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Relationship Create',
@@ -400,6 +404,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->customGroupDelete($ids['custom_group_id']);
   }
 
+  /**
+   * @return mixed
+   */
   function createCustomGroup() {
     $params = array(
       'title' => 'Custom Group',
@@ -414,6 +421,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     return $customGroup['id'];
   }
 
+  /**
+   * @return array
+   */
   function createCustomField() {
     $ids = array();
     $params = array(

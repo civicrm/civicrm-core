@@ -26,6 +26,10 @@
 */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_LineItemTest
+ */
 class api_v3_LineItemTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $testAmount = 34567;
@@ -109,7 +113,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   }
 
   public function testGetFieldsLineItem() {
-    $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create', 'action' => 'create'));
+    $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create',));
     $this->assertEquals(1, $result['values']['entity_id']['api.required']);
   }
 

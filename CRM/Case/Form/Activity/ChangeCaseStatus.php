@@ -39,6 +39,11 @@
  */
 class CRM_Case_Form_Activity_ChangeCaseStatus {
 
+  /**
+   * @param $form
+   *
+   * @throws Exception
+   */
   static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
@@ -63,6 +68,9 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     return $defaults;
   }
 
+  /**
+   * @param $form
+   */
   static function buildQuickForm(&$form) {
     $form->removeElement('status_id');
     $form->removeElement('priority_id');

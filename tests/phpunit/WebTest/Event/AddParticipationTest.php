@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_AddParticipationTest
+ */
 class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -415,6 +419,11 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $firstName
+   * @param $lastName
+   * @param $processorId
+   */
   function _fillParticipantDetails($firstName, $lastName, $processorId) {
     $this->webtestNewDialogContact($firstName, $lastName);
 

@@ -49,6 +49,12 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
     'pieChart' => 'Pie Chart',
   );
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array();
 
@@ -208,6 +214,13 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     return $errors;
@@ -273,6 +286,9 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function buildChart(&$rows) {
     if (empty($rows)) {
       return;
@@ -293,6 +309,9 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
     $this->assign('chartType', $this->_params['charts']);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

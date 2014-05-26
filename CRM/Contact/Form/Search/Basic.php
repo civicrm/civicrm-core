@@ -158,6 +158,9 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     parent::preProcess();
   }
 
+  /**
+   * @return array
+   */
   function &getFormValues() {
     return $this->_formValues;
   }
@@ -276,6 +279,15 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     return TRUE;
   }
 
+  /**
+   * Return a descriptive name for the page, used in wizard header
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function getTitle() {
     return ts('Find Contacts');
   }

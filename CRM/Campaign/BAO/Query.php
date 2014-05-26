@@ -144,6 +144,9 @@ class CRM_Campaign_BAO_Query {
     $query->_whereTables['civicrm_campaign'] = 1;
   }
 
+  /**
+   * @param $query
+   */
   static function where(&$query) {
     //get survey clause in force,
     //only when we have survey id.
@@ -161,6 +164,10 @@ class CRM_Campaign_BAO_Query {
     }
   }
 
+  /**
+   * @param $values
+   * @param $query
+   */
   static function whereClauseSingle(&$values, &$query) {
     //get survey clause in force,
     //only when we have survey id.
@@ -207,6 +214,13 @@ class CRM_Campaign_BAO_Query {
     }
   }
 
+  /**
+   * @param $name
+   * @param $mode
+   * @param $side
+   *
+   * @return null|string
+   */
   static function from($name, $mode, $side) {
     $from = NULL;
     //get survey clause in force,
@@ -251,6 +265,12 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
     return $from;
   }
 
+  /**
+   * @param $mode
+   * @param bool $includeCustomFields
+   *
+   * @return array|null
+   */
   static function defaultReturnProperties($mode,
     $includeCustomFields = TRUE
   ) {
@@ -285,9 +305,20 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
     return $properties;
   }
 
+  /**
+   * @param $tables
+   */
   static function tableNames(&$tables) {}
+
+  /**
+   * @param $row
+   * @param $id
+   */
   static function searchAction(&$row, $id) {}
 
+  /**
+   * @param $tables
+   */
   static function info(&$tables) {
     //get survey clause in force,
     //only when we have survey id.
@@ -422,6 +453,11 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
    * @param  array  $criteria an array
    * @return $voterClause as a string
    * @static
+   */
+  /**
+   * @param $params
+   *
+   * @return array
    */
   static public function voterClause($params) {
     $voterClause = array();

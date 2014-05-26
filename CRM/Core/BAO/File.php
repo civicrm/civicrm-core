@@ -40,6 +40,13 @@
 
    static $_signableFields = array('entityTable', 'entityID', 'fileID');
 
+   /**
+    * @param $fileID
+    * @param $entityID
+    * @param null $entityTable
+    *
+    * @return array
+    */
    static function path($fileID, $entityID, $entityTable = NULL) {
      $entityFileDAO = new CRM_Core_DAO_EntityFile();
      if ($entityTable) {
@@ -65,6 +72,19 @@
    }
 
 
+   /**
+    * @param $data
+    * @param $fileTypeID
+    * @param $entityTable
+    * @param $entityID
+    * @param $entitySubtype
+    * @param bool $overwrite
+    * @param null $fileParams
+    * @param string $uploadName
+    * @param null $mimeType
+    *
+    * @throws Exception
+    */
    static function filePostProcess(
      $data,
      $fileTypeID,
@@ -302,6 +322,14 @@
      return $results;
    }
 
+   /**
+    * @param $entityTable
+    * @param $entityID
+    * @param null $fileTypeID
+    * @param null $fileID
+    *
+    * @return array
+    */
    static function sql($entityTable, $entityID, $fileTypeID = NULL, $fileID = NULL) {
      $sql = "
  SELECT    CF.id as cfID,
@@ -332,6 +360,13 @@
      return array($sql, $params);
    }
 
+   /**
+    * @param $form
+    * @param $entityTable
+    * @param null $entityID
+    * @param null $numAttachments
+    * @param bool $ajaxDelete
+    */
    static function buildAttachment(&$form, $entityTable, $entityID = NULL, $numAttachments = NULL, $ajaxDelete = FALSE) {
 
      if (!$numAttachments) {
@@ -421,6 +456,12 @@
      return NULL;
    }
 
+   /**
+    * @param $formValues
+    * @param $params
+    * @param $entityTable
+    * @param null $entityID
+    */
    static function formatAttachment(
      &$formValues,
      &$params,
@@ -469,6 +510,11 @@
      }
    }
 
+   /**
+    * @param $params
+    * @param $entityTable
+    * @param $entityID
+    */
    static function processAttachment(&$params, $entityTable, $entityID) {
      $numAttachments = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
 
@@ -492,6 +538,9 @@
      }
    }
 
+   /**
+    * @return array
+    */
    static function uploadNames() {
      $numAttachments = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
 
@@ -506,6 +555,12 @@
    /*
     * Function to copy/attach an existing file to a different entity
     * table and id.
+    */
+   /**
+    * @param $oldEntityTable
+    * @param $oldEntityId
+    * @param $newEntityTable
+    * @param $newEntityId
     */
    static function copyEntityFile($oldEntityTable, $oldEntityId, $newEntityTable, $newEntityId) {
     $oldEntityFile = new CRM_Core_DAO_EntityFile();
@@ -522,7 +577,14 @@
     }
   }
 
-  static function deleteURLArgs($entityTable, $entityID, $fileID) {
+   /**
+    * @param $entityTable
+    * @param $entityID
+    * @param $fileID
+    *
+    * @return string
+    */
+   static function deleteURLArgs($entityTable, $entityID, $fileID) {
     $params['entityTable'] = $entityTable;
     $params['entityID']    = $entityID;
     $params['fileID']      = $fileID;

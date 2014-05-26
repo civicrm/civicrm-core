@@ -97,6 +97,9 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array();
 
@@ -109,6 +112,9 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
     return $defaults;
   }
 
+  /**
+   * @param $defaults
+   */
   function cbsDefaultValues(&$defaults) {
 
     foreach ($this->_varNames as $groupName => $groupValues) {

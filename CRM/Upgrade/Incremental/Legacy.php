@@ -112,6 +112,12 @@ SELECT  id
     }
   }
 
+  /**
+   * @param $template
+   * @param $message
+   * @param $latestVer
+   * @param $currentVer
+   */
   static function checkMessageTemplate(&$template, &$message, $latestVer, $currentVer) {
     if (version_compare($currentVer, '3.1.alpha1') < 0) {
       return;

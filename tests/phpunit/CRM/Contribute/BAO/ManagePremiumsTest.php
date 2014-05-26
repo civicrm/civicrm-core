@@ -26,7 +26,14 @@
 */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Contribute_BAO_ManagePremiumsTest
+ */
 class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'ManagePremiums BAOs',

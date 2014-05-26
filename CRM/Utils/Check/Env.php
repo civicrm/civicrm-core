@@ -73,6 +73,9 @@ class CRM_Utils_Check_Env {
     return $messages;
   }
 
+  /**
+   * @return array
+   */
   public function checkDebug() {
     $messages = array();
 
@@ -89,6 +92,9 @@ class CRM_Utils_Check_Env {
     return $messages;
   }
 
+  /**
+   * @return array
+   */
   public function checkOutboundMail() {
     $messages = array();
 
