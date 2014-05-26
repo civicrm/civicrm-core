@@ -97,12 +97,45 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
 
   }
 
+  function testGetAllDeclaredActivityTypes() {
+    $repo = new CRM_Case_XMLRepository(
+      array('CaseTypeWithTwoActivityTypes', 'CaseTypeWithThreeActivityTypes'),
+      array(
+        'CaseTypeWithTwoActivityTypes' => new SimpleXMLElement($this->fixtures['CaseTypeWithTwoActivityTypes']),
+        'CaseTypeWithThreeActivityTypes' => new SimpleXMLElement($this->fixtures['CaseTypeWithThreeActivityTypes']),
+        /* healthful noise: */
+        'CaseTypeWithSingleRole' => new SimpleXMLElement($this->fixtures['CaseTypeWithSingleRole']),
+      )
+    );
+
+    // omitted: 'Single Activity Type'
+    $expected = array('First Activity Type', 'Second Activity Type', 'Third Activity Type');
+    $actual = $repo->getAllDeclaredActivityTypes();
+    $this->assertEquals($expected, $actual);
+  }
+
+  function testGetAllDeclaredRelationshipTypes() {
+    $repo = new CRM_Case_XMLRepository(
+      array('CaseTypeWithTwoRoles', 'CaseTypeWithThreeRoles', 'CaseTypeWithSingleActivityType'),
+      array(
+        'CaseTypeWithTwoRoles' => new SimpleXMLElement($this->fixtures['CaseTypeWithTwoRoles']),
+        'CaseTypeWithThreeRoles' => new SimpleXMLElement($this->fixtures['CaseTypeWithThreeRoles']),
+        /* healthful noise: */
+        'CaseTypeWithSingleActivityType' => new SimpleXMLElement($this->fixtures['CaseTypeWithSingleActivityType']),
+      )
+    );
+    // omitted: 'Single Role'
+    $expected = array('First Role', 'Second Role', 'Third Role');
+    $actual = $repo->getAllDeclaredRelationshipTypes();
+    $this->assertEquals($expected, $actual);
+  }
+
   function testGetActivityReferenceCount_1() {
     $repo = new CRM_Case_XMLRepository(
       array('CaseTypeWithSingleActivityType'),
       array(
         'CaseTypeWithSingleActivityType' => new SimpleXMLElement($this->fixtures['CaseTypeWithSingleActivityType']),
-        /* noise: */
+        /* healthful noise: */
         'CaseTypeWithSingleRole' => new SimpleXMLElement($this->fixtures['CaseTypeWithSingleRole']),
       )
     );
@@ -135,7 +168,7 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
       array('CaseTypeWithSingleRole', 'CaseTypeWithSingleActivityType'),
       array(
         'CaseTypeWithSingleRole' => new SimpleXMLElement($this->fixtures['CaseTypeWithSingleRole']),
-        /* noise: */
+        /* healthful noise: */
         'CaseTypeWithSingleActivityType' => new SimpleXMLElement($this->fixtures['CaseTypeWithSingleActivityType']),
       )
     );
@@ -152,7 +185,7 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
       array(
         'CaseTypeWithTwoRoles' => new SimpleXMLElement($this->fixtures['CaseTypeWithTwoRoles']),
         'CaseTypeWithThreeRoles' => new SimpleXMLElement($this->fixtures['CaseTypeWithThreeRoles']),
-        /* noise: */
+        /* healthful noise: */
         'CaseTypeWithSingleActivityType' => new SimpleXMLElement($this->fixtures['CaseTypeWithSingleActivityType']),
       )
     );

@@ -27,10 +27,11 @@ class Container {
   private static $singleton;
 
   /**
+   * @param bool $reset whether to forcibly rebuild the entire container
    * @return \Symfony\Component\DependencyInjection\TaggedContainerInterface
    */
-  public static function singleton() {
-    if (self::$singleton === NULL) {
+  public static function singleton($reset = FALSE) {
+    if ($reset || self::$singleton === NULL) {
       $c = new self();
       self::$singleton = $c->createContainer();
     }
