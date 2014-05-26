@@ -195,6 +195,14 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
               );
               break;
 
+            case 'select':
+              $this->addElement('select',
+                $fieldName,
+                $fieldValue['title'],
+                $fieldValue['option_values']
+              );
+              break;
+
             case 'entity_reference':
               $this->addEntityRef($fieldName, $fieldValue['title'], CRM_Utils_Array::value('options', $fieldValue, array()));
           }
