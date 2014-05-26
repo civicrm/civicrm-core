@@ -38,12 +38,15 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
    * @return array
    */
   public static function getSubscribedEvents() {
+    // Using a high priority allows adhoc implementations
+    // to override standard implementations -- which is
+    // handy for testing/mocking.
     return array(
       Events::RESOLVE => array(
-        array('onApiResolve', Events::W_MIDDLE),
+        array('onApiResolve', Events::W_EARLY),
       ),
       Events::AUTHORIZE => array(
-        array('onApiAuthorize', Events::W_MIDDLE),
+        array('onApiAuthorize', Events::W_EARLY),
       ),
     );
   }
