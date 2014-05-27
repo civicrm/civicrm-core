@@ -99,27 +99,30 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
     if (!empty($params['definition']['activitySets'])) {
       $xmlFile .= "<ActivitySets>\n";
-      $xmlFile .= "<ActivitySet>\n";
-      foreach ($params['definition']['activitySets'] as $index => $setVal) {
-        if ($index == 'activityTypes') {
-          if (!empty($setVal)) {
-            $xmlFile .= "<ActivityTypes>\n";
-            foreach ($setVal as $values) {
-              $xmlFile .= "<ActivityType>\n";
-              foreach ($values as $key => $value) {
-                $xmlFile .= "<{$key}>{$value}</{$key}>\n";
+      foreach ($params['definition']['activitySets'] as $k => $val) {
+        $xmlFile .= "<ActivitySet>\n";
+        foreach ($val as $index => $setVal) {
+          if ($index == 'activityTypes') {
+            if (!empty($setVal)) {
+              $xmlFile .= "<ActivityTypes>\n";
+              foreach ($setVal as $values) {
+                $xmlFile .= "<ActivityType>\n";
+                foreach ($values as $key => $value) {
+                  $xmlFile .= "<{$key}>{$value}</{$key}>\n";
+                }
+                $xmlFile .= "</ActivityType>\n";
               }
-              $xmlFile .= "</ActivityType>\n";
+              $xmlFile .= "</ActivityTypes>\n";
             }
-            $xmlFile .= "</ActivityTypes>\n";
+          }
+          else {
+            $xmlFile .= "<{$index}>{$setVal}</{$index}>\n";
           }
         }
-        else {
-          $xmlFile .= "<{$index}>{$setVal}</{$index}>\n";
-        }
+
+        $xmlFile .= "</ActivitySet>\n";
       }
 
-      $xmlFile .= "</ActivitySet>\n";
       $xmlFile .= "</ActivitySets>\n";
     }
 
@@ -136,7 +139,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     }
 
     $xmlFile .= '</CaseType>';
-
     $params['definition'] = $xmlFile;
   }
 
@@ -166,7 +168,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
     // set activity sets
     $activitySets = json_decode(json_encode($xml->ActivitySets), TRUE);
-    foreach($activitySets as $key => $value) {
+    foreach ($activitySets as $key => $value) {
       $caseType['values'][0]['definition']['activitySets'] = array($key => $value);
       $caseType['values'][0]['definition']['activitySets'][$key]['activityTypes'] = $activitySets['ActivitySet']['ActivityTypes']['ActivityType'];
       unset($caseType['values'][0]['definition']['activitySets'][$key]['ActivityTypes']);
