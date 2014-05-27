@@ -148,6 +148,7 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
       'table_name' => 'varchar(16)',
       'contact_id' => 'int unsigned',
       'sort_name' => 'varchar(128)',
+      'display_name' => 'varchar(128)',
       'assignee_contact_id' => 'int unsigned',
       'assignee_sort_name' => 'varchar(128)',
       'target_contact_id' => 'int unsigned',
@@ -871,12 +872,11 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
   function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     $this->initialize();
 
-    $sql = "SELECT contact_id FROM {$this->_tableName}";
     if ($returnSQL) {
-      return $sql;
+      return $this->all($offset, $rowcount, $sort, FALSE, TRUE);;
     }
     else {
-      return CRM_Core_DAO::singleValueQuery($sql);
+      return CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM {$this->_tableName}");
     }
   }
 
@@ -893,7 +893,7 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
     $this->initialize();
 
     if ($justIDs) {
-      $select = "contact_a.contact_id";
+      $select = "contact_a.id as contact_id";
     }
     else {
       $select = "
@@ -965,8 +965,8 @@ FROM   {$this->_tableName} contact_a
       case 'Contact':
         $sql = "
 INSERT INTO {$this->_tableName}
-( contact_id, sort_name, table_name )
-SELECT     c.id, c.sort_name, 'Contact'
+( contact_id, sort_name, display_name, table_name )
+SELECT     c.id, c.sort_name, c.display_name, 'Contact'
   FROM     {$this->_entityIDTableName} ct
 INNER JOIN civicrm_contact c ON ct.entity_id = c.id
 {$this->_limitDetailClause}
