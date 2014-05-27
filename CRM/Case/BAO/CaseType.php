@@ -64,11 +64,11 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    */
   static function add(&$params) {
     $caseTypeDAO = new CRM_Case_DAO_CaseType();
-    $caseTypeDAO->copyValues($params);
 
     // function to format definition column
     self::convertDefinitionToXML($params);
 
+    $caseTypeDAO->copyValues($params);
     return $caseTypeDAO->save();
   }
 
