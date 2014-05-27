@@ -32,13 +32,27 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CiviCaseTestCase extends CiviUnitTestCase {
 
+  /**
+   * @var string symbolic-name
+   */
+  protected $caseType;
+
   protected $caseTypeId;
+
   protected $caseStatusGroup;
+
   protected $optionValues;
+
   protected $_loggedInUser;
 
   public function setUp() {
     parent::setUp();
+
+    /** @var $hooks \CRM_Utils_Hook_UnitTests */
+    $hooks = \CRM_Utils_Hook::singleton();
+    $hooks->setHook('civicrm_caseTypes', array($this, 'hook_caseTypes'));
+    \CRM_Case_XMLRepository::singleton(TRUE);
+
     // CRM-9404 - set-up is a bit cumbersome but had to put something in place to set up activity types & case types
     //. Using XML was causing breakage as id numbers were changing over time
     // & was really hard to troubleshoot as involved truncating option_value table to mitigate this & not leaving DB in a
@@ -66,6 +80,9 @@ class CiviCaseTestCase extends CiviUnitTestCase {
       // store for cleanup
       $this->optionValues[] = $activityTypes['id'];
     }
+
+    // TODO Our data seems inconsistent on whether name is "HousingSupport" or "housing_support"
+    $this->caseType = 'HousingSupport';
     $this->caseTypeId = 1;
     $this->tablesToTruncate = array(
       'civicrm_activity',
@@ -111,5 +128,15 @@ class CiviCaseTestCase extends CiviUnitTestCase {
   function tearDown() {
     $this->quickCleanup($this->tablesToTruncate, TRUE);
     $this->customDirectories(array('template_path' => FALSE));
+    CRM_Case_XMLRepository::singleton(TRUE);
+  }
+
+  /**
+   * Subclasses may override this if they want to be explicit about the case-type definition.
+   *
+   * @param $caseTypes
+   * @see CRM_Utils_Hook::caseTypes
+   */
+  function hook_caseTypes(&$caseTypes) {
   }
 }
