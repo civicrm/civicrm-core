@@ -978,12 +978,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $sql = $this->_search->contactIDs($start, $end, $sort, TRUE);
       $replaceSQL = "SELECT contact_a.id as contact_id";
 
-      if (is_a($this->_search, 'CRM_Contact_Form_Search_Custom_FullText') ||
-        is_a($this->_search, 'CRM_Contact_Form_Search_Custom_ContribSYBNT')
-      ) {
-        $replaceSQL = "SELECT contact_id";
-      }
-
       $coreSearch = FALSE;
     }
     // For core searches use the searchQuery method
@@ -1006,15 +1000,6 @@ INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cache
 SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.display_name
 ";
 
-    if (property_exists($this, '_search') &&
-      (is_a($this->_search, 'CRM_Contact_Form_Search_Custom_FullText') ||
-        is_a($this->_search, 'CRM_Contact_Form_Search_Custom_ContribSYBNT'))
-    ) {
-      $insertSQL = "
-INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cacheKey, data )
-SELECT 'civicrm_contact', contact_id, contact_id, '$cacheKey', sort_name
-";
-    }
 
     $sql = str_replace($replaceSQL, $insertSQL, $sql);
 
