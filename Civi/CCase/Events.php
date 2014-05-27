@@ -28,6 +28,13 @@ namespace Civi\CCase;
 
 class Events {
   /**
+   * @var array (int $caseId => bool $active) list of cases for which we are actively firing case-change event
+   *
+   * We do not want to fire case-change events recursively.
+   */
+  static $isActive = array();
+
+  /**
    * Following a change to an activity or case, fire the case-change event.
    *
    * @param \Civi\Core\Event\PostEvent $event
@@ -48,9 +55,11 @@ class Events {
         throw new \CRM_Core_Exception("CRM_Case_Listener does not support entity {$event->entity}");
     }
 
-    if ($caseId) {
+    if ($caseId && !isset(self::$isActive[$caseId])) {
+      self::$isActive[$caseId] = 1;
       $analyzer = new \Civi\CCase\Analyzer($caseId);
       \CRM_Utils_Hook::caseChange($analyzer);
+      unset(self::$isActive[$caseId]);
     }
   }
 

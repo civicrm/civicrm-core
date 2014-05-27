@@ -28,16 +28,9 @@ class SequenceListener implements CaseChangeListener {
     self::singleton()->onCaseChange($event);
   }
 
-  private $isActive = array();
-
   public function onCaseChange(\Civi\CCase\Event\CaseChangeEvent $event) {
     /** @var \Civi\CCase\Analyzer $analyzer */
     $analyzer = $event->analyzer;
-
-    if (isset($this->isActive[$analyzer->getCaseId()])) {
-      return;
-    }
-    $this->isActive[$analyzer->getCaseId()] = 1;
 
     $activitySetXML = $this->getSequenceXml($analyzer->getXml());
     if (!$activitySetXML) {
@@ -54,12 +47,10 @@ class SequenceListener implements CaseChangeListener {
       if (empty($actIndex[$actTypeId])) {
         // Haven't tried this step yet!
         $this->createActivity($analyzer, $actTypeXML);
-        unset($this->isActive[$analyzer->getCaseId()]);
         return;
       }
       elseif (empty($actIndex[$actTypeId][$actStatuses['Completed']])) {
         // Haven't gotten past this step yet!
-        unset($this->isActive[$analyzer->getCaseId()]);
         return;
       }
     }
@@ -70,9 +61,6 @@ class SequenceListener implements CaseChangeListener {
       'status_id' => 'Closed',
     ));
     $analyzer->flush();
-
-    // Wrap-up
-    unset($this->isActive[$analyzer->getCaseId()]);
   }
 
   /**
