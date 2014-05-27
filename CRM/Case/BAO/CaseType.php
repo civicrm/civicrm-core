@@ -163,4 +163,38 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     $caseType->id = $caseTypeId;
     return $caseType->delete();
   }
+
+  /**
+   * Function to get the case definition
+   *
+   * @param $caseType
+   * @return mixed
+   *
+   * FIX ME: need to clean up this function
+   */
+  static function getCaseTypeDefinition(&$caseType) {
+    // check if case type definition is saved in DB
+    if (!empty($caseType['values'][0]['definition'])) {
+      // FIX ME: process db values
+    }
+    else {
+      $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseType['values'][0]['name']);
+
+      // set activity types
+      $activityTypes = json_decode(json_encode($xml->ActivityTypes), true);
+      $caseType['values'][0]['definition']['activityTypes'] = $activityTypes['ActivityType'];
+
+      // set activity sets
+      $activitySets = json_decode(json_encode($xml->ActivitySets), true);
+      $caseType['values'][0]['definition']['activitySets'] = $activitySets['ActivitySet'];
+      $caseType['values'][0]['definition']['activitySets']['activityTypes'] = $activitySets['ActivitySet']['ActivityTypes']['ActivityType'];
+      unset($caseType['values'][0]['definition']['activitySets']['ActivityTypes']);
+
+      // set case roles
+      $caseRoles = json_decode(json_encode($xml->CaseRoles), true);
+      $caseType['values'][0]['definition']['caseRoles'] = $caseRoles['RelationshipType'];
+    }
+
+    return $caseType;
+  }
 }

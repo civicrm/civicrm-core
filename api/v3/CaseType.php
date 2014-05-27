@@ -69,7 +69,20 @@ function civicrm_api3_case_type_create($params) {
  */
 function civicrm_api3_case_type_get($params) {
   civicrm_api3_verify_mandatory($params);
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  $caseTypes = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+
+  // format case type, to fetch xml definition
+  return _civicrm_api3_case_type_get_formatResult($params, $caseTypes);
+}
+
+/**
+ * Function to format definition
+ *
+ * @param $caseTypes
+ * @return mixed
+ */
+function _civicrm_api3_case_type_get_formatResult(&$caseTypes) {
+  return CRM_Case_BAO_CaseType::getCaseTypeDefinition($caseTypes);
 }
 
 /**
