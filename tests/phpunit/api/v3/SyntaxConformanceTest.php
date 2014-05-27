@@ -48,6 +48,25 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   protected $_entity;
 
+  /** Map custom group entities to civicrm components */
+  static $componentMap = array(
+    'Contact' => NULL,
+    'Individual' => NULL,
+    'Household' => NULL,
+    'Organization' => NULL,
+    'Contribution' => 'CiviContribute',
+    'Membership' => 'CiviMember',
+    'Participant' => 'CiviEvent',
+    'Group' => NULL,
+    'Relationship' => NULL,
+    'Event' => 'CiviEvent',
+    'Case' => 'CiviCase',
+    'Activity' => NULL,
+    'Pledge' => 'CiviPledge',
+    'Grant' => 'CiviGrant',
+    'Address' => NULL,
+  );
+
   /* they are two types of missing APIs:
        - Those that are to be implemented
          (in some future version when someone steps in -hint hint-). List the entities in toBeImplemented[ {$action} ]
@@ -151,16 +170,19 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @return array
    */
   public static function custom_data_entities() {
-   $entities = CRM_Core_BAO_CustomQuery::$extendsMap;
-   $customDataEntities = array();
+    $enableComponents = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
+    $entities = CRM_Core_BAO_CustomQuery::$extendsMap;
+    $components = self::$componentMap;
+    $customDataEntities = array();
     $invalidEntities = array('Individual', 'Organization', 'Household');
     $entitiesToFix = array('Case', 'Relationship');
-   foreach ($entities as $entityName => $entity ) {
-     if(!in_array($entityName, $invalidEntities)
-       && !in_array($entityName, $entitiesToFix)) {
-       $customDataEntities[] = array($entityName );
-     }
-   }
+    foreach ($entities as $entityName => $entity ) {
+      if(!in_array($entityName, $invalidEntities)
+        && !in_array($entityName, $entitiesToFix)
+        && (!empty($components[$entityName]) && in_array($components[$entityName], $enableComponents) || $components[$entityName] == NULL)) {
+        $customDataEntities[] = array($entityName );
+      }
+    }
     return $customDataEntities;
   }
 
