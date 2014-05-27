@@ -114,6 +114,11 @@ class CRM_Contribute_Task {
           'class' => 'CRM_Contribute_Form_Task_PDFLetter',
           'result' => FALSE,
         ),
+        9 => array(
+          'title' => ts('Print or Email Contribution Invoices'),
+          'class' => 'CRM_Contribute_Form_Task_Invoice',
+          'result' => FALSE,
+        ),
       );
 
       //CRM-4418, check for delete
