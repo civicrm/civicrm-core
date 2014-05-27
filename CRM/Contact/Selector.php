@@ -1001,7 +1001,6 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
 ";
 
     $sql = str_replace($replaceSQL, $insertSQL, $sql);
-    CRM_Core_Error::debug_var( '$sql', $sql );
 
     $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     $result = CRM_Core_DAO::executeQuery($sql);
