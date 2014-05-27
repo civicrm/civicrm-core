@@ -893,7 +893,7 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
     $this->initialize();
 
     if ($justIDs) {
-      $select = "contact_a.contact_id as contact_id";
+      $select = "contact_a.contact_id";
     }
     else {
       $select = "
