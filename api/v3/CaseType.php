@@ -72,7 +72,7 @@ function civicrm_api3_case_type_get($params) {
   $caseTypes = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 
   // format case type, to fetch xml definition
-  return _civicrm_api3_case_type_get_formatResult($params, $caseTypes);
+  return _civicrm_api3_case_type_get_formatResult($caseTypes);
 }
 
 /**
