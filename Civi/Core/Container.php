@@ -89,6 +89,9 @@ class Container {
    */
   public function createEventDispatcher() {
     $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+    $dispatcher->addListener('hook_civicrm_post::Activity', array('\Civi\CCase\Events', 'fireCaseChange'));
+    $dispatcher->addListener('hook_civicrm_post::Case', array('\Civi\CCase\Events', 'fireCaseChange'));
+    $dispatcher->addListener('hook_civicrm_caseChange', array('\Civi\CCase\Events', 'delegateToXmlListeners'));
     return $dispatcher;
   }
 

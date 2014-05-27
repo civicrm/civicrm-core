@@ -158,7 +158,7 @@ class CRM_Case_XMLRepository {
   }
 
   /**
-   * @return array<string> symbolic names of case-types
+   * @return array<int,string> symbolic names of case-types
    */
   public function getAllCaseTypes() {
     if ($this->allCaseTypes === NULL) {
