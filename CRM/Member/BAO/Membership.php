@@ -1251,8 +1251,9 @@ AND civicrm_membership.is_test = %2";
    *
    * @param $isProcessSeparateMembershipTransaction
    *
+   * @param $defaultContributionTypeID
+   *
    * @throws CRM_Core_Exception
-   * @throws Exception
    * @internal param \isProcessSeparateMembershipTransaction $bool $
    *
    * @internal param $singleMembershipTypeID
@@ -1261,112 +1262,45 @@ AND civicrm_membership.is_test = %2";
    * @access public
    */
   public static function postProcessMembership($membershipParams, $contactID, &$form, $premiumParams,
-    $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeID, $isPaidMembership, $membershipID, $isProcessSeparateMembershipTransaction) {
-    $tempParams  = $membershipParams;
+    $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeID, $isPaidMembership, $membershipID,
+    $isProcessSeparateMembershipTransaction, $defaultContributionTypeID) {
     $result      = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
-
-    $minimumFee = CRM_Utils_Array::value('minimum_fee', $membershipDetails);
-    $contributionTypeId = NULL;
-    if ($form->_values['amount_block_is_active']) {
-      $contributionTypeId = $form->_values['financial_type_id'];
-    }
-    else {
-      $contributionTypeId = CRM_Utils_Array::value( 'financial_type_id', $membershipDetails );
-      if (!$contributionTypeId) {
-        $contributionTypeId = CRM_Utils_Array::value('financial_type_id' ,$membershipParams);
-      }
-    }
+    $errors = array();
 
     if ($isPaidMembership) {
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
         $premiumParams, $contactID,
-        $contributionTypeId,
+        $defaultContributionTypeID,
         'membership'
       );
+      if (is_a($result[1], 'CRM_Core_Error')) {
+        $errors[1] = CRM_Core_Error::getMessages($result[1]);
+      }
+      elseif (!empty($result[1])) {
+        // Save the contribution ID so that I can be used in email receipts
+        // For example, if you need to generate a tax receipt for the donation only.
+        $form->_values['contribution_other_id'] = $result[1]->id;
+        //note that this will be over-written if we are using a separate membership transaction. Otherwise there is only one
+        $membershipContribution = $result[1];
+      }
     }
 
-    $errors = array();
-    if (is_a($result[1], 'CRM_Core_Error')) {
-      $errors[1] = CRM_Core_Error::getMessages($result[1]);
-    }
-    elseif (!empty($result[1])) {
-      // Save the contribution ID so that I can be used in email receipts
-      // For example, if you need to generate a tax receipt for the donation only.
-      $form->_values['contribution_other_id'] = $result[1]->id;
-      $contribution[1] = $result[1];
-    }
-
-
-    $memBlockDetails = CRM_Member_BAO_Membership::getMembershipBlock($form->_id);
     if ($isProcessSeparateMembershipTransaction) {
-      $form->_lineItem = $form->_memLineItem;
-      $contributionType = new CRM_Financial_DAO_FinancialType( );
-      $contributionType->id = CRM_Utils_Array::value('financial_type_id', $membershipDetails);
-      if (!$contributionType->find(TRUE)) {
-        CRM_Core_Error::fatal(ts("Could not find a system table"));
+      try {
+        $membershipContribution = self::processSecondaryFinancialTransaction($contactID, $form, $membershipDetails, $membershipParams, $isTest);
       }
-      $tempParams['amount'] = $minimumFee;
-      $tempParams['invoiceID'] = md5(uniqid(rand(), TRUE));
-
-      $result = NULL;
-      if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
-        $payment = CRM_Core_Payment::singleton($form->_mode, $form->_paymentProcessor, $form);
-
-        if ($form->_contributeMode == 'express') {
-          $result = $payment->doExpressCheckout($tempParams);
-        }
-        else {
-          $result = $payment->doDirectPayment($tempParams);
-        }
-      }
-
-      if (is_a($result, 'CRM_Core_Error')) {
-        $errors[2] = CRM_Core_Error::getMessages($result);
-      }
-      else {
-        //assign receive date when separate membership payment
-        //and contribution amount not selected.
-        if ($form->_amount == 0) {
-          $now = date('YmdHis');
-          $form->_params['receive_date'] = $now;
-          $receiveDate = CRM_Utils_Date::mysqlToIso($now);
-          $form->set('params', $form->_params);
-          $form->assign('receive_date', $receiveDate);
-        }
-
-        $form->set('membership_trx_id', $result['trxn_id']);
-        $form->set('membership_amount', $minimumFee);
-
-        $form->assign('membership_trx_id', $result['trxn_id']);
-        $form->assign('membership_amount', $minimumFee);
-
-        // we don't need to create the user twice, so let's disable cms_create_account
-        // irrespective of the value, CRM-2888
-        $tempParams['cms_create_account'] = 0;
-
-        $pending = $form->_params['is_pay_later'] ? ((CRM_Utils_Array::value('minimum_fee', $membershipDetails, 0) > 0.0) ? TRUE : FALSE) : FALSE;
-
-        //set this variable as we are not creating pledge for
-        //separate membership payment contribution.
-        //so for differentiating membership contributon from
-        //main contribution.
-        $form->_params['separate_membership_payment'] = 1;
-        $contribution[2] = CRM_Contribute_Form_Contribution_Confirm::processContribution($form,
-          $tempParams,
-          $result,
-          $contactID,
-          $contributionType,
-          $pending,
-          TRUE
-        );
+      catch (CRM_Core_Exception $e) {
+        $errors[2] = $e->getMessage();
+        $membershipContribution = NULL;
       }
     }
 
-    $index = !empty($memBlockDetails['is_separate_payment']) ? 2 : 1;
     $createdMemberships = array();
     $membership = NULL;
-    if (empty($errors[$index])) {
+    if (!empty($membershipContribution) && !is_a($membershipContribution, 'CRM_Core_Error')) { {
+      $membershipContributionID = $membershipContribution->id;
+    }
       if (isset($membershipParams['onbehalf']) && !empty($membershipParams['onbehalf']['member_campaign_id'])) {
         $form->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
       }
@@ -1383,14 +1317,14 @@ AND civicrm_membership.is_test = %2";
           );
 
           // update recurring id for membership record
-          self::updateRecurMembership($membership, $contribution[$index]);
+          self::updateRecurMembership($membership, $membershipContribution);
 
           $createdMemberships[$memType] = $membership;
-          if (isset($contribution[$index])) {
+          if (!empty($membershipContribution)) {
             //insert payment record
             $dao = new CRM_Member_DAO_MembershipPayment();
             $dao->membership_id = $membership->id;
-            $dao->contribution_id = $contribution[$index]->id;
+            $dao->contribution_id = $membershipContribution->id;
             //Fixed for avoiding duplicate entry error when user goes
             //back and forward during payment mode is notify
             if (!$dao->find(TRUE)) {
@@ -1425,13 +1359,13 @@ AND civicrm_membership.is_test = %2";
         );
 
         // update recurring id for membership record
-        self::updateRecurMembership($membership, $contribution[$index]);
+        self::updateRecurMembership($membership, $membershipContribution);
 
-        if (isset($contribution[$index])) {
+        if (!empty($membershipContributionID)) {
           //insert payment record
           $dao = new CRM_Member_DAO_MembershipPayment();
           $dao->membership_id = $membership->id;
-          $dao->contribution_id = $contribution[$index]->id;
+          $dao->contribution_id = $membershipContributionID;
           //Fixed for avoiding duplicate entry error when user goes
           //back and forward during payment mode is notify
           if (!$dao->find(TRUE)) {
@@ -1469,7 +1403,7 @@ AND civicrm_membership.is_test = %2";
     $form->_params['membershipID'] = $membership->id;
     if ($form->_contributeMode == 'notify') {
       if ($form->_values['is_monetary'] && $form->_amount > 0.0 && !$form->_params['is_pay_later']) {
-        // call postprocess hook before leaving
+        // call postProcess hook before leaving
         $form->postProcessHook();
         // this does not return
         $payment = CRM_Core_Payment::singleton($form->_mode, $form->_paymentProcessor, $form);
@@ -1478,8 +1412,8 @@ AND civicrm_membership.is_test = %2";
     }
 
     $form->_values['membership_id'] = $membership->id;
-    if (isset($contribution[$index]->id)) {
-      $form->_values['contribution_id'] = $contribution[$index]->id;
+    if (isset($membershipContributionID)) {
+      $form->_values['contribution_id'] = $membershipContributionID;
     }
 
     // Do not send an email if Recurring transaction is done via Direct Mode
@@ -2449,6 +2383,85 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     $memberCount = CRM_Core_DAO::singleValueQuery($query, $params);
 
     return (int)$memberCount;
+  }
+
+  /**
+   * Where a second separate financial transaction is supported we will process it here
+   *
+   * @param $contactID
+   * @param $form
+   * @param $membershipDetails
+   * @param $tempParams
+   * @param $errors
+   * @param $isTest
+   *
+   * @throws Exception
+   * @internal param $minimumFee
+   * @return CRM_Contribute_BAO_Contribution
+   */
+  public static function processSecondaryFinancialTransaction($contactID, &$form, $membershipDetails, $tempParams, $isTest) {
+    $minimumFee = CRM_Utils_Array::value('minimum_fee', $membershipDetails);
+    $lineItems = $form->_lineItem = $form->_memLineItem;
+    $contributionType = new CRM_Financial_DAO_FinancialType();
+    $contributionType->id = CRM_Utils_Array::value('financial_type_id', $membershipDetails);
+    if (!$contributionType->find(TRUE)) {
+      CRM_Core_Error::fatal(ts("Could not find a system table"));
+    }
+    $tempParams['amount'] = $minimumFee;
+    $tempParams['invoiceID'] = md5(uniqid(rand(), TRUE));
+
+    $result = NULL;
+    if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
+      $payment = CRM_Core_Payment::singleton($form->_mode, $form->_paymentProcessor, $form);
+
+      if ($form->_contributeMode == 'express') {
+        $result = $payment->doExpressCheckout($tempParams);
+      }
+      else {
+        $result = $payment->doDirectPayment($tempParams);
+      }
+    }
+
+    if (is_a($result, 'CRM_Core_Error')) {
+      throw new CRM_Core_Exception(CRM_Core_Error::getMessages($result));
+    }
+    else {
+      //assign receive date when separate membership payment
+      //and contribution amount not selected.
+      if ($form->_amount == 0) {
+        $now = date('YmdHis');
+        $form->_params['receive_date'] = $now;
+        $receiveDate = CRM_Utils_Date::mysqlToIso($now);
+        $form->set('params', $form->_params);
+        $form->assign('receive_date', $receiveDate);
+      }
+
+      $form->set('membership_trx_id', $result['trxn_id']);
+      $form->set('membership_amount', $minimumFee);
+
+      // we don't need to create the user twice, so lets disable cms_create_account
+      // irrespective of the value, CRM-2888
+      $tempParams['cms_create_account'] = 0;
+
+      $pending = $form->_params['is_pay_later'] ? ((CRM_Utils_Array::value('minimum_fee', $membershipDetails, 0) > 0.0) ? TRUE : FALSE) : FALSE;
+
+      //set this variable as we are not creating pledge for
+      //separate membership payment contribution.
+      //so for differentiating membership contributon from
+      //main contribution.
+      $form->_params['separate_membership_payment'] = 1;
+      $membershipContribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($form,
+        $tempParams,
+        $result,
+        $contactID,
+        $contributionType,
+        $pending,
+        TRUE,
+        $isTest,
+        $lineItems
+      );
+      return $membershipContribution;
+    }
   }
 
   /**

@@ -62,6 +62,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $fieldTypes = NULL
   ) {
     CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $paymentParams, TRUE);
+    $isTest = ($form->_mode == 'test') ? 1 : 0;
+    $lineItems = $form->_lineItem;
 
     $contributionType = new CRM_Financial_DAO_FinancialType();
     if (isset($paymentParams['financial_type'])) {
@@ -111,7 +113,9 @@ class CRM_Contribute_BAO_Contribution_Utils {
         NULL,
         $contactID,
         $contributionType,
-        TRUE, TRUE
+        TRUE, TRUE,
+        $isTest,
+        $lineItems
       );
 
       if ($contribution) {
@@ -230,7 +234,9 @@ class CRM_Contribute_BAO_Contribution_Utils {
           NULL,
           $contactID,
           $contributionType,
-          TRUE, TRUE
+          TRUE, TRUE,
+          $isTest,
+          $lineItems
         );
 
         // restore cached values (part of fix for CRM-14354)
@@ -307,7 +313,9 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($form,
           $form->_params, $result,
           $contactID, $contributionType,
-          $pending, TRUE
+          $pending, TRUE,
+          $isTest,
+          $lineItems
         );
       }
       $form->postProcessPremium($premiumParams, $contribution);
