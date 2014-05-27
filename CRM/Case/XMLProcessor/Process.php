@@ -619,6 +619,22 @@ AND        a.is_deleted = 0
   }
 
   /**
+   * @param string $caseType
+   * @return array<\Civi\CCase\CaseChangeListener>
+   */
+  function getListeners($caseType) {
+    $xml = $this->retrieve($caseType);
+    $listeners = array();
+    if ($xml->Listeners && $xml->Listeners->Listener) {
+      foreach ($xml->Listeners->Listener as $listenerXML) {
+        $class = (string) $listenerXML;
+        $listeners[] = new $class();
+      }
+    }
+    return $listeners;
+  }
+
+  /**
    * @return int
    */
   function getRedactActivityEmail() {
