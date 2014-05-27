@@ -321,16 +321,15 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $profileFields = array();
       $labels = array();
 
-      //CRM-14338
-      $nullValueIndex = ' ';
       foreach ($fields as $name => $field) {
-        if ( isset($labels[$field['title']]) ) {
-          $labels[$field['title'].$nullValueIndex] = preg_replace('/\s+|\W+/', '_', $name);
-          $nullValueIndex .= $nullValueIndex;
-        }
-        else {
-          $labels[$field['title']] = preg_replace('/\s+|\W+/', '_', $name);
-        }
+        //CRM-14338
+        // Create a unique, non-empty index for each field.
+        $index = $field['title'];
+        if ($index === '') $index = ' ';
+        while (array_key_exists($index, $labels))
+          $index .= ' ';
+
+        $labels[$index] = preg_replace('/\s+|\W+/', '_', $name);
       }
 
       foreach ($values as $title => $value) {

@@ -958,7 +958,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $websiteTypes  = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
 
     $multipleFields = array('url');
-    $nullIndex = $nullValueIndex = ' ';
 
     //start of code to set the default values
     foreach ($fields as $name => $field) {
@@ -972,18 +971,12 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         continue;
       }
 
+      // Create a unique, non-empty index for each field.
       $index = $field['title'];
-      //handle for the label not set for the field
-      if (empty($field['title'])) {
-        $index = $nullIndex;
-        $nullIndex .= $nullIndex;
-      }
+      if ($index === '') $index = ' ';
+      while (array_key_exists($index, $values))
+        $index .= ' ';
 
-      //handle the case to avoid re-write where the profile field labels are the same
-      if (array_key_exists($index, $values)) {
-        $index .= $nullValueIndex;
-        $nullValueIndex .= $nullValueIndex;
-      }
       $params[$index] = $values[$index] = '';
       $customFieldName = NULL;
       // hack for CRM-665
