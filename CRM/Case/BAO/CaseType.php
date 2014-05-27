@@ -166,9 +166,11 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
     // set activity sets
     $activitySets = json_decode(json_encode($xml->ActivitySets), TRUE);
-    $caseType['values'][0]['definition']['activitySets'] = $activitySets['ActivitySet'];
-    $caseType['values'][0]['definition']['activitySets']['activityTypes'] = $activitySets['ActivitySet']['ActivityTypes']['ActivityType'];
-    unset($caseType['values'][0]['definition']['activitySets']['ActivityTypes']);
+    foreach($activitySets as $key => $value) {
+      $caseType['values'][0]['definition']['activitySets'] = array($key => $value);
+      $caseType['values'][0]['definition']['activitySets'][$key]['activityTypes'] = $activitySets['ActivitySet']['ActivityTypes']['ActivityType'];
+      unset($caseType['values'][0]['definition']['activitySets'][$key]['ActivityTypes']);
+    }
 
     // set case roles
     $caseRoles = json_decode(json_encode($xml->CaseRoles), TRUE);
