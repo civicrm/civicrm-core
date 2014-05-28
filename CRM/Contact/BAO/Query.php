@@ -4414,7 +4414,7 @@ civicrm_relationship.is_permission_a_b = 0
    *
    * @param bool $skipOrderAndLimit
    *
-   * @return CRM_Contact_DAO_Contact
+   * @return CRM_Core_DAO
    * @access public
    */
   function searchQuery(
@@ -4477,7 +4477,7 @@ civicrm_relationship.is_permission_a_b = 0
           }
           if (!empty($orderBy)) {
             // this is special case while searching for
-            // changelog CRM-1718
+            // change log CRM-1718
             if (preg_match('/sort_name/i', $orderBy)) {
               $orderBy = str_replace('sort_name', 'contact_a.sort_name', $orderBy);
             }
