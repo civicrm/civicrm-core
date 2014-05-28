@@ -32,7 +32,7 @@ Required vars: activitySet
       </select>
     </td>
     <td>
-      <input type="number" ng-model="activity.reference_offset" />
+      <input class="number" type="text" ng-pattern="/^[0-9]*$/" ng-model="activity.reference_offset" />
     </td>
     <td>
       <select ng-model="activity.reference_select" ng-options="key as value for (key,value) in {newest: 'Newest', oldest: 'Oldest'}">

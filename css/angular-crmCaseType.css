@@ -21,7 +21,7 @@
     text-align: center;
 }
 
-.crmCaseType input[type=number] {
+.crmCaseType input.number {
     width: 3.5em;
 }
 
