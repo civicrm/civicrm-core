@@ -259,6 +259,9 @@ abstract class CRM_Utils_Hook {
    * @return null the return value is ignored
    */
   static function pre($op, $objectName, $id, &$params) {
+    $event = new \Civi\Core\Event\PreEvent($op, $objectName, $id, $params);
+    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_pre", $event);
+    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_pre::$objectName", $event);
     return self::singleton()->invoke(4, $op, $objectName, $id, $params, self::$_nullObject, self::$_nullObject, 'civicrm_pre');
   }
 
@@ -275,6 +278,9 @@ abstract class CRM_Utils_Hook {
    * @access public
    */
   static function post($op, $objectName, $objectId, &$objectRef) {
+    $event = new \Civi\Core\Event\PostEvent($op, $objectName, $objectId, $objectRef);
+    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_post", $event);
+    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_post::$objectName", $event);
     return self::singleton()->invoke(4, $op, $objectName, $objectId, $objectRef, self::$_nullObject, self::$_nullObject, 'civicrm_post');
   }
 
@@ -1674,4 +1680,18 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * This hook fires whenever a record in a case changes.
+   *
+   * @param \Civi\CCase\Analyzer $analyzer
+   */
+  static function caseChange(\Civi\CCase\Analyzer $analyzer) {
+    $event = new \Civi\CCase\Event\CaseChangeEvent($analyzer);
+    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_caseChange", $event);
+
+    return self::singleton()->invoke(1, $angularModules,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_caseChange'
+    );
+  }
 }
