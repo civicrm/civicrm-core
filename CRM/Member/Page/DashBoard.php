@@ -51,11 +51,15 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     //CRM-13901 don't show dashboard to contacts with limited view writes & it does not relect
     //what they have access to
     //@todo implement acls on dashboard querys (preferably via api to enhance that at the same time)
+
+    /*
     if(!CRM_Core_Permission::check(array('view all contacts', 'edit all contacts'))) {
       $this->showMembershipSummary = FALSE;
       $this->assign('membershipSummary', FALSE);
       return;
     }
+    */
+    
     $this->assign('membershipSummary', TRUE);
     CRM_Utils_System::setTitle(ts('CiviMember'));
     $membershipSummary = array();
