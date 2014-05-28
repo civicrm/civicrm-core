@@ -1743,12 +1743,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   {
     try {
 
-      $singleMembershipTypeID = $membershipTypeID = $membershipParams['selectMembership'];
-      if (is_array($membershipTypeID) && count($membershipTypeID) == 1) {
-        $singleMembershipTypeID = $membershipTypeID[0];
-      }
+      $membershipTypeID = $membershipParams['selectMembership'];
 
-      $membershipDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $singleMembershipTypeID);
+      $membershipDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this);
       $this->assign('membership_name', CRM_Utils_Array::value('name', $membershipDetails));
       $isPaidMembership = FALSE;
       if($this->_amount > 0.0 && $membershipParams['amount']) {
@@ -1760,7 +1757,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       $isProcessSeparateMembershipTransaction = $this->isSeparateMembershipTransaction($this->_id, $this->_values['amount_block_is_active']);
 
-      if ($form->_values['amount_block_is_active']) {
+      if ($this->_values['amount_block_is_active']) {
         $contributionTypeId = $form->_values['financial_type_id'];
       }
       else {
