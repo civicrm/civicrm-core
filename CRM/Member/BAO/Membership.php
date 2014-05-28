@@ -1301,6 +1301,7 @@ AND civicrm_membership.is_test = %2";
     if (!empty($membershipContribution) && !is_a($membershipContribution, 'CRM_Core_Error')) { {
       $membershipContributionID = $membershipContribution->id;
     }
+      //@todo - why is this nested so deep? it seems like it could be just set on the calling function on the form layer
       if (isset($membershipParams['onbehalf']) && !empty($membershipParams['onbehalf']['member_campaign_id'])) {
         $form->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
       }
@@ -1309,30 +1310,7 @@ AND civicrm_membership.is_test = %2";
         $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
         foreach ($membershipTypeID as $memType) {
           $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
-          $membership = self::renewMembership($contactID, $memType,
-            $isTest, $form, NULL,
-            CRM_Utils_Array::value('cms_contactID', $membershipParams),
-            $customFieldsFormatted, CRM_Utils_Array::value($memType, $typesTerms, 1),
-            $membershipID
-          );
-
-          // update recurring id for membership record
-          self::updateRecurMembership($membership, $membershipContribution);
-
-          $createdMemberships[$memType] = $membership;
-          if (!empty($membershipContribution)) {
-            //insert payment record
-            $dao = new CRM_Member_DAO_MembershipPayment();
-            $dao->membership_id = $membership->id;
-            $dao->contribution_id = $membershipContribution->id;
-            //Fixed for avoiding duplicate entry error when user goes
-            //back and forward during payment mode is notify
-            if (!$dao->find(TRUE)) {
-              CRM_Utils_Hook::pre('create', 'MembershipPayment', NULL, $dao);
-              $dao->save();
-              CRM_Utils_Hook::post('create', 'MembershipPayment', $dao->id, $dao);
-            }
-          }
+          $createdMemberships[$memType] = self::createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, $createdMemberships);
         }
         if ($form->_priceSetId && !empty($form->_useForMember) && !empty($form->_lineItem)) {
           foreach ($form->_lineItem[$form->_priceSetId] as & $priceFieldOp) {
@@ -1352,43 +1330,19 @@ AND civicrm_membership.is_test = %2";
         }
       }
       else {
-        $membership = $createdMemberships[$membershipTypeID] = self::renewMembership($contactID, $membershipTypeID,
-          $isTest, $form, NULL,
-          CRM_Utils_Array::value('cms_contactID', $membershipParams),
-          $customFieldsFormatted, CRM_Utils_Array::value('types_terms', $membershipParams, 1)
-        );
-
-        // update recurring id for membership record
-        self::updateRecurMembership($membership, $membershipContribution);
-
-        if (!empty($membershipContributionID)) {
-          //insert payment record
-          $dao = new CRM_Member_DAO_MembershipPayment();
-          $dao->membership_id = $membership->id;
-          $dao->contribution_id = $membershipContributionID;
-          //Fixed for avoiding duplicate entry error when user goes
-          //back and forward during payment mode is notify
-          if (!$dao->find(TRUE)) {
-            CRM_Utils_Hook::pre('create', 'MembershipPayment', NULL, $dao);
-            $dao->save();
-            CRM_Utils_Hook::post('create', 'MembershipPayment', $dao->id, $dao);
-          }
-        }
+        $numTerms = CRM_Utils_Array::value('types_terms', $membershipParams, 1);
+        $createdMemberships[$membershipTypeID] = self::createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $membershipTypeID, $isTest, $numTerms, $membershipContribution, $createdMemberships);
       }
     }
 
     if (!empty($errors)) {
-      foreach ($errors as $error) {
-        if (is_string($error)) {
-          $message[] = $error;
-        }
-      }
-      $message = ts('Payment Processor Error message') . ': ' . implode('<br/>', $message);
+      $message = self::compileErrorMessage($errors);
       throw new CRM_Core_Exception($message);
     }
     $form->_params['createdMembershipIDs'] = array();
 
     // CRM-7851 - Moved after processing Payment Errors
+    //@todo - the reasoning for this being here seems a little outdated
     foreach ($createdMemberships as $createdMembership) {
       CRM_Core_BAO_CustomValueTable::postProcess(
         $form->_params,
@@ -2462,6 +2416,76 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       );
       return $membershipContribution;
     }
+  }
+
+  /**
+   * Create linkages between membership & contribution - note this is the wrong place for this code but this is a
+   * refactoring step. This should be BAO functionality
+   * @param $membership
+   * @param $membershipContribution
+   */
+  public static function linkMembershipPayment($membership, $membershipContribution) {
+    $dao = new CRM_Member_DAO_MembershipPayment();
+    $dao->membership_id = $membership->id;
+    $dao->contribution_id = $membershipContribution->id;
+    //Fixed for avoiding duplicate entry error when user goes
+    //back and forward during payment mode is notify
+    if (!$dao->find(TRUE)) {
+      CRM_Utils_Hook::pre('create', 'MembershipPayment', NULL, $dao);
+      $dao->save();
+      CRM_Utils_Hook::post('create', 'MembershipPayment', $dao->id, $dao);
+    }
+  }
+
+  /**
+   * @param $membershipParams
+   * @param $contactID
+   * @param $customFieldsFormatted
+   * @param $membershipID
+   * @param $memType
+   * @param $isTest
+   * @param $numTerms
+   * @param $membershipContribution
+   * @param $form
+   *
+   * @internal param $createdMemberships
+   *
+   * @return array
+   */
+  public static function createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution,  &$form) {
+    $membership = self::renewMembership($contactID, $memType,
+      $isTest, $form, NULL,
+      CRM_Utils_Array::value('cms_contactID', $membershipParams),
+      $customFieldsFormatted, $numTerms,
+      $membershipID
+    );
+
+    // update recurring id for membership record
+    self::updateRecurMembership($membership, $membershipContribution);
+
+    if (!empty($membershipContribution)) {
+      self::linkMembershipPayment($membership, $membershipContribution);
+    }
+    return $membership;
+  }
+
+  /**
+   * Turn array of errors into message string
+   *
+   * @param array $errors
+   *
+   * @internal param $message
+   *
+   * @return string
+   */
+  public static function compileErrorMessage($errors)
+  {
+    foreach($errors as $error) {
+      if (is_string($error)) {
+        $message[] = $error;
+      }
+    }
+    return ts('Payment Processor Error message') . ': ' . implode('<br/>', $message);
   }
 
   /**
