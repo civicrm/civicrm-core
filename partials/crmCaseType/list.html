@@ -1,0 +1,9 @@
+<!--
+Controller: CaseTypeListsCtrl
+Required vars: caseTypes
+-->
+<ul>
+  <li ng-repeat="caseType in caseTypes">
+    <a ng-href="#/caseType/{{caseType.id}}">{{caseType.title}}</a>
+  </li>
+</ul>
