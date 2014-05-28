@@ -2109,7 +2109,8 @@ class CRM_Contact_BAO_Query {
           $where = "`$tName`.$fldName";
 
           $this->_where[$grouping][] = self::buildClause("LOWER($where)", $op, $value);
-          $this->_whereTables[$tName] = $this->_tables[$tName];
+          // we set both _tables & whereTables because whereTables doesn't seem to do what the name implies it should
+          $this->_tables[$tName] = $this->_whereTables[$tName] = 1;
           $this->_qill[$grouping][] = "$field[title] $op '$value'";
         }
         else {
@@ -2173,7 +2174,7 @@ class CRM_Contact_BAO_Query {
           )
         )) {
         //fix for search by profile with address fields.
-        $tName = "{$locationType[$locType[1]]}-address";
+        $tName = "{$locationType[$locType[1]]}_address";
       }
       elseif ($locType[0] == 'on_hold') {
         $tName = "{$locationType[$locType[1]]}-email";
@@ -2244,6 +2245,12 @@ class CRM_Contact_BAO_Query {
     return $this->_tables;
   }
 
+  /**
+   * Where tables is sometimes used to create the from clause, but, not reliably, set this AND set tables
+   * It's unclear the intent - there is a 'simpleFrom' clause which takes whereTables into account & a fromClause which doesn't
+   * logic may have eroded
+   * @return array
+   */
   function whereTables() {
     return $this->_whereTables;
   }
@@ -2391,6 +2398,7 @@ class CRM_Contact_BAO_Query {
             $from .= " $side JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 )";
           }
           else {
+            //CRM-14263 further handling of address joins further down...
             $from .= " $side JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id ) ";
           }
           continue;
@@ -2499,13 +2507,20 @@ class CRM_Contact_BAO_Query {
           continue;
 
         default:
-          $from .= CRM_Core_Component::from($name, $mode, $side);
+          if (strpos($name, '_address') != 0) {
+            //we have a join on an address table - possibly in conjunction with search builder - CRM-14263
+            $parts = explode('_', $name);
+            $locationID = array_search($parts[0], CRM_Core_BAO_Address::buildOptions('location_type_id', 'get', array('name' => $parts[0])));
+            $from .= " $side JOIN civicrm_address $name ON ( contact_a.id = {$name}.contact_id ) and location_type_id = $locationID ";
+          }
+          else {
+            $from .= CRM_Core_Component::from($name, $mode, $side);
+          }
           $from .= CRM_Contact_BAO_Query_Hook::singleton()->buildSearchfrom($name, $mode, $side);
 
           continue;
       }
     }
-
     return $from;
   }
 
