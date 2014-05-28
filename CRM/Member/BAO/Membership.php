@@ -2302,7 +2302,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   public static function renewMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $allStatus, $membershipTypeDetails, $contributionRecurID, $format, $membershipSource, $ids, $statusFormat, $isPayLater, $campaignId) {
     $renewalMode = $updateStatusId = FALSE;
     $dates = array();
-/   // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
+    // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
     // is the same as the parent org of an existing membership of the contact
     $currentMembership = CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
       $is_test, $membershipID, TRUE
