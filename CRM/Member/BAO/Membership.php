@@ -1131,7 +1131,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @param bool|int $isTest if true, membership is for a test site
    * @param bool|int $isOwner if true, only retrieve membership records for owners //LCD
    *
-   * @return returns the number of members of type $membershipTypeId whose
+   * @return integer the number of members of type $membershipTypeId whose
    *         start_date is between $startDate and $endDate
    */
   //LCD
@@ -1266,7 +1266,7 @@ AND civicrm_membership.is_test = %2";
     $isProcessSeparateMembershipTransaction, $defaultContributionTypeID) {
     $result      = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
-    $errors = array();
+    $errors = $createdMemberships = array();
 
     if ($isPaidMembership) {
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
@@ -1296,7 +1296,6 @@ AND civicrm_membership.is_test = %2";
       }
     }
 
-    $createdMemberships = array();
     $membership = NULL;
     if (!empty($membershipContribution) && !is_a($membershipContribution, 'CRM_Core_Error')) { {
       $membershipContributionID = $membershipContribution->id;
