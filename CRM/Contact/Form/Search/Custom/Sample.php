@@ -93,6 +93,10 @@ class CRM_Contact_Form_Search_Custom_Sample extends CRM_Contact_Form_Search_Cust
     return $summary;
   }
 
+  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+    return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
+  }
+
   /**
    * @param int $offset
    * @param int $rowcount
@@ -107,6 +111,7 @@ class CRM_Contact_Form_Search_Custom_Sample extends CRM_Contact_Form_Search_Cust
   ) {
     if ($justIDs) {
       $selectClause = "contact_a.id as contact_id";
+      $sort = 'contact_a.id';
     }
     else {
       $selectClause = "

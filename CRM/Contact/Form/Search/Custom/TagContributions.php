@@ -122,22 +122,20 @@ SELECT $select
 FROM   $from
 WHERE  $where
 ";
-    //for only contact ids ignore order and group by.
-    if (!$onlyIDs) {
-      $sql .= " GROUP BY contact_a.id";
-      // Define ORDER BY for query in $sort, with default value
-      if (!empty($sort)) {
-        if (is_string($sort)) {
-          $sort = CRM_Utils_Type::escape($sort, 'String');
-          $sql .= " ORDER BY $sort ";
-        }
-        else {
-          $sql .= " ORDER BY " . trim($sort->orderBy());
-        }
+
+    $sql .= " GROUP BY contact_a.id";
+    // Define ORDER BY for query in $sort, with default value
+    if (!empty($sort)) {
+      if (is_string($sort)) {
+        $sort = CRM_Utils_Type::escape($sort, 'String');
+        $sql .= " ORDER BY $sort ";
       }
       else {
-        $sql .= "";
+        $sql .= " ORDER BY " . trim($sort->orderBy());
       }
+    }
+    else {
+      $sql .= "";
     }
     return $sql;
   }
