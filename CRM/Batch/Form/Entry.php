@@ -694,7 +694,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         if (!empty($params['member_option']) && CRM_Utils_Array::value( $key, $params['member_option'] ) == 2 ) {
           $this->_params = $params;
           $value['is_renew'] = true;
-          $membership = CRM_Member_BAO_Membership::renewMembership(
+          $membership = CRM_Member_BAO_Membership::renewMembershipFormWrapper(
             $value['contact_id'],
             $value['membership_type_id'],
             FALSE, $this, NULL, NULL,
