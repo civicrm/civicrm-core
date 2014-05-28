@@ -294,7 +294,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   public static function runJobs_pre($offset = 200, $mode = NULL) {
     $job = new CRM_Mailing_BAO_MailingJob();
 
-    $config       = CRM_Core_Config::singleton();
     $jobTable     = CRM_Mailing_DAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
 
