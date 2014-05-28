@@ -82,35 +82,43 @@ class CRM_Case_XMLRepository {
     if (!CRM_Utils_Array::value($caseType, $this->xml)) {
       // first check custom templates directory
       $fileName = NULL;
-      $config = CRM_Core_Config::singleton();
-      if (isset($config->customTemplateDir) &&
-        $config->customTemplateDir
-      ) {
-        // check if the file exists in the custom templates directory
-        $fileName = implode(DIRECTORY_SEPARATOR,
-          array(
-            $config->customTemplateDir,
-            'CRM',
-            'Case',
-            'xml',
-            'configuration',
-            "$caseType.xml",
-          )
-        );
+
+      if (!$fileName || !file_exists($fileName)) {
+        $caseTypesViaHook = $this->getCaseTypesViaHook();
+        if (isset($caseTypesViaHook[$caseType], $caseTypesViaHook[$caseType]['file'])) {
+          $fileName = $caseTypesViaHook[$caseType]['file'];
+        }
       }
 
-      if (!$fileName ||
-        !file_exists($fileName)
-      ) {
-        // check if file exists locally
-        $fileName = implode(DIRECTORY_SEPARATOR,
-          array(
-            dirname(__FILE__),
-            'xml',
-            'configuration',
-            "$caseType.xml",
-          )
-        );
+      if (!$fileName || !file_exists($fileName)) {
+        $config = CRM_Core_Config::singleton();
+        if (isset($config->customTemplateDir) && $config->customTemplateDir) {
+          // check if the file exists in the custom templates directory
+          $fileName = implode(DIRECTORY_SEPARATOR,
+            array(
+              $config->customTemplateDir,
+              'CRM',
+              'Case',
+              'xml',
+              'configuration',
+              "$caseType.xml",
+            )
+          );
+        }
+      }
+
+      if (!$fileName || !file_exists($fileName)) {
+        if (!file_exists($fileName)) {
+          // check if file exists locally
+          $fileName = implode(DIRECTORY_SEPARATOR,
+            array(
+              dirname(__FILE__),
+              'xml',
+              'configuration',
+              "$caseType.xml",
+            )
+          );
+        }
 
         if (!file_exists($fileName)) {
           // check if file exists locally
@@ -122,13 +130,6 @@ class CRM_Case_XMLRepository {
               "$caseType.xml",
             )
           );
-        }
-
-        if (!file_exists($fileName)) {
-          $caseTypesViaHook = $this->getCaseTypesViaHook();
-          if (isset($caseTypesViaHook[$caseType], $caseTypesViaHook[$caseType]['file'])) {
-            $fileName = $caseTypesViaHook[$caseType]['file'];
-          }
         }
 
         if (!file_exists($fileName)) {

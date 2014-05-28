@@ -65,7 +65,7 @@
 
     $scope.workflows = {
       'timeline': 'Timeline',
-      'pipeline': 'Sequence'
+      'sequence': 'Sequence'
     };
 
     $scope.caseType = selectedCaseType;
@@ -135,8 +135,8 @@
       switch (workflow) {
         case 'timeline':
           return true;
-        case 'pipeline':
-          return 0 == _.where($scope.caseType.definition.activitySets, {pipeline: '1'}).length;
+        case 'sequence':
+          return 0 == _.where($scope.caseType.definition.activitySets, {sequence: '1'}).length;
         default:
           if (console && console.log) console.log('Denied access to unrecognized workflow: (' + workflow + ')');
           return false;
@@ -159,8 +159,8 @@
     $scope.activityTableTemplate = function(activitySet) {
       if (activitySet.timeline) {
         return partialUrl('timelineTable.html');
-      } else if (activitySet.pipeline) {
-        return partialUrl('pipelineTable.html');
+      } else if (activitySet.sequence) {
+        return partialUrl('sequenceTable.html');
       } else {
         return '';
       }
