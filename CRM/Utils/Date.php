@@ -288,7 +288,7 @@ class CRM_Utils_Date {
    * %P - uppercase ante/post meridiem ('AM', 'PM')
    * %Y - year as a decimal number including the century ('2005')
    *
-   * @param $dateString
+   * @param string $dateString
    * @param string $format the output format
    * @param array $dateParts an array with the desired date parts
    *
