@@ -78,7 +78,7 @@
          <td>{if $hideCalendar neq true}
                       {include file="CRM/common/jcalendar.tpl" elementName=application_received_date}
                    {else}
-                      {$form.application_received_date.html|crmDate}
+                      {$form.application_received_date.value|crmDate}
                    {/if}</td>
       </tr>
       <tr class="crm-grant-form-block-decision_date">
@@ -86,7 +86,7 @@
          <td>{if $hideCalendar neq true}
                       {include file="CRM/common/jcalendar.tpl" elementName=decision_date}
                    {else}
-                      {$form.decision_date.html|crmDate}
+                      {$form.decision_date.value|crmDate}
                    {/if}<br />
                    <span class="description">{ts}Date on which the grant decision was finalized.{/ts}</span></td>
       </tr>
@@ -94,14 +94,14 @@
         <td>{if $hideCalendar neq true}
                        {include file="CRM/common/jcalendar.tpl" elementName=money_transfer_date}
                     {else}
-                       {$form.money_transfer_date.html|crmDate}
+                       {$form.money_transfer_date.value|crmDate}
                     {/if}<br /><span class="description">{ts}Date on which the grant money was transferred.{/ts}</span></td>
       </tr>
       <tr class="crm-grant-form-block-grant_due_date"><td class="label">{$form.grant_due_date.label}</td>
     <td>{if $hideCalendar neq true}
                        {include file="CRM/common/jcalendar.tpl" elementName=grant_due_date}
                     {else}
-                       {$form.grant_due_date.html|crmDate}
+                       {$form.grant_due_date.value|crmDate}
                     {/if}</td>
       </tr>
       <tr class="crm-grant-form-block-grant_report_received">
