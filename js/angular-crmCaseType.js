@@ -29,6 +29,15 @@
 
   crmCaseType.config(['$routeProvider',
     function($routeProvider) {
+      $routeProvider.when('/caseType', {
+        templateUrl: partialUrl('list.html'),
+        controller: 'CaseTypeListCtrl',
+        resolve: {
+          caseTypes: function($route, crmApi) {
+            return crmApi('CaseType', 'get', {});
+          }
+        }
+      });
       $routeProvider.when('/caseType/:id', {
         templateUrl: partialUrl('edit.html'),
         controller: 'CaseTypeCtrl',
@@ -179,6 +188,10 @@
         $('.crmCaseType-acttab').tabs('refresh');
       });
     });
+  });
+
+  crmCaseType.controller('CaseTypeListCtrl', function($scope, crmApi, caseTypes) {
+    $scope.caseTypes = caseTypes.values;
   });
 
 })(angular, CRM.$, CRM._);
