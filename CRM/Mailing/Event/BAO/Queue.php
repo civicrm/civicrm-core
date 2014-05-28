@@ -44,13 +44,13 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   /**
    * Queue a new recipient
    *
-   * @param array     The values of the new EventQueue
+   * @param array $params values of the new EventQueue
    *
-   * @return object   The new EventQueue
+   * @return CRM_Mailing_Event_BAO_Queue   The new EventQueue
    * @access public
    * @static
    */
-  public static function &create(&$params) {
+  public static function create($params) {
     $eq = new CRM_Mailing_Event_BAO_Queue();
     $eq->copyValues($params);
     $eq->hash = self::hash($params);
