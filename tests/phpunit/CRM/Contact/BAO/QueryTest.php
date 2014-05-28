@@ -70,5 +70,43 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $this->assertEquals($ids, $contacts, 'In line ' . __LINE__);
   }
+
+  /**
+   * CRM-14263 search builder failure with search profile & address in criteria
+   */
+  function testSearchProfile()
+  {
+    $contactID = $this->individualCreate();
+    CRM_Core_Config::singleton()->defaultSearchProfileID = 1;
+    $this->callAPISuccess('address', 'create', array('contact_id' => $contactID, 'city' => 'Cool City', 'location_type_id' => 1,));
+    $params = array(
+      0 => array(
+        0 => 'city-1',
+        1 => '=',
+        2 => 'Cool City',
+        3 => 1,
+        4 => 0,
+      )
+    );
+    $returnProperties = array(
+      'contact_type' => 1,
+      'contact_sub_type' => 1,
+      'sort_name' => 1,
+    );
+
+    $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
+    try {
+      $queryObj->searchQuery(0, 0, NULL,
+        FALSE, FALSE,
+        FALSE, FALSE,
+        FALSE);
+    }
+  catch (PEAR_Exception $e) {
+    $err = $e->getCause();
+    $this->fail('invalid SQL created' . $e->getMessage() . " " . $err->userinfo);
+
+  }
+
+}
 }
 
