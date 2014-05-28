@@ -910,7 +910,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
             'email_id' => $dao->email_id,
             'contact_id' => $groupContact,
           );
-          $queue = CRM_Mailing_Event_BAO_Queue::create($params);
+          CRM_Mailing_Event_BAO_Queue::create($params);
         }
       }
     }
@@ -2692,7 +2692,7 @@ WHERE  civicrm_mailing_job.id = %1
     //   CRM_Core_Error::debug_log_message("Beginning processQueue run: {$config->mailerJobsMax}, {$config->mailerJobSize}");
 
     if ($mode == NULL && CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG") {
-      CRM_Core_Error::fatal(ts('The <a href="%1">default mailbox</a> has not been configured. You will find <a href="%2">more info in the online user and administrator guide</a>', array(1 => CRM_Utils_System::url('civicrm/admin/mailSettings', 'reset=1'), 2 => "http://book.civicrm.org/user/advanced-configuration/email-system-configuration/")));
+      throw new CRM_Core_Exception(ts('The <a href="%1">default mailbox</a> has not been configured. You will find <a href="%2">more info in the online user and administrator guide</a>', array(1 => CRM_Utils_System::url('civicrm/admin/mailSettings', 'reset=1'), 2 => "http://book.civicrm.org/user/advanced-configuration/email-system-configuration/")));
     }
 
     // check if we are enforcing number of parallel cron jobs
