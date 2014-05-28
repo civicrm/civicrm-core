@@ -145,26 +145,26 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   /**
    * Function to get the case definition either from db or read from xml file
    *
-   * @param $caseType associated array
+   * @param $caseType a single case-type record
    *
-   * @return mixed
+   * @return array the definition of the case-type, expressed as PHP array-tree
    * @static
    */
-  static function getCaseTypeDefinition(&$caseType) {
+  static function getCaseTypeDefinition($caseType) {
     // check if case type definition is saved in DB
-    if (!empty($caseType['values'][0]['definition'])) {
-      $xml = simplexml_load_string($caseType['values'][0]['definition']);
+    if (!empty($caseType['definition'])) {
+      $xml = simplexml_load_string($caseType['definition']);
     }
     else {
-      $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseType['values'][0]['name']);
+      $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseType['name']);
     }
 
-    // unset case definition
-    $caseType['values'][0]['definition'] = array();
+    // build PHP array based on definition
+    $definition = array();
 
     // set activity types
     $activityTypes = json_decode(json_encode($xml->ActivityTypes), TRUE);
-    $caseType['values'][0]['definition']['activityTypes'] = $activityTypes['ActivityType'];
+    $definition['activityTypes'] = $activityTypes['ActivityType'];
 
     // set activity sets
     $activitySets = json_decode(json_encode($xml->ActivitySets), TRUE);
@@ -178,19 +178,19 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     foreach ($activitySets['ActivitySet'] as $key => $value) {
       foreach ($value as $k => $val) {
         if ( $k == 'ActivityTypes') {
-          $caseType['values'][0]['definition']['activitySets'][$key]['activityTypes'] = array_pop(array_values($val));
+          $definition['activitySets'][$key]['activityTypes'] = array_pop(array_values($val));
         }
         else {
-          $caseType['values'][0]['definition']['activitySets'][$key][$k] = $val;
+          $definition['activitySets'][$key][$k] = $val;
         }
       }
     }
 
     // set case roles
     $caseRoles = json_decode(json_encode($xml->CaseRoles), TRUE);
-    $caseType['values'][0]['definition']['caseRoles'] = $caseRoles['RelationshipType'];
+    $definition['caseRoles'] = $caseRoles['RelationshipType'];
 
-    return $caseType;
+    return $definition;
   }
 
   /**
