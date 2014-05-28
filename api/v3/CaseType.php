@@ -81,8 +81,12 @@ function civicrm_api3_case_type_get($params) {
  * @param $caseTypes
  * @return mixed
  */
-function _civicrm_api3_case_type_get_formatResult(&$caseTypes) {
-  return CRM_Case_BAO_CaseType::getCaseTypeDefinition($caseTypes);
+function _civicrm_api3_case_type_get_formatResult(&$result) {
+  foreach ($result['values'] as $key => $caseType) {
+    $definition = CRM_Case_BAO_CaseType::getCaseTypeDefinition($caseType);
+    $result['values'][$key]['definition'] = $definition;
+  }
+  return $result;
 }
 
 /**
