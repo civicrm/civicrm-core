@@ -8,8 +8,7 @@
 
   var newCaseTypeDefinitionTemplate = {
     activityTypes: [
-      {name: 'Open Case', max_instances: 1 },
-      {name: 'Example activity'}
+      {name: 'Open Case', max_instances: 1 }
     ],
     activitySets: [
       {
@@ -17,8 +16,7 @@
         label: 'Standard Timeline',
         timeline: '1', // Angular won't bind checkbox correctly with numeric 1
         activityTypes: [
-          {name: 'Open Case', status: 'Completed' },
-          {name: 'Example activity', reference_activity: 'Open Case', reference_offset: 3, reference_select: 'newest'}
+          {name: 'Open Case', status: 'Completed' }
         ]
       }
     ],
@@ -43,7 +41,13 @@
         controller: 'CaseTypeCtrl',
         resolve: {
           selectedCaseType: function($route, crmApi) {
-            return crmApi('CaseType', 'getsingle', {id: $route.current.params.id});
+            if ( $route.current.params.id !== 'new') {
+              return crmApi('CaseType', 'getsingle', {id: $route.current.params.id});
+            }
+            else {
+              return { title: "New case type", name: "New case type", is_active: "1", weight: "1",
+                definition: _.extend({}, newCaseTypeDefinitionTemplate) };
+            }
           }
         }
       });
@@ -78,7 +82,7 @@
     };
 
     $scope.caseType = selectedCaseType;
-    $scope.caseType.definition = $scope.caseType.definition || _.extend({}, newCaseTypeDefinitionTemplate);
+    $scope.caseType.definition = $scope.caseType.definition || [];
     $scope.caseType.definition.activityTypes = $scope.caseType.definition.activityTypes || [];
     $scope.caseType.definition.activitySets = $scope.caseType.definition.activitySets || [];
     $scope.caseType.definition.caseRoles = $scope.caseType.definition.caseRoles || [];
@@ -180,7 +184,12 @@
     };
 
     $scope.save = function() {
-      crmApi('CaseType', 'create', $scope.caseType, true);
+      var result = crmApi('CaseType', 'create', $scope.caseType, true);
+      result.success(function(data) {
+        if (data.is_error == 0) {
+          $scope.caseType.id = data.id;
+        }
+      });
     };
 
     $scope.$watchCollection('caseType.definition.activitySets', function() {
