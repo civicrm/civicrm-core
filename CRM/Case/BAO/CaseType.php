@@ -157,13 +157,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    * @static
    */
   static function getCaseTypeDefinition($caseType) {
-    // check if case type definition is saved in DB
-    if (!empty($caseType['definition'])) {
-      $xml = simplexml_load_string($caseType['definition']);
-    }
-    else {
-      $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseType['name']);
-    }
+    $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseType['name']);
 
     // build PHP array based on definition
     $definition = array();
