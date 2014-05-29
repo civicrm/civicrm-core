@@ -222,7 +222,10 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
       }
     }
     else {
-      $sql .= ' ORDER BY contact_a.sort_name';
+      //CRM-14107, since there could be multiple activities against same contact,
+      //we need to provide GROUP BY on contact id to prevent duplicacy on prev/next entries
+      $sql .= 'GROUP BY contact_a.id
+ORDER BY contact_a.sort_name';
     }
 
     if ($rowcount > 0 && $offset >= 0) {

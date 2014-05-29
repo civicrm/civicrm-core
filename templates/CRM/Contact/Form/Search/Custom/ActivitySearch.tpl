@@ -107,7 +107,7 @@
                     {if ($header.sort eq 'sort_name') or ($header.sort eq 'activity_status') or ($header.sort eq 'activity_type') or ($header.sort eq 'activity_subject') or ($header.sort eq 'source_contact') or ($header.SORT eq 'activity_date') or ($header.name eq null) }
                         {assign var=fName value=$header.sort}
                         {if $fName eq 'sort_name'}
-                            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
+                            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&key=`$qfKey`"}">{$row.sort_name}</a></td>
                         {elseif $fName eq 'activity_subject'}
                             <td>
                                 {if $row.case_id }
