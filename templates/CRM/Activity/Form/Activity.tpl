@@ -135,7 +135,7 @@
     {if $action neq 4}
       <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</td>
       {else}
-      <td class="view-value">{$form.activity_date_time.html|crmDate}</td>
+      <td class="view-value">{$form.activity_date_time.value|crmDate}</td>
     {/if}
   </tr>
   <tr class="crm-activity-form-block-duration">
