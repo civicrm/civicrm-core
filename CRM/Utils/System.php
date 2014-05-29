@@ -977,7 +977,7 @@ class CRM_Utils_System {
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
     // lets capture the return stuff rather than echo
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true );
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE );
 
     return curl_exec($ch);
   }
@@ -1164,7 +1164,7 @@ class CRM_Utils_System {
     return
       (isset($_SERVER['HTTPS']) &&
         !empty($_SERVER['HTTPS']) &&
-        strtolower($_SERVER['HTTPS']) != 'off') ? true : false;
+        strtolower($_SERVER['HTTPS']) != 'off') ? TRUE : FALSE;
   }
 
   /**
@@ -1851,5 +1851,55 @@ class CRM_Utils_System {
     else {
       return FALSE;
     }
+  }
+
+  /**
+   * Determine the standard URL for viewing or editing the specified link
+   *
+   * This function delegates the decision-making to (a) the hook system and
+   * (b) the BAO system.
+   *
+   * @param array $crudLinkSpec with keys:
+   *  - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
+   *  - entity_table: string, eg "civicrm_contact"
+   *  - entity_id: int
+   * @return array|NULL NULL if unavailable, or an array. array has keys:
+   *  - path: string
+   *  - query: array
+   *  - title: string
+   *  - url: string
+   */
+  static function createDefaultCrudLink($crudLinkSpec) {
+    $crudLinkSpec['action'] = CRM_Utils_Array::value('action', $crudLinkSpec, CRM_Core_Action::VIEW);
+    $daoClass = CRM_Core_DAO_AllCoreTables::getClassForTable($crudLinkSpec['entity_table']);
+    if (!$daoClass) {
+      return NULL;
+    }
+
+    $baoClass = str_replace('_DAO_', '_BAO_', $daoClass);
+    if (!class_exists($baoClass)) {
+      return NULL;
+    }
+
+    $bao = new $baoClass();
+    $bao->id = $crudLinkSpec['entity_id'];
+    if (!$bao->find(TRUE)) {
+      return NULL;
+    }
+
+    $link = array();
+    CRM_Utils_Hook::crudLink($crudLinkSpec, $bao, $link);
+    if (empty($link) && is_callable(array($bao, 'createDefaultCrudLink'))) {
+      $link = $bao->createDefaultCrudLink($crudLinkSpec);
+    }
+
+    if (!empty($link)) {
+      if (!isset($link['url'])) {
+        $link['url'] = self::url($link['path'], $link['query'], TRUE, NULL, FALSE);
+      }
+      return $link;
+    }
+
+    return NULL;
   }
 }
