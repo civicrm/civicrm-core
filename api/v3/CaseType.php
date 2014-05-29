@@ -50,7 +50,7 @@
  * @access public
  */
 function civicrm_api3_case_type_create($params) {
-  civicrm_api3_verify_mandatory($params, _civicrm_api3_get_DAO(__FUNCTION__), array('name'));
+  civicrm_api3_verify_mandatory($params, _civicrm_api3_get_DAO(__FUNCTION__));
 
   if (!array_key_exists('is_active', $params) && empty($params['id'])) {
     $params['is_active'] = TRUE;
