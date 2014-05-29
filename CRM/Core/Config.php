@@ -331,7 +331,8 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
       // also make sure we create the config directory within this directory
       // the below statement will create both the templates directory and the config and log directory
-      $this->configAndLogDir =
+      $this->configAndLogDir = defined('CIVICRM_CONFIGLOGDIR') ?
+        CRM_Utils_File::addTrailingSlash(CIVICRM_CONFIGLOGDIR) :
         CRM_Utils_File::baseFilePath($this->templateCompileDir) .
         'ConfigAndLog' . DIRECTORY_SEPARATOR;
       CRM_Utils_File::createDir($this->configAndLogDir);
