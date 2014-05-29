@@ -77,6 +77,13 @@ class CRM_Case_XMLRepository {
    * @return SimpleXMLElement|FALSE
    */
   public function retrieve($caseType) {
+    // check if xml definition is defined in db
+    $definition = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseType, 'definition', 'name');
+
+    if (!empty($definition)) {
+      return simplexml_load_string($definition);
+    }
+
     $caseType = CRM_Case_XMLProcessor::mungeCaseType($caseType);
 
     if (!CRM_Utils_Array::value($caseType, $this->xml)) {
