@@ -141,6 +141,10 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
     return NULL;
   }
 
+  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+    return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
+  }
+
   /**
    * @param int $offset
    * @param int $rowcount
@@ -163,6 +167,9 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
 
     if ($justIDs) {
       $selectClause = "contact_a.id as contact_id";
+      $sort = "contact_a.id";
+
+      return $this->sql($selectClause, $offset, $rowcount, $sort, $includeContactIDs, NULL);
     }
     else {
       $selectClause = "
