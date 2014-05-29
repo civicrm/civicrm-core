@@ -281,7 +281,7 @@
               {if $hideCalendar neq true}
                     {include file="CRM/common/jcalendar.tpl" elementName=register_date}
                   {else}
-                    {$form.register_date.html|crmDate}
+                    {$form.register_date.value|crmDate}
                   {/if}
             </td>
           </tr>
