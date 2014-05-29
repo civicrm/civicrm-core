@@ -65,6 +65,12 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   static function add(&$params) {
     $caseTypeDAO = new CRM_Case_DAO_CaseType();
 
+    // form the name only if missing: CRM-627
+    $nameParam = CRM_Utils_Array::value('name', $params, NULL);
+    if (!$nameParam && empty($params['id'])) {
+      $params['name'] = CRM_Utils_String::titleToVar($params['title']);
+    }
+
     // function to format definition column
     self::convertDefinitionToXML($params);
 

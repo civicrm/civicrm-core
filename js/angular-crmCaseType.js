@@ -45,7 +45,7 @@
               return crmApi('CaseType', 'getsingle', {id: $route.current.params.id});
             }
             else {
-              return { title: "New case type", name: "New case type", is_active: "1",
+              return { title: "New case type", name: "New case type", is_active: "1", weight: "1",
                 definition: _.extend({}, newCaseTypeDefinitionTemplate) };
             }
           }
@@ -184,7 +184,12 @@
     };
 
     $scope.save = function() {
-      crmApi('CaseType', 'create', $scope.caseType, true);
+      var result = crmApi('CaseType', 'create', $scope.caseType, true);
+      result.success(function(data) {
+        if (data.is_error == 0) {
+          $scope.caseType.id = data.id;
+        }
+      });
     };
 
     $scope.$watchCollection('caseType.definition.activitySets', function() {
