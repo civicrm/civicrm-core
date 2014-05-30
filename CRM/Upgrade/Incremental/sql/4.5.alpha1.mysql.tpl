@@ -525,7 +525,7 @@ WHERE co.id IS NULL;
 
 -- CRM-14197 Add contribution_id to civicrm_line_item
 
-ALTER TABLE civicrm_line_item ADD contribution_id INT(10) COMMENT 'Contribution ID' NULL AFTER entity_id;
+ALTER TABLE civicrm_line_item ADD contribution_id INT(10) unsigned COMMENT 'Contribution ID' NULL AFTER entity_id;
 
 -- FK to civicrm_contribution
 
