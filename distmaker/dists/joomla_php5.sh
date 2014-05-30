@@ -31,7 +31,7 @@ if [ -d $TRG ] ; then
 fi
 
 # copy all the rest of the stuff
-for CODE in css i install js packages PEAR templates bin joomla CRM api extern Reports settings; do
+for CODE in css i install js packages PEAR templates bin joomla CRM api extern Reports settings Civi; do
   echo $CODE
   [ -d $SRC/$CODE ] && $RSYNCCOMMAND $SRC/$CODE $TRG
 done
@@ -47,7 +47,7 @@ fi
 if [ ! -d $TRG/sql ] ; then
 	mkdir $TRG/sql
 fi
-for F in $SRC/sql/civicrm*.mysql $SRC/sql/counties.US.sql.gz $SRC/sql/case_sample*.mysql; do
+for F in $SRC/sql/civicrm*.mysql $SRC/sql/case_sample*.mysql; do
 	cp $F $TRG/sql
 done
 
