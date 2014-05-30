@@ -312,5 +312,13 @@ abstract class CRM_Utils_System_Base {
   function checkPermissionAddUser() {
     return FALSE;
   }
+
+  /**
+   * output code from error function
+   * @param string $content
+   */
+  function outputError($content) {
+    echo CRM_Utils_System::theme($content);
+  }
 }
 

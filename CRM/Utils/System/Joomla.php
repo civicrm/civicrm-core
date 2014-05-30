@@ -826,5 +826,22 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       return TRUE;
     }
   }
+
+  /**
+   * output code from error function
+   * @param string $content
+   */
+  function outputError($content) {
+    if (class_exists('JErrorPage')) {
+      $error = new Exception($content);
+      JErrorPage::render($error);
+    }
+    else if (class_exists('JError')) {
+      JError::raiseError('CiviCRM-001', $content);
+    }
+    else {
+      parent::outputError($content);
+    }
+  }
 }
 
