@@ -86,6 +86,7 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
       new CRM_Contact_Form_Search_Custom_FullText_Contribution(),
       new CRM_Contact_Form_Search_Custom_FullText_Participant(),
       new CRM_Contact_Form_Search_Custom_FullText_Membership(),
+      new CRM_Contact_Form_Search_Custom_FullText_File(),
     );
 
     $formValues['table'] = $this->getFieldValue($formValues, 'table', 'String');
@@ -194,6 +195,12 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
       'membership_end_date' => 'datetime',
       'membership_source' => 'varchar(255)',
       'membership_status' => 'varchar(255)',
+      'file_id' => 'int unsigned',
+      'file_name' => 'varchar(255)',
+      'file_url' => 'varchar(255)',
+      'file_mime_type' => 'varchar(255)',
+      'file_entity_table' => 'varchar(255)',
+      'file_entity_id' => 'int unsigned',
     );
 
     $sql = "

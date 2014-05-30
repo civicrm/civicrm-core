@@ -360,5 +360,51 @@
     {* END Actions/Results section *}
   </div>
 {/if}
+
+{if !empty($summary.File) }
+<div class="section">
+{* Search request has returned 1 or more matching rows. *}
+
+  <h3>{ts}Files{/ts}:
+      {if !$table}
+          {if $summary.Count.File <= $limit}{$summary.Count.File}{else}{ts 1=$limit}%1 or more{/ts}{/if}
+      {else}
+           {$summary.Count.File}
+      {/if}</h3>
+  {if $table}{include file="CRM/common/pager.tpl" location="top"}{/if}
+
+  {* This section displays the rows along and includes the paging controls *}
+  <table id="file_listing" class="display" summary="{ts}File listings.{/ts}">
+    <thead>
+    <tr>
+      <th class='link'>{ts}File Name{/ts}</th>
+      <th>{ts}Type{/ts}</th>
+      <th>{ts}Attached To{/ts}</th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+      {foreach from=$summary.File item=row}
+        <tr class="{cycle values="odd-row,even-row"}">
+          <td><a href="{$row.file_url}">{$row.file_name}</a></td>
+          <td>{$row.file_mime_type}</td>
+          <td>{crmCrudLink action=VIEW table=$row.file_entity_table id=$row.file_entity_id}</td>
+          <td>
+            <a href="{$row.file_url}">{ts}View{/ts}</a>
+          </td>
+        </tr>
+      {/foreach}
+    </tbody>
+  </table>
+  {if !$table and $summary.addShowAllLink.File}
+  <div class="crm-section full-text-view-all-section">
+    <a href="{crmURL p='civicrm/contact/search/custom' q="csid=`$csID`&reset=1&force=1&table=File&text=$text"}"
+          title="{ts}View all results for files{/ts}">&raquo;&nbsp;{ts}View all results for files{/ts}</a>
+  </div>{/if}
+  {if $table}{include file="CRM/common/pager.tpl" location="below"}{/if}
+{* END Actions/Results section *}
+</div>
+{/if}
+
 {if !$table}{include file="CRM/common/pager.tpl" location="bottom"}{/if}
 </div>
