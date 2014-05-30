@@ -106,7 +106,7 @@ FROM       {$fromTable} ct
 INNER JOIN civicrm_case cc ON cc.id = ct.entity_id
 LEFT JOIN  civicrm_case_contact ccc ON cc.id = ccc.case_id
 LEFT JOIN  civicrm_contact c ON ccc.contact_id = c.id
-{$limit}
+{$this->toLimit($limit)}
 ";
     CRM_Core_DAO::executeQuery($sql);
   }

@@ -111,7 +111,7 @@ LEFT JOIN  civicrm_contribution_page ccp ON ccp.id = cc.contribution_page_id
 LEFT JOIN  civicrm_option_group option_group_contributionStatus ON option_group_contributionStatus.name = 'contribution_status'
 LEFT JOIN  civicrm_option_value contribution_status ON
 ( contribution_status.option_group_id = option_group_contributionStatus.id AND contribution_status.value = cc.contribution_status_id )
-{$limit}
+{$this->toLimit($limit)}
 ";
     CRM_Core_DAO::executeQuery($sql);
   }

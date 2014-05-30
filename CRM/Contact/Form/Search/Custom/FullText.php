@@ -55,10 +55,19 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
 
   protected $_tableFields = NULL;
 
+  /**
+   * @var array|null NULL if no limit; or array(0 => $limit, 1 => $offset)
+   */
   protected $_limitClause = NULL;
 
+  /**
+   * @var array|null NULL if no limit; or array(0 => $limit, 1 => $offset)
+   */
   protected $_limitRowClause = NULL;
 
+  /**
+   * @var array|null NULL if no limit; or array(0 => $limit, 1 => $offset)
+   */
   protected $_limitDetailClause = NULL;
 
   protected $_limitNumber = 10;
@@ -86,8 +95,8 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
     $this->_text = $formValues['text'];
 
     if (!$this->_table) {
-      $this->_limitClause = " LIMIT {$this->_limitNumberPlus1}";
-      $this->_limitRowClause = $this->_limitDetailClause = "  LIMIT {$this->_limitNumber}";
+      $this->_limitClause = array($this->_limitNumberPlus1, NULL);
+      $this->_limitRowClause = $this->_limitDetailClause = array($this->_limitNumber, NULL);
     }
     else {
       // when there is table specified, we would like to use the pager. But since
@@ -98,8 +107,8 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
       $pageId = CRM_Utils_Array::value('crmPID', $_REQUEST, 1);
       $offset = ($pageId - 1) * $rowCount;
       $this->_limitClause = NULL;
-      $this->_limitRowClause = " LIMIT $rowCount";
-      $this->_limitDetailClause = " LIMIT $offset, $rowCount";
+      $this->_limitRowClause = array($rowCount, NULL);
+      $this->_limitDetailClause = array($rowCount, $offset);
     }
 
     $this->_formValues = $formValues;
@@ -351,7 +360,7 @@ WHERE      t.table_name = 'Activity' AND
     // now iterate through the table and add entries to the relevant section
     $sql = "SELECT * FROM {$this->_tableName}";
     if ($this->_table) {
-      $sql .= " {$this->_limitRowClause} ";
+      $sql .= " {$this->toLimit($this->_limitRowClause)} ";
     }
     $dao = CRM_Core_DAO::executeQuery($sql);
 
@@ -450,7 +459,7 @@ WHERE      t.table_name = 'Activity' AND
     $sql = "
 SELECT $select
 FROM   {$this->_tableName} contact_a
-       {$this->_limitRowClause}
+       {$this->toLimit($this->_limitRowClause)}
 ";
     return $sql;
   }
@@ -498,5 +507,24 @@ FROM   {$this->_tableName} contact_a
     if ($title) {
       CRM_Utils_System::setTitle($title);
     }
+  }
+
+  /**
+   * @param int|array $limit
+   * @return string SQL
+   * @see CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery::toLimit
+   */
+  public function toLimit($limit) {
+    if (is_array($limit)) {
+      list ($limit, $offset) = $limit;
+    }
+    if (empty($limit)) {
+      return '';
+    }
+    $result = "LIMIT {$limit}";
+    if ($offset) {
+      $result .= " OFFSET {$offset}";
+    }
+    return $result;
   }
 }

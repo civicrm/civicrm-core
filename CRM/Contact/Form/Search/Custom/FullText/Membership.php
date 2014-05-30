@@ -93,7 +93,7 @@ LEFT JOIN  civicrm_membership_type cmt ON cmt.id = cm.membership_type_id
 LEFT JOIN  civicrm_membership_payment cmp ON cmp.membership_id = cm.id
 LEFT JOIN  civicrm_contribution cc ON cc.id = cmp.contribution_id
 LEFT JOIN  civicrm_membership_status cms ON cms.id = cm.status_id
-{$limit}
+{$this->toLimit($limit)}
 ";
     CRM_Core_DAO::executeQuery($sql);
   }
