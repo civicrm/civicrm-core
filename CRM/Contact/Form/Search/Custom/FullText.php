@@ -67,42 +67,10 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
    * @param $formValues
    */
   function __construct(&$formValues) {
-    $this->_text = CRM_Utils_Array::value('text', $formValues);
-    $this->_table = CRM_Utils_Array::value('table', $formValues);
-
-    if (!$this->_text) {
-      $this->_text = CRM_Utils_Request::retrieve('text', 'String', CRM_Core_DAO::$_nullObject);
-      if ($this->_text) {
-        $this->_text = trim($this->_text);
-        $formValues['text'] = $this->_text;
-      }
-    }
-
-    if (!$this->_table) {
-      $this->_table = CRM_Utils_Request::retrieve('table', 'String', CRM_Core_DAO::$_nullObject);
-      if ($this->_table) {
-        $formValues['table'] = $this->_table;
-      }
-    }
-
-    // fix text to include wild card characters at beginning and end
-    if ($this->_text) {
-      if (is_numeric($this->_text)) {
-        $this->_textID = $this->_text;
-      }
-
-      $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-      $this->_text = $strtolower(CRM_Core_DAO::escapeString($this->_text));
-      if (strpos($this->_text, '%') === FALSE) {
-        $this->_text = "'%{$this->_text}%'";
-      }
-      else {
-        $this->_text = "'{$this->_text}'";
-      }
-    }
-    else {
-      $this->_text = "'%'";
-    }
+    $formValues['table'] = $this->getFieldValue($formValues, 'table', 'String');
+    $this->_table = $formValues['table'];
+    $formValues['text'] = trim($this->getFieldValue($formValues, 'text', 'String', ''));
+    $this->_text = $this->convertToSqlWildcard($formValues['text']);
 
     if (!$this->_table) {
       $this->_limitClause = " LIMIT {$this->_limitNumberPlus1}";
@@ -122,6 +90,52 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
     }
 
     $this->_formValues = $formValues;
+  }
+
+  /**
+   * Get a value from $formValues. If missing, get it from the request.
+   *
+   * @param $formValues
+   * @param $field
+   * @param $type
+   * @param null $default
+   * @return mixed|null
+   */
+  public function getFieldValue($formValues, $field, $type, $default = NULL) {
+    $value = CRM_Utils_Array::value($field, $formValues);
+    if (!$value) {
+      return CRM_Utils_Request::retrieve($field, $type, CRM_Core_DAO::$_nullObject, FALSE, $default);
+    }
+    return $value;
+  }
+
+  /**
+   * Modify  text to include wild card characters at beginning and end
+   *
+   * @param string $text
+   * @return string
+   */
+  public function convertToSqlWildcard($text) {
+    if ($text) {
+      if (is_numeric($text)) {
+        $textID = $text;
+      }
+
+      $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
+      $text = $strtolower(CRM_Core_DAO::escapeString($text));
+      if (strpos($text, '%') === FALSE) {
+        $text = "'%{$text}%'";
+        return $text;
+      }
+      else {
+        $text = "'{$text}'";
+        return $text;
+      }
+    }
+    else {
+      $text = "'%'";
+      return $text;
+    }
   }
 
   function __destruct() {
