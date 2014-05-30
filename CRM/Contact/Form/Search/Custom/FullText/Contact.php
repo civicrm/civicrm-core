@@ -125,7 +125,7 @@ INSERT INTO {$toTable}
 SELECT     c.id, ct.entity_id, c.sort_name, c.display_name, 'Contact'
   FROM     {$fromTable} ct
 INNER JOIN civicrm_contact c ON ct.entity_id = c.id
-{$limit}
+{$this->toLimit($limit)}
 ";
     CRM_Core_DAO::executeQuery($sql);
   }

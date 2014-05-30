@@ -67,11 +67,15 @@ abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
    * TODO: Consider removing $entityIDTableName from the function-signature. Each implementation could be
    * responsible for its own temp tables.
    *
+   * TODO: Understand why $queryLimit and $detailLimit are different
+   *
    * @param string $queryText a string of text to search for
    * @param string $entityIDTableName a temporary table into which we can write a list of all matching IDs
    * @param string $detailTable a table into which we can write details about a page worth of matches
-   * @param string $queryLimit overall limit (applied when building $entityIDTableName)
-   * @param string $detailLimit final limit (applied when building $detailTable)
+   * @param array|NULL $queryLimit overall limit (applied when building $entityIDTableName)
+   *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
+   * @param array|NULL $detailLimit final limit (applied when building $detailTable)
+   *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
    * @return int number of matches
    */
   public abstract function fillTempTable($queryText, $entityIDTableName, $detailTable, $queryLimit, $detailLimit);
@@ -131,7 +135,7 @@ AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
             $sql = "
 REPLACE INTO {$entityIDTableName} ( entity_id )
 $sqlStatement
-{$limit}
+{$this->toLimit($limit)}
 ";
             CRM_Core_DAO::executeQuery($sql);
           }
@@ -170,7 +174,7 @@ FROM     $tableName
 WHERE    ( $whereClause )
 AND      {$tableValues['id']} IS NOT NULL
 GROUP BY {$tableValues['id']}
-{$limit}
+{$this->toLimit($limit)}
 ";
           CRM_Core_DAO::executeQuery($sql);
         }
@@ -210,6 +214,25 @@ GROUP BY {$tableValues['id']}
       $text = "'%'";
       return $text;
     }
+  }
+
+  /**
+   * @param int|array $limit
+   * @return string SQL
+   * @see CRM_Contact_Form_Search_Custom_FullText::toLimit
+   */
+  public function toLimit($limit) {
+    if (is_array($limit)) {
+      list ($limit, $offset) = $limit;
+    }
+    if (empty($limit)) {
+      return '';
+    }
+    $result = "LIMIT {$limit}";
+    if ($offset) {
+      $result .= " OFFSET {$offset}";
+    }
+    return $result;
   }
 
 }

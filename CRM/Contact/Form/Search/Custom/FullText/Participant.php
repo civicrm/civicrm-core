@@ -104,7 +104,7 @@ INNER JOIN civicrm_participant cp ON cp.id = ct.entity_id
 LEFT JOIN  civicrm_contact c ON cp.contact_id = c.id
 LEFT JOIN  civicrm_event ce ON ce.id = cp.event_id
 LEFT JOIN  civicrm_participant_status_type participantStatus ON participantStatus.id = cp.status_id
-{$limit}
+{$this->toLimit($limit)}
 ";
     CRM_Core_DAO::executeQuery($sql);
   }

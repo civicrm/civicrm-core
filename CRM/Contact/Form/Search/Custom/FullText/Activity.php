@@ -123,7 +123,7 @@ LEFT JOIN  civicrm_case_activity cca ON cca.activity_id = ca.id
 LEFT JOIN  civicrm_case_contact ccc ON ccc.case_id = cca.case_id
 WHERE (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
 GROUP BY ca.id
-{$limit}
+{$this->toLimit($limit)}
 ";
     CRM_Core_DAO::executeQuery($sql);
   }
