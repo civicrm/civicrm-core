@@ -36,6 +36,12 @@ function civicrm_setup($filesDirectory) {
   global $crmPath, $sqlPath, $pkgPath, $tplPath;
   global $compileDir;
 
+  $pkgPath = $crmPath . DIRECTORY_SEPARATOR . 'packages';
+  set_include_path($crmPath . PATH_SEPARATOR .
+    $pkgPath . PATH_SEPARATOR .
+    get_include_path()
+  );
+
   $sqlPath = $crmPath . DIRECTORY_SEPARATOR . 'sql';
   $tplPath = $crmPath . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'CRM' . DIRECTORY_SEPARATOR . 'common' . DIRECTORY_SEPARATOR;
 
@@ -129,6 +135,7 @@ function civicrm_main(&$config) {
  */
 function civicrm_source($dsn, $fileName, $lineMode = FALSE) {
   global $crmPath;
+
   require_once "$crmPath/packages/DB.php";
 
   $db = DB::connect($dsn);
