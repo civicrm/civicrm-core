@@ -74,7 +74,7 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
     if (is_numeric($formValues['text'])) {
       $this->textID = $formValues['text'];
     }
-    $this->_text = $this->convertToSqlWildcard($formValues['text']);
+    $this->_text = $formValues['text'];
 
     if (!$this->_table) {
       $this->_limitClause = " LIMIT {$this->_limitNumberPlus1}";
@@ -114,12 +114,12 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
   }
 
   /**
-   * Modify  text to include wild card characters at beginning and end
+   * Format text to include wild card characters at beginning and end
    *
    * @param string $text
    * @return string
    */
-  public function convertToSqlWildcard($text) {
+  public function toSqlWildCard($text) {
     if ($text) {
       $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
       $text = $strtolower(CRM_Core_DAO::escapeString($text));
@@ -380,7 +380,7 @@ $sqlStatement
               }
             }
             else {
-              $clauses[] = "$fieldName LIKE {$this->_text}";
+              $clauses[] = "$fieldName LIKE {$this->toSqlWildCard($this->_text)}";
             }
           }
 
@@ -431,7 +431,7 @@ FROM       civicrm_entity_tag et
 INNER JOIN civicrm_tag t ON et.tag_id = t.id
 WHERE      et.entity_table = 'civicrm_contact'
 AND        et.tag_id       = t.id
-AND        t.name LIKE {$this->_text}
+AND        t.name LIKE {$this->toSqlWildCard($this->_text)}
 GROUP BY   et.entity_id
 ";
 
@@ -505,8 +505,8 @@ INNER JOIN civicrm_contact c ON cat.contact_id = c.id
 LEFT  JOIN civicrm_email e ON cat.contact_id = e.contact_id
 LEFT  JOIN civicrm_option_group og ON og.name = 'activity_type'
 LEFT  JOIN civicrm_option_value ov ON ( ov.option_group_id = og.id )
-WHERE      ( (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text}) OR
-             ( e.email LIKE {$this->_text}    AND
+WHERE      ( (c.sort_name LIKE {$this->toSqlWildCard($this->_text)} OR c.display_name LIKE {$this->toSqlWildCard($this->_text)}) OR
+             ( e.email LIKE {$this->toSqlWildCard($this->_text)}    AND
                ca.activity_type_id = ov.value AND
                ov.name IN ('Inbound Email', 'Email') ) )
 AND        (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
@@ -520,7 +520,7 @@ INNER JOIN civicrm_tag t ON et.tag_id = t.id
 INNER JOIN civicrm_activity ca ON et.entity_id = ca.id
 WHERE      et.entity_table = 'civicrm_activity'
 AND        et.tag_id       = t.id
-AND        t.name LIKE {$this->_text}
+AND        t.name LIKE {$this->toSqlWildCard($this->_text)}
 AND        (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
 GROUP BY   et.entity_id
 ";
@@ -528,7 +528,7 @@ GROUP BY   et.entity_id
     $contactSQL[] = "
 SELECT distinct ca.id
 FROM   civicrm_activity ca
-WHERE  (ca.subject LIKE  {$this->_text} OR ca.details LIKE  {$this->_text})
+WHERE  (ca.subject LIKE  {$this->toSqlWildCard($this->_text)} OR ca.details LIKE  {$this->toSqlWildCard($this->_text)})
 AND    (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
 ";
 
@@ -567,7 +567,7 @@ SELECT    distinct cc.id
 FROM      civicrm_case cc
 LEFT JOIN civicrm_case_contact ccc ON cc.id = ccc.case_id
 LEFT JOIN civicrm_contact c ON ccc.contact_id = c.id
-WHERE     (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text})
+WHERE     (c.sort_name LIKE {$this->toSqlWildCard($this->_text)} OR c.display_name LIKE {$this->toSqlWildCard($this->_text)})
           AND (cc.is_deleted = 0 OR cc.is_deleted IS NULL)
 ";
 
@@ -588,7 +588,7 @@ FROM       civicrm_entity_tag et
 INNER JOIN civicrm_tag t ON et.tag_id = t.id
 WHERE      et.entity_table = 'civicrm_case'
 AND        et.tag_id       = t.id
-AND        t.name LIKE {$this->_text}
+AND        t.name LIKE {$this->toSqlWildCard($this->_text)}
 GROUP BY   et.entity_id
 ";
 
@@ -617,8 +617,8 @@ GROUP BY   et.entity_id
 SELECT     distinct cc.id
 FROM       civicrm_contribution cc
 INNER JOIN civicrm_contact c ON cc.contact_id = c.id
-WHERE      (c.sort_name LIKE {$this->_text} OR
-           c.display_name LIKE {$this->_text})
+WHERE      (c.sort_name LIKE {$this->toSqlWildCard($this->_text)} OR
+           c.display_name LIKE {$this->toSqlWildCard($this->_text)})
 ";
     $tables = array(
       'civicrm_contribution' => array(
@@ -665,7 +665,7 @@ WHERE      (c.sort_name LIKE {$this->_text} OR
 SELECT     distinct cp.id
 FROM       civicrm_participant cp
 INNER JOIN civicrm_contact c ON cp.contact_id = c.id
-WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text})
+WHERE      (c.sort_name LIKE {$this->toSqlWildCard($this->_text)} OR c.display_name LIKE {$this->toSqlWildCard($this->_text)})
 ";
     $tables = array(
       'civicrm_participant' => array(
@@ -710,7 +710,7 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
 SELECT     distinct cm.id
 FROM       civicrm_membership cm
 INNER JOIN civicrm_contact c ON cm.contact_id = c.id
-WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text})
+WHERE      (c.sort_name LIKE {$this->toSqlWildCard($this->_text)} OR c.display_name LIKE {$this->toSqlWildCard($this->_text)})
 ";
     $tables = array(
       'civicrm_membership' => array(
