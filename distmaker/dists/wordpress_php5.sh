@@ -43,7 +43,7 @@ if [ ! -d $TRG/civicrm/civicrm ] ; then
 fi
 
 # copy all the stuff
-for CODE in css i js packages PEAR templates bin CRM api extern Reports install settings; do
+for CODE in css i js packages PEAR templates bin CRM api extern Reports install settings Civi; do
   echo $CODE
   [ -d $SRC/$CODE ] && $RSYNCCOMMAND $SRC/$CODE $TRG/civicrm/civicrm
 done
@@ -60,7 +60,7 @@ if [ ! -d $TRG/civicrm/civicrm/sql ] ; then
 	mkdir $TRG/civicrm/civicrm/sql
 fi
 
-for F in $SRC/sql/civicrm*.mysql $SRC/sql/counties.US.sql.gz $SRC/sql/case_sample*.mysql; do
+for F in $SRC/sql/civicrm*.mysql $SRC/sql/case_sample*.mysql; do
 	cp $F $TRG/civicrm/civicrm/sql
 done
 
