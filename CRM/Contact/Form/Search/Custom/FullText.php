@@ -69,7 +69,11 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
   function __construct(&$formValues) {
     $formValues['table'] = $this->getFieldValue($formValues, 'table', 'String');
     $this->_table = $formValues['table'];
+
     $formValues['text'] = trim($this->getFieldValue($formValues, 'text', 'String', ''));
+    if (is_numeric($formValues['text'])) {
+      $this->textID = $formValues['text'];
+    }
     $this->_text = $this->convertToSqlWildcard($formValues['text']);
 
     if (!$this->_table) {
@@ -117,10 +121,6 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
    */
   public function convertToSqlWildcard($text) {
     if ($text) {
-      if (is_numeric($text)) {
-        $textID = $text;
-      }
-
       $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
       $text = $strtolower(CRM_Core_DAO::escapeString($text));
       if (strpos($text, '%') === FALSE) {
@@ -355,7 +355,6 @@ AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
     $sql = "TRUNCATE {$this->_entityIDTableName}";
     CRM_Core_DAO::executeQuery($sql);
 
-    $maxRowCount = 0;
     foreach ($tables as $tableName => $tableValues) {
       if ($tableName == 'final') {
         continue;
@@ -727,7 +726,7 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   function buildForm(&$form) {
     $config = CRM_Core_Config::singleton();
@@ -839,7 +838,7 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
       if (isset($row['participant_role'])) {
         $participantRole = explode(CRM_Core_DAO::VALUE_SEPARATOR, $row['participant_role']);
         $viewRoles = array();
-        foreach ($participantRole as $k => $v) {
+        foreach ($participantRole as $v) {
           $viewRoles[] = $roleIds[$v];
         }
         $row['participant_role'] = implode(', ', $viewRoles);
@@ -887,7 +886,7 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
     $this->initialize();
 
     if ($returnSQL) {
-      return $this->all($offset, $rowcount, $sort, FALSE, TRUE);;
+      return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
     }
     else {
       return CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM {$this->_tableName}");
