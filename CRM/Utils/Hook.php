@@ -1694,4 +1694,27 @@ abstract class CRM_Utils_Hook {
       'civicrm_caseChange'
     );
   }
+
+  /**
+   * Generate a default CRUD URL for an entity
+   *
+   * @param array $spec with keys:
+   *   - action: int, eg CRM_Core_Action::VIEW or CRM_Core_Action::UPDATE
+   *   - entity_table: string
+   *   - entity_id: int
+   * @param CRM_Core_DAO $bao
+   * @param array $link to define the link, add these keys to $link:
+   *  - title: string
+   *  - path: string
+   *  - query: array
+   *  - url: string (used in lieu of "path"/"query")
+   *      Note: if making "url" CRM_Utils_System::url(), set $htmlize=false
+   * @return mixed
+   */
+  static function crudLink($spec, $bao, &$link) {
+    return self::singleton()->invoke(3, $spec, $bao, $link,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_crudLink'
+    );
+  }
 }
