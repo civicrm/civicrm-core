@@ -44,7 +44,7 @@ class Events {
     $caseId = NULL;
     switch ($event->entity) {
       case 'Activity':
-        if ($event->object->case_id) {
+        if (!empty($event->object->case_id)) {
           $caseId = $event->object->case_id;
         }
         break;
