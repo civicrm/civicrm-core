@@ -234,26 +234,30 @@ CREATE TEMPORARY TABLE {$this->_entityIDTableName} (
     $config = CRM_Core_Config::singleton();
 
     if ((!$this->_table || $this->_table == 'Contact')) {
-      $this->fillContact();
+      $this->fillContactIDs();
+      $this->moveContactIDs();
     }
 
     if ((!$this->_table || $this->_table == 'Activity') &&
       CRM_Core_Permission::check('view all activities')
     ) {
-      $this->fillActivity();
+      $this->fillActivityIDs();
+      $this->moveActivityIDs();
     }
 
     if ((!$this->_table || $this->_table == 'Case') &&
       in_array('CiviCase', $config->enableComponents)
     ) {
-      $this->fillCase();
+      $this->fillCaseIDs();
+      $this->moveCaseIDs();
     }
 
     if ((!$this->_table || $this->_table == 'Contribution') &&
       in_array('CiviContribute', $config->enableComponents) &&
       CRM_Core_Permission::check('access CiviContribute')
     ) {
-      $this->fillContribution();
+      $this->fillContributionIDs();
+      $this->moveContributionIDs();
     }
 
     if ((!$this->_table || $this->_table == 'Participant') &&
@@ -261,14 +265,16 @@ CREATE TEMPORARY TABLE {$this->_entityIDTableName} (
         CRM_Core_Permission::check('view event participants')
       )
     ) {
-      $this->fillParticipant();
+      $this->fillParticipantIDs();
+      $this->moveParticipantIDs();
     }
 
     if ((!$this->_table || $this->_table == 'Membership') &&
       in_array('CiviMember', $config->enableComponents) &&
       CRM_Core_Permission::check('access CiviMember')
     ) {
-      $this->fillMembership();
+      $this->fillMembershipIDs();
+      $this->moveMembershipIDs();
     }
 
     $this->filterACLContacts();
@@ -486,12 +492,16 @@ GROUP BY   et.entity_id
     $this->runQueries($tables);
   }
 
-  function fillContact() {
-
-    $this->fillContactIDs();
-
-    //move data from entity table to detail table.
-    $this->moveEntityToDetail('Contact');
+  public function moveContactIDs() {
+    $sql = "
+INSERT INTO {$this->_tableName}
+( id, contact_id, sort_name, display_name, table_name )
+SELECT     c.id, ct.entity_id, c.sort_name, c.display_name, 'Contact'
+  FROM     {$this->_entityIDTableName} ct
+INNER JOIN civicrm_contact c ON ct.entity_id = c.id
+{$this->_limitDetailClause}
+";
+    CRM_Core_DAO::executeQuery($sql);
   }
 
   function fillActivityIDs() {
@@ -544,19 +554,27 @@ AND    (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
     $this->runQueries($tables);
   }
 
-  function fillActivity() {
-
-    $this->fillActivityIDs();
-
-    //move data from entity table to detail table
-    $this->moveEntityToDetail('Activity');
-  }
-
-  function fillCase() {
-    $this->fillCaseIDs();
-
-    //move data from entity table to detail table
-    $this->moveEntityToDetail('Case');
+  public function moveActivityIDs() {
+    $sql = "
+INSERT INTO {$this->_tableName}
+( table_name, activity_id, subject, details, contact_id, sort_name, record_type,
+  activity_type_id, case_id, client_id )
+SELECT    'Activity', ca.id, substr(ca.subject, 1, 50), substr(ca.details, 1, 250),
+           c1.id, c1.sort_name, cac.record_type_id,
+           ca.activity_type_id,
+           cca.case_id,
+           ccc.contact_id as client_id
+FROM       {$this->_entityIDTableName} eid
+INNER JOIN civicrm_activity ca ON ca.id = eid.entity_id
+INNER JOIN  civicrm_activity_contact cac ON cac.activity_id = ca.id
+INNER JOIN  civicrm_contact c1 ON cac.contact_id = c1.id
+LEFT JOIN  civicrm_case_activity cca ON cca.activity_id = ca.id
+LEFT JOIN  civicrm_case_contact ccc ON ccc.case_id = cca.case_id
+WHERE (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
+GROUP BY ca.id
+{$this->_limitDetailClause}
+";
+    CRM_Core_DAO::executeQuery($sql);
   }
 
   function fillCaseIDs() {
@@ -600,12 +618,18 @@ GROUP BY   et.entity_id
     $this->runQueries($tables);
   }
 
-  function fillContribution() {
-    //get contribution ids in entity table.
-    $this->fillContributionIDs();
-
-    //move data from entity table to detail table
-    $this->moveEntityToDetail('Contribution');
+  public function moveCaseIDs() {
+    $sql = "
+INSERT INTO {$this->_tableName}
+( table_name, contact_id, sort_name, case_id, case_start_date, case_end_date, case_is_deleted )
+SELECT 'Case', c.id, c.sort_name, cc.id, DATE(cc.start_date), DATE(cc.end_date), cc.is_deleted
+FROM       {$this->_entityIDTableName} ct
+INNER JOIN civicrm_case cc ON cc.id = ct.entity_id
+LEFT JOIN  civicrm_case_contact ccc ON cc.id = ccc.case_id
+LEFT JOIN  civicrm_contact c ON ccc.contact_id = c.id
+{$this->_limitDetailClause}
+";
+    CRM_Core_DAO::executeQuery($sql);
   }
 
   /**
@@ -648,12 +672,24 @@ WHERE      (c.sort_name LIKE {$this->toSqlWildCard($this->_text)} OR
     $this->runQueries($tables);
   }
 
-  function fillParticipant() {
-    //get participant ids in entity table.
-    $this->fillParticipantIDs();
-
-    //move data from entity table to detail table
-    $this->moveEntityToDetail('Participant');
+  public function moveContributionIDs() {
+    $sql = "
+INSERT INTO {$this->_tableName}
+( table_name, contact_id, sort_name, contribution_id, financial_type, contribution_page, contribution_receive_date,
+  contribution_total_amount, contribution_trxn_Id, contribution_source, contribution_status, contribution_check_number )
+   SELECT  'Contribution', c.id, c.sort_name, cc.id, cct.name, ccp.title, cc.receive_date,
+           cc.total_amount, cc.trxn_id, cc.source, contribution_status.label, cc.check_number
+     FROM  {$this->_entityIDTableName} ct
+INNER JOIN civicrm_contribution cc ON cc.id = ct.entity_id
+LEFT JOIN  civicrm_contact c ON cc.contact_id = c.id
+LEFT JOIN  civicrm_financial_type cct ON cct.id = cc.financial_type_id
+LEFT JOIN  civicrm_contribution_page ccp ON ccp.id = cc.contribution_page_id
+LEFT JOIN  civicrm_option_group option_group_contributionStatus ON option_group_contributionStatus.name = 'contribution_status'
+LEFT JOIN  civicrm_option_value contribution_status ON
+( contribution_status.option_group_id = option_group_contributionStatus.id AND contribution_status.value = cc.contribution_status_id )
+{$this->_limitDetailClause}
+";
+    CRM_Core_DAO::executeQuery($sql);
   }
 
   /**
@@ -692,13 +728,21 @@ WHERE      (c.sort_name LIKE {$this->toSqlWildCard($this->_text)} OR c.display_n
     $this->runQueries($tables);
   }
 
-  function fillMembership() {
-
-    //get membership ids in entity table.
-    $this->fillMembershipIDs();
-
-    //move data from entity table to detail table
-    $this->moveEntityToDetail('Membership');
+  public function moveParticipantIDs() {
+    $sql = "
+INSERT INTO {$this->_tableName}
+( table_name, contact_id, sort_name, participant_id, event_title, participant_fee_level, participant_fee_amount,
+participant_register_date, participant_source, participant_status, participant_role )
+   SELECT  'Participant', c.id, c.sort_name, cp.id, ce.title, cp.fee_level, cp.fee_amount, cp.register_date, cp.source,
+           participantStatus.label, cp.role_id
+     FROM  {$this->_entityIDTableName} ct
+INNER JOIN civicrm_participant cp ON cp.id = ct.entity_id
+LEFT JOIN  civicrm_contact c ON cp.contact_id = c.id
+LEFT JOIN  civicrm_event ce ON ce.id = cp.event_id
+LEFT JOIN  civicrm_participant_status_type participantStatus ON participantStatus.id = cp.status_id
+{$this->_limitDetailClause}
+";
+    CRM_Core_DAO::executeQuery($sql);
   }
 
   /**
@@ -723,6 +767,24 @@ WHERE      (c.sort_name LIKE {$this->toSqlWildCard($this->_text)} OR c.display_n
     // get the custom data info
     $this->fillCustomInfo($tables, "( 'Membership' )");
     $this->runQueries($tables);
+  }
+
+  public function moveMembershipIDs() {
+    $sql = "
+INSERT INTO {$this->_tableName}
+( table_name, contact_id, sort_name, membership_id, membership_type, membership_fee, membership_start_date,
+membership_end_date, membership_source, membership_status )
+   SELECT  'Membership', c.id, c.sort_name, cm.id, cmt.name, cc.total_amount, cm.start_date, cm.end_date, cm.source, cms.name
+     FROM  {$this->_entityIDTableName} ct
+INNER JOIN civicrm_membership cm ON cm.id = ct.entity_id
+LEFT JOIN  civicrm_contact c ON cm.contact_id = c.id
+LEFT JOIN  civicrm_membership_type cmt ON cmt.id = cm.membership_type_id
+LEFT JOIN  civicrm_membership_payment cmp ON cmp.membership_id = cm.id
+LEFT JOIN  civicrm_contribution cc ON cc.id = cmp.contribution_id
+LEFT JOIN  civicrm_membership_status cms ON cms.id = cm.status_id
+{$this->_limitDetailClause}
+";
+    CRM_Core_DAO::executeQuery($sql);
   }
 
   /**
@@ -814,7 +876,6 @@ WHERE      (c.sort_name LIKE {$this->toSqlWildCard($this->_text)} OR c.display_n
       'Participant' => array(),
       'Membership' => array(),
     );
-
 
     // now iterate through the table and add entries to the relevant section
     $sql = "SELECT * FROM {$this->_tableName}";
@@ -965,117 +1026,6 @@ FROM   {$this->_tableName} contact_a
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
-    }
-  }
-
-  /**
-   * get entity id retrieve related data from db and move all data to detail table.
-   *
-   */
-  function moveEntityToDetail($tableName) {
-    $sql = NULL;
-    switch ($tableName) {
-      case 'Contact':
-        $sql = "
-INSERT INTO {$this->_tableName}
-( id, contact_id, sort_name, display_name, table_name )
-SELECT     c.id, ct.entity_id, c.sort_name, c.display_name, 'Contact'
-  FROM     {$this->_entityIDTableName} ct
-INNER JOIN civicrm_contact c ON ct.entity_id = c.id
-{$this->_limitDetailClause}
-";
-        break;
-
-      case 'Activity':
-        $sql = "
-INSERT INTO {$this->_tableName}
-( table_name, activity_id, subject, details, contact_id, sort_name, record_type,
-  activity_type_id, case_id, client_id )
-SELECT    'Activity', ca.id, substr(ca.subject, 1, 50), substr(ca.details, 1, 250),
-           c1.id, c1.sort_name, cac.record_type_id,
-           ca.activity_type_id,
-           cca.case_id,
-           ccc.contact_id as client_id
-FROM       {$this->_entityIDTableName} eid
-INNER JOIN civicrm_activity ca ON ca.id = eid.entity_id
-INNER JOIN  civicrm_activity_contact cac ON cac.activity_id = ca.id
-INNER JOIN  civicrm_contact c1 ON cac.contact_id = c1.id
-LEFT JOIN  civicrm_case_activity cca ON cca.activity_id = ca.id
-LEFT JOIN  civicrm_case_contact ccc ON ccc.case_id = cca.case_id
-WHERE (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
-GROUP BY ca.id
-{$this->_limitDetailClause}
-";
-        break;
-
-      case 'Contribution':
-        $sql = "
-INSERT INTO {$this->_tableName}
-( table_name, contact_id, sort_name, contribution_id, financial_type, contribution_page, contribution_receive_date,
-  contribution_total_amount, contribution_trxn_Id, contribution_source, contribution_status, contribution_check_number )
-   SELECT  'Contribution', c.id, c.sort_name, cc.id, cct.name, ccp.title, cc.receive_date,
-           cc.total_amount, cc.trxn_id, cc.source, contribution_status.label, cc.check_number
-     FROM  {$this->_entityIDTableName} ct
-INNER JOIN civicrm_contribution cc ON cc.id = ct.entity_id
-LEFT JOIN  civicrm_contact c ON cc.contact_id = c.id
-LEFT JOIN  civicrm_financial_type cct ON cct.id = cc.financial_type_id
-LEFT JOIN  civicrm_contribution_page ccp ON ccp.id = cc.contribution_page_id
-LEFT JOIN  civicrm_option_group option_group_contributionStatus ON option_group_contributionStatus.name = 'contribution_status'
-LEFT JOIN  civicrm_option_value contribution_status ON
-( contribution_status.option_group_id = option_group_contributionStatus.id AND contribution_status.value = cc.contribution_status_id )
-{$this->_limitDetailClause}
-";
-        break;
-
-      case 'Participant':
-        $sql = "
-INSERT INTO {$this->_tableName}
-( table_name, contact_id, sort_name, participant_id, event_title, participant_fee_level, participant_fee_amount,
-participant_register_date, participant_source, participant_status, participant_role )
-   SELECT  'Participant', c.id, c.sort_name, cp.id, ce.title, cp.fee_level, cp.fee_amount, cp.register_date, cp.source,
-           participantStatus.label, cp.role_id
-     FROM  {$this->_entityIDTableName} ct
-INNER JOIN civicrm_participant cp ON cp.id = ct.entity_id
-LEFT JOIN  civicrm_contact c ON cp.contact_id = c.id
-LEFT JOIN  civicrm_event ce ON ce.id = cp.event_id
-LEFT JOIN  civicrm_participant_status_type participantStatus ON participantStatus.id = cp.status_id
-{$this->_limitDetailClause}
-";
-        break;
-
-      case 'Membership':
-        $sql = "
-INSERT INTO {$this->_tableName}
-( table_name, contact_id, sort_name, membership_id, membership_type, membership_fee, membership_start_date,
-membership_end_date, membership_source, membership_status )
-   SELECT  'Membership', c.id, c.sort_name, cm.id, cmt.name, cc.total_amount, cm.start_date, cm.end_date, cm.source, cms.name
-     FROM  {$this->_entityIDTableName} ct
-INNER JOIN civicrm_membership cm ON cm.id = ct.entity_id
-LEFT JOIN  civicrm_contact c ON cm.contact_id = c.id
-LEFT JOIN  civicrm_membership_type cmt ON cmt.id = cm.membership_type_id
-LEFT JOIN  civicrm_membership_payment cmp ON cmp.membership_id = cm.id
-LEFT JOIN  civicrm_contribution cc ON cc.id = cmp.contribution_id
-LEFT JOIN  civicrm_membership_status cms ON cms.id = cm.status_id
-{$this->_limitDetailClause}
-";
-        break;
-
-      case 'Case':
-        $sql = "
-INSERT INTO {$this->_tableName}
-( table_name, contact_id, sort_name, case_id, case_start_date, case_end_date, case_is_deleted )
-SELECT 'Case', c.id, c.sort_name, cc.id, DATE(cc.start_date), DATE(cc.end_date), cc.is_deleted
-FROM       {$this->_entityIDTableName} ct
-INNER JOIN civicrm_case cc ON cc.id = ct.entity_id
-LEFT JOIN  civicrm_case_contact ccc ON cc.id = ccc.case_id
-LEFT JOIN  civicrm_contact c ON ccc.contact_id = c.id
-{$this->_limitDetailClause}
-";
-        break;
-    }
-
-    if ($sql) {
-      CRM_Core_DAO::executeQuery($sql);
     }
   }
 }
