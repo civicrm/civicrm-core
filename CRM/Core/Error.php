@@ -385,19 +385,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
     CRM_Core_Error::debug_var('Fatal Error Details', $vars);
     CRM_Core_Error::backtrace('backTrace', TRUE);
-    $content = $template->fetch($config->fatalErrorTemplate);
-    // JErrorPage exists only in 3.x and not 2.x
-    // CRM-13714
-    if ($config->userFramework == 'Joomla' && class_exists('JErrorPage')) {
-      $error = new Exception($content);
-      JErrorPage::render($error);
-    }
-    else if ($config->userFramework == 'Joomla' && class_exists('JError')) {
-      JError::raiseError('CiviCRM-001', $content);
-    }
-    else {
-      echo CRM_Utils_System::theme($content);
-    }
+    $config->userSystem->outputError($template->fetch($config->fatalErrorTemplate));
 
     self::abend(CRM_Core_Error::FATAL_ERROR);
   }
