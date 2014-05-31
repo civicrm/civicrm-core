@@ -35,87 +35,108 @@
 class CRM_Contact_Form_Search_Custom_FullText_File extends CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
 
   /**
-   * @var array
+   * @var DrupalApacheSolrServiceInterface
+   *
+   * At time of writing, this interface is fairly minimal and doesn't seem to require Drupalisms.
    */
-  var $solrResponse;
+  protected $solrService;
 
-  function __construct() {
+  public function __construct() {
     parent::__construct('File', ts('Files'));
   }
 
-  function isActive() {
-    return CRM_Core_Permission::check('access uploaded files');
+  public function isActive() {
+    return
+      function_exists('apachesolr_get_solr') // Drupal site with apachesolr module
+      && function_exists('apachesolr_civiAttachments_solr_document') // Drupal site with apachesolr_civiAttachments module
+      && CRM_Core_Permission::check('access uploaded files');
+  }
+
+  /**
+   * @return DrupalApacheSolrServiceInterface
+   */
+  public function getSolrService() {
+    if ($this->solrService === NULL) {
+      $this->solrService = apachesolr_get_solr();
+    }
+    return $this->solrService;
   }
 
   /**
    * {@inheritdoc}
    */
   public function fillTempTable($queryText, $entityIDTableName, $toTable, $queryLimit, $detailLimit) {
-    $this->solrResponse = $this->doSearch($queryText, $queryLimit);
-    $fileIds = $this->findFileIds($this->solrResponse, $detailLimit);
+    $solrResponse = $this->doSearch($queryText, $queryLimit);
+    if (!$solrResponse) {
+      CRM_Core_Session::setStatus(ts('Search service (%1) returned an invalid response', array(1 => 'Solr')), ts('File Search'), 'error');
+      return 0;
+    }
+    $fileIds = $this->extractFileIds($solrResponse, $detailLimit);
     $matches = $this->formatFileMatches($fileIds);
     $this->insertMatches($toTable, $matches);
 
-    return count($this->solrResponse['docs']);
-  }
-
-  public function doSearch($queryText, $limit) {
-    // TODO use $queryText, $limit
-    $json = '{
-  "response": {
-    "numFound": 14,
-    "start": 0,
-    "docs": [
-      {
-        "id": "pqlj2a/civiFile/2",
-        "site": "http://localhost:8009/",
-        "hash": "pqlj2a",
-        "entity_id": 2,
-        "entity_type": "civiFile",
-        "bundle": "civiFile",
-        "bundle_name": "civiFile",
-        "ss_language": "und",
-        "label": "CiviCRM_Scalability_DataSet_QA.doc",
-        "spell": [
-          "CiviCRM_Scalability_DataSet_QA.doc",
-          "CiviCRM Scalability Initiative: Reproducing Large Data Sets Background The CiviCRM community provides contact and payment processing software for a wide-range of organizations – organizations whose datasets range from a few thousand records to [WM\'s actual size]. For small and mid-sized organizations running CiviCRM on modern hardware, scalability-testing is a low-priority issue; for large organizations, scalability is critical. Unfortunately, the CiviCRM development community currently tests scalability in an ad-hoc fashion – system implementors may run ad-hoc performance tests in their staging environments when evaluating a new CiviCRM upgrade, but code contributors and core developers do not have suitable resources to test performance during development. Goals Enable the community to assess CiviCRM performance with large data-sets on an on-going basis. Assess performance of listed use-cases (see below). Non-Goals This project only addresses testing of read-access to large datasets. High-performance transaction processing (OLTP) is left as a separate issue. Related Projects Continuous integration – [Comment on funding/progress and how it ties in] Developer VM/puppet scripts – [Comment on funding/progress and how it ties in] Long upgrade support – [Comment on funding/progress and how it ties in] Deliverables Dataset An analysis of selected contact, contribution, group, and mailing data-patterns in the Wikimedia dataset A redistributable “clean-room” data-generation script which parallels the Wikimedia dataset (without explicitly copying it) Three redistributable, “rendered” MySQL data-sets which can be (re)loaded into developer VM\'s. The three data-sets will be designated “0.25x”, “1x”, and “4x” (based on the size of the data-set relative to the example Wikimedia) Systems (Cross-Support for CI/VM Projects) [some kind of plan for getting hardware to run tests periodically – eg a system-image for EC2 or a new box at OSUOSL] Performance Tests A repository of scripts for testing listed use-cases A report on performance of listed use-cases [Non-commital] Patches and/or analyses of slow use-cases Performance Test-Cases Advanced search by contact email address Advanced search by contribution amount Advanced search by contribution date Advanced search by contribution amount and date Database upgrades and schema changes Budget Dataset: X hr Systems (Cross-Support for CI/VM): $X hardware + X hour Performance Tests: X hour Total: $X h/w + X hr"
-        ],
-        "url": "/civicrm/file?reset=1&id=2&eid=22",
-        "ss_filemime": "application/msword",
-        "content": "CiviCRM Scalability Initiative: Reproducing Large Data Sets Background The CiviCRM community provides contact and payment processing software for a wide-range of organizations – organizations whose datasets range from a few thousand records to [WM\'s actual size]. For small and mid-sized organizations running CiviCRM on modern hardware, scalability-testing is a low-priority issue; for large organizations, scalability is critical. Unfortunately, the CiviCRM development community currently tests scalability in an ad-hoc fashion – system implementors may run ad-hoc performance tests in their staging environments when evaluating a new CiviCRM upgrade, but code contributors and core developers do not have suitable resources to test performance during development. Goals Enable the community to assess CiviCRM performance with large data-sets on an on-going basis. Assess performance of listed use-cases (see below). Non-Goals This project only addresses testing of read-access to large datasets. High-performance transaction processing (OLTP) is left as a separate issue. Related Projects Continuous integration – [Comment on funding/progress and how it ties in] Developer VM/puppet scripts – [Comment on funding/progress and how it ties in] Long upgrade support – [Comment on funding/progress and how it ties in] Deliverables Dataset An analysis of selected contact, contribution, group, and mailing data-patterns in the Wikimedia dataset A redistributable “clean-room” data-generation script which parallels the Wikimedia dataset (without explicitly copying it) Three redistributable, “rendered” MySQL data-sets which can be (re)loaded into developer VM\'s. The three data-sets will be designated “0.25x”, “1x”, and “4x” (based on the size of the data-set relative to the example Wikimedia) Systems (Cross-Support for CI/VM Projects) [some kind of plan for getting hardware to run tests periodically – eg a system-image for EC2 or a new box at OSUOSL] Performance Tests A repository of scripts for testing listed use-cases A report on performance of listed use-cases [Non-commital] Patches and/or analyses of slow use-cases Performance Test-Cases Advanced search by contact email address Advanced search by contribution amount Advanced search by contribution date Advanced search by contribution amount and date Database upgrades and schema changes Budget Dataset: X hr Systems (Cross-Support for CI/VM): $X hardware + X hour Performance Tests: X hour Total: $X h/w + X hr",
-        "teaser": "CiviCRM Scalability Initiative: Reproducing Large Data Sets Background The CiviCRM community provides contact and payment processing software for a wide-range of organizations – organizations whose datasets range from a few thousand records to [WM\'s actual size]. For small and mid-sized",
-        "timestamp": "2014-05-29T22:28:29.852Z"
-      }
-    ]
-  }
-}';
-    $matches = json_decode($json, TRUE);
-    return $matches['response'];
+    if (count($matches) < count($fileIds)) {
+      CRM_Core_Session::setStatus(
+        ts('The search service returned %1 file match(es), but only %2 match(es) exist.',
+          array(1 => count($fileIds), 2 => count($matches))
+        ),
+        ts('File Search')
+      );
+    }
+    return count($solrResponse->docs);
+    //return $solrResponse->numFound;
+    //return count($matches);
   }
 
   /**
+   * @param string $queryText
+   * @param array|NULL $limit
+   * @return object|NULL
+   */
+  public function doSearch($queryText, $limit) {
+    $params = array();
+    if (is_array($limit)) {
+      list ($params['rows'], $params['start']) = $limit;
+      if (!$params['start']) {
+        $params['start'] = 0;
+      }
+    }
+    $query = $this->getSolrService()->search("entity_type:civiFile AND content:($queryText)", $params);
+    if ($query->code == 200) {
+      return $query->response;
+    }
+    else {
+      CRM_Core_Error::debug_var('failedSolrQuery', $query);
+      return NULL;
+    }
+  }
+
+  /**
+   * Extract the list of file ID#'s from a Solr response.
+   *
    * @param array $solrResponse
    * @param array|NULL $limit
    * @return array<int>
    * @throws CRM_Core_Exception
    */
-  public function findFileIds($solrResponse, $limit) {
+  public function extractFileIds($solrResponse, $limit) {
     $fileIds = array();
-    if (!empty($solrResponse['docs'])) {
+    if (!empty($solrResponse->docs)) {
       if ($limit) {
         list($rowCount, $offset) = $limit;
-        $docs = array_slice($solrResponse['docs'], $offset ? $offset : 0, $rowCount);
+        $docs = array_slice($solrResponse->docs, $offset ? $offset : 0, $rowCount);
       }
       else {
-        $docs = $solrResponse['docs'];
+        $docs = $solrResponse->docs;
       }
 
       foreach ($docs as $doc) {
-        if ($doc['entity_type'] == 'civiFile') {
-          if (isset($doc['entity_id'])) {
-            $fileIds[] = $doc['entity_id'];
+        if ($doc->entity_type == 'civiFile') {
+          if (isset($doc->entity_id)) {
+            $fileIds[] = $doc->entity_id;
           }
           else {
+            CRM_Core_Session::setStatus(ts('Incorrect response type'), ts('File Search'));
           }
         }
       }
@@ -124,6 +145,9 @@ class CRM_Contact_Form_Search_Custom_FullText_File extends CRM_Contact_Form_Sear
   }
 
   /**
+   * Given a list of matching $fileIds, prepare a list of match records
+   * with details about the file (such as file-name and URL).
+   *
    * @param array<int> $fileIds
    * @return array
    */
@@ -181,14 +205,18 @@ class CRM_Contact_Form_Search_Custom_FullText_File extends CRM_Contact_Form_Sear
           break;
         default:
           $matches[$matchKey]['contact_id'] = NULL;
-          //$matches[$matchKey]['sort_name'] = NULL;
-          //$matches[$matchKey]['display_name'] = NULL;
+        //$matches[$matchKey]['sort_name'] = NULL;
+        //$matches[$matchKey]['display_name'] = NULL;
       }
     }
 
     return $matches;
   }
 
+  /**
+   * @param string $toTable
+   * @param array $matches each $match is an array which defines a row in $toTable
+   */
   public function insertMatches($toTable, $matches) {
     if (empty($matches)) {
       return;
