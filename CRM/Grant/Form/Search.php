@@ -244,19 +244,7 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
 
       $permission = CRM_Core_Permission::getPermission();
 
-      $tasks = array('' => ts('- actions -'));
-      $permissionedTask = CRM_Grant_Task::permissionedTaskTitles($permission);
-      if (is_array($permissionedTask) && !CRM_Utils_System::isNull($permissionedTask)) {
-        $tasks += $permissionedTask;
-      }
-
-      $this->add('select', 'task', ts('Actions:') . ' ', $tasks);
-      $this->add('submit', $this->_actionButtonName, ts('Go'),
-        array(
-          'class' => 'form-submit',
-          'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 0);",
-        )
-      );
+      $this->addTaskMenu(CRM_Grant_Task::permissionedTaskTitles($permission));
 
       // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
       $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));

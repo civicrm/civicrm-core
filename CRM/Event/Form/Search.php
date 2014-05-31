@@ -289,7 +289,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
       $permission = CRM_Core_Permission::getPermission();
 
-      $tasks = array('' => ts('- actions -')) + CRM_Event_Task::permissionedTaskTitles($permission);
+      $tasks = CRM_Event_Task::permissionedTaskTitles($permission);
       if (isset($this->_ssID)) {
         if ($permission == CRM_Core_Permission::EDIT) {
           $tasks = $tasks + CRM_Event_Task::optionalTaskTitle();
@@ -303,14 +303,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
         $this->assign('ssID', $this->_ssID);
       }
 
-      $this->add('select', 'task', ts('Actions:') . ' ', $tasks);
-      $this->add('submit', $this->_actionButtonName, ts('Go'),
-        array(
-          'class' => 'form-submit',
-          'id' => 'Go',
-          'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 0);",
-        )
-      );
+      $this->addTaskMenu($tasks);
 
       // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
       $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel',

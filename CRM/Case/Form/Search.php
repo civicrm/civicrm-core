@@ -262,7 +262,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
       $permission = CRM_Core_Permission::getPermission();
 
-      $tasks = array('' => ts('- actions -')) + CRM_Case_Task::permissionedTaskTitles($permission);
+      $tasks = CRM_Case_Task::permissionedTaskTitles($permission);
 
       if (!empty($this->_formValues['case_deleted'])) {
         unset($tasks[1]);
@@ -271,18 +271,11 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
         unset($tasks[4]);
       }
 
-      $this->add('select', 'task', ts('Actions:') . ' ', $tasks);
-      $this->add('submit', $this->_actionButtonName, ts('Go'),
-        array(
-          'class' => 'form-submit',
-          'id' => 'Go',
-          'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 0);",
-        )
-      );
+      $this->addTaskMenu($tasks);
 
       // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
       $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );"));
+      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('class' => 'select-rows'));
     }
 
   }
