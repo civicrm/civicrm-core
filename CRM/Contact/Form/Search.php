@@ -391,7 +391,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
     $permission = CRM_Core_Permission::getPermission();
     // some tasks.. what do we want to do with the selected contacts ?
-    $tasks = array('' => ts('- actions -'));
+    $tasks = array();
     if ($this->_componentMode == 1 || $this->_componentMode == 7) {
       $tasks += CRM_Contact_Task::permissionedTaskTitles($permission,
         CRM_Utils_Array::value('deleted_contacts', $this->_formValues)
@@ -504,14 +504,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->add('hidden', 'task', CRM_Contact_Task::GROUP_CONTACTS);
     }
     else {
-      $this->add('select', 'task', ts('Actions:') . ' ', $tasks);
-      $this->add('submit', $this->_actionButtonName, ts('Go'),
-        array(
-          'class' => 'form-submit',
-          'id' => 'Go',
-          'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 0, 1);",
-        )
-      );
+      $this->addTaskMenu($tasks);
     }
 
     // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
