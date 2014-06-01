@@ -2,10 +2,29 @@
 Controller: CaseTypeListsCtrl
 Required vars: caseTypes
 -->
-<ul>
-  <li ng-repeat="caseType in caseTypes">
-    <a ng-href="#/caseType/{{caseType.id}}">{{caseType.title}}</a>
-  </li>
-</ul>
+<div id="help">
+  A Case Type describes a group of related tasks, interactions, or processes.
+</div>
 
-<a ng-href="#/caseType/new">New Case</a>
+<table class="display">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Title</th>
+    <th>Description</th>
+    <th>Enabled?</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tr ng-repeat="caseType in caseTypes">
+    <td>{{caseType.name}}</td>
+    <td>{{caseType.title}}</td>
+    <td>{{caseType.description}}</td>
+    <td>{{caseType.is_active}}</td>
+    <td><a ng-href="#/caseType/{{caseType.id}}">Edit</a</td>
+  </tr>
+</table>
+
+<div class="action-link">
+  <a ng-href="#/caseType/new" class="button"><span>&raquo; New Case Type</span></a>
+</div>
