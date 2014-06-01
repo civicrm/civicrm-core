@@ -60,14 +60,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   static $_modeValues = NULL;
 
   /**
-   * The context that we are working on
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_context;
-
-  /**
    * The contextMenu
    *
    * @var array
@@ -101,30 +93,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_ssID;
 
   /**
-   * Are we forced to run a search
-   *
-   * @var int
-   * @access protected
-   */
-  protected $_force;
-
-  /**
-   * name of search button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_searchButtonName;
-
-  /**
-   * name of action button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_actionButtonName;
-
-  /**
    * the group elements
    *
    * @var array
@@ -142,14 +110,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    */
   public $_tag;
   public $_tagElement;
-
-  /**
-   * form values that we will be using
-   *
-   * @var array
-   * @access protected
-   */
-  public $_formValues;
 
   /**
    * The params used for search
@@ -205,14 +165,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_operator;
 
   protected $_modeValue;
-
-  /**
-   * have we already done this search
-   *
-   * @access protected
-   * @var boolean
-   */
-  protected $_done;
 
   /**
    * name of the selector to use

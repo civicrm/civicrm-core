@@ -30,6 +30,54 @@
 class CRM_Core_Form_Search extends CRM_Core_Form {
 
   /**
+   * Are we forced to run a search
+   *
+   * @var int
+   * @access protected
+   */
+  protected $_force;
+
+  /**
+   * name of search button
+   *
+   * @var string
+   * @access protected
+   */
+  protected $_searchButtonName;
+
+  /**
+   * name of action button
+   *
+   * @var string
+   * @access protected
+   */
+  protected $_actionButtonName;
+
+  /**
+   * form values that we will be using
+   *
+   * @var array
+   * @access public
+   */
+  public $_formValues;
+
+  /**
+   * have we already done this search
+   *
+   * @access protected
+   * @var boolean
+   */
+  protected $_done;
+
+  /**
+   * what context are we being invoked from
+   *
+   * @access protected
+   * @var string
+   */
+  protected $_context = NULL;
+
+  /**
    * Common buildform tasks required by all searches
    */
   function buildQuickform() {
