@@ -402,6 +402,31 @@ class CiviCRM_For_WordPress {
 
   }
 
+/**
+ * Detect Ajax, snippet, or file requests
+ *
+ * @return boolean
+ */
+  public function isPageRequest() {
+    $argString = NULL;
+    $args = array();
+    if (isset( $_GET['q'])) {
+      $argString = trim($_GET['q']);
+      $args = explode('/', $argString);
+    }
+    $args = array_pad($args, 2, '');
+
+    if (CRM_Utils_Array::value('HTTP_X_REQUESTED_WITH', $_SERVER) == 'XMLHttpRequest'
+        || ($args[0] == 'civicrm' && in_array($args[1], array('ajax', 'file')) )
+        || !empty($_REQUEST['snippet'])
+        || strpos($argString, 'civicrm/event/ical') === 0 && empty($_GET['html'])
+      ) {
+      return FALSE;
+    }
+    else {
+      return TRUE;
+    }
+  }
 
   /**
    * @description: invoke CiviCRM in a WordPress context
@@ -410,10 +435,6 @@ class CiviCRM_For_WordPress {
    * Also called by add_shortcode_includes() and _civicrm_update_user()
    */
   public function invoke() {
-  
-    if ( !in_the_loop() && !is_admin() && empty($_REQUEST['snippet']) ) {
-      return;
-    }
 
     static $alreadyInvoked = FALSE;
     if ( $alreadyInvoked ) {
@@ -466,6 +487,10 @@ class CiviCRM_For_WordPress {
       CRM_Core_BAO_UFMatch::synchronize( $current_user, FALSE, 'WordPress', 'Individual', TRUE );
     }
 
+    if ( $this->isPageRequest() && !in_the_loop() && !is_admin() ) {
+      return;
+    }
+
     // do the business
     CRM_Core_Invoke::invoke($args);
 
@@ -478,7 +503,6 @@ class CiviCRM_For_WordPress {
     do_action( 'civicrm_invoked' );
 
   }
-
 
   /**
    * @description: load translation files
@@ -502,7 +526,6 @@ class CiviCRM_For_WordPress {
     );
 
   }
-
 
   /**
    * @description: Adds menu items to WordPress admin menu
@@ -667,7 +690,6 @@ class CiviCRM_For_WordPress {
     // kick out if not CiviCRM
     if ( ! $this->initialize() ) { return; }
 
-
     // add CiviCRM core resources
     CRM_Core_Resources::singleton()->addCoreResources();
 
@@ -710,11 +732,9 @@ class CiviCRM_For_WordPress {
     // output civicrm html only in a few cases and skip the WP header
     if (
       // snippet is set - i.e. ajax call
-      !empty($_GET['snippet']) ||
       // ical feed (unless 'html' is specified)
-      (strpos($argString, 'civicrm/event/ical') === 0 && empty($_GET['html'])) ||
       // ajax and file download urls
-      ($args[0]) == 'civicrm' && in_array($args[1], array('ajax', 'file'))
+      ! $this->isPageRequest()
     ) {
       // from my limited understanding, putting this in the init hook allows civi to
       // echo all output and exit before the theme code outputs anything - lobo
