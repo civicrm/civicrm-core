@@ -555,3 +555,6 @@ UPDATE civicrm_line_item
 SET contribution_id = entity_id
 WHERE contribution_id IS NULL;
 
+-- update case type menu
+UPDATE civicrm_navigation set url = 'civicrm/a/#/caseType' WHERE url LIKE 'civicrm/admin/options/case_type%';
+
