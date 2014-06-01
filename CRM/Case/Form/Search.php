@@ -39,52 +39,12 @@
 class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
   /**
-   * Are we forced to run a search
-   *
-   * @var int
-   * @access protected
-   */
-  protected $_force;
-
-  /**
-   * name of search button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_searchButtonName;
-
-  /**
-   * name of action button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_actionButtonName;
-
-  /**
-   * form values that we will be using
-   *
-   * @var array
-   * @access protected
-   */
-  public $_formValues;
-
-  /**
    * the params that are sent to the query
    *
    * @var array
    * @access protected
    */
   protected $_queryParams;
-
-  /**
-   * have we already done this search
-   *
-   * @access protected
-   * @var boolean
-   */
-  protected $_done;
 
   /**
    * are we restricting ourselves to a single contact
@@ -101,14 +61,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    * @var boolean
    */
   protected $_limit = NULL;
-
-  /**
-   * what context are we being invoked from
-   *
-   * @access protected
-   * @var string
-   */
-  protected $_context = NULL;
 
   /**
    * prefix for the controller
