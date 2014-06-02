@@ -90,6 +90,11 @@
           scope.$evalAsync('_resetSelection()');
           e.preventDefault();
         });
+
+        scope.$watch(attrs.crmOptions, function(value) {
+          $(input).select2('data', getFormattedOptions);
+          $(input).select2('val', '');
+        });
       }
     };
   });
@@ -136,6 +141,9 @@
       activitySet.activityTypes.push({
         name: activityType
       });
+      if (!_.contains($scope.activityTypeNames, activityType)) {
+        $scope.activityTypeNames.push(activityType);
+      }
     };
 
     /// Add a new top-level activity-type entry
@@ -145,6 +153,10 @@
         $scope.caseType.definition.activityTypes.push({
           name: activityType
         });
+
+      }
+      if (!_.contains($scope.activityTypeNames, activityType)) {
+        $scope.activityTypeNames.push(activityType);
       }
     };
 
@@ -155,6 +167,9 @@
         roles.push({
           name: roleName
         });
+      }
+      if (!_.contains($scope.relationshipTypeNames, roleName)) {
+        $scope.relationshipTypeNames.push(roleName);
       }
     };
 
