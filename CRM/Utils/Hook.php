@@ -278,9 +278,12 @@ abstract class CRM_Utils_Hook {
    * @access public
    */
   static function post($op, $objectName, $objectId, &$objectRef) {
-    $event = new \Civi\Core\Event\PostEvent($op, $objectName, $objectId, $objectRef);
-    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_post", $event);
-    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_post::$objectName", $event);
+    //skipping update if operation is delete.
+    if ($op != 'delete') {
+      $event = new \Civi\Core\Event\PostEvent($op, $objectName, $objectId, $objectRef);
+      \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_post", $event);
+      \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_post::$objectName", $event);
+    }
     return self::singleton()->invoke(4, $op, $objectName, $objectId, $objectRef, self::$_nullObject, self::$_nullObject, 'civicrm_post');
   }
 
