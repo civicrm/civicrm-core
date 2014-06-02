@@ -251,7 +251,7 @@ class CRM_Core_I18n {
 
     // gettext domain for extensions
     $domain_changed = FALSE;
-    if (! empty($params['domain'])) {
+    if (! empty($params['domain']) && $this->_phpgettext) {
       if ($this->setGettextDomain($params['domain'])) {
         $domain_changed = TRUE;
       }
@@ -400,6 +400,11 @@ class CRM_Core_I18n {
    * @return Boolean True if the domain was changed for an extension.
    */
   function setGettextDomain($key) {
+    /* No domain changes for en_US */
+    if (! $this->_phpgettext) {
+      return FALSE;
+    }
+
     // It's only necessary to find/bind once
     if (! isset($this->_extensioncache[$key])) {
       $config = CRM_Core_Config::singleton();
