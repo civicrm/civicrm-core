@@ -243,6 +243,11 @@ WHERE  inst.report_id = %1";
       ) . "\r\n";
     }
 
+    //Export the BOM code so that Excel will open the csv file with the correct encoding
+    //See issue https://issues.civicrm.org/jira/browse/CRM-14773
+    //And see stack overflow: http://stackoverflow.com/questions/4348802/how-can-i-output-a-utf-8-csv-in-php-that-excel-will-read-properly
+    $csv = "\xEF\xBB\xBF" . $csv; // UTF-8 BOM 
+    
     return $csv;
   }
 
