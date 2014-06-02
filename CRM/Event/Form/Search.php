@@ -181,29 +181,14 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
     CRM_Event_BAO_Query::buildSearchForm($this);
 
-    /*
-     * add form checkboxes for each row. This is needed out here to conform to QF protocol
-     * of all elements being declared in builQuickForm
-     */
     $rows = $this->get('rows');
     if (is_array($rows)) {
       $lineItems = $eventIds = array();
       if (!$this->_single) {
-        $this->addElement('checkbox',
-          'toggleSelect',
-          NULL,
-          NULL,
-          array('onclick' => "toggleTaskAction( true );", 'class' => 'select-rows')
-        );
+        $this->addRowSelectors($rows);
       }
       foreach ($rows as $row) {
         $eventIds[$row['event_id']] = $row['event_id'];
-        if (!$this->_single) {
-          $this->addElement('checkbox', $row['checkbox'],
-            NULL, NULL,
-            array('onclick' => "toggleTaskAction( true );", 'class' => 'select-row')
-          );
-        }
         if (CRM_Event_BAO_Event::usesPriceSet($row['event_id'])) {
           // add line item details if applicable
           $lineItems[$row['participant_id']] = CRM_Price_BAO_LineItem::getLineItems($row['participant_id']);
@@ -237,8 +222,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->assign('participantCount', $participantCount);
       $this->assign('lineItems', $lineItems);
 
-      $total = $cancel = 0;
-
       $permission = CRM_Core_Permission::getPermission();
 
       $tasks = CRM_Event_Task::permissionedTaskTitles($permission);
@@ -256,14 +239,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       }
 
       $this->addTaskMenu($tasks);
-
-      // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel',
-        array('checked' => 'checked')
-      );
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all',
-        array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );")
-      );
     }
 
   }

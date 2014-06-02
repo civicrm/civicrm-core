@@ -174,7 +174,7 @@ function countSelections(obj) {
     else {
       cj('span', label).html(obj.getCount);
     }
-    toggleTaskAction(obj.getCount);
+    //toggleTaskAction(obj.getCount);
   }
 }
 function toggleContactSelection(name, qfKey, selection) {

@@ -11,28 +11,25 @@ function countSelectedCheckboxes(fldPrefix, form) {
   return fieldCount;
 }
 
-/**
- * Function to enable task action select
- */
-function toggleTaskAction(status) {
-  var radio_ts = document.getElementsByName('radio_ts');
-  if (!radio_ts[1]) {
-    radio_ts[0].checked = true;
-  }
-  if (radio_ts[0].checked || radio_ts[1].checked) {
-    status = true;
-  }
+(function($, _) {
+  "use strict";
+  var form = 'form.crm-search-form';
 
-  var formElements = ['task', 'Go', 'Print'];
-  for (var i = 0; i < formElements.length; i++) {
-    var element = document.getElementById(formElements[i]);
-    if (element) {
-      if (status) {
-        element.disabled = false;
-      }
-      else {
-        element.disabled = true;
-      }
+  function toggleTaskMenu() {
+    var $menu = $('select#task', form);
+    $menu.val('').select2('val', '');
+    if ($('[name=radio_ts][value=ts_all], .select-row', form).filter(':checked').length) {
+      $menu.prop('disabled', false).select2('enable');
+    } else {
+      $menu.prop('disabled', true).select2('disable');
     }
   }
-}
+
+  $('#crm-container')
+    .on('change', '[name=radio_ts], .select-row', toggleTaskMenu)
+    .on('crmLoad', toggleTaskMenu)
+    .on('change', 'select#task', function() {
+      $(this).siblings('input[type=submit]').click();
+    });
+
+})(CRM.$, CRM._);

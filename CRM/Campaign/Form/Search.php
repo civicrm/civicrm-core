@@ -205,25 +205,11 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     //build the search form.
     CRM_Campaign_BAO_Query::buildSearchForm($this);
 
-    /*
-         * add form checkboxes for each row. This is needed out here to conform to QF protocol
-         * of all elements being declared in builQuickForm
-         */
-
-
     $rows = $this->get('rows');
     if (is_array($rows)) {
       if (!$this->_single) {
-        $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('onclick' => "toggleTaskAction( true );", 'class' => 'select-rows'));
-        foreach ($rows as $row) {
-          $this->addElement('checkbox', $row['checkbox'],
-            NULL, NULL,
-            array('onclick' => "toggleTaskAction( true );", 'class' => 'select-row')
-          );
-        }
+        $this->addRowSelectors($rows);
       }
-
-      $total = $cancel = 0;
 
       $permission = CRM_Core_Permission::getPermission();
       $allTasks = CRM_Campaign_Task::permissionedTaskTitles($permission);
@@ -250,18 +236,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
           ));
       }
 
-      $this->add('select', 'task', ts('Actions:') . ' ', array('' => ts('- actions -')) + $taskValue);
-
-      $this->add('submit', $this->_actionButtonName, ts('Go'),
-        array(
-          'class' => 'form-submit',
-          'id' => 'Go',
-        )
-      );
-
-      // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );"));
+      $this->addTaskMenu($taskValue);
     }
 
   }
