@@ -59,12 +59,38 @@
   crmCaseType.directive('crmAddName', function() {
     return {
       restrict: 'AE',
-      scope: {
-        crmOptions: '=',
-        crmVar: '=',
-        crmOnAdd: '&'
-      },
-      templateUrl: partialUrl('addName.html')
+      template: '<input class="add-activity" type="hidden" />',
+      link: function(scope, element, attrs) {
+        /// Format list of options for select2's "data"
+        var getFormattedOptions = function() {
+          return {
+            results: _.map(scope[attrs.crmOptions], function(option){
+              return {id: option, text: option};
+            })
+          };
+        };
+
+        var input = $('input', element);
+
+        scope._resetSelection = function() {
+          $(input).select2('close');
+          $(input).select2('val', '');
+          scope[attrs.crmVar] = '';
+        };
+
+        $(input).select2({
+          data: getFormattedOptions,
+          createSearchChoice: function(term) {
+            return {id: term, text: term};
+          }
+        });
+        $(input).on('select2-selecting', function(e) {
+          scope[attrs.crmVar] = e.val;
+          scope.$evalAsync(attrs.crmOnAdd);
+          scope.$evalAsync('_resetSelection()');
+          e.preventDefault();
+        });
+      }
     };
   });
 
@@ -124,9 +150,12 @@
 
     /// Add a new role
     $scope.addRole = function(roles, roleName) {
-      roles.push({
-        name: roleName
-      });
+      var names = _.pluck($scope.caseType.definition.caseRoles, 'name');
+      if (!_.contains(names, roleName)) {
+        roles.push({
+          name: roleName
+        });
+      }
     };
 
     $scope.onManagerChange = function(managerRole) {
