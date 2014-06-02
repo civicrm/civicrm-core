@@ -91,11 +91,3 @@
   </tr>
   </table>
  </div>
-
-{literal}
-<script type="text/javascript">
-CRM.$(function($) {
-  toggleTaskAction( );
-});
-</script>
-{/literal}

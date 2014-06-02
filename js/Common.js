@@ -253,7 +253,7 @@ CRM.validate = CRM.validate || {
       }
     });
     return isDirty;
-  }
+  };
 
   /**
    * Wrapper for select2 initialization function; supplies defaults
