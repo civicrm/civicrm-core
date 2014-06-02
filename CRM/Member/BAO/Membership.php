@@ -2259,13 +2259,17 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       }
     }
 
+    $membershipSource = NULL;
     if (!empty($form->_params['membership_source'])) {
       $membershipSource = $form->_params['membership_source'];
     }
     elseif (isset($form->_values['title']) && !empty($form->_values['title'])) {
       $membershipSource = ts('Online Contribution:') . ' ' . $form->_values['title'];
     }
-    $isPayLater = CRM_Utils_Array::value('is_pay_later', $form->_params);
+    $isPayLater = NULL;
+    if(isset($form->_params)) {
+      $isPayLater = CRM_Utils_Array::value('is_pay_later', $form->_params);
+    }
     $campaignId = NULL;
     if (isset($form->_values) && is_array($form->_values) && !empty($form->_values)) {
       $campaignId = CRM_Utils_Array::value('campaign_id', $form->_params);
