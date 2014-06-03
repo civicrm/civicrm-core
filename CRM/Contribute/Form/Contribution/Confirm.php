@@ -1163,7 +1163,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $lineItems
   ) {
     $transaction = new CRM_Core_Transaction();
-    $recurringContributionID =  $contribSoftContactId = $addressID = NULL;
+    $contribSoftContactId = $addressID = NULL;
 
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $financialType->id;
