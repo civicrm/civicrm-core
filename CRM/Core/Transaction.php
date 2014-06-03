@@ -198,11 +198,18 @@ class CRM_Core_Transaction {
    * @param mixed $params Optional values to pass to callback.
    *          See php manual call_user_func_array for details.
    */
-  static public function addCallback($phase, $callback, $params = null) {
-    self::$_callbacks[$phase][] = array(
-      'callback' => $callback,
-      'parameters' => (is_array($params) ? $params : array($params))
-    );
+  static public function addCallback($phase, $callback, $params = null, $id = NULL) {
+    if ($id) {
+      self::$_callbacks[$phase][$id] = array(
+        'callback' => $callback,
+        'parameters' => (is_array($params) ? $params : array($params))
+      );
+    } else {
+      self::$_callbacks[$phase][] = array(
+        'callback' => $callback,
+        'parameters' => (is_array($params) ? $params : array($params))
+      );
+    }
   }
 
   /**
