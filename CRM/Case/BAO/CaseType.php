@@ -72,7 +72,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     }
 
     // function to format definition column
-    self::convertDefinitionToXML($params);
+    $params['definition'] = self::convertDefinitionToXML($params['name'], $params['definition']);
 
     $caseTypeDAO->copyValues($params);
     return $caseTypeDAO->save();
@@ -81,19 +81,19 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   /**
    * Function to format / convert submitted array to xml for case type definition
    *
-   * @param $params associated array of submitted values
-   *
-   * @return void
+   * @param string $name
+   * @param array $definition the case-type defintion expressed as an array-tree
+   * @return string XML
    * @static
    * @access public
    */
-  static function convertDefinitionToXML(&$params) {
+  static function convertDefinitionToXML($name, $definition) {
     $xmlFile = '<?xml version="1.0" encoding="iso-8859-1" ?>' . "\n\n<CaseType>\n";
-    $xmlFile .= "<name>{$params['name']}</name>\n";
+    $xmlFile .= "<name>{$name}</name>\n";
 
-    if (!empty($params['definition']['activityTypes'])) {
+    if (!empty($definition['activityTypes'])) {
       $xmlFile .= "<ActivityTypes>\n";
-      foreach ($params['definition']['activityTypes'] as $values) {
+      foreach ($definition['activityTypes'] as $values) {
         $xmlFile .= "<ActivityType>\n";
         foreach ($values as $key => $value) {
           $xmlFile .= "<{$key}>{$value}</{$key}>\n";
@@ -103,9 +103,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       $xmlFile .= "</ActivityTypes>\n";
     }
 
-    if (!empty($params['definition']['activitySets'])) {
+    if (!empty($definition['activitySets'])) {
       $xmlFile .= "<ActivitySets>\n";
-      foreach ($params['definition']['activitySets'] as $k => $val) {
+      foreach ($definition['activitySets'] as $k => $val) {
         $xmlFile .= "<ActivitySet>\n";
         foreach ($val as $index => $setVal) {
           if ($index == 'activityTypes') {
@@ -132,9 +132,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       $xmlFile .= "</ActivitySets>\n";
     }
 
-    if (!empty($params['definition']['caseRoles'])) {
+    if (!empty($definition['caseRoles'])) {
       $xmlFile .= "<CaseRoles>\n";
-      foreach ($params['definition']['caseRoles'] as $values) {
+      foreach ($definition['caseRoles'] as $values) {
         $xmlFile .= "<RelationshipType>\n";
         foreach ($values as $key => $value) {
           $xmlFile .= "<{$key}>{$value}</{$key}>\n";
@@ -145,20 +145,18 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     }
 
     $xmlFile .= '</CaseType>';
-    $params['definition'] = $xmlFile;
+    return $xmlFile;
   }
 
   /**
    * Function to get the case definition either from db or read from xml file
    *
-   * @param $caseType a single case-type record
+   * @param SimpleXmlElement $xml a single case-type record
    *
    * @return array the definition of the case-type, expressed as PHP array-tree
    * @static
    */
-  static function getCaseTypeDefinition($caseType) {
-    $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseType['name']);
-
+  static function convertXmlToDefinition($xml) {
     // build PHP array based on definition
     $definition = array();
 
