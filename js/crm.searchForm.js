@@ -1,16 +1,5 @@
 // http://civicrm.org/licensing
 
-function countSelectedCheckboxes(fldPrefix, form) {
-  fieldCount = 0;
-  for (i = 0; i < form.elements.length; i++) {
-    fpLen = fldPrefix.length;
-    if (form.elements[i].type == 'checkbox' && form.elements[i].name.slice(0, fpLen) == fldPrefix && form.elements[i].checked == true) {
-      fieldCount++;
-    }
-  }
-  return fieldCount;
-}
-
 (function($, _) {
   "use strict";
   var form = 'form.crm-search-form';
@@ -25,9 +14,17 @@ function countSelectedCheckboxes(fldPrefix, form) {
     }
   }
 
+  function countCheckboxes() {
+    $('label[for*=ts_sel] span', form).text($('input.select-row:checked', form).length);
+  }
+
   $('#crm-container')
     .on('change', '[name=radio_ts], .select-row', toggleTaskMenu)
+    .on('change', 'input.select-row', countCheckboxes)
     .on('crmLoad', toggleTaskMenu)
+    .on('click', 'input.select-row, input.select-rows', function() {
+      $(this).closest('form').find('input[name=radio_ts][value=ts_sel]').prop('checked', true);
+    })
     .on('change', 'select#task', function() {
       $(this).siblings('input[type=submit]').click();
     });
