@@ -118,7 +118,7 @@
       <type>Text</type>
     </html>d</comment>
     <add>3.2</add>
-    
+
   </field>
   <index>
     <name>index_entity</name>
@@ -153,6 +153,11 @@
     <title>Financial Type</title>
     <type>int unsigned</type>
     <default>NULL</default>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <comment>FK to Financial Type.</comment>
     <add>4.3</add>
     <html>
