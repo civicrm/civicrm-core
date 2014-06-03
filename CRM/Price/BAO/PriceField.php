@@ -55,7 +55,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @access public
    * @static
    */
-  static function &add(&$params) {
+  static function add(&$params) {
     $priceFieldBAO = new CRM_Price_BAO_PriceField();
 
     $priceFieldBAO->copyValues($params);
@@ -89,7 +89,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       return $priceField;
     }
 
-    $options = $optionsIds = array();
+    $optionsIds = array();
     $maxIndex = CRM_Price_Form_Field::NUM_OPTION;
 
     if ($priceField->html_type == 'Text') {
