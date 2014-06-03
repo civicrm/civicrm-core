@@ -99,6 +99,11 @@
       <title>Financial Type</title>
       <type>int unsigned</type>
       <default>NULL</default>
+      <pseudoconstant>
+        <table>civicrm_financial_type</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>name</labelColumn>
+      </pseudoconstant>
       <comment>FK to Financial Type.</comment>
       <add>4.3</add>
   </field>

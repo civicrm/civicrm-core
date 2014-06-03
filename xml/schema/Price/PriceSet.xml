@@ -103,7 +103,7 @@
     <add>1.8</add>
     <html>
       <type>Text</type>
-    </html>    
+    </html>
   </field>
   <field>
     <name>extends</name>
@@ -111,6 +111,11 @@
     <length>255</length>
     <required>true</required>
     <comment>What components are using this price set?</comment>
+    <pseudoconstant>
+      <table>civicrm_component</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <add>3.1</add>
     <html>
       <type>Text</type>
@@ -139,6 +144,11 @@
     <default>NULL</default>
     <comment>FK to Financial Type(for membership price sets only).</comment>
     <add>4.3</add>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <html>
       <type>Select</type>
     </html>
