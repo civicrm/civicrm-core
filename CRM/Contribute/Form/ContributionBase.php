@@ -110,7 +110,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @var array
    * @public
    */
-  public $_fields;
+  public $_fields = array();
 
   /**
    * The billing location id for this contribiution page
