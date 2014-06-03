@@ -216,7 +216,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   /**
    * This function for building custom fields
    *
-   * @param object $qf form object (reference)
+   * @param CRM_Core_Form $qf form object (reference)
    * @param string $elementName name of the custom field
    * @param $fieldId
    * @param boolean $inactiveNeeded

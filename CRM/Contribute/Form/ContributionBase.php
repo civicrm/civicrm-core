@@ -34,13 +34,13 @@
  */
 
 /**
- * This class generates form components for processing a ontribution
+ * This class generates form components for processing a contribution
  *
  */
 class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
-   * the id of the contribution page that we are proceessing
+   * the id of the contribution page that we are processsing
    *
    * @var int
    * @public
