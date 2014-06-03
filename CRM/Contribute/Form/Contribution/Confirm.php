@@ -1818,4 +1818,44 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
   }
+
+  /**
+   * Static submit function allowing tests (& api access although this is being built slowly)
+   * @param $params
+   */
+  static function submit($params) {
+    $form = new CRM_Contribute_Form_Contribution_Confirm();
+    $form->_id = $params['id'];
+    //this way the mocked up controller ignores the session stuff
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $form->controller = new CRM_Contribute_Controller_Contribution();
+    $params['invoiceID'] = md5(uniqid(rand(), TRUE));
+    $paramsProcessedForForm = $form->_params = self::getFormParams($params['id'], $params);
+
+    $priceSetID = $form->_params['priceSetId'] = $paramsProcessedForForm['price_set_id'];
+    $priceFields = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
+    $form->setFormAmountFields($priceSetID);
+    $priceFields = $priceFields[$priceSetID]['fields'];
+    CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution');
+    $form->_lineItem = array($priceSetID => $lineItems);
+    $form->postProcess();
+  }
+
+  /**
+   * Helper function for static submit function - set relevant params - help us to build up an array that we can pass in
+   * @param $id
+   * @param array $params
+   *
+   * @return array
+   * @throws CiviCRM_API3_Exception
+   */
+  static function getFormParams($id, array $params) {
+    if(!isset($params['is_pay_later'])) {
+      $params['is_pay_later'] = civicrm_api3('contribution_page', 'getvalue', array('id' => $id, 'return' => 'is_pay_later'));
+    }
+    if(empty($params['price_set_id'])) {
+      $params['price_set_id'] = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $params['id']);
+    }
+    return $params;
+  }
 }
