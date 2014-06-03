@@ -47,7 +47,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
           array(
             'name' => 'set1',
             'label' => 'Label 1',
-            'timeline' => 'true',
+            'timeline' => 1,
             'activityTypes' => array(
               array('name' => 'Open Case', 'status' => 'Completed'),
             ),
@@ -99,7 +99,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
           array(
             'name' => 'set1',
             'label' => 'Label 1',
-            'timeline' => 'true',
+            'timeline' => 1,
             'activityTypes' => array(
               array('name' => 'Open Case', 'status' => 'Completed'),
               array(
@@ -113,7 +113,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
           array(
             'name' => 'set2',
             'label' => 'Label 2',
-            'sequence' => 'true',
+            'sequence' => 1,
             'activityTypes' => array(
               array('name' => 'First act'),
               array('name' => 'Second act'),
