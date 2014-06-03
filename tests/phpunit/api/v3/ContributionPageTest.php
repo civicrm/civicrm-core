@@ -53,6 +53,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'currency' => 'NZD',
       'goal_amount' => $this->testAmount,
+      'is_pay_later' => 1,
     );
   }
 

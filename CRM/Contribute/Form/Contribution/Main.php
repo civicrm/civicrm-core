@@ -1175,7 +1175,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
 
-    //If the membership & contribution is used in contribution page & not seperate payment
+    //If the membership & contribution is used in contribution page & not separate payment
     $fieldId = $memPresent = $membershipLabel = $fieldOption = $is_quick_config = NULL;
     $proceFieldAmount = 0;
     if (property_exists($this, '_separateMembershipPayment') && $this->_separateMembershipPayment == 0) {
@@ -1251,7 +1251,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $invoiceID = md5(uniqid(rand(), TRUE));
     $this->set('invoiceID', $invoiceID);
 
-    // required only if is_monetary and valid postive amount
+    // required only if is_monetary and valid positive amount
     if ($this->_values['is_monetary'] &&
       is_array($this->_paymentProcessor) &&
       ((float ) $params['amount'] > 0.0 || $memFee > 0.0)
