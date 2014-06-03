@@ -975,6 +975,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'id' => $entity['id'],
         $field => isset($entity[$field]) ? $entity[$field] : NULL,
       );
+      if(isset($updateParams['financial_type_id'])) {
+        //api has special handling on these 2 fields for backward compatibility reasons
+        $entity['contribution_type_id'] = $updateParams['financial_type_id'];
+      }
 
       $update = $this->callAPISuccess($entityName, 'create', $updateParams);
       $checkParams = array(
