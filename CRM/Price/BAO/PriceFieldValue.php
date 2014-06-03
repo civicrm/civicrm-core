@@ -85,7 +85,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       return;
     }
     if(empty($params['id']) && empty($params['name'])) {
-      $params['name'] = CRM_Utils_String::munge($params['label'], '_', 242);
+      $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
     }
 
     if ($id = CRM_Utils_Array::value('id', $ids)) {

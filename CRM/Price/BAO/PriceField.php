@@ -82,7 +82,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    */
   static function create(&$params) {
     if(empty($params['id']) && empty($params['name'])) {
-      $params['name'] = CRM_Utils_String::munge($params['label'], '_', 242);
+      $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
     }
     $transaction = new CRM_Core_Transaction();
 
