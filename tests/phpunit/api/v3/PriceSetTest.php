@@ -60,8 +60,8 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
 
   public function testCreatePriceSet() {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->_params, $result['id'], $this->_entity);
   }
 
@@ -70,7 +70,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
       'name' => 'default_contribution_amount',
     );
     $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $getResult['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $getResult['count']);
   }
 
   public function testEventPriceSet() {
@@ -93,16 +93,16 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'get', array(
       'id' => $createResult['id'],
     ));
-    $this->assertEquals(array('civicrm_event' => array($event['id'])), $result['values'][$createResult['id']]['entity'], 'In line ' . __LINE__);
+    $this->assertEquals(array('civicrm_event' => array($event['id'])), $result['values'][$createResult['id']]['entity']);
   }
 
   public function testDeletePriceSet() {
     $startCount = $this->callAPISuccess($this->_entity, 'getcount', array());
     $createResult = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $deleteParams = array('id' => $createResult['id']);
-    $deleteResult = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
     $endCount = $this->callAPISuccess($this->_entity, 'getcount', array());
-    $this->assertEquals($startCount, $endCount, 'In line ' . __LINE__);
+    $this->assertEquals($startCount, $endCount);
   }
 
   public function testGetFieldsPriceSet() {
