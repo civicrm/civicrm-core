@@ -45,17 +45,21 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    * Return the DAO object containing to the default row of
    * civicrm_mail_settings and cache it for further calls
    *
-   * @return object  DAO with the default mail settings set
+   * @param bool $reset
+   *
+   * @return CRM_Core_BAO_MailSettings  DAO with the default mail settings set
    */
-  static function &defaultDAO() {
-    static $dao = NULL;
-    if (!$dao) {
-      $dao             = new self;
+  static function defaultDAO($reset = FALSE) {
+    static $mailSettings = array();
+    $domainID = CRM_Core_Config::domainID();
+    if (empty($mailSettings[$domainID]) || $reset) {
+      $dao = new self;
       $dao->is_default = 1;
-      $dao->domain_id  = CRM_Core_Config::domainID();
+      $dao->domain_id  = $domainID;
       $dao->find(TRUE);
+      $mailSettings[$domainID] = $dao;
     }
-    return $dao;
+    return $mailSettings[$domainID];
   }
 
   /**
@@ -166,7 +170,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    * @access public
    * @static
    */
-  static function &create(&$params) {
+  static function create(&$params) {
     $transaction = new CRM_Core_Transaction();
 
     $mailSettings = self::add($params);
@@ -176,7 +180,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
     }
 
     $transaction->commit();
-
+    CRM_Core_BAO_MailSettings::defaultDomain(TRUE);
     return $mailSettings;
   }
 
@@ -203,4 +207,3 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
     return $results;
   }
 }
-
