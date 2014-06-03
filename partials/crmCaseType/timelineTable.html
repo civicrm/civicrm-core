@@ -5,7 +5,7 @@ Required vars: activitySet
 <table>
   <thead>
   <tr>
-    <th>Activity Type</th>
+    <th>Activity</th>
     <th>Status</th>
     <th>Reference</th>
     <th>Offset</th>
@@ -50,7 +50,8 @@ Required vars: activitySet
   <tfoot>
   <tr class="addRow">
     <td colspan="6">
-      <div crm-add-name
+      Add activity:
+      <span crm-add-name
            crm-options="activityTypeNames"
            crm-var="newActivity"
            crm-on-add="addActivity(activitySet, newActivity)"

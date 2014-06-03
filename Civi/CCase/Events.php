@@ -55,11 +55,26 @@ class Events {
         throw new \CRM_Core_Exception("CRM_Case_Listener does not support entity {$event->entity}");
     }
 
-    if ($caseId && !isset(self::$isActive[$caseId])) {
+    if ($caseId) {
+      if (!isset(self::$isActive[$caseId])) {
+        \CRM_Core_Transaction::addCallback(
+          \CRM_Core_Transaction::PHASE_POST_COMMIT,
+          array(__CLASS__, 'fireCaseChangeForRealz'),
+          array($caseId),
+          "Civi_CCase_Events::fire::{$caseId}"
+        );
+      }
+    }
+  }
+
+  public static function fireCaseChangeForRealz($caseId) {
+    if (!isset(self::$isActive[$caseId])) {
+      $tx = new \CRM_Core_Transaction();
       self::$isActive[$caseId] = 1;
       $analyzer = new \Civi\CCase\Analyzer($caseId);
       \CRM_Utils_Hook::caseChange($analyzer);
       unset(self::$isActive[$caseId]);
+      unset($tx);
     }
   }
 

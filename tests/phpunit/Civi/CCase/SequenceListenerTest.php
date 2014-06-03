@@ -29,6 +29,20 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     $this->assertFalse($analyzer->hasActivity('Mental health evaluation'));
     $this->assertFalse($analyzer->hasActivity('Secure temporary housing'));
 
+    // Edit details of first activity -- but don't finish it yet!
+    \CRM_Utils_Time::setTime('2013-11-30 01:30:00');
+    $this->callApiSuccess('Activity', 'create', array(
+      'id' => $analyzer->getSingleActivity('Medical evaluation')['id'],
+      'subject' => 'This is the new subject',
+    ));
+
+    $analyzer = new \Civi\CCase\Analyzer($case['id']);
+    $this->assertEquals($caseStatuses['Open'], $analyzer->getCase()['status_id']);
+    $this->assertEquals('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
+    $this->assertEquals($actStatuses['Scheduled'], $analyzer->getSingleActivity('Medical evaluation')['status_id']);
+    $this->assertFalse($analyzer->hasActivity('Mental health evaluation'));
+    $this->assertFalse($analyzer->hasActivity('Secure temporary housing'));
+
     // Complete first activity; schedule second
     \CRM_Utils_Time::setTime('2013-11-30 02:00:00');
     $this->callApiSuccess('Activity', 'create', array(

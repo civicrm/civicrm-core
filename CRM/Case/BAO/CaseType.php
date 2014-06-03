@@ -72,7 +72,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     }
 
     // function to format definition column
-    self::convertDefinitionToXML($params);
+    if (isset($params['definition']) && is_array($params['definition'])) {
+      $params['definition'] = self::convertDefinitionToXML($params['name'], $params['definition']);
+    }
 
     $caseTypeDAO->copyValues($params);
     return $caseTypeDAO->save();
@@ -81,19 +83,19 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   /**
    * Function to format / convert submitted array to xml for case type definition
    *
-   * @param $params associated array of submitted values
-   *
-   * @return void
+   * @param string $name
+   * @param array $definition the case-type defintion expressed as an array-tree
+   * @return string XML
    * @static
    * @access public
    */
-  static function convertDefinitionToXML(&$params) {
+  static function convertDefinitionToXML($name, $definition) {
     $xmlFile = '<?xml version="1.0" encoding="iso-8859-1" ?>' . "\n\n<CaseType>\n";
-    $xmlFile .= "<name>{$params['name']}</name>\n";
+    $xmlFile .= "<name>{$name}</name>\n";
 
-    if (!empty($params['definition']['activityTypes'])) {
+    if (isset($definition['activityTypes'])) {
       $xmlFile .= "<ActivityTypes>\n";
-      foreach ($params['definition']['activityTypes'] as $values) {
+      foreach ($definition['activityTypes'] as $values) {
         $xmlFile .= "<ActivityType>\n";
         foreach ($values as $key => $value) {
           $xmlFile .= "<{$key}>{$value}</{$key}>\n";
@@ -103,26 +105,33 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       $xmlFile .= "</ActivityTypes>\n";
     }
 
-    if (!empty($params['definition']['activitySets'])) {
+    if (isset($definition['activitySets'])) {
       $xmlFile .= "<ActivitySets>\n";
-      foreach ($params['definition']['activitySets'] as $k => $val) {
+      foreach ($definition['activitySets'] as $k => $val) {
         $xmlFile .= "<ActivitySet>\n";
         foreach ($val as $index => $setVal) {
-          if ($index == 'activityTypes') {
-            if (!empty($setVal)) {
-              $xmlFile .= "<ActivityTypes>\n";
-              foreach ($setVal as $values) {
-                $xmlFile .= "<ActivityType>\n";
-                foreach ($values as $key => $value) {
-                  $xmlFile .= "<{$key}>{$value}</{$key}>\n";
+          switch ($index) {
+            case 'activityTypes':
+              if (!empty($setVal)) {
+                $xmlFile .= "<ActivityTypes>\n";
+                foreach ($setVal as $values) {
+                  $xmlFile .= "<ActivityType>\n";
+                  foreach ($values as $key => $value) {
+                    $xmlFile .= "<{$key}>{$value}</{$key}>\n";
+                  }
+                  $xmlFile .= "</ActivityType>\n";
                 }
-                $xmlFile .= "</ActivityType>\n";
+                $xmlFile .= "</ActivityTypes>\n";
               }
-              $xmlFile .= "</ActivityTypes>\n";
-            }
-          }
-          else {
-            $xmlFile .= "<{$index}>{$setVal}</{$index}>\n";
+              break;
+            case 'sequence': // passthrough
+            case 'timeline':
+              if ($setVal) {
+                $xmlFile .= "<{$index}>true</{$index}>\n";
+              }
+              break;
+            default:
+              $xmlFile .= "<{$index}>{$setVal}</{$index}>\n";
           }
         }
 
@@ -132,9 +141,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       $xmlFile .= "</ActivitySets>\n";
     }
 
-    if (!empty($params['definition']['caseRoles'])) {
+    if (isset($definition['caseRoles'])) {
       $xmlFile .= "<CaseRoles>\n";
-      foreach ($params['definition']['caseRoles'] as $values) {
+      foreach ($definition['caseRoles'] as $values) {
         $xmlFile .= "<RelationshipType>\n";
         foreach ($values as $key => $value) {
           $xmlFile .= "<{$key}>{$value}</{$key}>\n";
@@ -145,50 +154,61 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     }
 
     $xmlFile .= '</CaseType>';
-    $params['definition'] = $xmlFile;
+    return $xmlFile;
   }
 
   /**
    * Function to get the case definition either from db or read from xml file
    *
-   * @param $caseType a single case-type record
+   * @param SimpleXmlElement $xml a single case-type record
    *
    * @return array the definition of the case-type, expressed as PHP array-tree
    * @static
    */
-  static function getCaseTypeDefinition($caseType) {
-    $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseType['name']);
-
+  static function convertXmlToDefinition($xml) {
     // build PHP array based on definition
     $definition = array();
 
     // set activity types
-    $activityTypes = json_decode(json_encode($xml->ActivityTypes), TRUE);
-    $definition['activityTypes'] = $activityTypes['ActivityType'];
-
-    // set activity sets
-    $activitySets = json_decode(json_encode($xml->ActivitySets), TRUE);
-
-    // hack to fix the case when we have only one activityset
-    if (!empty($activitySets['ActivitySet']['name'])) {
-      $temp = $activitySets['ActivitySet'];
-      $activitySets['ActivitySet'] = array($temp);
+    if (isset($xml->ActivityTypes)) {
+      $definition['activityTypes'] = array();
+      foreach ($xml->ActivityTypes->ActivityType as $activityTypeXML) {
+        $definition['activityTypes'][] = json_decode(json_encode($activityTypeXML), TRUE);
+      }
     }
 
-    foreach ($activitySets['ActivitySet'] as $key => $value) {
-      foreach ($value as $k => $val) {
-        if ( $k == 'ActivityTypes') {
-          $definition['activitySets'][$key]['activityTypes'] = array_pop(array_values($val));
+    // set activity sets
+    if (isset($xml->ActivitySets)) {
+      $definition['activitySets'] = array();
+      foreach ($xml->ActivitySets->ActivitySet as $activitySetXML) {
+        // parse basic properties
+        $activitySet = array();
+        $activitySet['name'] = (string) $activitySetXML->name;
+        $activitySet['label'] = (string) $activitySetXML->label;
+        if ('true' == (string) $activitySetXML->timeline) {
+          $activitySet['timeline'] = 1;
         }
-        else {
-          $definition['activitySets'][$key][$k] = $val;
+        if ('true' == (string) $activitySetXML->sequence) {
+          $activitySet['sequence'] = 1;
         }
+
+        if (isset($activitySetXML->ActivityTypes)) {
+          $activitySet['activityTypes'] = array();
+          foreach ($activitySetXML->ActivityTypes->ActivityType as $activityTypeXML) {
+            $activitySet['activityTypes'][] = json_decode(json_encode($activityTypeXML), TRUE);
+          }
+        }
+        $definition['activitySets'][] = $activitySet;
       }
     }
 
     // set case roles
-    $caseRoles = json_decode(json_encode($xml->CaseRoles), TRUE);
-    $definition['caseRoles'] = $caseRoles['RelationshipType'];
+    if (isset($xml->CaseRoles)) {
+      $definition['caseRoles'] = array();
+      foreach ($xml->CaseRoles->RelationshipType as $caseRoleXml) {
+        $definition['caseRoles'][] = json_decode(json_encode($caseRoleXml), TRUE);
+      }
+    }
 
     return $definition;
   }
