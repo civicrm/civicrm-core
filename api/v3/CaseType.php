@@ -83,10 +83,12 @@ function civicrm_api3_case_type_get($params) {
  */
 function _civicrm_api3_case_type_get_formatResult(&$result) {
   foreach ($result['values'] as $key => $caseType) {
-    $definition = CRM_Case_BAO_CaseType::convertXmlToDefinition(
-      CRM_Case_XMLRepository::singleton()->retrieve($caseType['name'])
-    );
-    $result['values'][$key]['definition'] = $definition;
+    $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseType['name']);
+    if ($xml) {
+      $result['values'][$key]['definition'] = CRM_Case_BAO_CaseType::convertXmlToDefinition($xml);
+    } else {
+      $result['values'][$key]['definition'] = array();
+    }
   }
   return $result;
 }
