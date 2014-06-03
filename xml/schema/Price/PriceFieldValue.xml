@@ -49,7 +49,7 @@
     <comment>Price field option label</comment>
     <html>
       <type>Text</type>
-    </html>    
+    </html>
     <add>3.3</add>
   </field>
   <field>
@@ -60,7 +60,7 @@
       <rows>2</rows>
     <cols>60</cols>
     </html>
-    <default>NULL</default>    
+    <default>NULL</default>
     <localizable>true</localizable>
     <comment>>Price field option description.</comment>
     <add>3.3</add>
@@ -157,6 +157,11 @@
     <title>Financial Type</title>
     <type>int unsigned</type>
     <default>NULL</default>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <comment>FK to Financial Type.</comment>
     <add>4.3</add>
     <html>
