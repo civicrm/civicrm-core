@@ -144,11 +144,13 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
       return $result;
     }
 
-    $params['is_ssl'] = CRM_Utils_Array::value('is_ssl', $params, FALSE);
-    $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
+    if(empty($params['id'])) {
+      $params['is_ssl'] = CRM_Utils_Array::value('is_ssl', $params, FALSE);
+      $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
+    }
 
     //handle is_default.
-    if ($params['is_default']) {
+    if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_mail_settings SET is_default = 0 WHERE domain_id = %1';
       $queryParams = array(1 => array(CRM_Core_Config::domainID(), 'Integer'));
       CRM_Core_DAO::executeQuery($query, $queryParams);
@@ -180,7 +182,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
     }
 
     $transaction->commit();
-    CRM_Core_BAO_MailSettings::defaultDomain(TRUE);
+    CRM_Core_BAO_MailSettings::defaultDAO(TRUE);
     return $mailSettings;
   }
 

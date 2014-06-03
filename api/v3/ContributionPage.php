@@ -59,16 +59,15 @@ function civicrm_api3_contribution_page_create($params) {
 function _civicrm_api3_contribution_page_create_spec(&$params) {
   $params['financial_type_id']['api.required'] = 1;
   $params['payment_processor']['api.aliases'] = array('payment_processor_id');
+  $params['is_active']['api.default'] = 1;
 }
 
 /**
  * Returns array of contribution_pages  matching a set of one or more group properties
  *
- * @param array $params  (referance) Array of one or more valid
- *                       property_name=>value pairs. If $params is set
- *                       as null, all contribution_pages will be returned
+ * @param array $params Array of one or more valid property_name=>value pairs.
  *
- * @return array  (referance) Array of matching contribution_pages
+ * @return array API Result array Array of matching contribution_pages
  * {@getfields contribution_page_get}
  * @access public
  */
