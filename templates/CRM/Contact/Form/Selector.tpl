@@ -147,6 +147,7 @@
 <script type="text/javascript">
   {literal}
   CRM.$(function($) {
+    $("input.select-row, input.select-rows", 'form.crm-search-form').prop('checked', false);
     var cids = {/literal}{$selectedContactIds|@json_encode}{literal};
     if (cids.length > 0) {
       $('#mark_x_' + cids.join(',#mark_x_')).prop('checked', true).closest('tr').addClass('crm-row-selected');
