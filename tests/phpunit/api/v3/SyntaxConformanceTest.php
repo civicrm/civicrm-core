@@ -431,6 +431,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'pledge_contribution_page_id',
           'pledge_status_id',
           'pledge_campaign_id',
+          'pledge_financial_type_id',
         )
       ),
       'PaymentProcessorType' => array(
@@ -975,7 +976,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'id' => $entity['id'],
         $field => isset($entity[$field]) ? $entity[$field] : NULL,
       );
-      if(isset($updateParams['financial_type_id'])) {
+      if(isset($updateParams['financial_type_id']) && $entityName != 'Product') {
         //api has special handling on these 2 fields for backward compatibility reasons
         $entity['contribution_type_id'] = $updateParams['financial_type_id'];
       }
