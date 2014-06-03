@@ -55,7 +55,7 @@ class Events {
         throw new \CRM_Core_Exception("CRM_Case_Listener does not support entity {$event->entity}");
     }
 
-    if ($caseId) {
+    if ($caseId && $event->action != 'delete') {
       if (!isset(self::$isActive[$caseId])) {
         \CRM_Core_Transaction::addCallback(
           \CRM_Core_Transaction::PHASE_POST_COMMIT,
