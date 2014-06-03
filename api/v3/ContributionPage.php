@@ -92,3 +92,22 @@ function civicrm_api3_contribution_page_get($params) {
 function civicrm_api3_contribution_page_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
+
+/**
+ * delete an existing contribution_page
+ *
+ * This method is used to delete any existing contribution_page. id of the group
+ * to be deleted is required field in $params array
+ *
+ * @param array $params  (reference) array containing id of the group
+ *                       to be deleted
+ *
+ * @return array  (referance) returns flag true if successfull, error
+ *                message otherwise
+ * {@getfields contribution_page_delete}
+ * @access public
+ */
+function civicrm_api3_contribution_page_submit($params) {
+  $result = CRM_Contribute_Form_Contribution_Confirm::submit($params);
+  return civicrm_api3_create_success($result, $params, 'contribution_page', 'submit');
+}
