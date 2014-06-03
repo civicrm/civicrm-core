@@ -940,6 +940,7 @@ Group By  componentId";
     $greeting    = $params['gt'];
     $valueID     = $id = CRM_Utils_Array::value('id', $params);
     $force       = CRM_Utils_Array::value('force', $params);
+    $limit       = CRM_Utils_Array::value('limit', $params);
 
     // if valueID is not passed use default value
     if (!$valueID) {
@@ -995,6 +996,9 @@ Group By  componentId";
           WHERE contact_type = %1
           AND ({$idFldName} IS NULL
           OR ( {$idFldName} IS NOT NULL AND ({$displayFldName} IS NULL OR {$displayFldName} = '')) )";
+      }
+      if ($limit) {
+        $sql .= " LIMIT $limit";
       }
 
       $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contactType, 'String')));
