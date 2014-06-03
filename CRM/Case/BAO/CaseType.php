@@ -108,21 +108,28 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       foreach ($definition['activitySets'] as $k => $val) {
         $xmlFile .= "<ActivitySet>\n";
         foreach ($val as $index => $setVal) {
-          if ($index == 'activityTypes') {
-            if (!empty($setVal)) {
-              $xmlFile .= "<ActivityTypes>\n";
-              foreach ($setVal as $values) {
-                $xmlFile .= "<ActivityType>\n";
-                foreach ($values as $key => $value) {
-                  $xmlFile .= "<{$key}>{$value}</{$key}>\n";
+          switch ($index) {
+            case 'activityTypes':
+              if (!empty($setVal)) {
+                $xmlFile .= "<ActivityTypes>\n";
+                foreach ($setVal as $values) {
+                  $xmlFile .= "<ActivityType>\n";
+                  foreach ($values as $key => $value) {
+                    $xmlFile .= "<{$key}>{$value}</{$key}>\n";
+                  }
+                  $xmlFile .= "</ActivityType>\n";
                 }
-                $xmlFile .= "</ActivityType>\n";
+                $xmlFile .= "</ActivityTypes>\n";
               }
-              $xmlFile .= "</ActivityTypes>\n";
-            }
-          }
-          else {
-            $xmlFile .= "<{$index}>{$setVal}</{$index}>\n";
+              break;
+            case 'sequence': // passthrough
+            case 'timeline':
+              if ($setVal) {
+                $xmlFile .= "<{$index}>true</{$index}>\n";
+              }
+              break;
+            default:
+              $xmlFile .= "<{$index}>{$setVal}</{$index}>\n";
           }
         }
 
@@ -173,10 +180,16 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       $definition['activitySets'] = array();
       foreach ($xml->ActivitySets->ActivitySet as $activitySetXML) {
         // parse basic properties
-        $activitySet = json_decode(json_encode($activitySetXML), TRUE);
-        unset($activitySet['ActivityTypes']); // not parsed reliably (eg single-tag vs multi-tag)
+        $activitySet = array();
+        $activitySet['name'] = (string) $activitySetXML->name;
+        $activitySet['label'] = (string) $activitySetXML->label;
+        if ('true' == (string) $activitySetXML->timeline) {
+          $activitySet['timeline'] = 1;
+        }
+        if ('true' == (string) $activitySetXML->sequence) {
+          $activitySet['sequence'] = 1;
+        }
 
-        // parse activity-types
         if (isset($activitySetXML->ActivityTypes)) {
           $activitySet['activityTypes'] = array();
           foreach ($activitySetXML->ActivityTypes->ActivityType as $activityTypeXML) {
