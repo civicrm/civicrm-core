@@ -91,7 +91,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     $xmlFile = '<?xml version="1.0" encoding="iso-8859-1" ?>' . "\n\n<CaseType>\n";
     $xmlFile .= "<name>{$name}</name>\n";
 
-    if (!empty($definition['activityTypes'])) {
+    if (isset($definition['activityTypes'])) {
       $xmlFile .= "<ActivityTypes>\n";
       foreach ($definition['activityTypes'] as $values) {
         $xmlFile .= "<ActivityType>\n";
@@ -103,7 +103,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       $xmlFile .= "</ActivityTypes>\n";
     }
 
-    if (!empty($definition['activitySets'])) {
+    if (isset($definition['activitySets'])) {
       $xmlFile .= "<ActivitySets>\n";
       foreach ($definition['activitySets'] as $k => $val) {
         $xmlFile .= "<ActivitySet>\n";
@@ -132,7 +132,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       $xmlFile .= "</ActivitySets>\n";
     }
 
-    if (!empty($definition['caseRoles'])) {
+    if (isset($definition['caseRoles'])) {
       $xmlFile .= "<CaseRoles>\n";
       foreach ($definition['caseRoles'] as $values) {
         $xmlFile .= "<RelationshipType>\n";
@@ -161,32 +161,39 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     $definition = array();
 
     // set activity types
-    $activityTypes = json_decode(json_encode($xml->ActivityTypes), TRUE);
-    $definition['activityTypes'] = $activityTypes['ActivityType'];
-
-    // set activity sets
-    $activitySets = json_decode(json_encode($xml->ActivitySets), TRUE);
-
-    // hack to fix the case when we have only one activityset
-    if (!empty($activitySets['ActivitySet']['name'])) {
-      $temp = $activitySets['ActivitySet'];
-      $activitySets['ActivitySet'] = array($temp);
+    if (isset($xml->ActivityTypes)) {
+      $definition['activityTypes'] = array();
+      foreach ($xml->ActivityTypes->ActivityType as $activityTypeXML) {
+        $definition['activityTypes'][] = json_decode(json_encode($activityTypeXML), TRUE);
+      }
     }
 
-    foreach ($activitySets['ActivitySet'] as $key => $value) {
-      foreach ($value as $k => $val) {
-        if ( $k == 'ActivityTypes') {
-          $definition['activitySets'][$key]['activityTypes'] = array_pop(array_values($val));
+    // set activity sets
+    if (isset($xml->ActivitySets)) {
+      $definition['activitySets'] = array();
+      foreach ($xml->ActivitySets->ActivitySet as $activitySetXML) {
+        // parse basic properties
+        $activitySet = json_decode(json_encode($activitySetXML), TRUE);
+        unset($activitySet['ActivityTypes']); // not parsed reliably (eg single-tag vs multi-tag)
+
+        // parse activity-types
+        if (isset($activitySetXML->ActivityTypes)) {
+          $activitySet['activityTypes'] = array();
+          foreach ($activitySetXML->ActivityTypes->ActivityType as $activityTypeXML) {
+            $activitySet['activityTypes'][] = json_decode(json_encode($activityTypeXML), TRUE);
+          }
         }
-        else {
-          $definition['activitySets'][$key][$k] = $val;
-        }
+        $definition['activitySets'][] = $activitySet;
       }
     }
 
     // set case roles
-    $caseRoles = json_decode(json_encode($xml->CaseRoles), TRUE);
-    $definition['caseRoles'] = $caseRoles['RelationshipType'];
+    if (isset($xml->CaseRoles)) {
+      $definition['caseRoles'] = array();
+      foreach ($xml->CaseRoles->RelationshipType as $caseRoleXml) {
+        $definition['caseRoles'][] = json_decode(json_encode($caseRoleXml), TRUE);
+      }
+    }
 
     return $definition;
   }
