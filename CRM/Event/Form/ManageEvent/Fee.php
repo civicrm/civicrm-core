@@ -173,7 +173,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
               $optionIds[$rowCount] = $optionIds[$key];
               unset($optionIds[$key]);
             }
-          } 
+          }
         }
         $rowCount++;
       }
@@ -582,6 +582,11 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
       // delete all the prior label values or discounts in the custom options table
       // and delete a price set if one exists
+      //@todo note that this removes the reference from existing participants -
+      // even where there is not change - redress?
+      // note that a more tentative form of this is invoked by passing price_set_id as an array
+      // to event.create see CRM-14069
+      // @todo get all of this logic out of form layer (currently partially in BAO/api layer)
       if (CRM_Price_BAO_PriceSet::removeFrom('civicrm_event', $this->_id)) {
         CRM_Core_BAO_Discount::del($this->_id,'civicrm_event');
       }
@@ -589,6 +594,9 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
     if ($params['is_monetary']) {
       if (!empty($params['price_set_id'])) {
+        //@todo this is now being done in the event BAO if passed price_set_id as an array
+        // per notes on that fn - looking at the api converting to an array
+        // so calling via the api may cause this to be done in the api
         CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_id, $params['price_set_id']);
         if (!empty($params['price_field_id'])) {
           $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $params['price_field_id'], 'price_set_id');
@@ -717,7 +725,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                   $setParams['extends'] = CRM_Core_Component::getComponentID('CiviEvent');
                   $priceSet = CRM_Price_BAO_PriceSet::create($setParams);
                   $priceSetID = $priceSet->id;
-                } 
+                }
                 else {
                   $priceSetID = $discountPriceSets[$j-1];
                   $setParams = array (

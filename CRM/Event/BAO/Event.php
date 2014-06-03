@@ -144,7 +144,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     }
 
     $event = self::add($params);
-
+    CRM_Price_BAO_PriceSet::setPriceSets($params, $event, 'event');
     if (is_a($event, 'CRM_Core_Error')) {
       CRM_Core_DAO::transaction('ROLLBACK');
       return $event;
