@@ -689,20 +689,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // fix currency ID
     $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
-    $premiumParams = $membershipParams = $params = $this->_params;
-
     //carry payment processor id.
     if ($paymentProcessorId = CRM_Utils_Array::value('id', $this->_paymentProcessor)) {
       $this->_params['payment_processor_id'] = $paymentProcessorId;
-      foreach (array(
-        'premiumParams', 'membershipParams', 'tempParams', 'params') as $p) {
-        ${$p}['payment_processor_id'] = $paymentProcessorId;
-      }
     }
     if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
-
+    $premiumParams = $membershipParams = $params = $this->_params;
     $fields = array('email-Primary' => 1);
 
     // get the add to groups
