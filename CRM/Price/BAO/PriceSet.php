@@ -713,7 +713,7 @@ WHERE  id = %1";
           if (
             $component &&
             // auto_renew exists and is empty in some workflows, which php treat as a 0
-            // and hence we explicity check to see if auto_renew is numeric
+            // and hence we explicitly check to see if auto_renew is numeric
             isset($lineItem[$optionValueId]['auto_renew']) &&
             is_numeric($lineItem[$optionValueId]['auto_renew'])
           ) {
@@ -1270,7 +1270,7 @@ WHERE       ps.id = %1
 
           $copyPriceSet = &CRM_Price_BAO_PriceSet::copy($setId);
 
-          $copyDiscount = &CRM_Core_DAO::copyGeneric(
+          CRM_Core_DAO::copyGeneric(
             'CRM_Core_DAO_Discount',
             array(
               'id' => $discountId,
