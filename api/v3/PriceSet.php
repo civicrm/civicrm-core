@@ -71,6 +71,7 @@ function civicrm_api3_price_set_create($params) {
  * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_price_set_create_spec(&$params) {
+  $params['title']['api.required'] = TRUE;
 }
 
 /**
