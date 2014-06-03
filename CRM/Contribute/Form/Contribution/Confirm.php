@@ -1204,8 +1204,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $params['financial_type_id'] = $financialType->id;
 
     //create an contribution address
-    if (
-      $form->_contributeMode != 'notify' && empty($params['is_pay_later']) && !empty($form->_values['is_monetary'])) {
+    if ($form->_contributeMode != 'notify' && empty($params['is_pay_later']) && !empty($form->_values['is_monetary'])) {
       $addressID = CRM_Contribute_BAO_Contribution::createAddress($params, $form->_bltID);
     }
 
