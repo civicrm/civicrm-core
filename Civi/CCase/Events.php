@@ -55,7 +55,7 @@ class Events {
         throw new \CRM_Core_Exception("CRM_Case_Listener does not support entity {$event->entity}");
     }
 
-    if ($caseId && !isset(self::$isActive[$caseId])) {
+    if ($caseId && !isset(self::$isActive[$caseId]) && $event->action != 'delete') {
       self::$isActive[$caseId] = 1;
       $analyzer = new \Civi\CCase\Analyzer($caseId);
       \CRM_Utils_Hook::caseChange($analyzer);
