@@ -67,7 +67,7 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
     $groupList[''] = ts('- All Contacts -');
     asort($groupList);
 
-    $this->add('select', 'group_id', ts('Select Group'), $groupList);
+    $this->add('select', 'group_id', ts('Select Group'), $groupList, FALSE, array('class' => 'crm-select2 huge'));
     $this->addButtons(array(
         array(
           'type' => 'next',
