@@ -102,8 +102,19 @@ class Analyzer {
    */
   public function getActivities() {
     if ($this->activities === NULL) {
-      $result = civicrm_api3('Activity', 'get', array('case_id' => $this->caseId));
-      $this->activities = $result['values'];
+      // TODO find batch-oriented API for getting all activities in a case
+      $case = $this->getCase();
+      $activities = array();
+      if (isset($case['activities'])) {
+        foreach ($case['activities'] as $actId) {
+          $result = civicrm_api3('Activity', 'get', array(
+            'id' => $actId,
+            'is_current_revision' => 1,
+          ));
+          $activities = array_merge($activities, $result['values']);
+        }
+      }
+      $this->activities = $activities;
     }
     return $this->activities;
   }
