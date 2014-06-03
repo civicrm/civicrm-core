@@ -72,7 +72,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     }
 
     // function to format definition column
-    $params['definition'] = self::convertDefinitionToXML($params['name'], $params['definition']);
+    if (isset($params['definition']) && is_array($params['definition'])) {
+      $params['definition'] = self::convertDefinitionToXML($params['name'], $params['definition']);
+    }
 
     $caseTypeDAO->copyValues($params);
     return $caseTypeDAO->save();
