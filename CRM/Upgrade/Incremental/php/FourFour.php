@@ -336,7 +336,7 @@ ALTER TABLE civicrm_dashboard
    */
   function upgrade_4_4_6($rev){
     $sql = "SELECT count(*) AS count FROM INFORMATION_SCHEMA.STATISTICS where ".
-      "INDEX_NAME = 'index_image_url' AND TABLE_NAME = 'civicrm_contact';";
+      "TABLE_SCHEMA = database() AND INDEX_NAME = 'index_image_url' AND TABLE_NAME = 'civicrm_contact';";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $dao->fetch();
     if ($dao->count < 1) {
@@ -360,9 +360,6 @@ ALTER TABLE civicrm_dashboard
    * @return bool
    */
   static function upgradeImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId){
-    $sql = "CREATE INDEX index_image_url ON civicrm_contact (image_url);";
-    $dao = CRM_Core_DAO::executeQuery($sql);
-
     $sql = "
 SELECT id, image_url
 FROM civicrm_contact
