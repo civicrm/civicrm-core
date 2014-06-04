@@ -640,7 +640,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * @static
    */
   static function sendStatusUpdate($pcpId, $newStatus, $isInitial = FALSE, $component = 'contribute') {
-    $pcpStatus = CRM_Core_OptionGroup::values("pcp_status");
+    $pcpStatus = CRM_Core_OptionGroup::values("pcp_status", FALSE, FALSE, FALSE, NULL, 'name');
     $config = CRM_Core_Config::singleton();
 
     if (!isset($pcpStatus[$newStatus])) {
