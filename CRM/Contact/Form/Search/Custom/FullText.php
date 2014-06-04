@@ -36,13 +36,16 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
 
   const LIMIT = 10;
 
+  /**
+   * @var array CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery
+   */
+  protected $_partialQueries = NULL;
+
   protected $_formValues;
 
   protected $_columns;
 
   protected $_text = NULL;
-
-  protected $_textID = NULL;
 
   protected $_table = NULL;
 
@@ -52,10 +55,19 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
 
   protected $_tableFields = NULL;
 
+  /**
+   * @var array|null NULL if no limit; or array(0 => $limit, 1 => $offset)
+   */
   protected $_limitClause = NULL;
 
+  /**
+   * @var array|null NULL if no limit; or array(0 => $limit, 1 => $offset)
+   */
   protected $_limitRowClause = NULL;
 
+  /**
+   * @var array|null NULL if no limit; or array(0 => $limit, 1 => $offset)
+   */
   protected $_limitDetailClause = NULL;
 
   protected $_limitNumber = 10;
@@ -67,46 +79,25 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
    * @param $formValues
    */
   function __construct(&$formValues) {
-    $this->_text = CRM_Utils_Array::value('text', $formValues);
-    $this->_table = CRM_Utils_Array::value('table', $formValues);
+    $this->_partialQueries = array(
+      new CRM_Contact_Form_Search_Custom_FullText_Contact(),
+      new CRM_Contact_Form_Search_Custom_FullText_Activity(),
+      new CRM_Contact_Form_Search_Custom_FullText_Case(),
+      new CRM_Contact_Form_Search_Custom_FullText_Contribution(),
+      new CRM_Contact_Form_Search_Custom_FullText_Participant(),
+      new CRM_Contact_Form_Search_Custom_FullText_Membership(),
+      new CRM_Contact_Form_Search_Custom_FullText_File(),
+    );
 
-    if (!$this->_text) {
-      $this->_text = CRM_Utils_Request::retrieve('text', 'String', CRM_Core_DAO::$_nullObject);
-      if ($this->_text) {
-        $this->_text = trim($this->_text);
-        $formValues['text'] = $this->_text;
-      }
-    }
+    $formValues['table'] = $this->getFieldValue($formValues, 'table', 'String');
+    $this->_table = $formValues['table'];
 
-    if (!$this->_table) {
-      $this->_table = CRM_Utils_Request::retrieve('table', 'String', CRM_Core_DAO::$_nullObject);
-      if ($this->_table) {
-        $formValues['table'] = $this->_table;
-      }
-    }
-
-    // fix text to include wild card characters at beginning and end
-    if ($this->_text) {
-      if (is_numeric($this->_text)) {
-        $this->_textID = $this->_text;
-      }
-
-      $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-      $this->_text = $strtolower(CRM_Core_DAO::escapeString($this->_text));
-      if (strpos($this->_text, '%') === FALSE) {
-        $this->_text = "'%{$this->_text}%'";
-      }
-      else {
-        $this->_text = "'{$this->_text}'";
-      }
-    }
-    else {
-      $this->_text = "'%'";
-    }
+    $formValues['text'] = trim($this->getFieldValue($formValues, 'text', 'String', ''));
+    $this->_text = $formValues['text'];
 
     if (!$this->_table) {
-      $this->_limitClause = " LIMIT {$this->_limitNumberPlus1}";
-      $this->_limitRowClause = $this->_limitDetailClause = "  LIMIT {$this->_limitNumber}";
+      $this->_limitClause = array($this->_limitNumberPlus1, NULL);
+      $this->_limitRowClause = $this->_limitDetailClause = array($this->_limitNumber, NULL);
     }
     else {
       // when there is table specified, we would like to use the pager. But since
@@ -117,11 +108,28 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
       $pageId = CRM_Utils_Array::value('crmPID', $_REQUEST, 1);
       $offset = ($pageId - 1) * $rowCount;
       $this->_limitClause = NULL;
-      $this->_limitRowClause = " LIMIT $rowCount";
-      $this->_limitDetailClause = " LIMIT $offset, $rowCount";
+      $this->_limitRowClause = array($rowCount, NULL);
+      $this->_limitDetailClause = array($rowCount, $offset);
     }
 
     $this->_formValues = $formValues;
+  }
+
+  /**
+   * Get a value from $formValues. If missing, get it from the request.
+   *
+   * @param $formValues
+   * @param $field
+   * @param $type
+   * @param null $default
+   * @return mixed|null
+   */
+  public function getFieldValue($formValues, $field, $type, $default = NULL) {
+    $value = CRM_Utils_Array::value($field, $formValues);
+    if (!$value) {
+      return CRM_Utils_Request::retrieve($field, $type, CRM_Core_DAO::$_nullObject, FALSE, $default);
+    }
+    return $value;
   }
 
   function __destruct() {
@@ -187,6 +195,12 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
       'membership_end_date' => 'datetime',
       'membership_source' => 'varchar(255)',
       'membership_status' => 'varchar(255)',
+      'file_id' => 'int unsigned',
+      'file_name' => 'varchar(255)',
+      'file_url' => 'varchar(255)',
+      'file_mime_type' => 'varchar(255)',
+      'file_entity_table' => 'varchar(255)',
+      'file_entity_id' => 'int unsigned',
     );
 
     $sql = "
@@ -217,44 +231,13 @@ CREATE TEMPORARY TABLE {$this->_entityIDTableName} (
   }
 
   function fillTable() {
-    $config = CRM_Core_Config::singleton();
-
-    if ((!$this->_table || $this->_table == 'Contact')) {
-      $this->fillContact();
-    }
-
-    if ((!$this->_table || $this->_table == 'Activity') &&
-      CRM_Core_Permission::check('view all activities')
-    ) {
-      $this->fillActivity();
-    }
-
-    if ((!$this->_table || $this->_table == 'Case') &&
-      in_array('CiviCase', $config->enableComponents)
-    ) {
-      $this->fillCase();
-    }
-
-    if ((!$this->_table || $this->_table == 'Contribution') &&
-      in_array('CiviContribute', $config->enableComponents) &&
-      CRM_Core_Permission::check('access CiviContribute')
-    ) {
-      $this->fillContribution();
-    }
-
-    if ((!$this->_table || $this->_table == 'Participant') &&
-      (in_array('CiviEvent', $config->enableComponents) &&
-        CRM_Core_Permission::check('view event participants')
-      )
-    ) {
-      $this->fillParticipant();
-    }
-
-    if ((!$this->_table || $this->_table == 'Membership') &&
-      in_array('CiviMember', $config->enableComponents) &&
-      CRM_Core_Permission::check('access CiviMember')
-    ) {
-      $this->fillMembership();
+    foreach ($this->_partialQueries as $partialQuery) {
+      /** @var $partialQuery CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery */
+      if (!$this->_table || $this->_table == $partialQuery->getName()) {
+        if ($partialQuery->isActive()) {
+          $this->_foundRows[$partialQuery->getName()] = $partialQuery->fillTempTable($this->_text, $this->_entityIDTableName, $this->_tableName, $this->_limitClause, $this->_limitDetailClause);
+        }
+      }
     }
 
     $this->filterACLContacts();
@@ -307,413 +290,7 @@ WHERE      t.table_name = 'Activity' AND
   }
 
   /**
-   * @param $tables
-   * @param $extends
-   */
-  function fillCustomInfo(&$tables, $extends) {
-    $sql = "
-SELECT     cg.table_name, cf.column_name
-FROM       civicrm_custom_group cg
-INNER JOIN civicrm_custom_field cf ON cf.custom_group_id = cg.id
-WHERE      cg.extends IN $extends
-AND        cg.is_active = 1
-AND        cf.is_active = 1
-AND        cf.is_searchable = 1
-AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
-";
-
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    while ($dao->fetch()) {
-      if (!array_key_exists($dao->table_name, $tables)) {
-        $tables[$dao->table_name] = array(
-          'id' => 'entity_id',
-          'fields' => array(),
-        );
-      }
-      $tables[$dao->table_name]['fields'][$dao->column_name] = NULL;
-    }
-  }
-
-  /**
-   * @param $tables
-   */
-  function runQueries(&$tables) {
-    $sql = "TRUNCATE {$this->_entityIDTableName}";
-    CRM_Core_DAO::executeQuery($sql);
-
-    $maxRowCount = 0;
-    foreach ($tables as $tableName => $tableValues) {
-      if ($tableName == 'final') {
-        continue;
-      }
-      else {
-        if ($tableName == 'sql') {
-          foreach ($tableValues as $sqlStatement) {
-            $sql = "
-REPLACE INTO {$this->_entityIDTableName} ( entity_id )
-$sqlStatement
-{$this->_limitClause}
-";
-            CRM_Core_DAO::executeQuery($sql);
-          }
-        }
-        else {
-          $clauses = array();
-
-          foreach ($tableValues['fields'] as $fieldName => $fieldType) {
-            if ($fieldType == 'Int') {
-              if ($this->_textID) {
-                $clauses[] = "$fieldName = {$this->_textID}";
-              }
-            }
-            else {
-              $clauses[] = "$fieldName LIKE {$this->_text}";
-            }
-          }
-
-          if (empty($clauses)) {
-            continue;
-          }
-
-          $whereClause = implode(' OR ', $clauses);
-
-          //resolve conflict between entity tables.
-          if ($tableName == 'civicrm_note' &&
-            $entityTable = CRM_Utils_Array::value('entity_table', $tableValues)
-          ) {
-            $whereClause .= " AND entity_table = '{$entityTable}'";
-          }
-
-          $sql = "
-REPLACE  INTO {$this->_entityIDTableName} ( entity_id )
-SELECT   {$tableValues['id']}
-FROM     $tableName
-WHERE    ( $whereClause )
-AND      {$tableValues['id']} IS NOT NULL
-GROUP BY {$tableValues['id']}
-{$this->_limitClause}
-";
-          CRM_Core_DAO::executeQuery($sql);
-        }
-      }
-    }
-
-    if (isset($tables['final'])) {
-      foreach ($tables['final'] as $sqlStatement) {
-        CRM_Core_DAO::executeQuery($sqlStatement);
-      }
-    }
-
-    $rowCount = "SELECT count(*) FROM {$this->_entityIDTableName}";
-    $tableKey = array_keys($tables);
-    $this->_foundRows[ucfirst(str_replace('civicrm_', '', $tableKey[0]))] =
-      CRM_Core_DAO::singleValueQuery($rowCount);
-  }
-
-  function fillContactIDs() {
-    $contactSQL = array();
-    $contactSQL[] = "
-SELECT     et.entity_id
-FROM       civicrm_entity_tag et
-INNER JOIN civicrm_tag t ON et.tag_id = t.id
-WHERE      et.entity_table = 'civicrm_contact'
-AND        et.tag_id       = t.id
-AND        t.name LIKE {$this->_text}
-GROUP BY   et.entity_id
-";
-
-    // lets delete all the deceased contacts from the entityID box
-    // this allows us to keep numbers in sync
-    // when we have acl contacts, the situation gets even more murky
-    $final = array();
-    $final[] = "DELETE FROM {$this->_entityIDTableName} WHERE entity_id IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)";
-
-    $tables = array(
-      'civicrm_contact' => array(
-        'id' => 'id',
-        'fields' => array(
-          'sort_name' => NULL,
-          'nick_name' => NULL,
-          'display_name' => NULL,
-        ),
-      ),
-      'civicrm_address' => array(
-        'id' => 'contact_id',
-        'fields' => array(
-          'street_address' => NULL,
-          'city' => NULL,
-          'postal_code' => NULL,
-        ),
-      ),
-      'civicrm_email' => array(
-        'id' => 'contact_id',
-        'fields' => array('email' => NULL),
-      ),
-      'civicrm_phone' => array(
-        'id' => 'contact_id',
-        'fields' => array('phone' => NULL),
-      ),
-      'civicrm_note' => array(
-        'id' => 'entity_id',
-        'entity_table' => 'civicrm_contact',
-        'fields' => array(
-          'subject' => NULL,
-          'note' => NULL,
-        ),
-      ),
-      'sql' => $contactSQL,
-      'final' => $final,
-    );
-
-    // get the custom data info
-    $this->fillCustomInfo($tables,
-      "( 'Contact', 'Individual', 'Organization', 'Household' )"
-    );
-
-    $this->runQueries($tables);
-  }
-
-  function fillContact() {
-
-    $this->fillContactIDs();
-
-    //move data from entity table to detail table.
-    $this->moveEntityToDetail('Contact');
-  }
-
-  function fillActivityIDs() {
-    $contactSQL = array();
-
-    $contactSQL[] = "
-SELECT     distinct ca.id
-FROM       civicrm_activity ca
-INNER JOIN civicrm_activity_contact cat ON cat.activity_id = ca.id
-INNER JOIN civicrm_contact c ON cat.contact_id = c.id
-LEFT  JOIN civicrm_email e ON cat.contact_id = e.contact_id
-LEFT  JOIN civicrm_option_group og ON og.name = 'activity_type'
-LEFT  JOIN civicrm_option_value ov ON ( ov.option_group_id = og.id )
-WHERE      ( (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text}) OR
-             ( e.email LIKE {$this->_text}    AND
-               ca.activity_type_id = ov.value AND
-               ov.name IN ('Inbound Email', 'Email') ) )
-AND        (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
-AND        (c.is_deleted = 0 OR c.is_deleted IS NULL)
-";
-
-    $contactSQL[] = "
-SELECT     et.entity_id
-FROM       civicrm_entity_tag et
-INNER JOIN civicrm_tag t ON et.tag_id = t.id
-INNER JOIN civicrm_activity ca ON et.entity_id = ca.id
-WHERE      et.entity_table = 'civicrm_activity'
-AND        et.tag_id       = t.id
-AND        t.name LIKE {$this->_text}
-AND        (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
-GROUP BY   et.entity_id
-";
-
-    $contactSQL[] = "
-SELECT distinct ca.id
-FROM   civicrm_activity ca
-WHERE  (ca.subject LIKE  {$this->_text} OR ca.details LIKE  {$this->_text})
-AND    (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
-";
-
-    $final = array();
-
-    $tables = array(
-      'civicrm_activity' => array('fields' => array()),
-      'sql' => $contactSQL,
-      'final' => $final,
-    );
-
-    $this->fillCustomInfo($tables, "( 'Activity' )");
-    $this->runQueries($tables);
-  }
-
-  function fillActivity() {
-
-    $this->fillActivityIDs();
-
-    //move data from entity table to detail table
-    $this->moveEntityToDetail('Activity');
-  }
-
-  function fillCase() {
-    $this->fillCaseIDs();
-
-    //move data from entity table to detail table
-    $this->moveEntityToDetail('Case');
-  }
-
-  function fillCaseIDs() {
-    $contactSQL = array();
-
-    $contactSQL[] = "
-SELECT    distinct cc.id
-FROM      civicrm_case cc
-LEFT JOIN civicrm_case_contact ccc ON cc.id = ccc.case_id
-LEFT JOIN civicrm_contact c ON ccc.contact_id = c.id
-WHERE     (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text})
-          AND (cc.is_deleted = 0 OR cc.is_deleted IS NULL)
-";
-
-    if ($this->_textID) {
-      $contactSQL[] = "
-SELECT    distinct cc.id
-FROM      civicrm_case cc
-LEFT JOIN civicrm_case_contact ccc ON cc.id = ccc.case_id
-LEFT JOIN civicrm_contact c ON ccc.contact_id = c.id
-WHERE     cc.id = {$this->_textID}
-          AND (cc.is_deleted = 0 OR cc.is_deleted IS NULL)
-";
-    }
-
-    $contactSQL[] = "
-SELECT     et.entity_id
-FROM       civicrm_entity_tag et
-INNER JOIN civicrm_tag t ON et.tag_id = t.id
-WHERE      et.entity_table = 'civicrm_case'
-AND        et.tag_id       = t.id
-AND        t.name LIKE {$this->_text}
-GROUP BY   et.entity_id
-";
-
-    $tables = array(
-      'civicrm_case' => array('fields' => array()),
-      'sql' => $contactSQL,
-    );
-
-    $this->runQueries($tables);
-  }
-
-  function fillContribution() {
-    //get contribution ids in entity table.
-    $this->fillContributionIDs();
-
-    //move data from entity table to detail table
-    $this->moveEntityToDetail('Contribution');
-  }
-
-  /**
-   * get contribution ids in entity tables.
-   */
-  function fillContributionIDs() {
-    $contactSQL = array();
-    $contactSQL[] = "
-SELECT     distinct cc.id
-FROM       civicrm_contribution cc
-INNER JOIN civicrm_contact c ON cc.contact_id = c.id
-WHERE      (c.sort_name LIKE {$this->_text} OR
-           c.display_name LIKE {$this->_text})
-";
-    $tables = array(
-      'civicrm_contribution' => array(
-        'id' => 'id',
-        'fields' => array(
-          'source' => NULL,
-          'amount_level' => NULL,
-          'trxn_Id' => NULL,
-          'invoice_id' => NULL,
-          'check_number' => ($this->_textID) ? 'Int' : NULL,
-          'total_amount' => ($this->_textID) ? 'Int' : NULL,
-        ),
-      ),
-      'sql' => $contactSQL,
-      'civicrm_note' => array(
-        'id' => 'entity_id',
-        'entity_table' => 'civicrm_contribution',
-        'fields' => array(
-          'subject' => NULL,
-          'note' => NULL,
-        ),
-      ),
-    );
-
-    // get the custom data info
-    $this->fillCustomInfo($tables, "( 'Contribution' )");
-    $this->runQueries($tables);
-  }
-
-  function fillParticipant() {
-    //get participant ids in entity table.
-    $this->fillParticipantIDs();
-
-    //move data from entity table to detail table
-    $this->moveEntityToDetail('Participant');
-  }
-
-  /**
-   * get participant ids in entity tables.
-   */
-  function fillParticipantIDs() {
-    $contactSQL = array();
-    $contactSQL[] = "
-SELECT     distinct cp.id
-FROM       civicrm_participant cp
-INNER JOIN civicrm_contact c ON cp.contact_id = c.id
-WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text})
-";
-    $tables = array(
-      'civicrm_participant' => array(
-        'id' => 'id',
-        'fields' => array(
-          'source' => NULL,
-          'fee_level' => NULL,
-          'fee_amount' => ($this->_textID) ? 'Int' : NULL,
-        ),
-      ),
-      'sql' => $contactSQL,
-      'civicrm_note' => array(
-        'id' => 'entity_id',
-        'entity_table' => 'civicrm_participant',
-        'fields' => array(
-          'subject' => NULL,
-          'note' => NULL,
-        ),
-      ),
-    );
-
-    // get the custom data info
-    $this->fillCustomInfo($tables, "( 'Participant' )");
-    $this->runQueries($tables);
-  }
-
-  function fillMembership() {
-
-    //get membership ids in entity table.
-    $this->fillMembershipIDs();
-
-    //move data from entity table to detail table
-    $this->moveEntityToDetail('Membership');
-  }
-
-  /**
-   * get membership ids in entity tables.
-   */
-  function fillMembershipIDs() {
-    $contactSQL = array();
-    $contactSQL[] = "
-SELECT     distinct cm.id
-FROM       civicrm_membership cm
-INNER JOIN civicrm_contact c ON cm.contact_id = c.id
-WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text})
-";
-    $tables = array(
-      'civicrm_membership' => array(
-        'id' => 'id',
-        'fields' => array('source' => NULL),
-      ),
-      'sql' => $contactSQL,
-    );
-
-    // get the custom data info
-    $this->fillCustomInfo($tables, "( 'Membership' )");
-    $this->runQueries($tables);
-  }
-
-  /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   function buildForm(&$form) {
     $config = CRM_Core_Config::singleton();
@@ -727,23 +304,11 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
 
     // also add a select box to allow the search to be constrained
     $tables = array('' => ts('All tables'));
-    if (CRM_Core_Permission::check('view all contacts')) {
-      $tables['Contact'] = ts('Contacts');
-    }
-    if (CRM_Core_Permission::check('view all activities')) {
-      $tables['Activity'] = ts('Activities');
-    }
-    if (in_array('CiviCase', $config->enableComponents)) {
-      $tables['Case'] = ts('Cases');
-    }
-    if (in_array('CiviContribute', $config->enableComponents)) {
-      $tables['Contribution'] = ts('Contributions');
-    }
-    if (in_array('CiviEvent', $config->enableComponents) && CRM_Core_Permission::check('view event participants')) {
-      $tables['Participant'] = ts('Participants');
-    }
-    if (in_array('CiviMember', $config->enableComponents)) {
-      $tables['Membership'] = ts('Memberships');
+    foreach ($this->_partialQueries as $partialQuery) {
+      /** @var $partialQuery CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery */
+      if ($partialQuery->isActive()) {
+        $tables[$partialQuery->getName()] = $partialQuery->getLabel();
+      }
     }
 
     $form->add('select', 'table', ts('Tables'), $tables );
@@ -793,20 +358,16 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
   function summary() {
     $this->initialize();
 
-    $summary = array(
-      'Contact' => array(),
-      'Activity' => array(),
-      'Case' => array(),
-      'Contribution' => array(),
-      'Participant' => array(),
-      'Membership' => array(),
-    );
-
+    $summary = array();
+    foreach ($this->_partialQueries as $partialQuery) {
+      /** @var $partialQuery CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery */
+      $summary[$partialQuery->getName()] = array();
+    }
 
     // now iterate through the table and add entries to the relevant section
     $sql = "SELECT * FROM {$this->_tableName}";
     if ($this->_table) {
-      $sql .= " {$this->_limitRowClause} ";
+      $sql .= " {$this->toLimit($this->_limitRowClause)} ";
     }
     $dao = CRM_Core_DAO::executeQuery($sql);
 
@@ -825,7 +386,7 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
       if (isset($row['participant_role'])) {
         $participantRole = explode(CRM_Core_DAO::VALUE_SEPARATOR, $row['participant_role']);
         $viewRoles = array();
-        foreach ($participantRole as $k => $v) {
+        foreach ($participantRole as $v) {
           $viewRoles[] = $roleIds[$v];
         }
         $row['participant_role'] = implode(', ', $viewRoles);
@@ -873,7 +434,7 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
     $this->initialize();
 
     if ($returnSQL) {
-      return $this->all($offset, $rowcount, $sort, FALSE, TRUE);;
+      return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
     }
     else {
       return CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM {$this->_tableName}");
@@ -905,7 +466,7 @@ WHERE      (c.sort_name LIKE {$this->_text} OR c.display_name LIKE {$this->_text
     $sql = "
 SELECT $select
 FROM   {$this->_tableName} contact_a
-       {$this->_limitRowClause}
+       {$this->toLimit($this->_limitRowClause)}
 ";
     return $sql;
   }
@@ -956,114 +517,21 @@ FROM   {$this->_tableName} contact_a
   }
 
   /**
-   * get entity id retrieve related data from db and move all data to detail table.
-   *
+   * @param int|array $limit
+   * @return string SQL
+   * @see CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery::toLimit
    */
-  function moveEntityToDetail($tableName) {
-    $sql = NULL;
-    switch ($tableName) {
-      case 'Contact':
-        $sql = "
-INSERT INTO {$this->_tableName}
-( id, contact_id, sort_name, display_name, table_name )
-SELECT     c.id, ct.entity_id, c.sort_name, c.display_name, 'Contact'
-  FROM     {$this->_entityIDTableName} ct
-INNER JOIN civicrm_contact c ON ct.entity_id = c.id
-{$this->_limitDetailClause}
-";
-        break;
-
-      case 'Activity':
-        $sql = "
-INSERT INTO {$this->_tableName}
-( table_name, activity_id, subject, details, contact_id, sort_name, record_type,
-  activity_type_id, case_id, client_id )
-SELECT    'Activity', ca.id, substr(ca.subject, 1, 50), substr(ca.details, 1, 250),
-           c1.id, c1.sort_name, cac.record_type_id,
-           ca.activity_type_id,
-           cca.case_id,
-           ccc.contact_id as client_id
-FROM       {$this->_entityIDTableName} eid
-INNER JOIN civicrm_activity ca ON ca.id = eid.entity_id
-INNER JOIN  civicrm_activity_contact cac ON cac.activity_id = ca.id
-INNER JOIN  civicrm_contact c1 ON cac.contact_id = c1.id
-LEFT JOIN  civicrm_case_activity cca ON cca.activity_id = ca.id
-LEFT JOIN  civicrm_case_contact ccc ON ccc.case_id = cca.case_id
-WHERE (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
-GROUP BY ca.id
-{$this->_limitDetailClause}
-";
-        break;
-
-      case 'Contribution':
-        $sql = "
-INSERT INTO {$this->_tableName}
-( table_name, contact_id, sort_name, contribution_id, financial_type, contribution_page, contribution_receive_date,
-  contribution_total_amount, contribution_trxn_Id, contribution_source, contribution_status, contribution_check_number )
-   SELECT  'Contribution', c.id, c.sort_name, cc.id, cct.name, ccp.title, cc.receive_date,
-           cc.total_amount, cc.trxn_id, cc.source, contribution_status.label, cc.check_number
-     FROM  {$this->_entityIDTableName} ct
-INNER JOIN civicrm_contribution cc ON cc.id = ct.entity_id
-LEFT JOIN  civicrm_contact c ON cc.contact_id = c.id
-LEFT JOIN  civicrm_financial_type cct ON cct.id = cc.financial_type_id
-LEFT JOIN  civicrm_contribution_page ccp ON ccp.id = cc.contribution_page_id
-LEFT JOIN  civicrm_option_group option_group_contributionStatus ON option_group_contributionStatus.name = 'contribution_status'
-LEFT JOIN  civicrm_option_value contribution_status ON
-( contribution_status.option_group_id = option_group_contributionStatus.id AND contribution_status.value = cc.contribution_status_id )
-{$this->_limitDetailClause}
-";
-        break;
-
-      case 'Participant':
-        $sql = "
-INSERT INTO {$this->_tableName}
-( table_name, contact_id, sort_name, participant_id, event_title, participant_fee_level, participant_fee_amount,
-participant_register_date, participant_source, participant_status, participant_role )
-   SELECT  'Participant', c.id, c.sort_name, cp.id, ce.title, cp.fee_level, cp.fee_amount, cp.register_date, cp.source,
-           participantStatus.label, cp.role_id
-     FROM  {$this->_entityIDTableName} ct
-INNER JOIN civicrm_participant cp ON cp.id = ct.entity_id
-LEFT JOIN  civicrm_contact c ON cp.contact_id = c.id
-LEFT JOIN  civicrm_event ce ON ce.id = cp.event_id
-LEFT JOIN  civicrm_participant_status_type participantStatus ON participantStatus.id = cp.status_id
-{$this->_limitDetailClause}
-";
-        break;
-
-      case 'Membership':
-        $sql = "
-INSERT INTO {$this->_tableName}
-( table_name, contact_id, sort_name, membership_id, membership_type, membership_fee, membership_start_date,
-membership_end_date, membership_source, membership_status )
-   SELECT  'Membership', c.id, c.sort_name, cm.id, cmt.name, cc.total_amount, cm.start_date, cm.end_date, cm.source, cms.name
-     FROM  {$this->_entityIDTableName} ct
-INNER JOIN civicrm_membership cm ON cm.id = ct.entity_id
-LEFT JOIN  civicrm_contact c ON cm.contact_id = c.id
-LEFT JOIN  civicrm_membership_type cmt ON cmt.id = cm.membership_type_id
-LEFT JOIN  civicrm_membership_payment cmp ON cmp.membership_id = cm.id
-LEFT JOIN  civicrm_contribution cc ON cc.id = cmp.contribution_id
-LEFT JOIN  civicrm_membership_status cms ON cms.id = cm.status_id
-{$this->_limitDetailClause}
-";
-        break;
-
-      case 'Case':
-        $sql = "
-INSERT INTO {$this->_tableName}
-( table_name, contact_id, sort_name, case_id, case_start_date, case_end_date, case_is_deleted )
-SELECT 'Case', c.id, c.sort_name, cc.id, DATE(cc.start_date), DATE(cc.end_date), cc.is_deleted
-FROM       {$this->_entityIDTableName} ct
-INNER JOIN civicrm_case cc ON cc.id = ct.entity_id
-LEFT JOIN  civicrm_case_contact ccc ON cc.id = ccc.case_id
-LEFT JOIN  civicrm_contact c ON ccc.contact_id = c.id
-{$this->_limitDetailClause}
-";
-        break;
+  public function toLimit($limit) {
+    if (is_array($limit)) {
+      list ($limit, $offset) = $limit;
     }
-
-    if ($sql) {
-      CRM_Core_DAO::executeQuery($sql);
+    if (empty($limit)) {
+      return '';
     }
+    $result = "LIMIT {$limit}";
+    if ($offset) {
+      $result .= " OFFSET {$offset}";
+    }
+    return $result;
   }
 }
-
