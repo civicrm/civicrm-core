@@ -314,23 +314,23 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    */
   function getDeclaredActivityTypes($caseTypeXML) {
     $result = array();
-
-    if ($caseTypeXML->ActivityTypes && $caseTypeXML->ActivityTypes->ActivityType) {
-      foreach ($caseTypeXML->ActivityTypes->ActivityType as $activityTypeXML) {
-        $result[] = (string) $activityTypeXML->name;
+    if (!empty($caseTypeXML)) {
+      if ($caseTypeXML->ActivityTypes && $caseTypeXML->ActivityTypes->ActivityType) {
+        foreach ($caseTypeXML->ActivityTypes->ActivityType as $activityTypeXML) {
+          $result[] = (string) $activityTypeXML->name;
+        }
       }
-    }
 
-    if ($caseTypeXML->ActivitySets && $caseTypeXML->ActivitySets->ActivitySet) {
-      foreach ($caseTypeXML->ActivitySets->ActivitySet as $activitySetXML) {
-        if ($activitySetXML->ActivityTypes && $activitySetXML->ActivityTypes->ActivityType) {
-          foreach ($activitySetXML->ActivityTypes->ActivityType as $activityTypeXML) {
-            $result[] = (string) $activityTypeXML->name;
+      if ($caseTypeXML->ActivitySets && $caseTypeXML->ActivitySets->ActivitySet) {
+        foreach ($caseTypeXML->ActivitySets->ActivitySet as $activitySetXML) {
+          if ($activitySetXML->ActivityTypes && $activitySetXML->ActivityTypes->ActivityType) {
+            foreach ($activitySetXML->ActivityTypes->ActivityType as $activityTypeXML) {
+              $result[] = (string) $activityTypeXML->name;
+            }
           }
         }
       }
     }
-
     $result = array_unique($result);
     sort($result);
     return $result;
@@ -342,13 +342,13 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    */
   function getDeclaredRelationshipTypes($caseTypeXML) {
     $result = array();
-
-    if ($caseTypeXML->CaseRoles && $caseTypeXML->CaseRoles->RelationshipType) {
-      foreach ($caseTypeXML->CaseRoles->RelationshipType as $relTypeXML) {
-        $result[] = (string) $relTypeXML->name;
+    if (!empty($caseTypeXML)) {
+      if ($caseTypeXML->CaseRoles && $caseTypeXML->CaseRoles->RelationshipType) {
+        foreach ($caseTypeXML->CaseRoles->RelationshipType as $relTypeXML) {
+          $result[] = (string) $relTypeXML->name;
+        }
       }
     }
-
     $result = array_unique($result);
     sort($result);
     return $result;
