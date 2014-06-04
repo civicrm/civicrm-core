@@ -402,7 +402,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     // get the price set associated with offline contribution record.
     $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
     $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-    $fieldID = key($this->_priceSet['fields']);
+    $priceFieldID = CRM_Price_BAO_PriceSet::getOnlyPriceFieldID($this->_priceSet);
+    $priceFieldValueID = CRM_Price_BAO_PriceSet::getOnlyPriceFieldValueID($this->_priceSet);
+    $fieldID = $priceFieldID;
 
     if (isset($params['field'])) {
       foreach ($params['field'] as $key => $value) {
@@ -464,7 +466,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $value['skipRecentView'] = TRUE;
 
         // build line item params
-        $this->_priceSet['fields'][$fieldID]['options'][$fieldID]['amount'] =  $value['total_amount'];
+        $this->_priceSet['fields'][$fieldID]['options'][$priceFieldValueID ]['amount'] =  $value['total_amount'];
         $value['price_'.$fieldID] = 1;
 
         $lineItem = array();
