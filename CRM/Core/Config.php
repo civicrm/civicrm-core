@@ -228,6 +228,12 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
         // we retrieve the object from memcache, so we now initialize the objects
         self::$_singleton->_initialize($loadFromDB);
 
+        // Ensure tsLocale is set when using memcache
+        // CRM-10250
+        global $tsLocale;
+        if(empty($tsLocale)) {
+          $tsLocale = self::$_singleton->lcMessages;
+        }
         // CRM-9803, NYSS-4822
         // this causes various settings to be reset and hence we should
         // only use the config object that we retrieved from memcache
