@@ -108,6 +108,47 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals(12, $result['values']['start_date']['type']);
   }
 
+
+  public function testSubmit() {
+    $contributionPageResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $priceSetParams = array(
+      'is_quick_config' => 1,
+      'extends' => 'CiviContribute',
+      'financial_type_id' => 'Donation',
+      'title' => 'my Page'
+    );
+
+    $priceSet = $this->callAPISuccess('price_set', 'create', $priceSetParams);
+    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSet['id']);
+    $priceField = $this->callAPISuccess('price_field', 'create', array(
+      'price_set_id' => $priceSet['id'],
+      'label' => 'Goat Breed',
+      'html_type' => 'Radio',
+    ));
+    $this->callAPISuccess('price_field_value', 'create', array(
+      'price_set_id' => $priceSet['id'],
+      'price_field_id' => $priceField['id'],
+      'label' => 'Long Haired Goat',
+      'amount' => 20,
+      )
+    );
+    $priceFieldValue2 = $this->callAPISuccess('price_field_value', 'create', array(
+      'price_set_id' => $priceSet['id'],
+      'price_field_id' => $priceField['id'],
+      'label' => 'Shoe-eating Goat',
+      'amount' => 10,
+      )
+    );
+    $submitParams = array(
+      'price_' . $priceField['id'] => $priceFieldValue2['id'],
+      'id' => (int) $contributionPageResult['id'],
+      'amount' => 10
+    );
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $contributionPageResult['id']));
+  }
+
   public static function setUpBeforeClass() {
       // put stuff here that should happen before all tests in this unit
   }
