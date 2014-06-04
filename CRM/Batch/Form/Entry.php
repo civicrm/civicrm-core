@@ -34,7 +34,7 @@
  */
 
 /**
- * This class provides the functionality for batch entry for contributions/memeberships
+ * This class provides the functionality for batch entry for contributions/memberships
  */
 class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
@@ -50,7 +50,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   protected $_batchId;
 
   /**
-   * Batch informtaion
+   * Batch information
    */
   protected $_batchInfo = array();
 
@@ -427,29 +427,22 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         if (!empty($value['send_receipt'])) {
           $value['receipt_date'] = date('Y-m-d His');
         }
+        // these translations & date handling are required because we are calling BAO directly rather than the api
+        $fieldTranslations = array(
+          'financial_type' => 'financial_type_id',
+          'payment_instrument' => 'payment_instrument_id',
+          'contribution_source' => 'source',
+          'contribution_note' => 'note',
 
-        if ($value['financial_type']) {
-          $value['financial_type_id'] = $value['financial_type'];
-        }
-
-        if (!empty($value['payment_instrument'])) {
-          $value['payment_instrument_id'] = $value['payment_instrument'];
-        }
-
-        if (!empty($value['contribution_source'])) {
-          $value['source'] = $value['contribution_source'];
-        }
-
-        if (!empty($value['contribution_note'])) {
-          $value['note'] = $value['contribution_note'];
+        );
+        foreach ($fieldTranslations as $formField => $baoField) {
+          if(isset($value[$formField])) {
+            $value[$baoField] = $value[$formField];
+          }
+          unset($value[$formField]);
         }
 
         $params['actualBatchTotal'] += $value['total_amount'];
-
-        unset($value['contribution_note']);
-        unset($value['financial_type']);
-        unset($value['contribution_source']);
-
         $value['batch_id'] = $this->_batchId;
         $value['skipRecentView'] = TRUE;
 
@@ -463,9 +456,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         //unset amount level since we always use quick config price set
         unset($value['amount_level']);
 
-        //CRM-11529 for backoffice transactions
+        //CRM-11529 for back office transactions
         //when financial_type_id is passed in form, update the
-        //lineitems with the financial type selected in form
+        //line items with the financial type selected in form
         if (!empty($value['financial_type_id']) && !empty($lineItem[$priceSetId])) {
           foreach ($lineItem[$priceSetId] as &$values) {
             $values['financial_type_id'] = $value['financial_type_id'];
@@ -510,6 +503,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
       }
     }
+    return TRUE;
   }
   //end of function
 
@@ -520,7 +514,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return bool
    */
   private function processMembership(&$params) {
     $dateTypes = array(
