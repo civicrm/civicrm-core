@@ -1150,8 +1150,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @internal param int $membershipTypeID
    */
   function membershipTypeDelete($params) {
-    $result = $this->callAPISuccess('MembershipType', 'Delete', $params);
-    return;
+    $this->callAPISuccess('MembershipType', 'Delete', $params);
   }
 
   /**
@@ -2345,6 +2344,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'civicrm_membership',
       'civicrm_membership_type',
       'civicrm_membership_payment',
+      'civicrm_membership_log',
       'civicrm_membership_status',
       'civicrm_event',
       'civicrm_participant',
@@ -2829,6 +2829,29 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     CRM_ACL_BAO_Cache::resetCache();
     CRM_Contact_BAO_Group::getPermissionClause(TRUE);
     CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL, TRUE);
+  }
+
+  /**
+   * alter default price set so that the field numbers are not all 1 (hiding errors)
+   */
+  function offsetDefaultPriceSet() {
+    $contributionPriceSet = $this->callAPISuccess('price_set', 'getsingle', array('name' => 'default_contribution_amount'));
+    $firstID = $contributionPriceSet['id'];
+    $this->callAPISuccess('price_set', 'create', array('id' => $contributionPriceSet['id'], 'is_active' => 0, 'name' => 'old'));
+    unset($contributionPriceSet['id']);
+    $newPriceSet = $this->callAPISuccess('price_set', 'create', $contributionPriceSet);
+    $priceField = $this->callAPISuccess('price_field', 'getsingle', array('price_set_id' => $firstID, 'options' => array('limit' => 1)));
+    unset($priceField['id']);
+    $priceField['price_set_id'] = $newPriceSet['id'];
+    $newPriceField = $this->callAPISuccess('price_field', 'create', $priceField);
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'getsingle', array('price_set_id' => $firstID, 'sequential' => 1, 'options' => array('limit' => 1)));
+
+    unset($priceFieldValue['id']);
+    //create some padding to use up ids
+    $this->callAPISuccess('price_field_value', 'create', $priceFieldValue);
+    $this->callAPISuccess('price_field_value', 'create', $priceFieldValue);
+    $this->callAPISuccess('price_field_value', 'create', array_merge($priceFieldValue, array('price_field_id' => $newPriceField['id'])));
+
   }
 
 /**

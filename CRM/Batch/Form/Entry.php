@@ -759,14 +759,31 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $value['contact_id']
     );
   }
+
   /**
    * Function exists purely for unit testing purposes. If you feel tempted to use this in live code
    * then it probably means there is some functionality that needs to be moved
    * out of the form layer
+   *
    * @param unknown_type $params
+   *
+   * @return bool
    */
   function testProcessMembership($params) {
     return $this->processMembership($params);
+  }
+
+  /**
+   * Function exists purely for unit testing purposes. If you feel tempted to use this in live code
+   * then it probably means there is some functionality that needs to be moved
+   * out of the form layer
+   *
+   * @param array $params
+   *
+   * @return bool
+   */
+  function testProcessContribution($params) {
+    return $this->processContribution($params);
   }
 }
 
