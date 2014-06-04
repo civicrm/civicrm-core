@@ -549,7 +549,6 @@ WHERE  id = %1";
     return $setTree;
   }
 
-
   /**
    * Get the Price Field ID. We call this function when more than one being present would represent an error
    * starting format derived from current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId))
@@ -581,7 +580,6 @@ WHERE  id = %1";
     return (int) implode('_', array_keys($priceSet['fields'][$priceFieldID]['options']));
   }
 
-
   /**
    * @param CRM_Core_Form $form
    * @param $id
@@ -591,6 +589,7 @@ WHERE  id = %1";
    *
    * @return bool|false|int|null
    */
+
   static function initSet(&$form, $id, $entityTable = 'civicrm_event', $validOnly = FALSE, $priceSetId = NULL) {
     if (!$priceSetId) {
       $priceSetId = self::getFor($entityTable, $id);
