@@ -26,6 +26,7 @@
     return $(form).hasClass('crm-ajax-selection-form');
   }
 
+  // Use ajax to store selection server-side
   function phoneHome(single, $el, event) {
     var url = CRM.url('civicrm/ajax/markSelection');
     var params = {qfKey: 'civicrm search ' + $('input[name=qfKey]', form).val()};
@@ -37,10 +38,13 @@
       params.name = $el.attr('id');
     } else {
       params.variableType = 'multiple';
+      // "Reset all" button
       if ($el.is('a')) {
         event.preventDefault();
         $("input.select-row, input.select-rows", form).prop('checked', false).closest('tr').removeClass('crm-row-selected');
-      } else {
+      }
+      // Master checkbox
+      else {
         params.name = $('input.select-row').map(function() {return $(this).attr('id')}).get().join('-');
       }
     }
@@ -59,7 +63,12 @@
     .on('crmLoad', function(e) {
       if ($(e.target).is('#crm-container') || $(e.target).is('#crm-main-content-wrapper')) {
         clearTaskMenu();
-        selected = usesAjax() ? parseInt($('label[for*=ts_sel] span', form).text(), 10) : countCheckboxes();
+        if (usesAjax()) {
+          selected = parseInt($('label[for*=ts_sel] span', form).text(), 10);
+        } else {
+          selected = countCheckboxes();
+          displayCount();
+        }
         enableTaskMenu();
       }
     })
