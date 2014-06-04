@@ -147,11 +147,12 @@
 <script type="text/javascript">
   {literal}
   CRM.$(function($) {
+    // Clear any old selection that may be lingering in quickform
     $("input.select-row, input.select-rows", 'form.crm-search-form').prop('checked', false);
+    // Retrieve stored checkboxes
     var cids = {/literal}{$selectedContactIds|@json_encode}{literal};
     if (cids.length > 0) {
-      $('#mark_x_' + cids.join(',#mark_x_')).prop('checked', true).closest('tr').addClass('crm-row-selected');
-      $('input[name=radio_ts][value=ts_sel]').prop('checked', true);
+      $('#mark_x_' + cids.join(',#mark_x_') + ',input[name=radio_ts][value=ts_sel]').prop('checked', true);
     }
   });
 {/literal}
