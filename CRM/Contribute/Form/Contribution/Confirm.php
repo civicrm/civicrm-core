@@ -254,42 +254,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->_useForMember = $this->get('useForMember');
 
       if (isset($this->_params['amount'])) {
-        $priceField = new CRM_Price_DAO_PriceField();
-        $priceField->price_set_id = $this->_params['priceSetId'];
-        $priceField->orderBy('weight');
-        $priceField->find();
-        $contriPriceId = NULL;
-        $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_params['priceSetId'], 'is_quick_config');
-        while ($priceField->fetch()) {
-          if ($priceField->name == "contribution_amount") {
-            $contriPriceId = $priceField->id;
-          }
-          if ($isQuickConfig && !empty($this->_params["price_{$priceField->id}"])) {
-            if ($this->_values['fee'][$priceField->id]['html_type'] != 'Text') {
-            $this->_params['amount_level'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
-              $this->_params["price_{$priceField->id}"], 'label');
-            }
-            if ($priceField->name == "membership_amount") {
-              $this->_params['selectMembership'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
-                $this->_params["price_{$priceField->id}"], 'membership_type_id');
-            }
-          } // if separate payment we set contribution amount to be null, so that it will not show contribution amount same as membership amount.
-          elseif ((CRM_Utils_Array::value('is_separate_payment', $this->_membershipBlock)) && !empty($this->_values['fee'][$priceField->id]) && ($this->_values['fee'][$priceField->id]['name'] == "other_amount")
-              && CRM_Utils_Array::value("price_{$contriPriceId}", $this->_params) < 1 && empty($this->_params["price_{$priceField->id}"])) {
-              $this->_params['amount'] = null;
-          }
-
-          // Fix for CRM-14375 - If we are using separate payments and "no
-          // thank you" is selected for the additional contribution, set
-          // contribution amount to be null, so that it will not show
-          // contribution amount same as membership amount.
-          if ($this->_membershipBlock['is_separate_payment']
-            && CRM_Utils_Array::value('name', $this->_values['fee'][$priceField->id]) == 'contribution_amount'
-            && CRM_Utils_Array::value("price_{$priceField->id}", $this->_params) == '-1'
-          ) {
-            $this->_params['amount'] = null;
-          }
-        }
+        $this->setFormAmountFields($this->_params['priceSetId']);
       }
       $this->_params['currencyID'] = $config->defaultCurrency;
       $this->_params['payment_action'] = 'Sale';
@@ -439,7 +404,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       $this->_params['is_recur'] = $this->_values['is_recur'] = 1;
       // check if price set is not quick config
-      if (!empty($this->_params['priceSetId']) && !$isQuickConfig) {
+      if (!empty($this->_params['priceSetId']) && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_params['priceSetId'], 'is_quick_config')) {
         list($this->_params['frequency_interval'], $this->_params['frequency_unit']) = CRM_Price_BAO_PriceSet::getRecurDetails($this->_params['priceSetId']);
       }
       else {
@@ -1198,7 +1163,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $lineItems
   ) {
     $transaction = new CRM_Core_Transaction();
-    $recurringContributionID =  $contribSoftContactId = $addressID = NULL;
+    $contribSoftContactId = $addressID = NULL;
 
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $financialType->id;
@@ -1789,5 +1754,108 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * This function sets the fields
+   * - $this->_params['amount_level']
+   * - $this->_params['selectMembership']
+   * And under certain circumstances sets
+   * $this->_params['amount'] = null;
+   *
+   * @param $priceSetID
+   *
+   * @internal param $isQuickConfig
+   * @internal param $priceField
+   */
+  public function setFormAmountFields($priceSetID) {
+    $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_params['priceSetId'], 'is_quick_config');
+    $priceField = new CRM_Price_DAO_PriceField();
+    $priceField->price_set_id = $priceSetID;
+    $priceField->orderBy('weight');
+    $priceField->find();
+
+    while ($priceField->fetch()) {
+      $paramWeDoNotUnderstand = NULL;
+      if ($priceField->name == "contribution_amount") {
+        $paramWeDoNotUnderstand = $priceField->id;
+      }
+      if ($isQuickConfig && !empty($this->_params["price_{$priceField->id}"])) {
+        if ($this->_values['fee'][$priceField->id]['html_type'] != 'Text') {
+          $this->_params['amount_level'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
+            $this->_params["price_{$priceField->id}"], 'label');
+        }
+        if ($priceField->name == "membership_amount") {
+          $this->_params['selectMembership'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
+            $this->_params["price_{$priceField->id}"], 'membership_type_id');
+        }
+      } // if separate payment we set contribution amount to be null, so that it will not show contribution amount same as membership amount.
+      // @todo - this needs more documentation - it appears the setting to null is tied up with separate membership payments
+      // but the circumstances are very confusing. Many of these conditions are repeated in the next conditional
+      // so we should merge them together
+      // the quick config seems like a red-herring - if this is about a separate membership payment then there
+      // are 2 types of line items - membership ones & non-membership ones - regardless of whether quickconfig is set
+      elseif (
+        CRM_Utils_Array::value('is_separate_payment', $this->_membershipBlock)
+        && !empty($this->_values['fee'][$priceField->id])
+        && ($this->_values['fee'][$priceField->id]['name'] == "other_amount")
+        && CRM_Utils_Array::value("price_{$paramWeDoNotUnderstand}", $this->_params) < 1
+        && empty($this->_params["price_{$priceField->id}"])
+      ) {
+        $this->_params['amount'] = null;
+      }
+
+      // Fix for CRM-14375 - If we are using separate payments and "no
+      // thank you" is selected for the additional contribution, set
+      // contribution amount to be null, so that it will not show
+      // contribution amount same as membership amount.
+      //@todo - merge with section above
+      if ($this->_membershipBlock['is_separate_payment']
+        && CRM_Utils_Array::value('name', $this->_values['fee'][$priceField->id]) == 'contribution_amount'
+        && CRM_Utils_Array::value("price_{$priceField->id}", $this->_params) == '-1'
+      ) {
+        $this->_params['amount'] = null;
+      }
+    }
+  }
+
+  /**
+   * Static submit function allowing tests (& api access although this is being built slowly)
+   * @param $params
+   */
+  static function submit($params) {
+    $form = new CRM_Contribute_Form_Contribution_Confirm();
+    $form->_id = $params['id'];
+    //this way the mocked up controller ignores the session stuff
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $form->controller = new CRM_Contribute_Controller_Contribution();
+    $params['invoiceID'] = md5(uniqid(rand(), TRUE));
+    $paramsProcessedForForm = $form->_params = self::getFormParams($params['id'], $params);
+
+    $priceSetID = $form->_params['priceSetId'] = $paramsProcessedForForm['price_set_id'];
+    $priceFields = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
+    $form->setFormAmountFields($priceSetID);
+    $priceFields = $priceFields[$priceSetID]['fields'];
+    CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution');
+    $form->_lineItem = array($priceSetID => $lineItems);
+    $form->postProcess();
+  }
+
+  /**
+   * Helper function for static submit function - set relevant params - help us to build up an array that we can pass in
+   * @param $id
+   * @param array $params
+   *
+   * @return array
+   * @throws CiviCRM_API3_Exception
+   */
+  static function getFormParams($id, array $params) {
+    if(!isset($params['is_pay_later'])) {
+      $params['is_pay_later'] = civicrm_api3('contribution_page', 'getvalue', array('id' => $id, 'return' => 'is_pay_later'));
+    }
+    if(empty($params['price_set_id'])) {
+      $params['price_set_id'] = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $params['id']);
+    }
+    return $params;
   }
 }

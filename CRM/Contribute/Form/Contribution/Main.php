@@ -1081,12 +1081,22 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   public function postProcess() {
     $config = CRM_Core_Config::singleton();
-
     // we first reset the confirm page so it accepts new values
     $this->controller->resetPage('Confirm');
 
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
+
+    //carry campaign from profile.
+    if (array_key_exists('contribution_campaign_id', $params)) {
+      $params['campaign_id'] = $params['contribution_campaign_id'];
+    }
+
+    if (!empty($params['onbehalfof_id'])) {
+      $params['organization_id'] = $params['onbehalfof_id'];
+    }
+
+    $params['currencyID'] = $config->defaultCurrency;
 
     if (!empty($params['priceSetId'])) {
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
@@ -1146,16 +1156,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->assign('pay_later_receipt', $this->_values['pay_later_receipt']);
     }
 
-    //carry campaign from profile.
-    if (array_key_exists('contribution_campaign_id', $params)) {
-      $params['campaign_id'] = $params['contribution_campaign_id'];
-    }
-
-    if (!empty($params['onbehalfof_id'])) {
-      $params['organization_id'] = $params['onbehalfof_id'];
-    }
-
-    $params['currencyID'] = $config->defaultCurrency;
     // from here on down, $params['amount'] holds a monetary value (or null) rather than an option ID
     $params['amount'] = self::computeAmount($params, $this);
     $params['separate_amount'] = $params['amount'];
