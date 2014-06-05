@@ -239,7 +239,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   function getIDs(&$ids, &$input) {
-    $ids['contact'] = self::retrieve('x_cust_id', 'Integer');
+    $ids['contact'] = self::retrieve('x_cust_id', 'Integer', FALSE, 0);
     $ids['contribution'] = self::retrieve('x_invoice_num', 'Integer');
 
     // joining with contribution table for extra checks
