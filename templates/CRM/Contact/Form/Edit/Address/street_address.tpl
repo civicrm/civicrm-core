@@ -35,7 +35,7 @@
         </td>
     </tr>
 
-    {if $parseStreetAddress eq 1 && $action eq 2}
+    {if $parseStreetAddress eq 1 && ($action eq 1 || $action eq 2)}
            <tr id="addressElements_{$blockId}" class=hiddenElement>
                <td>
                   {$form.address.$blockId.street_number.label}<br />
