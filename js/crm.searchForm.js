@@ -98,7 +98,25 @@
     })
     // When selecting a task
     .on('change', 'select#task', function() {
-      $(this).siblings('input[type=submit]').click();
+      var $form = $(this).closest('form'),
+        $go = $('input.crm-search-go-button', $form);
+      if (1) {
+        $go.click();
+      }
+      // The following code can load the task in a popup, however not all tasks function correctly with this
+      // So it's disabled pending a per-task opt-in mechanism
+      else {
+        var data = $form.serialize() + '&' + $go.attr('name') + '=' + $go.attr('value');
+        var url = $form.attr('action');
+        url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=json';
+        clearTaskMenu();
+        $.post(url, data, function(data) {
+          CRM.loadForm(data.userContext).on('crmFormSuccess', function() {
+            CRM.refreshParent($form);
+          });
+          enableTaskMenu();
+        }, 'json');
+      }
     });
 
 })(CRM.$, CRM._);
