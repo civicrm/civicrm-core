@@ -1802,7 +1802,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-  /**
    * CRM-14743 - test api respects search operators
    */
   function testGetModifiedDateByOperators() {
@@ -1823,7 +1822,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-  /**
    * CRM-14743 - test api respects search operators
    */
   function testGetCreatedDateByOperators() {
@@ -1841,5 +1839,16 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($contacts['count'], 3);
     $contacts = $this->callAPISuccess('contact', 'get', array('created_date' => array('>' => '2014-01-01')));
     $this->assertEquals($contacts['count'], $preExistingContactCount);
+  }
+
+  /**
+   * CRM-14263 check that API is not affected by search profile related bug
+   */
+  function testReturnCityProfile () {
+    $contactID = $this->individualCreate();
+    CRM_Core_Config::singleton()->defaultSearchProfileID = 1;
+    $this->callAPISuccess('address', 'create', array('contact_id' => $contactID, 'city' => 'Cool City', 'location_type_id' => 1,));
+    $result = $this->callAPISuccess('contact', 'get', array('city' => 'Cool City', 'return' => 'contact_type'));
+    $this->assertEquals(1, $result['count']);
   }
 }
