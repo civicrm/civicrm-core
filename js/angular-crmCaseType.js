@@ -45,7 +45,7 @@
               return crmApi('CaseType', 'getsingle', {id: $route.current.params.id});
             }
             else {
-              return { title: "New case type", name: "New case type", is_active: "1", weight: "1",
+              return { title: "", name: "", is_active: "1", weight: "1",
                 definition: _.extend({}, newCaseTypeDefinitionTemplate) };
             }
           }
