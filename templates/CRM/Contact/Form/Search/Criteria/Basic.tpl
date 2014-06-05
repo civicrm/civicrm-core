@@ -114,6 +114,15 @@
   </tr>
   <tr>
     {if $form.contact_tags}
+    </tr>
+      {if $form.tag_toggle.html}
+        <tr>
+          <td colspan="2">
+            {$form.tag_toggle.html} {help id="id-tag-toggle"}
+          </td>
+        </tr>
+      {/if}
+      <tr>
       <td><label>{ts}Select Tag(s){/ts}</label>
         {$form.contact_tags.html}
       </td>
