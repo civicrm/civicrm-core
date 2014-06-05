@@ -551,9 +551,10 @@ AND pv.membership_type_id IS NOT NULL
 AND membership_id IS NOT NULL;
 
 -- update line items for contributions with contribution id
-UPDATE civicrm_line_item
+UPDATE civicrm_line_item cln
+LEFT JOIN civicrm_contribution cc ON cc.id = cln.entity_id AND cln.contribution_id  IS NULL and cln.entity_table = 'civicrm_contribution'
 SET contribution_id = entity_id
-WHERE contribution_id IS NULL and entity_table = 'civicrm_contribution';
+WHERE cc.id IS NOT NULL;
 
 -- update case type menu
 UPDATE civicrm_navigation set url = 'civicrm/a/#/caseType' WHERE url LIKE 'civicrm/admin/options/case_type%';
