@@ -1893,7 +1893,7 @@ EOS;
               return (sprintf('%s %s', $fieldName, $operator));
             }
             else{
-              return NULL;  // not yet implemented (tests required to implement)
+              return (sprintf('%s %s ', $fieldName, $operator));
             }
             break;
 
@@ -1939,6 +1939,15 @@ EOS;
         }
       }
     }
+  }
+
+  /**
+   * @see http://issues.civicrm.org/jira/browse/CRM-9150
+   * support for other syntaxes is discussed in ticket but being put off for now
+   * @return array
+   */
+  public static function acceptedSQLOperators() {
+    return array('=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=", "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'IS NOT NULL', 'IS NULL');
   }
 
   /**
