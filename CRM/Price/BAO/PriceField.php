@@ -108,7 +108,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       }
     }
     $defaultArray = array();
-    if ($params['html_type'] == 'CheckBox' && isset($params['default_checkbox_option'])) {
+    //html type would be empty in update scenario not sure what would happen ...
+    if (!empty($params['html_type']) && $params['html_type'] == 'CheckBox' && isset($params['default_checkbox_option'])) {
       $tempArray = array_keys($params['default_checkbox_option']);
       foreach ($tempArray as $v) {
         if ($params['option_amount'][$v]) {
