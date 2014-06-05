@@ -46,6 +46,26 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   public $_single = FALSE;
 
   /**
+   * gives all the statues for conribution
+   *
+   * @access public
+   */
+  public $_contributionStatusId;
+
+  /**
+   * gives the HTML template of PDF Invoice
+   *
+   * @access public
+   */
+  public $_messageInvoice;
+
+  /**
+   * This variable is used to assign parameters for HTML template of PDF Invoice
+   *
+   * @access public
+   */
+  public $_invoiceTemplate;
+  /**
    * build all the data structures needed to build the form
    *
    * @return void
@@ -63,17 +83,20 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       parent::preProcess();
     }
     
-    // check that all the contribution ids have pending status
-    $query = "
-SELECT count(*)
-FROM   civicrm_contribution
-WHERE  contribution_status_id != 1
-AND    contribution_status_id != 7
-AND    contribution_status_id != 2
-AND    {$this->_componentClause}";
+    // check that all the contribution ids have status Completed, Pending, Refunded.
+    $this->_contributionStatusId = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $status = array('Completed', 'Pending', 'Refunded');
+    $statusId = array();
+    foreach ($this->_contributionStatusId as $key => $value) {
+      if (in_array($value, $status)) {
+        $statusId[]= $key;
+      }
+    }
+    $Id = implode(",", $statusId);
+    $query = "SELECT count(*) FROM civicrm_contribution WHERE contribution_status_id NOT IN ($Id) AND {$this->_componentClause}";
     $count = CRM_Core_DAO::singleValueQuery($query);
     if ($count != 0) {
-      CRM_Core_Error::statusBounce("Please select only online contributions with Completed status.");
+      CRM_Core_Error::statusBounce("Please select only contributions with Completed, Pending, Refunded status.");
     }
     
     // we have all the contribution ids, so now we get the contact ids
@@ -135,61 +158,33 @@ AND    {$this->_componentClause}";
    */
   public function postProcess() {
     // get all the details needed to generate a invoice
-    $contribIDs = implode(',', $this->_contributionIds);
+    $this->_messageInvoice = array();
     
-    $details = CRM_Contribute_Form_Task_Status::getDetails($contribIDs);
+    $this->_invoiceTemplate = CRM_Core_Smarty::singleton();
     
-    $baseIPN = new CRM_Core_Payment_BaseIPN();
+    $invoiceElements = CRM_Contribute_Form_Task_PDF::getElements();
+
+    // gives the status id when contribution status is 'Refunded'
+    $refundedStatusId = CRM_Utils_Array::key('Refunded', $this->_contributionStatusId);
     
-    $messageInvoice = array();
-    
-    $template = CRM_Core_Smarty::singleton();
-    
-    $params = $this->controller->exportValues($this->_name);
-    
-    $createPdf = FALSE;
-    if ($params['output'] == "pdf_invoice") {
-      $createPdf = TRUE;
-    }
-    
-    $excludeContactIds = array();
-    if (!$createPdf) {
-      $returnProperties = array(
-                                'email' => 1,
-                                'do_not_email' => 1,
-                                'is_deceased' => 1,
-                                'on_hold' => 1,
-                                );
-      
-      list($contactDetails) = CRM_Utils_Token::getTokenDetails($this->_contactIds, $returnProperties, FALSE, FALSE);
-      $suppressedEmails = 0;
-      foreach ($contactDetails as $id => $values) {
-        if (empty($values['email']) || !empty($values['do_not_email']) ||
-            CRM_Utils_Array::value('is_deceased', $values) || !empty($values['on_hold'])) {
-          $suppressedEmails++;
-          $excludeContactIds[] = $values['contact_id'];
-        }
-      }
-    }
-    
-    foreach ($details as $contribID => $detail) {
+    foreach ($invoiceElements['details'] as $invoiceElements['contribID'] => $detail) {
       $input = $ids = $objects = array();
       
-      if (in_array($detail['contact'], $excludeContactIds)) {
+      if (in_array($detail['contact'], $invoiceElements['excludeContactIds'])) {
         continue;
       }
       
       $input['component'] = $detail['component'];
       
       $ids['contact'] = $detail['contact'];
-      $ids['contribution'] = $contribID;
+      $ids['contribution'] = $invoiceElements['contribID'];
       $ids['contributionRecur'] = NULL;
       $ids['contributionPage'] = NULL;
       $ids['membership'] = CRM_Utils_Array::value('membership', $detail);
       $ids['participant'] = CRM_Utils_Array::value('participant', $detail);
       $ids['event'] = CRM_Utils_Array::value('event', $detail);
       
-      if (!$baseIPN->validateData($input, $ids, $objects, FALSE)) {
+      if (!$invoiceElements['baseIPN']->validateData($input, $ids, $objects, FALSE)) {
         CRM_Core_Error::fatal();
       }
       
@@ -198,14 +193,10 @@ AND    {$this->_componentClause}";
       $input['amount'] = $contribution->total_amount;
       $input['invoice_id'] = $contribution->invoice_id;
       $input['receive_date'] = $contribution->receive_date;
-      $input['source'] = $contribution->source;
       $input['contribution_status_id'] = $contribution->contribution_status_id;
       $input['organization_name'] = $contribution->_relatedObjects['contact']->organization_name;
-      $input['trxn_date'] = isset($contribution->trxn_date) ? $contribution->trxn_date : NULL;
       
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
-      
-      $contributionStatusId = key(CRM_Core_PseudoConstant::accountOptionValues('contribution_status', NULL, " AND v.name LIKE 'Refunded' "));
       
       $addressParams = array('contact_id' => $contribution->contact_id);
       $addressDetails = CRM_Core_BAO_Address::getValues($addressParams);
@@ -225,9 +216,9 @@ AND    {$this->_componentClause}";
       $stateProvinceAbbreviation = CRM_Core_PseudoConstant::stateProvinceAbbreviation($billingAddress[$contribution->contact_id]['state_province_id']);
       
       // getting data from admin page
-      $prefixValue = CRM_Contribute_BAO_Contribution::getContributionSettings();
+       $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
       
-      if ($contribution->contribution_status_id == $contributionStatusId) {
+      if ($contribution->contribution_status_id == $refundedStatusId) {
         $invoiceId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue)."".$contribution->id;
       }
       else {
@@ -240,7 +231,7 @@ AND    {$this->_componentClause}";
       $dueDate = date('F j ,Y', strtotime($contributionReceiveDate."+".$prefixValue['due_date']."". $prefixValue['due_date_period']));
       
       if ($input['component'] == 'contribute') {
-        $eid = $contribID;
+        $eid = $invoiceElements['contribID'];
         $etable = 'contribution';     
       } 
       else {
@@ -310,6 +301,7 @@ AND    {$this->_componentClause}";
       }
       
       $config = CRM_Core_Config::singleton();
+      $config->doNotAttachPDFReceipt = 1;
       
       // parameters to be assign for template
       $tplParams = array(
@@ -317,6 +309,7 @@ AND    {$this->_componentClause}";
                          'component' => $input['component'],
                          'id' => $contribution->id,
                          'invoice_id' => $invoiceId,
+                         'imageUploadURL' => $config->imageUploadURL,
                          'defaultCurrency' => $config->defaultCurrency,
                          'amount' => $contribution->total_amount,
                          'amountDue' => $amountDue,
@@ -326,7 +319,7 @@ AND    {$this->_componentClause}";
                          'display_name' => $contribution->_relatedObjects['contact']->display_name,
                          'lineItem' => $lineItem,
                          'dataArray' => $dataArray,
-                         'contributionStatusId' => $contributionStatusId,
+                         'refundedStatusId' => $refundedStatusId,
                          'contribution_status_id' => $contribution->contribution_status_id,
                          'subTotal' => $subTotal,
                          'street_address' => CRM_Utils_Array::value('street_address', $billingAddress[$contribution->contact_id]),
@@ -339,7 +332,6 @@ AND    {$this->_componentClause}";
                          'organization_name' => $contribution->_relatedObjects['contact']->organization_name,
                          );
       
-      $config->doNotAttachPDFReceipt = 1;
       $sendTemplateParams = array(
                                   'groupName' => 'msg_tpl_workflow_contribution',
                                   'valueName' => 'contribution_invoice_receipt',
@@ -350,7 +342,7 @@ AND    {$this->_componentClause}";
       
       
       // condition to check for download PDF Invoice or email Invoice
-      if ($createPdf) {
+      if ($invoiceElements['createPdf']) {
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         $mail = array(
                       'subject' => $subject,
@@ -359,16 +351,16 @@ AND    {$this->_componentClause}";
                       );
         
         if ($mail['html']) {
-          $messageInvoice[] = $mail['html'];
+          $this->_messageInvoice[] = $mail['html'];
         }     
         else {
-          $messageInvoice[] = nl2br($mail['body']);
+          $this->_messageInvoice[] = nl2br($mail['body']);
         }
       }
       elseif ($contribution->_component == 'contribute') {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id);
         
-        $sendTemplateParams['tplParams'] =array_merge($tplParams,array('email_comment'=>$params['email_comment']));
+        $sendTemplateParams['tplParams'] =array_merge($tplParams,array('email_comment' => $invoiceElements['params']['email_comment']));
         $sendTemplateParams['from'] = CRM_Utils_Array::value('receipt_from_name', $values) . ' <' . $mailDetails[$contribution->contribution_page_id]['receipt_from_email']. '>';
         $sendTemplateParams['toEmail'] = $email;
         $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_receipt', $values);
@@ -379,7 +371,7 @@ AND    {$this->_componentClause}";
       elseif ($contribution->_component == 'event') {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id);
         
-        $sendTemplateParams['tplParams'] =array_merge($tplParams,array('email_comment'=>$params['email_comment']));
+        $sendTemplateParams['tplParams'] =array_merge($tplParams,array('email_comment' => $invoiceElements['params']['email_comment']));
         $sendTemplateParams['from'] = CRM_Utils_Array::value('confirm_from_name', $values) . ' <' . $mailDetails[$contribution->_relatedObjects['event']->id]['confirm_from_email'].  '>';
         $sendTemplateParams['toEmail'] = $email;
         $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_confirm', $values);
@@ -389,16 +381,16 @@ AND    {$this->_componentClause}";
       }
       
       $updateInvoiceId = CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'invoice_id', $invoiceId);
-      $template->clearTemplateVars();
+      $this->_invoiceTemplate->clearTemplateVars();
     }
     
-    if ($createPdf) {
-      CRM_Utils_PDF_Utils::html2pdf($messageInvoice, 'Invoice.pdf', FALSE);
+    if ($invoiceElements['createPdf']) {
+      CRM_Utils_PDF_Utils::html2pdf($this->_messageInvoice, 'Invoice.pdf', FALSE);
       CRM_Utils_System::civiExit();
     }
     else {
-      if ($suppressedEmails) {
-        $status = ts('Email was NOT sent to %1 contacts (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).', array(1 => $suppressedEmails));
+      if ($invoiceElements['suppressedEmails']) {
+        $status = ts('Email was NOT sent to %1 contacts (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).', array(1 => $invoiceElements['suppressedEmails']));
         $msgTitle = ts('Email Error');
         $msgType = 'error';
       }
