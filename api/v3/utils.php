@@ -538,6 +538,13 @@ function _civicrm_api3_get_query_object($params, $mode, $entity) {
 
 /**
  * Function transfers the filters being passed into the DAO onto the params object
+ * @param CRM_Core_DAO $dao
+ * @param array $params
+ * @param bool $unique
+ * @param string $entity
+ *
+ * @throws API_Exception
+ * @throws Exception
  */
 function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
   $entity = substr($dao->__table, 8);
@@ -793,6 +800,9 @@ function _civicrm_api3_build_fields_array(&$bao, $unique = TRUE) {
 /**
  * build fields array. This is the array of fields as it relates to the given DAO
  * returns unique fields as keys by default but if set but can return by DB fields
+ * @param CRM_Core_BAO $bao
+ *
+ * @return mixed
  */
 function _civicrm_api3_get_unique_name_array(&$bao) {
   $fields = $bao->fields();
@@ -1222,6 +1232,7 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $err
 
       case 4:
       case 12:
+      case CRM_Utils_Type::T_TIMESTAMP:
         //field is of type date or datetime
         _civicrm_api3_validate_date($params, $fieldName, $fieldInfo);
         break;
@@ -1270,27 +1281,45 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $err
  *
  * @param array $params params from civicrm_api
  * @param string $fieldName uniquename of field being checked
- * @param $fieldInfo
+ * @param array $fieldInfo
  * @throws Exception
- * @internal param array $fieldinfo array of fields from getfields function
  */
 function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
   //should we check first to prevent it from being copied if they have passed in sql friendly format?
   if (!empty($params[$fieldInfo['name']])) {
-    //accept 'whatever strtotime accepts
-    if (strtotime($params[$fieldInfo['name']]) === FALSE) {
-      throw new Exception($fieldInfo['name'] . " is not a valid date: " . $params[$fieldInfo['name']]);
-    }
-    $format = ($fieldInfo['type'] == CRM_Utils_Type::T_DATE) ? 'Ymd000000' : 'YmdHis';
-    $params[$fieldInfo['name']] = CRM_Utils_Date::processDate($params[$fieldInfo['name']], NULL, FALSE, $format);
+    $params[$fieldInfo['name']] = _civicrm_api3_getValidDate($params[$fieldInfo['name']], $fieldInfo['name'], $fieldInfo['type']);
   }
   if ((CRM_Utils_Array::value('name', $fieldInfo) != $fieldName) && !empty($params[$fieldName])) {
-    //If the unique field name differs from the db name & is set handle it here
-    if (strtotime($params[$fieldName]) === FALSE) {
-      throw new Exception($fieldName . " is not a valid date: " . $params[$fieldName]);
-    }
-    $params[$fieldName] = CRM_Utils_Date::processDate($params[$fieldName]);
+    $params[$fieldName] = _civicrm_api3_getValidDate($params[$fieldName], $fieldName, $fieldInfo['type']);
   }
+}
+
+/**
+ * convert date into BAO friendly date
+ * we accept 'whatever strtotime accepts'
+ *
+ * @param string $dateValue
+ * @param $fieldName
+ * @param $fieldType
+ *
+ * @throws Exception
+ * @internal param $fieldInfo
+ *
+ * @internal param $params
+ * @return mixed
+ */
+function _civicrm_api3_getValidDate($dateValue, $fieldName, $fieldType) {
+  if (is_array($dateValue)) {
+    foreach ($dateValue as $key => $value) {
+      $dateValue[$key] = _civicrm_api3_getValidDate($value, $fieldName, $fieldType);
+    }
+    return $dateValue;
+  }
+  if (strtotime($dateValue) === FALSE) {
+    throw new Exception($fieldName . " is not a valid date: " . $dateValue);
+  }
+  $format = ($fieldType == CRM_Utils_Type::T_DATE) ? 'Ymd000000' : 'YmdHis';
+  return CRM_Utils_Date::processDate($dateValue, NULL, FALSE, $format);
 }
 
 /**
@@ -1658,11 +1687,10 @@ function _civicrm_api3_validate_html(&$params, &$fieldName, &$fieldInfo) {
  * Validate string fields being passed into API.
  * @param array $params params from civicrm_api
  * @param string $fieldName uniquename of field being checked
- * @param $fieldInfo
+ * @param array $fieldInfo array of fields from getfields function
  * @param $entity
  * @throws API_Exception
  * @throws Exception
- * @internal param array $fieldinfo array of fields from getfields function
  */
 function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $entity) {
   // If fieldname exists in params
