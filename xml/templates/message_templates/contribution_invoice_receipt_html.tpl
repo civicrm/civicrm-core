@@ -7,20 +7,20 @@
   <body>
     <table style = "margin-top:2px;padding-left:29px;">
       <tr>
-        <td><img src = "http://civivat.wastaging.com/sites/default/files/logo.png" height = "39" width = "108"></td>
+        <td><img src = "{$imageUploadURL}/block_small.png" height = "39" width = "108"></td>
       </tr>
     </table>
     <center>
       <br/><br/>
       <table style = "padding-right:19px;" width = "500" height = "100" border = "0" cellpadding = "2" cellspacing = "1">
 	<tr>
-          {if $contribution_status_id == $contributionStatusId}
+          {if $contribution_status_id == $refundedStatusId}
             <td style = "padding-left:35px;" ><b><font size = "3" align = "center">CREDIT NOTE</font></b></td>
             {else}
               <td style = "padding-left:35px;" ><b><font size = "3" align = "center">TAX INVOICE</font></b></td>
           {/if}
           <td colspan = "1"></td>
-          {if $contribution_status_id == $contributionStatusId}
+          {if $contribution_status_id == $refundedStatusId}
             <td style = "padding-left:88px;"><b><font size = "1" align = "right">Date:</font></b></td> 
             {else}
               <td style = "padding-left:88px;"><b><font size = "1" align = "right">Invoice Date:</font></b></td> 
@@ -39,7 +39,7 @@
         <tr>
           <td style = "padding-left:48px;"><font size = "1" align = "center">{$street_address}   {$supplemental_address_1}</font></td>
           <td colspan = "1"></td>
-          {if $contribution_status_id == $contributionStatusId}
+          {if $contribution_status_id == $refundedStatusId}
             <td style = "padding-left:88px;"><b><font size = "1" align = "right">Credit Note Number:</font></b></td>     
             {else}
               <td style = "padding-left:88px;"><b><font size = "1" align = "right">Incoice Number:</font></b></td> 
@@ -118,7 +118,7 @@
 		{if $is_pay_later == 0}
 	          <tr>
 		    <td colspan = "3"></td>
-		    {if $contribution_status_id == $contributionStatusId}
+		    {if $contribution_status_id == $refundedStatusId}
 		      <td style = "padding-left:52px;"><font size = "1" align = "right">LESS Credit to invoice(s)</font></td>
 		      {else}
 		        <td style = "padding-left:52px;"><font size = "1" align = "righ">LESS Amount Paid</font></td>
@@ -131,7 +131,7 @@
 		  </tr>
 	          <tr>
 		    <td colspan = "3"></td>
-		    {if $contribution_status_id == $contributionStatusId}
+		    {if $contribution_status_id == $refundedStatusId}
 		      <td style = "padding-left:52px;"><b><font size = "1" align = "center">REMAINING CREDIT</font></b></td>
 		      <td style = "padding-left:52px;"><b><font size = "1" align = "center">{$amountDue|crmMoney:$currency}</font></b></td>
 		      {else}
@@ -146,7 +146,7 @@
 		  <td colspan = "3"></td>
 		</tr>
 	        <tr>
-		  {if $contribution_status_id == $contributionStatusId}
+		  {if $contribution_status_id == $refundedStatusId}
 		    <td ></td>
 		    {else}
 		      <td><b><font size = "1" align = "center">DUE DATE: {$dueDate}</font></b></td>
@@ -160,11 +160,11 @@
 
       <table style = "margin-top:5px;padding-right:45px;">
         <tr>
-          <td><img src = "http://civivat.wastaging.com/sites/default/files/img.png" height = "15" width = "630"></td>
+          <td><img src = "{$imageUploadURL}/img.png" height = "15" width = "630"></td>
         </tr>
       </table>
 
-      {if $contribution_status_id == $contributionStatusId}
+      {if $contribution_status_id == $refundedStatusId}
         <table  style = "margin-top:6px;padding-right:30px;" width = "585" border = "0" cellpadding = "-10" cellspacing = "19" id = "desc">
 	  <tr>
 	    <td ><b><font size = "4" align = "right">CREDIT ADVICE<br/><br/><font size = "1" >{$notes}</font></font></b></td>
