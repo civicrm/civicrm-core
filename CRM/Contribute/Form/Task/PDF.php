@@ -151,66 +151,33 @@ AND    {$this->_componentClause}";
    */
   public function postProcess() {
     // get all the details needed to generate a receipt
-    $contribIDs = implode(',', $this->_contributionIds);
+      $message = array();
+      $template = CRM_Core_Smarty::singleton();
 
-    $details = CRM_Contribute_Form_Task_Status::getDetails($contribIDs);
+      $elements = self::getElements();
 
-    $baseIPN = new CRM_Core_Payment_BaseIPN();
-
-    $message = array();
-    $template = CRM_Core_Smarty::singleton();
-
-    $params = $this->controller->exportValues($this->_name);
-
-    $createPdf = FALSE;
-    if ($params['output'] == "pdf_receipt") {
-      $createPdf = TRUE;
-    }
-
-    $excludeContactIds = array();
-    if (!$createPdf) {
-      $returnProperties = array(
-        'email' => 1,
-        'do_not_email' => 1,
-        'is_deceased' => 1,
-        'on_hold' => 1,
-      );
-
-      list($contactDetails) = CRM_Utils_Token::getTokenDetails($this->_contactIds, $returnProperties, FALSE, FALSE);
-      $suppressedEmails = 0;
-      foreach ($contactDetails as $id => $values) {
-        if (empty($values['email']) || !empty($values['do_not_email']) ||
-          CRM_Utils_Array::value('is_deceased', $values) || !empty($values['on_hold'])) {
-          $suppressedEmails++;
-          $excludeContactIds[] = $values['contact_id'];
-        }
-      }
-    }
-
-    foreach ($details as $contribID => $detail) {
+      foreach ($elements['details'] as $elements['contribID'] => $detail) {
       $input = $ids = $objects = array();
 
-      if (in_array($detail['contact'], $excludeContactIds)) {
+      if (in_array($detail['contact'], $elements['excludeContactIds'])) {
         continue;
       }
 
       $input['component'] = $detail['component'];
 
       $ids['contact'] = $detail['contact'];
-      $ids['contribution'] = $contribID;
+      $ids['contribution'] = $elements['contribID'];
       $ids['contributionRecur'] = NULL;
       $ids['contributionPage'] = NULL;
       $ids['membership'] = CRM_Utils_Array::value('membership', $detail);
       $ids['participant'] = CRM_Utils_Array::value('participant', $detail);
       $ids['event'] = CRM_Utils_Array::value('event', $detail);
 
-      if (!$baseIPN->validateData($input, $ids, $objects, FALSE)) {
+      if (!$elements['baseIPN']->validateData($input, $ids, $objects, FALSE)) {
         CRM_Core_Error::fatal();
       }
 
       $contribution = &$objects['contribution'];
-      // CRM_Core_Error::debug('o',$objects);
-
 
       // set some fake input values so we can reuse IPN code
       $input['amount']     = $contribution->total_amount;
@@ -226,7 +193,7 @@ AND    {$this->_componentClause}";
       // CRM_Core_Error::debug('input',$input);
 
       $values = array();
-      $mail = $baseIPN->sendMail($input, $ids, $objects, $values, FALSE, $createPdf);
+      $mail = $elements['baseIPN']->sendMail($input, $ids, $objects, $values, FALSE, $elements['createPdf']);
 
       if ($mail['html']) {
         $message[] = $mail['html'];
@@ -238,17 +205,18 @@ AND    {$this->_componentClause}";
       // reset template values before processing next transactions
       $template->clearTemplateVars();
     }
-    if ($createPdf) {
+
+    if ($elements['createPdf']) {
       CRM_Utils_PDF_Utils::html2pdf($message,
         'civicrmContributionReceipt.pdf',
         FALSE,
-        $params['pdf_format_id']
+        $elements['params']['pdf_format_id']
       );
       CRM_Utils_System::civiExit();
     }
     else {
-      if ($suppressedEmails) {
-        $status = ts('Email was NOT sent to %1 contacts (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).', array(1 => $suppressedEmails));
+      if ($elements['suppressedEmails']) {
+        $status = ts('Email was NOT sent to %1 contacts (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).', array(1 => $elements['suppressedEmails']));
         $msgTitle = ts('Email Error');
         $msgType = 'error';
       }
@@ -259,6 +227,52 @@ AND    {$this->_componentClause}";
       }
       CRM_Core_Session::setStatus($status, $msgTitle, $msgType);
     }
+  }
+
+  /**
+   * to get elements of postprocess function
+   *
+   * @access public
+   *
+   */
+  public function getElements() {
+    $pdfElements = array();
+
+    $pdfElements['contribIDs'] = implode(',', $this->_contributionIds);
+
+    $pdfElements['details'] = CRM_Contribute_Form_Task_Status::getDetails($pdfElements['contribIDs']);
+
+    $pdfElements['baseIPN'] = new CRM_Core_Payment_BaseIPN();
+
+    $pdfElements['params'] = $this->controller->exportValues($this->_name);
+
+    $pdfElements['createPdf'] = FALSE;
+    if ($pdfElements['params']['output'] == "pdf_invoice" || $pdfElements['params']['output'] == "pdf_receipt") {
+      $pdfElements['createPdf'] = TRUE;
+    }
+
+    $excludeContactIds = array();
+    if (!$pdfElements['createPdf']) {
+      $returnProperties = array(
+                                'email' => 1,
+                                'do_not_email' => 1,
+                                'is_deceased' => 1,
+                                'on_hold' => 1,
+                                );
+
+      list($contactDetails) = CRM_Utils_Token::getTokenDetails($this->_contactIds, $returnProperties, FALSE, FALSE);
+      $pdfElements['suppressedEmails'] = 0;
+      foreach ($contactDetails as $id => $values) {
+        if (empty($values['email']) || !empty($values['do_not_email']) ||
+            CRM_Utils_Array::value('is_deceased', $values) || !empty($values['on_hold'])) {
+          $suppressedEmails++;
+          $pdfElements['suppressedEmails'] = $suppressedEmails;
+          $excludeContactIds[] = $values['contact_id'];
+        }
+      }
+    }
+    $pdfElements['excludeContactIds'] = $excludeContactIds;
+    return $pdfElements;
   }
 }
 
