@@ -165,6 +165,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->add('select', 'end_action', ts('Repetition Condition'), $condition, TRUE);
     $this->add('select', 'end_date', ts('Date Field'), $sel4, TRUE);
 
+    $this->add('text', 'from_name', ts('From Name'));
+    $this->add('text', 'from_email', ts('From Email'));
+
     $recipient = 'activity_contacts';
     $recipientListingOptions = array();
 
@@ -342,7 +345,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'absolute_date',
       'group_id',
       'record_activity',
-      'limit_to'
+      'limit_to',
+      'from_name',
+      'from_email',
     );
     foreach ($keys as $key) {
       $params[$key] = CRM_Utils_Array::value($key, $values);
@@ -376,7 +381,12 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $params['body_text'] = CRM_Utils_Array::value('text_message', $values);
     $params['body_html'] = CRM_Utils_Array::value('html_message', $values);
-
+    if (CRM_Utils_Array::value('from_name', $values)){
+      $params['from_name'] = $values['from_name'];
+    }
+    if (CRM_Utils_Array::value('from_email', $values)){
+      $params['from_name'] = $values['from_email'];
+    }
     if (CRM_Utils_Array::value('recipient', $values) == 'manual') {
       $params['recipient_manual'] = CRM_Utils_Array::value('recipient_manual_id', $values);
       $params['group_id'] = $params['recipient'] = $params['recipient_listing'] = 'null';

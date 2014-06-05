@@ -229,4 +229,11 @@
        <comment>Date on which the reminder be sent.</comment>
        <add>4.1</add>
   </field>
+  <field>
+       <name>from</name>
+       <type>varchar</type>
+       <length>64</length>
+       <comment>Name and email address in "from" field</comment>
+       <add>4.4</add>
+  </field>
 </table>
