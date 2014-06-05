@@ -6,25 +6,27 @@ Required vars: caseTypes
   A Case Type describes a group of related tasks, interactions, or processes.
 </div>
 
-<table class="form-layout">
+<table class="display">
   <thead>
-  <tr>
-    <th>Name</th>
-    <th>Title</th>
-    <th>Description</th>
-    <th>Enabled?</th>
-    <th></th>
-  </tr>
+	  <tr>
+	    <th>Title</th>
+	    <th>Name</th>
+	    <th>Description</th>
+	    <th>Enabled?</th>
+	    <th></th>
+	  </tr>
   </thead>
-  <tr ng-repeat="caseType in caseTypes">
-    <td>{{caseType.name}}</td>
-    <td>{{caseType.title}}</td>
-    <td>{{caseType.description}}</td>
-    <td>{{caseType.is_active}}</td>
-    <td><a ng-href="#/caseType/{{caseType.id}}">Edit</a</td>
-  </tr>
+	<tbody>
+	  <tr ng-repeat="caseType in caseTypes" ng-class-even="'crm-entity even-row even'" ng-class-odd="'crm-entity odd-row odd'">
+	    <td>{{caseType.title}}</td>
+	    <td>{{caseType.name}}</td>
+	    <td>{{caseType.description}}</td>
+	    <td>{{caseType.is_active}}</td>
+	    <td><a ng-href="#/caseType/{{caseType.id}}">Edit</a</td>
+  	</tr>
+	</tbody>
 </table>
 
-<div class="action-link">
-  <a ng-href="#/caseType/new" class="button"><span>&raquo; New Case Type</span></a>
+<div class="crm-submit-buttons">
+  <a ng-href="#/caseType/new" class="button"><span><div class="icon add-icon"></div>New Case Type</span></a>
 </div>
