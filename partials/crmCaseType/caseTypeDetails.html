@@ -15,7 +15,7 @@ The original form used table layout; don't know if we have an alternative, CSS-b
   <tr>
     <td class="label">Name</td>
     <td>
-      <input type="text" ng-model="caseType.name"/> <!-- FIXME lock -->
+      <input type="text" ng-model="caseType.name" ng-disabled="caseType.id" class="big crm-form-text"/> <!-- FIXME lock -->
     </td>
   </tr>
   <tr>
