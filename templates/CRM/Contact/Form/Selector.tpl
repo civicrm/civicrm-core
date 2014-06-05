@@ -148,7 +148,7 @@
   {literal}
   CRM.$(function($) {
     // Clear any old selection that may be lingering in quickform
-    $("input.select-row, input.select-rows", 'form.crm-search-form').prop('checked', false);
+    $("input.select-row, input.select-rows", 'form.crm-search-form').prop('checked', false).closest('tr').removeClass('crm-row-selected');
     // Retrieve stored checkboxes
     var cids = {/literal}{$selectedContactIds|@json_encode}{literal};
     if (cids.length > 0) {
