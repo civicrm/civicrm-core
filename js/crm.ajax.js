@@ -468,7 +468,7 @@
     e.preventDefault();
   };
   /**
-   * An event callback for CRM.popup or a standalone function to refresh the content around a popup link
+   * An event callback for CRM.popup or a standalone function to refresh the content around a given element
    * @param e event|selector
    */
   CRM.refreshParent = function(e) {
