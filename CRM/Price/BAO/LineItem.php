@@ -424,7 +424,14 @@ AND li.entity_id = {$entityId}
   }
 
   /**
-   * Function to calculate tax rate in percentage
+   * Calculate tax rate in percentage
+   *
+   * @param $lineItemId an assoc array of lineItem
+   *
+   * @return tax rate
+   *
+   * @access public
+   * @static
    */
   public static function calculateTaxRate($lineItemId) {
     if ($lineItemId['html_type'] == 'Text') {

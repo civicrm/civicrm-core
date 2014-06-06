@@ -7,7 +7,7 @@
   <body>
     <table style = "margin-top:2px;padding-left:29px;">
       <tr>
-        <td><img src = "{$imageUploadURL}/block_small.png" height = "39" width = "108"></td>
+        <td><img src = "{$imageUploadURL}/logo.png" height = "39" width = "108"></td>
       </tr>
     </table>
     <center>
