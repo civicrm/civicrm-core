@@ -151,12 +151,12 @@ AND    {$this->_componentClause}";
    */
   public function postProcess() {
     // get all the details needed to generate a receipt
-      $message = array();
-      $template = CRM_Core_Smarty::singleton();
+    $message = array();
+    $template = CRM_Core_Smarty::singleton();
 
-      $elements = self::getElements();
+    $elements = self::getElements();
 
-      foreach ($elements['details'] as $elements['contribID'] => $detail) {
+    foreach ($elements['details'] as $contribID => $detail) {
       $input = $ids = $objects = array();
 
       if (in_array($detail['contact'], $elements['excludeContactIds'])) {
@@ -166,7 +166,7 @@ AND    {$this->_componentClause}";
       $input['component'] = $detail['component'];
 
       $ids['contact'] = $detail['contact'];
-      $ids['contribution'] = $elements['contribID'];
+      $ids['contribution'] = $contribID;
       $ids['contributionRecur'] = NULL;
       $ids['contributionPage'] = NULL;
       $ids['membership'] = CRM_Utils_Array::value('membership', $detail);
@@ -230,9 +230,11 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * to get elements of postprocess function
+   * declaration of common variables for Invoice and PDF
    *
    * @access public
+   *
+   * @return array array of common elements
    *
    */
   public function getElements() {
@@ -272,6 +274,7 @@ AND    {$this->_componentClause}";
       }
     }
     $pdfElements['excludeContactIds'] = $excludeContactIds;
+
     return $pdfElements;
   }
 }

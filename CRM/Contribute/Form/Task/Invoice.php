@@ -89,7 +89,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $statusId = array();
     foreach ($this->_contributionStatusId as $key => $value) {
       if (in_array($value, $status)) {
-        $statusId[]= $key;
+        $statusId[] = $key;
       }
     }
     $Id = implode(",", $statusId);
@@ -167,7 +167,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     // gives the status id when contribution status is 'Refunded'
     $refundedStatusId = CRM_Utils_Array::key('Refunded', $this->_contributionStatusId);
     
-    foreach ($invoiceElements['details'] as $invoiceElements['contribID'] => $detail) {
+    foreach ($invoiceElements['details'] as $contribID => $detail) {
       $input = $ids = $objects = array();
       
       if (in_array($detail['contact'], $invoiceElements['excludeContactIds'])) {
@@ -177,7 +177,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $input['component'] = $detail['component'];
       
       $ids['contact'] = $detail['contact'];
-      $ids['contribution'] = $invoiceElements['contribID'];
+      $ids['contribution'] = $contribID;
       $ids['contributionRecur'] = NULL;
       $ids['contributionPage'] = NULL;
       $ids['membership'] = CRM_Utils_Array::value('membership', $detail);
@@ -216,7 +216,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $stateProvinceAbbreviation = CRM_Core_PseudoConstant::stateProvinceAbbreviation($billingAddress[$contribution->contact_id]['state_province_id']);
       
       // getting data from admin page
-       $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+      $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
       
       if ($contribution->contribution_status_id == $refundedStatusId) {
         $invoiceId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue)."".$contribution->id;
@@ -231,7 +231,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $dueDate = date('F j ,Y', strtotime($contributionReceiveDate."+".$prefixValue['due_date']."". $prefixValue['due_date_period']));
       
       if ($input['component'] == 'contribute') {
-        $eid = $invoiceElements['contribID'];
+        $eid = $contribID;
         $etable = 'contribution';     
       } 
       else {
@@ -360,7 +360,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       elseif ($contribution->_component == 'contribute') {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id);
         
-        $sendTemplateParams['tplParams'] =array_merge($tplParams,array('email_comment' => $invoiceElements['params']['email_comment']));
+        $sendTemplateParams['tplParams'] = array_merge($tplParams,array('email_comment' => $invoiceElements['params']['email_comment']));
         $sendTemplateParams['from'] = CRM_Utils_Array::value('receipt_from_name', $values) . ' <' . $mailDetails[$contribution->contribution_page_id]['receipt_from_email']. '>';
         $sendTemplateParams['toEmail'] = $email;
         $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_receipt', $values);
@@ -371,7 +371,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       elseif ($contribution->_component == 'event') {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id);
         
-        $sendTemplateParams['tplParams'] =array_merge($tplParams,array('email_comment' => $invoiceElements['params']['email_comment']));
+        $sendTemplateParams['tplParams'] = array_merge($tplParams,array('email_comment' => $invoiceElements['params']['email_comment']));
         $sendTemplateParams['from'] = CRM_Utils_Array::value('confirm_from_name', $values) . ' <' . $mailDetails[$contribution->_relatedObjects['event']->id]['confirm_from_email'].  '>';
         $sendTemplateParams['toEmail'] = $email;
         $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_confirm', $values);
