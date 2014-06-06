@@ -251,6 +251,20 @@
        <add>4.1</add>
   </field>
   <field>
+    <name>from_name</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Name in "from" field</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>from_email</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Email address in "from" field</comment>
+    <add>4.5</add>
+  </field>
+  <field>
     <name>mode</name>
     <title>Message Mode</title>
     <default>"Email"</default>

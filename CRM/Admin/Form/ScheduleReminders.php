@@ -186,6 +186,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->add('select', 'end_action', ts('Repetition Condition'), $condition, TRUE);
     $this->add('select', 'end_date', ts('Date Field'), $sel4, TRUE);
 
+    $this->add('text', 'from_name', ts('From Name'));
+    $this->add('text', 'from_email', ts('From Email'));    
+
     $recipient = 'activity_contacts';
     $recipientListingOptions = array();
 
@@ -346,7 +349,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'record_activity',
       'limit_to',
       'mode',
-      'sms_provider_id'
+      'sms_provider_id',
+      'from_name',
+      'from_email',
     );
     foreach ($keys as $key) {
       $params[$key] = CRM_Utils_Array::value($key, $values);
