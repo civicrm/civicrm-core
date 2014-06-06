@@ -454,7 +454,14 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   static function loadBootStrap( $params = array( ), $loadUser = true, $throwError = true )
   {
-    // load BootStrap here if needed
+    if ($loadUser) {
+      if (!CRM_Utils_Array::value('uid', $params)) {
+        return false;
+      }
+      $session = CRM_Core_Session::singleton();
+      $session->set('ufID', $params['uid']);
+      $session->set('userID', $params['uid']);
+    }
     return true;
   }
 

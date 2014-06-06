@@ -566,6 +566,10 @@ AND    domain_id    = %4
     if (!isset($contactID)) {
       return NULL;
     }
+    $config = CRM_Core_Config::singleton();
+    if ($config->userFramework == 'Standalone') {
+      return $contactID;
+    }
     $domain = CRM_Core_BAO_Domain::getDomain();
     $ufmatch = new CRM_Core_DAO_UFMatch();
 
