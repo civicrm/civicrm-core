@@ -474,11 +474,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         foreach ($cidRefs[$table] as $field) {
           // carry related contributions CRM-5359
           if (in_array($table, $paymentTables)) {
-            $payOprSqls = self::operationSql($mainId, $otherId, $table, $tableOperations, 'payment');
-            $sqls = array_merge($sqls, $payOprSqls);
-
             $paymentSqls = self::paymentSql($table, $mainId, $otherId);
             $sqls = array_merge($sqls, $paymentSqls);
+
+            if (!empty($tables) && !in_array('civicrm_contribution', $tables)) {
+              $payOprSqls = self::operationSql($mainId, $otherId, $table, $tableOperations, 'payment');
+              $sqls = array_merge($sqls, $payOprSqls);
+            }
           }
 
           $preOperationSqls = self::operationSql($mainId, $otherId, $table, $tableOperations);
