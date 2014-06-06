@@ -56,9 +56,9 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
 
     $statusVals = array('Scheduled', 'Complete', 'Running', 'Canceled');
     foreach ($statusVals as $status) {
-      $this->addElement('checkbox', "mailing_status[$status]", NULL, $status);
+      $this->addElement('checkbox', "mailing_status[$status]", NULL, ts($status));
     }
-    $this->addElement('checkbox', 'status_unscheduled', NULL, 'Draft / Unscheduled');
+    $this->addElement('checkbox', 'status_unscheduled', NULL, ts('Draft / Unscheduled'));
     $this->addYesNo('is_archived', ts('Mailing is Archived'), TRUE);
 
     if ($parent->_sms) {
