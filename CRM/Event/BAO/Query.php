@@ -596,7 +596,6 @@ class CRM_Event_BAO_Query {
     CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
 
     $status = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
-    asort($status);
     foreach ($status as $id => $Name) {
       $form->_participantStatus = &$form->addElement('checkbox', "participant_status_id[$id]", NULL, $Name);
     }
