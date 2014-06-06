@@ -852,5 +852,24 @@ LIMIT 1
     }
     return $_cache[$contactID];
   }
+
+  /**
+   * Calculate the tax amount based on given tax rate.
+   *
+   * @param float $amount amount of field.
+   * @param float $taxRate tax rate of selected financial account for field.
+   *
+   * @return array array of tax amount
+   *
+   * @access public
+   * @static
+   *
+   */
+  public static function calculateTaxAmount($amount, $taxRate) {
+    $taxAmount = array();
+    $taxAmount['tax_amount'] = ($taxRate/100) * $amount;
+
+    return $taxAmount;
+  }
 }
 
