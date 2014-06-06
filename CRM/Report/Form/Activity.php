@@ -490,6 +490,10 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
                 CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
                 CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
               );
+              if ($fieldName == 'activity_type_id' && empty($this->_params['activity_type_id_value'])) {
+                $actTypes = array_flip(CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'label', TRUE));
+                $clause = "( {$this->_aliases['civicrm_activity']}.activity_type_id IN (".implode(',',$actTypes).") )";
+              }
             }
           }
 
