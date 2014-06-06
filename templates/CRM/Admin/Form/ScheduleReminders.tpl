@@ -106,7 +106,16 @@
           </tr>
         </table>
      </td>
+    </tr> 
+    <tr id="fromName" class="crm-scheduleReminder-form-block-from_name">
+        <td class="label" width="20%">{$form.from_name.label}</td>
+        <td>{$form.from_name.html}&nbsp;&nbsp;</td>
     </tr>
+    <tr id="fromEmail" class="crm-scheduleReminder-form-block-from_email">
+        <td class="label" width="20%">{$form.from_email.label}</td>
+        <td>{$form.from_email.html}&nbsp;&nbsp;</td>
+    </tr>
+
     <tr class="crm-scheduleReminder-form-block-recipient">
       <td id="recipientLabel" class="right">{$form.recipient.label}</td><td colspan="3">{$form.limit_to.html}&nbsp;&nbsp;{$form.recipient.html}&nbsp;&nbsp;{help id="recipient" title=$form.recipient.label}</td>
     </tr>
