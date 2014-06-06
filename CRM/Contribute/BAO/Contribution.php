@@ -2776,6 +2776,27 @@ WHERE  contribution_id = %1 ";
         // also make it available as return value
         $return = $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
         $params['entity_id'] = $financialTxn->id;
+
+        // when a tax is charged
+        if (!empty($params['tax_amount'])) {
+          $salesTaxTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
+          $amount = $params['tax_amount'];
+          if (!$amount) {
+            return FALSE;
+          }
+
+          $taxTrxnParams = $trxnParams;
+
+          //build financial transaction params for tax
+          $financialAccount = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id'], $salesTaxTypeId);
+          $taxTrxnParams['from_financial_account_id'] = $params['to_financial_account_id'];
+          $taxTrxnParams['to_financial_account_id'] = $financialAccount;
+          $taxTrxnParams['total_amount'] = $amount;
+          $taxTrxnParams['fee_amount'] =
+              $taxTrxnParams['net_amount'] = 0;
+          $trxn = CRM_Core_BAO_FinancialTrxn::create($taxTrxnParams);
+          $params['contribution']->tax_trxn_id = $trxn->id;
+        }
       }
     }
     // record line items and finacial items
