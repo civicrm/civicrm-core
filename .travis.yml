@@ -34,7 +34,7 @@ before_script:
   - php -d sendmail_path=`which true` ~/.composer/vendor/bin/drush.php --yes core-quick-drupal --no-server --db-url=mysql://root:@127.0.0.1/civicrm_build --account-pass=123456 --site-name=CiviCRM --enable=simpletest civicrm_build
 
   # reference and enable civicrm in build site
-  - ln -s $(readlink -e $(cd -)) civicrm_build/drupal-6.x/sites/all/modules/civicrm
+  - ln -s $(readlink -e $(cd -)) civicrm_build/drupal/sites/all/modules/civicrm
   - cd civicrm_build/drupal
   - chmod -R 777 sites/default/files
   - drush --yes pm-download simpletest
