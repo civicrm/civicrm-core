@@ -40,7 +40,7 @@ before_script:
   - drush --yes pm-download simpletest
   - drush --yes pm-enable simpletest
 
-  # download civicrm
+  # download civicrm-packages and civicrm-drupal
   wget --no-check-certificate https://raw.githubusercontent.com/jimyhuang/civicrm-travis/master/gitfyzip
   bash gitfyzip Drupal civicrm
 
