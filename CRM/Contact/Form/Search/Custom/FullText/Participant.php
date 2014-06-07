@@ -60,12 +60,14 @@ class CRM_Contact_Form_Search_Custom_FullText_Participant extends CRM_Contact_Fo
    * @return int the total number of matches
    */
   function fillParticipantIDs($queryText, $entityIDTableName, $limit) {
+    // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
+
     $contactSQL = array();
     $contactSQL[] = "
 SELECT     distinct cp.id
 FROM       civicrm_participant cp
 INNER JOIN civicrm_contact c ON cp.contact_id = c.id
-WHERE      (c.sort_name LIKE {$this->toSqlWildCard($queryText)} OR c.display_name LIKE {$this->toSqlWildCard($queryText)})
+WHERE      ({$this->matchText('civicrm_contact c', array('sort_name', 'display_name', 'nick_name'), $queryText)})
 ";
     $tables = array(
       'civicrm_participant' => array(
@@ -73,7 +75,7 @@ WHERE      (c.sort_name LIKE {$this->toSqlWildCard($queryText)} OR c.display_nam
         'fields' => array(
           'source' => NULL,
           'fee_level' => NULL,
-          'fee_amount' => (is_numeric($queryText)) ? 'Int' : NULL,
+          'fee_amount' => 'Int',
         ),
       ),
       'sql' => $contactSQL,

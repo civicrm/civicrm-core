@@ -57,6 +57,8 @@ class CRM_Contact_Form_Search_Custom_FullText_Case extends CRM_Contact_Form_Sear
    * @return int the total number of matches
    */
   function fillCaseIDs($queryText, $entityIDTableName, $limit) {
+    // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
+
     $contactSQL = array();
 
     $contactSQL[] = "
@@ -64,7 +66,7 @@ SELECT    distinct cc.id
 FROM      civicrm_case cc
 LEFT JOIN civicrm_case_contact ccc ON cc.id = ccc.case_id
 LEFT JOIN civicrm_contact c ON ccc.contact_id = c.id
-WHERE     (c.sort_name LIKE {$this->toSqlWildCard($queryText)} OR c.display_name LIKE {$this->toSqlWildCard($queryText)})
+WHERE     ({$this->matchText('civicrm_contact c', array('sort_name', 'display_name', 'nick_name'), $queryText)})
           AND (cc.is_deleted = 0 OR cc.is_deleted IS NULL)
 ";
 
@@ -85,7 +87,7 @@ FROM       civicrm_entity_tag et
 INNER JOIN civicrm_tag t ON et.tag_id = t.id
 WHERE      et.entity_table = 'civicrm_case'
 AND        et.tag_id       = t.id
-AND        t.name LIKE {$this->toSqlWildCard($queryText)}
+AND        ({$this->matchText('civicrm_tag t', 'name', $queryText)})
 GROUP BY   et.entity_id
 ";
 

@@ -60,12 +60,14 @@ class CRM_Contact_Form_Search_Custom_FullText_Membership extends CRM_Contact_For
    * @return int the total number of matches
    */
   function fillMembershipIDs($queryText, $entityIDTableName, $limit) {
+    // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
+
     $contactSQL = array();
     $contactSQL[] = "
 SELECT     distinct cm.id
 FROM       civicrm_membership cm
 INNER JOIN civicrm_contact c ON cm.contact_id = c.id
-WHERE      (c.sort_name LIKE {$this->toSqlWildCard($queryText)} OR c.display_name LIKE {$this->toSqlWildCard($queryText)})
+WHERE      ({$this->matchText('civicrm_contact c', array('sort_name', 'display_name', 'nick_name'), $queryText)})
 ";
     $tables = array(
       'civicrm_membership' => array(

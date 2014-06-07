@@ -37,20 +37,36 @@ class CRM_Core_InnoDBIndexer {
    */
   private static $singleton = NULL;
 
+  /**
+   * @param bool $fresh
+   * @return CRM_Core_InnoDBIndexer
+   */
   public static function singleton($fresh = FALSE) {
     if ($fresh || self::$singleton === NULL) {
       $indices = array(
         'civicrm_address' => array(
           array('street_address', 'city', 'postal_code')
         ),
+        'civicrm_activity' => array(
+          array('subject', 'details'),
+        ),
         'civicrm_contact' => array(
           array('sort_name', 'nick_name', 'display_name'),
+        ),
+        'civicrm_contribution' => array(
+          array('source', 'amount_level', 'trxn_Id', 'invoice_id'),
         ),
         'civicrm_email' => array(
           array('email')
         ),
+        'civicrm_membership' => array(
+          array('source'),
+        ),
         'civicrm_note' => array(
           array('subject', 'note'),
+        ),
+        'civicrm_participant' => array(
+          array('source', 'fee_level'),
         ),
         'civicrm_phone' => array(
           array('phone'),
