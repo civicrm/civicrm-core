@@ -348,7 +348,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * @static
    * @access public
    */
-  function setUFFieldStatus($customGroupId, $is_active) {
+  static function setUFFieldStatus($customGroupId, $is_active) {
     //find the profile id given custom group id
     $queryString = "SELECT civicrm_custom_field.id as custom_field_id
                         FROM   civicrm_custom_field, civicrm_custom_group
