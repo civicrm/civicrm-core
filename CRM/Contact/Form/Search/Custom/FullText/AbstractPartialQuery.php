@@ -141,7 +141,8 @@ $sqlStatement
           }
         }
         else {
-          $clauses = array();
+          $fullTextFields = array(); // array (string $sqlColumnName)
+          $clauses = array(); // array (string $sqlExpression)
 
           foreach ($tableValues['fields'] as $fieldName => $fieldType) {
             if ($fieldType == 'Int') {
@@ -150,8 +151,12 @@ $sqlStatement
               }
             }
             else {
-              $clauses[] = "$fieldName LIKE {$this->toSqlWildCard($queryText)}";
+              $fullTextFields[] = $fieldName;
             }
+          }
+
+          if (!empty($fullTextFields)) {
+            $clauses[] = $this->matchText($tableName, $fullTextFields, $queryText);
           }
 
           if (empty($clauses)) {
@@ -189,6 +194,51 @@ GROUP BY {$tableValues['id']}
 
     $rowCount = "SELECT count(*) FROM {$entityIDTableName}";
     return CRM_Core_DAO::singleValueQuery($rowCount);
+  }
+
+  /**
+   * Create a SQL expression for matching against a list of
+   * text columns.
+   *
+   * @param string $table eg "civicrm_note" or "civicrm_note mynote"
+   * @param array|string $fullTextFields list of field names
+   * @param string $queryText
+   * @return array
+   */
+  public function matchText($table, $fullTextFields, $queryText) {
+    if (strpos($table, ' ') === FALSE) {
+      $tableName = $tableAlias = $table;
+    } else {
+      list ($tableName, $tableAlias) = explode(' ', $table);
+    }
+    if (is_scalar($fullTextFields)) {
+      $fullTextFields = array($fullTextFields);
+    }
+
+    $clauses = array();
+    if (CRM_Core_InnoDBIndexer::singleton()->hasDeclaredIndex($tableName, $fullTextFields)) {
+      $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
+
+      $prefixedFieldNames = array();
+      foreach ($fullTextFields as $fieldName) {
+        $prefixedFieldNames[] = "$tableAlias.$fieldName";
+      }
+
+      $clauses[] = sprintf("MATCH (%s) AGAINST ('%s')",
+        implode(',', $prefixedFieldNames),
+        $strtolower(CRM_Core_DAO::escapeString($queryText))
+      );
+    }
+    else {
+      //CRM_Core_Session::setStatus(ts('Cannot use FTS for %1 (%2)', array(
+      //  1 => $table,
+      //  2 => implode(', ', $fullTextFields),
+      //)));
+      foreach ($fullTextFields as $fieldName) {
+        $clauses[] = "$tableAlias.$fieldName LIKE {$this->toSqlWildCard($queryText)}";
+      }
+    }
+    return implode(' OR ', $clauses);
   }
 
   /**
