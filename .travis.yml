@@ -40,7 +40,8 @@ before_script:
 
   # download civicrm-packages and civicrm-drupal
   - wget --no-check-certificate https://raw.githubusercontent.com/jimyhuang/civicrm-travis/master/gitfyzip
-  - gitfyzip Drupal civicrm-core
+  - chmod 755 gitfyzip
+  - ./gitfyzip Drupal civicrm-core
 
   # start a web server on port 8080, run in the background; wait for initialization
   - drush runserver 127.0.0.1:8080 >> /dev/null &
