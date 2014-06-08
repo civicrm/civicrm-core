@@ -203,7 +203,7 @@ GROUP BY {$tableValues['id']}
    * @param string $table eg "civicrm_note" or "civicrm_note mynote"
    * @param array|string $fullTextFields list of field names
    * @param string $queryText
-   * @return array
+   * @return string SQL, eg "MATCH (col1) AGAINST (queryText)" or "col1 LIKE '%queryText%'"
    */
   public function matchText($table, $fullTextFields, $queryText) {
     if (strpos($table, ' ') === FALSE) {
