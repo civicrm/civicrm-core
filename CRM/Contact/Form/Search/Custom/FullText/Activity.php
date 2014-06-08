@@ -56,6 +56,8 @@ class CRM_Contact_Form_Search_Custom_FullText_Activity extends CRM_Contact_Form_
    * @return int the total number of matches
    */
   function fillActivityIDs($queryText, $entityIDTableName, $limit) {
+    // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
+
     $contactSQL = array();
 
     $contactSQL[] = "
@@ -66,10 +68,11 @@ INNER JOIN civicrm_contact c ON cat.contact_id = c.id
 LEFT  JOIN civicrm_email e ON cat.contact_id = e.contact_id
 LEFT  JOIN civicrm_option_group og ON og.name = 'activity_type'
 LEFT  JOIN civicrm_option_value ov ON ( ov.option_group_id = og.id )
-WHERE      ( (c.sort_name LIKE {$this->toSqlWildCard($queryText)} OR c.display_name LIKE {$this->toSqlWildCard($queryText)}) OR
-             ( e.email LIKE {$this->toSqlWildCard($queryText)}    AND
-               ca.activity_type_id = ov.value AND
-               ov.name IN ('Inbound Email', 'Email') ) )
+WHERE      (
+             ({$this->matchText('civicrm_contact c', array('sort_name', 'display_name', 'nick_name'), $queryText)})
+             OR
+             ({$this->matchText('civicrm_email e', 'email', $queryText)} AND ca.activity_type_id = ov.value AND ov.name IN ('Inbound Email', 'Email') )
+           )
 AND        (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
 AND        (c.is_deleted = 0 OR c.is_deleted IS NULL)
 ";
@@ -81,7 +84,7 @@ INNER JOIN civicrm_tag t ON et.tag_id = t.id
 INNER JOIN civicrm_activity ca ON et.entity_id = ca.id
 WHERE      et.entity_table = 'civicrm_activity'
 AND        et.tag_id       = t.id
-AND        t.name LIKE {$this->toSqlWildCard($queryText)}
+AND        ({$this->matchText('civicrm_tag t', 'name', $queryText)})
 AND        (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
 GROUP BY   et.entity_id
 ";
@@ -89,7 +92,7 @@ GROUP BY   et.entity_id
     $contactSQL[] = "
 SELECT distinct ca.id
 FROM   civicrm_activity ca
-WHERE  (ca.subject LIKE  {$this->toSqlWildCard($queryText)} OR ca.details LIKE  {$this->toSqlWildCard($queryText)})
+WHERE  ({$this->matchText('civicrm_activity ca', array('subject', 'details'), $queryText)})
 AND    (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
 ";
 

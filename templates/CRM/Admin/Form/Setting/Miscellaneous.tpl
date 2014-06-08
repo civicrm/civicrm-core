@@ -103,6 +103,13 @@
                 <p class="description">{ts}If enabled, contacts with the permission to edit a related contact will inherit that contact's permission to edit other related contacts.{/ts}</p>
             </td>
         </tr>
+
+        <tr class="crm-miscellaneous-form-block-enable_innodb_fts">
+            <td class="label">{$form.enable_innodb_fts.label}</td>
+            <td>{$form.enable_innodb_fts.html}<br />
+                <p class="description">{$enable_innodb_fts_description}</p>
+            </td>
+        </tr>
     </table>
 <h3>{ts}reCAPTCHA Keys{/ts}</h3>
     <div class="description">
