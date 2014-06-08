@@ -29,6 +29,57 @@
  */
 class CRM_Core_Form_Search extends CRM_Core_Form {
 
+  /**
+   * Are we forced to run a search
+   *
+   * @var int
+   * @access protected
+   */
+  protected $_force;
+
+  /**
+   * name of search button
+   *
+   * @var string
+   * @access protected
+   */
+  protected $_searchButtonName;
+
+  /**
+   * name of action button
+   *
+   * @var string
+   * @access protected
+   */
+  protected $_actionButtonName;
+
+  /**
+   * form values that we will be using
+   *
+   * @var array
+   * @access public
+   */
+  public $_formValues;
+
+  /**
+   * have we already done this search
+   *
+   * @access protected
+   * @var boolean
+   */
+  protected $_done;
+
+  /**
+   * what context are we being invoked from
+   *
+   * @access protected
+   * @var string
+   */
+  protected $_context = NULL;
+
+  /**
+   * Common buildform tasks required by all searches
+   */
   function buildQuickform() {
     $resources = CRM_Core_Resources::singleton();
 
@@ -47,5 +98,35 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
         'isDefault' => TRUE,
       ),
     ));
+
+    $this->setAttribute('class', 'crm-search-form');
+  }
+
+  /**
+   * Add checkboxes for each row plus a master checkbox
+   */
+  function addRowSelectors($rows) {
+    $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows'));
+    foreach ($rows as $row) {
+      $this->addElement('checkbox', $row['checkbox'], NULL, NULL, array('class' => 'select-row'));
+    }
+  }
+
+  /**
+   * Add actions menu to search results form
+   * @param $tasks
+   */
+  function addTaskMenu($tasks) {
+    if (is_array($tasks) && !empty($tasks)) {
+      $tasks = array('' => ts('Actions')) + $tasks;
+      $this->add('select', 'task', NULL, $tasks, FALSE, array('class' => 'crm-select2 crm-action-menu huge crm-search-result-actions'));
+      $this->add('submit', $this->_actionButtonName, ts('Go'), array('class' => 'hiddenElement crm-search-go-button'));
+
+      // Radio to choose "All items" or "Selected items only"
+      $selectedRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
+      $allRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all');
+      $this->assign('ts_sel_id', $selectedRowsRadio->_attributes['id']);
+      $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
+    }
   }
 }
