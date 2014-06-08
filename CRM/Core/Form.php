@@ -296,13 +296,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * This function is just a wrapper, so that we can call all the hook functions
+   * @param bool $allowAjax - FIXME: This feels kind of hackish, ideally we would take the json-related code from this function
+   *                          and bury it deeper down in the controller
    */
-  function mainProcess() {
+  function mainProcess($allowAjax = TRUE) {
     $this->postProcess();
     $this->postProcessHook();
 
     // Respond with JSON if in AJAX context (also support legacy value '6')
-    if (!empty($_REQUEST['snippet']) && in_array($_REQUEST['snippet'], array(CRM_Core_Smarty::PRINT_JSON, 6))) {
+    if ($allowAjax && !empty($_REQUEST['snippet']) && in_array($_REQUEST['snippet'], array(CRM_Core_Smarty::PRINT_JSON, 6))) {
       $this->ajaxResponse['buttonName'] = str_replace('_qf_' . $this->getAttribute('id') . '_', '', $this->controller->getButtonName());
       $this->ajaxResponse['action'] = $this->_action;
       if (isset($this->_id) || isset($this->id)) {
