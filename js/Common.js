@@ -505,7 +505,7 @@ CRM.validate = CRM.validate || {
     })
     .on('dialogclose', function(e) {
       // Restore scrollbars when closing modal
-      if ($('.ui-dialog .modal-dialog').not(e.target).length < 1) {
+      if ($('.ui-dialog .modal-dialog:visible').not(e.target).length < 1) {
         $('body').css({overflow: ''});
       }
     })
