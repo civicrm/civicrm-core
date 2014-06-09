@@ -658,9 +658,10 @@ WHERE  id = %1";
 
       switch ($field['html_type']) {
         case 'Text':
-          $params["price_{$id}"] = array(key($field['options']) => $params["price_{$id}"]);
+          $firstOption = reset($field['options']);
+          $params["price_{$id}"] = array($firstOption['id'] => $params["price_{$id}"]);
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
-          $totalPrice += $lineItem[key($field['options'])]['line_total'];
+          $totalPrice += $lineItem[$firstOption['id']]['line_total'];
           break;
 
         case 'Radio':
