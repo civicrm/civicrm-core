@@ -614,6 +614,16 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             continue;
           }
 
+          //hack to fix CRM-14823 buildAmount hook does not alter labels for text fields
+          // I don't propose this as a fix for master, only production, as I think the correct fix is to figure out
+          // why we are building up 'in use' priceset data here but then assigning a different variable
+          // to template & to consolidate what is going on
+          foreach ($options as $optionID => $option) {
+            if($option['amount'] != $form->_priceSet['fields'][$option['price_field_id']]['options'][$optionID]['amount']) {
+              $form->_priceSet['fields'][$option['price_field_id']]['options'][$optionID]['amount'] = $option['amount'];
+            }
+          }
+
           $optionFullIds = CRM_Utils_Array::value('option_full_ids', $field, array());
 
           //soft suppress required rule when option is full.
