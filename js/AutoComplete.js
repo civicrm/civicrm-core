@@ -25,7 +25,6 @@ CRM.$(function($) {
 
     customIdObj.on('change', function (event, data) {
         var contactID = $(this).val();
-        console.log(contactID);
         var namefields = ['first_name', 'last_name', 'middle_name'];
         CRM.api('profile', 'get', {'profile_id': profileids, 'contact_id': contactID}, {
           success: function (result) {
