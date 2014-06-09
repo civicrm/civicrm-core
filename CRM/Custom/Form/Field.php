@@ -527,7 +527,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     // add buttons
     $this->addButtons(array(
         array(
-          'type' => 'next',
+          'type' => 'done',
           'name' => ts('Save'),
           'isDefault' => TRUE,
         ),
