@@ -172,6 +172,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    */
   static function &links() {
     list($key) = func_get_args();
+    $searchContext = "&context=custom";
     $extraParams = ($key) ? "&key={$key}" : NULL;
 
     if (!(self::$_links)) {
@@ -179,7 +180,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
         CRM_Core_Action::VIEW => array(
           'name' => ts('View'),
           'url' => 'civicrm/contact/view',
-          'qs' => "reset=1&cid=%%id%%{$extraParams}",
+          'qs' => "reset=1&cid=%%id%%{$extraParams}{$searchContext}",
           'title' => ts('View Contact Details'),
         ),
         CRM_Core_Action::UPDATE => array(
