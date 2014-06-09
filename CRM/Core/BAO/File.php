@@ -79,7 +79,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
    * @param $entityID
    * @param $entitySubtype
    * @param bool $overwrite
-   * @param null $fileParams
+   * @param null|array $fileParams
    * @param string $uploadName
    * @param null $mimeType
    *
@@ -117,7 +117,6 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
     if (!rename($data, $directoryName . DIRECTORY_SEPARATOR . $filename)) {
       CRM_Core_Error::fatal(ts('Could not move custom file to custom upload directory'));
-      break;
     }
 
     // to get id's
@@ -362,8 +361,8 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
-   * @param $form
-   * @param $entityTable
+   * @param CRM_Core_Form $form
+   * @param string $entityTable
    * @param null $entityID
    * @param null $numAttachments
    * @param bool $ajaxDelete
