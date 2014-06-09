@@ -76,7 +76,7 @@ function invoke() {
             print $str . CRM_Core_Invoke::invoke( explode('/', $_GET[$urlVar] ) );
         }
     } else {
-        if ($_GET[$urlVar] == "") {
+        if (empty($_GET[$urlVar])) {
             print CRM_Core_Invoke::invoke( array("civicrm","dashboard") );
         } else {
             print CRM_Core_Invoke::invoke( explode('/', $_GET[$urlVar] ) );
