@@ -355,7 +355,7 @@
     }
     if (widget.data('uiDialog')) {
       // This is a bit harsh but we are removing jQuery UI's event handler from the close button and adding our own
-      $('.ui-dialog-titlebar-close').first().off().click(cancelAction);
+      widget.parent().find('.ui-dialog-titlebar-close').first().off().click(cancelAction);
     }
 
     widget.on('crmFormLoad.crmForm', function(event, data) {
