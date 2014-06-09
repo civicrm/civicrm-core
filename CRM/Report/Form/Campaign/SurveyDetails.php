@@ -90,7 +90,6 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
         'fields' => array('contact_id' => array('title' => ts('Interviewer Name'))),
         'filters' => array(
           'contact_id' => array('name' => 'contact_id',
-            'alias' => 'civicrm_activity_assignment',
             'title' => ts('Interviewer Name'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' =>
@@ -326,8 +325,8 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
                       ( {$this->_aliases['civicrm_contact']}.id = civicrm_activity_target.contact_id AND civicrm_activity_target.record_type_id = {$targetID}) \n";
     $this->_from .= " INNER JOIN civicrm_activity {$this->_aliases['civicrm_activity']} ON
                       ( {$this->_aliases['civicrm_activity']}.id = civicrm_activity_target.activity_id )\n";
-    $this->_from .= " INNER JOIN civicrm_activity_contact civicrm_activity_assignment ON
-                      ( {$this->_aliases['civicrm_activity']}.id = civicrm_activity_assignment.activity_id  AND civicrm_activity_assignment.record_type_id = {$assigneeID} )\n";
+    $this->_from .= " INNER JOIN civicrm_activity_contact activity_contact_civireport ON
+                      ( {$this->_aliases['civicrm_activity']}.id = activity_contact_civireport.activity_id  AND activity_contact_civireport.record_type_id = {$assigneeID} )\n";
 
     //get the address table.
     $this->_from .= " LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} ON
@@ -623,8 +622,8 @@ INNER JOIN  civicrm_option_value val ON ( val.option_group_id = survey.result_id
       }
 
 
-      if (array_key_exists('civicrm_activity_assignment_assignee_contact_id', $row)) {
-        $rows[$rowNum]['civicrm_activity_assignment_assignee_contact_id'] = CRM_Utils_Array::value($row['civicrm_activity_assignment_assignee_contact_id'],
+      if (array_key_exists('civicrm_activity_contact_contact_id', $row)) {
+        $rows[$rowNum]['civicrm_activity_contact_contact_id'] = CRM_Utils_Array::value($row['civicrm_activity_contact_contact_id'],
           CRM_Campaign_BAO_Survey::getInterviewers()
         );
         $entryFound = TRUE;
