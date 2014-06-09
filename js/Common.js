@@ -245,10 +245,10 @@ CRM.validate = CRM.validate || {
  */
   CRM.utils.initialValueChanged = function(el) {
     var isDirty = false;
-    $(':input:visible, :input.select2-offscreen', el).each(function () {
+    $(':input:visible, :input.select2-offscreen', el).not('[type=submit], [type=button], .crm-action-menu').each(function () {
       var initialValue = $(this).data('crm-initial-value');
       // skip change of value for submit buttons
-      if (initialValue !== undefined && !$(this).hasClass('form-submit') && initialValue != $(this).val()) {
+      if (initialValue !== undefined && !_.isEqual(initialValue, $(this).val())) {
         isDirty = true;
       }
     });
@@ -505,7 +505,7 @@ CRM.validate = CRM.validate || {
     })
     .on('dialogclose', function(e) {
       // Restore scrollbars when closing modal
-      if ($('.ui-dialog .modal-dialog').not(e.target).length < 1) {
+      if ($('.ui-dialog .modal-dialog:visible').not(e.target).length < 1) {
         $('body').css({overflow: ''});
       }
     })
