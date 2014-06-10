@@ -22,6 +22,8 @@
  */
 class CRM_Utils_SQL_Insert {
 
+  private $verb = 'INSERT INTO';
+
   /**
    * @var string
    */
@@ -94,6 +96,17 @@ class CRM_Utils_SQL_Insert {
   }
 
   /**
+   * Use REPLACE INTO instead of INSERT INTO
+   *
+   * @param bool $asReplace
+   * @return CRM_Utils_SQL_Insert
+   */
+  public function usingReplace($asReplace = TRUE) {
+    $this->verb = $asReplace ? 'REPLACE INTO' : 'INSERT INTO';
+    return $this;
+  }
+
+  /**
    * @param string|NULL $value
    * @return string SQL expression, e.g. "it\'s great" (with-quotes) or NULL (without-quotes)
    */
@@ -106,7 +119,7 @@ class CRM_Utils_SQL_Insert {
    */
   public function toSQL() {
     $columns = "`" . implode('`,`', $this->columns) . "`";
-    $sql = "INSERT INTO {$this->table} ({$columns}) VALUES";
+    $sql = "{$this->verb} {$this->table} ({$columns}) VALUES";
 
     $nextDelim = '';
     foreach ($this->rows as $row) {
