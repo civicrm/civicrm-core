@@ -48,18 +48,20 @@ class CRM_Contact_Form_Search_Custom_FullText_Participant extends CRM_Contact_Fo
    * {@inheritdoc}
    */
   public function fillTempTable($queryText, $entityIDTableName, $toTable, $queryLimit, $detailLimit) {
-    $count = $this->fillParticipantIDs($queryText, $entityIDTableName, $queryLimit);
+    $queries = $this->prepareQueries($queryText, $entityIDTableName);
+    $result = $this->runQueries($queryText, $queries, $entityIDTableName, $queryLimit);
     $this->moveParticipantIDs($entityIDTableName, $toTable, $detailLimit);
-    return $count;
+    return $result;
   }
 
   /**
    * get participant ids in entity tables.
    *
    * @param string $queryText
-   * @return int the total number of matches
+   * @param string $entityIDTableName
+   * @return array list tables/queries (for runQueries)
    */
-  function fillParticipantIDs($queryText, $entityIDTableName, $limit) {
+  function prepareQueries($queryText, $entityIDTableName) {
     // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
 
     $contactSQL = array();
@@ -91,7 +93,7 @@ WHERE      ({$this->matchText('civicrm_contact c', array('sort_name', 'display_n
 
     // get the custom data info
     $this->fillCustomInfo($tables, "( 'Participant' )");
-    return $this->runQueries($queryText, $tables, $entityIDTableName, $limit);
+    return $tables;
   }
 
   public function moveParticipantIDs($fromTable, $toTable, $limit) {

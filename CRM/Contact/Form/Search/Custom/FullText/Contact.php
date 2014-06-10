@@ -46,16 +46,18 @@ class CRM_Contact_Form_Search_Custom_FullText_Contact extends CRM_Contact_Form_S
    * {@inheritdoc}
    */
   public function fillTempTable($queryText, $entityIDTableName, $toTable, $queryLimit, $detailLimit) {
-    $count = $this->fillContactIDs($queryText, $entityIDTableName, $queryLimit);
+    $queries = $this->prepareQueries($queryText, $entityIDTableName);
+    $result = $this->runQueries($queryText, $queries, $entityIDTableName, $queryLimit);
     $this->moveContactIDs($entityIDTableName, $toTable, $detailLimit);
-    return $count;
+    return $result;
   }
 
   /**
    * @param string $queryText
-   * @return int the total number of matches
+   * @param string $entityIDTableName
+   * @return array list tables/queries (for runQueries)
    */
-  function fillContactIDs($queryText, $entityIDTableName, $limit) {
+  function prepareQueries($queryText, $entityIDTableName) {
     // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
 
     $contactSQL = array();
@@ -117,7 +119,7 @@ GROUP BY   et.entity_id
       "( 'Contact', 'Individual', 'Organization', 'Household' )"
     );
 
-    return $this->runQueries($queryText, $tables, $entityIDTableName, $limit);
+    return $tables;
   }
 
   public function moveContactIDs($fromTable, $toTable, $limit) {
