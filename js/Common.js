@@ -510,16 +510,17 @@ CRM.validate = CRM.validate || {
       }
     })
     .on('submit', function(e) {
-      // CRM-14353 - disable changes warn when submitting the form
+      // CRM-14353 - disable changes warn when submitting a form
       $('[data-warn-changes]').removeAttr('data-warn-changes');
     })
-    ;
-    
-    window.onbeforeunload = function() {
-      if (CRM.utils.initialValueChanged($('form[data-warn-changes=true]'))) {
-        return ts('You have unsaved changes.');
-       }
-    };
+   ;
+
+  // CRM-14353 - Warn of unsaved changes for forms which have opted in
+  window.onbeforeunload = function() {
+    if (CRM.utils.initialValueChanged($('form[data-warn-changes=true]'))) {
+      return ts('You have unsaved changes.');
+     }
+  };
 
   /**
    * Function to make multiselect boxes behave as fields in small screens
