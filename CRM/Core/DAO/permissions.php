@@ -107,6 +107,22 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   $permissions['entity_tag'] = $permissions['address'];
   $permissions['note'] = $permissions['address'];
 
+  //relationship permissions
+  $permissions['relationship'] = array(
+    'get' => array(
+      'access CiviCRM',
+      'view all contacts',
+    ),
+    'delete' => array(
+      'access CiviCRM',
+      'delete contacts',
+    ),
+    'default' => array(
+      'access CiviCRM',
+      'edit all contacts',
+    ),
+  );
+  
   // Activity permissions
   $permissions['activity'] = array(
     'delete' => array(
