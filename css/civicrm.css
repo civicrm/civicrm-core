@@ -1729,7 +1729,7 @@ editor specific classes
 }
 .crm-container a.crm-hover-button.action-item,
 .crm-container .crm-hover-button.btn-slide {
-  font-size: .9em;
+  font-size: .95em;
   padding: 3px 5px;
   opacity: 1;
 }
