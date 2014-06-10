@@ -151,7 +151,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
       // no change
       $this->assertEquals(2, $contribution['contribution_status_id']);
-      $this->assertEquals('Payment Express IPNS not currently handled', $e->getMessage());
+      $this->assertEquals('Paypal IPNS not handled other than recurring_payments', $e->getMessage());
       return;
     }
     $this->fail('The Paypal Express IPN should have caused an exception');
