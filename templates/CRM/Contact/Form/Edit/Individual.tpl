@@ -47,27 +47,20 @@ CRM.$(function($) {
       sort_name: $('#last_name').val(),
       contact_type: 'Individual',
       'return': 'display_name,sort_name,email'
-    })
-      .done(function(data) {
-        if (data.is_error == 1 || data.count == 0) {
-          return;
-        }
-        var msg = "<em>{/literal}{ts escape='js'}If the person you were trying to add is listed below, click their name to view or edit their record{/ts}{literal}:</em>";
-        if ( data.count == 1 ) {
-          var title = "{/literal}{ts escape='js'}Similar Contact Found{/ts}{literal}";
-        } else {
-          var title = "{/literal}{ts escape='js'}Similar Contacts Found{/ts}{literal}";
-        }
-        msg += '<ul class="matching-contacts-actions">';
-        $.each(data.values, function(i, contact){
-          if ( !(contact.email) ) {
-            contact.email = '';
-          }
+    }).done(function(data) {
+      var title = data.count == 1 ? {/literal}"{ts escape='js'}Similar Contact Found{/ts}" : "{ts escape='js'}Similar Contacts Found{/ts}"{literal},
+        msg = "<em>{/literal}{ts escape='js'}If the person you were trying to add is listed below, click their name to view or edit their record{/ts}{literal}:</em>";
+      if (data.is_error == 1 || data.count == 0) {
+        return;
+      }
+      msg += '<ul class="matching-contacts-actions">';
+      $.each(data.values, function(i, contact) {
+        contact.email = contact.email || '';
         msg += '<li><a href="'+viewIndividual+contact.id+'">'+ contact.display_name +'</a> '+contact.email+'</li>';
       });
       msg += '</ul>';
       lastnameMsg = CRM.alert(msg, title);
-      $('.matching-contacts-actions a').click(function(){
+      $('.matching-contacts-actions a').click(function() {
         // No confirmation dialog on click
         $('[data-warn-changes=true]').attr('data-warn-changes', 'false');
       });
@@ -83,7 +76,7 @@ CRM.$(function($) {
     <td>
       {$form.prefix_id.label}<br/>
       {$form.prefix_id.html}
-    </td>    
+    </td>
     {/if}
     {if $form.formal_title}
     <td>
