@@ -125,10 +125,13 @@ AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
    *   - *: All other keys are treated as table names
    * @return array keys: match-descriptor
    *   - count: int
+   *   - files: NULL | array
    */
   function runQueries($queryText, &$tables, $entityIDTableName, $limit) {
     $sql = "TRUNCATE {$entityIDTableName}";
     CRM_Core_DAO::executeQuery($sql);
+
+    $files = NULL;
 
     foreach ($tables as $tableName => $tableValues) {
       if ($tableName == 'final') {
@@ -143,6 +146,26 @@ $sqlStatement
 {$this->toLimit($limit)}
 ";
             CRM_Core_DAO::executeQuery($sql);
+          }
+        }
+        else if ($tableName == 'file') {
+          $searcher = CRM_Core_BAO_File::getSearchService();
+          if (!($searcher && CRM_Core_Permission::check('access uploaded files'))) {
+            continue;
+          }
+
+          $query = $tableValues + array(
+            'text' => $queryText,
+          );
+          list($intLimit, $intOffset) = $this->parseLimitOffset($limit);
+          $files = $searcher->search($query, $intLimit, $intOffset);
+          $matches = array();
+          foreach ($files as $file) {
+            $matches[] = array('entity_id' => $file['xparent_id']);
+          }
+          if ($matches) {
+            $insertSql = CRM_Utils_SQL_Insert::into($entityIDTableName)->usingReplace()->rows($matches)->toSQL();
+            CRM_Core_DAO::executeQuery($insertSql);
           }
         }
         else {
@@ -198,7 +221,8 @@ GROUP BY {$tableValues['id']}
     }
 
     return array(
-      'count' => CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM {$entityIDTableName}")
+      'count' => CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM {$entityIDTableName}"),
+      'files' => $files,
     );
   }
 
@@ -248,6 +272,45 @@ GROUP BY {$tableValues['id']}
   }
 
   /**
+   * For any records in $toTable that originated with this query,
+   * append file information.
+   *
+   * @param string $toTable
+   * @param string $parentIdColumn
+   * @param array $files see return format of CRM_Core_FileSearchInterface::search
+   */
+  public function moveFileIDs($toTable, $parentIdColumn, $files) {
+    if (empty($files)) {
+      return;
+    }
+
+    $filesIndex = CRM_Utils_Array::index(array('xparent_id', 'file_id'), $files);
+    // ex: $filesIndex[$xparent_id][$file_id] = array(...the file record...);
+
+    $dao = CRM_Core_DAO::executeQuery("
+      SELECT distinct {$parentIdColumn}
+      FROM {$toTable}
+      WHERE table_name = %1
+    ", array(
+      1 => array($this->getName(), 'String'),
+    ));
+    while ($dao->fetch()) {
+      if (empty($filesIndex[$dao->{$parentIdColumn}])) {
+        continue;
+      }
+
+      CRM_Core_DAO::executeQuery("UPDATE {$toTable}
+        SET file_ids = %1
+        WHERE table_name = %2 AND {$parentIdColumn} = %3
+      ", array(
+        1 => array(implode(',', array_keys($filesIndex[$dao->{$parentIdColumn}])), 'String'),
+        2 => array($this->getName(), 'String'),
+        3 => array($dao->{$parentIdColumn}, 'Int'),
+      ));
+    }
+  }
+
+  /**
    * Format text to include wild card characters at beginning and end
    *
    * @param string $text
@@ -289,6 +352,23 @@ GROUP BY {$tableValues['id']}
       $result .= " OFFSET {$offset}";
     }
     return $result;
+  }
+
+  /**
+   * @param array|int $limit
+   * @return array (0 => $limit, 1 => $offset)
+   */
+  public function parseLimitOffset($limit) {
+    if (is_scalar($limit)) {
+      $intLimit = $limit;
+    }
+    else {
+      list ($intLimit, $intOffset) = $limit;
+    }
+    if (!$intOffset) {
+      $intOffset = 0;
+    }
+    return array($intLimit, $intOffset);
   }
 
 }

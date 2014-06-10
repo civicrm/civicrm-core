@@ -49,6 +49,9 @@ class CRM_Contact_Form_Search_Custom_FullText_Activity extends CRM_Contact_Form_
     $queries = $this->prepareQueries($queryText, $entityIDTableName);
     $result = $this->runQueries($queryText, $queries, $entityIDTableName, $queryLimit);
     $this->moveIDs($entityIDTableName, $toTable, $detailLimit);
+    if (!empty($result['files'])) {
+      $this->moveFileIDs($toTable, 'activity_id', $result['files']);
+    }
     return $result;
   }
 
@@ -102,6 +105,9 @@ AND    (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
 
     $tables = array(
       'civicrm_activity' => array('fields' => array()),
+      'file' => array(
+        'xparent_table' => 'civicrm_activity',
+      ),
       'sql' => $contactSQL,
       'final' => $final,
     );

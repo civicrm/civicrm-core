@@ -51,6 +51,9 @@ class CRM_Contact_Form_Search_Custom_FullText_Participant extends CRM_Contact_Fo
     $queries = $this->prepareQueries($queryText, $entityIDTableName);
     $result = $this->runQueries($queryText, $queries, $entityIDTableName, $queryLimit);
     $this->moveIDs($entityIDTableName, $toTable, $detailLimit);
+    if (!empty($result['files'])) {
+      $this->moveFileIDs($toTable, 'participant_id', $result['files']);
+    }
     return $result;
   }
 
@@ -79,6 +82,9 @@ WHERE      ({$this->matchText('civicrm_contact c', array('sort_name', 'display_n
           'fee_level' => NULL,
           'fee_amount' => 'Int',
         ),
+      ),
+      'file' => array(
+        'xparent_table' => 'civicrm_participant',
       ),
       'sql' => $contactSQL,
       'civicrm_note' => array(
