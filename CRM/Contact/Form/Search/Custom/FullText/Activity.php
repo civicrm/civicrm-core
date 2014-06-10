@@ -48,7 +48,7 @@ class CRM_Contact_Form_Search_Custom_FullText_Activity extends CRM_Contact_Form_
   public function fillTempTable($queryText, $entityIDTableName, $toTable, $queryLimit, $detailLimit) {
     $queries = $this->prepareQueries($queryText, $entityIDTableName);
     $result = $this->runQueries($queryText, $queries, $entityIDTableName, $queryLimit);
-    $this->moveActivityIDs($entityIDTableName, $toTable, $detailLimit);
+    $this->moveIDs($entityIDTableName, $toTable, $detailLimit);
     return $result;
   }
 
@@ -110,7 +110,7 @@ AND    (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
     return $tables;;
   }
 
-  public function moveActivityIDs($fromTable, $toTable, $limit) {
+  public function moveIDs($fromTable, $toTable, $limit) {
     $sql = "
 INSERT INTO {$toTable}
 ( table_name, activity_id, subject, details, contact_id, sort_name, record_type,

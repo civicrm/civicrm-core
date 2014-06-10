@@ -49,7 +49,7 @@ class CRM_Contact_Form_Search_Custom_FullText_Case extends CRM_Contact_Form_Sear
   public function fillTempTable($queryText, $entityIDTableName, $toTable, $queryLimit, $detailLimit) {
     $queries = $this->prepareQueries($queryText, $entityIDTableName);
     $result = $this->runQueries($queryText, $queries, $entityIDTableName, $queryLimit);
-    $this->moveCaseIDs($entityIDTableName, $toTable, $detailLimit);
+    $this->moveIDs($entityIDTableName, $toTable, $detailLimit);
     return $result;
   }
 
@@ -101,7 +101,7 @@ GROUP BY   et.entity_id
     return $tables;
   }
 
-  public function moveCaseIDs($fromTable, $toTable, $limit) {
+  public function moveIDs($fromTable, $toTable, $limit) {
     $sql = "
 INSERT INTO {$toTable}
 ( table_name, contact_id, sort_name, case_id, case_start_date, case_end_date, case_is_deleted )

@@ -48,7 +48,7 @@ class CRM_Contact_Form_Search_Custom_FullText_Contact extends CRM_Contact_Form_S
   public function fillTempTable($queryText, $entityIDTableName, $toTable, $queryLimit, $detailLimit) {
     $queries = $this->prepareQueries($queryText, $entityIDTableName);
     $result = $this->runQueries($queryText, $queries, $entityIDTableName, $queryLimit);
-    $this->moveContactIDs($entityIDTableName, $toTable, $detailLimit);
+    $this->moveIDs($entityIDTableName, $toTable, $detailLimit);
     return $result;
   }
 
@@ -122,7 +122,7 @@ GROUP BY   et.entity_id
     return $tables;
   }
 
-  public function moveContactIDs($fromTable, $toTable, $limit) {
+  public function moveIDs($fromTable, $toTable, $limit) {
     $sql = "
 INSERT INTO {$toTable}
 ( id, contact_id, sort_name, display_name, table_name )

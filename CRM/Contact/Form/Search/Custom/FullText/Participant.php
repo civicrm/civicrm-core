@@ -50,7 +50,7 @@ class CRM_Contact_Form_Search_Custom_FullText_Participant extends CRM_Contact_Fo
   public function fillTempTable($queryText, $entityIDTableName, $toTable, $queryLimit, $detailLimit) {
     $queries = $this->prepareQueries($queryText, $entityIDTableName);
     $result = $this->runQueries($queryText, $queries, $entityIDTableName, $queryLimit);
-    $this->moveParticipantIDs($entityIDTableName, $toTable, $detailLimit);
+    $this->moveIDs($entityIDTableName, $toTable, $detailLimit);
     return $result;
   }
 
@@ -96,7 +96,7 @@ WHERE      ({$this->matchText('civicrm_contact c', array('sort_name', 'display_n
     return $tables;
   }
 
-  public function moveParticipantIDs($fromTable, $toTable, $limit) {
+  public function moveIDs($fromTable, $toTable, $limit) {
     $sql = "
 INSERT INTO {$toTable}
 ( table_name, contact_id, sort_name, participant_id, event_title, participant_fee_level, participant_fee_amount,

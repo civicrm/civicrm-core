@@ -50,7 +50,7 @@ class CRM_Contact_Form_Search_Custom_FullText_Membership extends CRM_Contact_For
   public function fillTempTable($queryText, $entityIDTableName, $toTable, $queryLimit, $detailLimit) {
     $queries = $this->prepareQueries($queryText, $entityIDTableName);
     $result = $this->runQueries($queryText, $queries, $entityIDTableName, $queryLimit);
-    $this->moveMembershipIDs($entityIDTableName, $toTable, $detailLimit);
+    $this->moveIDs($entityIDTableName, $toTable, $detailLimit);
     return $result;
   }
 
@@ -84,7 +84,7 @@ WHERE      ({$this->matchText('civicrm_contact c', array('sort_name', 'display_n
     return $tables;
   }
 
-  public function moveMembershipIDs($fromTable, $toTable, $limit) {
+  public function moveIDs($fromTable, $toTable, $limit) {
     $sql = "
 INSERT INTO {$toTable}
 ( table_name, contact_id, sort_name, membership_id, membership_type, membership_fee, membership_start_date,
