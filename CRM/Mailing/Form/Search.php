@@ -54,9 +54,9 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($this);
 
-    $statusVals = array('Scheduled', 'Complete', 'Running', 'Canceled');
+    $statusVals = array(ts('Scheduled'), ts('Complete'), ts('Running'), ts('Canceled'));
     foreach ($statusVals as $status) {
-      $this->addElement('checkbox', "mailing_status[$status]", NULL, ts($status));
+      $this->addElement('checkbox', "mailing_status[$status]", NULL, $status);
     }
     $this->addElement('checkbox', 'status_unscheduled', NULL, ts('Draft / Unscheduled'));
     $this->addYesNo('is_archived', ts('Mailing is Archived'), TRUE);
