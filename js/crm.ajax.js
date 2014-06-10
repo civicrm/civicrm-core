@@ -341,11 +341,13 @@
     var widget = CRM.loadPage(url, settings).off('.crmForm');
 
     function cancelAction() {
-      var dirty = CRM.utils.initialValueChanged(widget),
-        title = widget.dialog('option', 'title');
-      widget.attr('data-unsaved-changes', dirty ? 'true' : 'false').dialog('close');
+      var dirty = CRM.utils.initialValueChanged($('form:not([data-warn-changes=false])', widget));
+      widget
+        .attr('data-unsaved-changes', dirty ? 'true' : 'false')
+        .dialog('close');
       if (dirty) {
         var id = widget.attr('id') + '-unsaved-alert',
+          title = widget.dialog('option', 'title'),
           alert = CRM.alert('<p>' + ts('%1 has not been saved.', {1: title}) + '</p><p><a href="#" id="' + id + '">' + ts('Restore') + '</a></p>', ts('Unsaved Changes'), 'alert unsaved-dialog', {expires: 60000});
         $('#' + id).button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}}).click(function(e) {
           widget.attr('data-unsaved-changes', 'false').dialog('open');
