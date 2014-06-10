@@ -511,7 +511,7 @@ CRM.validate = CRM.validate || {
     })
     .on('submit', function(e) {
       // CRM-14353 - disable changes warn when submitting a form
-      $('[data-warn-changes]').removeAttr('data-warn-changes');
+      $('[data-warn-changes]').attr('data-warn-changes', 'false');
     })
    ;
 
