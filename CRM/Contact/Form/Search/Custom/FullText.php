@@ -86,7 +86,6 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
       new CRM_Contact_Form_Search_Custom_FullText_Contribution(),
       new CRM_Contact_Form_Search_Custom_FullText_Participant(),
       new CRM_Contact_Form_Search_Custom_FullText_Membership(),
-      new CRM_Contact_Form_Search_Custom_FullText_File(),
     );
 
     $formValues['table'] = $this->getFieldValue($formValues, 'table', 'String');
@@ -195,12 +194,10 @@ class CRM_Contact_Form_Search_Custom_FullText implements CRM_Contact_Form_Search
       'membership_end_date' => 'datetime',
       'membership_source' => 'varchar(255)',
       'membership_status' => 'varchar(255)',
-      'file_id' => 'int unsigned',
-      'file_name' => 'varchar(255)',
-      'file_url' => 'varchar(255)',
-      'file_mime_type' => 'varchar(255)',
-      'file_entity_table' => 'varchar(255)',
-      'file_entity_id' => 'int unsigned',
+
+      // We may have multiple files to list on one record.
+      // The temporary-table approach can't store full details for all of them
+      'file_ids' => 'varchar(255)', // comma-separate id listing
     );
 
     $sql = "
@@ -339,6 +336,9 @@ WHERE      t.table_name = 'Activity' AND
      * You can define a custom title for the search form
      */
     $this->setTitle(ts('Full-text Search'));
+
+    $searchService = CRM_Core_BAO_File::getSearchService();
+    $form->assign('allowFileSearch', !empty($searchService) && CRM_Core_Permission::check('access uploaded files'));
   }
 
   /**
@@ -391,6 +391,17 @@ WHERE      t.table_name = 'Activity' AND
           $viewRoles[] = $roleIds[$v];
         }
         $row['participant_role'] = implode(', ', $viewRoles);
+      }
+      if (!empty($row['file_ids'])) {
+        $fileIds = (explode(',', $row['file_ids']));
+        $fileHtml = '';
+        foreach ($fileIds as $fileId) {
+          $paperclip = CRM_Core_BAO_File::paperIconAttachment('*', $fileId);
+          if ($paperclip) {
+            $fileHtml .= implode('', $paperclip);
+          }
+        }
+        $row['fileHtml'] = $fileHtml;
       }
       $summary[$dao->table_name][] = $row;
     }

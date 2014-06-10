@@ -49,6 +49,9 @@ class CRM_Contact_Form_Search_Custom_FullText_Contact extends CRM_Contact_Form_S
     $queries = $this->prepareQueries($queryText, $entityIDTableName);
     $result = $this->runQueries($queryText, $queries, $entityIDTableName, $queryLimit);
     $this->moveIDs($entityIDTableName, $toTable, $detailLimit);
+    if (!empty($result['files'])) {
+      $this->moveFileIDs($toTable, 'contact_id', $result['files']);
+    }
     return $result;
   }
 
@@ -109,6 +112,9 @@ GROUP BY   et.entity_id
           'subject' => NULL,
           'note' => NULL,
         ),
+      ),
+      'file' => array(
+        'xparent_table' => 'civicrm_contact',
       ),
       'sql' => $contactSQL,
       'final' => $final,

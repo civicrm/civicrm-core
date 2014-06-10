@@ -50,6 +50,9 @@ class CRM_Contact_Form_Search_Custom_FullText_Case extends CRM_Contact_Form_Sear
     $queries = $this->prepareQueries($queryText, $entityIDTableName);
     $result = $this->runQueries($queryText, $queries, $entityIDTableName, $queryLimit);
     $this->moveIDs($entityIDTableName, $toTable, $detailLimit);
+    if (!empty($result['files'])) {
+      $this->moveFileIDs($toTable, 'case_id', $result['files']);
+    }
     return $result;
   }
 
@@ -95,6 +98,9 @@ GROUP BY   et.entity_id
 
     $tables = array(
       'civicrm_case' => array('fields' => array()),
+      'file' => array(
+        'xparent_table' => 'civicrm_case',
+      ),
       'sql' => $contactSQL,
     );
 
