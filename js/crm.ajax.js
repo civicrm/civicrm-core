@@ -340,6 +340,7 @@
 
     var widget = CRM.loadPage(url, settings).off('.crmForm');
 
+    // CRM-14353 - Warn of unsaved changes for all forms except those which have opted out
     function cancelAction() {
       var dirty = CRM.utils.initialValueChanged($('form:not([data-warn-changes=false])', widget));
       widget
@@ -356,7 +357,7 @@
       }
     }
     if (widget.data('uiDialog')) {
-      // This is a bit harsh but we are removing jQuery UI's event handler from the close button and adding our own
+      // CRM-14353 - This is a bit harsh but we are removing jQuery UI's event handler from the close button and adding our own
       widget.parent().find('.ui-dialog-titlebar-close').first().off().click(cancelAction);
     }
 
