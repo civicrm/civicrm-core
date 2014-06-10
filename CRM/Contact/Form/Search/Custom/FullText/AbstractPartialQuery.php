@@ -76,7 +76,8 @@ abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
    *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
    * @param array|NULL $detailLimit final limit (applied when building $detailTable)
    *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
-   * @return int number of matches
+   * @return array keys: match-descriptor
+   *   - count: int
    */
   public abstract function fillTempTable($queryText, $entityIDTableName, $detailTable, $queryLimit, $detailLimit);
 
@@ -118,8 +119,12 @@ AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
 
   /**
    * @param string $queryText
-   * @param array $tables
-   * @return int the total number of matches
+   * @param array $tables a list of places to query. Keys may be:
+   *   - sql: an array of SQL queries to execute
+   *   - final: an array of SQL queries to execute at the end
+   *   - *: All other keys are treated as table names
+   * @return array keys: match-descriptor
+   *   - count: int
    */
   function runQueries($queryText, &$tables, $entityIDTableName, $limit) {
     $sql = "TRUNCATE {$entityIDTableName}";
@@ -192,8 +197,9 @@ GROUP BY {$tableValues['id']}
       }
     }
 
-    $rowCount = "SELECT count(*) FROM {$entityIDTableName}";
-    return CRM_Core_DAO::singleValueQuery($rowCount);
+    return array(
+      'count' => CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM {$entityIDTableName}")
+    );
   }
 
   /**

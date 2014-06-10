@@ -83,7 +83,9 @@ class CRM_Contact_Form_Search_Custom_FullText_File extends CRM_Contact_Form_Sear
         ts('File Search')
       );
     }
-    return count($solrResponse->docs);
+    return array(
+      'count' => count($solrResponse->docs),
+    );
     //return $solrResponse->numFound;
     //return count($matches);
   }

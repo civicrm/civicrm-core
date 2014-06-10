@@ -235,7 +235,8 @@ CREATE TEMPORARY TABLE {$this->_entityIDTableName} (
       /** @var $partialQuery CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery */
       if (!$this->_table || $this->_table == $partialQuery->getName()) {
         if ($partialQuery->isActive()) {
-          $this->_foundRows[$partialQuery->getName()] = $partialQuery->fillTempTable($this->_text, $this->_entityIDTableName, $this->_tableName, $this->_limitClause, $this->_limitDetailClause);
+          $result = $partialQuery->fillTempTable($this->_text, $this->_entityIDTableName, $this->_tableName, $this->_limitClause, $this->_limitDetailClause);
+          $this->_foundRows[$partialQuery->getName()] = $result['count'];
         }
       }
     }
