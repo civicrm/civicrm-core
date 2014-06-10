@@ -677,4 +677,21 @@ AND       CEF.entity_id    = %2";
     }
     return $results;
   }
+
+  /**
+   * Get a reference to the file-search service (if one is available).
+   *
+   * @return CRM_Core_FileSearchInterface|NULL
+   */
+  static function getSearchService() {
+    $fileSearches = array();
+    CRM_Utils_Hook::fileSearches($fileSearches);
+
+    // use the first available search
+    foreach ($fileSearches as $fileSearch) {
+      /** @var $fileSearch CRM_Core_FileSearchInterface */
+      return $fileSearch;
+    }
+    return NULL;
+  }
 }
