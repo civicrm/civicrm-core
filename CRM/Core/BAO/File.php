@@ -293,11 +293,11 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
       $result['description'] = $dao->description;
       $result['cleanName'] = CRM_Utils_File::cleanFileName($dao->uri);
       $result['fullPath'] = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $dao->uri;
-      $result['url'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$dao->cfID}&eid={$entityID}");
+      $result['url'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$dao->cfID}&eid={$dao->entity_id}");
       $result['href'] = "<a href=\"{$result['url']}\">{$result['cleanName']}</a>";
       $result['tag'] = CRM_Core_BAO_EntityTag::getTag($dao->cfID, 'civicrm_file');
       if ($addDeleteArgs) {
-        $result['deleteURLArgs'] = self::deleteURLArgs($entityTable, $entityID, $dao->cfID);
+        $result['deleteURLArgs'] = self::deleteURLArgs($dao->entity_table, $dao->entity_id, $dao->cfID);
       }
       $results[$dao->cfID] = $result;
     }
@@ -323,24 +323,42 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
   }
 
   /**
-   * @param $entityTable
-   * @param $entityID
+   * @param string $entityTable table-name or "*" (to reference files directly by file-id)
+   * @param int $entityID
    * @param null $fileTypeID
    * @param null $fileID
    *
    * @return array
    */
   static function sql($entityTable, $entityID, $fileTypeID = NULL, $fileID = NULL) {
-    $sql = "
+    if ($entityTable == '*') {
+      // $entityID is the ID of a specific file
+      $sql = "
 SELECT    CF.id as cfID,
            CF.uri as uri,
            CF.mime_type as mime_type,
            CF.description as description,
-           CEF.id as cefID
+           CEF.id as cefID,
+           CEF.entity_table as entity_table,
+           CEF.entity_id as entity_id
+FROM      civicrm_file AS CF
+LEFT JOIN civicrm_entity_file AS CEF ON ( CEF.file_id = CF.id )
+WHERE     CF.id = %2";
+
+    } else {
+      $sql = "
+SELECT    CF.id as cfID,
+           CF.uri as uri,
+           CF.mime_type as mime_type,
+           CF.description as description,
+           CEF.id as cefID,
+           CEF.entity_table as entity_table,
+           CEF.entity_id as entity_id
 FROM      civicrm_file AS CF
 LEFT JOIN civicrm_entity_file AS CEF ON ( CEF.file_id = CF.id )
 WHERE     CEF.entity_table = %1
 AND       CEF.entity_id    = %2";
+    }
 
     $params = array(
       1 => array($entityTable, 'String'),
@@ -630,6 +648,7 @@ AND       CEF.entity_id    = %2";
    * function to display paper icon for a file attachment -- CRM-13624
    *
    * @param $entityTable string  The entityTable to which the file is attached. eg "civicrm_contact", "civicrm_note", "civicrm_activity"
+   *                             If you have the ID of a specific row in civicrm_file, use $entityTable='*'
    * @param $entityID    int     The id of the object in the above entityTable
    *
    * @return array|NULL          list of HTML snippets; one HTML snippet for each attachment. If none found, then NULL
