@@ -887,13 +887,118 @@ function _civicrm_api3_object_to_array_unique_fields(&$dao, &$values) {
  */
 function _civicrm_api3_custom_format_params($params, &$values, $extends, $entityId = NULL) {
   $values['custom'] = array();
+  $checkCheckBoxField = FALSE;
+  $entity = $extends;
+  if(in_array($extends, array('Household', 'Individual', 'Organization'))) {
+    $entity = 'Contact';
+  }
+
+  $fields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => 'create'));
+  if(!$fields['is_error']) {
+    // not sure if fields could be error - maybe change to using civicrm_api3 wrapper later - this is conservative
+    $fields = $fields['values'];
+    $checkCheckBoxField = TRUE;
+  }
+
   foreach ($params as $key => $value) {
     list($customFieldID, $customValueID) = CRM_Core_BAO_CustomField::getKeyID($key, TRUE);
     if ($customFieldID && (!IS_NULL($value))) {
+      if ($checkCheckBoxField && $fields['custom_' . $customFieldID]['html_type'] == 'CheckBox') {
+        formatCheckBoxField($value, 'custom_' . $customFieldID, $entity);
+      }
       CRM_Core_BAO_CustomField::formatCustomField($customFieldID, $values['custom'],
         $value, $extends, $customValueID, $entityId, FALSE, FALSE
       );
     }
+  }
+}
+
+/**
+ * we can't rely on downstream to add separators to checkboxes so we'll check here. We should look at pushing to BAO function
+ * and / or validate function but this is a safe place for now as it has massive test coverage & we can keep the change very specific
+ * note that this is specifically tested in the GRANT api test case so later refactoring should use that as a checking point
+ *
+ * We will only alter the value if we are sure that changing it will make it correct - if it appears wrong but does not appear to have a clear fix we
+ * don't touch - lots of very cautious code in here
+ *
+ * @todo - we are probably skipping handling disabled options as presumably getoptions is not giving us them. This should be non-regressive but might
+ * be fixed in future
+ *
+ * @param $checkboxFieldValue
+ * @param $customFieldLabel
+ * @param $entity
+ *
+ * @internal param $fields
+ * @internal param $customFieldID
+ * @internal param $checkCheckBoxField
+ * @return string
+ */
+function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
+
+  if (is_string($checkboxFieldValue) && stristr($checkboxFieldValue, CRM_Core_DAO::VALUE_SEPARATOR)) {
+    // we can assume it's pre-formatted
+    return;
+  }
+  $options = civicrm_api($entity, 'getoptions', array('field' => $customFieldLabel, 'version' => 3));
+  if (!empty($options['is_error'])) {
+    //the check is precautionary - can probably be removed later
+    return;
+  }
+
+  $options = $options['values'];
+  $validValue = TRUE;
+  if (is_array($checkboxFieldValue)) {
+    foreach ($checkboxFieldValue as $key => $value) {
+      if (!array_key_exists($key, $options)) {
+        $validValue = FALSE;
+      }
+    }
+    if ($validValue) {
+      // we have been passed an array that is already in the 'odd' custom field format
+      return;
+    }
+  }
+
+  // so we either have an array that is not keyed by the value or we have a string that doesn't hold separators
+  // if the array only has one item we'll treat it like any other string
+  if (is_array($checkboxFieldValue) && count($checkboxFieldValue) == 1) {
+    $possibleValue = reset($checkboxFieldValue);
+  }
+  if (is_string($checkboxFieldValue)) {
+    $possibleValue = $checkboxFieldValue;
+  }
+  if (isset($possibleValue) && array_key_exists($possibleValue, $options)) {
+    $checkboxFieldValue = CRM_Core_DAO::VALUE_SEPARATOR . $possibleValue . CRM_Core_DAO::VALUE_SEPARATOR;
+    return;
+  }
+  elseif (is_array($checkboxFieldValue)) {
+    // so this time around we are considering the values in the array
+    $possibleValues = $checkboxFieldValue;
+    $formatValue = TRUE;
+  }
+  elseif (stristr($checkboxFieldValue, ',')) {
+    $formatValue = TRUE;
+    //lets see if we should separate it
+    $possibleValues = explode(',', $checkboxFieldValue);
+  }
+  else {
+    // run out of ideas as to what the format might be - if it's a string it doesn't match with or without the ','
+    return;
+  }
+
+  foreach ($possibleValues as $index => $possibleValue) {
+    if (array_key_exists($possibleValue, $options)) {
+      // do nothing - we will leave formatValue set to true unless another value is not found (which would cause us to ignore the whole value set)
+    }
+    elseif (array_key_exists(trim($possibleValue), $options)) {
+      $possibleValues[$index] = trim($possibleValue);
+    }
+    else {
+      $formatValue = FALSE;
+    }
+  }
+  if ($formatValue) {
+    $checkboxFieldValue = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $possibleValues) . CRM_Core_DAO::VALUE_SEPARATOR;
   }
 }
 
