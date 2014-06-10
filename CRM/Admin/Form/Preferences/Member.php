@@ -46,6 +46,7 @@ class CRM_Admin_Form_Preferences_Member extends CRM_Admin_Form_Preferences {
         'default_renewal_contribution_page' => array(
           'html_type' => 'select',
           'title' => ts('Default online membership renewal page'),
+          'option_values' => array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::contributionPage(),
           'weight' => 1,
           'description' => ts('If you select a default online contribution page for self-service membership renewals, a "renew" link pointing to that page will be displayed on the Contact Dashboard for memberships which were entered offline. You will need to ensure that the membership block for the selected online contribution page includes any currently available memberships.'),
         ),
@@ -62,14 +63,6 @@ class CRM_Admin_Form_Preferences_Member extends CRM_Admin_Form_Preferences {
    * @access public
    */
   function buildQuickForm() {
-
-    $this->add('select', 'default_renewal_contribution_page',
-      ts('Default Online Membership Renewal Page'),
-      array(
-        '' => ts('- select -')) +
-      CRM_Contribute_PseudoConstant::contributionPage()
-    );
-
     parent::buildQuickForm();
   }
 }
