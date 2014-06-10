@@ -69,8 +69,7 @@ CRM.$(function($) {
       lastnameMsg = CRM.alert(msg, title);
       $('.matching-contacts-actions a').click(function(){
         // No confirmation dialog on click
-        global_formNavigate = true;
-        return true;
+        $('[data-warn-changes=true]').removeAttr('data-warn-changes');
       });
     });
   });
