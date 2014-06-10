@@ -245,7 +245,7 @@ CRM.validate = CRM.validate || {
  */
   CRM.utils.initialValueChanged = function(el) {
     var isDirty = false;
-    $(':input:visible, :input.select2-offscreen', el).not('[type=submit], [type=button], .crm-action-menu').each(function () {
+    $(':input:visible, .select2-container:visible+:input.select2-offscreen', el).not('[type=submit], [type=button], .crm-action-menu').each(function () {
       var initialValue = $(this).data('crm-initial-value');
       // skip change of value for submit buttons
       if (initialValue !== undefined && !_.isEqual(initialValue, $(this).val())) {
@@ -517,7 +517,7 @@ CRM.validate = CRM.validate || {
 
   // CRM-14353 - Warn of unsaved changes for forms which have opted in
   window.onbeforeunload = function() {
-    if (CRM.utils.initialValueChanged($('form[data-warn-changes=true]'))) {
+    if (CRM.utils.initialValueChanged($('form[data-warn-changes=true]:visible'))) {
       return ts('You have unsaved changes.');
      }
   };
