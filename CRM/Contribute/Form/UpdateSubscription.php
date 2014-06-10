@@ -104,7 +104,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     $this->assign('self_service', $this->_selfService);
 
     if (!$this->_paymentProcessorObj->isSupported('changeSubscriptionAmount')) {
-      $userAlert = "<span class='font-red'>" . ts('Updates made using this form will change the recurring contribution information stored in your CiviCRM database, but will NOT be sent to the payment processor. You must enter the same changes using the payment processor web site.',
+      $userAlert = "<span class='font-red'>" . ts('Updates made using this form will change the recurring contribution information stored in your CiviCRM database, but MAY NOT be sent to the payment processor. You MAY have to enter the same changes on your payment processor web site.',
         array( 1 => $this->_paymentProcessorObj->_processorName ) ) . '</span>';
       CRM_Core_Session::setStatus($userAlert, ts('Warning'), 'alert');
     }
