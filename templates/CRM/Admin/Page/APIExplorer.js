@@ -118,7 +118,6 @@
    */
   function showReturn() {
     $('#api-params').prepend($(returnTpl({})));
-    console.log($(returnTpl({})));
     $('#api-return-value').crmSelect2({data: fields, multiple: true});
   }
 
@@ -183,7 +182,8 @@
 
   /**
    * Attempt to parse a string into a value of the intended type
-   * @param val
+   * @param val string
+   * @param makeArray bool
    */
   function evaluate(val, makeArray) {
     try {
@@ -284,7 +284,9 @@
         if (op !== '=') {
           params[name][op] = val;
         }
-        clearError(this);
+        if ($(this).hasClass('crm-error')) {
+          clearError(this);
+        }
       }
       else if (name && (!e || e.type !== 'keyup')) {
         setError(this);
@@ -297,11 +299,13 @@
 
   function setError(el) {
     if (!$(el).hasClass('crm-error')) {
+      var msg = ts('Syntax error: input should be valid JSON or a quoted string.');
       $(el)
         .addClass('crm-error')
         .css('width', '82%')
-        .attr('title', ts('Syntax error'))
-        .before('<div class="icon red-icon ui-icon-alert"/>');
+        .attr('title', msg)
+        .before('<div class="icon red-icon ui-icon-alert" title="'+msg+'"/>')
+        .tooltip();
     }
   }
 
@@ -310,6 +314,7 @@
       .removeClass('crm-error')
       .attr('title', '')
       .css('width', '85%')
+      .tooltip('destroy')
       .siblings('.ui-icon-alert').remove();
   }
 
