@@ -159,7 +159,7 @@ class CRM_Core_StateMachine {
 
     // the page is valid, process it if we are jumping to the next state
     if ($type == 'Next') {
-      $page->mainProcess(FALSE);
+      $page->mainProcess();
       // we get the state again, since postProcess might have changed it
       // this bug took me forever to find :) Lobo
       $state = &$this->_states[$pageName];
