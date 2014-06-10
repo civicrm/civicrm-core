@@ -61,6 +61,7 @@
   </field>
   <field>
     <name>money_transfer_date</name>
+    <uniqueName>grant_money_transfer_date</uniqueName>
     <title>Grant Money transfer date</title>
     <type>date</type>
     <comment>Date on which grant money transfer was made.</comment>
@@ -101,7 +102,7 @@
     <html>
       <type>Select</type>
     </html>
-    <export>false</export>
+    <export>true</export>
     <required>true</required>
     <comment>Type of grant. Implicit FK to civicrm_option_value in grant_type option_group.</comment>
     <add>1.8</add>
