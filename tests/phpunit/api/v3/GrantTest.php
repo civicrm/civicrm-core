@@ -64,6 +64,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
         $this->callAPISuccess($entity, 'delete', array( 'id' => $id));
       }
     }
+    $this->quickCleanup(array('civicrm_grant'));
   }
 
   public function testCreateGrant() {
@@ -71,6 +72,73 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
+  }
+
+  /**
+   * Check checkbox type custom fields are created correctly
+   * We want to ensure they are saved with separators as appropriate
+   */
+  public function testCreateCustomCheckboxGrant() {
+    $ids = array();
+    $result = $this->customGroupCreate(array('extends' => 'Grant'));
+    $ids['custom_group_id'] = $result['id'];
+    $customTable = $result['values'][$result['id']]['table_name'];
+    $result = $this->customFieldCreate(array(
+      'html_type' => 'Checkbox',
+      'custom_group_id' => $ids['custom_group_id'],
+      'option_values' => array(
+        array('label' => 'my valley', 'value' => 'valley', 'is_active' => TRUE, 'weight' => 1),
+        array('label' => 'my goat', 'value' => 'goat', 'is_active' => TRUE, 'weight' => 2),
+        array('label' => 'mohair', 'value' => 'wool', 'is_active' => TRUE, 'weight' => 3),
+        array('label' => 'hungry', 'value' => '', 'is_active' => TRUE, 'weight' => 3),
+    )));
+    $columnName = $result['values'][$result['id']]['column_name'];
+    $ids['custom_field_id']  = $result['id'];
+    $customFieldLabel = 'custom_' . $ids['custom_field_id'];
+    $expectedValue = CRM_Core_DAO::VALUE_SEPARATOR . 'valley' . CRM_Core_DAO::VALUE_SEPARATOR;
+    //first we pass in the core separators ourselves
+    $this->params[$customFieldLabel] = $expectedValue;
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $this->params['id'] = $result['id'];
+
+    $savedValue = CRM_Core_DAO::singleValueQuery("SELECT {$columnName} FROM $customTable WHERE entity_id = {$result['id']}");
+
+    $this->assertEquals($expectedValue, $savedValue);
+
+    // now we ask CiviCRM to add the separators
+    $this->params[$customFieldLabel] = "valley";
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $savedValue = CRM_Core_DAO::singleValueQuery("SELECT {$columnName} FROM $customTable WHERE entity_id = {$result['id']}");
+    $this->assertEquals($expectedValue, $savedValue);
+
+    //let's try with 2 params already separated
+    $expectedValue = CRM_Core_DAO::VALUE_SEPARATOR . 'valley' . CRM_Core_DAO::VALUE_SEPARATOR . 'goat' .  CRM_Core_DAO::VALUE_SEPARATOR;
+    $this->params[$customFieldLabel] = $expectedValue;
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $savedValue = CRM_Core_DAO::singleValueQuery("SELECT {$columnName} FROM $customTable WHERE entity_id = {$result['id']}");
+    $this->assertEquals($expectedValue, $savedValue);
+
+    // & check it will do the separating
+    $this->params[$customFieldLabel] = 'valley,goat';
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $savedValue = CRM_Core_DAO::singleValueQuery("SELECT {$columnName} FROM $customTable WHERE entity_id = {$result['id']}");
+    $this->assertEquals($expectedValue, $savedValue);
+
+    //& here is the odd but previously supported (form-oriented) format
+    //& an array for good measure
+    $this->params[$customFieldLabel] = array('valley' => 1, 'goat' => 1);
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $savedValue = CRM_Core_DAO::singleValueQuery("SELECT {$columnName} FROM $customTable WHERE entity_id = {$result['id']}");
+    $this->assertEquals($expectedValue, $savedValue);
+
+    //& an array for good measure
+    $this->params[$customFieldLabel] = array('valley', 'goat');
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $savedValue = CRM_Core_DAO::singleValueQuery("SELECT {$columnName} FROM $customTable WHERE entity_id = {$result['id']}");
+    $this->assertEquals($expectedValue, $savedValue);
+
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   public function testGetGrant() {
