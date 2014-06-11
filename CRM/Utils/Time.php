@@ -86,5 +86,19 @@ class CRM_Utils_Time {
   static function resetTime() {
     self::$_delta = 0;
   }
+
+  /**
+   * Approximate time-comparison. $a and $b are considered equal if they
+   * are within $threshold seconds of each other.
+   *
+   * @param string $a time which can be parsed by strtotime
+   * @param string $b time which can be parsed by strtotime
+   * @param int $threshold maximum allowed difference (in seconds)
+   * @return bool
+   */
+  static function isEqual($a, $b, $threshold = 0) {
+    $diff = strtotime($b) - strtotime($a);
+    return (abs($diff) <= $threshold);
+  }
 }
 

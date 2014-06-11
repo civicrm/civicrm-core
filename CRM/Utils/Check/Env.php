@@ -51,11 +51,11 @@ class CRM_Utils_Check_Env {
 
     $phpNow = date('Y-m-d H:i');
     $sqlNow = CRM_Core_DAO::singleValueQuery("SELECT date_format(now(), '%Y-%m-%d %H:%i')");
-    if ($phpNow != $sqlNow) {
+    if (!CRM_Utils_Time::isEqual($phpNow, $sqlNow, 2.5 * 60)) {
       $messages[] = new CRM_Utils_Check_Message(
         'checkMysqlTime',
         ts('Timestamps reported by MySQL (eg "%2") and PHP (eg "%3" ) are mismatched.<br /><a href="%1">Read more about this warning</a>', array(
-          1 => CRM_Utils_System::getWikiBaseURL()  . 'checkMysqlTime',
+          1 => CRM_Utils_System::getWikiBaseURL() . 'checkMysqlTime',
           2 => $sqlNow,
           3 => $phpNow,
         )),
