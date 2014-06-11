@@ -181,12 +181,14 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
           'name' => ts('View'),
           'url' => 'civicrm/contact/view',
           'qs' => "reset=1&cid=%%id%%{$extraParams}{$searchContext}",
+          'class' => 'no-popup',
           'title' => ts('View Contact Details'),
         ),
         CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit'),
           'url' => 'civicrm/contact/add',
           'qs' => 'reset=1&action=update&cid=%%id%%',
+          'class' => 'no-popup',
           'title' => ts('Edit Contact Details'),
         ),
       );
@@ -197,6 +199,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
           'name' => ts('Map'),
           'url' => 'civicrm/contact/map',
           'qs' => 'reset=1&cid=%%id%%&searchType=custom',
+          'class' => 'no-popup',
           'title' => ts('Map Contact'),
         );
       }
