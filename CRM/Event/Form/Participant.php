@@ -561,7 +561,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
         $roleID = $submittedRole[0];
       }
       $submittedEvent = $this->getElementValue('event_id');
-      if ($submittedEvent[0]) {
+      if (!empty($submittedEvent[0])) {
         $eventID = $submittedEvent[0];
       }
     }
