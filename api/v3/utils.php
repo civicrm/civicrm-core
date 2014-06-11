@@ -921,6 +921,14 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
  * We will only alter the value if we are sure that changing it will make it correct - if it appears wrong but does not appear to have a clear fix we
  * don't touch - lots of very cautious code in here
  *
+ * The resulting array should look like
+ * array(
+ *  'key' => 1,
+ *  'key1' => 1,
+ * );
+ *
+ * OR one or more keys wrapped in a CRM_Core_DAO::VALUE_SEPARATOR - either it accepted by the receiving function
+ *
  * @todo - we are probably skipping handling disabled options as presumably getoptions is not giving us them. This should be non-regressive but might
  * be fixed in future
  *
@@ -928,10 +936,6 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
  * @param $customFieldLabel
  * @param $entity
  *
- * @internal param $fields
- * @internal param $customFieldID
- * @internal param $checkCheckBoxField
- * @return string
  */
 function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
 
