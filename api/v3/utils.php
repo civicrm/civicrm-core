@@ -982,7 +982,9 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
   }
   elseif (stristr($checkboxFieldValue, ',')) {
     $formatValue = TRUE;
-    //lets see if we should separate it
+    //lets see if we should separate it - we do this near the end so we
+    // ensure we have already checked that the comma is not part of a legitimate match
+    // and of course, we don't make any changes if we don't now have matches
     $possibleValues = explode(',', $checkboxFieldValue);
   }
   else {
