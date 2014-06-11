@@ -202,7 +202,7 @@ class CRM_Utils_Address {
     // for every token, replace {fooTOKENbar} with fooVALUEbar if
     // the value is not empty, otherwise drop the whole {fooTOKENbar}
     foreach ($replacements as $token => $value) {
-      if ($value && is_string($value)) {
+      if ($value && is_string($value) || is_numeric($value)) {
         $formatted = preg_replace("/{([^{}]*)\b{$token}\b([^{}]*)}/u", "\${1}{$value}\${2}", $formatted);
       }
       else {
