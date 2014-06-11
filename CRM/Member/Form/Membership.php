@@ -1092,7 +1092,11 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
     $isTest = ($this->_mode == 'test') ? 1 : 0;
-    $lineItems = $this->_lineItem;
+
+    $lineItems = NULL;
+    if (!empty($this->_lineItem)) {
+      $lineItems = $this->_lineItem;
+    }
 
     $config = CRM_Core_Config::singleton();
     // get the submitted form values.

@@ -278,7 +278,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       // -lets use relative url for internal use.
       // -make sure relative url should not be htmlize.
       if (substr($dashboadDAO->url, 0, 4) != 'http') {
-        $urlParam = CRM_Utils_System::explode('&', $dashboadDAO->url, 2);
+        $urlParam = explode('?', $dashboadDAO->url);
         $url = CRM_Utils_System::url($urlParam[0], $urlParam[1], TRUE, NULL, FALSE);
       }
 
@@ -297,7 +297,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     if ($dashboadDAO->is_fullscreen) {
       $fullscreenUrl = $dashboadDAO->fullscreen_url;
       if (substr($fullscreenUrl, 0, 4) != 'http') {
-        $urlParam = CRM_Utils_System::explode('&', $dashboadDAO->fullscreen_url, 2);
+        $urlParam = explode('?', $dashboadDAO->fullscreen_url);
         $fullscreenUrl = CRM_Utils_System::url($urlParam[0], $urlParam[1], TRUE, NULL, FALSE);
       }
       $dashletInfo['fullscreenUrl'] = $fullscreenUrl;
