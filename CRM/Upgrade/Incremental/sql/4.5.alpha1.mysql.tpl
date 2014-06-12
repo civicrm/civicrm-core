@@ -240,7 +240,7 @@ ALTER TABLE  `civicrm_group` CHANGE  `visibility`  `visibility` VARCHAR( 24 ) CH
 ALTER TABLE  `civicrm_contact` CHANGE  `preferred_mail_format`  `preferred_mail_format` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'Both' COMMENT  'What is the preferred mode of sending an email.';
 
 -- CRM-14183
-INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1157, "PL", "Plateau");
+INSERT IGNORE INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1157, "PL", "Plateau");
 UPDATE civicrm_state_province SET name = "Abuja Federal Capital Territory" WHERE name = "Abuja Capital Territory";
 
 -- CRM-13992
@@ -284,7 +284,7 @@ ALTER TABLE `civicrm_event`
   CHANGE is_template is_template tinyint(4) DEFAULT '0' COMMENT 'whether the event has template';
 
 -- CRM-14493
-INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1085, "61", "Pieria");
+INSERT IGNORE INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1085, "61", "Pieria");
 
 -- CRM-14445
 ALTER TABLE `civicrm_option_group`
