@@ -3,7 +3,7 @@
  * @see https://wiki.civicrm.org/confluence/display/CRMDOC/AJAX+Interface
  * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Ajax+Pages+and+Forms
  */
-(function($, CRM) {
+(function($, CRM, undefined) {
   /**
    * Almost like {crmURL} but on the client side
    * eg: var url = CRM.url('civicrm/contact/view', {reset:1,cid:42});
@@ -316,16 +316,7 @@
         refreshAction: ['next_new', 'submit_savenext', 'upload_new'],
         cancelButton: '.cancel',
         openInline: 'a.open-inline, a.button, a.action-item',
-        onCancel: function(event) {},
-        onError: function(data) {
-          var $el = $(this);
-          $el.html(data.content).trigger('crmLoad', data).trigger('crmFormLoad', data).trigger('crmFormError', data);
-          if (typeof(data.errors) == 'object') {
-            $.each(data.errors, function(formElement, msg) {
-              $('[name="'+formElement+'"]', $el).crmError(msg);
-            });
-          }
-        }
+        onCancel: function(event) {}
       }
     };
     // Move options that belong to crmForm. Others will be passed through to crmSnippet
@@ -385,7 +376,7 @@
         url: data.url.replace(/reset=1[&]?/, ''),
         dataType: 'json',
         success: function(response) {
-          if (response.status !== 'form_error') {
+          if (response.content === undefined) {
             $el.crmSnippet('option', 'block') && $el.unblock();
             $el.trigger('crmFormSuccess', response);
             // Reset form for e.g. "save and new"
@@ -403,7 +394,13 @@
           }
           else {
             response.url = data.url;
-            settings.onError.call($el, response);
+            $el.html(response.content).trigger('crmLoad', response).trigger('crmFormLoad', response);
+            if (response.status === 'form_error') {
+              $el.trigger('crmFormError', response);
+              $.each(response.errors || [], function(formElement, msg) {
+                $('[name="'+formElement+'"]', $el).crmError(msg);
+              });
+            }
           }
         },
         beforeSerialize: function(form, options) {
