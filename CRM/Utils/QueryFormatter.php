@@ -38,6 +38,7 @@
 class CRM_Utils_QueryFormatter {
   const LANG_SQL_LIKE = 'like';
   const LANG_SQL_FTS = 'fts';
+  const LANG_SQL_FTSBOOL = 'ftsbool';
   const LANG_SOLR = 'solr';
 
   /**
@@ -122,6 +123,9 @@ class CRM_Utils_QueryFormatter {
       case self::LANG_SQL_FTS:
         $text = $this->_formatFts($text, $this->mode);
         break;
+      case self::LANG_SQL_FTSBOOL:
+        $text = $this->_formatFtsBool($text, $this->mode);
+        break;
       case self::LANG_SQL_LIKE:
         $text = $this->_formatLike($text, $this->mode);
         break;
@@ -143,11 +147,11 @@ class CRM_Utils_QueryFormatter {
     $text = str_replace('%', '*', $text);
 
     if (empty($text)) {
-      $result = '%';
+      $result = '*';
     }
     elseif (strpos($text, '*') !== FALSE) {
       // if user supplies their own wildcards, then don't do any sophisticated changes
-      return $text;
+      $result = $text;
     }
     else {
       switch ($mode) {
@@ -169,6 +173,49 @@ class CRM_Utils_QueryFormatter {
 
         case self::MODE_WILDWORDS_SUFFIX:
           $result = $this->mapWords($text, 'word*');
+          break;
+
+        default:
+          $result = NULL;
+      }
+    }
+
+    return $this->dedupeWildcards($result, '%');
+  }
+
+  protected function _formatFtsBool($text, $mode) {
+    $result = NULL;
+
+    // normalize user-inputted wildcards
+    $text = str_replace('%', '*', $text);
+
+    if (empty($text)) {
+      $result = '*';
+    }
+    elseif (strpos($text, '*') !== FALSE) {
+      // if user supplies their own wildcards, then don't do any sophisticated changes
+      $result = $this->mapWords($text, '+word');
+    }
+    else {
+      switch ($mode) {
+        case self::MODE_NONE:
+          $result = $this->mapWords($text, '+word');
+          break;
+
+        case self::MODE_PHRASE:
+          $result = '+"' . $text . '"';
+          break;
+
+        case self::MODE_WILDPHRASE:
+          $result = '+"*' . $text . '*"';
+          break;
+
+        case self::MODE_WILDWORDS:
+          $result = $this->mapWords($text, '+*word*');
+          break;
+
+        case self::MODE_WILDWORDS_SUFFIX:
+          $result = $this->mapWords($text, '+word*');
           break;
 
         default:
@@ -262,6 +309,7 @@ class CRM_Utils_QueryFormatter {
     return array(
       self::LANG_SOLR,
       self::LANG_SQL_FTS,
+      self::LANG_SQL_FTSBOOL,
       self::LANG_SQL_LIKE,
     );
   }
