@@ -356,6 +356,12 @@ class CRM_Core_BAO_ConfigSetting {
         $defaults['enableComponentIDs'] = $enabledComponentIDs;
       }
     }
+
+    // Provide a settings override (CRM-14850)
+    global $civicrm_setting;
+    if (is_array($civicrm_setting) && isset($civicrm_setting['Configuration Settings'])) {
+      $defaults = array_merge( $defaults, $civicrm_setting['Configuration Settings']);
+    }
   }
 
   static function getConfigSettings() {
