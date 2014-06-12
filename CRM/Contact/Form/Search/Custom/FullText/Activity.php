@@ -46,16 +46,21 @@ class CRM_Contact_Form_Search_Custom_FullText_Activity extends CRM_Contact_Form_
    * {@inheritdoc}
    */
   public function fillTempTable($queryText, $entityIDTableName, $toTable, $queryLimit, $detailLimit) {
-    $count = $this->fillActivityIDs($queryText, $entityIDTableName, $queryLimit);
-    $this->moveActivityIDs($entityIDTableName, $toTable, $detailLimit);
-    return $count;
+    $queries = $this->prepareQueries($queryText, $entityIDTableName);
+    $result = $this->runQueries($queryText, $queries, $entityIDTableName, $queryLimit);
+    $this->moveIDs($entityIDTableName, $toTable, $detailLimit);
+    if (!empty($result['files'])) {
+      $this->moveFileIDs($toTable, 'activity_id', $result['files']);
+    }
+    return $result;
   }
 
   /**
    * @param string $queryText
-   * @return int the total number of matches
+   * @param string $entityIDTableName
+   * @return array list tables/queries (for runQueries)
    */
-  function fillActivityIDs($queryText, $entityIDTableName, $limit) {
+  function prepareQueries($queryText, $entityIDTableName) {
     // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
 
     $contactSQL = array();
@@ -100,15 +105,18 @@ AND    (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
 
     $tables = array(
       'civicrm_activity' => array('fields' => array()),
+      'file' => array(
+        'xparent_table' => 'civicrm_activity',
+      ),
       'sql' => $contactSQL,
       'final' => $final,
     );
 
     $this->fillCustomInfo($tables, "( 'Activity' )");
-    return $this->runQueries($queryText, $tables, $entityIDTableName, $limit);
+    return $tables;;
   }
 
-  public function moveActivityIDs($fromTable, $toTable, $limit) {
+  public function moveIDs($fromTable, $toTable, $limit) {
     $sql = "
 INSERT INTO {$toTable}
 ( table_name, activity_id, subject, details, contact_id, sort_name, record_type,

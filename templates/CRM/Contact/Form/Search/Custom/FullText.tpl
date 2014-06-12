@@ -59,6 +59,7 @@
         <thead>
         <tr>
           <th class='link'>{ts}Name{/ts}</th>
+          {if $allowFileSearch}<th>{ts}File{/ts}</th>{/if}
           <th></th>
         </tr>
         </thead>
@@ -67,6 +68,7 @@
             <td><a
                 href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&context=fulltext&key=`$qfKey`"}"
                 title="{ts}View contact details{/ts}">{$row.sort_name}</a></td>
+            {if $allowFileSearch}<td>{$row.fileHtml}</td>{/if}
             <td><a
                 href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&context=fulltext&key=`$qfKey`"}">{ts}View{/ts}</a>
             </td>
@@ -101,6 +103,7 @@
           <th class='link'>{ts}Added By{/ts}</th>
           <th class='link'>{ts}With{/ts}</th>
           <th class='link'>{ts}Assignee{/ts}</th>
+          {if $allowFileSearch}<th>{ts}File{/ts}</th>{/if}
           <th></th>
         </tr>
         </thead>
@@ -121,6 +124,7 @@
               <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.assignee_contact_id`&context=fulltext&key=`$qfKey`"}"
                 title="{ts}View contact details{/ts}">{$row.assignee_sort_name}</a>
             </td>
+            {if $allowFileSearch}<td>{$row.fileHtml}</td>{/if}
             <td>
               {if $row.case_id }
                 <a href="{crmURL p='civicrm/case/activity/view'
@@ -159,6 +163,7 @@
           <th class="start_date">{ts}Start Date{/ts}</th>
           <th class="end_date">{ts}End Date{/ts}</th>
           <th>{ts}Case ID{/ts}</th>
+          {if $allowFileSearch}<th>{ts}File{/ts}</th>{/if}
           <th></th>
           <th class="hiddenElement"></th>
           <th class="hiddenElement"></th>
@@ -173,6 +178,7 @@
             <td>{$row.case_start_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
             <td>{$row.case_end_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
             <td>{$row.case_id}</td>
+            {if $allowFileSearch}<td>{$row.fileHtml}</td>{/if}
             {if $row.case_is_deleted}
               <td>
                 <a href="{crmURL p='civicrm/contact/view/case'
@@ -217,6 +223,7 @@
           <th>{ts}Source{/ts}</th>
           <th class="received_date">{ts}Received{/ts}</th>
           <th>{ts}Status{/ts}</th>
+          {if $allowFileSearch}<th>{ts}File{/ts}</th>{/if}
           <th></th>
           <th class="hiddenElement"></th>
         </tr>
@@ -233,6 +240,7 @@
             <td>{$row.contribution_source}</td>
             <td>{$row.contribution_receive_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
             <td>{$row.contribution_status}</td>
+            {if $allowFileSearch}<td>{$row.fileHtml}</td>{/if}
             <td>
               <a href="{crmURL p='civicrm/contact/view/contribution'
               q="reset=1&id=`$row.contribution_id`&cid=`$row.contact_id`&action=view&context=fulltext&key=`$qfKey`"}">{ts}View{/ts}</a>
@@ -271,6 +279,7 @@
           <th>{ts}Source{/ts}</th>
           <th>{ts}Status{/ts}</th>
           <th>{ts}Role{/ts}</th>
+          {if $allowFileSearch}<th>{ts}File{/ts}</th>{/if}
           <th></th>
           <th class="hiddenElement"></th>
         </tr>
@@ -288,6 +297,7 @@
             <td>{$row.participant_source}</td>
             <td>{$row.participant_status}</td>
             <td>{$row.participant_role}</td>
+            {if $allowFileSearch}<td>{$row.fileHtml}</td>{/if}
             <td>
               <a href="{crmURL p='civicrm/contact/view/participant'
               q="reset=1&id=`$row.participant_id`&cid=`$row.contact_id`&action=view&context=fulltext&key=`$qfKey`"}">{ts}View{/ts}</a>
@@ -324,6 +334,7 @@
           <th class="end_date">{ts}Membership End Date{/ts}</th>
           <th>{ts}Source{/ts}</th>
           <th>{ts}Status{/ts}</th>
+          {if $allowFileSearch}<th>{ts}File{/ts}</th>{/if}
           <th></th>
           <th class="hiddenElement"></th>
           <th class="hiddenElement"></th>
@@ -341,6 +352,7 @@
             <td>{$row.membership_end_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
             <td>{$row.membership_source}</td>
             <td>{$row.membership_status}</td>
+            {if $allowFileSearch}<td>{$row.fileHtml}</td>{/if}
             <td>
               <a href="{crmURL p='civicrm/contact/view/membership'
               q="reset=1&id=`$row.membership_id`&cid=`$row.contact_id`&action=view&context=fulltext&key=`$qfKey`"}">{ts}View{/ts}</a>

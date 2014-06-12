@@ -1717,4 +1717,15 @@ abstract class CRM_Utils_Hook {
       'civicrm_crudLink'
     );
   }
+
+  /**
+   * @param array<CRM_Core_FileSearchInterface> $fileSearches
+   * @return mixed
+   */
+  static function fileSearches(&$fileSearches) {
+    return self::singleton()->invoke(1, $fileSearches,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_fileSearches'
+    );
+  }
 }
