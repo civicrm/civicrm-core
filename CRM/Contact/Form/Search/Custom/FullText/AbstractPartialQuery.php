@@ -252,14 +252,14 @@ GROUP BY {$tableValues['id']}
     $clauses = array();
     if (CRM_Core_InnoDBIndexer::singleton()->hasDeclaredIndex($tableName, $fullTextFields)) {
       $formattedQuery = CRM_Utils_QueryFormatter::singleton()
-        ->format($queryText, CRM_Utils_QueryFormatter::LANG_SQL_FTS);
+        ->format($queryText, CRM_Utils_QueryFormatter::LANG_SQL_FTSBOOL);
 
       $prefixedFieldNames = array();
       foreach ($fullTextFields as $fieldName) {
         $prefixedFieldNames[] = "$tableAlias.$fieldName";
       }
 
-      $clauses[] = sprintf("MATCH (%s) AGAINST ('%s')",
+      $clauses[] = sprintf("MATCH (%s) AGAINST ('%s' IN BOOLEAN MODE)",
         implode(',', $prefixedFieldNames),
         $strtolower(CRM_Core_DAO::escapeString($formattedQuery))
       );
