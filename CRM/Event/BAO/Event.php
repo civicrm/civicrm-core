@@ -1139,9 +1139,16 @@ WHERE civicrm_event.is_active = 1
             'email' => $email,
             'confirm_email_text' => CRM_Utils_Array::value('confirm_email_text', $values['event']),
             'isShowLocation' => CRM_Utils_Array::value('is_show_location', $values['event']),
-            'contributeMode' => NULL,
+            'contributeMode' => CRM_Utils_Array::value('contributeMode', $template->_tpl_vars),
             'participantID' => $participantId,
             'conference_sessions' => $sessions,
+            'credit_card_number' =>
+                CRM_Utils_System::mungeCreditCard(
+                    CRM_Utils_Array::value('credit_card_number', $participantParams)),
+            'credit_card_exp_date' =>
+                CRM_Utils_Date::mysqlToIso(
+                    CRM_Utils_Date::format(
+                        CRM_Utils_Array::value('credit_card_exp_date', $participantParams))),
           ));
 
         // CRM-13890 : NOTE wait list condition need to be given so that
