@@ -76,7 +76,8 @@ abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
    *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
    * @param array|NULL $detailLimit final limit (applied when building $detailTable)
    *                   NULL if no limit; or array(0 => $limit, 1 => $offset)
-   * @return int number of matches
+   * @return array keys: match-descriptor
+   *   - count: int
    */
   public abstract function fillTempTable($queryText, $entityIDTableName, $detailTable, $queryLimit, $detailLimit);
 
@@ -118,12 +119,19 @@ AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
 
   /**
    * @param string $queryText
-   * @param array $tables
-   * @return int the total number of matches
+   * @param array $tables a list of places to query. Keys may be:
+   *   - sql: an array of SQL queries to execute
+   *   - final: an array of SQL queries to execute at the end
+   *   - *: All other keys are treated as table names
+   * @return array keys: match-descriptor
+   *   - count: int
+   *   - files: NULL | array
    */
   function runQueries($queryText, &$tables, $entityIDTableName, $limit) {
     $sql = "TRUNCATE {$entityIDTableName}";
     CRM_Core_DAO::executeQuery($sql);
+
+    $files = NULL;
 
     foreach ($tables as $tableName => $tableValues) {
       if ($tableName == 'final') {
@@ -138,6 +146,27 @@ $sqlStatement
 {$this->toLimit($limit)}
 ";
             CRM_Core_DAO::executeQuery($sql);
+          }
+        }
+        else if ($tableName == 'file') {
+          $searcher = CRM_Core_BAO_File::getSearchService();
+          if (!($searcher && CRM_Core_Permission::check('access uploaded files'))) {
+            continue;
+          }
+
+          $query = $tableValues + array(
+            'text' => CRM_Utils_QueryFormatter::singleton()
+              ->format($queryText, CRM_Utils_QueryFormatter::LANG_SOLR),
+          );
+          list($intLimit, $intOffset) = $this->parseLimitOffset($limit);
+          $files = $searcher->search($query, $intLimit, $intOffset);
+          $matches = array();
+          foreach ($files as $file) {
+            $matches[] = array('entity_id' => $file['xparent_id']);
+          }
+          if ($matches) {
+            $insertSql = CRM_Utils_SQL_Insert::into($entityIDTableName)->usingReplace()->rows($matches)->toSQL();
+            CRM_Core_DAO::executeQuery($insertSql);
           }
         }
         else {
@@ -192,8 +221,10 @@ GROUP BY {$tableValues['id']}
       }
     }
 
-    $rowCount = "SELECT count(*) FROM {$entityIDTableName}";
-    return CRM_Core_DAO::singleValueQuery($rowCount);
+    return array(
+      'count' => CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM {$entityIDTableName}"),
+      'files' => $files,
+    );
   }
 
   /**
@@ -206,9 +237,12 @@ GROUP BY {$tableValues['id']}
    * @return string SQL, eg "MATCH (col1) AGAINST (queryText)" or "col1 LIKE '%queryText%'"
    */
   public function matchText($table, $fullTextFields, $queryText) {
+    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
+
     if (strpos($table, ' ') === FALSE) {
       $tableName = $tableAlias = $table;
-    } else {
+    }
+    else {
       list ($tableName, $tableAlias) = explode(' ', $table);
     }
     if (is_scalar($fullTextFields)) {
@@ -217,7 +251,8 @@ GROUP BY {$tableValues['id']}
 
     $clauses = array();
     if (CRM_Core_InnoDBIndexer::singleton()->hasDeclaredIndex($tableName, $fullTextFields)) {
-      $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
+      $formattedQuery = CRM_Utils_QueryFormatter::singleton()
+        ->format($queryText, CRM_Utils_QueryFormatter::LANG_SQL_FTS);
 
       $prefixedFieldNames = array();
       foreach ($fullTextFields as $fieldName) {
@@ -226,7 +261,7 @@ GROUP BY {$tableValues['id']}
 
       $clauses[] = sprintf("MATCH (%s) AGAINST ('%s')",
         implode(',', $prefixedFieldNames),
-        $strtolower(CRM_Core_DAO::escapeString($queryText))
+        $strtolower(CRM_Core_DAO::escapeString($formattedQuery))
       );
     }
     else {
@@ -234,35 +269,53 @@ GROUP BY {$tableValues['id']}
       //  1 => $table,
       //  2 => implode(', ', $fullTextFields),
       //)));
+
+      $formattedQuery = CRM_Utils_QueryFormatter::singleton()
+        ->format($queryText, CRM_Utils_QueryFormatter::LANG_SQL_LIKE);
+      $escapedText = $strtolower(CRM_Core_DAO::escapeString($formattedQuery));
       foreach ($fullTextFields as $fieldName) {
-        $clauses[] = "$tableAlias.$fieldName LIKE {$this->toSqlWildCard($queryText)}";
+        $clauses[] = "$tableAlias.$fieldName LIKE '{$escapedText}'";
       }
     }
     return implode(' OR ', $clauses);
   }
 
   /**
-   * Format text to include wild card characters at beginning and end
+   * For any records in $toTable that originated with this query,
+   * append file information.
    *
-   * @param string $text
-   * @return string
+   * @param string $toTable
+   * @param string $parentIdColumn
+   * @param array $files see return format of CRM_Core_FileSearchInterface::search
    */
-  public function toSqlWildCard($text) {
-    if ($text) {
-      $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-      $text = $strtolower(CRM_Core_DAO::escapeString($text));
-      if (strpos($text, '%') === FALSE) {
-        $text = "'%{$text}%'";
-        return $text;
-      }
-      else {
-        $text = "'{$text}'";
-        return $text;
-      }
+  public function moveFileIDs($toTable, $parentIdColumn, $files) {
+    if (empty($files)) {
+      return;
     }
-    else {
-      $text = "'%'";
-      return $text;
+
+    $filesIndex = CRM_Utils_Array::index(array('xparent_id', 'file_id'), $files);
+    // ex: $filesIndex[$xparent_id][$file_id] = array(...the file record...);
+
+    $dao = CRM_Core_DAO::executeQuery("
+      SELECT distinct {$parentIdColumn}
+      FROM {$toTable}
+      WHERE table_name = %1
+    ", array(
+      1 => array($this->getName(), 'String'),
+    ));
+    while ($dao->fetch()) {
+      if (empty($filesIndex[$dao->{$parentIdColumn}])) {
+        continue;
+      }
+
+      CRM_Core_DAO::executeQuery("UPDATE {$toTable}
+        SET file_ids = %1
+        WHERE table_name = %2 AND {$parentIdColumn} = %3
+      ", array(
+        1 => array(implode(',', array_keys($filesIndex[$dao->{$parentIdColumn}])), 'String'),
+        2 => array($this->getName(), 'String'),
+        3 => array($dao->{$parentIdColumn}, 'Int'),
+      ));
     }
   }
 
@@ -283,6 +336,23 @@ GROUP BY {$tableValues['id']}
       $result .= " OFFSET {$offset}";
     }
     return $result;
+  }
+
+  /**
+   * @param array|int $limit
+   * @return array (0 => $limit, 1 => $offset)
+   */
+  public function parseLimitOffset($limit) {
+    if (is_scalar($limit)) {
+      $intLimit = $limit;
+    }
+    else {
+      list ($intLimit, $intOffset) = $limit;
+    }
+    if (!$intOffset) {
+      $intOffset = 0;
+    }
+    return array($intLimit, $intOffset);
   }
 
 }
