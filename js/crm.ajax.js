@@ -422,6 +422,10 @@
           return false;
         });
       }
+      // Alow a button to prevent ajax submit
+      $('input[data-no-ajax-submit=true]').click(function() {
+        $(this).closest('form').ajaxFormUnbind();
+      });
       // For convenience, focus the first field
       $('input[type=text], textarea, select', this).filter(':visible').first().not('.dateplugin').focus();
     });
@@ -429,7 +433,6 @@
   };
   /**
    * Handler for jQuery click event e.g. $('a').click(CRM.popup)
-   * @returns {boolean}
    */
   CRM.popup = function(e) {
     var $el = $(this).first(),
