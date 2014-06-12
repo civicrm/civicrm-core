@@ -284,7 +284,7 @@ ALTER TABLE `civicrm_event`
   CHANGE is_template is_template tinyint(4) DEFAULT '0' COMMENT 'whether the event has template';
 
 -- CRM-14493
-INSERT INTO IGNORE civicrm_state_province (country_id, abbreviation, name) VALUES (1085, "61", "Pieria");
+INSERT IGNORE INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1085, "61", "Pieria");
 
 -- CRM-14445
 ALTER TABLE `civicrm_option_group`
