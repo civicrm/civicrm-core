@@ -1817,8 +1817,8 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
       _civicrm_api3_api_match_pseudoconstant($params, $entity, $fieldName, $fieldInfo);
     }
     // Check our field length
-    elseif (is_string($value) && !empty($fieldInfo['maxlength']) && strlen($value) > $fieldInfo['maxlength']) {
-      throw new API_Exception("Value for $fieldName is " . strlen($value) . " characters  - This field has a maxlength of {$fieldInfo['maxlength']} characters.",
+    elseif (is_string($value) && !empty($fieldInfo['maxlength']) && strlen(utf8_decode($value)) > $fieldInfo['maxlength']) {
+      throw new API_Exception("Value for $fieldName is " . strlen(utf8_decode($value)) . " characters  - This field has a maxlength of {$fieldInfo['maxlength']} characters.",
         2100, array('field' => $fieldName)
       );
     }
