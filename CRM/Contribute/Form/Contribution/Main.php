@@ -140,13 +140,21 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     //CRM-5001
     if (!empty($this->_values['is_for_organization'])) {
       $msg = ts('Mixed profile not allowed for on behalf of registration/sign up.');
-      if ($preID = CRM_Utils_Array::value('custom_pre_id', $this->_values)) {
-        $preProfile = CRM_Core_BAO_UFGroup::profileGroups($preID);
+      $ufJoinParams = array(
+        'module' => 'onBehalf',
+        'entity_table' => 'civicrm_contribution_page',
+        'entity_id' => $this->_id,
+      );
+      $onBehalfProfileIDs = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+      // getUFGroupIDs returns an array with the first item being the ID we need
+      $onBehalfProfileID = $onBehalfProfileIDs[0];
+      if ($onBehalfProfileID) {
+        $onBehalfProfile = CRM_Core_BAO_UFGroup::profileGroups($onBehalfProfileID);
         foreach (array(
             'Individual', 'Organization', 'Household') as $contactType) {
-          if (in_array($contactType, $preProfile) &&
-            (in_array('Membership', $preProfile) ||
-              in_array('Contribution', $preProfile)
+          if (in_array($contactType, $onBehalfProfile) &&
+            (in_array('Membership', $onBehalfProfile) ||
+              in_array('Contribution', $onBehalfProfile)
             )
           ) {
             CRM_Core_Error::fatal($msg);
