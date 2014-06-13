@@ -122,25 +122,25 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $params = array('sequential' => 1,);
     $result = $this->callAPIAndDocument('domain', 'get', $params, __FUNCTION__, __FILE__);
 
-    $this->assertType('array', $result, 'In line' . __LINE__);
+    $this->assertType('array', $result);
 
     $domain = $result['values'][0];
     $this->assertEquals("info@EXAMPLE.ORG", $domain['from_email'], 'In line ' . __LINE__);
-    $this->assertEquals("FIXME", $domain['from_name'], 'In line' . __LINE__);
+    $this->assertEquals("FIXME", $domain['from_name']);
     // checking other important parts of domain information
     // test will fail if backward incompatible changes happen
-    $this->assertArrayHasKey('id', $domain, 'In line' . __LINE__);
-    $this->assertArrayHasKey('name', $domain, 'In line' . __LINE__);
-    $this->assertArrayHasKey('domain_email', $domain, 'In line' . __LINE__);
-    $this->assertArrayHasKey('domain_phone', $domain, 'In line' . __LINE__);
-    $this->assertArrayHasKey('domain_address', $domain, 'In line' . __LINE__);
+    $this->assertArrayHasKey('id', $domain);
+    $this->assertArrayHasKey('name', $domain);
+    $this->assertArrayHasKey('domain_email', $domain);
+    $this->assertArrayHasKey('domain_phone', $domain);
+    $this->assertArrayHasKey('domain_address', $domain);
   }
 
   public function testGetCurrentDomain() {
     $params = array('current_domain' => 1);
     $result = $this->callAPISuccess('domain', 'get', $params);
 
-    $this->assertType('array', $result, 'In line' . __LINE__);
+    $this->assertType('array', $result);
 
     foreach ($result['values'] as $key => $domain) {
       if ($key == 'version') {
@@ -148,15 +148,15 @@ class api_v3_DomainTest extends CiviUnitTestCase {
       }
 
       $this->assertEquals("info@EXAMPLE.ORG", $domain['from_email'], 'In line ' . __LINE__);
-      $this->assertEquals("FIXME", $domain['from_name'], 'In line' . __LINE__);
+      $this->assertEquals("FIXME", $domain['from_name']);
 
       // checking other important parts of domain information
       // test will fail if backward incompatible changes happen
-      $this->assertArrayHasKey('id', $domain, 'In line' . __LINE__);
-      $this->assertArrayHasKey('name', $domain, 'In line' . __LINE__);
-      $this->assertArrayHasKey('domain_email', $domain, 'In line' . __LINE__);
-      $this->assertArrayHasKey('domain_phone', $domain, 'In line' . __LINE__);
-      $this->assertArrayHasKey('domain_address', $domain, 'In line' . __LINE__);
+      $this->assertArrayHasKey('id', $domain);
+      $this->assertArrayHasKey('name', $domain);
+      $this->assertArrayHasKey('domain_email', $domain);
+      $this->assertArrayHasKey('domain_phone', $domain);
+      $this->assertArrayHasKey('domain_address', $domain);
       $this->assertEquals("my@email.com",$domain['domain_email']);
       $this->assertEquals("456-456",$domain['domain_phone']['phone']);
       $this->assertEquals("45 Penny Lane",$domain['domain_address']['street_address']);
@@ -175,12 +175,12 @@ class api_v3_DomainTest extends CiviUnitTestCase {
         'current_domain' => 1,
         'return' => 'name',
       ));
-    $this->assertEquals('Default Domain Name', $domain, print_r($domain, TRUE) . 'in line ' . __LINE__);
+    $this->assertEquals('Default Domain Name', $domain, print_r($domain, TRUE));
     $domain = $this->callAPISuccess('domain', 'getvalue', array(
         'current_domain' => 1,
         'return' => 'name',
       ));
-    $this->assertEquals('Default Domain Name', $domain, print_r($domain, TRUE) . 'in line ' . __LINE__);
+    $this->assertEquals('Default Domain Name', $domain, print_r($domain, TRUE));
   }
 
   /**
