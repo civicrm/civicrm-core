@@ -511,7 +511,8 @@ class CRM_Core_Resources {
         $this->addStyleUrl($config->customCSSURL, 99, $region);
       }
       if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'disable_core_css')) {
-        $this->addStyleFile('civicrm', 'css/civicrm.css', -99, $region);
+        $this->addStyleFile('civicrm', 'css/civicrm.css', -99, $region)
+        ->addStyleFile('civicrm', 'packages/jquery/plugins/DataTables/media/css/jquery.dataTables.min.css', -99, $region);
       }
     }
     return $this;
