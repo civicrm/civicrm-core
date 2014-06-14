@@ -47,11 +47,28 @@
     crmMailingAB.controller('TabsDemoCtrl', function($scope, crmApi, mailingList) {
 
         $scope.adi=0;
-        $scope.settab=function(){
-          //$scope.adi=$scope.adi + 1;
-
-
+        $scope.campaign_clicked= function(){
+            if($scope.adi >= 0 ){
+                $scope.adi  =0;
+            }
         };
+        $scope.compose_clicked=function(){
+            if($scope.adi >=1){
+                $scope.adi =1;
+            }
+        };
+        $scope.rec_clicked=function(){
+            if($scope.adi >=2){
+                $scope.adi =2;
+            }
+        };
+        $scope.preview_clicked=function(){
+            if($scope.adi>=3){
+                $scope.adi=3;
+            }
+        };
+
+
 
     });
 
