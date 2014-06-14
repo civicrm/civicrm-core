@@ -63,12 +63,18 @@
             link: function(scope, element, attrs) {
 
                 $(element).parent().parent().parent().tabs(scope.$eval(attrs.nexttab));
-                //$(element).parent().parent().parent().tabs({disabled:[1,2,3]});
+                var myarr = new Array(1,2,3)
+                $(element).parent().parent().parent().tabs({disabled:myarr});
                 //$(element).parent().parent().parent().tabs({"enable":1});
 
                 $(element).on("click",function() {
                     scope.adi=scope.adi +1;
-                   // $(element).parent().parent().parent().tabs({"enable":scope.adi});
+                    var myArray1 = new Array(  );
+                    for ( var i = scope.adi+1; i < 4; i++ ) {
+                        myArray1.push(i);
+                        console.log( "try " + i );
+                    }
+                    $(element).parent().parent().parent().tabs( "option", "disabled", myArray1 );
                     $(element).parent().parent().parent().tabs({active:scope.adi});
                     console.log("adiroxxx");
                 });
