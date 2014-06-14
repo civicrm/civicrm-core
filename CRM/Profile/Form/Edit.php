@@ -211,10 +211,6 @@ SELECT module
       $this->_postURL = str_replace('&amp;', '&', $this->_postURL);
       $this->_cancelURL = str_replace('&amp;', '&', $this->_cancelURL);
 
-      if ($this->_cancelURL) {
-        $this->addElement('hidden', 'cancelURL', $this->_cancelURL);
-      }
-
       // also retain error URL if set
       $this->_errorURL = CRM_Utils_Array::value('errorURL', $_POST);
       if ($this->_errorURL) {
@@ -242,6 +238,7 @@ SELECT module
         'type' => 'cancel',
         'name' => ts('Cancel'),
         'isDefault' => TRUE,
+        'js' => array('onclick' => "location.href='{$this->_cancelURL}'; return false;"),
       );
       $this->addButtons($buttons);
       return;
@@ -269,6 +266,7 @@ SELECT module
         'type' => 'cancel',
         'name' => ts('Cancel'),
         'isDefault' => TRUE,
+        'js' => array('onclick' => "location.href='{$this->_cancelURL}'; return false;"),
       );
     }
 
