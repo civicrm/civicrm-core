@@ -1,0 +1,86 @@
+/**
+ * Created by aditya on 6/12/14.
+ */
+
+
+(function(angular, $, _) {
+
+    var partialUrl = function(relPath) {
+        return CRM.resourceUrls['civicrm'] + '/partials/abtesting/' + relPath;
+    };
+
+    var crmMailingAB = angular.module('crmMailingAB', ['ngRoute', 'ui.utils']);
+
+
+//-------------------------------------------------------------------------------------------------------
+    crmMailingAB.config(['$routeProvider',
+        function($routeProvider) {
+            $routeProvider.when('/mailing', {
+                template: '<h1>sdfs</h1>',
+                controller: 'mailingListCtrl',
+                resolve: {
+                    mailingList: function($route, crmApi) {
+                        return crmApi('Mailing', 'get', {});
+                    }
+                }
+            });
+
+
+            $routeProvider.when('/mailing/abtesting', {
+
+                templateUrl: partialUrl('helloworld.html'),
+                controller: 'TabsDemoCtrl',
+                resolve: {
+                    mailingList: function($route, crmApi) {
+                        return crmApi('Mailing', 'get', {});
+                    }
+                }
+
+
+            });
+        }
+    ]);
+//-----------------------------------------
+    // Add a new record by name.
+    // Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
+
+    crmMailingAB.controller('TabsDemoCtrl', function($scope, crmApi, mailingList) {
+
+        $scope.adi=0;
+        $scope.settab=function(){
+          //$scope.adi=$scope.adi + 1;
+
+
+        };
+
+    });
+
+    crmMailingAB.directive('nexttab', function() {
+        return {
+            // Restrict it to be an attribute in this case
+            restrict: 'A',
+            // responsible for registering DOM listeners as well as updating the DOM
+            link: function(scope, element, attrs) {
+
+                $(element).parent().parent().parent().tabs(scope.$eval(attrs.nexttab));
+                //$(element).parent().parent().parent().tabs({disabled:[1,2,3]});
+                //$(element).parent().parent().parent().tabs({"enable":1});
+
+                $(element).on("click",function() {
+                    scope.adi=scope.adi +1;
+                   // $(element).parent().parent().parent().tabs({"enable":scope.adi});
+                    $(element).parent().parent().parent().tabs({active:scope.adi});
+                    console.log("adiroxxx");
+                });
+            }
+        };
+    });
+
+
+
+
+
+
+
+
+})(angular, CRM.$, CRM._);
