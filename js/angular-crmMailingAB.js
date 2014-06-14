@@ -67,6 +67,11 @@
                 $scope.adi=3;
             }
         };
+        $scope.templates =
+            [   { name: 'subjectlines', url: partialUrl('subject_lines.html')},
+                { name: 'fromname', url: partialUrl('from_name.html')},
+                {name:'2emails',url: partialUrl('two_emails.html')} ];
+        $scope.template = $scope.templates[0];
 
 
 
