@@ -65,13 +65,13 @@
                     <div sliderbar id="trial" style="margin: 10px;"></div>
 
                     <h3 style="text-decoration: underline;">How will the winner be decided</h3><br>
-                    &nbsp <input type="radio" ng-model="winner_criteria" value="Open"> Open <br/><br>
-                    &nbsp <input type="radio" ng-model="winner_criteria" value="Total Unique Clicks"> Total Unique Clicks <br/><br>
-                    &nbsp <input type="radio" ng-model="winner_criteria" value="Total Clicks on a particular link"> Total Clicks on a particular link <br/><br>
+                    &nbsp <input type="radio" ng-model="winner_criteria" value="Open" name="cri"> Open <br/><br>
+                    &nbsp <input type="radio" ng-model="winner_criteria" value="Total Unique Clicks" name="cri"> Total Unique Clicks <br/><br>
+                    &nbsp <input type="radio" ng-model="winner_criteria" value="Total Clicks on a particular link" name="cri"> Total Clicks on a particular link <br/><br>
 
                     <h3 style="text-decoration: underline;">Do you want the A/B test to be automated </h3>
-                    &nbsp<input  type="radio" ng-model="automated" value="Yes" ng-click="setifyes(1)" >Yes &nbsp
-                    &nbsp<input type="radio" ng-model="automated" value="No" ng-click="setifyes(2)"> No <br/><br>
+                    &nbsp<input  type="radio" ng-model="automated" value="Yes" ng-click="setifyes(1)" name="auto">Yes &nbsp
+                    &nbsp<input type="radio" ng-model="automated" value="No" ng-click="setifyes(2)" name="auto"> No <br/><br>
 
                     <tpmax ng-show="ifyes">
 
@@ -80,9 +80,9 @@
 
 
                         <h3>If the confidence level is not reached what do you want us to do?</h3>
-                        &nbsp <input type="radio" ng-model="ifnot" value="Inform me"> Inform me  <br/><br>
-                        &nbsp <input type="radio" ng-model="ifnot" value="Send Version A"> Send Version A <br/><br>
-                        &nbsp <input type="radio" ng-model="ifnot" value="Send Version B"> Send Version B <br/><br>
+                        &nbsp <input type="radio" ng-model="ifnot" value="Inform me" name="ifnot"> Inform me  <br/><br>
+                        &nbsp <input type="radio" ng-model="ifnot" value="Send Version A" name="ifnot"> Send Version A <br/><br>
+                        &nbsp <input type="radio" ng-model="ifnot" value="Send Version B" name="ifnot"> Send Version B <br/><br>
 
                         <button id="closebutton" style="position: relative;left:200px;">Save & Close</button>
 
@@ -144,10 +144,21 @@
 
             </table>
 
+            <h3 style="text-decoration: underline;"><a href="#">Preview Mailing</a></h3><br>
 
+            <h3 style="text-decoration: underline;">When to Start</h3><br>
+            <div>
+            <input type="radio" name="Start" ng-model="start" value="now"> Now &nbsp
+            <input type="radio" name="Start" ng-model="start" value="later"> Later
 
-            <button  value=">> Compose"   id="campaignbutton" nexttab={{adi}} >Submit & Send</button> <br>
+            &nbsp &nbsp <input type="date" ng-show="start=='later'" ng-model="send_date">
+            </div>
+            <br><br>
+
+            <button    id="campaignbutton" nexttab={{adi}} >Submit & Send</button> <br>
         </div>
+
+        
     </div>
 
 
