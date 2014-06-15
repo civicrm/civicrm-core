@@ -70,28 +70,28 @@
                     &nbsp <input type="radio" ng-model="winner_criteria" value="Total Clicks on a particular link"> Total Clicks on a particular link <br/><br>
 
                     <h3 style="text-decoration: underline;">Do you want the A/B test to be automated </h3>
-                    &nbsp<input  type="radio" ng-model="automated" value="yes" ng-click="setifyes(1)" >Yes &nbsp
-                    &nbsp<input type="radio" ng-model="automated" value="no" ng-click="setifyes(2)"> No <br/><br>
+                    &nbsp<input  type="radio" ng-model="automated" value="Yes" ng-click="setifyes(1)" >Yes &nbsp
+                    &nbsp<input type="radio" ng-model="automated" value="No" ng-click="setifyes(2)"> No <br/><br>
 
                     <tpmax ng-show="ifyes">
 
                         <h3> Please enter the confidence level at which a decision can be made</h3>
-                        &nbsp &nbsp <input type="text" style="height: 20px; width: 25px;" ng-modal="confidence" numbar=99><br><br>
+                        &nbsp &nbsp <input type="text" style="height: 20px; width: 25px;" ng-model="conf" numbar=99><br><br>
 
 
                         <h3>If the confidence level is not reached what do you want us to do?</h3>
-                        &nbsp <input type="radio" ng-model="ifnot" value="Open"> Inform me  <br/><br>
-                        &nbsp <input type="radio" ng-model="ifnot" value="Total Unique Clicks"> Send Version A <br/><br>
-                        &nbsp <input type="radio" ng-model="ifnot" value="Total Clicks on a particular link"> Send Version B <br/><br>
+                        &nbsp <input type="radio" ng-model="ifnot" value="Inform me"> Inform me  <br/><br>
+                        &nbsp <input type="radio" ng-model="ifnot" value="Send Version A"> Send Version A <br/><br>
+                        &nbsp <input type="radio" ng-model="ifnot" value="Send Version B"> Send Version B <br/><br>
 
                         <button id="closebutton" style="position: relative;left:200px;">Save & Close</button>
 
                     </tpmax>
 
                     <h3 style="text-decoration: underline;">Declare the winner in how much time?</h3><br>
-                    &nbsp <input type="text" style="height: 20px; width: 15px;" numbar=7> Days
-                    &nbsp <input type="text" style="height: 20px; width: 15px;" numbar=23> Hours
-                    &nbsp <input type="text" style="height: 20px; width: 15px;" numbar=59> Minutes
+                    &nbsp <input type="text" style="height: 20px; width: 15px;" ng-model="days" numbar=7> Days
+                    &nbsp <input type="text" style="height: 20px; width: 15px;" ng-model="hours" numbar=23> Hours
+                    &nbsp <input type="text" style="height: 20px; width: 15px;" ng-model="minutes" numbar=59> Minutes
                     <br>
                     <br>
 
@@ -100,9 +100,53 @@
                 </form>
         </div>
 
-        <div id="tabs-4">dsfdfbdfg
+        <div id="tabs-4">
+
+            <h3 style="text-decoration: underline;">Details</h3><br>
+
+            <table>
+            <tr>
+                <td>Test Criteria</td>
+                <td>{{template.name}}</td>
+            </tr>
+             <tr>
+                 <td>Groups Selected</td>
+                 <td></td>
+             </tr>
+             <tr>
+                 <td>Size of Test Group</td>
+                 <td>{{slide_value}}</td>
+
+             </tr>
+                <tr>
+                    <td>Winner Criteria</td>
+                    <td>{{winner_criteria}}</td>
+                </tr>
+              <tr>
+                  <td>Automated</td>
+                  <td>{{automated}}</td>
+
+              </tr>
+               <tr ng-show="automated=='Yes'">
+                   <td>Minum Confidence Level</td>
+                <td>{{conf}}%</td>
+               </tr>
+                <tr ng-show="automated=='Yes'">
+                    <td>If Level not Achieved</td>
+                    <td>{{ifnot}}</td>
+                </tr>
+                <tr>
+                    <td>Declare Winner in</td>
+                    <td>{{days}} Days {{hours}} Hours {{minutes}} Minutes</td>
+
+                </tr>
 
 
+            </table>
+
+
+
+            <button  value=">> Compose"   id="campaignbutton" nexttab={{adi}} >Submit & Send</button> <br>
         </div>
     </div>
 
