@@ -1,0 +1,95 @@
+
+
+
+<div>
+
+
+    <div ui-jq="tabs" id="alltabs" >
+
+        <ul>
+
+            <li><a href="#tabs-1" ng-click="campaign_clicked()" >Campaign</a></li>
+            <li><a href="#tabs-2" ng-click="compose_clicked()">Compose</a></li>
+            <li><a href="#tabs-3" ng-click="rec_clicked()">Recipients and Winner Criteria</a> </li>
+            <li><a href="#tabs-4" ng-click="preview_clicked()">Preview and Send</a></li>
+        </ul>
+
+
+        <div  id="tabs-1" >
+
+            <form name="myForm" >
+
+                <h3 style ="text-decoration:underline"> What would you like to test ?</h3><br><br>
+
+                &nbsp <input type="radio" ng-model="template" ng-value="templates[0]">  Subject Lines <br/><br>
+                &nbsp <input type="radio" ng-model="template" ng-value="templates[1]"> From Names <br/><br>
+                &nbsp <input type="radio" ng-model="template" ng-value="templates[2]"> Two different Emails <br/><br>
+                &nbsp <input type="submit" value=">> Compose"    id="campaignbutton" nexttab={{adi}} > <br>
+            </form>
+        </div>
+
+        <div id="tabs-2"  >
+
+            <form>
+            <div  ng-include="template.url">
+
+            </div>
+
+
+
+
+            <button  id="campaignbutton" nexttab={{adi}} >Done</button><br>
+
+            </form>
+
+        </div>
+
+        <div id="tabs-3">
+
+                <form>
+                    <h3 style="text-decoration: underline;">Select the groups you would like to add</h3><br>
+
+
+                    &nbsp<select multiple id="e1" groupselect>
+                        <option value="AL">Mumbai</option>
+                        <option value="AL">Delhi</option>
+                        <option value="AL">Madras</option>
+                        <option value="AL">Kanpur</option>
+                        <option value="WY">Kharagpur</option>
+                    </select><br><br>
+
+                    <h3 style="text-decoration: underline;">Select the size of your test group</h3><br>
+
+                    &nbsp Percentage Selected - {{slide_value}}%
+
+                    <div sliderbar id="trial" style="margin: 10px;"></div>
+
+                    <h3 style="text-decoration: underline;">How will the winner be decided</h3><br>
+                    &nbsp <input type="radio" ng-model="winner_criteria" value="Open"> Open <br/><br>
+                    &nbsp <input type="radio" ng-model="winner_criteria" value="Total Unique Clicks"> Total Unique Clicks <br/><br>
+                    &nbsp <input type="radio" ng-model="winner_criteria" value="Total Clicks on a particular link"> Total Clicks on a particular link <br/><br>
+
+                    <h3 style="text-decoration: underline;">Do you want the A/B test to be automated </h3>
+                    &nbsp<input modal_win type="radio" ng-model="automated" value="yes" >Yes &nbsp
+                    &nbsp<input type="radio" ng-model="automated" value="no"> No <br/><br>
+
+
+
+                    <h3 style="text-decoration: underline;">Declare the winner in how much time?</h3>
+
+
+
+
+                <button  value=">> Compose"   id="campaignbutton" nexttab={{adi}} >Next</button> <br>
+                </form>
+        </div>
+
+        <div id="tabs-4">dsfdfbdfg
+
+
+        </div>
+    </div>
+
+
+
+</div>
