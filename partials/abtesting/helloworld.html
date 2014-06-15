@@ -151,8 +151,10 @@
             <input type="radio" name="Start" ng-model="start" value="now"> Now &nbsp
             <input type="radio" name="Start" ng-model="start" value="later"> Later
 
-            &nbsp &nbsp <input type="date" ng-show="start=='later'" ng-model="send_date">
+            &nbsp &nbsp <input type="date" ng-show="start=='later'" ng-model="send_date" datepick>
             </div>
+
+            
             <br><br>
 
             <button    id="campaignbutton" nexttab={{adi}} >Submit & Send</button> <br>
