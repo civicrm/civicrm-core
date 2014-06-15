@@ -75,7 +75,21 @@
 
         $scope.slide_value = 0;
 
+        $scope.$watch("automated", function() {
 
+            console.log("Smsdd");
+
+        });
+
+        $scope.setifyes= function(val){
+            if(val ==1) {
+                $scope.ifyes = true;
+            }
+            else
+            $scope.ifyes=false;
+        };
+
+        $scope.closebox="open";
 
     });
 
@@ -137,16 +151,19 @@
 
                    }
                });
+
            }
 
        };
 
     });
 
-    crmMailingAB.directive('modal_win',function(){
+
+
+    crmMailingAB.directive('tpmax',function(){
         return {
 
-            restrict: 'AE',
+            restrict: 'E',
 
 
 
@@ -154,32 +171,60 @@
 
 
 
-                scope.$watch("automated", function() {
-                    alert("cgh");
-                    console.log("Sd");
+                scope.$watch('automated', function(val) {
+                    if(val=="yes") {
+                        console.log("yo");
+
+                        $(element).dialog({
+                            title: 'Automated A/B Testing',
+                            width: 800,
+                            height: 600,
+                            closed: false,
+                            cache: false,
+                            modal: true
+
+                        });
+
+
+
+
+
+                    }
 
                 });
+
+                $(element).find("#closebutton").on("click",function(){
+                    console.log("you can do it");
+                    $(element).dialog("close");
+
+                });
+
+
+
 
 
             }
 
         };
 
+
+
     });
 
-    crmMailingAB.directive('num_select',function(){
-       return {
+    crmMailingAB.directive('numbar',function(){
+        return{
 
-           restrict: 'AE',
+            restrict: 'AE',
 
-           link: function(scope,element,attr){
+            link: function(scope,element, attrs){
 
-               $(element).spinner();
-           }
+                $(element).spinner({max:attrs.numbar,min:0});
 
 
-       };
 
+            }
+
+        };
 
     });
 
