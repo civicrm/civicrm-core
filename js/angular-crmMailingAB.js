@@ -73,6 +73,8 @@
                 {name:'2emails',url: partialUrl('two_emails.html')} ];
         $scope.template = $scope.templates[0];
 
+        $scope.slide_value = 0;
+
 
 
     });
@@ -103,6 +105,87 @@
             }
         };
     });
+
+    crmMailingAB.directive('groupselect',function(){
+       return {
+
+           restrict : 'AE',
+
+           link: function(scope,element, attrs){
+
+              $(document).ready(function() { $(element).select2({width:"400px",placeholder: "Select the groups you wish to include"});
+
+              });
+
+           }
+       };
+
+    });
+
+    crmMailingAB.directive('sliderbar',function(){
+       return{
+
+           restrict: 'AE',
+
+           link: function(scope,element, attrs){
+
+               $(element).slider();
+               $(element).slider({
+                   slide: function( event, ui ) {
+                       scope.slide_value = ui.value;
+                       scope.$apply();
+
+                   }
+               });
+           }
+
+       };
+
+    });
+
+    crmMailingAB.directive('modal_win',function(){
+        return {
+
+            restrict: 'AE',
+
+
+
+            link: function(scope,element,attr){
+
+
+
+                scope.$watch("automated", function() {
+                    alert("cgh");
+                    console.log("Sd");
+
+                });
+
+
+            }
+
+        };
+
+    });
+
+    crmMailingAB.directive('num_select',function(){
+       return {
+
+           restrict: 'AE',
+
+           link: function(scope,element,attr){
+
+               $(element).spinner();
+           }
+
+
+       };
+
+
+    });
+
+
+
+
 
 
 
