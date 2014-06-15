@@ -1,11 +1,23 @@
 <div>
 
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <form >
     <h3> Please enter the confidence level at which a decision can be made</h3>
-    <div num_select></div>
+   &nbsp <input type="text" style="height: 20px; width: 15px;" ng-modal="confidence" numbar><br><br>
+
+    <div sliderbar id="trial" style="margin: 10px;"></div>
+
+    {{4+6}}
+
+    dfsf: {{adi}}
 
     <h3>If the confidence level is not reached what do you want us to do?</h3>
     &nbsp <input type="radio" ng-model="ifnot" value="Open"> Inform me  <br/><br>
     &nbsp <input type="radio" ng-model="ifnot" value="Total Unique Clicks"> Send Version A <br/><br>
     &nbsp <input type="radio" ng-model="ifnot" value="Total Clicks on a particular link"> Send Version B <br/><br>
+
+    </form>
 
 </div>
