@@ -68,9 +68,9 @@
             }
         };
         $scope.templates =
-            [   { name: 'subjectlines', url: partialUrl('subject_lines.html')},
-                { name: 'fromname', url: partialUrl('from_name.html')},
-                {name:'2emails',url: partialUrl('two_emails.html')} ];
+            [   { name: 'Subject Lines', url: partialUrl('subject_lines.html')},
+                { name: 'From Name', url: partialUrl('from_name.html')},
+                {name:'Two different Emails',url: partialUrl('two_emails.html')} ];
         $scope.template = $scope.templates[0];
 
         $scope.slide_value = 0;
@@ -89,7 +89,7 @@
             $scope.ifyes=false;
         };
 
-        $scope.closebox="open";
+
 
     });
 
@@ -172,7 +172,7 @@
 
 
                 scope.$watch('automated', function(val) {
-                    if(val=="yes") {
+                    if(val=="Yes") {
                         console.log("yo");
 
                         $(element).dialog({
