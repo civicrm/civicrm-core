@@ -89,6 +89,7 @@
             $scope.ifyes=false;
         };
 
+        $scope.send_date ="10/4/2004";
 
 
     });
@@ -225,6 +226,32 @@
             }
 
         };
+
+    });
+
+    crmMailingAB.directive('datepick',function(){
+
+        return {
+            scope :{
+                foo : '=send_date'
+            },
+
+
+          restrict: 'AE',
+
+
+            link: function(scope,element,attrs){
+
+                $(element).datepicker({
+                    onSelect: function(date) {
+                        $(".ui-datepicker a").removeAttr("href");
+                        scope.foo =date;
+                        console.log(date);
+                    }
+                });
+            }
+        };
+
 
     });
 
