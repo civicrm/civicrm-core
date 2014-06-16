@@ -33,7 +33,11 @@
                 resolve: {
                     mailingList: function($route, crmApi) {
                         return crmApi('Mailing', 'get', {});
+                    },
+                    allgroups: function($route,crmApi){
+                        return crmApi('Group','get',{});
                     }
+
                 }
 
 
@@ -92,6 +96,7 @@
         $scope.send_date ="10/4/2004";
 
 
+
     });
 
     crmMailingAB.directive('nexttab', function() {
@@ -144,7 +149,7 @@
 
            link: function(scope,element, attrs){
 
-               $(element).slider();
+               $(element).slider({min:1});
                $(element).slider({
                    slide: function( event, ui ) {
                        scope.slide_value = ui.value;
