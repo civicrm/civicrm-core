@@ -5,9 +5,11 @@
 
 
     <ul>
-        <li ng-repeat="a in allgroups">a.name</li>
+        <li ng-repeat="a in groups">{{a.title}}</li>
     </ul>
-
+    <ul>
+        <li ng-repeat="b in mailings">{{b.name}}</li>
+    </ul>
     <div ui-jq="tabs" id="alltabs" >
 
         <ul>
@@ -54,12 +56,9 @@
                     <h3 style="text-decoration: underline;">Select the groups you would like to add</h3><br>
 
 
-                    &nbsp<select multiple id="e1" groupselect required name ="grps" required>
-                        <option value="AL">Mumbai</option>
-                        <option value="AL">Delhi</option>
-                        <option value="AL">Madras</option>
-                        <option value="AL">Kanpur</option>
-                        <option value="WY">Kharagpur</option>
+                    &nbsp<select multiple  groupselect required name ="grps" required ng-model="groups_selected">
+                        <option ng-repeat="grp in groups" value={{grp.title}} >{{grp.title}}</option>
+
                     </select><br><br>
                     <p ng-show=" impform.grps.$pristine" >You name is required.</p>
 
@@ -119,7 +118,7 @@
             </tr>
              <tr>
                  <td>Groups Selected</td>
-                 <td></td>
+                 <td>{{groups_selected}}</td>
              </tr>
              <tr>
                  <td>Size of Test Group</td>
