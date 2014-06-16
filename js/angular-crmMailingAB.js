@@ -31,25 +31,29 @@
                 templateUrl: partialUrl('helloworld.html'),
                 controller: 'TabsDemoCtrl',
                 resolve: {
+                    metaData: function($route, crmApi) {
+                        return crmApi('Group', 'get', {});
+                    },
                     mailingList: function($route, crmApi) {
                         return crmApi('Mailing', 'get', {});
-                    },
-                    allgroups: function($route,crmApi){
-                        return crmApi('Group','get',{});
                     }
 
                 }
 
 
             });
+
+
         }
     ]);
 //-----------------------------------------
     // Add a new record by name.
     // Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
 
-    crmMailingAB.controller('TabsDemoCtrl', function($scope, crmApi, mailingList) {
+    crmMailingAB.controller('TabsDemoCtrl', function($scope, crmApi, metaData, mailingList) {
 
+        $scope.groups = metaData.values;
+        $scope.mailings = mailingList.values;
         $scope.adi=0;
         $scope.campaign_clicked= function(){
             if($scope.adi >= 0 ){
@@ -133,9 +137,11 @@
 
            link: function(scope,element, attrs){
 
-              $(document).ready(function() { $(element).select2({width:"400px",placeholder: "Select the groups you wish to include"});
+               $(element).select2({width:"400px",placeholder: "Select the groups you wish to include"});
+               $(element).select2("data",groups)
 
-              });
+
+
 
            }
        };
