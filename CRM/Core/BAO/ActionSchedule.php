@@ -88,6 +88,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $eventTemplate = CRM_Event_PseudoConstant::eventTemplates();
     $autoRenew = CRM_Core_OptionGroup::values('auto_renew_options');
     $membershipType = CRM_Member_PseudoConstant::membershipType();
+    $dateFields = array('birth_date' => ts('Birth Date'));
 
     asort($activityType);
 
@@ -147,6 +148,13 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
             $sel1Val = ts('Membership');
           }
           $sel2[$key] = $valueLabel + $membershipType;
+          break;
+
+        case 'birth_date':
+          if ($value['entity'] == 'civicrm_contact') {
+            $sel1Val = ts('Contact');
+          }
+          $sel2[$key] = $valueLabel + $dateFields;
           break;
       }
       $sel1[$key] = $sel1Val;
@@ -211,6 +219,16 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
               $vval = $statusLabel;
             }
           }
+          break;
+
+        case 'none':
+          foreach ($sel3[$id] as $kkey => & $vval) {
+            $vval = $statusLabel;
+          }
+          break;
+
+        case null:
+          $sel3[$id] = array('' => 'hello there');
           break;
 
         case '':
@@ -717,6 +735,13 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
         }
       }
 
+      if ($mapping->entity == 'civicrm_contact') {
+        $tokenEntity = 'contact';
+        //TODO: get full list somewhere!
+        $tokenFields = array('birth_date', 'last_name');
+        //TODO: is there anything to add here?
+      }
+
       $entityJoinClause = "INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
       if ($actionSchedule->limit_to == 0) {
         $entityJoinClause = "LEFT JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
@@ -993,6 +1018,10 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "(is_current_member = 1 OR name = 'Expired')", 'id');
         $mStatus = implode (',', $membershipStatus);
         $where[] = "e.status_id IN ({$mStatus})";
+      }
+
+      if ($mapping->entity == 'civicrm_contact') {
+        // TODO get this working
       }
 
       // CRM-13577 Introduce Smart Groups Handling
@@ -1332,4 +1361,3 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     return $options;
   }
 }
-
