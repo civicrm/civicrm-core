@@ -733,7 +733,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (2097, 1044, "LL", "Los Lagos"),
 (2098, 1044, "MA", "Magallanes"),
 (2099, 1044, "ML", "Maule"),
-(2100, 1044, "RM", "Region Metropolitana de Santiago"),
+(2100, 1044, "SM", "Santiago Metropolitan"),
 (2101, 1044, "TA", "Tarapaca"),
 (2102, 1044, "VS", "Valparaiso"),
 (2103, 1038, "AD", "Adamaoua"),
@@ -3910,4 +3910,8 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 
 
 -- CRM-14493 Added State for Greece
-(NULL, 1085, "61", "Pieria");
+(NULL, 1085, "61", "Pieria"),
+
+-- CRM-14843 Added States for Chile and Modify Santiago Metropolitan for consistency
+(NULL, 1044, "LR", "Los Rios"),
+(NULL, 1044, "AP", "Arica y Parinacota");
