@@ -377,6 +377,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     else {
       error_reporting(E_ALL & ~E_NOTICE);
     }
+    $this->_sethtmlGlobals();
   }
 
   /**

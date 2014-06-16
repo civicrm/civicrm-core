@@ -109,6 +109,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
 
+  /**
+   * Test form submission with basic price set
+   */
   public function testSubmit() {
     $contributionPageResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $priceSetParams = array(
