@@ -4,6 +4,10 @@
 <div>
 
 
+    <ul>
+        <li ng-repeat="a in allgroups">a.name</li>
+    </ul>
+
     <div ui-jq="tabs" id="alltabs" >
 
         <ul>
@@ -46,17 +50,18 @@
 
         <div id="tabs-3">
 
-                <form>
+                <form name="impform" ng-submit="submitForm(userForm.$valid)" novalidate>
                     <h3 style="text-decoration: underline;">Select the groups you would like to add</h3><br>
 
 
-                    &nbsp<select multiple id="e1" groupselect>
+                    &nbsp<select multiple id="e1" groupselect required name ="grps" required>
                         <option value="AL">Mumbai</option>
                         <option value="AL">Delhi</option>
                         <option value="AL">Madras</option>
                         <option value="AL">Kanpur</option>
                         <option value="WY">Kharagpur</option>
                     </select><br><br>
+                    <p ng-show=" impform.grps.$pristine" >You name is required.</p>
 
                     <h3 style="text-decoration: underline;">Select the size of your test group</h3><br>
 
@@ -65,38 +70,41 @@
                     <div sliderbar id="trial" style="margin: 10px;"></div>
 
                     <h3 style="text-decoration: underline;">How will the winner be decided</h3><br>
-                    &nbsp <input type="radio" ng-model="winner_criteria" value="Open" name="cri"> Open <br/><br>
-                    &nbsp <input type="radio" ng-model="winner_criteria" value="Total Unique Clicks" name="cri"> Total Unique Clicks <br/><br>
-                    &nbsp <input type="radio" ng-model="winner_criteria" value="Total Clicks on a particular link" name="cri"> Total Clicks on a particular link <br/><br>
+                    &nbsp <input type="radio" ng-model="winner_criteria" value="Open" name="cri"  required> Open <br/><br>
+                    &nbsp <input type="radio" ng-model="winner_criteria" value="Total Unique Clicks" name="cri" checked="checked" > Total Unique Clicks <br/><br>
+                    &nbsp <input type="radio" ng-model="winner_criteria" value="Total Clicks on a particular link" name="cri" > Total Clicks on a particular link <br/><br>
+
+
 
                     <h3 style="text-decoration: underline;">Do you want the A/B test to be automated </h3>
-                    &nbsp<input  type="radio" ng-model="automated" value="Yes" ng-click="setifyes(1)" name="auto">Yes &nbsp
-                    &nbsp<input type="radio" ng-model="automated" value="No" ng-click="setifyes(2)" name="auto"> No <br/><br>
+                    &nbsp<input  type="radio" ng-model="automated" value="Yes" ng-click="setifyes(1)" name="auto" required>Yes &nbsp
+                    &nbsp<input type="radio" ng-model="automated" value="No" ng-click="setifyes(2)" name="auto" checked="checked"> No <br/><br>
 
                     <tpmax ng-show="ifyes">
 
                         <h3> Please enter the confidence level at which a decision can be made</h3>
-                        &nbsp &nbsp <input type="text" style="height: 20px; width: 25px;" ng-model="conf" numbar=99><br><br>
-
+                        &nbsp &nbsp <input type="text" style="height: 20px; width: 25px;" ng-model="conf" numbar=99 ><br><br>
+                        <div ng-show="conf==null || conf ==0 || conf>99"  style="color: red;">&nbsp Please Enter a Valid Number</div>
 
                         <h3>If the confidence level is not reached what do you want us to do?</h3>
-                        &nbsp <input type="radio" ng-model="ifnot" value="Inform me" name="ifnot"> Inform me  <br/><br>
-                        &nbsp <input type="radio" ng-model="ifnot" value="Send Version A" name="ifnot"> Send Version A <br/><br>
-                        &nbsp <input type="radio" ng-model="ifnot" value="Send Version B" name="ifnot"> Send Version B <br/><br>
+                        &nbsp <input type="radio" ng-model="ifnot" value="Inform me" name="ifnot"/> Inform me  <br/><br>
+                        &nbsp <input type="radio" checked="checked" ng-model="ifnot" value="Send Version A" name="ifnot" /> Send Version A <br/><br>
+                        &nbsp <input type="radio" ng-model="ifnot" value="Send Version B" name="ifnot"/> Send Version B <br/><br>
 
                         <button id="closebutton" style="position: relative;left:200px;">Save & Close</button>
 
                     </tpmax>
 
                     <h3 style="text-decoration: underline;">Declare the winner in how much time?</h3><br>
-                    &nbsp <input type="text" style="height: 20px; width: 15px;" ng-model="days" numbar=7> Days
-                    &nbsp <input type="text" style="height: 20px; width: 15px;" ng-model="hours" numbar=23> Hours
-                    &nbsp <input type="text" style="height: 20px; width: 15px;" ng-model="minutes" numbar=59> Minutes
+                    &nbsp <input type="text" style="height: 20px; width: 15px;" ng-model="days" numbar=7 name="d"> Days
+                    &nbsp <input type="text" style="height: 20px; width: 15px;" ng-model="hours" numbar=23 name="h"> Hours
+                    &nbsp <input type="text" style="height: 20px; width: 15px;" ng-model="minutes" numbar=59 name="m"> Minutes
+                    <div ng-show="((days == null || days ==0 ) && (hours==null|| hours == 0 ) && (minutes==null || minutes ==0 )|| days>99 || minutes>59 || hours >23) "  style="color: red;">&nbsp Please a Valid Time</div>
                     <br>
                     <br>
 
 
-                <button  value=">> Compose"   id="campaignbutton" nexttab={{adi}} >Next</button> <br>
+                <button  type="submit" class="btn btn-primary" ng-disabled="((days == null || days ==0 ) && (hours==null|| hours == 0 ) && (minutes==null || minutes ==0 )|| days>99 || minutes>59 || hours >23)" value=">> Compose"   id="campaignbutton" nexttab={{adi}} >Next</button> <br>
                 </form>
         </div>
 
@@ -154,7 +162,7 @@
             &nbsp &nbsp <input type="date" ng-show="start=='later'" ng-model="send_date" datepick>
             </div>
 
-            
+
             <br><br>
 
             <button    id="campaignbutton" nexttab={{adi}} >Submit & Send</button> <br>
