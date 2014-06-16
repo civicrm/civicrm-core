@@ -1,17 +1,5 @@
-
-
-
 <div>
-
-
-    <ul>
-        <li ng-repeat="a in groups">{{a.title}}</li>
-    </ul>
-    <ul>
-        <li ng-repeat="b in mailings">{{b.name}}</li>
-    </ul>
     <div ui-jq="tabs" id="alltabs" >
-
         <ul>
 
             <li><a href="#tabs-1" ng-click="campaign_clicked()" >Campaign</a></li>
@@ -20,13 +8,11 @@
             <li><a href="#tabs-4" ng-click="preview_clicked()">Preview and Send</a></li>
         </ul>
 
-
         <div  id="tabs-1" >
 
             <form name="myForm" >
 
                 <h3 style ="text-decoration:underline"> What would you like to test ?</h3><br><br>
-
                 &nbsp <input type="radio" ng-model="template" ng-value="templates[0]">  Subject Lines <br/><br>
                 &nbsp <input type="radio" ng-model="template" ng-value="templates[1]"> From Names <br/><br>
                 &nbsp <input type="radio" ng-model="template" ng-value="templates[2]"> Two different Emails <br/><br>
@@ -38,32 +24,21 @@
 
             <form>
             <div  ng-include="template.url">
-
             </div>
-
-
-
-
             <button  id="campaignbutton" nexttab={{adi}} >Done</button><br>
-
             </form>
-
         </div>
 
         <div id="tabs-3">
 
                 <form name="impform" ng-submit="submitForm(userForm.$valid)" novalidate>
                     <h3 style="text-decoration: underline;">Select the groups you would like to add</h3><br>
-
-
                     &nbsp<select multiple  groupselect required name ="grps" required ng-model="groups_selected">
                         <option ng-repeat="grp in groups" value={{grp.title}} >{{grp.title}}</option>
-
                     </select><br><br>
                     <p ng-show=" impform.grps.$pristine" >You name is required.</p>
 
                     <h3 style="text-decoration: underline;">Select the size of your test group</h3><br>
-
                     &nbsp Percentage Selected - {{slide_value}}%
 
                     <div sliderbar id="trial" style="margin: 10px;"></div>
@@ -72,8 +47,6 @@
                     &nbsp <input type="radio" ng-model="winner_criteria" value="Open" name="cri"  required> Open <br/><br>
                     &nbsp <input type="radio" ng-model="winner_criteria" value="Total Unique Clicks" name="cri" checked="checked" > Total Unique Clicks <br/><br>
                     &nbsp <input type="radio" ng-model="winner_criteria" value="Total Clicks on a particular link" name="cri" > Total Clicks on a particular link <br/><br>
-
-
 
                     <h3 style="text-decoration: underline;">Do you want the A/B test to be automated </h3>
                     &nbsp<input  type="radio" ng-model="automated" value="Yes" ng-click="setifyes(1)" name="auto" required>Yes &nbsp
@@ -102,7 +75,6 @@
                     <br>
                     <br>
 
-
                 <button  type="submit" class="btn btn-primary" ng-disabled="((days == null || days ==0 ) && (hours==null|| hours == 0 ) && (minutes==null || minutes ==0 )|| days>99 || minutes>59 || hours >23)" value=">> Compose"   id="campaignbutton" nexttab={{adi}} >Next</button> <br>
                 </form>
         </div>
@@ -110,45 +82,39 @@
         <div id="tabs-4">
 
             <h3 style="text-decoration: underline;">Details</h3><br>
-
             <table>
             <tr>
                 <td>Test Criteria</td>
                 <td>{{template.name}}</td>
             </tr>
-             <tr>
+            <tr>
                  <td>Groups Selected</td>
                  <td>{{groups_selected}}</td>
-             </tr>
-             <tr>
+            </tr>
+            <tr>
                  <td>Size of Test Group</td>
                  <td>{{slide_value}}</td>
-
-             </tr>
-                <tr>
-                    <td>Winner Criteria</td>
-                    <td>{{winner_criteria}}</td>
-                </tr>
-              <tr>
-                  <td>Automated</td>
-                  <td>{{automated}}</td>
-
-              </tr>
-               <tr ng-show="automated=='Yes'">
-                   <td>Minum Confidence Level</td>
-                <td>{{conf}}%</td>
-               </tr>
-                <tr ng-show="automated=='Yes'">
-                    <td>If Level not Achieved</td>
-                    <td>{{ifnot}}</td>
-                </tr>
-                <tr>
-                    <td>Declare Winner in</td>
-                    <td>{{days}} Days {{hours}} Hours {{minutes}} Minutes</td>
-
-                </tr>
-
-
+            </tr>
+            <tr>
+                 <td>Winner Criteria</td>
+                 <td>{{winner_criteria}}</td>
+            </tr>
+            <tr>
+                 <td>Automated</td>
+                 <td>{{automated}}</td>
+            </tr>
+            <tr ng-show="automated=='Yes'">
+                 <td>Minum Confidence Level</td>
+                 <td>{{conf}}%</td>
+            </tr>
+            <tr ng-show="automated=='Yes'">
+                 <td>If Level not Achieved</td>
+                 <td>{{ifnot}}</td>
+            </tr>
+            <tr>
+                 <td>Declare Winner in</td>
+                 <td>{{days}} Days {{hours}} Hours {{minutes}} Minutes</td>
+            </tr>
             </table>
 
             <h3 style="text-decoration: underline;"><a href="#">Preview Mailing</a></h3><br>
@@ -160,16 +126,9 @@
 
             &nbsp &nbsp <input type="date" ng-show="start=='later'" ng-model="send_date" datepick>
             </div>
-
-
             <br><br>
 
             <button    id="campaignbutton" nexttab={{adi}} >Submit & Send</button> <br>
         </div>
-
-        
     </div>
-
-
-
 </div>
