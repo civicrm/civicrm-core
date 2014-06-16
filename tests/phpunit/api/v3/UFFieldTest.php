@@ -62,7 +62,6 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       $this->_dbconn,
       new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml')
     );
-    $this->_sethtmlGlobals();
 
     $this->callAPISuccess('uf_field', 'getfields', array('cache_clear' => 1));
 
