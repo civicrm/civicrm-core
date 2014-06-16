@@ -1398,4 +1398,13 @@ abstract class CRM_Utils_Hook {
   static function dashboard_defaults($availableDashlets, &$defaultDashlets) {
     return self::singleton()->invoke(2, $availableDashlets, $defaultDashlets, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_dashboard_defaults');
   }
+
+  /**
+   * This hook is called for bypass a few civicrm urls from IDS check
+   * @param array $skip list of civicrm url;
+   */
+  static function idsException(&$skip) {
+    return self::singleton()->invoke(1, $skip, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_idsException' ); 
+  }
+
 }
