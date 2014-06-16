@@ -453,8 +453,8 @@
   CRM.$(function($) {
     // highlight price sets
     function updatePriceSetHighlight() {
-      cj('#priceset .price-set-row').removeClass('highlight');
-      cj('#priceset .price-set-row input:checked').parent().parent().addClass('highlight');
+      cj('#priceset .price-set-row span').removeClass('highlight');
+      cj('#priceset .price-set-row input:checked').parent().addClass('highlight');
     }
     cj('#priceset input[type="radio"]').change(updatePriceSetHighlight);
     updatePriceSetHighlight();
