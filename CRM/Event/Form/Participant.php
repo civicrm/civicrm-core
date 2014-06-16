@@ -931,6 +931,21 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
         CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $values, $errorMsg, TRUE);
       }
     }
+    // For single additions - show validation error if the contact has already been registered
+    // for this event with the same role.
+    if($self->_single && ($self->_action & CRM_Core_Action::ADD)) {
+      $contactId = $self->_contactId;
+      $eventId = CRM_Utils_Array::value('event_id', $values);
+      if(!empty($contactId) && !empty($eventId)) {
+        $dupeCheck = new CRM_Event_BAO_Participant;
+        $dupeCheck->contact_id = $contactId;
+        $dupeCheck->event_id = $eventId;
+        $dupeCheck->find(TRUE);
+        if(!empty($dupeCheck->id)) {
+          $errorMsg['event_id'] = ts("This contact has already been assigned to this event.");
+        }
+      }
+    }
     return CRM_Utils_Array::crmIsEmptyArray($errorMsg) ? TRUE : $errorMsg;
   }
 
@@ -962,6 +977,37 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
       }
       return;
     }
+    // When adding a single contact, the formRule prevents you from adding duplicates
+    // (See above in formRule()). When adding more than one contact, the duplicates are
+    // removed automatically and the user receives one notification.
+    if ($this->_action & CRM_Core_Action::ADD) {
+      if(!$this->_single && !empty($this->_eventId)) {
+        $duplicateContacts = 0;
+        while(list($k,$dupeCheckContactId) = each($this->_contactIds)) {
+          // Eliminate contacts that have already been assigned to this event.
+          $dupeCheck = new CRM_Event_BAO_Participant;
+          $dupeCheck->contact_id = $dupeCheckContactId;
+          $dupeCheck->event_id = $this->_eventId;
+          $dupeCheck->find(TRUE);
+          if(!empty($dupeCheck->id)) {
+            $duplicateContacts++;
+            unset($this->_contactIds[$k]);
+          }
+        }
+        if($duplicateContacts > 0) {
+          $msg = ts(
+            "%1 contacts have already been assigned to this event. They were not added a second time.",
+            array(1 => $duplicateContacts)
+          );
+          CRM_Core_Session::setStatus($msg);
+        }
+        if(count($this->_contactIds) == 0) {
+          CRM_Core_Session::setStatus(ts("No participants were added."));
+          return;
+        }
+      }
+    }
+
 
     $participantStatus = CRM_Event_PseudoConstant::participantStatus();
     // set the contact, when contact is selected
