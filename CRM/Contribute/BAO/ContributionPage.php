@@ -887,5 +887,20 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     }
     return $sctJson;
   }
+
+
+  /**
+   * helper to determine if the page supports separate membership payments
+   * @param integer id form id
+   *
+   * @return bool isSeparateMembershipPayment
+   */
+  static function getIsMembershipPayment($id) {
+    $membershipBlocks = civicrm_api3('membership_block', 'get', array('entity_table' => 'civicrm_contribution_page', 'entity_id' => $id, 'sequential' => TRUE));
+    if(!$membershipBlocks['count']) {
+      return FALSE;
+    }
+    return $membershipBlocks['values'][0]['is_separate_payment'];
+  }
 }
 

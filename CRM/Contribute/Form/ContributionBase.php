@@ -89,6 +89,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_membershipBlock = NULL;
 
   /**
+   * Does this form support a separate membership payment
+   * @var bool
+   */
+  protected $_separateMembershipPayment;
+  /**
    * the default values for the form
    *
    * @var array
