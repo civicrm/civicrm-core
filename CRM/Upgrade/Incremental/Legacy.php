@@ -111,7 +111,7 @@ SELECT  id
       }
     }
 
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_innodb_fts', NULL, FALSE)) {
+    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME, 'enable_innodb_fts', NULL, FALSE)) {
       // The FTS indexing feature dynamically manipulates the schema which could
       // cause conflicts with other layers that manipulate the schema. The
       // simplest thing is to turn it off and back on.

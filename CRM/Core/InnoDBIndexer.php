@@ -75,7 +75,7 @@ class CRM_Core_InnoDBIndexer {
           array('name'),
         ),
       );
-      $active = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_innodb_fts', NULL, FALSE);
+      $active = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME, 'enable_innodb_fts', NULL, FALSE);
       self::$singleton = new self($active, $indices);
     }
     return self::$singleton;
