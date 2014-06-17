@@ -717,7 +717,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @param boolean $thankPage thank you page
    * @param null $isTest
    *
-   * @return bool|mixed
+   * @return bool Is this a separate membership payment
    * @internal param int $pageId contribution page id
    * @internal param bool $memContactId contact who is to be
    * checked for having a current membership for a particular membership
@@ -1304,7 +1304,7 @@ AND civicrm_membership.is_test = %2";
       if (isset($membershipParams['onbehalf']) && !empty($membershipParams['onbehalf']['member_campaign_id'])) {
         $form->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
       }
-      //!!B
+      //@todo it should no longer be possible for it to get to this point & membership to not be an array
       if (is_array($membershipTypeID)) {
         $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
         foreach ($membershipTypeID as $memType) {
