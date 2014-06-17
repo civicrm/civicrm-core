@@ -104,12 +104,6 @@
             </td>
         </tr>
 
-        <tr class="crm-miscellaneous-form-block-enable_innodb_fts">
-            <td class="label">{$form.enable_innodb_fts.label}</td>
-            <td>{$form.enable_innodb_fts.html}<br />
-                <p class="description">{$enable_innodb_fts_description}</p>
-            </td>
-        </tr>
     </table>
 <h3>{ts}reCAPTCHA Keys{/ts}</h3>
     <div class="description">
