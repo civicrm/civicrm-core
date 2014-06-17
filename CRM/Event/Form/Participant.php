@@ -1005,6 +1005,10 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           CRM_Core_Session::setStatus(ts("No participants were added."));
           return;
         }
+        // We have to re-key $this->_contactIds so each contact has the same
+        // key as their corresponding record in the $participants array that
+        // will be created below.
+        $this->_contactIds = array_values($this->_contactIds);
       }
     }
 
