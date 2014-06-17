@@ -764,6 +764,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $loginURL = $config->userFrameworkBaseURL;
     $loginURL = str_replace('administrator/', '', $loginURL);
     $loginURL .= 'index.php?option=com_users&view=login';
+
+    //CRM-14872 append destination
+    if ( !empty($destination) ) {
+      $loginURL .= '&return='.urlencode(base64_encode($destination));
+    }
     return $loginURL;
   }
 
@@ -771,7 +776,35 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @param $form
    */
   public function getLoginDestination(&$form) {
-    return;
+    $args = NULL;
+
+    $id = $form->get('id');
+    if ($id) {
+      $args .= "&id=$id";
+    }
+    else {
+      $gid = $form->get('gid');
+      if ($gid) {
+        $args .= "&gid=$gid";
+      }
+      else {
+        // Setup Personal Campaign Page link uses pageId
+        $pageId = $form->get('pageId');
+        if ($pageId) {
+          $component = $form->get('component');
+          $args .= "&pageId=$pageId&component=$component&action=add";
+        }
+      }
+    }
+
+    $destination = NULL;
+    if ($args) {
+      // append destination so user is returned to form they came from after login
+      $args = 'reset=1'.$args;
+      $destination = CRM_Utils_System::url(CRM_Utils_System::currentPath(), $args, TRUE, NULL, TRUE, TRUE);
+    }
+
+    return $destination;
   }
 
   /**
