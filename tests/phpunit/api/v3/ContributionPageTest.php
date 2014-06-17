@@ -79,7 +79,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   function tearDown() {
     foreach ($this->contactIds as $id) {
       $this->callAPISuccess('contact', 'delete', array('id' => $id));
-    }if(!empty($this->id)){
+    }
+    if (!empty($this->id)){
        $this->callAPISuccess('contribution_page', 'delete', array('id' => $this->id));
     }
   }
@@ -117,7 +118,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   public function testDeleteContributionPage() {
     $createResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = array('id' => $createResult['id']);
-    $deleteResult = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(0, $checkDeleted['count']);
   }
@@ -154,12 +155,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->setUpContributionPage();
     $contributionPageID = $this->_ids['contribution_page'];
     /*
-     *             [qfKey] => 6994954fc612cb500406b793d2676ebb_7820
-            [entryURL] => http://civi45/civicrm/contribute/transact?reset=1&id=5
-            [hidden_processor] => 1
-            [billing_first_name] => me
-            [billing_middle_name] =>
-            [billing_last_name] => demo
             [billing_street_address-5] => d
             [billing_city-5] => s
             [billing_state_province_id-5] => 1011
@@ -179,8 +174,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
             [priceSetId] => 11
             [price_18] => 30
             [selectProduct] =>
-            [MAX_FILE_SIZE] => 2097152
-            [stripe_token] =>
             [billing_state_province-5] => ID
             [billing_country-5] => US
             [year] => 2016
