@@ -43,6 +43,17 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   protected $contactIds = array();
   protected $_entity = 'contribution_page';
   protected $contribution_result = null;
+  protected $_priceSetParams = array();
+
+  /**
+   * @var array
+   *  - contribution_page
+   *  - price_set
+   *  - price_field
+   *  - price_field_value
+   */
+  protected $_ids = array();
+
 
   public $DBResetRequired = TRUE;
   public function setUp() {
@@ -54,6 +65,14 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'currency' => 'NZD',
       'goal_amount' => $this->testAmount,
       'is_pay_later' => 1,
+      'is_monetary' => TRUE,
+    );
+
+    $this->_priceSetParams = array(
+      'is_quick_config' => 1,
+      'extends' => 'CiviContribute',
+      'financial_type_id' => 'Donation',
+      'title' => 'my Page'
     );
   }
 
@@ -113,43 +132,128 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * Test form submission with basic price set
    */
   public function testSubmit() {
-    $contributionPageResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $priceSetParams = array(
-      'is_quick_config' => 1,
-      'extends' => 'CiviContribute',
-      'financial_type_id' => 'Donation',
-      'title' => 'my Page'
-    );
-
-    $priceSet = $this->callAPISuccess('price_set', 'create', $priceSetParams);
-    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSet['id']);
-    $priceField = $this->callAPISuccess('price_field', 'create', array(
-      'price_set_id' => $priceSet['id'],
-      'label' => 'Goat Breed',
-      'html_type' => 'Radio',
-    ));
-    $this->callAPISuccess('price_field_value', 'create', array(
-      'price_set_id' => $priceSet['id'],
-      'price_field_id' => $priceField['id'],
-      'label' => 'Long Haired Goat',
-      'amount' => 20,
-      )
-    );
-    $priceFieldValue2 = $this->callAPISuccess('price_field_value', 'create', array(
-      'price_set_id' => $priceSet['id'],
-      'price_field_id' => $priceField['id'],
-      'label' => 'Shoe-eating Goat',
-      'amount' => 10,
-      )
-    );
+    $this->setUpContributionPage();
+    $priceFieldID = reset($this->_ids['price_field']);
+    $priceFieldValueID = reset($this->_ids['price_field_value']);
     $submitParams = array(
-      'price_' . $priceField['id'] => $priceFieldValue2['id'],
-      'id' => (int) $contributionPageResult['id'],
+      'price_' . $priceFieldID => $priceFieldValueID,
+      'id' => (int) $this->_ids['contribution_page'],
       'amount' => 10
     );
 
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
-    $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $contributionPageResult['id']));
+    $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
+  }
+
+  /**
+   * Test submit with a membership block in place
+   */
+  public function testSubmitMembershipBlock() {
+    $this->_ids['price_set'][] = $this->callAPISuccess('price_set', 'getvalue', array('name'  => 'default_membership_type_amount', 'return' => 'id'));
+    $this->params['payment_processor_id'] = $this->paymentProcessorCreate(array('payment_processor_type_id' => 'Dummy',));
+    $this->setUpContributionPage();
+    $contributionPageID = $this->_ids['contribution_page'];
+    /*
+     *             [qfKey] => 6994954fc612cb500406b793d2676ebb_7820
+            [entryURL] => http://civi45/civicrm/contribute/transact?reset=1&id=5
+            [hidden_processor] => 1
+            [billing_first_name] => me
+            [billing_middle_name] =>
+            [billing_last_name] => demo
+            [billing_street_address-5] => d
+            [billing_city-5] => s
+            [billing_state_province_id-5] => 1011
+            [billing_postal_code-5] => 7070
+            [billing_country_id-5] => 1228
+            [credit_card_number] => 4111111111111111
+            [cvv2] => 123
+            [credit_card_exp_date] => Array
+                (
+                    [M] => 2
+                    [Y] => 2016
+                )
+
+            [credit_card_type] => Visa
+            [email-5] => demo@example.com
+            [payment_processor] => 13
+            [priceSetId] => 11
+            [price_18] => 30
+            [selectProduct] =>
+            [MAX_FILE_SIZE] => 2097152
+            [stripe_token] =>
+            [billing_state_province-5] => ID
+            [billing_country-5] => US
+            [year] => 2016
+            [month] => 2
+            [ip_address] => 192.168.56.1
+            [amount] => 100
+            [amount_level] =>
+            [selectMembership] => 1
+            [currencyID] => USD
+            [payment_action] => Sale
+            [is_pay_later] => 0
+            [invoiceID] => 78bc8c7ebf99c609067caac81128720d
+            [is_quick_config] => 1
+     */
+    $this->_ids['membership_type'] = $this->membershipTypeCreate();
+    $this->callAPISuccess('membership_block', 'create', array(
+      'entity_id' => $contributionPageID,
+      'entity_table' => 'civicrm_contribution_page',
+      'is_required' => TRUE,
+      'is_active' => TRUE,
+      'membership_type_default' => $this->_ids['membership_type'],
+    ));
+    $submitParams = array(
+      'price_' . reset($this->_ids['price_field']) => reset($this->_ids['price_field_value']),
+      'id' => (int) $contributionPageID,
+      'amount' => 10,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'selectMembership' => $this->_ids['membership_type'],
+
+    );
+
+    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $contributionPageID));
+    $this->callAPISuccess('membership_payment', 'getsingle', array('contribution_id' => $contribution['id']));
+
+  }
+
+  /**
+   * help function to set up contribution page with some defaults
+   */
+  function setUpContributionPage() {
+    $contributionPageResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    if (empty($this->_ids['price_set'])) {
+      $priceSet = $this->callAPISuccess('price_set', 'create', $this->_priceSetParams);
+      $this->_ids['price_set'][] = $priceSet['id'];
+    }
+    $priceSetID = reset($this->_ids['price_set']);
+    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSetID );
+    $priceField = $this->callAPISuccess('price_field', 'create', array(
+      'price_set_id' => $priceSetID ,
+      'label' => 'Goat Breed',
+      'html_type' => 'Radio',
+    ));
+    $this->callAPISuccess('price_field_value', 'create', array(
+        'price_set_id' => $priceSetID ,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Long Haired Goat',
+        'amount' => 20,
+      )
+    );
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+        'price_set_id' => $priceSetID ,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Shoe-eating Goat',
+        'amount' => 10,
+      )
+    );
+    $this->_ids['contribution_page'] = $contributionPageResult['id'];
+    $this->_ids['price_field'] = array($priceField['id']);
+    $this->_ids['price_field_value'] = array($priceFieldValue['id']
+    );
   }
 
   public static function setUpBeforeClass() {

@@ -902,7 +902,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $membershipParams['cms_contactID'] = $contactID;
       }
 
-      //inherit campaign from contirb page.
+      //inherit campaign from contribution page.
       if (!array_key_exists('campaign_id', $membershipParams)) {
         $membershipParams['campaign_id'] = CRM_Utils_Array::value('campaign_id', $this->_values);
       }
@@ -1697,11 +1697,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param $fieldTypes
    * @param $premiumParams
    */
-  public function processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams)
-  {
+  public function processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams) {
     try {
-
-      $membershipTypeID = $membershipParams['selectMembership'];
+      $membershipTypeID = (array) $membershipParams['selectMembership'];
 
       $membershipDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this);
       $this->assign('membership_name', CRM_Utils_Array::value('name', $membershipDetails));
@@ -1794,7 +1792,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // but the circumstances are very confusing. Many of these conditions are repeated in the next conditional
       // so we should merge them together
       // the quick config seems like a red-herring - if this is about a separate membership payment then there
-      // are 2 types of line items - membership ones & non-membership ones - regardless of whether quickconfig is set
+      // are 2 types of line items - membership ones & non-membership ones - regardless of whether quick config is set
       elseif (
         CRM_Utils_Array::value('is_separate_payment', $this->_membershipBlock)
         && !empty($this->_values['fee'][$priceField->id])
@@ -1826,14 +1824,20 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   static function submit($params) {
     $form = new CRM_Contribute_Form_Contribution_Confirm();
     $form->_id = $params['id'];
+    CRM_Contribute_BAO_ContributionPage::setValues($form->_id, $form->_values);
+    $form->_separateMembershipPayment = CRM_Contribute_BAO_ContributionPage::getIsMembershipPayment($form->_id);
     //this way the mocked up controller ignores the session stuff
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Contribute_Controller_Contribution();
     $params['invoiceID'] = md5(uniqid(rand(), TRUE));
     $paramsProcessedForForm = $form->_params = self::getFormParams($params['id'], $params);
+    $form->_amount = $params['amount'];
+
 
     $priceSetID = $form->_params['priceSetId'] = $paramsProcessedForForm['price_set_id'];
     $priceFields = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
+    $priceSetFields = reset($priceFields);
+    $form->_values['fee'] = $priceSetFields['fields'];
     $form->setFormAmountFields($priceSetID);
     $priceFields = $priceFields[$priceSetID]['fields'];
     CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution');
