@@ -8,22 +8,22 @@
       </ul>
 
       <div id="tabs-21">
-          From Email Address : <input type="text"><br>
-          Use Template : <input type="text"><br>
-          Mail Subject: <input type="text"><br>
+          From Email Address : <input type="text" ng-model="mailA.fromEmail"><br>
+          Use Template : <input type="text" ><br>
+          Mail Subject: <input type="text" ng-model="mailA.subj"><br>
 
-          <textarea rows="4" cols="50">
+          <textarea rows="4" cols="50" ng-model="mailA.body">
 
           </textarea>
 
 
       </div>
       <div id="tabs-22">
-          From Email Address : <input type="text"><br>
+          From Email Address : <input type="text" ng-model="mailB.fromEmail"><br>
           Use Template : <input type="text"><br>
-          Mail Subject: <input type="text"><br>
+          Mail Subject: <input type="text" ng-model="mailB.subj"><br>
 
-          <textarea rows="4" cols="50">
+          <textarea rows="4" cols="50" ng-model="mailB.body">
 
           </textarea>
 
@@ -31,6 +31,7 @@
       </div>
 
   </div>
+
 
 
 </div>
