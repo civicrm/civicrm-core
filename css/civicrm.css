@@ -4007,6 +4007,11 @@ div.m ul#civicrm-menu,
   font-size: 1.2em;
 }
 
+/* Match font size on 'Continue' button on event participant form (no specific class) */
+#crm-container .crm-event-additionalparticipant-form-block span.crm-button input.form-submit.default {
+  font-size: 1.2em;
+}
+
 /* jQuery UI styles */
 .crm-container .ui-progressbar-value {
   background-image: url("../packages/jquery/css/images/pbar-ani.gif");
