@@ -69,6 +69,21 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   }
 
   /**
+   * Get all fields of the type Date
+   */
+
+  static function getDateFields() {
+    $allFields = CRM_Core_BAO_CustomField::getFields('');
+    $dateFields = array('birth_date' => ts('Birth Date'));
+    foreach ($allFields as $fieldID => $field) {
+      if ($field['data_type'] == 'Date') {
+        $dateFields["custom_$fieldID"] = $field['label'];
+      }
+    }
+    return $dateFields;
+  }
+
+  /**
    * Retrieve list of selections/drop downs for Scheduled Reminder form
    *
    * @param bool    $id    mapping id
@@ -88,6 +103,9 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $eventTemplate = CRM_Event_PseudoConstant::eventTemplates();
     $autoRenew = CRM_Core_OptionGroup::values('auto_renew_options');
     $membershipType = CRM_Member_PseudoConstant::membershipType();
+    $dateFieldParams = array('data_type' => 'Date');
+    $dateFields = self::getDateFields();
+    $contactOptions = CRM_Core_OptionGroup::values('contact_date_reminder_options');
 
     asort($activityType);
 
@@ -147,6 +165,13 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
             $sel1Val = ts('Membership');
           }
           $sel2[$key] = $valueLabel + $membershipType;
+          break;
+
+        case 'civicrm_contact':
+          if ($value['entity'] == 'civicrm_contact') {
+            $sel1Val = ts('Contact');
+          }
+          $sel2[$key] = $dateFields;
           break;
       }
       $sel1[$key] = $sel1Val;
@@ -210,6 +235,12 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
             else {
               $vval = $statusLabel;
             }
+          }
+          break;
+
+        case 'contact_date_reminder_options':
+          foreach ($sel3[$id] as $kkey => & $vval) {
+            $vval = $contactOptions;
           }
           break;
 
@@ -302,14 +333,17 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $civicrm_event = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
     $civicrm_participant_status_type = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $event_template = CRM_Event_PseudoConstant::eventTemplates();
+    $civicrm_contact = self::getDateFields();
 
     $auto_renew_options = CRM_Core_OptionGroup::values('auto_renew_options');
+    $contact_date_reminder_options = CRM_Core_OptionGroup::values('contact_date_reminder_options');
     $civicrm_membership_type = CRM_Member_PseudoConstant::membershipType();
 
     $entity = array(
       'civicrm_activity' => 'Activity',
       'civicrm_participant' => 'Event',
       'civicrm_membership' => 'Member',
+      'civicrm_contact' => 'Contact',
     );
 
     $query = "
@@ -717,6 +751,13 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
         }
       }
 
+      if ($mapping->entity == 'civicrm_contact') {
+        $tokenEntity = 'contact';
+        //TODO: get full list somewhere!
+        $tokenFields = array('birth_date', 'last_name');
+        //TODO: is there anything to add here?
+      }
+
       $entityJoinClause = "INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
       if ($actionSchedule->limit_to == 0) {
         $entityJoinClause = "LEFT JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
@@ -877,6 +918,8 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       );
       $status = implode(',', $status);
 
+      $anniversary = false;
+
       if (!CRM_Utils_System::isNull($mapping->entity_recipient)) {
         $recipientOptions = CRM_Core_OptionGroup::values($mapping->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name');
       }
@@ -995,6 +1038,42 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $where[] = "e.status_id IN ({$mStatus})";
       }
 
+      if ($mapping->entity == 'civicrm_contact') {
+        if ($value == 'birth_date') {
+          $dateDBField = 'birth_date';
+          $table = 'civicrm_contact e';
+          $contactField = 'e.id';
+          $where[] = 'e.is_deleted = 0';
+          $where[] = 'e.is_deceased = 0';
+        }
+        else {
+          //custom field
+          $customFieldParams = array('id' => substr($value, 7));
+          $customGroup = $customField = array();
+          CRM_Core_BAO_CustomField::retrieve($customFieldParams, $customField);
+          $dateDBField = $customField['column_name'];
+          $customGroupParams = array('id' => $customField['custom_group_id'], $customGroup);
+          CRM_Core_BAO_CustomGroup::retrieve($customGroupParams, $customGroup);
+          $from = $table = "{$customGroup['table_name']} e";
+          $contactField = 'e.entity_id';
+          $where[] = '1'; // possible to have no "where" in this case
+        }
+
+        $status_ = explode(',', $status);
+        if (in_array(2, $status_)) {
+          // anniversary mode:
+          $dateField = 'DATE_ADD(e.' . $dateDBField . ', INTERVAL ROUND(DATEDIFF(NOW(), e.' . $dateDBField . ') / 365) YEAR)';
+          $anniversary = true;
+        }
+        else {
+          // regular mode:
+          $dateField = 'e.' . $dateDBField;
+        }
+        // TODO get this working
+
+        // TODO: Make sure everything's provided for repetition, etc.
+      }
+
       // CRM-13577 Introduce Smart Groups Handling
       if ($actionSchedule->group_id) {
 
@@ -1066,7 +1145,14 @@ reminder.entity_id          = e.id AND
 reminder.entity_table       = '{$mapping->entity}' AND
 reminder.action_schedule_id = %1";
 
-      $join[] = "INNER JOIN civicrm_contact c ON c.id = {$contactField} AND c.is_deleted = 0 AND c.is_deceased = 0 ";
+      if ($anniversary) {
+        // only consider reminders less than 11 months ago
+        $reminderJoinClause .= " AND reminder.action_date_time > DATE_SUB({$now}, INTERVAL 11 MONTH)";
+      }
+
+      if ($table != 'civicrm_contact e') {
+        $join[] = "INNER JOIN civicrm_contact c ON c.id = {$contactField} AND c.is_deleted = 0 AND c.is_deceased = 0 ";
+      }
 
       if ($actionSchedule->start_action_date) {
         $startDateClause = array();
@@ -1332,4 +1418,3 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     return $options;
   }
 }
-

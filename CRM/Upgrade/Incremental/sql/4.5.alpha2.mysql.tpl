@@ -22,3 +22,21 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 UPDATE civicrm_state_province
 	SET name = "Santiago Metropolitan", abbreviation = "SM"
 	WHERE id = "2100";
+
+-- CRM-14879 contact fields for scheduled reminders
+INSERT INTO civicrm_action_mapping
+  (entity, entity_value, entity_value_label, entity_status, entity_status_label, entity_date_start, entity_date_end, entity_recipient)
+  VALUES
+	( 'civicrm_contact', 'civicrm_contact', 'Date Field', 'contact_date_reminder_options', 'Annual Options', 'date_field', NULL, NULL);
+
+INSERT INTO `civicrm_option_group` (`name`, `title`, `is_reserved`, `is_active`, `is_locked`)
+  VALUES
+  ('contact_date_reminder_options', '{ts escape="sql"}Contact Date Reminder Options{/ts}', 1, 1, 1);
+
+SELECT @option_group_id_contactDateMode := max(id) from civicrm_option_group where name = 'contact_date_reminder_options';
+
+INSERT INTO `civicrm_option_value`
+  (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
+  VALUES
+  (@option_group_id_contactDateMode, '{ts escape="sql"}Actual date only{/ts}', '1', 'Actual date only', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
+  (@option_group_id_contactDateMode, '{ts escape="sql"}Each anniversary{/ts}', '2', 'Each anniversary', NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL);
