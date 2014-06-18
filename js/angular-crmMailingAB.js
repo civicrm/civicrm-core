@@ -11,6 +11,12 @@
 
     var crmMailingAB = angular.module('crmMailingAB', ['ngRoute', 'ui.utils']);
 
+    crmMailingAB.run(function($rootScope, $templateCache) {
+        $rootScope.$on('$viewContentLoaded', function() {
+            $templateCache.removeAll();
+        });
+    });
+
     crmMailingAB.config(['$routeProvider',
         function($routeProvider) {
             $routeProvider.when('/mailing', {
@@ -84,12 +90,28 @@
 
         $scope.send_date ="10/4/2004";
 
+        $scope.mailA={};
+
+        $scope.mailB={};
+        $scope.save=function(dat){
+
+            var result= crmApi('Mailing', 'create',dat, true);
+            console.log("Ac "+result);
+        };
+
+        $scope.init=function(par){
+
+            $scope.whatnext=par.toString()
+        }
+
+
     });
 
     crmMailingAB.directive('nexttab', function() {
         return {
             // Restrict it to be an attribute in this case
             restrict: 'A',
+            priority: 500,
             // responsible for registering DOM listeners as well as updating the DOM
             link: function(scope, element, attrs) {
 
@@ -102,11 +124,10 @@
                     var myArray1 = new Array(  );
                     for ( var i = scope.tab_val+1; i < 4; i++ ) {
                         myArray1.push(i);
-                        console.log( "try " + i );
                     }
                     $(element).parent().parent().parent().tabs( "option", "disabled", myArray1 );
                     $(element).parent().parent().parent().tabs({active:scope.tab_val});
-                    console.log("adiroxxx");
+                    console.log("Adir");
                 });
             }
         };
@@ -188,4 +209,54 @@
             }
         };
     });
+
+    crmMailingAB.directive('submitform',function(){
+        return {
+          restrict:'A',
+            priority: 1000,
+          link: function(scope,element,attrs){
+              $(element).on("click",function() {
+
+                  console.log("clicked");
+                  scope.save({
+                      "sequential": 1,
+                       "name": "Aditya Nambiar",
+                      "subject": scope.mailA.subj,
+                      "created_id": "2",
+                      "from_email": scope.mailA.fromEmail,
+                      "body_text": scope.mailA.body
+
+                  });
+                  console.log("Truth "+ scope.whatnext)
+
+                  if(scope.whatnext=="3"){
+                      console.log("sdf");
+                      scope.mailB.subj=scope.mailA.subj;
+                      scope.mailB.body=scope.mailA.body;
+
+                  }
+                  else if(scope.whatnext=="2"){
+                      scope.mailB.fromEmail=scope.mailA.fromEmail;
+                      scope.mailB.body=scope.mailA.body;
+
+                  }
+                  
+
+                  scope.save({
+                      "sequential": 1,
+                      "name": "Aditya Nambiar",
+                      "subject": scope.mailB.subj,
+                      "created_id": "2",
+                      "from_email": scope.mailB.fromEmail,
+                      "body_text": scope.mailB.body
+
+                  });
+
+              });
+          }
+        };
+
+    });
+
+
 })(angular, CRM.$, CRM._);

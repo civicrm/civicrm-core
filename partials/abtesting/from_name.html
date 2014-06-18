@@ -4,16 +4,17 @@
     <br><br>
     <pre>
 
-        From Email Address A: <input type="text"><br>
-        From Email Address B: <input type="text"><br>
+        From Email Address A: <input type="text" ng-model="mailA.fromEmail"><br>
+        From Email Address B: <input type="text" ng-model="mailB.fromEmail"><br>
         Use Template : <input type="text"><br>
-        Mail Subject: <input type="text"><br>
+        Mail Subject: <input type="text" ng-model="mailA.subj" ><br>
 
-        <textarea rows="4" cols="50">
+        <textarea rows="4" cols="50" ng-model="mailA.body" >
 
         </textarea>
 
 
+        <span ng-init="init('3')" ></span>
 
     </pre>
 </div>
