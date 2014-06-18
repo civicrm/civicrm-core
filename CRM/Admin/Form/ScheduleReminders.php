@@ -244,10 +244,19 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    */
   static function formRule($fields) {
     $errors = array();
-    if ((array_key_exists(1, $fields['entity']) && $fields['entity'][1][0] == 0) ||
+    if ((array_key_exists(1, $fields['entity']) && $fields['entity'][1][0] === 0) ||
       (array_key_exists(2, $fields['entity']) && $fields['entity'][2][0] == 0)
     ) {
       $errors['entity'] = ts('Please select appropriate value');
+    }
+
+    if (array_key_exists(1, $fields['entity']) && !is_numeric($fields['entity'][1][0])) {
+      if (count($fields['entity'][1]) > 1) {
+        $errors['entity'] = ts('You may only select one contact field per reminder');
+      }
+      elseif (!(array_key_exists(2, $fields['entity']) && $fields['entity'][2][0] > 0)) {
+        $errors['entity'] = ts('Please select whether the reminder is sent each year.');
+      }
     }
 
     if (!empty($fields['is_active']) &&
