@@ -493,6 +493,19 @@
     }
     cj('#priceset input[type="radio"]').change(updatePriceSetHighlight);
     updatePriceSetHighlight();
+
+    function toggleBillingBlockIfFree(){
+      var total_amount_tmp =  cj(this).data('raw-total');
+      // Hide billing questions if this is free
+      if (total_amount_tmp == 0){
+        cj("#billing-payment-block").hide(); 
+      } 
+      else {
+        cj("#billing-payment-block").show(); 
+      }
+    }
+
+    cj('#pricevalue').each(toggleBillingBlockIfFree).on('change', toggleBillingBlockIfFree);
   });
   {/literal}
 </script>
