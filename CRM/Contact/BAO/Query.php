@@ -1250,6 +1250,8 @@ class CRM_Contact_BAO_Query {
    * @access public
    */
   function query($count = FALSE, $sortByChar = FALSE, $groupContacts = FALSE) {
+    //@todo - this next line should probably be called from initialize - adding it here as a more conservative approach to patching a stable release
+    $this->generatePermissionClause(FALSE, $count);
     if ($count) {
       if (isset($this->_distinctComponentClause)) {
         // we add distinct to get the right count for components
@@ -1319,10 +1321,7 @@ class CRM_Contact_BAO_Query {
       $from = $this->_fromClause;
     }
 
-    $where = '';
-    if (!empty($this->_whereClause)) {
-      $where = "WHERE {$this->_whereClause}";
-    }
+    $where = $this->composeWhereClause();
 
     $having = '';
     if (!empty($this->_having)) {
@@ -1341,6 +1340,25 @@ class CRM_Contact_BAO_Query {
     }
 
     return array($select, $from, $where, $having);
+  }
+
+  /**
+   * Combine whereClause & where condition clause into a complete where clause if they are set
+   *
+   * @return string
+   */
+  function composeWhereClause() {
+    if (empty($this->_whereClause)  AND empty($this->_permissionWhereClause)) {
+      return '';
+    }
+    $where = ' WHERE 1 ';
+    if (!empty($this->_whereClause)) {
+      $where .= " AND {$this->_whereClause} ";
+    }
+    if (!empty($this->_permissionWhereClause)) {
+      $where .= " AND {$this->_permissionWhereClause}";
+    }
+    return $where;
   }
 
   function &getWhereValues($name, $grouping) {
