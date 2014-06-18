@@ -499,12 +499,12 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       CRM_Utils_Hook::alterDisplayName($displayName, $id, $dao);
 
       return $type ? array(
-        $dao->display_name,
+        $displayName,
         $image,
         $dao->contact_type,
         $dao->contact_sub_type,
         $imageUrl,
-      ) : array($dao->display_name, $image, $imageUrl);
+      ) : array($displayName, $image, $imageUrl);
     }
     return NULL;
   }
