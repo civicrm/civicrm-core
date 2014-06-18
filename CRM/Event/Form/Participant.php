@@ -1537,7 +1537,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
       $participantRoles = CRM_Utils_Array::value('role_id', $params);
       if (is_array($participantRoles)) {
         $selectedRoles = array();
-        foreach (array_keys($participantRoles) as $roleId) {
+        foreach ($participantRoles as $roleId) {
           $selectedRoles[] = $role[$roleId];
         }
         $event['participant_role'] = implode(', ', $selectedRoles);

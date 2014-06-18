@@ -325,7 +325,9 @@ AND li.entity_id = {$entityId}
           $line['contribution_id'] = $entityId;
         }
         else {
-          $line['contribution_id'] = $contributionDetails->id;
+          if (!empty($contributionDetails->id)) {
+            $line['contribution_id'] = $contributionDetails->id;
+          }
         }
         // if financial type is not set and if price field value is NOT NULL
         // get financial type id of price field value
