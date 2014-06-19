@@ -5,20 +5,6 @@
  *
  */
 class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
-  /**
-   * gives array of contribution settings of administer form for Invoice
-   *
-   * @access public
-   **/ 
-  public $_defaults;
-
-  /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
-   */
   function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviContribute Component Settings'));
     $this->_varNames = array(
@@ -84,36 +70,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
                      )    
                );
     parent::buildQuickForm();
-  }
-
-  /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return void
-   */
-  public function postProcess() {
-    // store the submitted values in an array
-    $params = $this->controller->exportValues($this->_name);
-    $setInvoiceSettings = CRM_Core_BAO_Setting::setItem($params, CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
-    }
-
-  /**
-   * This function sets the default values for the form.
-   * default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return void
-   */
-  function setDefaultValues() {
-    if (!$this->_defaults) {
-      $this->_defaults = array();
-      $contributionSettings = $this->_config->contribution_invoice_settings;
-      $this->_defaults = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
-    }
-    return $this->_defaults;
   }
 }
 
