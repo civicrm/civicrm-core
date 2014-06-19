@@ -63,6 +63,19 @@ class CRM_GenCode_Util_File {
 
     return $newTempDir;
   }
+
+  static function needsUpdate($sources, $target) {
+    // each $source is assumed to be checked upstream for existence (as otherwise $target can't be generated!)
+    if (!is_array($sources)) {
+      $sources = array($sources);
+    }
+    $result = file_exists($target);
+    foreach ($sources as $source) {
+      if (substr($source, -4) == '.tpl') $source = 'templates/'.$source;
+      $result = $result && (filemtime($source) > filemtime($target));
+    }
+    return $result;
+  }
 }
 
 class CRM_GenCode_Main {
@@ -77,6 +90,8 @@ class CRM_GenCode_Main {
   var $phpCodePath;
   var $tplCodePath;
   var $schemaPath; // ex: schema/Schema.xml
+
+  var $localeDir;
 
   var $smarty;
 
@@ -214,6 +229,10 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   }
 
   function generateCiviTestTruncate($tables) {
+    if (!file_exists('../tests/')) {
+      return;
+    }
+
     echo "Generating tests truncate file\n";
 
     $truncate = '<?xml version="1.0" encoding="UTF-8" ?>
@@ -259,36 +278,62 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     global $tsLocale;
     $oldTsLocale = $tsLocale;
     foreach ($locales as $locale) {
-      echo "Generating data files for $locale\n";
-      $tsLocale = $locale;
-      $this->smarty->assign('locale', $locale);
 
-      $data   = array();
-      $data[] = $this->smarty->fetch('civicrm_country.tpl');
-      $data[] = $this->smarty->fetch('civicrm_state_province.tpl');
-      $data[] = $this->smarty->fetch('civicrm_currency.tpl');
-      $data[] = $this->smarty->fetch('civicrm_data.tpl');
-      $data[] = $this->smarty->fetch('civicrm_navigation.tpl');
-
-      $data[] = " UPDATE civicrm_domain SET version = '" . $this->db_version . "';";
-
-      $data = implode("\n", $data);
+      $sources = array(
+        'civicrm_country.tpl',
+        'civicrm_state_province.tpl',
+        'civicrm_currency.tpl',
+        'civicrm_data.tpl',
+        'civicrm_navigation.tpl'
+      );
+      if ($locale != 'en_US') {
+        $sources[] = "{$this->localeDir}/$locale/civicrm.mo";
+      }
 
       $ext = ($locale != 'en_US' ? ".$locale" : '');
-      // write the initialize base-data sql script
-      file_put_contents($this->sqlCodePath . "civicrm_data$ext.mysql", $data);
+      $target = $this->sqlCodePath . "civicrm_data$ext.mysql";
+      if (CRM_GenCode_Util_File::needsUpdate($sources, $target)) {
+        echo "Generating data file for $locale\n";
+        $tsLocale = $locale;
+        $this->smarty->assign('locale', $locale);
 
-      // write the acl sql script
-      file_put_contents($this->sqlCodePath . "civicrm_acl$ext.mysql", $this->smarty->fetch('civicrm_acl.tpl'));
+        $data   = array();
+        foreach ($sources as $source) {
+          $data[] = $this->smarty->fetch($source);
+        }
+        $data[] = " UPDATE civicrm_domain SET version = '" . $this->db_version . "';";
+
+        $data = implode("\n", $data);
+
+        // write the initialize base-data sql script
+        file_put_contents($target, $data);
+      }
+
+      $source = 'civicrm_acl.tpl';
+      $target = $this->sqlCodePath . "civicrm_acl$ext.mysql";
+      if (CRM_GenCode_Util_File::needsUpdate($source, $target)) {
+        echo "Generating acl file for $locale\n";
+        $tsLocale = $locale;
+        $this->smarty->assign('locale', $locale);
+
+        // write the acl sql script
+        file_put_contents($target, $this->smarty->fetch($source));
+      }
     }
     $tsLocale = $oldTsLocale;
   }
 
   function generateSample() {
-    $this->reset_smarty_assignments();
-    $sample = $this->smarty->fetch('civicrm_sample.tpl');
-    $sample .= $this->smarty->fetch('civicrm_acl.tpl');
-    file_put_contents($this->sqlCodePath . 'civicrm_sample.mysql', $sample);
+    $sources = array('civicrm_sample.tpl', 'civicrm_acl.tpl');
+    $target = $this->sqlCodePath . 'civicrm_sample.mysql';
+    if (CRM_GenCode_Util_File::needsUpdate($sources, $target)) {
+      $this->reset_smarty_assignments();
+      $sample = '';
+      foreach ($sources as $source) {
+        $sample .= $this->smarty->fetch($source);
+      }
+      file_put_contents($target, $sample);
+    }
   }
 
   function generateInstallLangs() {
@@ -305,6 +350,12 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
 
   function generateDAOs($tables) {
     foreach (array_keys($tables) as $name) {
+      $source = str_replace('CRM/', '', $this->phpCodePath . $tables[$name]['sourceFile']);
+      $target = $this->phpCodePath . $tables[$name]['base'] . $tables[$name]['fileName'];
+      if (!CRM_GenCode_Util_File::needsUpdate($source, $target)) {
+        continue;
+      }
+
       $this->smarty->clear_all_cache();
       echo "Generating $name as " . $tables[$name]['fileName'] . "\n";
       $this->reset_smarty_assignments();
@@ -373,14 +424,14 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     $config = CRM_Core_Config::singleton(FALSE);
     $locales = array();
     if (substr($config->gettextResourceDir, 0, 1) === '/') {
-      $localeDir = $config->gettextResourceDir;
+      $this->localeDir = $config->gettextResourceDir;
     }
     else {
-      $localeDir = '../' . $config->gettextResourceDir;
+      $this->localeDir = '../' . $config->gettextResourceDir;
     }
-    if (file_exists($localeDir)) {
-      $config->gettextResourceDir = $localeDir;
-      $locales = preg_grep('/^[a-z][a-z]_[A-Z][A-Z]$/', scandir($localeDir));
+    if (file_exists($this->localeDir)) {
+      $config->gettextResourceDir = $this->localeDir;
+      $locales = preg_grep('/^[a-z][a-z]_[A-Z][A-Z]$/', scandir($this->localeDir));
     }
 
     $localesMask = getenv('CIVICRM_LOCALES');
@@ -414,10 +465,12 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       }
     }
 
-    echo "Generating civicrm-version file\n";
-    $this->smarty->assign('db_version', $this->db_version);
-    $this->smarty->assign('cms', ucwords($this->cms));
-    file_put_contents($this->phpCodePath . "civicrm-version.php", $this->smarty->fetch('civicrm_version.tpl'));
+    if (CRM_GenCode_Util_File::needsUpdate('civicrm_version.tpl', $this->phpCodePath . 'civicrm-version.php')) {
+      echo "Generating civicrm-version file\n";
+      $this->smarty->assign('db_version', $this->db_version);
+      $this->smarty->assign('cms', ucwords($this->cms));
+      file_put_contents($this->phpCodePath . "civicrm-version.php", $this->smarty->fetch('civicrm_version.tpl'));
+    }
   }
 
   /**
