@@ -96,7 +96,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $query = "SELECT count(*) FROM civicrm_contribution WHERE contribution_status_id NOT IN ($Id) AND {$this->_componentClause}";
     $count = CRM_Core_DAO::singleValueQuery($query);
     if ($count != 0) {
-      CRM_Core_Error::statusBounce("Please select only contributions with Completed, Pending, Refunded status.");
+      CRM_Core_Error::statusBounce(ts('Please select only contributions with Completed, Pending, Refunded status.'));
     }
     
     // we have all the contribution ids, so now we get the contact ids
@@ -163,9 +163,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $this->_invoiceTemplate = CRM_Core_Smarty::singleton();
     
     $invoiceElements = CRM_Contribute_Form_Task_PDF::getElements();
-
+    
     // gives the status id when contribution status is 'Refunded'
     $refundedStatusId = CRM_Utils_Array::key('Refunded', $this->_contributionStatusId);
+
+    // getting data from admin page
+    $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
     
     foreach ($invoiceElements['details'] as $contribID => $detail) {
       $input = $ids = $objects = array();
@@ -215,20 +218,17 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       
       $stateProvinceAbbreviation = CRM_Core_PseudoConstant::stateProvinceAbbreviation($billingAddress[$contribution->contact_id]['state_province_id']);
       
-      // getting data from admin page
-      $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
-      
       if ($contribution->contribution_status_id == $refundedStatusId) {
-        $invoiceId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue)."".$contribution->id;
+        $invoiceId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue). "" .$contribution->id;
       }
       else {
-        $invoiceId = CRM_Utils_Array::value('invoice_prefix', $prefixValue)."".$contribution->id;
+        $invoiceId = CRM_Utils_Array::value('invoice_prefix', $prefixValue). "" .$contribution->id;
       }
       
       //to obtain due date for PDF invoice
       $contributionReceiveDate = date('F j,Y', strtotime(date($input['receive_date'])));
       $invoiceDate = date("F j, Y");
-      $dueDate = date('F j ,Y', strtotime($contributionReceiveDate."+".$prefixValue['due_date']."". $prefixValue['due_date_period']));
+      $dueDate = date('F j ,Y', strtotime($contributionReceiveDate. "+" .$prefixValue['due_date']. "" .$prefixValue['due_date_period']));
       
       if ($input['component'] == 'contribute') {
         $eid = $contribID;
