@@ -1,0 +1,9 @@
+[.]
+# Clean-up after each update
+fixups = bin/cividesk_cleanup.sh
+
+[packages]
+checkout = git clone 'https://github.com/cividesk/civicrm-packages.git' 'packages'
+
+[drupal]
+checkout = git clone 'https://github.com/civicrm/civicrm-drupal.git' 'drupal' && cd drupal; git checkout 7.x-4.4
