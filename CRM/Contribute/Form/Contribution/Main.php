@@ -805,13 +805,15 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         foreach ($self->_values['fee'] as $fieldKey => $fieldValue) {
           if ($fieldValue['html_type'] != 'Text' && CRM_Utils_Array::value('price_' . $fieldKey, $fields)) {
             if (!is_array($fields['price_' . $fieldKey])) {
-              if (in_array($fieldValue['options'][$fields['price_' . $fieldKey]]['membership_type_id'], $currentMemberships)) {
-                $errors['price_' . $fieldKey] = ts($errorText, array( 1 => CRM_Member_PseudoConstant::membershipType($fieldValue['options'][$fields['price_' . $fieldKey]]['membership_type_id'])));
+              if (array_key_exists('membership_type_id', $fieldValue['options'][$fields['price_' . $fieldKey]]) 
+                && in_array($fieldValue['options'][$fields['price_' . $fieldKey]]['membership_type_id'], $currentMemberships)) {
+                $errors['price_' . $fieldKey] = ts($errorText, array(1 => CRM_Member_PseudoConstant::membershipType($fieldValue['options'][$fields['price_' . $fieldKey]]['membership_type_id'])));
               }
             }
             else {
               foreach ($fields['price_' . $fieldKey] as $key => $ignore) {
-                if (in_array($fieldValue['options'][$key]['membership_type_id'], $currentMemberships)) {
+                if (array_key_exists('membership_type_id', $fieldValue['options'][$key]) 
+                  && in_array($fieldValue['options'][$key]['membership_type_id'], $currentMemberships)) {
                   $errors['price_' . $fieldKey] = ts($errorText, array(1 => CRM_Member_PseudoConstant::membershipType($fieldValue['options'][$key]['membership_type_id'])));
                 }
               }
