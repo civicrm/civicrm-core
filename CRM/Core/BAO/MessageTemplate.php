@@ -501,6 +501,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
           $params['attachments'] = array();
         }
         $params['attachments'][] = CRM_Utils_Mail::appendPDF($params['PDFFilename'], $params['html'], $format);
+        if (isset($params['tplParams']['email_comment'])) {
+          $params['html'] = $params['tplParams']['email_comment'];
+        }
       }
 
       $sent = CRM_Utils_Mail::send($params);
