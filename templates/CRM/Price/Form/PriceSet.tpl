@@ -84,6 +84,9 @@
 			  {/if}
 			{else}
 			  {$option.amount|crmMoney}
+			  {if $option.tax_amount == "0" && $displayOpt != 'Do_not_show'}
+			    <span class='crm-price-amount-label'>{ts} VAT (exempt){/ts}</span>
+			  {/if}
 			{/if}
 		      {/foreach}
                     </span>
