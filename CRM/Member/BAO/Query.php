@@ -192,9 +192,13 @@ class CRM_Member_BAO_Query {
 
       case 'membership_status':
       case 'member_status_id':
+        $statusTypes = CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label');
         if (!is_array($value)) {
           $status = $value;
           if (!empty($value)) {
+            if(!is_numeric($value)) {
+              $value = $status = array_search($value, $statusTypes);
+            }
             $value = array_flip(explode(",", str_replace(array( '(', ')' ), '', $value)));
           }
           else {
@@ -210,7 +214,7 @@ class CRM_Member_BAO_Query {
         }
 
         $names = array();
-        $statusTypes = CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label');
+
         foreach ($value as $id => $dontCare) {
           $names[] = $statusTypes[$id];
         }
