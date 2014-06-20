@@ -55,8 +55,8 @@ class CRM_Core_Lock {
    * @return object the lock object
    *
    */
- function __construct($name, $timeout = NULL, $serverWideLock = FALSE) {
-    $config   = CRM_Core_Config::singleton();
+  function __construct($name, $timeout = NULL, $serverWideLock = FALSE) {
+    $config = CRM_Core_Config::singleton();
     $dsnArray = DB::parseDSN($config->dsn);
     $database = $dsnArray['database'];
     $domainID = CRM_Core_Config::domainID();
@@ -68,10 +68,10 @@ class CRM_Core_Lock {
     }
     CRM_Core_Error::debug_log_message('trying to construct lock for ' . $this->_name);
     static $jobLog = FALSE;
-    if($jobLog && CRM_Core_DAO::singleValueQuery("SELECT IS_USED_LOCK( '{$jobLog}')")) {
+    if ($jobLog && CRM_Core_DAO::singleValueQuery("SELECT IS_USED_LOCK( '{$jobLog}')")) {
       return $this->hackyHandleBrokenCode($jobLog);
     }
-    if(stristr($name, 'civimail.job.')) {
+    if (stristr($name, 'civimail.job.')) {
       $jobLog = $this->_name;
     }
     //CRM_Core_Error::debug_var('backtrace', debug_backtrace());
@@ -85,11 +85,11 @@ class CRM_Core_Lock {
   }
 
   function acquire() {
-
     CRM_Core_Error::debug_log_message('aquire lock for ' . $this->_name);
     if (!$this->_hasLock) {
       $query = "SELECT GET_LOCK( %1, %2 )";
-      $params = array(1 => array($this->_name, 'String'),
+      $params = array(
+        1 => array($this->_name, 'String'),
         2 => array($this->_timeout, 'Integer'),
       );
       $res = CRM_Core_DAO::singleValueQuery($query, $params);
@@ -134,7 +134,7 @@ class CRM_Core_Lock {
    * @return boolean
    */
   function hackyHandleBrokenCode($jobLog) {
-    if(stristr($this->_name, 'job')) {
+    if (stristr($this->_name, 'job')) {
       throw new CRM_Core_Exception('lock aquisition for ' . $this->_name . 'attempted when ' . $jobLog . 'is not released');
     }
     CRM_Core_Error::debug_log_message('(CRM-12856) faking lock for ' . $this->_name);
