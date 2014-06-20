@@ -2174,7 +2174,7 @@ class CRM_Contact_BAO_Query {
           )
         )) {
         //fix for search by profile with address fields.
-        $tName = "{$locationType[$locType[1]]}_address";
+        $tName = "{$locationType[$locType[1]]}-address";
       }
       elseif ($locType[0] == 'on_hold') {
         $tName = "{$locationType[$locType[1]]}-email";
@@ -2507,11 +2507,11 @@ class CRM_Contact_BAO_Query {
           continue;
 
         default:
-          if (strpos($name, '_address') != 0) {
+          if (strpos($name, '-address') != 0) {
             //we have a join on an address table - possibly in conjunction with search builder - CRM-14263
-            $parts = explode('_', $name);
+            $parts = explode('-', $name);
             $locationID = array_search($parts[0], CRM_Core_BAO_Address::buildOptions('location_type_id', 'get', array('name' => $parts[0])));
-            $from .= " $side JOIN civicrm_address $name ON ( contact_a.id = {$name}.contact_id ) and location_type_id = $locationID ";
+            $from .= " $side JOIN civicrm_address `{$name}` ON ( contact_a.id = `{$name}`.contact_id ) and `{$name}`.location_type_id = $locationID ";
           }
           else {
             $from .= CRM_Core_Component::from($name, $mode, $side);
