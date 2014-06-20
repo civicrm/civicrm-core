@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -66,22 +66,14 @@
 </div><!-- /.crm-accordion-wrapper -->
 {/if}
 
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
-
 </div>
 
 <script type="text/javascript">
 {if $preview}
-{literal}
-cj(function() {
-   cj().crmAccordions();
-});
-{/literal}
 {/if}
 
 {literal}
-cj(function() {
+CRM.$(function($) {
    cj('#start_date_display').change( function( ) { 
        if ( cj(this).val( ) ) {
           cj('#now').prop('checked', false );

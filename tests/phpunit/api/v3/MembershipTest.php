@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,6 +35,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class api_v3_MembershipTest
+ */
 class api_v3_MembershipTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_contactID;
@@ -208,7 +211,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * Test civicrm_membership_get with params not array.
    * Gets treated as contact_id, memberships expected.
    */
-
   function testGetWithParamsMemberShipTypeId() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $params = array(
@@ -229,7 +231,32 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($result['is_override'], 1, "In line " . __LINE__);
     $this->assertEquals($result['id'], $membership['id']);
   }
+  /**
+   * Test civicrm_membership_get with params not array.
+   * Gets treated as contact_id, memberships expected.
+   */
+  function testGetWithParamsMemberShipTypeIdContactID() {
+    $params = $this->_params;
+    $this->callAPISuccess($this->_entity, 'create', $params);
+    $params['membership_type_id'] = $this->_membershipTypeID2;
+    $this->callAPISuccess($this->_entity, 'create', $params);
+    $this->callAPISuccessGetCount('membership', array('contact_id' => $this->_contactID), 2);
+    $params = array(
+      'membership_type_id' => $this->_membershipTypeID,
+      'contact_id' => $this->_contactID,
+    );
+    $result = $this->callAPISuccess('membership', 'getsingle', $params);
+    $this->assertEquals($result['contact_id'], $this->_contactID);
+    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID);
 
+    $params = array(
+      'membership_type_id' => $this->_membershipTypeID2,
+      'contact_id' => $this->_contactID,
+    );
+    $result = $this->callAPISuccess('membership', 'getsingle', $params);
+    $this->assertEquals($result['contact_id'], $this->_contactID);
+    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID2);
+  }
   /**
    * check with complete array + custom field
    * Note that the test is written on purpose without any
@@ -317,8 +344,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     $membership = $this->callAPISuccess('membership', 'get', $params);
     $result = $membership['values'][$this->_membershipID];
-    $this->assertEquals($membership['values'][$this->_membershipID]['status_id'], $this->_membershipStatusID, "In line " . __LINE__);
-    $this->assertEquals($membership['values'][$this->_membershipID]['contact_id'], $this->_contactID, "In line " . __LINE__);
+    $this->assertEquals($membership['values'][$this->_membershipID]['status_id'], $this->_membershipStatusID);
+    $this->assertEquals($membership['values'][$this->_membershipID]['contact_id'], $this->_contactID);
     $params = array(
       'contact_id' => $this->_contactID,
       'filters' => array(
@@ -328,8 +355,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     $membership = $this->callAPIAndDocument('membership', 'get', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $result = $membership['values'][$this->_membershipID];
-    $this->assertEquals($membership['values'][$this->_membershipID]['status_id'], $this->_membershipStatusID, "In line " . __LINE__);
-    $this->assertEquals($membership['values'][$this->_membershipID]['contact_id'], $this->_contactID, "In line " . __LINE__);
+    $this->assertEquals($membership['values'][$this->_membershipID]['status_id'], $this->_membershipStatusID);
+    $this->assertEquals($membership['values'][$this->_membershipID]['contact_id'], $this->_contactID);
 
 
     $result = $this->callAPISuccess('Membership', 'Delete', array(

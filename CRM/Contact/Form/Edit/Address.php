@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -294,8 +294,12 @@ class CRM_Contact_Form_Edit_Address {
   /**
    * check for correct state / country mapping.
    *
-   * @param array reference $fields - submitted form values.
-   * @param array reference $errors - if any errors found add to this array. please.
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @internal param \reference $array $fields - submitted form values.
+   * @internal param \reference $array $errors - if any errors found add to this array. please.
    *
    * @return true if no errors
    *         array of errors if any present.
@@ -393,6 +397,14 @@ class CRM_Contact_Form_Edit_Address {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * @param $form
+   * @param $countryElementName
+   * @param $stateElementName
+   * @param $countyElementName
+   * @param $countryDefaultValue
+   * @param null $stateDefaultValue
+   */
   static function fixStateSelect(&$form,
     $countryElementName,
     $stateElementName,
@@ -566,6 +578,10 @@ class CRM_Contact_Form_Edit_Address {
   }
 
 
+  /**
+   * @param $form
+   * @param $groupTree
+   */
   static function storeRequiredCustomDataInfo(&$form, $groupTree) {
     if (CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Contact') {
       $requireOmission = NULL;

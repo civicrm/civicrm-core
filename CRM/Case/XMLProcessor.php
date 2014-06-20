@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,90 +28,36 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Case_XMLProcessor {
 
-  static protected $_xml;
+  /**
+   * Relationship-types have four name fields (name_a_b, name_b_a, label_a_b,
+   * label_b_a), but CiviCase XML refers to reltypes by a single name.
+   * REL_TYPE_CNAME identifies the canonical name field as used by CiviCase XML.
+   *
+   * This appears to be "label_b_a", but IMHO "name_b_a" would be more
+   * sensible.
+   */
+  const REL_TYPE_CNAME = 'label_b_a';
 
-  static protected $_hookCache = NULL;
-
-  function retrieve($caseType) {
-    $caseType = self::mungeCaseType($caseType);
-
-    if (!CRM_Utils_Array::value($caseType, self::$_xml)) {
-      if (!self::$_xml) {
-        self::$_xml = array();
-      }
-
-      // first check custom templates directory
-      $fileName = NULL;
-      $config = CRM_Core_Config::singleton();
-      if (isset($config->customTemplateDir) &&
-        $config->customTemplateDir
-      ) {
-        // check if the file exists in the custom templates directory
-        $fileName = implode(DIRECTORY_SEPARATOR,
-          array(
-            $config->customTemplateDir,
-            'CRM',
-            'Case',
-            'xml',
-            'configuration',
-            "$caseType.xml",
-          )
-        );
-      }
-
-      if (!$fileName ||
-        !file_exists($fileName)
-      ) {
-        // check if file exists locally
-        $fileName = implode(DIRECTORY_SEPARATOR,
-          array(dirname(__FILE__),
-            'xml',
-            'configuration',
-            "$caseType.xml",
-          )
-        );
-
-        if (!file_exists($fileName)) {
-          // check if file exists locally
-          $fileName = implode(DIRECTORY_SEPARATOR,
-            array(dirname(__FILE__),
-              'xml',
-              'configuration.sample',
-              "$caseType.xml",
-            )
-          );
-        }
-
-        if (!file_exists($fileName)) {
-          if (self::$_hookCache === NULL) {
-            self::$_hookCache = array();
-            CRM_Utils_Hook::caseTypes(self::$_hookCache);
-          }
-          if (isset(self::$_hookCache[$caseType], self::$_hookCache[$caseType]['file'])) {
-            $fileName = self::$_hookCache[$caseType]['file'];
-          }
-        }
-
-        if (!file_exists($fileName)) {
-          return FALSE;
-        }
-      }
-
-      // read xml file
-      $dom = new DomDocument();
-      $dom->load($fileName);
-      $dom->xinclude();
-      self::$_xml[$caseType] = simplexml_import_dom($dom);
-    }
-    return self::$_xml[$caseType];
+  /**
+   * @param $caseType
+   *
+   * @return FALSE|SimpleXMLElement
+   */
+  public function retrieve($caseType) {
+    return CRM_Case_XMLRepository::singleton()->retrieve($caseType);
   }
 
+  /**
+   * @param $caseType
+   *
+   * @return mixed|string
+   */
   public static function mungeCaseType($caseType) {
     // trim all spaces from $caseType
     $caseType = str_replace('_', ' ', $caseType);
@@ -119,6 +65,12 @@ class CRM_Case_XMLProcessor {
     return $caseType;
   }
 
+  /**
+   * @param bool $indexName
+   * @param bool $all
+   *
+   * @return array
+   */
   function &allActivityTypes($indexName = TRUE, $all = FALSE) {
     static $activityTypes = NULL;
     if (!$activityTypes) {
@@ -127,6 +79,9 @@ class CRM_Case_XMLProcessor {
     return $activityTypes;
   }
 
+  /**
+   * @return array
+   */
   function &allRelationshipTypes() {
     static $relationshipTypes = array();
 
@@ -135,7 +90,7 @@ class CRM_Case_XMLProcessor {
 
       $relationshipTypes = array();
       foreach ($relationshipInfo as $id => $info) {
-        $relationshipTypes[$id] = $info['label_b_a'];
+        $relationshipTypes[$id] = $info[CRM_Case_XMLProcessor::REL_TYPE_CNAME];
       }
     }
 

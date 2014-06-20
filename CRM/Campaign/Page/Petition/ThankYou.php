@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Campaign_Page_Petition_ThankYou extends CRM_Core_Page {
+  /**
+   * @return string
+   */
   function run() {
     $id             = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $petition_id    = CRM_Utils_Request::retrieve('pid', 'Positive', $this);

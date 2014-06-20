@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,15 +28,23 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
+  /**
+   * Constructor
+   */
   function __construct() {
     parent::__construct();
   }
 
+  /**
+   * @param string $component
+   *
+   * @return bool|void
+   */
   function main($component = 'contribute') {
 
     //we only get invoice num as a key player from payment gateway response.
@@ -74,6 +82,14 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     }
   }
 
+  /**
+   * @param array $input
+   * @param array $ids
+   * @param $objects
+   * @param $first
+   *
+   * @return bool
+   */
   function recur(&$input, &$ids, &$objects, $first) {
     $recur = &$objects['contributionRecur'];
 
@@ -165,7 +181,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
       // the recurring contribution has declined a payment or has failed
       // so we just fix the recurring contribution and not change any of
-      // the existing contribiutions
+      // the existing contributions
       // CRM-9036
       return TRUE;
     }
@@ -198,6 +214,10 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     }
   }
 
+  /**
+   * @param $input
+   * @param $ids
+   */
   function getInput(&$input, &$ids) {
     $input['amount'] = self::retrieve('x_amount', 'String');
     $input['subscription_id'] = self::retrieve('x_subscription_id', 'Integer');
@@ -236,6 +256,10 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     }
   }
 
+  /**
+   * @param $ids
+   * @param $input
+   */
   function getIDs(&$ids, &$input) {
     $ids['contact'] = self::retrieve('x_cust_id', 'Integer');
     $ids['contribution'] = self::retrieve('x_invoice_num', 'Integer');
@@ -251,11 +275,11 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
     $contRecur = CRM_Core_DAO::executeQuery($sql);
     $contRecur->fetch();
     $ids['contributionRecur'] = $contRecur->id;
-    if($ids['contact_id'] != $contRecur->contact_id){
-      CRM_Core_Error::debug_log_message("Recurring contribution appears to have been re-assigned from id {$ids['contact_id']} to {$contRecur->contact_id}
+    if($ids['contact'] != $contRecur->contact_id){
+      CRM_Core_Error::debug_log_message("Recurring contribution appears to have been re-assigned from id {$ids['contact']} to {$contRecur->contact_id}
         Continuing with {$contRecur->contact_id}
       ");
-      $ids['contact_id'] = $contRecur->contact_id;
+      $ids['contact'] = $contRecur->contact_id;
     }
     if (!$ids['contributionRecur']) {
       CRM_Core_Error::debug_log_message("Could not find contributionRecur id: ".print_r($input, TRUE));
@@ -290,6 +314,15 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     }
   }
 
+  /**
+   * @param $name
+   * @param $type
+   * @param bool $abort
+   * @param null $default
+   * @param string $location
+   *
+   * @return mixed
+   */
   static function retrieve($name, $type, $abort = TRUE, $default = NULL, $location = 'POST') {
     static $store = NULL;
     $value = CRM_Utils_Request::retrieve($name, $type, $store,
@@ -305,6 +338,12 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     return $value;
   }
 
+  /**
+   * @param $ids
+   * @param $input
+   *
+   * @return bool
+   */
   function checkMD5($ids, $input) {
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ids['paymentProcessor'],
       $input['is_test'] ? 'test' : 'live'

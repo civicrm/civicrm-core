@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -39,9 +39,10 @@
  * no replacement is mentioned the value is inserted at the end of
  * the form element
  *
- * @param string $string    the html to be tweaked with
- * @param string $attribute the attribute to modify
- * @param string $value     the new attribute value
+ * @param string $string the html to be tweaked with
+ *
+ * @internal param string $attribute the attribute to modify
+ * @internal param string $value the new attribute value
  *
  * @return string        the new modified html string
  * @access public

@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -48,14 +48,15 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * price field object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params    (reference ) an assoc array of name/value pairs
-   * @param array  $ids       the array that holds all the db ids
+   * @param array $params (reference ) an assoc array of name/value pairs
+   *
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return object CRM_Price_BAO_PriceField object
    * @access public
    * @static
    */
-  static function &add(&$params) {
+  static function add(&$params) {
     $priceFieldBAO = new CRM_Price_BAO_PriceField();
 
     $priceFieldBAO->copyValues($params);
@@ -80,6 +81,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @static
    */
   static function create(&$params) {
+    if(empty($params['id']) && empty($params['name'])) {
+      $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
+    }
     $transaction = new CRM_Core_Transaction();
 
     $priceField = self::add($params);
@@ -89,7 +93,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       return $priceField;
     }
 
-    $options = $optionsIds = array();
+    $optionsIds = array();
     $maxIndex = CRM_Price_Form_Field::NUM_OPTION;
 
     if ($priceField->html_type == 'Text') {
@@ -104,7 +108,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       }
     }
     $defaultArray = array();
-    if ($params['html_type'] == 'CheckBox' && isset($params['default_checkbox_option'])) {
+    //html type would be empty in update scenario not sure what would happen ...
+    if (!empty($params['html_type']) && $params['html_type'] == 'CheckBox' && isset($params['default_checkbox_option'])) {
       $tempArray = array_keys($params['default_checkbox_option']);
       foreach ($tempArray as $v) {
         if ($params['option_amount'][$v]) {
@@ -215,13 +220,18 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   /**
    * This function for building custom fields
    *
-   * @param object  $qf             form object (reference)
-   * @param string  $elementName    name of the custom field
+   * @param CRM_Core_Form $qf form object (reference)
+   * @param string $elementName name of the custom field
+   * @param $fieldId
    * @param boolean $inactiveNeeded
-   * @param boolean $useRequired    true if required else false
-   * @param boolean $search         true if used for search else false
-   * @param string  $label          label for custom field
+   * @param boolean $useRequired true if required else false
+   * @param string $label label for custom field
    *
+   * @param null $fieldOptions
+   * @param array $feezeOptions
+   *
+   * @return null
+   * @internal param bool $search true if used for search else false
    * @access public
    * @static
    */
@@ -295,9 +305,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $extra = array('onclick' => 'useAmountOther();');
         }
 
-        // if seperate membership payment is used with quick config priceset then change the other amount label
         if (!empty($qf->_membershipBlock) && !empty($qf->_quickConfig) && $field->name == 'other_amount' && empty($qf->_contributionAmount)) {
-          $label = ts('Additional Contribution');
           $useRequired = 0;
         }
         elseif (!empty($fieldOptions[$optionKey]['label'])) {      //check for label.
@@ -511,6 +519,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     return $options[$fieldId];
   }
 
+  /**
+   * @param $optionLabel
+   * @param $fid
+   *
+   * @return mixed
+   */
   public static function getOptionId($optionLabel, $fid) {
     if (!$optionLabel || !$fid) {
       return;
@@ -567,6 +581,9 @@ WHERE
     return NULL;
   }
 
+  /**
+   * @return array
+   */
   static function &htmlTypes() {
     static $htmlTypes = NULL;
     if (!$htmlTypes) {
@@ -583,13 +600,16 @@ WHERE
   /**
    * Validate the priceset
    *
-   * @param int $priceSetId, array $fields
+   * @param int $priceSetId , array $fields
    *
    * retrun the error string
    *
+   * @param $fields
+   * @param $error
+   * @param bool $allowNoneSelection
+   *
    * @access public
    * @static
-   *
    */
 
   public static function priceSetValidation($priceSetId, $fields, &$error, $allowNoneSelection = FALSE) {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -38,6 +38,10 @@
  */
 
 require_once 'DB.php';
+
+/**
+ * Class CRM_Core_BAO_CMSUser
+ */
 class CRM_Core_BAO_CMSUser {
 
   /**
@@ -253,9 +257,11 @@ class CRM_Core_BAO_CMSUser {
   /**
    * Function to create Form for CMS user using Profile
    *
-   * @param object  $form
+   * @param object $form
    * @param integer $gid id of group of profile
    * @param bool $emailPresent true if the profile field has email(primary)
+   * @param \const|int $action
+   *
    * @return FALSE|void WTF
    *
    * @access public
@@ -341,6 +347,13 @@ class CRM_Core_BAO_CMSUser {
    *  @param  array $files uploaded files if any
    *  @param array $self reference to form object
    *
+   */
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array|bool
    */
   static function formRule($fields, $files, $self) {
     if (empty($fields['cms_create_account'])) {
@@ -478,10 +491,15 @@ class CRM_Core_BAO_CMSUser {
     return $result;
   }
 
+  /**
+   * @param $config
+   *
+   * @return object
+   */
   static function &dbHandle(&$config) {
-    CRM_Core_Error::ignoreException();
+    $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     $db_uf = DB::connect($config->userFrameworkDSN);
-    CRM_Core_Error::setCallback();
+    unset($errorScope);
     if (!$db_uf ||
       DB::isError($db_uf)
     ) {

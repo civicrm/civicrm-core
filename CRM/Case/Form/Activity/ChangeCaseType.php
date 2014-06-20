@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -39,6 +39,11 @@
  */
 class CRM_Case_Form_Activity_ChangeCaseType {
 
+  /**
+   * @param $form
+   *
+   * @throws Exception
+   */
   static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
@@ -50,6 +55,8 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    * the default values are retrieved from the database
    *
    * @access public
+   *
+   * @param $form
    *
    * @return void
    */
@@ -65,18 +72,20 @@ class CRM_Case_Form_Activity_ChangeCaseType {
     return $defaults;
   }
 
+  /**
+   * @param $form
+   */
   static function buildQuickForm(&$form) {
     $form->removeElement('status_id');
     $form->removeElement('priority_id');
 
     $form->_caseType = CRM_Case_PseudoConstant::caseType();
-    $caseTypeId = explode(CRM_Case_BAO_Case::VALUE_SEPARATOR, CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case',
-        $form->_caseId,
-        'case_type_id'
-      ));
-    $form->_caseTypeId = $caseTypeId[1];
+    $form->_caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case',
+      $form->_caseId,
+      'case_type_id'
+    );
     if (!in_array($form->_caseTypeId, $form->_caseType)) {
-      $form->_caseType[$form->_caseTypeId] = CRM_Core_OptionGroup::getLabel('case_type', $form->_caseTypeId, FALSE);
+      $form->_caseType[$form->_caseTypeId] = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $form->_caseTypeId, 'title');
     }
 
     $form->add('select', 'case_type_id', ts('New Case Type'),
@@ -93,6 +102,9 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    *
    * @param array $values posted values of the form
    *
+   * @param $files
+   * @param $form
+   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public
@@ -105,6 +117,9 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    * Function to process the form
    *
    * @access public
+   *
+   * @param $form
+   * @param $params
    *
    * @return void
    */
@@ -127,6 +142,10 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    *
    * @access public
    *
+   * @param $form
+   * @param $params
+   * @param $activity
+   *
    * @return void
    */
   static function endPostProcess(&$form, &$params, $activity) {
@@ -136,7 +155,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
     }
 
     $caseTypes = CRM_Case_PseudoConstant::caseType('name');
-    $allCaseTypes = CRM_Case_PseudoConstant::caseType('label', FALSE);
+    $allCaseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
 
     if (!empty($caseTypes[$params['case_type_id']])) {
       $caseType = $caseTypes[$params['case_type_id']];

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,9 +40,17 @@
  */
 
 require_once 'PHPUnit/Framework/TestCase.php';
+
+/**
+ * Class HelloTest
+ */
 class HelloTest extends PHPUnit_Framework_TestCase {
   // contains the object handle of the string class
   var $abc;
+
+  /**
+   * @param null $name
+   */
   function __construct($name = NULL) {
     parent::__construct($name);
   }

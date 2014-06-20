@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -178,12 +178,12 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
   /**
    * This function is to get the result of the search for Add to * forms
    *
-   * @param  array $params  This contains elements for search criteria
+   * @param $form
+   * @param  array $params This contains elements for search criteria
    *
    * @access public
    *
    * @return void
-   *
    */
   function search(&$form, &$params) {
     //max records that will be listed

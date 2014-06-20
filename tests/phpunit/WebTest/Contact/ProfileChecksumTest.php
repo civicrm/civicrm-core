@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_ProfileChecksumTest
+ */
 class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -99,7 +103,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     $profileId = $this->_testCreateContactProfile($fields, $profileName);
 
     // Check for profile create/edit permissions.
-    $permission = array('edit-1-profile-edit', 'edit-1-profile-create', 'edit-1-access-all-custom-data');
+    $permission = array('edit-1-profile-edit', 'edit-1-profile-create', 'edit-1-access-all-custom-data', 'edit-1-edit-all-contacts');
     $this->changePermissions($permission);
 
     // Get checksum of the newly created contact.
@@ -137,6 +141,12 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
     $this->assertStringsPresent($checkFieldValues);
   }
 
+  /**
+   * @param $fields
+   * @param $profileName
+   *
+   * @return null
+   */
   function _testCreateContactProfile($fields, $profileName) {
     // Add new profile.
     $this->openCiviPage("admin/uf/group", "reset=1");
@@ -145,6 +155,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
 
     // Name of the profile.
     $this->type('title', $profileName);
+    $this->click('uf_group_type_Profile');
     $this->click('_qf_Group_next-top');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $profileId = $this->urlArg('gid');

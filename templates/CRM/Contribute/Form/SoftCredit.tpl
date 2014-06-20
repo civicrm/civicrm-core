@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -66,7 +66,8 @@
 {/if}
 {literal}
 <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
+    var $form = $("#{/literal}{$form.formName}{literal}");
     $('#showPCP, #showSoftCredit').click(function(){
       return showHideSoftCreditAndPCP();
     });
@@ -79,19 +80,36 @@
     }
 
     $('#addMoreSoftCredit').on('click', function () {
-      $('.crm-contribution-form-block-soft_credit_to tr.hiddenElement').filter(':first').show().removeClass('hiddenElement');
+      if ($('tr.crm-contribution-form-block-soft_credit_to').hasClass("hiddenElement")) {
+        $('.crm-contribution-form-block-soft_credit_to tr.hiddenElement').filter(':first').show().removeClass('hiddenElement');
+      }
       if ($('.crm-soft-credit-block tr.hiddenElement').length < 1) {
         $('#addMoreSoftCredit').hide();
       }
       return false;
     });
 
-    var pcpURL = CRM.url('civicrm/ajax/rest',
-      'className=CRM_Contact_Page_AJAX&fnName=getPCPList&json=1&context=contact&reset=1');
-    $('#pcp_made_through').autocomplete(pcpURL,
-      { width : 360, selectFirst : false, matchContains: true
-      }).result( function(event, data, formatted) {
-        $("#pcp_made_through_id" ).val( data[1]);
+    // FIXME: This could be much simpler as an entityRef field but pcp doesn't have a searchable api :(
+    var pcpURL = CRM.url('civicrm/ajax/rest', 'className=CRM_Contact_Page_AJAX&fnName=getPCPList&json=1&context=contact&reset=1');
+    $('#pcp_made_through_id').crmSelect2({
+      placeholder: {/literal}'{ts escape="js"}- select -{/ts}'{literal},
+      minimumInputLength: 1,
+      ajax: {
+        url: pcpURL,
+        data: function(term) {
+          return {term: term};
+        },
+        results: function(response) {
+          return {results: response};
+        }
+      },
+      initSelection: function(el, callback) {
+        callback({id: $(el).val(), text: $('[name=pcp_made_through]', $form).val()});
+      }
+    })
+      // This is just a cheap trick to store the name in case of a formrule error
+      .on('change', function() {
+        $('[name=pcp_made_through]', $form).val($(this).select2('data').text || '');
       });
 
     $('.crm-soft-credit-block tr span').each(function () {
@@ -101,7 +119,9 @@
     });
 
     $('.soft-credit-delete-link').click(function(){
-      $(this).closest('tr').hide().find('input').val('').change();
+      $(this).closest('tr').find('input').val('');
+      $(this).closest('tr').addClass('hiddenElement').removeAttr('style');
+      $('#addMoreSoftCredit').show();
       return false;
     });
 

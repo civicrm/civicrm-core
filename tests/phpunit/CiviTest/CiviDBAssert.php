@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -119,6 +119,14 @@ class CiviDBAssert {
 
   /**
    * Compare a single column value in a retrieved DB record to an expected value
+   *
+   * @param $testCase
+   * @param $daoName
+   * @param $searchValue
+   * @param $returnColumn
+   * @param $searchColumn
+   * @param $expectedValue
+   * @param string $message
    */
   function assertDBCompareValue(&$testCase, $daoName, $searchValue, $returnColumn, $searchColumn,
     $expectedValue, $message
@@ -140,6 +148,11 @@ class CiviDBAssert {
     self::assertAttributesEquals($testCase, $expectedValues, $dbValues);
   }
 
+  /**
+   * @param $testCase
+   * @param $expectedValues
+   * @param $actualValues
+   */
   function assertAttributesEquals(&$testCase, &$expectedValues, &$actualValues) {
     foreach ($expectedValues as $paramName => $paramValue) {
       if (isset($actualValues[$paramName])) {

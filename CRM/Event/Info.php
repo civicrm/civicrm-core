@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -41,6 +41,9 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   protected $keyword = 'event';
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function getInfo() {
     return array(
       'name' => 'CiviEvent',
@@ -52,6 +55,11 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @param bool $getAllUnconditionally
+   *
+   * @return array
+   */
   public function getPermissions($getAllUnconditionally = FALSE) {
     return array(
       'access CiviEvent',
@@ -64,7 +72,19 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
     );
   }
 
+  /**
+   * @return array
+   */
+  public function getAnonymousPermissionWarnings() {
+    return array(
+      'access CiviEvent',
+    );
+  }
+
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function getUserDashboardElement() {
     return array('name' => ts('Events'),
       'title' => ts('Your Event(s)'),
@@ -74,6 +94,9 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function registerTab() {
     return array('title' => ts('Events'),
       'id' => 'participant',
@@ -83,6 +106,9 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function registerAdvancedSearchPane() {
     return array('title' => ts('Events'),
       'weight' => 40,
@@ -90,6 +116,9 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
+  /**
+   * @return array
+   */
   public function getActivityTypes() {
     $types = array();
     $types['Event'] = array('title' => ts('Event'),
@@ -99,25 +128,30 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   // add shortcut to Create New
+  /**
+   * @param $shortCuts
+   * @param $newCredit
+   */
   public function creatNewShortcut(&$shortCuts, $newCredit) {
     if (CRM_Core_Permission::check('access CiviEvent') &&
       CRM_Core_Permission::check('edit event participants')
     ) {
-      $shortCuts = array_merge($shortCuts, array(
-        array('path' => 'civicrm/participant/add',
-            'query' => "reset=1&action=add&context=standalone",
-            'ref' => 'new-participant',
-            'title' => ts('Event Registration'),
-          )));
+      $shortCut[] = array(
+        'path' => 'civicrm/participant/add',
+        'query' => "reset=1&action=add&context=standalone",
+        'ref' => 'new-participant',
+        'title' => ts('Event Registration'),
+      );
       if ($newCredit) {
         $title = ts('Event Registration') . '<br />&nbsp;&nbsp;(' . ts('credit card') . ')';
-        $shortCuts = array_merge($shortCuts, array(
-          array('path' => 'civicrm/participant/add',
-              'query' => "reset=1&action=add&context=standalone&mode=live",
-              'ref' => 'new-participant-cc',
-              'title' => $title,
-            )));
+        $shortCut[0]['shortCuts'][] = array(
+          'path' => 'civicrm/participant/add',
+          'query' => "reset=1&action=add&context=standalone&mode=live",
+          'ref' => 'new-participant-cc',
+          'title' => $title,
+        );
       }
+      $shortCuts = array_merge($shortCuts, $shortCut);
     }
   }
 }

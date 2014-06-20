@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -71,21 +71,20 @@
 
                 {if $element.data_type eq 'File'}
                     {if $element.element_value.data}
-                      <div id="attachStatusMesg_{$element_name}" class="status hiddenElement"></div>
-                      <div id="attachFile_{$element_name}">
+                      <div class="crm-attachment-wrapper crm-entity" id="file_{$element_name}">
                         <span class="html-adjust"><br />
                             &nbsp;{ts}Attached File{/ts}: &nbsp;
                             {if $element.element_value.displayURL}
-                                <a href="{$element.element_value.displayURL}" class='crm-image-popup'>
+                                <a href="{$element.element_value.displayURL}" class='crm-image-popup crm-attachment'>
                                   <img src="{$element.element_value.displayURL}"
                                        height = "{$element.element_value.imageThumbHeight}"
                                        width="{$element.element_value.imageThumbWidth}">
                                 </a>
                             {else}
-                                <a href="{$element.element_value.fileURL}">{$element.element_value.fileName}</a>
+                                <a class="crm-attachment" href="{$element.element_value.fileURL}">{$element.element_value.fileName}</a>
                             {/if}
                             {if $element.element_value.deleteURL}
-                                   <a href="#" onclick="showDeleteAttachment('{$element.element_value.fileName}', '{$element.element_value.deleteURLArgs}', {$element.element_value.fid}, '#attachStatusMesg_{$element_name}', '#attachFile_{$element_name}'); return false;" title="{ts}Delete this file{/ts}"><span class="icon red-icon delete-icon" style="margin:0px 0px -5px 20px" title="{ts}Delete this file{/ts}"></span></a>
+                                   <a href="#" class="crm-hover-button delete-attachment" data-filename="{$element.element_value.fileName}" data-args="{$element.element_value.deleteURLArgs}" title="{ts}Delete File{/ts}"><span class="icon delete-icon"></span></a>
                             {/if}
                         </span>
                       </div>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,6 +35,11 @@ class WebTest_Utils_RestTest extends CiviSeleniumTestCase {
   protected $session_id;
   protected $nocms_contact_id;
 
+  /**
+   * @param $apiResult
+   * @param $cmpvar
+   * @param string $prefix
+   */
   protected function assertAPIErrorCode($apiResult, $cmpvar, $prefix = '') {
     if (!empty($prefix)) {
       $prefix .= ': ';

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,41 +31,23 @@
   {include file='CRM/Profile/Page/MultipleRecordFieldsListing.tpl' showListing=1 dontShowTitle=1 pageViewType='customDataView'}
   {literal}
   <script type="text/javascript">
-    function showDeleteInDialog(valueID, groupID, contactID, redirectUrl) {
-      var confirmText = '{/literal}{ts escape='js'}Are you sure you want to delete this record?{/ts}{literal}';
-      cj('#browseValues').after("<div id='delete-record'></div>");
-        cj('#delete-record').html(confirmText).dialog({
-          title: "{/literal}{ts escape='js'}Delete Record{/ts}{literal}",
-          modal: true,
-          width: 680,
-          overlay: {
-            opacity: 0.5,
-            background: "black"
-          },
-
-          buttons: {
-          {/literal}"{ts escape='js'}Cancel{/ts}"{literal}: function() {
-            cj(this).dialog("close");
-            cj('#delete-record').html('');
-          },
-          {/literal}"{ts escape='js'}OK{/ts}{literal}": function() {
-            deleteCustomValueRec(valueID, groupID, contactID, redirectUrl);
-          }
-        }
-        });
-    }
-
-    function deleteCustomValueRec(valueID, groupID, contactID, redirectUrl) {
-      var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0 }"{literal};
-      cj.ajax({
-        type: "POST",
-        data: "valueID=" + valueID + "&groupID=" + groupID + "&contactId=" + contactID + "&key={/literal}{crmKey name='civicrm/ajax/customvalue'}{literal}",
-        url: postUrl,
-        success: function (html) {
-          window.location.href = redirectUrl;
-        }
+    CRM.$(function($) {
+      var $table = $("#{/literal}custom-{$customGroupId}-table-wrapper{literal}");
+      $('a.delete-custom-row', $table).on('click', function(e) {
+        var $el = $(this);
+        CRM.confirm({
+          message: '{/literal}{ts escape='js'}Are you sure you want to delete this record?{/ts}{literal}'
+        }).on('crmConfirm:yes', function() {
+          var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0 }"{literal};
+          var request = $.post(postUrl, $el.data('delete_params'));
+          CRM.status({/literal}"{ts escape='js'}Record Deleted{/ts}"{literal}, request);
+          request.done(function() {
+            CRM.refreshParent($el);
+          });
+        })
+        e.preventDefault();
       });
-    }
+    });
   </script>
   {/literal}
 {else}

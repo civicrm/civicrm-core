@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,9 +33,12 @@ class CRM_Upgrade_Headless {
   /**
    * Perform an upgrade without using the web-frontend
    *
+   * @param bool $enablePrint
+   *
+   * @throws
+   * @throws Exception
    * @return array, with keys:
    *   - message: string, HTML-ish blob
-   * @throws Exception
    */
   function run($enablePrint = TRUE) {
     // lets get around the time limit issue if possible for upgrades

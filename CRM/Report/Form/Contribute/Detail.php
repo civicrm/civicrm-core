@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -44,6 +44,12 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
 
   protected $_customGroupExtends = array( 'Contribution');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
     // Check if CiviCampaign is a) enabled and b) has active campaigns
@@ -144,18 +150,6 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'name' => 'id',
             'title' => ts('Contribution ID'),
           ),
-          'contribution_or_soft' =>
-          array('title' => ts('Contribution OR Soft Credit?'),
-            'dbAlias' => "'Contribution'"
-          ),
-          'soft_credits' =>
-          array('title' => ts('Soft Credits'),
-            'dbAlias' => "NULL"
-          ),
-          'soft_credit_for' =>
-          array('title' => ts('Soft Credit For'),
-            'dbAlias' => "NULL"
-          ),
           'financial_type_id' => array('title' => ts('Financial Type'),
             'default' => TRUE,
           ),
@@ -176,12 +170,24 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'trxn_id' => NULL,
           'receive_date' => array('default' => TRUE),
           'receipt_date' => NULL,
-          'fee_amount' => NULL,
-          'net_amount' => NULL,
           'total_amount' => array('title' => ts('Amount'),
             'required' => TRUE,
             'statistics' =>
             array('sum' => ts('Amount')),
+          ),
+          'fee_amount' => NULL,
+          'net_amount' => NULL,
+          'contribution_or_soft' =>
+          array('title' => ts('Contribution OR Soft Credit?'),
+            'dbAlias' => "'Contribution'"
+          ),
+          'soft_credits' =>
+          array('title' => ts('Soft Credits'),
+            'dbAlias' => "NULL"
+          ),
+          'soft_credit_for' =>
+          array('title' => ts('Soft Credit For'),
+            'dbAlias' => "NULL"
           ),
         ),
         'filters' =>
@@ -384,6 +390,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param bool $softcredit
+   */
   function from($softcredit = FALSE) {
     $this->_from = "
         FROM  civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
@@ -457,6 +466,11 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_contribution']}.id ";
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -620,6 +634,9 @@ UNION ALL
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $checkList          = array();

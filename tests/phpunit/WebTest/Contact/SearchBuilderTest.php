@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_SearchBuilderTest
+ */
 class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -68,6 +72,9 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
   }
 
   // function to create contact with details (contact details, address, Constituent information ...)
+  /**
+   * @param null $firstName
+   */
   function createDetailContact($firstName = NULL) {
 
     if (!$firstName) {
@@ -83,7 +90,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->type("first_name", "$firstName");
     $this->type("middle_name", "mid$firstName");
     $this->type("last_name", "adv$firstName");
-    $this->select("contact_sub_type", "label=- $Subtype");
+    $this->select("contact_sub_type", "label=$Subtype");
     $this->type("email_1_email", "$firstName@advsearch.co.in");
     $this->type("phone_1_phone", "123456789");
     $this->type("external_identifier", "extid$firstName");
@@ -159,8 +166,8 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->_searchBuilder('Email', NULL, NULL, 'IS NULL');
-    $this->click("xpath=//div[@class='crm-search-results']/div[4]/a[2]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->type("xpath=//*[@id='Builder-rows-per-page-select']", '100');
+    $this->waitForElementPresent("xpath=//*[@id='Builder-rows-per-page-select']");
     $names = array(
       1 => $firstName1,
       2 => $firstName2,
@@ -176,8 +183,8 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
     //searching contacts whose phone field is not empty
     $this->_searchBuilder('Phone', NULL, $firstName, 'IS NOT EMPTY');
-    $this->click("xpath=//div[@class='crm-search-results']/div[4]/a[2]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->type("xpath=//*[@id='Builder-rows-per-page-select']", '100');
+    $this->waitForElementPresent("xpath=//*[@id='Builder-rows-per-page-select']");
     $this->assertTrue($this->isTextPresent($firstName));
 
     $firstName4 = "AB" . substr(sha1(rand()), 0, 7);
@@ -205,6 +212,13 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
   }
 
+  /**
+   * @param $field
+   * @param null $fieldValue
+   * @param null $name
+   * @param string $op
+   * @param null $count
+   */
   function _searchBuilder($field, $fieldValue = NULL, $name = NULL, $op = '=', $count = NULL) {
     // search builder using contacts(not using contactType)
     $this->openCiviPage("contact/search/builder", "reset=1");
@@ -264,11 +278,18 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param null $fieldValue
+   * @param null $name
+   * @param null $contactType
+   * @param null $count
+   * @param $field
+   */
   function _advancedSearch($fieldValue = NULL, $name = NULL, $contactType = NULL, $count = NULL, $field) {
     //advanced search by selecting the contactType
     $this->openCiviPage("contact/search/advanced", "reset=1");
     if (isset($contactType)) {
-      $this->select("id=crmasmSelect0", "value=$contactType");
+      $this->select("id=contact_type", "value=$contactType");
     }
     if (substr($field, 0, 5) == 'note_') {
       $this->click("notes");
@@ -309,6 +330,13 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $contactType
+   * @param $name
+   * @param $email
+   * @param null $streetName
+   * @param null $postalCode
+   */
   function _createContact($contactType, $name, $email, $streetName = NULL, $postalCode = NULL) {
     $this->openCiviPage('contact/add', array('reset' => 1, 'ct' => $contactType), '_qf_Contact_cancel');
 

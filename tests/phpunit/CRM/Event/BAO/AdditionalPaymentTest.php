@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,14 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Event.php';
 require_once 'CiviTest/Participant.php';
+
+/**
+ * Class CRM_Event_BAO_AdditionalPaymentTest
+ */
 class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Additional Payment BAOs test',
@@ -46,7 +53,31 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->_eventId = Event::create($this->_contactId);
   }
 
+  function tearDown() {
+    $this->eventDelete($this->_eventId);
+    $this->quickCleanup(
+      array(
+        'civicrm_contact',
+        'civicrm_contribution',
+        'civicrm_participant',
+        'civicrm_participant_payment',
+        'civicrm_line_item',
+        'civicrm_financial_item',
+        'civicrm_financial_trxn',
+        'civicrm_entity_financial_trxn',
+      ),
+      TRUE
+    );
+  }
+
   // helper function to record participant with paid contribution
+  /**
+   * @param $feeTotal
+   * @param $actualPaidAmt
+   *
+   * @return array
+   * @throws Exception
+   */
   function _addParticipantWithPayment($feeTotal, $actualPaidAmt) {
     // creating price set, price field
     $paramsSet['title'] = 'Price Set';
@@ -103,8 +134,8 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
       'note' => 'Note added for Event_' . $eventId,
       'fee_level' => 'Price_Field - 55',
     );
-    $participant = CRM_Event_BAO_Participant::add($participantParams);
-
+    $participant = $this->callAPISuccess('participant', 'create', $participantParams);
+    $this->callAPISuccessGetSingle('participant', array('id' => $participant['id']));
     // create participant contribution with partial payment
     $contributionParams = array(
       'total_amount' => $actualPaidAmt,
@@ -121,11 +152,13 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
       'partial_payment_total' => $feeTotal,
       'partial_amount_pay' => $actualPaidAmt
     );
-    $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams, CRM_Core_DAO::$_nullArray);
+
+    $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
     $contributionId = $contribution->id;
+    $participant = $this->callAPISuccessGetSingle('participant', array('id' => $participant['id']));
 
     // add participant payment entry
-    $this->participantPaymentCreate($participant->id, $contributionId);
+    $this->callAPISuccess('participant_payment', 'create', array('participant_id' => $participant['id'], 'contribution_id' => $contributionId));
 
     // -- processing priceSet using the BAO
     $lineItem = array();
@@ -137,7 +170,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
       $params, $lineItem
     );
     $lineItemVal[$priceSetId] = $lineItem;
-    CRM_Price_BAO_LineItem::processPriceSet($participant->id, $lineItemVal, $contribution, 'civicrm_participant');
+    CRM_Price_BAO_LineItem::processPriceSet($participant['id'], $lineItemVal, $contribution, 'civicrm_participant');
     return array($participant, $contribution);
   }
 
@@ -147,7 +180,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $amtPaid = 60;
     $balance = $feeAmt - $amtPaid;
     list($participant, $contribution) = $this->_addParticipantWithPayment($feeAmt, $amtPaid);
-    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($participant->id, 'event');
+    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($participant['id'], 'event');
 
     // amount checking
     $this->assertEquals(round($paymentInfo['total']), $feeAmt, 'Total amount recorded is not proper');
@@ -155,7 +188,8 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->assertEquals(round($paymentInfo['balance']), $balance, 'Balance amount is not proper');
 
     // status checking
-    $this->assertEquals($participant->status_id, 14, 'Status record is not proper for participant');
+    $this->assertEquals($participant['participant_status_id'], 14, 'Status record is not proper for participant');
     $this->assertEquals($contribution->contribution_status_id, 8, 'Status record is not proper for contribution');
   }
 }
+

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_AddEventTest
+ */
 class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -204,6 +208,11 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->_deleteDiscount($id, $eventTitle, $discount);
   }
 
+  /**
+   * @param $id
+   * @param $eventTitle
+   * @param $discount
+   */
   function _deleteDiscount($id, $eventTitle, $discount) {
     $this->openCiviPage("event/manage/fee", "reset=1&action=update&id=$id", "_qf_Fee_upload-bottom");
     $this->type("discount_name_2", "");
@@ -327,6 +336,10 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
   }
 
+  /**
+   * @param $eventTitle
+   * @param $eventDescription
+   */
   function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
@@ -354,6 +367,12 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
+  /**
+   * @param $eventTitle
+   * @param $eventDescription
+   * @param $templateID
+   * @param $eventTypeID
+   */
   function _testAddEventInfoFromTemplate($eventTitle, $eventDescription, $templateID, $eventTypeID) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
@@ -386,6 +405,9 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
   }
 
+  /**
+   * @param $streetAddress
+   */
   function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -406,6 +428,15 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("'Location' information has been saved.");
   }
 
+  /**
+   * @param bool $discount
+   * @param bool $priceSet
+   * @param string $processorName
+   * @param bool $double
+   * @param bool $payLater
+   *
+   * @return array
+   */
   function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName = "PP Pro", $double = FALSE, $payLater = FALSE) {
     $discount1 = "Early-bird" . substr(sha1(rand()), 0, 7);
     $discount2 = "";
@@ -471,6 +502,10 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     return array($discount1, $discount2);
   }
 
+  /**
+   * @param $registerIntro
+   * @param bool $multipleRegistrations
+   */
   function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
     // Go to Online Registration tab
     $this->click("link=Online Registration");
@@ -496,6 +531,13 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("'Registration' information has been saved.");
   }
 
+  /**
+   * @param $eventTitle
+   * @param $eventInfoStrings
+   * @param null $eventFees
+   *
+   * @return null
+   */
   function _testVerifyEventInfo($eventTitle, $eventInfoStrings, $eventFees = NULL) {
     // verify event input on info page
     // start at Manage Events listing
@@ -516,6 +558,11 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     return $this->urlArg('id');
   }
 
+  /**
+   * @param $registerStrings
+   *
+   * @return string
+   */
   function _testVerifyRegisterPage($registerStrings) {
     // Go to Register page and check for intro text and fee levels
     $this->click("link=Register Now");
@@ -524,6 +571,16 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     return $this->getLocation();
   }
 
+  /**
+   * @param $registerUrl
+   * @param int $numberRegistrations
+   * @param bool $anonymous
+   * @param bool $isPayLater
+   * @param array $participantEmailInfo
+   * @param null $paymentProcessor
+   *
+   * @return array
+   */
   function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE, $isPayLater = FALSE, $participantEmailInfo = array(), $paymentProcessor = NULL) {
     $infoPassed = FALSE;
     if (!empty($participantEmailInfo)) {
@@ -615,6 +672,9 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     return $primaryParticipantInfo;
   }
 
+  /**
+   * @param $eventTitle
+   */
   function _testAddReminder($eventTitle) {
     // Go to Schedule Reminders tab
     $this->click('css=li#tab_reminder a');
@@ -786,6 +846,9 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->verifyFinancialRecords($contributionID);
   }
 
+  /**
+   * @param $contributionID
+   */
   function verifyFinancialRecords($contributionID) {
     // check count for civicrm_contribution and civicrm_financial_item in civicrm_entity_financial_trxn
     $query = "SELECT COUNT(DISTINCT(c1.id)) civicrm_contribution, COUNT(c2.id) civicrm_financial_item  FROM civicrm_entity_financial_trxn c1
@@ -898,7 +961,10 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
 
   }
 
- function _testEnableParticipantStatuses($status) {
+  /**
+   * @param $status
+   */
+  function _testEnableParticipantStatuses($status) {
    // enable participant status
    if ($this->isElementPresent("xpath=//td[@class='crm-particpant-label'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']")){
      $this->click("xpath=//td[@class='crm-particpant-label'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']");

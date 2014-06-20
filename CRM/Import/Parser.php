@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -197,17 +197,48 @@ abstract class CRM_Import_Parser {
    * Abstract function definitions
    */
   abstract function init();
+
+  /**
+   * @return mixed
+   */
   abstract function fini();
+
+  /**
+   * @param $values
+   *
+   * @return mixed
+   */
   abstract function mapField(&$values);
+
+  /**
+   * @param $values
+   *
+   * @return mixed
+   */
   abstract function preview(&$values);
+
+  /**
+   * @param $values
+   *
+   * @return mixed
+   */
   abstract function summary(&$values);
+
+  /**
+   * @param $onDuplicate
+   * @param $values
+   *
+   * @return mixed
+   */
   abstract function import($onDuplicate, &$values);
 
   /**
    * Set and validate field values
    *
-   * @param $elements: array
-   * @param $erroneousField: reference
+   * @param $elements : array
+   * @param $erroneousField : reference
+   *
+   * @return int
    */
   function setActiveFieldValues($elements, &$erroneousField) {
     $maxCount = count($elements) < $this->_activeFieldCount ? count($elements) : $this->_activeFieldCount;
@@ -253,6 +284,9 @@ abstract class CRM_Import_Parser {
     return $params;
   }
 
+  /**
+   * @return array
+   */
   function getSelectValues() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
@@ -261,6 +295,9 @@ abstract class CRM_Import_Parser {
     return $values;
   }
 
+  /**
+   * @return array
+   */
   function getSelectTypes() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
@@ -271,6 +308,9 @@ abstract class CRM_Import_Parser {
     return $values;
   }
 
+  /**
+   * @return array
+   */
   function getHeaderPatterns() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
@@ -281,6 +321,9 @@ abstract class CRM_Import_Parser {
     return $values;
   }
 
+  /**
+   * @return array
+   */
   function getDataPatterns() {
     $values = array();
     foreach ($this->_fields as $name => $field) {

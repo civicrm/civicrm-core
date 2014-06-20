@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -44,11 +44,13 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @param array $params (reference), array $ids
    *
+   * @param $ids
+   *
    * @return object CRM_Price_DAO_PriceFieldValue object
    * @access public
    * @static
    */
-  static function &add(&$params, $ids) {
+  static function add(&$params, $ids = array()) {
 
     $fieldValueBAO = new CRM_Price_BAO_PriceFieldValue();
     $fieldValueBAO->copyValues($params);
@@ -71,14 +73,19 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @param array $params (reference), array $ids
    *
+   * @param $ids
+   *
    * @return object CRM_Price_DAO_PriceFieldValue object
    * @access public
    * @static
    */
-  static function create(&$params, $ids) {
+  static function create(&$params, $ids = array()) {
 
     if (!is_array($params) || empty($params)) {
       return;
+    }
+    if(empty($params['id']) && empty($params['name'])) {
+      $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
     }
 
     if ($id = CRM_Utils_Array::value('id', $ids)) {
@@ -126,7 +133,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param int $fieldId price_field_id
    * @param array $values (reference ) to hold the values
    * @param string $orderBy for order by, default weight
-   * @param int $isActive is_active, default false
+   * @param bool|int $isActive is_active, default false
    *
    * @return array $values
    *
@@ -184,14 +191,13 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @param  int    $fieldId    Price field id
    *
-   * @return boolean
    *
    * @access public
    * @static
    */
   static function deleteValues($fieldId) {
     if (!$fieldId) {
-      return FALSE;
+      return;
     }
 
     $fieldValueDAO = new CRM_Price_DAO_PriceFieldValue();
@@ -218,13 +224,13 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     $fieldValueDAO->id = $id;
     return $fieldValueDAO->delete();
   }
-  
+
   /**
-   * Update civicrm_price_field_value.financial_type_id 
+   * Update civicrm_price_field_value.financial_type_id
    * when financial_type_id of contribution_page or event is changed
    *
-   * @param   int   $entityId  Id
-   * @param   String $entityTable  entity table
+   * @param   int $entityId Id
+   * @param   String $entityTable entity table
    * @param   String $financialTypeID financial type id
    *
    * @access public
@@ -232,7 +238,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    */
   static function updateFinancialType($entityId, $entityTable, $financialTypeID) {
     if (!$entityId || !$entityTable || !$financialTypeID) {
-      return FALSE;
+      return;
     }
     $params = array(
       1 => array($entityId, 'Integer'),
@@ -245,8 +251,8 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       $join = " LEFT JOIN civicrm_discount cd ON cd.price_set_id = cps.id AND cd.entity_id = %1  AND cd.entity_table = %2 ";
       $where = ' OR cd.id IS NOT NULL ';
     }
-    $sql = "UPDATE civicrm_price_set cps 
-LEFT JOIN civicrm_price_set_entity cpse ON cpse.price_set_id = cps.id AND cpse.entity_id = %1 AND cpse.entity_table = %2 
+    $sql = "UPDATE civicrm_price_set cps
+LEFT JOIN civicrm_price_set_entity cpse ON cpse.price_set_id = cps.id AND cpse.entity_id = %1 AND cpse.entity_table = %2
 LEFT JOIN civicrm_price_field cpf ON cpf.price_set_id = cps.id
 LEFT JOIN civicrm_price_field_value cpfv ON cpf.id = cpfv.price_field_id
 {$join}
@@ -257,7 +263,7 @@ SET cpfv.financial_type_id = CASE
 END,
 cps.financial_type_id = %3
 WHERE cpse.id IS NOT NULL {$where}";
-    
+
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 }

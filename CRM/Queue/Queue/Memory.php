@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -95,7 +95,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
    * Add a new item to the queue
    *
    * @param $data serializable PHP object or array
-   * @param $options queue-dependent options; for example, if this is a
+   * @param array|\queue $options queue-dependent options; for example, if this is a
    *   priority-queue, then $options might specify the item's priority
    *
    * @return bool, TRUE on success
@@ -118,7 +118,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   /**
    * Get and remove the next item
    *
-   * @param $leaseTime seconds
+   * @param int|\seconds $leaseTime seconds
    *
    * @return object with key 'data' that matches the inputted data
    */
@@ -146,7 +146,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   /**
    * Get the next item
    *
-   * @param $leaseTime seconds
+   * @param int|\seconds $leaseTime seconds
    *
    * @return object with key 'data' that matches the inputted data
    */
@@ -178,7 +178,9 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   /**
    * Return an item that could not be processed
    *
-   * @param $dao object The item returned by claimItem
+   * @param The $item
+   *
+   * @internal param object $dao The item returned by claimItem
    *
    * @return bool
    */

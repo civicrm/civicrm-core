@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -48,6 +48,12 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
     'Contact', 'Individual', 'Household', 'Organization'
   );
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -240,6 +246,9 @@ FROM       civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom
     parent::postProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

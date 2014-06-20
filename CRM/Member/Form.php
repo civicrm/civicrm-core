@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -64,7 +64,7 @@ class CRM_Member_Form extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return array defaults
    */
   function setDefaultValues() {
     $defaults = array();
@@ -170,6 +170,9 @@ class CRM_Member_Form extends CRM_Core_Form {
    * @param $formValues array values from form. The important values we are looking for are
    *  - contact_id
    *  - soft_credit_contact_id
+   */
+  /**
+   * @param $formValues
    */
   function storeContactFields($formValues){
     // in a 'standalone form' (contact id not in the url) the contact will be in the form values

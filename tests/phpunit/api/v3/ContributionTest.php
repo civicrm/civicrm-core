@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -396,6 +396,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $lineItems = $this->callAPISuccess('line_item','get',array(
       'entity_id' => $contribution['id'],
+      'contribution_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
       'sequential' => 1,
     ));
@@ -424,18 +425,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1, 'In line ' . __LINE__);
     $lineItems = $this->callAPISuccess('line_item','get',array(
       'entity_id' => $contribution['id'],
+      'contribution_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
       'sequential' => 1,
       ));
     $this->assertEquals(1, $lineItems['count']);
     $this->assertEquals($contribution['id'], $lineItems['values'][0]['entity_id']);
-    $this->assertEquals($contribution['id'], $lineItems['values'][0]['entity_id']);
-    $lineItems = $this->callAPISuccess('line_item','get',array(
-      'entity_id' => $contribution['id'],
-      'entity_table' => 'civicrm_contribution',
-      'sequential' => 1,
-    ));
-    $this->assertEquals(1, $lineItems['count']);
+    $this->assertEquals($contribution['id'], $lineItems['values'][0]['contribution_id']);
     $this->_checkFinancialRecords($contribution, 'offline');
     $this->contributionGetnCheck($params, $contribution['id']);
   }
@@ -694,10 +690,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ));
     $this->assertEquals(1, $lineItems['count']);
     $this->assertEquals($contribution['id'], $lineItems['values'][0]['entity_id']);
-    $this->assertEquals($contribution['id'], $lineItems['values'][0]['entity_id']);
+    $this->assertEquals($contribution['id'], $lineItems['values'][0]['contribution_id']);
     $lineItems = $this->callAPISuccess('line_item','get',array(
 
         'entity_id' => $contribution['id'],
+        'contribution_id' => $contribution['id'],
         'entity_table' => 'civicrm_contribution',
         'sequential' => 1,
     ));
@@ -1396,7 +1393,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     return $contribution['id'];
   }
 
- function _getFinancialTrxnAmount($contId) {
+  /**
+   * @param $contId
+   *
+   * @return null|string
+   */function _getFinancialTrxnAmount($contId) {
    $query = "SELECT
      SUM( ft.total_amount ) AS total
      FROM civicrm_financial_trxn AS ft
@@ -1408,7 +1409,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    return $result;
  }
 
- function _getFinancialItemAmount($contId) {
+  /**
+   * @param $contId
+   *
+   * @return null|string
+   */function _getFinancialItemAmount($contId) {
    $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
    $query = "SELECT
      SUM(amount)
@@ -1419,7 +1424,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    return $result;
  }
 
- function _checkFinancialItem($contId, $context) {
+  /**
+   * @param $contId
+   * @param $context
+   */
+  function _checkFinancialItem($contId, $context) {
    if ($context != 'paylater') {
      $params = array (
        'entity_id' =>   $contId,
@@ -1483,7 +1492,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    }
  }
 
- function _checkFinancialTrxn($contribution, $context, $instrumentId = NULL) {
+  /**
+   * @param $contribution
+   * @param $context
+   * @param null $instrumentId
+   */
+  function _checkFinancialTrxn($contribution, $context, $instrumentId = NULL) {
    $trxnParams = array(
      'entity_id' =>   $contribution['id'],
      'entity_table' => 'civicrm_contribution',
@@ -1550,7 +1564,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $params, $compareParams);
  }
 
- function _addPaymentInstrument () {
+  /**
+   * @return mixed
+   */
+  function _addPaymentInstrument () {
    $gId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'payment_instrument', 'id', 'name');
    $optionParams = array(
      'option_group_id' => $gId,
@@ -1573,7 +1590,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    return $optionValue['values'][$optionValue['id']]['value'];
  }
 
- function _checkFinancialRecords($params,$context) {
+  /**
+   * @param $params
+   * @param $context
+   */
+  function _checkFinancialRecords($params,$context) {
    $entityParams = array(
      'entity_id' => $params['id'],
      'entity_table' => 'civicrm_contribution',

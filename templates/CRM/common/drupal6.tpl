@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -73,8 +73,10 @@
 </div>
 
 {crmRegion name='page-footer'}
-{if ! $urlIsPublic}
-{include file="CRM/common/footer.tpl"}
+{if $urlIsPublic}
+  {include file="CRM/common/publicFooter.tpl"}
+{else}
+  {include file="CRM/common/footer.tpl"}
 {/if}
 {/crmRegion}
 

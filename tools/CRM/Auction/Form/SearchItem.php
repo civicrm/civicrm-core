@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,27 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
 require_once 'CRM/Core/Form.php';
 require_once 'CRM/Core/OptionGroup.php';
+
+/**
+ * Class CRM_Auction_Form_SearchItem
+ */
 class CRM_Auction_Form_SearchItem extends CRM_Core_Form {
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array reference to the array of default values
+   *
+   */
   function setDefaultValues() {
     $defaults = array();
     $defaults['auctionsByDates'] = 0;

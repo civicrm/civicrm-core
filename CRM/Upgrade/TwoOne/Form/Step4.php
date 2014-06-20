@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Upgrade_TwoOne_Form_Step4 extends CRM_Upgrade_Form {
+  /**
+   * @param $errorMessage
+   *
+   * @return bool
+   */
   function verifyPreDBState(&$errorMessage) {
     $errorMessage = ts('Pre-condition failed for upgrade step %1.', array(1 => '2'));
 
@@ -77,10 +82,16 @@ class CRM_Upgrade_TwoOne_Form_Step4 extends CRM_Upgrade_Form {
 
   function buildQuickForm() {}
 
+  /**
+   * @return string
+   */
   function getTitle() {
     return ts('Database Upgrade to v2.1 Completed');
   }
 
+  /**
+   * @return string
+   */
   function getTemplateMessage() {
     if ($this->_config->userSystem->is_drupal) {
       $upgradeDoc = 'http://wiki.civicrm.org/confluence/x/7IFH';

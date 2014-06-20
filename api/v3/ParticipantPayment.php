@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Participant
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Participant.php 30486 2010-11-02 16:12:09Z shot $
  *
  */
@@ -85,7 +85,9 @@ function _civicrm_api3_participant_payment_create_spec(&$params) {
  *
  * This API is used for deleting a Participant Payment
  *
- * @param  Int  $participantPaymentID   Id of the Participant Payment to be deleted
+ * @param $params
+ *
+ * @internal param Int $participantPaymentID Id of the Participant Payment to be deleted
  *
  * @return array API result
  * @example ParticipantPaymentDelete.php
@@ -99,7 +101,7 @@ function civicrm_api3_participant_payment_delete($params) {
 
 /**
  * Retrieve one / all contribution(s) / participant(s) linked to a
- * contrbution.
+ * contribution.
  *
  * @param  array   $params  input parameters
  *

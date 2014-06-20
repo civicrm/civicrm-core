@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: PaymentProcessorType.php 9702 2007-05-29 23:57:16Z lobo $
  *
  */
@@ -148,6 +148,8 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
+   * @param bool $check
+   *
    * @return void
    * @access public
    */
@@ -176,6 +178,9 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
     $this->add('checkbox', 'is_recur', ts('Does this Payment Processor Type support recurring donations?'));
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array();
 

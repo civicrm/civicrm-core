@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -69,27 +69,19 @@
         </table>
       {/foreach}
       <div>
-        <a href="#" class="button" style="margin-left: 6px;"
-           onclick="updateCaseCustom({$caseID}, {$customGroupId}, {$contactID}, {$caseTypeID}); return false;">
+        <a href="{crmURL p="civicrm/case/cd/edit" q="cgcount=1&action=update&reset=1&type=Case&entityID=$caseID&groupID=$customGroupId&cid=$contactID&subType=$caseTypeID"}" class="button">
           <span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
         </a>
       </div>
       <br/>
+      <div class="clear"></div>
     </div>
-    <div class="clear"></div>
   </div>
 
   {/foreach}
 {/foreach}
 <div id="case_custom_edit"></div>
 
-{literal}
-<script type="text/javascript">
-  cj(function() {
-    cj().crmAccordions();
-  });
-</script>
-{/literal}
 {*currently delete is available only for tab custom data*}
 {if $groupId}
 <script type="text/javascript">
@@ -117,40 +109,6 @@
       }
     });
     CRM.status({success: '{/literal}{ts escape="js"}Record Deleted{/ts}{literal}'}, request);
-  }
-  {/literal}
-</script>
-  {else}
-<script type="text/javascript">
-  {literal}
-  function updateCaseCustom( entityID, groupID, contactID, subType ) {
-    var dataURL = {/literal}"{crmURL p="civicrm/case/cd/edit" q="snippet=5&cgcount=1&action=update&reset=1" h=0}"{literal};
-    dataURL = dataURL + '&type=Case&entityID=' + entityID + '&groupID=' + groupID + '&cid=' + contactID + ( subType ? '&subType=' + subType  : '');
-
-    cj.ajax({
-      url: dataURL,
-      success: function(content) {
-        cj('#case_custom_edit').show( ).html(content).dialog({
-          title: "{/literal}{ts escape='js'}Update Case Information{/ts}{literal}",
-          modal: true,
-          width: 680,
-          overlay: {
-            opacity: 0.5,
-            background: "black"
-          },
-          open: function() {
-            var dialog = this;
-            cj('#_qf_CustomData_cancel').click(function() {
-              cj(dialog).dialog('close');
-              return false;
-            });
-          },
-          close: function(event, ui) {
-            cj(this).dialog('destroy');
-          }
-        });
-      }
-    });
   }
   {/literal}
 </script>

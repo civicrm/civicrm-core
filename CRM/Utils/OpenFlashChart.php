@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -389,6 +389,13 @@ class CRM_Utils_OpenFlashChart {
     return $chart;
   }
 
+  /**
+   * @param $rows
+   * @param $chart
+   * @param $interval
+   *
+   * @return array
+   */
   static function chart($rows, $chart, $interval) {
     $chartData = $dateKeys = array();
 
@@ -464,6 +471,14 @@ class CRM_Utils_OpenFlashChart {
     return self::buildChart($chartData, $chart);
   }
 
+  /**
+   * @param $rows
+   * @param $chart
+   * @param $interval
+   * @param $chartInfo
+   *
+   * @return array
+   */
   static function reportChart($rows, $chart, $interval, &$chartInfo) {
     foreach ($interval as $key => $val) {
       $graph[$val] = $rows['value'][$key];
@@ -493,6 +508,12 @@ class CRM_Utils_OpenFlashChart {
     return self::buildChart($chartData, $chart);
   }
 
+  /**
+   * @param $params
+   * @param $chart
+   *
+   * @return array
+   */
   static function buildChart(&$params, $chart) {
     $openFlashChart = array();
     if ($chart && is_array($params) && !empty($params)) {

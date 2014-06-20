@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,12 +27,19 @@
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Core_BAO_ActionScheduleTest
+ */
 class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * @var object see CiviTest/CiviMailUtils
    */
   var $mut;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Action-Schedule BAO',
@@ -473,7 +480,9 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Run a series of cron jobs and make an assertion about email deliveries
    *
-   * @param $jobSchedule array specifying when to run cron and what messages to expect; each item is an array with keys:
+   * @param $cronRuns
+   *
+   * @internal param array $jobSchedule specifying when to run cron and what messages to expect; each item is an array with keys:
    *  - time: string, e.g. '2012-06-15 21:00:01'
    *  - recipients: array(array(string)), list of email addresses which should receive messages
    */

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -112,6 +112,9 @@ class CRM_Queue_Runner {
     $this->qrid = $this->queue->getName();
   }
 
+  /**
+   * @return array
+   */
   function __sleep() {
     // exclude taskCtx
     return array('title', 'queue', 'errorMode', 'isMinimal', 'onEnd', 'onEndUrl', 'pathPrefix', 'qrid', 'buttons');
@@ -234,6 +237,9 @@ class CRM_Queue_Runner {
     }
   }
 
+  /**
+   * @param $item
+   */
   protected function releaseErrorItem($item) {
     switch ($this->errorMode) {
       case self::ERROR_CONTINUE:
@@ -270,6 +276,9 @@ class CRM_Queue_Runner {
 
   /**
    *
+   * @param $isOK
+   * @param null $exception
+   *
    * @return array(is_error => bool, is_continue => bool, numberOfItems => int)
    */
   function formatTaskResult($isOK, $exception = NULL) {
@@ -300,6 +309,9 @@ class CRM_Queue_Runner {
     return $result;
   }
 
+  /**
+   * @return CRM_Queue_TaskContext
+   */
   protected function getTaskContext() {
     if (!is_object($this->taskCtx)) {
       $this->taskCtx = new CRM_Queue_TaskContext();

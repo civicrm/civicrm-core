@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,12 +28,20 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Utils_PDF_Utils {
 
+  /**
+   * @param $text
+   * @param string $fileName
+   * @param bool $output
+   * @param null $pdfFormat
+   *
+   * @return string|void
+   */
   static function html2pdf(&$text, $fileName = 'civicrm.pdf', $output = FALSE, $pdfFormat = NULL) {
     if (is_array($text)) {
       $pages = &$text;
@@ -105,6 +113,15 @@ class CRM_Utils_PDF_Utils {
     }
   }
 
+  /**
+   * @param $paper_size
+   * @param $orientation
+   * @param $html
+   * @param $output
+   * @param $fileName
+   *
+   * @return string
+   */
   static function _html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName) {
     require_once 'packages/dompdf/dompdf_config.inc.php';
     spl_autoload_register('DOMPDF_autoload');
@@ -121,6 +138,14 @@ class CRM_Utils_PDF_Utils {
     }
   }
 
+  /**
+   * @param $paper_size
+   * @param $orientation
+   * @param $margins
+   * @param $html
+   * @param $output
+   * @param $fileName
+   */
   static function _html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName) {
     require_once 'packages/snappy/src/autoload.php';
     $config = CRM_Core_Config::singleton();
@@ -145,6 +170,14 @@ class CRM_Utils_PDF_Utils {
 
   /*
    * function to convert value from one metric to another
+   */
+  /**
+   * @param $value
+   * @param $from
+   * @param $to
+   * @param null $precision
+   *
+   * @return float|int
    */
   static function convertMetric($value, $from, $to, $precision = NULL) {
     switch ($from . $to) {
@@ -202,6 +235,17 @@ class CRM_Utils_PDF_Utils {
     return $value;
   }
 
+  /**
+   * @param $fileName
+   * @param $searchPath
+   * @param $values
+   * @param int $numPages
+   * @param bool $echo
+   * @param string $output
+   * @param string $creator
+   * @param string $author
+   * @param string $title
+   */
   static function &pdflib($fileName,
     $searchPath,
     &$values,

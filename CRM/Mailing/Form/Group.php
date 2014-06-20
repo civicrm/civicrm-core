@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -143,8 +143,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
         $mailingGroups[$entityTable][$dao->group_type][] = $dao->entity_id;
       }
 
-      $defaults['includeGroups'] = $mailingGroups['civicrm_group']['Include'];
-      $defaults['excludeGroups'] = CRM_Utils_Array::value('Exclude', $mailingGroups['civicrm_group']);
+      $defaults['includeGroups'] = $mailingGroups['civicrm_group']['include'];
+      $defaults['excludeGroups'] = CRM_Utils_Array::value('exclude', $mailingGroups['civicrm_group']);
 
       if (!empty($mailingGroups['civicrm_mailing'])) {
         $defaults['includeMailings'] = CRM_Utils_Array::value('Include', $mailingGroups['civicrm_mailing']);

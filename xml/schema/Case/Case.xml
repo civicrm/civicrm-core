@@ -39,16 +39,11 @@
   </foreignKey>
   <field>
        <name>case_type_id</name>
-       <type>varchar</type>
-       <length>128</length>
-       <required>true</required>
+       <type>int unsigned</type>
        <import>true</import>
        <export>false</export>
        <title>Case Type</title>
-       <comment>Multivalued pseudo-fk to option_value table where option_group_name = case_type.</comment>
-       <pseudoconstant>
-         <optionGroupName>case_type</optionGroupName>
-       </pseudoconstant>
+       <comment>FK to civicrm_case_type.id</comment>
        <html>
          <type>Select</type>
        </html>
@@ -59,6 +54,13 @@
        <fieldName>case_type_id</fieldName>
        <add>2.0</add>
   </index>
+  <foreignKey>
+       <name>case_type_id</name>
+       <table>civicrm_case_type</table>
+       <key>id</key>
+       <add>4.5</add>
+       <onDelete>SET NULL</onDelete>
+  </foreignKey>
   <field>
        <name>casetag1_id</name>
        <type>varchar</type>

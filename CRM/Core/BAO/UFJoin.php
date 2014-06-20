@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -66,6 +66,9 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
     return $dao;
   }
 
+  /**
+   * @param $params
+   */
   public static function deleteAll(&$params) {
     $module      = CRM_Utils_Array::value('module', $params);
     $entityTable = CRM_Utils_Array::value('entity_table', $params);
@@ -145,6 +148,11 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
     return NULL;
   }
 
+  /**
+   * @param $params
+   *
+   * @return array
+   */
   public static function getUFGroupIds(&$params) {
 
     $dao = new CRM_Core_DAO_UFJoin();

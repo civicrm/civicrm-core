@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.5                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -53,9 +53,9 @@ function civicrm_api3_generic_getList($apiRequest) {
   $output = array('page_num' => $request['page_num']);
 
   // Limit is set for searching but not fetching by id
-  if (!empty($request['params']['limit'])) {
+  if (!empty($request['params']['options']['limit'])) {
     // If we have an extra result then this is not the last page
-    $last = $request['params']['limit'] - 1;
+    $last = $request['params']['options']['limit'] - 1;
     $output['more_results'] = isset($values[$last]);
     unset($values[$last]);
   }
@@ -113,11 +113,11 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request) {
   }
   // When looking up a field e.g. displaying existing record
   if (!empty($request['id'])) {
-    if (is_string($request['id']) && strpos(',', $request['id'])) {
-      $request['id'] = explode(',', $request['id']);
+    if (is_string($request['id']) && strpos($request['id'], ',')) {
+      $request['id'] = explode(',', trim($request['id'], ', '));
     }
     // Don't run into search limits when prefilling selection
-    unset($params['limit'], $params['offset'], $request['params']['limit'], $request['params']['offset']);
+    unset($params['options']['limit'], $params['options']['offset'], $request['params']['options']['limit'], $request['params']['options']['offset']);
     $params[$request['id_field']] = is_array($request['id']) ? array('IN' => $request['id']) : $request['id'];
   }
   $request['params'] += $params;

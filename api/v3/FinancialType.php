@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,6 +41,8 @@
  * {@getfields financial_type_create}
  * @example financial_typeCreate.php
  *
+ * @param $params
+ *
  * @return array of newly created financial_type property values.
  * @access public
  */
@@ -55,6 +57,8 @@ function civicrm_api3_financial_type_create($params) {
  * {@getfields financial_type_get}
  * @example financial_typeCreate.php
  *
+ * @param $params
+ *
  * @return array of retrieved financial_type property values.
  * @access public
  */
@@ -68,6 +72,8 @@ function civicrm_api3_financial_type_get($params) {
  * Allowed @params array keys are:
  * {@getfields financial_type_delete}
  * @example financial_typeCreate.php
+ *
+ * @param $params
  *
  * @return array of deleted values.
  * @access public

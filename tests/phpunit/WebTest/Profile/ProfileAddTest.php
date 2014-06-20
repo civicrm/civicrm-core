@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Profile_ProfileAddTest
+ */
 class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -120,6 +124,8 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
   function testProfileAddContactstoGroup() {
     $this->webtestLogin();
 
+    $permissions = array("edit-1-profile-listings-and-forms");
+    $this->changePermissions($permissions);
     // take group name and create group
     $groupName = 'group_' . substr(sha1(rand()), 0, 7);
     $this->WebtestAddGroup($groupName);
@@ -135,6 +141,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $profileTitle = 'profile_' . substr(sha1(rand()), 0, 7);
     $this->type('title', $profileTitle);
 
+    $this->click('uf_group_type_Profile');
     //Profile Advance Settings
     $this->click("//form[@id='Group']/div[2]/div[2]/div[1]");
 
@@ -187,9 +194,8 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $groupName);
     $this->click('_qf_Search_refresh');
-    $this->waitForVisible('crm-group-selector_processing');
-    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(text(), '$groupName')]/following-sibling::td[@class='crm-group-group_links']/span/a");
-    $this->clickLink("xpath=//table[@id='crm-group-selector']/tbody/tr/td[1][text()= '$groupName']/following-sibling::td[@class='crm-group-group_links']/span/a");
+    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td/span[text() = '$groupName']/parent::td/following-sibling::td[@class=' crm-group-group_links']/span/a");
+    $this->clickLink("xpath=//table[@id='crm-group-selector']/tbody/tr/td[1]/span[text() = '$groupName']/parent::td/following-sibling::td[@class=' crm-group-group_links']/span/a");
     $contactEmails = array(
       1 => "$lastName1, $firstName1",
       2 => "$lastName2, $firstName2"
@@ -224,6 +230,9 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->_testdeleteProfile($profileTitle);
   }
 
+  /**
+   * @param $profileTitle
+   */
   function _testdeleteProfile($profileTitle) {
     //$this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
@@ -246,11 +255,11 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
     // open Add Profile page
     $this->openCiviPage("admin/uf/group/add", "action=add&reset=1");
-    
+
     $this->waitForElementPresent('_qf_Group_next-bottom');
     $profileTitle = 'Test Profile' . substr(sha1(rand()), 0, 7);
     $this->type('title', $profileTitle);
-    
+
     // check if description field is present
     $this->waitForElementPresent('description');
 
@@ -263,7 +272,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
     // Wait for "saved" status msg
     $this->waitForText('crm-notification-container', 'Profile Added');
-    
+
     $this->waitForElementPresent('_qf_Field_next-bottom');
 
     // select field(s) to be added in profile
@@ -277,16 +286,14 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     // Wait for "saved" status msg
     $this->waitForText('crm-notification-container', "Profile Field Saved");
 
-    $this->waitForElementPresent("xpath=//div[@id='field_page']/div[4]/a[2]");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']/div[4]/a[4]");
 
-    $this->waitForElementPresent("xpath=//div[@id='field_page']/div[3]/table/tbody/tr[1]/td[9]/span/a[text()='Edit']");
+    $this->waitForElementPresent("xpath=//div[@id='field_page']/div[2]/table/tbody/tr[1]/td[9]/span/a[text()='Edit']");
     // extract profile Id
-    $id = explode("gid=", $this->getAttribute("xpath=//div[@id='field_page']/div[3]/table/tbody/tr/td[9]/span/a[text()='Edit']/@href"));
+    $id = explode("gid=", $this->getAttribute("xpath=//div[@id='field_page']/div[2]/table/tbody/tr/td[9]/span/a[text()='Edit']/@href"));
     $id = $id[1];
 
     // click on Edit Settings
-    $this->clickLink("xpath=//div[@id='field_page']/div[4]/a[2]", '_qf_Group_next-bottom');
+    $this->clickLink("xpath=//div[@id='field_page']/div[3]/a[2]", '_qf_Group_next-bottom', FALSE);
 
     // check for description field
     $this->waitForElementPresent('description');
@@ -294,11 +301,12 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->assertEquals($this->getValue('description'), $profileDescription);
 
     // click on save button
-    $this->clickLink('_qf_Group_next-bottom');
+    $this->clickLink('_qf_Group_next-bottom', "xpath=//div[@id='field_page']/div[3]/a[2]", FALSE);
 
     // Wait for "saved" status msg
     $this->waitForText('crm-notification-container', 'Profile Saved');
-  
+
+    $this->clickLink("xpath=//div[@id='breadcrumb']/div//a[text()='Profiles']");
     $this->waitForElementPresent("xpath=//div[@class='crm-submit-buttons']/a[@id='newCiviCRMProfile-bottom']");
     $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody/tr[@id='UFGroup-$id']/td[2]/a");
     $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody/tr[@id='UFGroup-$id']/td[3]");
@@ -316,7 +324,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
     // Is contact present?
     $this->assertTrue($this->isTextPresent("$createdBy"), "Contact did not find!");
-    
+
     $this->openCiviPage('admin/uf/group', 'reset=1');
     // delete created profile
     $this->_testdeleteProfile($profileTitle);

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -110,7 +110,7 @@
             {if $lineItem}
                 <td class="label">{ts}Selections{/ts}</td>
                 <td>{include file="CRM/Price/Page/LineItem.tpl" context="Event"}
-                {if $hasPayment}
+                {if $hasPayment or $parentHasPayment}
                    <a class="button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}' title="{ts}Change Selections{/ts}"><span><div class="icon edit-icon"></div> {ts}Change Selections{/ts}</span></a>
                 {/if}
                 </td>

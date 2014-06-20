@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -41,6 +41,12 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
   protected $_add2groupSupported = FALSE;
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
     $this->_columns = array(
@@ -67,6 +73,9 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     parent::preProcess();
   }
 
+  /**
+   * @param $eventIDs
+   */
   function buildEventReport($eventIDs) {
 
     $this->assign('events', $eventIDs);
@@ -255,6 +264,11 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     $this->assign('statistics', $this->statistics($eventIDs));
   }
 
+  /**
+   * @param $eventIDs
+   *
+   * @return array
+   */
   function statistics(&$eventIDs) {
     $statistics = array();
     $count = count($eventIDs);
@@ -266,6 +280,9 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     return $statistics;
   }
 
+  /**
+   * @param int $rowCount
+   */
   function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);
 
@@ -280,6 +297,9 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     $this->_limit = ($pageId - 1) * self::ROW_COUNT_LIMIT;
   }
 
+  /**
+   * @param int $rowCount
+   */
   function setPager($rowCount = self::ROW_COUNT_LIMIT) {
     $params = array(
       'total' => $this->_rowsFound,
@@ -304,7 +324,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
       $this->_setVariable = FALSE;
 
       $events = CRM_Event_PseudoConstant::event(NULL, NULL,
-        "is_template IS NULL OR is_template = 0"
+        "is_template = 0"
       );
       if (empty($events)) {
         return FALSE;
@@ -338,7 +358,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
         }
       } elseif ($this->_params['id_op'] == 'notin') {
         $events = CRM_Event_PseudoConstant::event(NULL, NULL,
-          "is_template IS NULL OR is_template = 0"
+          "is_template = 0"
         );
 
         $showEvents = array_diff(array_keys($events), $this->_params['id_value']);

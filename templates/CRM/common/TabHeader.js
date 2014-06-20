@@ -4,15 +4,14 @@
  * Tabs with class 'ajaxForm' will use CRM.loadForm instead, suitable for most forms
  * Tabs with class 'livePage' will get popup action links, suitable for crud tables
  */
-cj(function($) {
+CRM.$(function($) {
   var tabSettings = CRM.tabSettings || {};
   tabSettings.active = tabSettings.active ? $('#tab_' + tabSettings.active).prevAll().length : 0;
   $("#mainTabContainer")
     .on('tabsbeforeactivate', function(e, ui) {
-      // Warn of unsaved changes - requires formNavigate.tpl to be included in each tab
-      if (!global_formNavigate) {
+      // CRM-14353 - Warn of unsaved changes for all forms except those which have opted out
+      if (CRM.utils.initialValueChanged($('form:not([data-warn-changes=false])', ui.oldPanel))) {
         CRM.alert(ts('Your changes in the <em>%1</em> tab have not been saved.', {1: ui.oldTab.text()}), ts('Unsaved Changes'), 'warning');
-        global_formNavigate = true;
       }
     })
     .on('tabsbeforeload', function(e, ui) {
@@ -29,23 +28,11 @@ cj(function($) {
             })
           });
         }
-        if (ui.tab.hasClass('livePage')) {
+        if (ui.tab.hasClass('livePage') && CRM.config.ajaxPopupsEnabled) {
           ui.panel
             .off('click.crmLivePage')
-            .on('click.crmLivePage', 'a.button, a.action-item', function() {
-              var url = $(this).attr('href');
-              // only follow real links not javascript buttons
-              if (url === '#' || $(this).attr('onclick') || $(this).hasClass('no-popup')) {
-                return;
-              }
-              CRM.loadForm(url, {
-                openInline: 'a:not("[href=#], .no-popup")'
-              }).on('crmFormSuccess', function(e, data) {
-                  // Refresh when form completes
-                  ui.panel.crmSnippet('refresh');
-                });
-              return false;
-            });
+            .on('click.crmLivePage', 'a.button, a.action-item', CRM.popup)
+            .on('crmPopupFormSuccess.crmLivePage', 'a.button, a.action-item', CRM.refreshParent);
         }
         ui.panel
           .off('.tabInfo')
@@ -78,12 +65,31 @@ cj(function($) {
   CRM.tabHeader = CRM.tabHeader || {};
 
   /**
+   * Return active tab
+   */
+  CRM.tabHeader.getActiveTab = function() {
+    return $('.ui-tabs-active', '#mainTabContainer');
+  }
+
+  /**
+   * Make a given tab the active one
+   * @param tab jQuery selector
+   */
+  CRM.tabHeader.focus = function(tab) {
+    $('#mainTabContainer').tabs('option', 'active', $(tab).prevAll().length);
+  };
+
+  /**
    * @param tab jQuery selector
    * @returns panel jQuery object
    */
   CRM.tabHeader.getTabPanel = function(tab) {
     return $('#' + $(tab).attr('aria-controls'));
   };
+
+  CRM.tabHeader.getCount = function(tab) {
+    return parseInt($(tab).find('a em').text(), 10);
+  }
 
   /**
    * Update the counter in a tab
@@ -112,4 +118,4 @@ cj(function($) {
       $panel.data("civiCrmSnippet") && $panel.crmSnippet('destroy');
     }
   };
-})(cj);
+})(CRM.$);

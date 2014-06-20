@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_BatchUpdateViaProfileTest
+ */
 class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -97,7 +101,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
     $this->type('sort_name', $lastName);
     $this->click('_qf_Search_refresh');
-    $this->waitForElementPresent('_qf_Search_next_print');
+    $this->waitForElementPresent('Go');
 
     // Batch Update Via Profile
     $this->click("xpath=//div[@id='search-status']/table/tbody/tr[2]/td[2]/input");
@@ -119,7 +123,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->click('_qf_Batch_next-bottom');
     $this->waitForElementPresent('_qf_Result_done');
     $this->click('_qf_Result_done');
-    $this->waitForElementPresent('_qf_Search_next_print');
+    $this->waitForElementPresent('Go');
 
     // View Membership
     $this->click("xpath=//div[@id='memberSearch']/table/tbody//tr/td[3]/a[text()='{$Name1}']/../../td[11]/span/a[text()='View']");
@@ -134,7 +138,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($verifyData);
 
     $this->click('_qf_MembershipView_cancel-bottom');
-    $this->waitForElementPresent('_qf_Search_next_print');
+    $this->waitForElementPresent('Go');
 
     // View Membership
     $this->click("xpath=//div[@id='memberSearch']/table/tbody//tr/td[3]/a[text()='{$Name2}']/../../td[11]/span/a[text()='View']");
@@ -149,6 +153,9 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($verifyData);
   }
 
+  /**
+   * @param $memTypeParams
+   */
   function _addMembership($memTypeParams) {
     // click through to the membership view screen
     $this->click("css=li#tab_member a");
@@ -183,6 +190,10 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
   }
 
+  /**
+   * @param $profileTitle
+   * @param $customDataParams
+   */
   function _addProfile($profileTitle, $customDataParams) {
 
     $this->openCiviPage("admin/uf/group", "reset=1");
@@ -191,6 +202,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     // Add membership custom data field to profile
     $this->waitForElementPresent('_qf_Group_cancel-bottom');
     $this->type('title', $profileTitle);
+    $this->click('uf_group_type_Profile');
     $this->click('_qf_Group_next-bottom');
 
     $this->waitForElementPresent('_qf_Field_cancel-bottom');
@@ -217,6 +229,9 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Membership Status' has been saved to '{$profileTitle}'.");
   }
 
+  /**
+   * @return array
+   */
   function _addCustomData() {
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 4);
 
@@ -257,7 +272,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->waitForText('crm-notification-container', "Your custom field '$textFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$textFieldLabel' has been saved.");
 
     return array($textFieldLabel, $customGroupTitle);
   }

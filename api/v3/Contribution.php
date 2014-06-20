@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Contribute
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Contribution.php 30486 2010-11-02 16:12:09Z shot $
  *
  */
@@ -40,8 +40,9 @@
 /**
  * Add or update a contribution
  *
- * @param  array   $params           (reference ) input parameters
+ * @param  array $params (reference ) input parameters
  *
+ * @throws API_Exception
  * @return array  Api result array
  * @static void
  * @access public
@@ -162,8 +163,9 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
 /**
  * Retrieve a set of contributions, given a set of input params
  *
- * @param  array   $params           (reference ) input parameters
- * @param array    $returnProperties Which properties should be included in the
+ * @param  array $params (reference ) input parameters
+ *
+ * @internal param array $returnProperties Which properties should be included in the
  * returned Contribution object. If NULL, the default
  * set of properties will be included.
  *
@@ -175,30 +177,9 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
  */
 function civicrm_api3_contribution_get($params) {
 
-  $options          = _civicrm_api3_get_options_from_params($params, TRUE,'contribution','get');
-  $sort             = CRM_Utils_Array::value('sort', $options, NULL);
-  $offset           = CRM_Utils_Array::value('offset', $options);
-  $rowCount         = CRM_Utils_Array::value('limit', $options);
-  $smartGroupCache  = CRM_Utils_Array::value('smartGroupCache', $params);
-  $inputParams      = CRM_Utils_Array::value('input_params', $options, array());
-  $returnProperties = CRM_Utils_Array::value('return', $options, NULL);
-  if (empty($returnProperties)) {
-    $returnProperties = CRM_Contribute_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_CONTRIBUTE);
-  }
-
-  $newParams = CRM_Contact_BAO_Query::convertFormValues($inputParams);
-  $query = new CRM_Contact_BAO_Query($newParams, $returnProperties, NULL,
-    FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTRIBUTE
-  );
-  list($select, $from, $where, $having) = $query->query();
-
-  $sql = "$select $from $where $having";
-
-  if (!empty($sort)) {
-    $sql .= " ORDER BY $sort ";
-  }
-  $sql .= " LIMIT $offset, $rowCount ";
-  $dao = CRM_Core_DAO::executeQuery($sql);
+  $mode = CRM_Contact_BAO_Query::MODE_CONTRIBUTE;
+  $entity = 'contribution';
+  list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, $entity);
 
   $contribution = array();
   while ($dao->fetch()) {
@@ -245,10 +226,12 @@ function _civicrm_api3_contribution_get_spec(&$params) {
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params Associative array of property name/value
  * pairs to insert in new contact.
- * @param array  $values       The reformatted properties that we can use internally
+ * @param array $values The reformatted properties that we can use internally
  * '
+ *
+ * @param bool $create
  *
  * @return array|CRM_Error
  * @access public
@@ -319,16 +302,19 @@ function civicrm_api3_contribution_transact($params) {
 
   return civicrm_api('contribution', 'create', $params);
 }
+
 /**
  * Send a contribution confirmation (receipt or invoice)
  * The appropriate online template will be used (the existence of related objects
  * (e.g. memberships ) will affect this selection
+ *
  * @param array $params input parameters
  * {@getfields Contribution_sendconfirmation}
+ *
+ * @throws Exception
  * @return array  Api result array
  * @static void
  * @access public
- *
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
   $contribution = new CRM_Contribute_BAO_Contribution();
@@ -379,10 +365,11 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
  *
  * @param array $params input parameters
  * {@getfields Contribution_completetransaction}
+ *
+ * @throws API_Exception
  * @return array  Api result array
  * @static void
  * @access public
- *
  */
 function civicrm_api3_contribution_completetransaction(&$params) {
 
@@ -401,7 +388,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
     $objects['contribution'] = &$contribution;
     $input['component'] = $contribution->_component;
     $input['is_test'] = $contribution->is_test;
-    $input['trxn_id']= $contribution->trxn_id;
+    $input['trxn_id']= !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
     $input['amount'] = $contribution->total_amount;
     if(isset($params['is_email_receipt'])){
       $input['is_email_receipt'] = $params['is_email_receipt'];
@@ -416,6 +403,21 @@ function civicrm_api3_contribution_completetransaction(&$params) {
   }
 }
 
+/**
+ * @param $params
+ */
 function _civicrm_api3_contribution_completetransaction(&$params) {
-
+  $params['id'] = array(
+    'title' => 'Contribution ID',
+    'type' => CRM_Utils_Type::T_INT,
+    'api.required' => TRUE,
+  );
+  $params['trxn_id'] = array(
+    'title' => 'Transaction ID',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['is_email_receipt'] = array(
+    'title' => 'Send email Receipt?',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
 }

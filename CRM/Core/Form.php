@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,12 +31,16 @@
  * machine. Each form can also operate in various modes
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
 require_once 'HTML/QuickForm/Page.php';
+
+/**
+ * Class CRM_Core_Form
+ */
 class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
@@ -99,6 +103,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   static protected $_template;
 
   /**
+   *  Indicate if this form should warn users of unsaved changes
+   */
+  protected $unsavedChangesWarn;
+
+  /**
    * What to return to the client if in ajax mode (snippet=json)
    *
    * @var array
@@ -111,6 +120,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @var array
    */
   public $urlPath = array();
+
+  /**
+   * @var CRM_Core_Controller
+   */
+  public $controller;
 
   /**
    * constants for attributes for various form elements
@@ -127,7 +141,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * If u have multiple groups of checkboxes, you will need to give them different
    * ids to avoid potential name collision
    *
-   * @var const string / int
+   * @var string|int
    */
   CONST CB_PREFIX = 'mark_x_', CB_PREFIY = 'mark_y_', CB_PREFIZ = 'mark_z_', CB_PREFIX_LEN = 7;
 
@@ -137,12 +151,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * We should not use QuickForm directly. This class provides a lot
    * of default convenient functions, rules and buttons
    *
-   * @param object    $state     State associated with this form
-   * @param enum      $action    The mode the form is operating in (None/Create/View/Update/Delete)
-   * @param string    $method    The type of http method used (GET/POST)
-   * @param string    $name      The name of the form if different from class name
+   * @param object $state State associated with this form
+   * @param \const|\enum|int $action The mode the form is operating in (None/Create/View/Update/Delete)
+   * @param string $method The type of http method used (GET/POST)
+   * @param string $name The name of the form if different from class name
    *
-   * @return object
+   * @return \CRM_Core_Form
    * @access public
    */
   function __construct(
@@ -174,7 +188,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       self::$_template = CRM_Core_Smarty::singleton();
     }
 
-    $this->assign('snippet', (int) CRM_Utils_Array::value('snippet', $_REQUEST));
+    $this->assign('snippet', CRM_Utils_Array::value('snippet', $_GET));
   }
 
   static function generateID() {
@@ -208,16 +222,22 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Simple easy to use wrapper around addElement. Deal with
    * simple validation rules
    *
-   * @param string type of html element to be added
-   * @param string name of the html element
-   * @param string display label for the html element
-   * @param string attributes used for this element.
+   * @param $type
+   * @param $name
+   * @param string $label
+   * @param string $attributes
+   * @param bool $required
+   * @param null $extra
+   *
+   * @internal param \type $string of html element to be added
+   * @internal param \name $string of the html element
+   * @internal param \display $string label for the html element
+   * @internal param \attributes $string used for this element.
    *               These are not default values
-   * @param bool   is this a required field
+   * @internal param \is $bool this a required field
    *
    * @return HTML_QuickForm_Element could be an error object
    * @access public
-   *
    */
   function &add($type, $name, $label = '',
     $attributes = '', $required = FALSE, $extra = NULL
@@ -276,13 +296,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * This function is just a wrapper, so that we can call all the hook functions
+   * @param bool $allowAjax - FIXME: This feels kind of hackish, ideally we would take the json-related code from this function
+   *                          and bury it deeper down in the controller
    */
-  function mainProcess() {
+  function mainProcess($allowAjax = TRUE) {
     $this->postProcess();
     $this->postProcessHook();
 
     // Respond with JSON if in AJAX context (also support legacy value '6')
-    if (!empty($_REQUEST['snippet']) && in_array($_REQUEST['snippet'], array(CRM_Core_Smarty::PRINT_JSON, 6))) {
+    if ($allowAjax && !empty($_REQUEST['snippet']) && in_array($_REQUEST['snippet'], array(CRM_Core_Smarty::PRINT_JSON, 6))) {
       $this->ajaxResponse['buttonName'] = str_replace('_qf_' . $this->getAttribute('id') . '_', '', $this->controller->getButtonName());
       $this->ajaxResponse['action'] = $this->_action;
       if (isset($this->_id) || isset($this->id)) {
@@ -339,6 +361,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   function addRules() {}
 
+  /**
+   * Performs the server side validation
+   * @access    public
+   * @since     1.0
+   * @return    boolean   true if no error found
+   * @throws    HTML_QuickForm_Error
+   */
   function validate() {
     $error = parent::validate();
 
@@ -411,6 +440,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     CRM_Utils_Hook::buildForm(get_class($this), $this);
 
     $this->addRules();
+
+    //Set html data-attribute to enable warning user of unsaved changes
+    if ($this->unsavedChangesWarn === true
+        || (!isset($this->unsavedChangesWarn)
+           && ($this->_action & CRM_Core_Action::ADD || $this->_action & CRM_Core_Action::UPDATE)
+           )
+        ) {
+          $this->setAttribute('data-warn-changes', 'true');
+    }
   }
 
   /**
@@ -732,9 +770,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * assign value to name in template
    *
-   * @param array|string $name  name  of variable
+   * @param $var
    * @param mixed $value value of varaible
    *
+   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */
@@ -745,9 +784,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * assign value to name in template by reference
    *
-   * @param array|string $name  name  of variable
+   * @param $var
    * @param mixed $value value of varaible
    *
+   * @internal param array|string $name name  of variable
    * @return void
    * @access public
    */
@@ -770,13 +810,24 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Returns an array containing template variables
    *
    * @param string $name
-   * @param string $type
+   *
+   * @internal param string $type
    * @return array
    */
   function get_template_vars($name=null) {
     return self::$_template->get_template_vars($name);
   }
 
+  /**
+   * @param $name
+   * @param $title
+   * @param $values
+   * @param array $attributes
+   * @param null $separator
+   * @param bool $required
+   *
+   * @return HTML_QuickForm_group
+   */
   function &addRadio($name, $title, $values, $attributes = array(), $separator = NULL, $required = FALSE) {
     $options = array();
     $attributes = $attributes ? $attributes : array();
@@ -796,6 +847,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return $group;
   }
 
+  /**
+   * @param $id
+   * @param $title
+   * @param bool $allowClear
+   * @param null $required
+   * @param array $attributes
+   */
   function addYesNo($id, $title, $allowClear = FALSE, $required = NULL, $attributes = array()) {
     $attributes += array('id_suffix' => $id);
     $choice   = array();
@@ -811,6 +869,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
+  /**
+   * @param $id
+   * @param $title
+   * @param $values
+   * @param null $other
+   * @param null $attributes
+   * @param null $required
+   * @param null $javascriptMethod
+   * @param string $separator
+   * @param bool $flipValues
+   */
   function addCheckBox($id, $title, $values, $other = NULL,
     $attributes       = NULL, $required = NULL,
     $javascriptMethod = NULL,
@@ -863,9 +932,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * the form with a customized title for the main Submit
    *
    * @param string $title title of the main button
-   * @param string $type  button type for the form after processing
-   * @param string $submitOnce If true, add javascript to next button submit which prevents it from being clicked more than once
+   * @param string $nextType
+   * @param string $backType
+   * @param bool|string $submitOnce If true, add javascript to next button submit which prevents it from being clicked more than once
    *
+   * @internal param string $type button type for the form after processing
    * @return void
    * @access public
    */
@@ -891,6 +962,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->addButtons($buttons);
   }
 
+  /**
+   * @param $name
+   * @param string $from
+   * @param string $to
+   * @param string $label
+   * @param string $dateFormat
+   * @param bool $required
+   * @param bool $displayTime
+   */
   function addDateRange($name, $from = '_from', $to = '_to', $label = 'From:', $dateFormat = 'searchDate', $required = FALSE, $displayTime = FALSE) {
     if ($displayTime) {
       $this->addDateTime($name . $from, $label, $required, array('formatType' => $dateFormat));
@@ -985,6 +1065,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     ));
   }
 
+  /**
+   * @param $name
+   * @param $label
+   * @param $attributes
+   * @param bool $forceTextarea
+   */
   function addWysiwyg($name, $label, $attributes, $forceTextarea = FALSE) {
     // 1. Get configuration option for editor (tinymce, ckeditor, pure textarea)
     // 2. Based on the option, initialise proper editor
@@ -1023,6 +1109,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->assign('includeWysiwygEditor', $includeWysiwygEditor);
   }
 
+  /**
+   * @param $id
+   * @param $title
+   * @param null $required
+   * @param null $extra
+   */
   function addCountry($id, $title, $required = NULL, $extra = NULL) {
     $this->addElement('select', $id, $title,
       array(
@@ -1033,6 +1125,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
+  /**
+   * @param $name
+   * @param $label
+   * @param $options
+   * @param $attributes
+   * @param null $required
+   * @param null $javascriptMethod
+   */
   function addSelectOther($name, $label, $options, $attributes, $required = NULL, $javascriptMethod = NULL) {
 
     $this->addElement('select', $name . '_id', $label, $options, $javascriptMethod);
@@ -1042,18 +1142,30 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
+  /**
+   * @return null
+   */
   public function getRootTitle() {
     return NULL;
   }
 
+  /**
+   * @return string
+   */
   public function getCompleteTitle() {
     return $this->getRootTitle() . $this->getTitle();
   }
 
+  /**
+   * @return CRM_Core_Smarty
+   */
   static function &getTemplate() {
     return self::$_template;
   }
 
+  /**
+   * @param $elementName
+   */
   function addUploadElement($elementName) {
     $uploadNames = $this->get('uploadNames');
     if (!$uploadNames) {
@@ -1079,6 +1191,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
+  /**
+   * @return string
+   */
   function buttonType() {
     $uploadNames = $this->get('uploadNames');
     $buttonType = (is_array($uploadNames) && !empty($uploadNames)) ? 'upload' : 'next';
@@ -1086,10 +1201,19 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return $buttonType;
   }
 
+  /**
+   * @param $name
+   *
+   * @return null
+   */
   function getVar($name) {
     return isset($this->$name) ? $this->$name : NULL;
   }
 
+  /**
+   * @param $name
+   * @param $value
+   */
   function setVar($name, $value) {
     $this->$name = $value;
   }
@@ -1334,6 +1458,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
+  /**
+   * @param $elementName
+   */
   function removeFileRequiredRules($elementName) {
     $this->_required = array_diff($this->_required, array($elementName));
     if (isset($this->_rules[$elementName])) {
@@ -1368,17 +1495,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
-/**
- * Get contact if for a form object. Prioritise
- *  - cid in URL if 0 (on behalf on someoneelse)
- *      (@todo consider setting a variable if onbehalf for clarity of downstream 'if's
- *  - logged in user id if it matches the one in the cid in the URL
- *  - contact id validated from a checksum from a checksum
- *  - cid from the url if the caller has ACL permission to view
- *  - fallback is logged in user (or ? NULL if no logged in user) (@todo wouldn't 0 be more intuitive?)
- *
- * @return Ambigous <mixed, NULL, value, unknown, array, number>|unknown
- */
+  /**
+   * Get contact if for a form object. Prioritise
+   *  - cid in URL if 0 (on behalf on someoneelse)
+   *      (@todo consider setting a variable if onbehalf for clarity of downstream 'if's
+   *  - logged in user id if it matches the one in the cid in the URL
+   *  - contact id validated from a checksum from a checksum
+   *  - cid from the url if the caller has ACL permission to view
+   *  - fallback is logged in user (or ? NULL if no logged in user) (@todo wouldn't 0 be more intuitive?)
+   *
+   * @return mixed NULL|integer
+   */
   function getContactID() {
     $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     if(isset($this->_params) && isset($this->_params['select_contact_id'])) {
@@ -1443,40 +1570,45 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   </div>
    * </div>
    * {/if}
+   *
    * @param array $profiles ids of profiles that are on the form (to be autofilled)
-   * @param array $field metadata of field to use as selector including
+   * @param array $autoCompleteField
+   *
+   * @internal param array $field metadata of field to use as selector including
    *  - name_field
    *  - id_field
    *  - url (for ajax lookup)
    *
-   *  @todo add data attributes so we can deal with multiple instances on a form
+   * @todo add data attributes so we can deal with multiple instances on a form
    */
   function addAutoSelector($profiles = array(), $autoCompleteField = array()) {
     $autoCompleteField = array_merge(array(
-        'name_field' => 'select_contact',
         'id_field' => 'select_contact_id',
-        'field_text' => ts('Select Contact'),
+        'placeholder' => ts('Select someone else ...'),
         'show_hide' => TRUE,
-        'show_text' => ts('to select someone already in our database.'),
-        'hide_text' => ts('to clear this person\'s information, and fill the form in for someone else'),
-        'url' => array('civicrm/ajax/rest', 'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1'),
-        'max' => civicrm_api3('setting', 'getvalue', array(
-        'name' => 'search_autocomplete_count',
-        'group' => 'Search Preferences',
-        ))
+        'api' => array('params' => array('contact_type' => 'Individual'))
       ), $autoCompleteField);
 
-    if(0 < (civicrm_api3('contact', 'getcount', array('check_permissions' => 1)))) {
-      $this->addElement('text', $autoCompleteField['name_field'] , $autoCompleteField['field_text']);
-      $this->addElement('hidden',  $autoCompleteField['id_field'], '', array('id' => $autoCompleteField['id_field']));
+    if($this->canUseAjaxContactLookups()) {
       $this->assign('selectable', $autoCompleteField['id_field']);
+      $this->addEntityRef($autoCompleteField['id_field'], NULL, array('placeholder' => $autoCompleteField['placeholder'], 'api' => $autoCompleteField['api']));
 
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AutoComplete.js')
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AlternateContactSelector.js')
       ->addSetting(array(
       'form' => array('autocompletes' => $autoCompleteField),
       'ids' => array('profile' => $profiles),
       ));
     }
+  }
+
+  /**
+   *
+   */
+  function canUseAjaxContactLookups() {
+    if (0 < (civicrm_api3('contact', 'getcount', array('check_permissions' => 1))) &&
+      CRM_Core_Permission::check(array(array('access AJAX API', 'access CiviCRM')))) {
+        return TRUE;
+      }
   }
 
   /**
@@ -1506,8 +1638,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Set default values on form for given contact (or no contact defaults)
+   *
    * @param mixed $profile_id (can be id, or profile name)
    * @param integer $contactID
+   *
+   * @return array
    */
   function getProfileDefaults($profile_id = 'Billing', $contactID = NULL) {
     try{
@@ -1522,6 +1657,22 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // as silent failures are often worse than noisy ones
       return array();
     }
+  }
+
+  /**
+   * Sets form attribute
+   * @see CRM.loadForm
+   */
+  function preventAjaxSubmit() {
+    $this->setAttribute('data-no-ajax-submit', 'true');
+  }
+
+  /**
+   * Sets form attribute
+   * @see CRM.loadForm
+   */
+  function allowAjaxSubmit() {
+    $this->removeAttribute('data-no-ajax-submit');
   }
 }
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,10 +25,16 @@
  +--------------------------------------------------------------------+
 */
 
+/**
+ * Class CRM_Utils_Api
+ */
 class CRM_Utils_Api {
   /**
-   * Attempt to retrieve the api entity name from any calling class
-   * @param $classNameOrObject
+   * Attempts to retrieve the API entity name from any calling class.
+   *
+   * @param string|object $classNameOrObject
+   *
+   * @return string
    * @throws CRM_Core_Exception
    */
   static function getEntityName($classNameOrObject) {

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -58,6 +58,9 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
     self::$SEPARATOR = chr(9);
   }
 
+  /**
+   * @param $exportParams
+   */
   function export( $exportParams ) {
     parent::export( $exportParams );
 
@@ -72,6 +75,11 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
     $this->output();
   }
 
+  /**
+   * @param $out
+   *
+   * @return string
+   */
   function putFile($out) {
     $config = CRM_Core_Config::singleton();
     $fileName = $config->uploadDir.'Financial_Transactions_'.$this->_batchIds.'_'.date('YmdHis').'.'.$this->getFileExtension();
@@ -82,6 +90,11 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
     return $fileName;
   }
 
+  /**
+   * @param $batchId
+   *
+   * @return Object
+   */
   function generateExportQuery($batchId) {
 
     $sql = "SELECT
@@ -131,6 +144,9 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
     return $dao;
   }
 
+  /**
+   * @param $export
+   */
   function makeIIF($export) {
     // Keep running list of accounts and contacts used in this batch, since we need to
     // include those in the output. Only want to include ones used in the batch, not everything in the db,
@@ -294,14 +310,23 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
     self::assign( 'journalEntries', $this->_exportParams['journalEntries'] );
   }
 
+  /**
+   * @return string
+   */
   function getMimeType() {
     return 'application/octet-stream';
   }
 
+  /**
+   * @return string
+   */
   function getFileExtension() {
     return 'iif';
   }
 
+  /**
+   * @return string
+   */
   function getHookedTemplateFileName() {
     return 'CRM/Financial/ExportFormat/IIF.tpl';
   }
@@ -309,6 +334,12 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
   /*
    * $s the input string
    * $type can be string, date, or notepad
+   */
+  /**
+   * @param $s
+   * @param string $type
+   *
+   * @return bool|mixed|string
    */
   static function format($s, $type = 'string') {
     // If I remember right there's a couple things:

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -275,7 +275,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       //for birthdate format with respect to birth format set
       $this->assign('birthDateViewFormat', CRM_Utils_Array::value('qfMapping', CRM_Utils_Date::checkBirthDateFormat()));
     }
-    
+
     $defaults['external_identifier'] = $contact->external_identifier;
     $this->assign($defaults);
 
@@ -328,8 +328,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
           'title' => $elem['title'],
           'weight' => $elem['weight'],
           'count' => CRM_Contact_BAO_Contact::getCountComponent($u, $this->_contactId),
-          // CiviCase UI not yet compatible with livePage popups
-          'class' => $u == 'case' ? '' : 'livePage',
+          'class' => 'livePage',
         );
         // make sure to get maximum weight, rest of tabs go after
         // FIXME: not very elegant again
@@ -395,6 +394,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'title' => $group['title'],
         'weight' => $weight,
         'count' => CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $group['table_name']),
+        'class' => 'livePage'
       );
       $weight += 10;
     }
@@ -417,9 +417,12 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
   }
 
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     if ($this->_contactId) {
-      $contactSubtypes = $this->get('contactSubtype') ? 
+      $contactSubtypes = $this->get('contactSubtype') ?
         explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->get('contactSubtype')) : array();
 
       // there could be multiple subtypes. We check templates for each of the subtype, and return the first one found.

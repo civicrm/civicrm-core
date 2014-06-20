@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class CRM_Custom_Import_Form_MapField
+ */
 class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
   protected $_parser = 'CRM_Custom_Import_Parser_Api';
   protected $_mappingType = 'Import Multi value custom data';
@@ -47,7 +51,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
    * @return void
    * @access public
    */
-  public function buildQuickForm() { 
+  public function buildQuickForm() {
     parent::buildQuickForm();
     $this->addFormRule(array('CRM_Custom_Import_Form_MapField', 'formRule'));
    }

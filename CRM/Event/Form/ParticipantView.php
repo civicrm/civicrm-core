@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -38,6 +38,8 @@
  *
  */
 class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * Function to set variables up before form is built
@@ -73,6 +75,15 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       $participantID, 'id', 'participant_id'
     );
     $this->assign('hasPayment', $paymentId);
+
+    if ($parentParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
+          $participantID, 'registered_by_id'
+      )) {
+      $parentHasPayment = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+        $parentParticipantId, 'id', 'participant_id'
+      );
+      $this->assign('parentHasPayment', $parentHasPayment);
+    }
 
     $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'status_id', 'id');
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
@@ -208,7 +219,6 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $this->addButtons(array(
         array(
           'type' => 'cancel',

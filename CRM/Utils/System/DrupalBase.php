@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -37,6 +37,9 @@
  * Drupal specific stuff goes here
  */
 abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
+  /**
+   *
+   */
   function __construct() {
     $this->is_drupal = TRUE;
     $this->supports_form_extensions = TRUE;
@@ -233,5 +236,28 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   function permissionDenied() {
     drupal_access_denied();
+  }
+
+  /**
+   * Get Url to view user record
+   * @param integer $contactID Contact ID
+   *
+   * @return string
+   */
+  function getUserRecordUrl($contactID) {
+    $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
+    if (CRM_Core_Session::singleton()->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(array('cms:administer users', 'cms:view user account'))) {
+      return CRM_Utils_System::url('user/' . $uid);
+    };
+  }
+
+  /**
+   * Is the current user permitted to add a user
+   * @return bool
+   */
+  function checkPermissionAddUser() {
+    if (CRM_Core_Permission::check('administer users')) {
+      return TRUE;
+    }
   }
 }

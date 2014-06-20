@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -52,6 +52,8 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * Function to get events Summary
    *
    * @static
+   *
+   * @param bool $admin
    *
    * @return array Array of event summary values
    */
@@ -112,6 +114,8 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * Function to retrieve statistics for grants.
    *
    * @static
+   *
+   * @param bool $admin
    *
    * @return array Array of grant summary statistics
    */
@@ -248,8 +252,9 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * function to create the event
    *
    * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @param array $ids reference array contains the id
    *
+   * @return object
    * @access public
    * @static
    *
@@ -309,11 +314,13 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Function to delete the Contact
    *
-   * @param int $cid  contact id
+   * @param $id
+   *
+   * @return bool
+   * @internal param int $cid contact id
    *
    * @access public
    * @static
-   *
    */
   static function deleteContact($id) {
     $grant = new CRM_Grant_DAO_Grant();
@@ -325,8 +332,9 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Function to delete the grant
    *
-   * @param int $id  grant id
+   * @param int $id grant id
    *
+   * @return bool|mixed
    * @access public
    * @static
    *
@@ -412,7 +420,9 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
   /**
    * Function to get grant record count for a Contact
    *
-   * @param int $contactId Contact ID
+   * @param $contactID
+   *
+   * @internal param int $contactId Contact ID
    *
    * @return int count of grant records
    * @access public

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -335,6 +335,9 @@ FROM   {$this->_componentTable}
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
+   * @param $files
+   * @param $self
+   *
    * @return mixed true or array of errors
    * @access public
    * @static
@@ -488,6 +491,9 @@ FROM   {$this->_componentTable}
     }
   }
 
+  /**
+   * @return array
+   */
   static function getGreetingOptions() {
     $options = array();
     $greetings = array(

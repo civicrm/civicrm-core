@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -36,12 +36,35 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   CONST
     NUM_ROWS_TO_INSERT = 100;
 
+  /**
+   * Provides information about the data source
+   *
+   * @return array collection of info about this data source
+   *
+   * @access public
+   *
+   */
   function getInfo() {
     return array('title' => ts('Comma-Separated Values (CSV)'));
   }
 
+  /**
+   * Function to set variables up before form is built
+   *
+   * @access public
+   */
   function preProcess(&$form) {}
 
+  /**
+   * This is function is called by the form object to get the DataSource's
+   * form snippet. It should add all fields necesarry to get the data
+   * uploaded to the temporary table in the DB.
+   *
+   * @param $form
+   *
+   * @return void (operates directly on form argument)
+   * @access public
+   */
   function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
 
@@ -61,6 +84,11 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     $form->addElement('checkbox', 'skipColumnHeader', ts('First row contains column headers'));
   }
 
+  /**
+   * Function to process the form
+   *
+   * @access public
+   */
   function postProcess(&$params, &$db, &$form) {
     $file = $params['uploadFile']['name'];
 
@@ -219,6 +247,11 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   }
 }
 
+/**
+ * @param $string
+ *
+ * @return string
+ */
 function civicrm_mysql_real_escape_string($string) {
   static $dao = NULL;
   if (!$dao) {

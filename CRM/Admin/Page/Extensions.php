@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * This is a part of CiviCRM extension management functionality.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -259,6 +259,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
   /**
    * Get user context.
    *
+   * @param null $mode
+   *
    * @return string user context.
    */
   function userContext($mode = NULL) {
@@ -282,6 +284,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    * extension's status on the local system.
    *
    * The result format resembles the old CRM_Core_Extensions_Extension.
+   *
+   * @param CRM_Extension_Info $obj
    *
    * @return array
    */

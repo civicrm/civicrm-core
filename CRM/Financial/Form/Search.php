@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -41,6 +41,9 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
     $this->assign('batchStatus', $this->_batchStatus);
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array();
     $status = CRM_Utils_Request::retrieve('status', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, 1);
@@ -57,15 +60,16 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
     $attributes['total']['class'] = $attributes['item_count']['class'] = 'number';
     $this->add('text', 'title', ts('Batch Name'), $attributes['title']);
 
+    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
     $this->add(
       'select',
       'status_id',
       ts('Batch Status'),
       array(
         '' => ts('- any -' ),
-        1 => ts('Open'),
-        2 => ts('Closed'),
-        5 => ts('Exported'),
+        array_search('Open', $batchStatus) => ts('Open'),
+        array_search('Closed', $batchStatus) => ts('Closed'),
+        array_search('Exported', $batchStatus) => ts('Exported'),
       ),
       false
     );

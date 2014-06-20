@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_VerifySSLContributionTest
+ */
 class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase {
 
   protected $initialized = FALSE;
@@ -99,6 +103,9 @@ class WebTest_Contribute_VerifySSLContributionTest extends CiviSeleniumTestCase 
     }
   }
 
+  /**
+   * @param $name
+   */
   function _tryPaymentProcessor($name) {
     // load contribution page
     $this->openCiviPage("contribute/transact", "reset=1&action=preview&id={$this->pageId}", "_qf_Main_upload-bottom");

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -82,6 +82,11 @@
             <td>{$form.versionCheck.html}<br />
                 <p class="description">{ts}When enabled, statistics about your CiviCRM installation are reported anonymously to the CiviCRM team to assist in prioritizing ongoing development efforts. The following information is gathered: CiviCRM version, versions of PHP, MySQL and framework (Drupal/Joomla/standalone), and default language. Counts (but no actual data) of the following record types are reported: contacts, activities, cases, relationships, contributions, contribution pages, contribution products, contribution widgets, discounts, price sets, profiles, events, participants, tell-a-friend pages, grants, mailings, memberships, membership blocks, pledges, pledge blocks and active payment processor types.{/ts}</p></td>
         </tr>
+        <tr class="crm-miscellaneous-form-block-empoweredBy">
+            <td class="label">{$form.empoweredBy.label}</td>
+            <td>{$form.empoweredBy.html}<br />
+                <p class="description">{ts}When enabled, "empowered by CiviCRM" is displayed at the bottom of public forms.{/ts}</p></td>
+        </tr>
         <tr class="crm-miscellaneous-form-block-max_attachments">
             <td class="label">{$form.max_attachments.label}</td>
             <td>{$form.max_attachments.html}<br />
@@ -98,6 +103,7 @@
                 <p class="description">{ts}If enabled, contacts with the permission to edit a related contact will inherit that contact's permission to edit other related contacts.{/ts}</p>
             </td>
         </tr>
+
     </table>
 <h3>{ts}reCAPTCHA Keys{/ts}</h3>
     <div class="description">

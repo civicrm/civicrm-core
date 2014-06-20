@@ -1,9 +1,9 @@
 <?php
 /**
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -48,6 +48,10 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   protected $_params;
 
   protected $_entity;
+
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Relationship Create',
@@ -400,6 +404,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->customGroupDelete($ids['custom_group_id']);
   }
 
+  /**
+   * @return mixed
+   */
   function createCustomGroup() {
     $params = array(
       'title' => 'Custom Group',
@@ -414,6 +421,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     return $customGroup['id'];
   }
 
+  /**
+   * @return array
+   */
   function createCustomField() {
     $ids = array();
     $params = array(
@@ -1088,5 +1098,14 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     foreach ($result['values'] as $key => $value) {
       $this->assertTrue(in_array($value['relationship_type_id'], array($relType1, $relType3)));
     }
+  }
+
+  /**
+   * Check for enotices on enable & disable as reported in CRM-14350
+   */
+  function testSetActive() {
+    $relationship = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $this->callAPISuccess($this->_entity, 'create', array('id' => $relationship['id'], 'is_active' => 0));
+    $this->callAPISuccess($this->_entity, 'create', array('id' => $relationship['id'], 'is_active' => 1));
   }
 }

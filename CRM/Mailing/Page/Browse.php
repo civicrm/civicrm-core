@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -311,6 +311,12 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $form->run();
   }
 
+  /**
+   * @param $params
+   * @param bool $sortBy
+   *
+   * @return string
+   */
   function whereClause(&$params, $sortBy = TRUE) {
     $values = array();
 

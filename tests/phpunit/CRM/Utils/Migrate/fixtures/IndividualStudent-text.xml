@@ -34,6 +34,7 @@
       <is_active>1</is_active>
       <is_view>0</is_view>
       <column_name>name1_1</column_name>
+      <in_selector>0</in_selector>
       <custom_group_name>example</custom_group_name>
     </CustomField>
   </CustomFields>

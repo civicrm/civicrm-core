@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -37,6 +37,8 @@
  * Page for displaying Campaigns
  */
 class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -84,7 +86,6 @@ class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
   }
 
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
 
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaignSummary();
 
@@ -123,6 +124,9 @@ class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
     $this->assign('addCampaignUrl', CRM_Utils_System::url('civicrm/campaign/add', 'reset=1&action=add'));
   }
 
+  /**
+   * @return string
+   */
   function run() {
     if (!CRM_Core_Permission::check('administer CiviCampaign')) {
       CRM_Utils_System::permissionDenied();

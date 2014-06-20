@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -92,12 +92,18 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     return NULL;
   }
 
+  /**
+   * @param $entityId
+   * @param $entityTable
+   *
+   * @return null|string
+   */
   static function getLineTotal($entityId, $entityTable) {
     $sqlLineItemTotal = "SELECT SUM(li.line_total)
 FROM civicrm_line_item li
-INNER JOIN civicrm_participant_payment pp ON ( li.entity_id = pp.participant_id
-AND li.entity_table = '{$entityTable}'
-AND li.entity_id = {$entityId})";
+WHERE li.entity_table = '{$entityTable}'
+AND li.entity_id = {$entityId}
+";
     $lineItemTotal = CRM_Core_DAO::singleValueQuery($sqlLineItemTotal);
     return $lineItemTotal;
   }
@@ -109,6 +115,9 @@ AND li.entity_id = {$entityId})";
    * @param $entityId  int    participant/contribution id
    * @param $entity    string participant/contribution.
    *
+   * @param null $isQuick
+   * @param bool $isQtyZero
+   *
    * @return array of line items
    */
   static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL , $isQtyZero = TRUE) {
@@ -116,6 +125,7 @@ AND li.entity_id = {$entityId})";
     $selectClause = "
       SELECT    li.id,
       li.label,
+      li.contribution_id,
       li.qty,
       li.unit_price,
       li.line_total,
@@ -131,7 +141,9 @@ AND li.entity_id = {$entityId})";
 
     $fromClause = "
       FROM      civicrm_%2 as %2
-      LEFT JOIN civicrm_line_item li ON ( li.entity_id = %2.id AND li.entity_table = 'civicrm_%2')
+      LEFT JOIN civicrm_line_item li ON (( li.entity_id = %2.id AND li.entity_table = 'civicrm_%2')
+        OR (li.contribution_id = %2.id AND li.entity_table = 'civicrm_membership')
+        OR (li.contribution_id = %2.id AND li.entity_table = 'civicrm_participant'))
       LEFT JOIN civicrm_price_field_value pfv ON ( pfv.id = li.price_field_value_id )
       LEFT JOIN civicrm_price_field pf ON (pf.id = li.price_field_id )";
     $whereClause = "
@@ -157,7 +169,7 @@ AND li.entity_id = {$entityId})";
       2 => array($entity, 'Text'),
     );
 
-    $dao = CRM_Core_DAO::executeQuery("$selectClause $fromClause $whereClause", $params);
+    $dao = CRM_Core_DAO::executeQuery("$selectClause $fromClause $whereClause ORDER by li.id", $params);
     while ($dao->fetch()) {
       if (!$dao->id) {
         continue;
@@ -174,6 +186,7 @@ AND li.entity_id = {$entityId})";
         'html_type' => $dao->html_type,
         'description' => $dao->description,
         'entity_id' => $entityId,
+        'contribution_id' => $dao->contribution_id,
         'financial_type_id' => $dao->financial_type_id,
         'membership_type_id' => $dao->membership_type_id,
         'membership_num_terms' => $dao->membership_num_terms,
@@ -245,7 +258,7 @@ AND li.entity_id = {$entityId})";
         'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $options[$oid]),
       );
 
-      if ($values[$oid]['membership_type_id'] && !isset($values[$oid]['auto_renew'])) {
+      if ($values[$oid]['membership_type_id'] && empty($values[$oid]['auto_renew'])) {
         $values[$oid]['auto_renew'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values[$oid]['membership_type_id'], 'auto_renew');
       }
     }
@@ -257,6 +270,7 @@ AND li.entity_id = {$entityId})";
    * @param int $entityId
    * @param int $entityTable
    *
+   * @return bool
    * @access public
    * @static
    */
@@ -276,12 +290,16 @@ AND li.entity_id = {$entityId})";
 
   /**
    * Function to process price set and line items.
-   * @param int $contributionId contribution id
+   *
+   * @param $entityId
    * @param array $lineItem line item array
    * @param object $contributionDetails
-   * @param decimal $initAmount amount
    * @param string $entityTable entity table
    *
+   * @param bool $update
+   *
+   * @internal param int $contributionId contribution id
+   * @internal param \decimal $initAmount amount
    * @access public
    * @return void
    * @static
@@ -301,6 +319,18 @@ AND li.entity_id = {$entityId})";
       foreach ($values as $line) {
         $line['entity_table'] = $entityTable;
         $line['entity_id'] = $entityId;
+        if(!empty($line['membership_type_id'])) {
+          $entityTable == 'civicrm_membership';
+          $line['contribution_id'] = $contributionDetails->id;
+        }
+        if ($entityTable == 'civicrm_contribution') {
+          $line['contribution_id'] = $entityId;
+        }
+        else {
+          if (!empty($contributionDetails->id)) {
+            $line['contribution_id'] = $contributionDetails->id;
+          }
+        }
         // if financial type is not set and if price field value is NOT NULL
         // get financial type id of price field value
         if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
@@ -314,6 +344,12 @@ AND li.entity_id = {$entityId})";
     }
   }
 
+  /**
+   * @param $entityId
+   * @param string $entityTable
+   * @param $amount
+   * @param null $otherParams
+   */
   public static function syncLineItems($entityId, $entityTable = 'civicrm_contribution', $amount, $otherParams = NULL) {
     if (!$entityId || CRM_Utils_System::isNull($amount))
       return;
@@ -364,7 +400,7 @@ AND li.entity_id = {$entityId})";
 
    /**
    * Function to build line items array.
-   * @param int $params form values
+   * @param array $params form values
    *
    * @param string $entityId entity id
    *

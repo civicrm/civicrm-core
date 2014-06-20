@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -89,9 +89,9 @@ campaignTrClass='' campaignTdClass='crm-event-form-block-participant_campaign_id
 
 {literal}
 <script type="text/javascript">
-cj(function($) {
+CRM.$(function($) {
   // FIXME: This could be much simpler as an entityRef field but the priceFieldValue api doesn't currently support the filters we need
-  $('#participant_fee_id').select2({
+  $('#participant_fee_id').crmSelect2({
     placeholder: {/literal}'{ts escape="js"}- any -{/ts}'{literal},
     minimumInputLength: 1,
     allowClear: true,

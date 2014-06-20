@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Redefine the jump action.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,8 +40,8 @@ class CRM_Core_QuickForm_Action_Jump extends CRM_Core_QuickForm_Action {
    *
    * @param object $stateMachine reference to state machine object
    *
-   * @return object
-   * @access public
+   * @return \CRM_Core_QuickForm_Action_Jump
+  @access public
    */
   function __construct(&$stateMachine) {
     parent::__construct($stateMachine);

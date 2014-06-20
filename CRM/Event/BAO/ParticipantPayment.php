@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -44,7 +44,7 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
    * @return object the partcipant payment record
    * @static
    */
-  static function &create(&$params, &$ids) {
+  static function create(&$params, &$ids) {
     if (isset($ids['id'])) {
       CRM_Utils_Hook::pre('edit', 'ParticipantPayment', $ids['id'], $params);
     }
@@ -67,6 +67,16 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
     }
     else {
       CRM_Utils_Hook::post('create', 'ParticipantPayment', NULL, $participantPayment);
+    }
+
+    //generally if people are creating participant_payments via the api they won't be setting the line item correctly - we can't help them if they are doing complex transactions
+    // but if they have a single line item for the contribution we can assume it should refer to the participant line
+    $lineItemCount = CRM_Core_DAO::singleValueQuery("select count(*) FROM civicrm_line_item WHERE contribution_id = %1", array(1 => array($participantPayment->contribution_id, 'Integer')));
+    if($lineItemCount == 1) {
+      $sql = "UPDATE civicrm_line_item li
+      SET entity_table = 'civicrm_participant', entity_id = %1
+      WHERE contribution_id = %2 AND entity_table = 'civicrm_contribution'";
+      CRM_Core_DAO::executeQuery($sql, array(1 => array($participantPayment->participant_id, 'Integer'), 2 => array($participantPayment->contribution_id, 'Integer')));
     }
 
     return $participantPayment;

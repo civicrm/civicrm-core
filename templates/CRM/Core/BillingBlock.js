@@ -79,4 +79,4 @@
   $(function() {
     $('#billing-payment-block').on('crmFormLoad', civicrm_billingblock_creditcard_helper);
   });
-})(cj);
+})(CRM.$);

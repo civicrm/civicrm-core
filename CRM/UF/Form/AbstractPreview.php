@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -124,6 +124,15 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Use the form name to create the tpl file name
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   public function getTemplateFileName() {
     return 'CRM/UF/Form/Preview.tpl';
   }

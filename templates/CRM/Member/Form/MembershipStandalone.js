@@ -1,4 +1,4 @@
-cj(function($) {
+CRM.$(function($) {
   memberResults = new Array;
   $("input[name='contact[1]']").result( function() {
     var contact_id = cj("input[name='contact_select_id[1]']").val();

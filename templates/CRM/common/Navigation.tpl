@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 {capture assign=menuMarkup}{strip}
   <ul id="civicrm-menu">
     {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
-      <li id="crm-qsearch" class="menumain crm-link-home">
+      <li id="crm-qsearch" class="menumain">
         <form action="{crmURL p='civicrm/contact/search/advanced' h=0 }" name="search_block" id="id_search_block" method="post">
           <div id="quickSearch">
             <input type="text" class="form-text" id="sort_name_navigation" placeholder="{ts}Find Contacts{/ts}" name="sort_name" style="width: 12em;" />
@@ -58,7 +58,7 @@
 (function($) {
   var menuMarkup = {/literal}{$menuMarkup|@json_encode};
 {if $config->userFramework neq 'Joomla'}{literal}
-  $('body').prepend(menuMarkup);
+  $('body').append(menuMarkup);
 
   //Track Scrolling
   $(window).scroll(function () {
@@ -89,7 +89,7 @@ $('#civicrm-menu').ready(function() {
   });
 
   $('#sort_name_navigation')
-    .crmAutocomplete({
+    .autocomplete({
       source: function(request, response) {
         var
           option = $('input[name=quickSearchField]:checked'),
@@ -108,13 +108,16 @@ $('#civicrm-menu').ready(function() {
           response(ret);
         })
       },
+      focus: function (event, ui){
+        return false;
+      }, 
       select: function (event, ui) {
         document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: ui.item.value});
         return false;
       },
       create: function() {
         // Place menu in front
-        $(this).crmAutocomplete('widget').css('z-index', $('#civicrm-menu').css('z-index'));
+        $(this).autocomplete('widget').css('z-index', $('#civicrm-menu').css('z-index'));
       }
     })
     .keydown(function() {
@@ -144,7 +147,7 @@ $('#civicrm-menu').ready(function() {
   });
   // redirect to view page if there is only one contact
   $('#id_search_block').on('submit', function() {
-    var $menu = $('#sort_name_navigation').crmAutocomplete('widget');
+    var $menu = $('#sort_name_navigation').autocomplete('widget');
     if ($('li.ui-menu-item', $menu).length === 1) {
       var cid = $('li.ui-menu-item', $menu).data('ui-autocomplete-item').value;
       document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: cid});
@@ -153,4 +156,4 @@ $('#civicrm-menu').ready(function() {
   });
 });
 $('#civicrm-menu').menuBar({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
-})(cj);{/literal}
+})(CRM.$);{/literal}

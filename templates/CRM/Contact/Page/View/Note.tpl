@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -97,8 +97,6 @@
    <div class="clear"></div>
   </div>
     </div>
-    {* include jscript to warn if unsaved form field changes *}
-    {include file="CRM/common/formNavigate.tpl"}
 {/if}
 {if ($action eq 8)}
 <fieldset><legend>{ts}Delete Note{/ts}</legend>
@@ -110,7 +108,7 @@
 
 {if $permission EQ 'edit' AND ($action eq 16)}
    <div class="action-link">
-   <a accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}" class="button"><span><div class="icon add-icon"></div>{ts}Add Note{/ts}</span></a>
+   <a accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}" class="button medium-popup"><span><div class="icon add-icon"></div>{ts}Add Note{/ts}</span></a>
    </div>
    <div class="clear"></div>
 {/if}
@@ -178,7 +176,8 @@
                         + response['values'][i].modified_date
                         + '</td><td>'
                         + '<a href="'+ urlTemplate + response['values'][i].createdById +'">'+ response['values'][i].createdBy +'</a>'
-                        + '</td><td>' // FIXME: attachments
+                        + '</td><td>'
+                        + response['values'][i].attachment
                         + '</td><td>'+ commentAction.replace(/{cid}/g, response['values'][i].createdById).replace(/{id}/g, response['values'][i].id) +'</td></tr>'
 
                     commentRows['cnote_'+ noteId][response['values'][i].id] = str;
@@ -195,11 +194,13 @@
     }
 
     function drawCommentRows(rowId) {
+      if (rowId) {
         row = cj('tr#'+ rowId)
         for (i in commentRows[rowId]) {
             row.after(commentRows[rowId][i]);
             row = cj('tr#cnote_'+ i);
         }
+      }
     }
 
     {/literal}
@@ -284,7 +285,7 @@
 {elseif ($action eq 16)}
    <div class="messages status no-popup">
         <div class="icon inform-icon"></div>
-        {capture assign=link}class="action-item action-item-first" accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}"{/capture}
+        {capture assign=link}class="action-item medium-popup" accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}"{/capture}
         {ts 1=$link}There are no Notes for this contact. You can <a %1>add one</a>.{/ts}
    </div>
 {/if}

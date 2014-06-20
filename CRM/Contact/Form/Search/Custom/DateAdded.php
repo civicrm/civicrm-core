@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -36,6 +36,9 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
 
   protected $_debug = 0;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     parent::__construct($formValues);
 
@@ -50,6 +53,9 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     );
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
     $form->addDate('start_date', ts('Start Date'), FALSE, array('formatType' => 'custom'));
     $form->addDate('end_date', ts('End Date'), FALSE, array('formatType' => 'custom'));
@@ -96,10 +102,26 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     $form->assign('elements', array('start_date', 'end_date', 'includeGroups', 'excludeGroups'));
   }
 
+  /**
+   * @return null
+   */
   function summary() {
     return NULL;
   }
 
+  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+    return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
+  }
+
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return string
+   */
   function all($offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
@@ -122,22 +144,27 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     }
 
     if ($justIDs) {
-      $select = "contact_a.id as contact_id";
+      $selectClause = "contact_a.id as contact_id";
+      $groupBy = " GROUP BY contact_a.id";
+      $sort = "contact_a.id";
     }
     else {
       $selectClause = "contact_a.id  as contact_id,
                        contact_a.contact_type as contact_type,
                        contact_a.sort_name    as sort_name,
                       d.date_added           as date_added";
+      $groupBy = " GROUP BY contact_id ";
     }
 
-    $groupBy = " GROUP BY contact_id ";
     return $this->sql($selectClause,
       $offset, $rowcount, $sort,
       $includeContactIDs, $groupBy
     );
   }
 
+  /**
+   * @return string
+   */
   function from() {
     //define table name
     $randomNum = md5(uniqid());
@@ -354,14 +381,25 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     return $from;
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     return '(1)';
   }
 
+  /**
+   * @return string
+   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
@@ -371,6 +409,9 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     }
   }
 
+  /**
+   * @return mixed
+   */
   function count() {
     $sql = $this->all();
 

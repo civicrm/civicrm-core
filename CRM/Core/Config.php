@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * The default values in general, should reflect production values (minimizes chances of screwing up)
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -41,6 +41,9 @@ require_once 'Mail.php';
 
 require_once 'api/api.php';
 
+/**
+ * Class CRM_Core_Config
+ */
 class CRM_Core_Config extends CRM_Core_Config_Variables {
   ///
   /// BASE SYSTEM PROPERTIES (CIVICRM.SETTINGS.PHP)
@@ -81,6 +84,11 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * @var CRM_Utils_System_Base
    */
   public $userSystem = NULL;
+
+  /**
+   * @var CRM_Core_Permission_Base
+   */
+  public $userPermissionClass;
 
   /**
    * The root directory where Smarty should store compiled files
@@ -188,8 +196,8 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   static function &singleton($loadFromDB = TRUE, $force = FALSE) {
     if (self::$_singleton === NULL || $force) {
       // goto a simple error handler
-      $GLOBALS['_PEAR_default_error_mode'] = PEAR_ERROR_CALLBACK;
-      $GLOBALS['_PEAR_default_error_options'] = array('CRM_Core_Error', 'simpleHandler');
+      $GLOBALS['civicrm_default_error_scope'] = CRM_Core_TemporaryErrorScope::create(array('CRM_Core_Error', 'handle'));
+      $errorScope = CRM_Core_TemporaryErrorScope::create(array('CRM_Core_Error', 'simpleHandler'));
 
       // lets ensure we set E_DEPRECATED to minimize errors
       // CRM-6327
@@ -213,7 +221,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
           self::$_singleton->_initVariables();
 
-          // I dont think we need to do this twice
+          // I don't think we need to do this twice
           // however just keeping this commented for now in 4.4
           // in case we hit any issues - CRM-13064
           // We can safely delete this once we release 4.4.4
@@ -227,7 +235,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
         // CRM-9803, NYSS-4822
         // this causes various settings to be reset and hence we should
-        // only use the config object that we retrived from memcache
+        // only use the config object that we retrieved from memcache
       }
 
       self::$_singleton->initialized = 1;
@@ -241,7 +249,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
       // set the callback at the very very end, to avoid an infinite loop
       // set the error callback
-      CRM_Core_Error::setCallback();
+      unset($errorScope);
 
       // call the hook so other modules can add to the config
       // again doing this at the very very end
@@ -499,7 +507,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
         CRM_Utils_System::mapConfigToSSL();
       }
       $rrb = parse_url($this->userFrameworkResourceURL);
-      // dont use absolute path if resources are stored on a different server
+      // don't use absolute path if resources are stored on a different server
       // CRM-4642
       $this->resourceBase = $this->userFrameworkResourceURL;
       if (isset($_SERVER['HTTP_HOST']) &&
@@ -646,7 +654,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
     // Whether we delete/create or simply preserve directories, we should
     // certainly make sure the restrictions are enforced.
-    foreach (array($this->templateCompileDir, $this->uploadDir, $this->configAndLogDir) as $dir) {
+    foreach (array($this->templateCompileDir, $this->uploadDir, $this->configAndLogDir, $this->customFileUploadDir) as $dir) {
       if ($dir && is_dir($dir)) {
         CRM_Utils_File::restrictAccess($dir);
       }
@@ -850,6 +858,22 @@ AND
   public function setUserFramework($userFramework = NULL) {
     $this->userFramework = $userFramework;
     $this->_setUserFrameworkConfig($userFramework);
+  }
+
+  /**
+   * Is back office credit card processing enabled for this site - ie are there any installed processors that support
+   * on-site processing
+   * @return bool
+   */
+  static function isEnabledBackOfficeCreditCardPayments() {
+    // restrict to type=1 (credit card) payment processor payment_types and only include billing mode types 1 and 3
+    $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE,
+      "billing_mode IN ( 1, 3 ) AND payment_type = 1"
+    );
+    if (count($processors) > 0) {
+      return TRUE;
+    }
+    return FALSE;
   }
 }
 // end CRM_Core_Config

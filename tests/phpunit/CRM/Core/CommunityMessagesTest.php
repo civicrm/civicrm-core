@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,6 +28,10 @@
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Core_CommunityMessagesTest
+ */
 class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
   /**
    * @var CRM_Utils_Cache_Interface
@@ -39,6 +43,9 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    */
   protected static $webResponses = NULL;
 
+  /**
+   * @return array
+   */
   public static function initWebResponses() {
     if (self::$webResponses === NULL) {
       self::$webResponses = array(
@@ -372,6 +379,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
 
   /**
    * Generate a mock HTTP client with the expectation that it is called once.
+   *
+   * @param $response
    *
    * @return CRM_Utils_HttpClient|PHPUnit_Framework_MockObject_MockObject
    */

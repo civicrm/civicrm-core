@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
  *
  */
@@ -134,6 +134,18 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     $this->add('checkbox', 'is_default', ts('Is this a default provider?'));
   }
 
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array reference to the array of default values
+   *
+   */
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array();
 

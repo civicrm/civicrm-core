@@ -89,6 +89,8 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
    * Get a list of Backbone-Form models
    *
    * @param array $entityTypes model names ("IndividualModel")
+   *
+   * @throws CRM_Core_Exception
    * @return array; keys are model names ("IndividualModel") and values describe 'sections' and 'schema'
    * @see js/model/crm.core.js
    * @see js/model/crm.mappedcore.js
@@ -151,6 +153,13 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Participant',
             ts('Participant'),
+            $availableFields
+          );
+          break;
+        case 'CaseModel':
+          $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
+            'Case',
+            ts('Case'),
             $availableFields
           );
           break;

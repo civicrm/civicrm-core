@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_OnlineRecurContributionTest
+ */
 class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -129,8 +133,8 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     $this->click("contribution_test");
     $this->click("_qf_Search_refresh");
 
-    $this->waitForElementPresent('css=#contributionSearch table tbody tr td span a.action-item-first');
-    $this->click('css=#contributionSearch table tbody tr td span a.action-item-first');
+    $this->waitForElementPresent('css=#contributionSearch table tbody tr td span a.action-item:first-child');
+    $this->click('css=#contributionSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
 
     // View Recurring Contribution Record

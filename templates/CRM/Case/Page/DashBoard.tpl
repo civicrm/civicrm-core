@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,7 +36,7 @@
     {if $newClient and $allowToAddNewCase}
       <a href="{$newCaseURL}" class="button"><span><div class="icon add-icon"></div> {ts}Add Case{/ts}</span></a>
     {/if}
-    <a class="button" name="find_my_cases" href="{crmURL p="civicrm/case/search" q="reset=1&case_owner=2&force=1"}"><span>{ts}Find My Cases{/ts}</span></a>
+    <a class="button no-popup" name="find_my_cases" href="{crmURL p="civicrm/case/search" q="reset=1&case_owner=2&force=1"}"><span>{ts}Find My Cases{/ts}</span></a>
 
     <div class="crm-case-dashboard-switch-view-buttons">
         {if $myCases}
@@ -110,3 +110,5 @@
     {/if}
 {/if}
 </div>
+
+{include file="CRM/Case/Form/ActivityChangeStatusJs.tpl"}

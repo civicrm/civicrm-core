@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -121,7 +121,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         'is_enabled'
       )) {
       // clear any descendant groups cache if exists
-      $finalGroups = CRM_Core_BAO_Cache::deleteGroup('descendant groups for an org');
+      CRM_Core_BAO_Cache::deleteGroup('descendant groups for an org');
     }
 
     // delete from group table
@@ -154,8 +154,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Get the count of a members in a group with the specific status
    *
-   * @param int $id      group id
-   * @param enum $status status of members in group
+   * @param int $id group id
+   * @param enum|string $status status of members in group
+   *
+   * @param bool $countChildGroups
    *
    * @return int count of members in the group with above status
    * @access public
@@ -199,7 +201,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Get the list of member for a group id
    *
-   * @param int $lngGroupId this is group id
+   * @param $groupID
+   * @param bool $useCache
+   *
+   * @internal param int $lngGroupId this is group id
    *
    * @return array $aMembers this arrray contains the list of members for this group id
    * @access public
@@ -221,11 +226,16 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * Returns array of group object(s) matching a set of one or Group properties.
    *
-   * @param array       $param             Array of one or more valid property_name=>value pairs.
-   *                                       Limits the set of groups returned.
-   * @param array       $returnProperties  Which properties should be included in the returned group objects.
+   * @param null $params
+   * @param array $returnProperties Which properties should be included in the returned group objects.
    *                                       (member_count should be last element.)
    *
+   * @param null $sort
+   * @param null $offset
+   * @param null $rowCount
+   *
+   * @internal param array $param Array of one or more valid property_name=>value pairs.
+   *                                       Limits the set of groups returned.
    * @return  An array of group objects.
    *
    * @access public
@@ -561,8 +571,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * build the condition to retrieve groups.
    *
-   * @param string  $groupType type of group(Access/Mailing) OR the key of the group
-   * @param boolen  $excludeHidden exclude hidden groups.
+   * @param string $groupType type of group(Access/Mailing) OR the key of the group
+   * @param bool|\boolen $excludeHidden exclude hidden groups.
    *
    * @return string $condition
    * @static
@@ -597,6 +607,39 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     return $condition;
   }
 
+  /**
+   * get permission relevant clauses
+   * CRM-12209
+   *
+   * @internal param $existingClauses
+   *
+   * @internal param $clauses
+   *
+   * @param bool $force
+   *
+   * @return array
+   */
+  public static function getPermissionClause($force = FALSE) {
+    static $clause = 1;
+    static $retrieved = FALSE;
+    if ((!$retrieved || $force ) && !CRM_Core_Permission::check('view all contacts') && !CRM_Core_Permission::check('edit all contacts')) {
+      //get the allowed groups for the current user
+      $groups = CRM_ACL_API::group(CRM_ACL_API::VIEW);
+      if (!empty($groups)) {
+        $groupList = implode(', ', array_values($groups));
+        $clause = "groups.id IN ( $groupList ) ";
+      }
+      else {
+        $clause = '1 = 0';
+      }
+    }
+    $retrieved = TRUE;
+    return $clause;
+  }
+
+  /**
+   * @return string
+   */
   public function __toString() {
     return $this->title;
   }
@@ -742,7 +785,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * This function to get list of groups
    *
-   * @param  array   $params associated array for params
+   * @param  array $params associated array for params
+   *
+   * @return array
    * @access public
    */
   static function getGroupList(&$params) {
@@ -925,117 +970,143 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   /**
    * This function to get hierarchical list of groups (parent followed by children)
    *
-   * @param  array   $groupIDs array of group ids
+   * @param  array $groupIDs array of group ids
    *
+   * @param null $parents
+   * @param string $spacer
+   * @param bool $titleOnly
+   *
+   * @return array
    * @access public
    */
-  static function getGroupsHierarchy (
+  static function getGroupsHierarchy(
     $groupIDs,
-    $parents  = NULL,
+    $parents = NULL,
     $spacer = '<span class="child-indent"></span>',
     $titleOnly = FALSE
-   ) {
+  ) {
     if (empty($groupIDs)) {
       return array();
     }
 
     $groupIdString = '(' . implode(',', array_keys($groupIDs)) . ')';
-     // <span class="child-icon"></span>
-     // need to return id, title (w/ spacer), description, visibility
+    // <span class="child-icon"></span>
+    // need to return id, title (w/ spacer), description, visibility
 
-     // We need to build a list of tags ordered by hierarchy and sorted by
-     // name. The heirarchy will be communicated by an accumulation of
-     // separators in front of the name to give it a visual offset.
-     // Instead of recursively making mysql queries, we'll make one big
-     // query and build the heirarchy with the algorithm below.
-     $groups = array();
-     $args = array(1 => array($groupIdString, 'String'));
-     $query = "
+    // We need to build a list of tags ordered by hierarchy and sorted by
+    // name. The heirarchy will be communicated by an accumulation of
+    // separators in front of the name to give it a visual offset.
+    // Instead of recursively making mysql queries, we'll make one big
+    // query and build the heirarchy with the algorithm below.
+    $groups = array();
+    $args = array(1 => array($groupIdString, 'String'));
+    $query = "
 SELECT id, title, description, visibility, parents
 FROM   civicrm_group
 WHERE  id IN $groupIdString
 ";
-     if ($parents) {
-       // group can have > 1 parent so parents may be comma separated list (eg. '1,2,5'). We just grab and match on 1st parent.
-       $parentArray = explode(',', $parents);
-       $parent = $parentArray[0];
-       $args[2] = array($parent, 'Integer');
-       $query .= " AND SUBSTRING_INDEX(parents, ',', 1) = %2";
-     }
-     $query .= " ORDER BY title";
-     $dao = CRM_Core_DAO::executeQuery($query, $args);
+    if ($parents) {
+      // group can have > 1 parent so parents may be comma separated list (eg. '1,2,5'). We just grab and match on 1st parent.
+      $parentArray = explode(',', $parents);
+      $parent = $parentArray[0];
+      $args[2] = array($parent, 'Integer');
+      $query .= " AND SUBSTRING_INDEX(parents, ',', 1) = %2";
+    }
+    $query .= " ORDER BY title";
+    $dao = CRM_Core_DAO::executeQuery($query, $args);
 
-     // Sort the groups into the correct storage by the parent
-     // $roots represent the current leaf nodes that need to be checked for
-     // children. $rows represent the unplaced nodes
-     $roots = $rows = $allGroups = array();
-     while ($dao->fetch()) {
-       $allGroups[$dao->id] = array('title' => $dao->title,
-                                    'visibility' => $dao->visibility,
-                                    'description' => $dao->description);
+    // Sort the groups into the correct storage by the parent
+    // $roots represent the current leaf nodes that need to be checked for
+    // children. $rows represent the unplaced nodes
+    $roots = $rows = $allGroups = array();
+    while ($dao->fetch()) {
+      $allGroups[$dao->id] = array(
+        'title' => $dao->title,
+        'visibility' => $dao->visibility,
+        'description' => $dao->description
+      );
 
-       if ($dao->parents == $parents) {
-         $roots[] = array('id' => $dao->id,
-                          'prefix' => '',
-                          'title' => $dao->title);
-       }
-       else {
-         // group can have > 1 parent so $dao->parents may be comma separated list (eg. '1,2,5'). Grab and match on 1st parent.
-         $parentArray = explode(',', $dao->parents);
-         $parent = $parentArray[0];
-         $rows[] = array('id' => $dao->id,
-                          'prefix' => '',
-                          'title' => $dao->title,
-                          'parents' => $parent);
-       }
-     }
-     $dao->free();
-     // While we have nodes left to build, shift the first (alphabetically)
-     // node of the list, place it in our groups list and loop through the
-     // list of unplaced nodes to find its children. We make a copy to
-     // iterate through because we must modify the unplaced nodes list
-     // during the loop.
-     while (count($roots)) {
-       $new_roots         = array();
-       $current_rows      = $rows;
-       $root              = array_shift($roots);
-       $groups[$root['id']] = array($root['prefix'], $root['title']);
+      if ($dao->parents == $parents) {
+        $roots[] = array(
+          'id' => $dao->id,
+          'prefix' => '',
+          'title' => $dao->title
+        );
+      }
+      else {
+        // group can have > 1 parent so $dao->parents may be comma separated list (eg. '1,2,5'). Grab and match on 1st parent.
+        $parentArray = explode(',', $dao->parents);
+        $parent = $parentArray[0];
+        $rows[] = array(
+          'id' => $dao->id,
+          'prefix' => '',
+          'title' => $dao->title,
+          'parents' => $parent
+        );
+      }
+    }
+    $dao->free();
+    // While we have nodes left to build, shift the first (alphabetically)
+    // node of the list, place it in our groups list and loop through the
+    // list of unplaced nodes to find its children. We make a copy to
+    // iterate through because we must modify the unplaced nodes list
+    // during the loop.
+    while (count($roots)) {
+      $new_roots = array();
+      $current_rows = $rows;
+      $root = array_shift($roots);
+      $groups[$root['id']] = array($root['prefix'], $root['title']);
 
-       // As you find the children, append them to the end of the new set
-       // of roots (maintain alphabetical ordering). Also remove the node
-       // from the set of unplaced nodes.
-       if (is_array($current_rows)) {
-         foreach ($current_rows as $key => $row) {
-           if ($row['parents'] == $root['id']) {
-             $new_roots[] = array('id' => $row['id'], 'prefix' => $groups[$root['id']][0] . $spacer, 'title' => $row['title']);
-             unset($rows[$key]);
-           }
-         }
-       }
+      // As you find the children, append them to the end of the new set
+      // of roots (maintain alphabetical ordering). Also remove the node
+      // from the set of unplaced nodes.
+      if (is_array($current_rows)) {
+        foreach ($current_rows as $key => $row) {
+          if ($row['parents'] == $root['id']) {
+            $new_roots[] = array(
+              'id' => $row['id'],
+              'prefix' => $groups[$root['id']][0] . $spacer,
+              'title' => $row['title']
+            );
+            unset($rows[$key]);
+          }
+        }
+      }
 
-       //As a group, insert the new roots into the beginning of the roots
-       //list. This maintains the hierarchical ordering of the tags.
-       $roots = array_merge($new_roots, $roots);
-     }
+      //As a group, insert the new roots into the beginning of the roots
+      //list. This maintains the hierarchical ordering of the tags.
+      $roots = array_merge($new_roots, $roots);
+    }
 
-     // Prefix titles with the calcuated spacing to give the visual
-     // appearance of ordering when transformed into HTML in the form layer. Add description and visibility.
-     $groupsReturn = array();
-     foreach ($groups as $key=>$value) {
-       if ($titleOnly) {
-         $groupsReturn[$key] = $value[0] . $value[1];
-       } else {
-         $groupsReturn[$key] = array(
-           'title' => $value[0] . $value[1],
-           'description' => $allGroups[$key]['description'],
-           'visibility' => $allGroups[$key]['visibility'],
-         );
-       }
-     }
+    // below is the redundant looping to ensure child groups are populated in the case where user does not have
+    // access to parent groups ( esp. using ACL permissions and logged in user can assess only child groups )
+    foreach ($rows as $value) {
+      $groups[$value['id']] = array($value['prefix'], $value['title']);
+    }
+    // Prefix titles with the calcuated spacing to give the visual
+    // appearance of ordering when transformed into HTML in the form layer. Add description and visibility.
+    $groupsReturn = array();
+    foreach ($groups as $key => $value) {
+      if ($titleOnly) {
+        $groupsReturn[$key] = $value[0] . $value[1];
+      }
+      else {
+        $groupsReturn[$key] = array(
+          'title' => $value[0] . $value[1],
+          'description' => $allGroups[$key]['description'],
+          'visibility' => $allGroups[$key]['visibility'],
+        );
+      }
+    }
 
-     return $groupsReturn;
+    return $groupsReturn;
   }
 
+  /**
+   * @param $params
+   *
+   * @return null|string
+   */
   static function getGroupCount(&$params) {
     $whereClause = self::whereClause($params, FALSE);
     $query = "SELECT COUNT(*) FROM civicrm_group groups";
@@ -1050,10 +1121,16 @@ WHERE {$whereClause}";
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
+  /**
+   * Generate permissioned where clause for group search
+   * @param $params
+   * @param bool $sortBy
+   * @param bool $excludeHidden
+   *
+   * @return string
+   */
   static function whereClause(&$params, $sortBy = TRUE, $excludeHidden = TRUE) {
     $values = array();
-    $clauses = array();
-
     $title = CRM_Utils_Array::value('title', $params);
     if ($title) {
       $clauses[] = "groups.title LIKE %1";
@@ -1122,27 +1199,6 @@ WHERE {$whereClause}";
       }
     }
 
-    /*
-      if ( $sortBy &&
-      $this->_sortByCharacter !== null ) {
-      $clauses[] =
-      "groups.title LIKE '" .
-      strtolower(CRM_Core_DAO::escapeWildCardString($this->_sortByCharacter)) .
-      "%'";
-      }
-
-      // dont do a the below assignement when doing a
-      // AtoZ pager clause
-      if ( $sortBy ) {
-      if ( count( $clauses ) > 1 ) {
-      $this->assign( 'isSearch', 1 );
-      } else {
-      $this->assign( 'isSearch', 0 );
-      }
-      }
-    */
-
-
     if (empty($clauses)) {
       $clauses[] = 'groups.is_active = 1';
     }
@@ -1150,15 +1206,9 @@ WHERE {$whereClause}";
     if ($excludeHidden) {
       $clauses[] = 'groups.is_hidden = 0';
     }
-    //CRM-12209
-    if (!CRM_Core_Permission::check('view all contacts')) {
-      //get the allowed groups for the current user
-      $groups = CRM_ACL_API::group(CRM_ACL_API::VIEW);
-      if (!empty( $groups)) {
-        $groupList = implode( ', ', array_values( $groups ) );
-        $clauses[] = "groups.id IN ( $groupList ) ";
-      }
-    }
+    ;
+    $clauses[] = self::getPermissionClause();
+
 
     return implode(' AND ', $clauses);
   }
@@ -1204,6 +1254,12 @@ WHERE {$whereClause}";
     return $links;
   }
 
+  /**
+   * @param $whereClause
+   * @param $whereParams
+   *
+   * @return string
+   */
   function pagerAtoZ($whereClause, $whereParams) {
     $query = "
         SELECT DISTINCT UPPER(LEFT(groups.title, 1)) as sort_name

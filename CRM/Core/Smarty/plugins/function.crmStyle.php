@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,6 +42,9 @@
  *  - url: string. see CRM_Core_Resources::addStyleURL
  *  - weight: int; default: CRM_Core_Resources::DEFAULT_WEIGHT (0)
  *  - region: string; default: CRM_Core_Resources::DEFAULT_REGION ('html-header')
+ * @param $smarty
+ *
+ * @throws Exception
  */
 function smarty_function_crmStyle($params, &$smarty) {
   $res = CRM_Core_Resources::singleton();

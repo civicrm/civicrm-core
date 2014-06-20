@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -42,7 +42,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   /**
    * class constructor
    *
-   * @return object CRM_Contact_BAO_SavedSearch
+   * @return \CRM_Contact_BAO_SavedSearch CRM_Contact_BAO_SavedSearch
    */
   function __construct() {
     parent::__construct();
@@ -130,6 +130,11 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
     return $result;
   }
 
+  /**
+   * @param $id
+   *
+   * @return array
+   */
   static function getSearchParams($id) {
     $fv = self::getFormValues($id);
     //check if the saved seach has mapping id
@@ -167,6 +172,11 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
     return NULL;
   }
 
+  /**
+   * @param $id
+   *
+   * @return string
+   */
   static function contactIDsSQL($id) {
     $params = self::getSearchParams($id);
     if ($params && !empty($params['customSearchID'])) {
@@ -186,6 +196,11 @@ WHERE  $where";
     }
   }
 
+  /**
+   * @param $id
+   *
+   * @return array
+   */
   static function fromWhereEmail($id) {
     $params = self::getSearchParams($id);
 
@@ -252,6 +267,8 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
    * given an id, get the name of the saved search
    *
    * @param int $id the id of the saved search
+   *
+   * @param string $value
    *
    * @return string the name of the saved search
    * @access public

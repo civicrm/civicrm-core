@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -127,7 +127,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
     // add select for groups
     $group = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::group();
 
-    $groupElement = $this->add('select', 'group_id', ts('Select Group'), $group);
+    $groupElement = $this->add('select', 'group_id', ts('Select Group'), $group, FALSE, array('class' => 'crm-select2 huge'));
 
     $this->_title = $group[$this->_id];
 
@@ -182,7 +182,9 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
   /**
    * global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param $params
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static

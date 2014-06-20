@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,11 +38,13 @@ class CRM_Utils_Address {
    * Format an address basing on the address fields provided.
    * Use Setting's address_format if there's no format specified.
    *
-   * @param array   $fields            the address fields
-   * @param string  $format            the desired address format
-   * @param boolean $microformat       if true indicates, the address to be built in hcard-microformat standard.
-   * @param boolean $mailing           if true indicates, the call has been made from mailing label
-   * @param boolean $individualFormat  if true indicates, the call has been made for the contact of type 'individual'
+   * @param array $fields the address fields
+   * @param string $format the desired address format
+   * @param boolean $microformat if true indicates, the address to be built in hcard-microformat standard.
+   * @param boolean $mailing if true indicates, the call has been made from mailing label
+   * @param boolean $individualFormat if true indicates, the call has been made for the contact of type 'individual'
+   *
+   * @param null $tokenFields
    *
    * @return string  formatted address string
    *
@@ -267,6 +269,11 @@ class CRM_Utils_Address {
     return $finalFormatted;
   }
 
+  /**
+   * @param $format
+   *
+   * @return array
+   */
   static function sequence($format) {
     // also compute and store the address sequence
     $addressSequence = array(

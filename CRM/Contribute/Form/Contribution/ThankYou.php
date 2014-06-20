@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -63,7 +63,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('max_reminders', CRM_Utils_Array::value('max_reminders', $this->_values));
     $this->assign('initial_reminder_day', CRM_Utils_Array::value('initial_reminder_day', $this->_values));
     CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $this->_values));
-    // Make the contributionPageID avilable to the template
+    // Make the contributionPageID available to the template
     $this->assign('contributionPageID', $this->_id);
     $this->assign('isShare', $this->_values['is_share']);
 

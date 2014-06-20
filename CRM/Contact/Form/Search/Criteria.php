@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -41,7 +41,10 @@ class CRM_Contact_Form_Search_Criteria {
 
     if ($form->_searchOptions['contactType']) {
       // add checkboxes for contact type
-      $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements();
+      //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
+      // this is loaded onto then replace with something like '__' & test
+      $separator = CRM_Core_DAO::VALUE_SEPARATOR;
+      $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, $separator);
 
       if ($contactTypes) {
         $form->add('select', 'contact_type', ts('Contact Type(s)'), $contactTypes, FALSE,
@@ -78,7 +81,7 @@ class CRM_Contact_Form_Search_Criteria {
       }
 
       $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
-      CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', NULL, TRUE, FALSE, TRUE);
+      CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', NULL, TRUE, FALSE);
 
       $used_for = CRM_Core_OptionGroup::values('tag_used_for');
       $tagsTypes = array();
@@ -267,6 +270,9 @@ class CRM_Contact_Form_Search_Criteria {
   }
 
 
+  /**
+   * @param $form
+   */
   static function location(&$form) {
     // Build location criteria based on _submitValues if
     // available; otherwise, use $form->_formValues.
@@ -406,11 +412,17 @@ class CRM_Contact_Form_Search_Criteria {
     }
   }
 
+  /**
+   * @param $form
+   */
   static function activity(&$form) {
     $form->add('hidden', 'hidden_activity', 1);
     CRM_Activity_BAO_Query::buildSearchForm($form);
   }
 
+  /**
+   * @param $form
+   */
   static function changeLog(&$form) {
     $form->add('hidden', 'hidden_changeLog', 1);
 
@@ -423,10 +435,16 @@ class CRM_Contact_Form_Search_Criteria {
     CRM_Core_Form_Date::buildDateRange($form, 'log_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
   }
 
+  /**
+   * @param $form
+   */
   static function task(&$form) {
     $form->add('hidden', 'hidden_task', 1);
   }
 
+  /**
+   * @param $form
+   */
   static function relationship(&$form) {
     $form->add('hidden', 'hidden_relationship', 1);
 
@@ -474,6 +492,9 @@ class CRM_Contact_Form_Search_Criteria {
     }
   }
 
+  /**
+   * @param $form
+   */
   static function demographics(&$form) {
     $form->add('hidden', 'hidden_demographics', 1);
     // radio button for gender
@@ -496,6 +517,9 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addYesNo( 'is_deceased', ts('Deceased'), TRUE);
   }
 
+  /**
+   * @param $form
+   */
   static function notes(&$form) {
     $form->add('hidden', 'hidden_notes', 1);
 
@@ -516,6 +540,8 @@ class CRM_Contact_Form_Search_Criteria {
    * on the is_searchable
    *
    * @access private
+   *
+   * @param $form
    *
    * @return void
    */
@@ -550,6 +576,9 @@ class CRM_Contact_Form_Search_Criteria {
     //TODO: validate for only one state if prox_distance isset
   }
 
+  /**
+   * @param $form
+   */
   static function CiviCase(&$form) {
     //Looks like obsolete code, since CiviCase is a component, but might be used by HRD
     $form->add('hidden', 'hidden_CiviCase', 1);

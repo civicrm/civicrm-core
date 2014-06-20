@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,12 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
 require_once 'api/api.php';
+
+/**
+ * Class CRM_Contact_Form_Merge
+ */
 class CRM_Contact_Form_Merge extends CRM_Core_Form {
   // the id of the contact that tere's a duplicate for; this one will
   // possibly inherit some of $_oid's properties and remain in the system
@@ -244,6 +248,18 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->assign('userContextURL', $session->readUserContext());
   }
 
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array reference to the array of default values
+   *
+   */
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     return array('deleteOther' => 1);
   }
@@ -296,6 +312,13 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->addFormRule(array('CRM_Contact_Form_Merge', 'formRule'), $this);
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = array();
     $link = CRM_Utils_System::href(ts('Flip between the original and duplicate contacts.'),

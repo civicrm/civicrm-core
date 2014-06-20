@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_MultipleRelationshipTest
+ */
 class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
@@ -48,6 +52,9 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
    * Helper function to provide data for multiple relationship import
    * for Individuals.
 
+   */
+  /**
+   * @return array
    */
   function _individualRelationshipCSVData() {
 

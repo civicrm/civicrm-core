@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -122,6 +122,8 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    *
    * Redirect to civicrm home page when clicked on cancel button
    *
+   * @param null $mode
+   *
    * @return string user context.
    */
   function userContext($mode = null) {
@@ -132,6 +134,11 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
     return 'civicrm';
   }
 
+  /**
+   * @param null $mode
+   *
+   * @return string
+   */
   function userContextParams($mode = NULL) {
     $context = $this->get("context");
     if ($mode == CRM_Core_Action::UPDATE || ($mode = CRM_Core_Action::ADD & isset($context))) {

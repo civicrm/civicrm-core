@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -42,6 +42,8 @@
  *
  */
 class CRM_Price_Page_Option extends CRM_Core_Page {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The field id of the option
@@ -127,7 +129,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @access public
    */
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $customOption = array();
     CRM_Price_BAO_PriceFieldValue::getValues($this->_fid, $customOption);
     $config = CRM_Core_Config::singleton();

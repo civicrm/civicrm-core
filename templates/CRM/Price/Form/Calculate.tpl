@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -108,28 +108,14 @@ cj("input,#priceset select,#priceset").each(function () {
   case 'text':
 
     //default calcution of element.
-    var textval = parseFloat( cj(this).val() );
-    if ( textval ) {
-      eval( 'var option = '+ cj(this).attr('price') );
-      ele         = option[0];
-      if ( ! price[ele] ) {
-       price[ele] = 0;
-      }
-      optionPart = option[1].split(optionSep);
-      addprice   = parseFloat( optionPart[0] );
-      var curval  = textval * addprice;
-      if ( textval >= 0 ) {
-    totalfee   = parseFloat(totalfee) + curval - parseFloat(price[ele]);
-    price[ele] = curval;
-      }
-    }
+    calculateText( this );
 
     //event driven calculation of element.
     cj(this).bind( 'keyup', function() { calculateText( this );
     }).bind( 'blur' , function() { calculateText( this );
     });
-    display( totalfee );
-    break;
+
+   break;
 
   case 'select-one':
 
@@ -181,23 +167,25 @@ cj("input,#priceset select,#priceset").each(function () {
 
 //calculation for text box.
 function calculateText( object ) {
-  eval( 'var option = ' + cj(object).attr('price') );
-  ele = option[0];
-  if ( ! price[ele] ) {
-    price[ele] = 0;
-  }
-  var optionPart = option[1].split(optionSep);
-  addprice    = parseFloat( optionPart[0] );
-  var textval = parseFloat( cj(object).attr('value') );
-  var curval  = textval * addprice;
-    if ( textval >= 0 ) {
-  totalfee   = parseFloat(totalfee) + curval - parseFloat(price[ele]);
-  price[ele] = curval;
-    } else {
-  totalfee   = parseFloat(totalfee) - parseFloat(price[ele]);
-  price[ele] = parseFloat('0');
-    }
-  display( totalfee );
+   var textval = parseFloat( cj(object).val() );
+
+   eval( 'var option = '+ cj(object).attr('price') );
+   ele         = option[0];
+   if ( ! price[ele] ) {
+       price[ele] = 0;
+   }
+   optionPart = option[1].split(optionSep);
+   addprice   = parseFloat( optionPart[0] );
+   var curval  = textval * addprice;
+   if ( textval >= 0 ) {
+       totalfee   = parseFloat(totalfee) + curval - parseFloat(price[ele]);
+       price[ele] = curval;
+   }
+   else {
+       totalfee   = parseFloat(totalfee) - parseFloat(price[ele]);
+       price[ele] = parseFloat('0');
+   }
+   display( totalfee );
 }
 {/literal}
 {if $displayOveride neq 'true'}
@@ -214,7 +202,9 @@ function display( totalfee ) {
     cj('#total_amount').val( totalfee );
 
     ( totalfee < 0 ) ? cj('table#pricelabel').addClass('disabled') : cj('table#pricelabel').removeClass('disabled');
-
+    if (typeof skipPaymentMethod == 'function') {
+      skipPaymentMethod();
+    }
 }
 {/literal}
 {/if}

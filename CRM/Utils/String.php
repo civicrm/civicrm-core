@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -52,6 +52,8 @@ class CRM_Utils_String {
    * name that we could use in forms/code
    *
    * @param  name    Name of the string
+   *
+   * @param int $maxLength
    *
    * @return string  An equivalent variable name
    *
@@ -121,7 +123,7 @@ class CRM_Utils_String {
    * useful while converting file names to class names etc
    *
    * @param string $string the input string
-   * @param char   $char   the character used to demarcate the componets
+   * @param \char|string $char $char   the character used to demarcate the componets
    *
    * @access public
    *
@@ -263,6 +265,12 @@ class CRM_Utils_String {
     return CRM_Core_DAO::$_nullArray;
   }
 
+  /**
+   * @param $str
+   * @param $stringRules
+   *
+   * @return mixed
+   */
   static function redaction($str, $stringRules) {
     //redact the strings
     if (!empty($stringRules)) {
@@ -417,6 +425,10 @@ class CRM_Utils_String {
     return $text;
   }
 
+  /**
+   * @param $string
+   * @param $params
+   */
   static function extractName($string, &$params) {
     $name = trim($string);
     if (empty($name)) {
@@ -467,6 +479,11 @@ class CRM_Utils_String {
     }
   }
 
+  /**
+   * @param $string
+   *
+   * @return array
+   */
   static function &makeArray($string) {
     $string = trim($string);
 
@@ -594,6 +611,8 @@ class CRM_Utils_String {
    *
    * @param string $string
    * @param int $maxLen
+   *
+   * @return string
    */
   static function ellipsify($string, $maxLen) {
     $len = strlen($string);
@@ -626,7 +645,10 @@ class CRM_Utils_String {
    * "admin foo" => array(NULL,"admin foo")
    * "cms:admin foo" => array("cms", "admin foo")
    *
+   * @param $delim
    * @param string $string e.g. "view all contacts". Syntax: "[prefix:]name"
+   * @param null $defaultPrefix
+   *
    * @return array (0 => string|NULL $prefix, 1 => string $value)
    */
   public static function parsePrefix($delim, $string, $defaultPrefix = NULL) {
@@ -639,6 +661,61 @@ class CRM_Utils_String {
     }
   }
 
+  /**
+   * this function will mask part of the the user portion of an Email address (everything before the @)
+   *
+   * @param string $email the email address to be masked
+   * @param string $maskChar the character used for masking
+   * @param integer $percent the percentage of the user portion to be masked
+   *
+   * @return string returns the masked Email address
+   */
+  public static function maskEmail($email, $maskChar= '*', $percent=50) {
+    list($user, $domain) = preg_split("/@/", $email);
+    $len = strlen($user);
+    $maskCount = floor($len * $percent /100);
+    $offset = floor(($len - $maskCount) / 2);
+
+    $masked = substr($user, 0, $offset)
+      .str_repeat($maskChar, $maskCount)
+      .substr($user, $maskCount + $offset);
+
+    return($masked.'@'.$domain);
+  }
+
+  /**
+   * this function compares two strings
+   *
+   * @param string $strOne string one
+   * @param string $strTwo string two
+   * @param boolean $case boolean indicating whether you want the comparison to be case sensitive or not
+   *
+   * @return boolean TRUE (string are identical); FALSE (strings are not identical)
+   */
+  public static function compareStr($strOne, $strTwo, $case) {
+    if ($case == TRUE) {
+      // Convert to lowercase and trim white spaces
+      if (strtolower(trim($strOne)) == strtolower(trim($strTwo))) {
+        // yes - they are identical
+        return TRUE;
+      }
+      else {
+        // not identical
+        return FALSE;
+      }
+    }
+    if ($case == FALSE) {
+      // Trim white spaces
+      if (trim($strOne) == trim($strTwo)) {
+        // yes - they are identical
+        return TRUE;
+      }
+      else {
+        // not identical
+        return FALSE;
+      }
+    }
+  }
 
 }
 

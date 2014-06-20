@@ -1,5 +1,5 @@
 // http://civicrm.org/licensing
-cj(function ($) {
+CRM.$(function($) {
   function openKCFinder(field) {
     var field = $(this);
     window.KCFinder = {

@@ -3,9 +3,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,15 +34,10 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Job
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: Contact.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
-
-/**
- * Include common API util functions
- */
-require_once 'api/v3/utils.php';
 
 /**
  * Adjust metadata for "Create" action
@@ -88,7 +83,9 @@ function civicrm_api3_job_get($params) {
 /**
  * Delete a job
  *
- * @param int $id
+ * @param $params
+ *
+ * @internal param int $id
  *
  * @return array API Result Array
  * {@getfields Job_delete}
@@ -96,15 +93,7 @@ function civicrm_api3_job_get($params) {
  * @access public
  */
 function civicrm_api3_job_delete($params) {
-  if ($params['id'] != NULL && !CRM_Utils_Rule::integer($params['id'])) {
-    return civicrm_api3_create_error('Invalid value for job ID');
-  }
-
-  $result = CRM_Core_BAO_Job::del($params['id']);
-  if (!$result) {
-    return civicrm_api3_create_error('Could not delete job');
-  }
-  return civicrm_api3_create_success($result, $params, 'job', 'delete');
+  _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -185,6 +174,11 @@ function _civicrm_api3_job_geocode_spec(&$params) {
  *
  */
 function civicrm_api3_job_send_reminder($params) {
+  //note that $params['rowCount' can be overridden by one of the preferred syntaxes ($options['limit'] = x
+  //It's not clear whether than syntax can be passed in via the UI config - but this keeps the pre 4.4.4 behaviour
+  // in that case (ie. makes it unconfigurable via the UI). Another approach would be to set a default of 0
+  // in the _spec function - but since that is a deprecated value it seems more contentious than this approach
+  $params['rowCount'] = 0;
   $lock = new CRM_Core_Lock('civimail.job.EmailProcessor');
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error('Could not acquire lock, another EmailProcessor process is running');
@@ -247,10 +241,11 @@ function civicrm_api3_job_mail_report($params) {
  *
  *                        id - Integer - greetings option group
  *
+ * @param $params
+ *
  * @return boolean        true if success, else false
  * @static
  * @access public
- *
  */
 function civicrm_api3_job_update_greeting($params) {
 
@@ -434,7 +429,7 @@ function civicrm_api3_job_process_participant($params) {
 function civicrm_api3_job_process_membership($params) {
   $lock = new CRM_Core_Lock('civimail.job.updateMembership');
   if (!$lock->isAcquired()) {
-    return civicrm_api3_create_error('Could not acquire lock, another EmailProcessor process is running');
+    return civicrm_api3_create_error('Could not acquire lock, another Membership Processing process is running');
   }
 
   $result = CRM_Member_BAO_Membership::updateAllMembershipStatus();

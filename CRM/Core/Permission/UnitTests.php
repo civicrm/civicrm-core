@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -41,6 +41,14 @@ class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
   // permission mapping to stub check() calls
   public $permissions = NULL;
 
+  /**
+   * given a permission string, check for access requirements
+   *
+   * @param string $str the permission to check
+   *
+   * @return boolean true if yes, else false
+   * @access public
+   */
   function check($str) {
     // return the stubbed permission (defaulting to true if the array is missing)
     return is_array($this->permissions) ? in_array($str, $this->permissions) : TRUE;

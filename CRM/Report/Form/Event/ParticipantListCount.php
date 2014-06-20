@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                       |
+ | CiviCRM version 4.5                                       |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                    |
+ | Copyright CiviCRM LLC (c) 2004-2014                    |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                      |
  |                                      |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -44,6 +44,13 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
   );
 
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
+
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -285,6 +292,11 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
   }
 
   //Add The statistics
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
 
     $statistics = parent::statistics($rows);
@@ -363,6 +375,13 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     return $errors;
@@ -372,7 +391,7 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     $this->_from = "
       FROM civicrm_participant {$this->_aliases['civicrm_participant']}
          LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']}
-              ON ({$this->_aliases['civicrm_event']}.id = {$this->_aliases['civicrm_participant']}.event_id ) AND ({$this->_aliases['civicrm_event']}.is_template IS NULL OR {$this->_aliases['civicrm_event']}.is_template = 0)
+              ON ({$this->_aliases['civicrm_event']}.id = {$this->_aliases['civicrm_participant']}.event_id ) AND {$this->_aliases['civicrm_event']}.is_template = 0
          LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
               ON ({$this->_aliases['civicrm_participant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  )
          {$this->_aclFrom}
@@ -388,7 +407,7 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
               ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                 {$this->_aliases['civicrm_phone']}.is_primary = 1
          LEFT JOIN civicrm_line_item {$this->_aliases['civicrm_line_item']}
-              ON {$this->_aliases['civicrm_participant']}.id ={$this->_aliases['civicrm_line_item']}.entity_id AND {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_participant'";
+              ON {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_participant' AND {$this->_aliases['civicrm_participant']}.id ={$this->_aliases['civicrm_line_item']}.entity_id";
   }
 
   function storeWhereHavingClauseArray() {
@@ -446,6 +465,9 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
 
     $entryFound = FALSE;

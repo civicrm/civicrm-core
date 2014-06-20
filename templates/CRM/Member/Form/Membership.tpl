@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,7 +37,7 @@
   {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Membership"}
   {literal}
   <script type="text/javascript">
-  cj( function() {
+  CRM.$(function($) {
     var membershipValues = new Array;
     {/literal}{foreach from=$optionsMembershipTypes item=memType key=opId}{literal}
       membershipValues[{/literal}{$opId}{literal}] = {/literal}{$memType}{literal};
@@ -144,12 +144,14 @@
           <td>{if $isRecur && $endDate}{$endDate|crmDate}{else}{include file="CRM/common/jcalendar.tpl" elementName=end_date}{/if}
             <br />
             <span class="description">{ts}Latest membership period expiration date. End Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span></td></tr>
-        <tr id="autoRenew" class="crm-membership-form-block-auto_renew">
-          <td class="label"> {$form.auto_renew.label} </td>
-          <td> {$form.auto_renew.html} {help id="id-auto_renew" file="CRM/Member/Form/Membership.hlp" action=$action} </td>
-        </tr>
-        {if ! $membershipMode}
-          <tr><td class="label">{$form.is_override.label}</td><td>{$form.is_override.html}&nbsp;&nbsp;{help id="id-status-override"}</td></tr>
+        {if !empty($form.auto_renew)}
+          <tr id="autoRenew" class="crm-membership-form-block-auto_renew">
+            <td class="label"> {$form.auto_renew.label} {help id="id-auto_renew" file="CRM/Member/Form/Membership.hlp" action=$action} </td>
+            <td> {$form.auto_renew.html} </td>
+          </tr>
+        {/if}
+        {if !$membershipMode}
+          <tr><td class="label">{$form.is_override.label} {help id="id-status-override"}</td><td>{$form.is_override.html}</td></tr>
         {/if}
 
         {if ! $membershipMode}
@@ -175,34 +177,32 @@
             <td>{$form.total_amount.html}<br />
               <span class="description">{ts}Membership payment amount.{/ts}</span></td>
           </tr>
-          {if $context neq 'standalone'}
-            <tr class="crm-membership-form-block-contribution-contact">
-              <td class="label">{$form.is_different_contribution_contact.label}</td>
-              <td>{$form.is_different_contribution_contact.html}&nbsp;&nbsp;{help id="id-contribution_contact"}</td>
-            </tr>
-            <tr id="record-different-contact">
-              <td>&nbsp;</td>
-              <td>
-                <table class="compressed">
-                  <tr class="crm-membership-form-block-soft-credit-type">
-                    <td class="label">{$form.soft_credit_type.label}</td>
-                    <td>{$form.soft_credit_type.html}</td>
-                  </tr>
-                  <tr class="crm-membership-form-block-soft-credit-contact-id">
-                    <td class="label">{$form.soft_credit_contact_id.label}</td>
-                    <td>{$form.soft_credit_contact_id.html}</td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          {/if}
+          <tr class="crm-membership-form-block-contribution-contact">
+            <td class="label">{$form.is_different_contribution_contact.label}</td>
+            <td>{$form.is_different_contribution_contact.html}&nbsp;&nbsp;{help id="id-contribution_contact"}</td>
+          </tr>
+          <tr id="record-different-contact">
+            <td>&nbsp;</td>
+            <td>
+              <table class="compressed">
+                <tr class="crm-membership-form-block-soft-credit-type">
+                  <td class="label">{$form.soft_credit_type.label}</td>
+                  <td>{$form.soft_credit_type.html}</td>
+                </tr>
+                <tr class="crm-membership-form-block-soft-credit-contact-id">
+                  <td class="label">{$form.soft_credit_contact_id.label}</td>
+                  <td>{$form.soft_credit_contact_id.html}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
           <tr class="crm-membership-form-block-billing">
             <td colspan="2">
             {include file='CRM/Core/BillingBlock.tpl'}
             </td>
           </tr>
         {/if}
-        {if $accessContribution and ! $membershipMode AND ($action neq 2 or !$rows.0.contribution_id or $onlinePendingContributionId)}
+        {if $accessContribution and ! $membershipMode AND ($action neq 2 or (!$rows.0.contribution_id AND !$softCredit) or $onlinePendingContributionId)}
           <tr id="contri">
             <td class="label">{if $onlinePendingContributionId}{ts}Update Payment Status{/ts}{else}{$form.record_contribution.label}{/if}</td>
             <td>{$form.record_contribution.html}<br />
@@ -210,7 +210,7 @@
           </tr>
           <tr class="crm-membership-form-block-record_contribution"><td colspan="2">
             <fieldset id="recordContribution"><legend>{ts}Membership Payment and Receipt{/ts}</legend>
-              <table>{if $context neq 'standalone'}
+              <table>
                 <tr class="crm-membership-form-block-contribution-contact">
                   <td class="label">{$form.is_different_contribution_contact.label}</td>
                   <td>{$form.is_different_contribution_contact.html}&nbsp;&nbsp;{help id="id-contribution_contact"}</td>
@@ -229,7 +229,7 @@
                       </tr>
                     </table>
                   </td>
-                </tr>{/if}
+                </tr>
                   <tr class="crm-membership-form-block-financial_type_id">
                       <td class="label">{$form.financial_type_id.label}</td>
                       <td>{$form.financial_type_id.html}<br />
@@ -295,7 +295,7 @@
       {include file="CRM/common/customData.tpl"}
       {literal}
       <script type="text/javascript">
-      cj(function() {
+      CRM.$(function($) {
       {/literal}
         CRM.buildCustomData( '{$customDataType}' );
         {if $customDataSubType}
@@ -306,9 +306,16 @@
       </script>
       {/literal}
       {if $accessContribution and $action eq 2 and $rows.0.contribution_id}
-        <fieldset>
-        {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
-        </fieldset>
+        <div class="crm-accordion-wrapper">
+          <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
+          <div class="crm-accordion-body">{include file="CRM/Contribute/Form/Selector.tpl" context="Search"}</div>
+        </div>
+      {/if}
+      {if $softCredit}
+        <div class="crm-accordion-wrapper">
+          <div class="crm-accordion-header">{ts}Related Soft Contributions{/ts}</div>
+          <div class="crm-accordion-body">{include file="CRM/Contribute/Page/ContributionSoft.tpl" context="membership"}</div>
+       </div>
       {/if}
     {/if}
 
@@ -382,7 +389,7 @@
       }
 
 
-      cj( function( ) {
+      CRM.$(function($) {
       var mode   = {/literal}'{$membershipMode}'{literal};
       if ( !mode ) {
         // Offline form (mode = false) has the record_contribution checkbox
@@ -462,7 +469,7 @@
 
     {if $context eq 'standalone' and $outBound_option != 2 }
     {literal}
-    cj( function( ) {
+    CRM.$(function($) {
       cj("#contact_1").blur( function( ) {
         checkEmail( );
       } );
@@ -503,7 +510,7 @@
 
     {literal}
     //keep read only always checked.
-    cj( function( ) {
+    CRM.$(function($) {
       var allowAutoRenew   = {/literal}'{$allowAutoRenew}'{literal};
       var alreadyAutoRenew = {/literal}'{$alreadyAutoRenew}'{literal};
       if ( allowAutoRenew || alreadyAutoRenew ) {

@@ -1,9 +1,9 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.5                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2014                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -67,6 +67,9 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
     return self::$_stringActionLinks;
   }
 
+  /**
+   * @return array
+   */
   function &customizeActionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_customizeActionLinks)) {

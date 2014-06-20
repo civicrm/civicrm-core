@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,11 +30,15 @@
  * when the actual value is NULL or "". Rewrite the output.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  */
 
 require_once 'api/Wrapper.php';
+
+/**
+ * Class CRM_Utils_API_NullOutputCoder
+ */
 class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
 
   /**
@@ -57,12 +61,17 @@ class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
    * submitted values across XSS vulnerability.
    *
    * @param array|string $values
-   * @param bool $castToString If TRUE, all scalars will be filtered (and therefore cast to strings)
+   *
+   * @internal param bool $castToString If TRUE, all scalars will be filtered (and therefore cast to strings)
    *    If FALSE, then non-string values will be preserved
    */
   public function encodeInput(&$values) {
   }
 
+  /**
+   * @param $values
+   * @param bool $castToString
+   */
   public function decodeOutput(&$values, $castToString = FALSE) {
     if (is_array($values)) {
       foreach ($values as &$value) {
@@ -76,6 +85,15 @@ class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  /**
+   * @param $apiRequest
+   * @param $result
+   *
+   * @return modified
+   */
   public function toApiOutput($apiRequest, $result) {
     $lowerAction = strtolower($apiRequest['action']);
     if ($lowerAction === 'create') {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -80,6 +80,11 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   public $_grid;
 
+  /**
+   * Name of button for saving matching contacts
+   * @var
+   */
+  protected $_duplicateButtonName;
   /**
    * The title of the category we are editing
    *
@@ -358,6 +363,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
         } elseif (!empty($this->_multiRecordFields)
            && (!$this->_multiRecord || !in_array($this->_multiRecord, array(CRM_Core_Action::DELETE, CRM_Core_Action::UPDATE)) )) {
+          CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
           //multirecord listing page
           $multiRecordFieldListing = TRUE;
           $page = new CRM_Profile_Page_MultipleRecordFieldsListing();
@@ -389,19 +395,19 @@ class CRM_Profile_Form extends CRM_Core_Form {
         }
       }
 
-      //transfering all the multirecord custom fields in _fields
+      //transferring all the multi-record custom fields in _fields
       if ($this->_multiRecord && !empty($this->_multiRecordFields)) {
         $this->_fields = $this->_multiRecordFields;
         $this->_multiRecordProfile = TRUE;
       } elseif ($this->_multiRecord && empty($this->_multiRecordFields)) {
         CRM_Core_Session::setStatus(ts('This feature is not currently available.'), ts('Sorry'), 'error');
-        return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
       }
     }
 
     if (!is_array($this->_fields)) {
       CRM_Core_Session::setStatus(ts('This feature is not currently available.'), ts('Sorry'), 'error');
-      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
     }
   }
 
@@ -675,7 +681,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
 
-    //lets have sigle status message,
+    //lets have single status message,
     $this->assign('statusMessage', $statusMessage);
     if ($return) {
       return FALSE;
@@ -863,6 +869,13 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @params Integer $gid        Profile Id
    *
    * @return Array   $errors     Errors ( if any ).
+   */
+  /**
+   * @param $activityId
+   * @param $contactId
+   * @param $gid
+   *
+   * @return array
    */
   static function validateContactActivityProfile($activityId, $contactId, $gid) {
     $errors = array();
@@ -1089,8 +1102,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
     if ($this->_deleteButtonName) {
       if (!empty($_POST[$this->_deleteButtonName]) && $this->_recordId) {
         $filterParams['id'] = $this->_customGroupId;
-        $returnProperities = array('is_multiple', 'table_name');
-        CRM_Core_DAO::commonRetrieve("CRM_Core_DAO_CustomGroup", $filterParams, $returnValues, $returnProperities);
+        $returnProperties = array('is_multiple', 'table_name');
+        CRM_Core_DAO::commonRetrieve("CRM_Core_DAO_CustomGroup", $filterParams, $returnValues, $returnProperties);
         if (!empty($returnValues['is_multiple'])) {
           if ($tableName = CRM_Utils_Array::value('table_name', $returnValues)) {
             $sql = "DELETE FROM {$tableName} WHERE id = %1 AND entity_id = %2";
@@ -1150,10 +1163,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     $transaction = new CRM_Core_Transaction();
 
-    //used to send subcribe mail to the group which user want.
+    //used to send subscribe mail to the group which user want.
     //if the profile double option in is enabled
     $mailingType = array();
-    $config = CRM_Core_Config::singleton();
 
     $result = NULL;
     foreach ($params as $name => $values) {
@@ -1340,6 +1352,11 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $transaction->commit();
   }
 
+  /**
+   * @param null $suffix
+   *
+   * @return null|string
+   */
   function checkTemplateFileExists($suffix = NULL) {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Form/{$this->_gid}/{$this->_name}.{$suffix}tpl";
@@ -1360,11 +1377,30 @@ class CRM_Profile_Form extends CRM_Core_Form {
     return NULL;
   }
 
+  /**
+   * Use the form name to create the tpl file name
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
 
+  /**
+   * Default extra tpl file basically just replaces .tpl with .extra.tpl
+   * i.e. we dont override
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();

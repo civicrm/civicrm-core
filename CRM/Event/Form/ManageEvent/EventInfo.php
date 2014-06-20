@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -239,7 +239,9 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
   /**
    * global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param $values
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -355,6 +357,11 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
      * @return $defaults an array of custom data defaults.
      */
 
+  /**
+   * @param $templateId
+   *
+   * @return array
+   */
   public function templateCustomDataValues($templateId) {
     $defaults = array();
     if (!$templateId) {

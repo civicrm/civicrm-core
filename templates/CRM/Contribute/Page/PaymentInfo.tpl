@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 {if $show eq 'event-payment'}
 {literal}
 <script type='text/javascript'>
-cj(function($){
+CRM.$(function($) {
   if (cj("#payment-info").length) {
     var dataUrl = {/literal}'{crmURL p="civicrm/payment/view" h=0 q="action=browse&id=$participantId&cid=`$contactId`&component=event&context=payment_info&snippet=4"}'{literal};
     cj.ajax({
@@ -56,13 +56,14 @@ cj(function($){
     <td>{$paymentInfo.total|crmMoney}</td>
     <td class='right'>
       {if $paymentInfo.paid > 0}
-        <a class='action-item' href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>{$paymentInfo.paid|crmMoney}<br/>>> view payments</a>
+        {$paymentInfo.paid|crmMoney}<br/>
+        <a class="crm-hover-button crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>&raquo; {ts}view payments{/ts}</a>
       {/if}
     </td>
     <td class='right'>{$paymentInfo.balance|crmMoney}</td>
   </tr>
 </table>
-{if $paymentInfo.balance}
+{if $paymentInfo.balance and !$paymentInfo.payLater}
   {if $paymentInfo.balance > 0}
      {assign var=paymentButtonName value='Record Payment'}
   {elseif $paymentInfo.balance < 0}

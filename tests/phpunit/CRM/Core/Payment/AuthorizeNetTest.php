@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,13 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/AuthorizeNet.php';
 
+/**
+ * Class CRM_Core_Payment_AuthorizeNetTest
+ */
 class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Authorize.net processing',
@@ -60,8 +66,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
   function tearDown() {
     $this->paymentProcessor->delete($this->processorParams->id);
-    $tablesToTruncate = array('civicrm_contribution', 'civicrm_contribution_recur', 'civicrm_line_item' );
-    $this->quickCleanup($tablesToTruncate);
+    $this->quickCleanUpFinancialEntities();
   }
 
   /**

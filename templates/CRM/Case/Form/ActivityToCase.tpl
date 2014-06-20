@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,17 +27,17 @@
 {if !empty($buildCaseActivityForm)}
   <div class="crm-block crm-form-block crm-case-activitytocase-form-block">
     <table class="form-layout">
-      <tr class="crm-case-activitytocase-form-block-unclosed_case_id">
-        <td class="label">{$form.unclosed_case_id.label}</td>
-        <td>{$form.unclosed_case_id.html}</td>
+      <tr class="crm-case-activitytocase-form-block-file_on_case_unclosed_case_id">
+        <td class="label">{$form.file_on_case_unclosed_case_id.label}</td>
+        <td>{$form.file_on_case_unclosed_case_id.html}</td>
       </tr>
-      <tr class="crm-case-activitytocase-form-block-target_contact_id">
-        <td class="label">{$form.target_contact_id.label}</td>
-        <td>{$form.target_contact_id.html}</td>
+      <tr class="crm-case-activitytocase-form-block-file_on_case_target_contact_id">
+        <td class="label">{$form.file_on_case_target_contact_id.label}</td>
+        <td>{$form.file_on_case_target_contact_id.html}</td>
       </tr>
-      <tr class="crm-case-activitytocase-form-block-case_activity_subject">
-        <td class="label">{$form.case_activity_subject.label}</td>
-        <td>{$form.case_activity_subject.html}<br />
+      <tr class="crm-case-activitytocase-form-block-file_on_case_activity_subject">
+        <td class="label">{$form.file_on_case_activity_subject.label}</td>
+        <td>{$form.file_on_case_activity_subject.html}<br />
           <span class="description">{ts}You can modify the activity subject before filing.{/ts}</span>
         </td>
       </tr>
@@ -45,12 +45,8 @@
   </div>
 {literal}
   <script type="text/javascript">
-    var target_contact = '';
-    var target_contact_id = '';
-    var selectedCaseId = '';
-    var contactId = '';
-    cj(function($) {
-      $('input[name=unclosed_case_id]', '#fileOnCaseDialog').select2({
+    CRM.$(function($) {
+      $('input[name=file_on_case_unclosed_case_id]', '#fileOnCaseDialog').crmSelect2({
         placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
         minimumInputLength: 1,
         ajax: {
@@ -69,34 +65,6 @@
         }
       });
     });
-    {/literal}
-    {if $targetContactValues}
-      {foreach from=$targetContactValues key=id item=name}
-        {literal}
-        target_contact += '{"name":"'+{/literal}"{$name}"{literal}+'","id":"'+{/literal}"{$id}"{literal}+'"},';
-        {/literal}
-      {/foreach}
-      {literal}
-      eval( 'target_contact = [' + target_contact + ']');
-      {/literal}
-    {/if}
-
-    {if $form.target_contact_id.value}
-      {literal}
-      var toDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1&noemail=1' h=0 }{literal}";
-      var target_contact_id = cj.ajax({ url: toDataUrl + "&cid={/literal}{$form.$currentElement.value}{literal}", async: false }).responseText;
-      {/literal}
-    {/if}
-
-    {literal}
-    if ( target_contact_id ) {
-      eval( 'target_contact = ' + target_contact_id );
-    }
-
-    var tokenDataUrl  = "{/literal}{$tokenUrl}{literal}";
-    var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name or email address of an existing contact.{/ts}{literal}";
-    cj( "#target_contact_id" ).tokenInput(tokenDataUrl,{prePopulate: target_contact, theme: 'facebook', hintText: hintText });
-    cj( 'ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px' );
 
     cj( "#fileOnCaseDialog" ).hide( );
 
@@ -124,30 +92,26 @@
     cj.ajax({
       url     : dataUrl,
       success : function ( content ) {
-        cj("#fileOnCaseDialog").show( ).html( content ).dialog({
+        cj("#fileOnCaseDialog").show( ).html( content).trigger('crmLoad').dialog({
           title: dialogTitle,
           modal: true,
           width: 600,
-          height: 270,
+          height: 'auto',
           close: function( event, ui ) {
-            cj( "#unclosed_cases" ).unautocomplete( );
+            cj('input[name=file_on_case_unclosed_case_id]', '#fileOnCaseDialog').select2('destroy');
             cj(this).hide().dialog("destroy");
           },
-          open: function() {
-
-          },
-
           buttons: {
-            "{/literal}{ts escape='js'}Ok{/ts}{literal}": function() {
-              var subject         = cj("#case_activity_subject").val( );
-              var targetContactId = cj("#target_contact_id").val( );
+            "{/literal}{ts escape='js'}Save{/ts}{literal}": function() {
+              var subject         = cj("#file_on_case_activity_subject").val( );
+              var targetContactId = cj("#file_on_case_target_contact_id").val( );
 
-              if ( !cj("#unclosed_cases").val( )  ) {
-                cj("#unclosed_cases").crmError('{/literal}{ts escape="js"}Please select a case from the list{/ts}{literal}.');
+              if ( !cj("#file_on_case_unclosed_case_id").val( )  ) {
+                cj("#file_on_case_unclosed_case_id").crmError('{/literal}{ts escape="js"}Please select a case from the list{/ts}{literal}.');
                 return false;
               }
 
-              cj(this).dialog("destroy");
+              cj(this).dialog("close");
 
               var postUrl = {/literal}"{crmURL p='civicrm/ajax/activity/convert' h=0 }"{literal};
               cj.post( postUrl, { activityID: activityID, caseID: selectedCaseId, contactID: contactId, newSubject: subject, targetContactIds: targetContactId, mode: action, key: {/literal}"{crmKey name='civicrm/ajax/activity/convert'}"{literal} },
@@ -189,7 +153,7 @@
                     } else if ( reloadWindow ) {
                       window.location.reload( );
                     } else {
-                      var activitySubject = cj("#case_activity_subject").val( );
+                      var activitySubject = cj("#file_on_case_activity_subject").val( );
                       var statusMsg = activitySubject + '" has been filed to selected case: <a href="' + caseUrl + '">' + cj("#unclosed_cases").val( ) + '</a>.';
                       CRM.alert(statusMsg, '{/literal}{ts escape="js"}Activity Filed{/ts}{literal}', 'success');
 
@@ -200,7 +164,6 @@
             },
             "{/literal}{ts escape='js'}Cancel{/ts}{literal}": function() {
               cj(this).dialog("close");
-              cj(this).dialog("destroy");
             }
           }
 

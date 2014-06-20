@@ -1,6 +1,6 @@
 <?php
 /**
- * Test Generated example of using survey_respondant get API
+ * Test Generated example of using survey_respondent get API
  * *
  */
 function survey_respondant_get_example(){

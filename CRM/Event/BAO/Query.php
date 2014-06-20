@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,12 +29,15 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Event_BAO_Query {
 
+  /**
+   * @return array
+   */
   static function &getFields() {
     $fields = array();
     $fields = array_merge($fields, CRM_Event_DAO_Event::import());
@@ -44,6 +47,9 @@ class CRM_Event_BAO_Query {
     return $fields;
   }
 
+  /**
+   * @return array
+   */
   static function &getParticipantFields() {
     $fields = CRM_Event_BAO_Participant::importableFields('Individual', TRUE, TRUE);
     return $fields;
@@ -51,6 +57,8 @@ class CRM_Event_BAO_Query {
 
   /**
    * build select for CiviEvent
+   *
+   * @param $query
    *
    * @return void
    * @access public
@@ -129,23 +137,20 @@ class CRM_Event_BAO_Query {
         $query->_whereTables['participant_status'] = 1;
       }
 
-      //add role
-      if (!empty($query->_returnProperties['participant_role'])) {
+      //add participant_role and participant_role_id
+      if (!empty($query->_returnProperties['participant_role']) || !empty($query->_returnProperties['participant_role_id'])) {
         $query->_select['participant_role'] = "participant_role.label as participant_role";
-        $query->_element['participant_role'] = 1;
-        $query->_tables['civicrm_participant'] = 1;
-        $query->_tables['participant_role'] = 1;
-        $query->_whereTables['civicrm_participant'] = 1;
-        $query->_whereTables['participant_role'] = 1;
-      }
-
-      if (!empty($query->_returnProperties['participant_role_id'])) {
         $query->_select['participant_role_id'] = "civicrm_participant.role_id as participant_role_id";
+        $query->_element['participant_role'] = 1;
         $query->_element['participant_role_id'] = 1;
         $query->_tables['civicrm_participant'] = 1;
         $query->_tables['participant_role'] = 1;
         $query->_whereTables['civicrm_participant'] = 1;
         $query->_whereTables['participant_role'] = 1;
+        $query->_pseudoConstantsSelect['participant_role'] = array(
+          'pseudoField' => 'participant_role',
+          'idCol' => 'participant_role_id',
+        );
       }
 
       //add register date
@@ -202,6 +207,9 @@ class CRM_Event_BAO_Query {
     }
   }
 
+  /**
+   * @param $query
+   */
   static function where(&$query) {
     $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
@@ -220,6 +228,10 @@ class CRM_Event_BAO_Query {
     }
   }
 
+  /**
+   * @param $values
+   * @param $query
+   */
   static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
     switch ($name) {
@@ -348,6 +360,7 @@ class CRM_Event_BAO_Query {
         $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
         return;
 
+      case 'participant_role':
       case 'participant_role_id':
         $val = array();
         if (is_array($value)) {
@@ -445,6 +458,13 @@ class CRM_Event_BAO_Query {
     }
   }
 
+  /**
+   * @param $name
+   * @param $mode
+   * @param $side
+   *
+   * @return null|string
+   */
   static function from($name, $mode, $side) {
     $from = NULL;
     switch ($name) {
@@ -494,6 +514,12 @@ class CRM_Event_BAO_Query {
     return (isset($this->_qill)) ? $this->_qill : "";
   }
 
+  /**
+   * @param $mode
+   * @param bool $includeCustomFields
+   *
+   * @return array|null
+   */
   static function defaultReturnProperties($mode,
     $includeCustomFields = TRUE
   ) {
@@ -570,7 +596,6 @@ class CRM_Event_BAO_Query {
     CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
 
     $status = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
-    asort($status);
     foreach ($status as $id => $Name) {
       $form->_participantStatus = &$form->addElement('checkbox', "participant_status_id[$id]", NULL, $Name);
     }
@@ -587,7 +612,7 @@ class CRM_Event_BAO_Query {
     $form->addRule('participant_fee_amount_low', ts('Please enter a valid money value.'), 'money');
     $form->addRule('participant_fee_amount_high', ts('Please enter a valid money value.'), 'money');
     // add all the custom  searchable fields
-    $extends = array('Participant');
+    $extends = array('Participant', 'Event');
     $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE, $extends);
     if ($groupDetails) {
       $form->assign('participantGroupTree', $groupDetails);
@@ -610,8 +635,15 @@ class CRM_Event_BAO_Query {
     $form->setDefaults(array('participant_test' => 0));
   }
 
+  /**
+   * @param $row
+   * @param $id
+   */
   static function searchAction(&$row, $id) {}
 
+  /**
+   * @param $tables
+   */
   static function tableNames(&$tables) {
     //add participant table
     if (!empty($tables['civicrm_event'])) {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Mailing_MailingTest
+ */
 class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -69,7 +73,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->click("css=li#tab_group a");
     $this->waitForElementPresent("_qf_GroupContact_next");
     $this->select("group_id", "$groupName");
-    $this->clickLink("_qf_GroupContact_next", "_qf_GroupContact_next");
+    $this->clickLink("_qf_GroupContact_next", "_qf_GroupContact_next", FALSE);
 
     // configure default mail-box
     $this->setupDefaultMailbox();
@@ -87,7 +91,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->click("add");
 
     // click next
-    $this->clickLink("_qf_Group_next", "_qf_Settings_cancel");
+    $this->clickLink("_qf_Group_next", "_qf_Settings_cancel", FALSE);
 
     //--------track and respond----------
 
@@ -168,7 +172,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
     $this->assertElementContainsText('page-title', "Find Mailings");
-    $this->assertElementContainsText("xpath=//table[@class='selector']/tbody//tr//td", "Mailing $mailingName Webtest");
+    $this->assertElementContainsText("xpath=//table[@class='selector row-highlight']/tbody//tr//td", "Mailing $mailingName Webtest");
 
     //--------- mail delivery verification---------
     // test undelivered report
@@ -321,7 +325,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->click("css=li#tab_group a");
     $this->waitForElementPresent("_qf_GroupContact_next");
     $this->select("group_id", "$groupName");
-    $this->clickLink("_qf_GroupContact_next", "_qf_GroupContact_next");
+    $this->clickLink("_qf_GroupContact_next", "_qf_GroupContact_next", FALSE);
 
     // configure default mail-box
     $this->openCiviPage("admin/mailSettings", "action=update&id=1&reset=1", '_qf_MailSettings_cancel-bottom');
@@ -403,8 +407,8 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     //----------end New Mailing-------------
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
-    $this->assertElementContainsText('page-title', "Scheduled and Sent Mailings");
-    $this->assertElementContainsText("xpath=//table[@class='selector']/tbody//tr//td", "Mailing $mailingName Webtest");
+    $this->assertElementContainsText('page-title', "Find Mailings");
+    $this->assertElementContainsText("xpath=//table[@class='selector row-highlight']/tbody//tr//td", "Mailing $mailingName Webtest");
 
     // directly send schedule mailing -- not working right now
     $this->openCiviPage("mailing/queue", "reset=1");
@@ -489,6 +493,10 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->criteriaCheck($criteriaCheck, $mailingReportUrl);
   }
 
+  /**
+   * @param $criteriaCheck
+   * @param $mailingReportUrl
+   */
   function criteriaCheck($criteriaCheck, $mailingReportUrl) {
     foreach($criteriaCheck as $key => $infoFilter) {
       foreach($infoFilter as $entity => $dataToCheck) {
@@ -503,6 +511,11 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $summaryInfo
+   * @param $dataToCheck
+   * @param $entity
+   */
   function _verifyCriteria($summaryInfo, $dataToCheck, $entity) {
     foreach($dataToCheck as $key => $value) {
       if ($entity == 'report') {

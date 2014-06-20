@@ -242,7 +242,6 @@
       $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
     });
 
-  $().crmAccordions();
   initialize();
 
   // Fetch initial options during page refresh - it's more efficient to bundle them in a single ajax request

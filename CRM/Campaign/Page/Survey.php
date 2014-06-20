@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -38,8 +38,13 @@
  */
 class CRM_Campaign_Page_Survey extends CRM_Core_Page {
 
+  public $useLivePageJS = TRUE;
+
   private static $_actionLinks;
 
+  /**
+   * @return array
+   */
   function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_actionLinks)) {
@@ -73,7 +78,6 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
   }
 
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
 
     $surveys = CRM_Campaign_BAO_Survey::getSurveySummary();
 
@@ -112,6 +116,9 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
     $this->assign('addSurveyUrl', CRM_Utils_System::url('civicrm/survey/add', 'reset=1&action=add'));
   }
 
+  /**
+   * @return string
+   */
   function run() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();

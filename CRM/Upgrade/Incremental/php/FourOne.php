@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -36,6 +36,11 @@ class CRM_Upgrade_Incremental_php_FourOne {
   // This was changed in 4.3 so we define it locally for compatability with older dbs
   const NAVIGATION_NAME = "Navigation Menu";
 
+  /**
+   * @param $errors
+   *
+   * @return bool
+   */
   function verifyPreDBstate(&$errors) {
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviCase', $config->enableComponents)) {
@@ -66,6 +71,9 @@ class CRM_Upgrade_Incremental_php_FourOne {
     }
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_1_alpha1($rev) {
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviCase', $config->enableComponents)) {
@@ -271,6 +279,9 @@ VALUES
     CRM_Core_DAO::executeQuery($sql);
   }
 
+  /**
+   * @param $params
+   */
   static function retrieveDirectoryAndURLPaths(&$params) {
 
     $sql = "
@@ -296,6 +307,9 @@ AND    v.is_active = 1
     }
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_1_alpha2($rev) {
     $dao             = new CRM_Core_DAO_Setting();
     $dao->group_name = 'Directory Preferences';
@@ -313,6 +327,9 @@ AND    v.is_active = 1
     $upgrade->processSQL($rev);
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_1_beta1($rev) {
     //CRM-9311
     $groupNames = array('directory_preferences', 'url_preferences');
@@ -389,6 +406,9 @@ AND    v.is_active = 1
     $upgrade->processSQL($rev);
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_4_1_1($rev) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->assign('addDedupeEmail', !(CRM_Core_DAO::checkFieldExists('civicrm_mailing', 'dedupe_email')));
@@ -399,6 +419,9 @@ AND    v.is_active = 1
     $upgrade->processSQL($rev);
   }
 
+  /**
+   * @return string
+   */
   function getTemplateMessage() {
     return "Blah";
   }

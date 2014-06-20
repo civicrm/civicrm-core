@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_ParticipantCountTest
+ */
 class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -65,7 +69,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     // register for event
     $this->click('link=Register Now');
     $this->waitForElementPresent('_qf_Register_upload-bottom');
-    $this->click("xpath=//input[@class='form-radio']");
+    $this->click("xpath=//input[@class='crm-form-radio']");
 
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('first_name', 'Mary');
@@ -83,7 +87,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->click('link=Register Now');
     $this->waitForElementPresent('_qf_Register_upload-bottom');
 
-    $this->click("xpath=//input[@class='form-radio']");
+    $this->click("xpath=//input[@class='crm-form-radio']");
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('first_name', 'Mary');
     $this->type('last_name', 'Jones'. substr(sha1(rand()), 0, 5));
@@ -97,11 +101,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
 
     // Find Participant
     $this->openCiviPage("event/search", "reset=1", 'participant_fee_amount_low');
-    $this->click("event_name");
-    $this->type("event_name", $eventTitle);
-    $this->typeKeys("event_name", $eventTitle);
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2("event_id", $eventTitle);
     $this->click('_qf_Search_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -217,7 +217,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->click('link=Register Now');
     $this->waitForElementPresent('_qf_Register_upload-bottom');
 
-    $this->type("xpath=//input[@class='form-text four required']", '1');
+    $this->type("xpath=//input[@class='four crm-form-text required']", '1');
 
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $participants[1] = array(
@@ -252,7 +252,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->click('link=Register Now');
     $this->waitForElementPresent('_qf_Register_upload-bottom');
 
-    $this->type("xpath=//input[@class='form-text four required']", '2');
+    $this->type("xpath=//input[@class='four crm-form-text required']", '2');
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
 
     $participants[2] = array(
@@ -284,11 +284,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
 
     // Find Participant
     $this->openCiviPage('event/search', 'reset=1', 'participant_fee_amount_low');
-    $this->click("event_name");
-    $this->type("event_name", $eventTitle);
-    $this->typeKeys("event_name", $eventTitle);
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2("event_id", $eventTitle);
     $this->click('_qf_Search_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -300,19 +296,26 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->_testPricesetDetailsCustomSearch($paramsEvent, $participants, $priceFieldOptionCounts);
   }
 
+  /**
+   * @param $setTitle
+   * @param string $financialType
+   */
   function _testAddSet($setTitle, $financialType = 'Event Fee') {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
     $this->type('title', $setTitle);
     $this->check('extends[1]');
-    $this->select("css=select.form-select", "label={$financialType}");
+    $this->select("css=select.crm-form-select", "label={$financialType}");
     $this->type('help_pre', 'This is test priceset.');
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
     $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
   }
 
+  /**
+   * @param $options
+   */
   function _testAddMultipleChoiceOptions($options) {
     foreach ($options as $oIndex => $oValue) {
       $this->type("option_label_{$oIndex}", $oValue['label']);
@@ -326,6 +329,11 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->click('CIVICRM_QFID_1_2');
   }
 
+  /**
+   * @param $params
+   *
+   * @return string
+   */
   function _testAddEvent($params) {
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
@@ -370,7 +378,7 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     }
 
     $this->click('_qf_Fee_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('_qf_Fee_cancel-top');
 
     // Go to Online Registration tab
     $this->click('link=Online Registration');
@@ -387,8 +395,8 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->type('confirm_from_email', 'jane.doe@example.org');
 
     $this->click('_qf_Registration_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Registration' information has been saved.");
+    $this->waitForElementPresent('_qf_Registration_upload-bottom');
+    $this->waitForTextPresent("'Online Registration' information has been saved.");
 
     // verify event input on info page
     // start at Manage Events listing
@@ -399,6 +407,9 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     return $this->getLocation();
   }
 
+  /**
+   * @param array $participant
+   */
   function _testRegisterWithBillingInfo($participant = array()) {
     $this->waitForElementPresent("credit_card_type");
     $this->select('credit_card_type', 'value=Visa');
@@ -423,6 +434,11 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
     $this->assertStringsPresent($thankStrings);
   }
 
+  /**
+   * @param $eventParams
+   * @param $participants
+   * @param $priceFieldOptionCounts
+   */
   function _testPricesetDetailsCustomSearch($eventParams, $participants, $priceFieldOptionCounts) {
     $this->openCiviPage('contact/search/custom', 'csid=9&reset=1');
 
@@ -435,16 +451,16 @@ class WebTest_Event_ParticipantCountTest extends CiviSeleniumTestCase {
 
     $tdnum = 2;
     foreach ($tableHeaders as $header) {
-      $this->verifyText("xpath=//form[@id='Custom']//div[@class='crm-search-results']//table[@class='selector']/thead/tr[1]/th[$tdnum]", $header);
+      $this->verifyText("xpath=//form[@id='Custom']//div[@class='crm-search-results']//table[@class='selector row-highlight']/thead/tr[1]/th[$tdnum]", $header);
       $tdnum++;
     }
 
     foreach ($participants as $participantNum => $participant) {
       $tdnum = 4;
-      $this->verifyText("xpath=//form[@id='Custom']//div[@class='crm-search-results']//table[@class='selector']/tbody/tr[{$participantNum}]/td[{$tdnum}]", preg_quote("{$participant['first_name']} {$participant['last_name']}"));
+      $this->verifyText("xpath=//form[@id='Custom']//div[@class='crm-search-results']//table[@class='selector row-highlight']/tbody/tr[{$participantNum}]/td[{$tdnum}]", preg_quote("{$participant['first_name']} {$participant['last_name']}"));
       foreach ($priceFieldOptionCounts[$participantNum] as $priceFieldOptionCount) {
         $tdnum++;
-        $this->verifyText("xpath=//form[@id='Custom']//div[@class='crm-search-results']//table[@class='selector']/tbody/tr[{$participantNum}]/td[{$tdnum}]", preg_quote($priceFieldOptionCount));
+        $this->verifyText("xpath=//form[@id='Custom']//div[@class='crm-search-results']//table[@class='selector row-highlight']/tbody/tr[{$participantNum}]/td[{$tdnum}]", preg_quote($priceFieldOptionCount));
       }
     }
   }

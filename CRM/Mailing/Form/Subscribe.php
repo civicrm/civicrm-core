@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -135,7 +135,7 @@ ORDER BY title";
     $config = CRM_Core_Config::singleton();
     $session   = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
-    
+
     if (empty($config->recaptchaPublicKey) ||
       empty($config->recaptchaPrivateKey) ||
       $contactID) {
@@ -173,6 +173,11 @@ ORDER BY title";
     );
   }
 
+  /**
+   * @param $fields
+   *
+   * @return array|bool
+   */
   static function formRule($fields) {
     foreach ($fields as $name => $dontCare) {
       if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {

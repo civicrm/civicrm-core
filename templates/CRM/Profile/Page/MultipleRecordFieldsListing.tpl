@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
   {/if}
   {if $records and $headers}
     {include file="CRM/common/jsortable.tpl"}
-    <div id="browseValues">
+    <div id="custom-{$customGroupId}-table-wrapper">
       <div>
         {strip}
           <table id="records" class="display">
@@ -80,81 +80,11 @@
 
   {if !$reachedMax}
     {if $pageViewType eq 'customDataView'}
-      <br/><a accesskey="N" title="{ts 1=$customGroupTitle}Add %1 Record{/ts}" href="{crmURL p='civicrm/contact/view/cd/edit' q="reset=1&snippet=1&type=$ctype&groupID=$customGroupId&entityID=$contactId&cgcount=$cgcount&multiRecordDisplay=single"}" 
+      <br/><a accesskey="N" title="{ts 1=$customGroupTitle}Add %1 Record{/ts}" href="{crmURL p='civicrm/contact/view/cd/edit' q="reset=1&type=$ctype&groupID=$customGroupId&entityID=$contactId&cgcount=$cgcount&multiRecordDisplay=single&mode=add"}" 
        class="button action-item"><span><div class="icon add-icon"></div>{ts 1=$customGroupTitle}Add %1 Record{/ts}</span></a>
     {else}
-      <a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="reset=1&id=`$contactId`&multiRecord=add&gid=`$gid`&snippet=1&context=multiProfileDialog&onPopupClose=`$onPopupClose`"}"
+      <a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="reset=1&id=`$contactId`&multiRecord=add&gid=`$gid`&context=multiProfileDialog&onPopupClose=`$onPopupClose`"}"
        class="button action-item"><span><div class="icon add-icon"></div>{ts}Add New Record{/ts}</span></a>
     {/if}
   {/if}
 {/if}
-{literal}
-  <script type='text/javascript'>
-    cj(function () {
-      var dialogId = '{/literal}{$dialogId}{literal}';
-      var pageViewType = '{/literal}{$pageViewType}{literal}';
-      // NOTE: Triggers two events, "profile-dialog:FOO:open" and "profile-dialog:FOO:close",
-      // where "FOO" is the internal name of a profile form
-      function formDialog(dialogName, dataURL, dialogTitle) {
-        cj.ajax({
-          url: dataURL,
-          success: function (content) {
-            cj('#' + dialogId).show().html(content).dialog({
-              title: dialogTitle,
-              modal: true,
-              width: 750,
-              overlay: {
-                opacity: 0.5,
-                background: "black"
-              },
-              open: function(event, ui) {
-                cj('#' + dialogId).trigger({
-                  type: "crmFormLoad",
-                  profileName: dialogName
-                });
-              },
-              close: function (event, ui) {
-                cj('#' + dialogId).trigger({
-                  type: "crmFormClose",
-                  profileName: dialogName
-                });
-                cj('#' + dialogId).html('');
-              }
-            });
-            cj('.action-link').hide();
-            if (pageViewType == 'customDataView') {
-              var labelElement = cj('#custom-record-dialog .html-adjust label').css('display', 'inline');
-            }
-            else {
-              var labelElement = cj('#profile-dialog #crm-profile-block .edit-value label').css('display', 'inline');
-            }
-          }
-        });
-      }
-
-      var profileName = {/literal}"{$ufGroupName}"{literal};
-      cj('.action-item').each(function () {
-        if (!cj(this).attr('jshref') && !cj(this).hasClass('ignore-jshref')) {
-          cj(this).attr('jshref', cj(this).attr('href'));
-          cj(this).attr('href', '#browseValues');
-        }
-      });
-
-      if (pageViewType == 'customDataView') {
-        var actionItemHeirarchy = '.action-item';
-        profileName = 'customRecordView';
-      }
-      else {
-        var actionItemHeirarchy = '.crm-profile-name-' + profileName + ' .action-item';
-      }
-
-      cj(actionItemHeirarchy).click(function () {
-        dataURL = cj(this).attr('jshref');
-        dialogTitle = cj(this).attr('title');
-        if (!cj(this).hasClass('ignore-jshref')) {
-          formDialog(profileName, dataURL, dialogTitle);
-        }
-      });
-    });
-    </script>
-  {/literal}

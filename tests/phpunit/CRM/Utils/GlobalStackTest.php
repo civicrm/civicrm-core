@@ -2,6 +2,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Utils_GlobalStackTest
+ */
 class CRM_Utils_GlobalStackTest extends CiviUnitTestCase {
 
   public function testPushPop() {

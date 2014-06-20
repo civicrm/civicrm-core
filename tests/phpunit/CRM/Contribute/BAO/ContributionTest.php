@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,14 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Custom.php';
+
+/**
+ * Class CRM_Contribute_BAO_ContributionTest
+ */
 class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Contribution BAOs',

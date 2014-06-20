@@ -1,5 +1,5 @@
 // http://civicrm.org/licensing
-(function($) {
+(function($, _) {
 
   var ajaxFormParams = {
     dataType:'json',
@@ -294,25 +294,20 @@
         return false;
       })
       // Handle action links in popup
-      .on('click', '.crm-contact_actions-list a, .crm-contact_activities-list a', function() {
-        var
-          tabName = $(this).data('tab') || 'summary',
-          $tab = $('#tab_' + tabName),
-          $panel = $('#' + $tab.attr('aria-controls')),
-          url = $(this).attr('href');
-        if (url !== '#') {
-          CRM.loadForm(url)
-            .on('crmFormSuccess', function() {
-              if ($panel.data('civiCrmSnippet')) {
-                $panel.crmSnippet('refresh');
-              }
-              $('#mainTabContainer').tabs('option', 'active', $tab.prevAll().length);
-            });
-        } else {
-          $('#mainTabContainer').tabs('option', 'active', $tab.prevAll().length);
-        }
+      .on('click', '.crm-contact_actions-list a, .crm-contact_activities-list a', function(e) {
         $('#crm-contact-actions-list').hide();
-        return false;
+        if ($(this).attr('href') === '#') {
+          var $tab = $('#tab_' + ($(this).data('tab') || 'summary'));
+          CRM.tabHeader.focus($tab);
+          e.preventDefault();
+        } else {
+          CRM.popup.call(this, e);
+        }
+      })
+      .on('crmPopupFormSuccess',  '.crm-contact_actions-list a, .crm-contact_activities-list a', function() {
+        var $tab = $('#tab_' + ($(this).data('tab') || 'summary'));
+        CRM.tabHeader.resetTab($tab);
+        CRM.tabHeader.focus($tab);
       });
     $(document)
       // Actions menu
@@ -331,6 +326,5 @@
           _.each(data.reloadBlocks, reloadBlock);
         }
       });
-    $().crmAccordions();
   });
-})(cj);
+})(CRM.$, CRM._);

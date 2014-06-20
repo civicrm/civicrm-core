@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 <script  type="text/javascript">
 {literal}
 
-cj( function($) {
+CRM.$(function($) {
   // hide all the selects that contains only one option
   cj('.crm-message-select select').each(function (){
     if (cj(this).find('option').size() == 1) {
@@ -111,8 +111,5 @@ cj( function($) {
   </fieldset>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
 </div>
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
 </div>
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -49,14 +49,23 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
     return 'CRM_Mailing_BAO_Mailing';
   }
 
+  /**
+   * @return null
+   */
   function &links() {
     return CRM_Core_DAO::$_nullObject;
   }
 
+  /**
+   * @return null
+   */
   function editForm() {
     return NULL;
   }
 
+  /**
+   * @return string
+   */
   function editName() {
     return 'CiviMail Report';
   }
@@ -64,16 +73,26 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
   /**
    * Get user context.
    *
+   * @param null $mode
+   *
    * @return string user context.
    */
   function userContext($mode = NULL) {
     return 'civicrm/mailing/report';
   }
 
+  /**
+   * @param null $mode
+   *
+   * @return string
+   */
   function userContextParams($mode = NULL) {
     return 'reset=1&mid=' . $this->_mailing_id;
   }
 
+  /**
+   * @return string
+   */
   function run() {
     $this->_mailing_id = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
 

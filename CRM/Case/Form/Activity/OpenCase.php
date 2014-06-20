@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -47,6 +47,9 @@ class CRM_Case_Form_Activity_OpenCase {
    */
   public $_contactID;
 
+  /**
+   * @param $form
+   */
   static function preProcess(&$form) {
     //get multi client case configuration
     $xmlProcessorProcess = new CRM_Case_XMLProcessor_Process();
@@ -74,6 +77,11 @@ class CRM_Case_Form_Activity_OpenCase {
     $caseTypes = CRM_Case_PseudoConstant::caseType();
     $form->_caseTypeId = array_key_exists($caseTypeId, $caseTypes) ? $caseTypeId : NULL;
 
+    // check if the case status id passed in url is a valid one
+    $caseStatusId = CRM_Utils_Request::retrieve('case_status_id', 'Positive', $form);
+    $caseStatus = CRM_Case_PseudoConstant::caseStatus();
+    $form->_caseStatusId = array_key_exists($caseStatusId, $caseStatus) ? $caseStatusId : NULL;
+
     // Add attachments
     CRM_Core_BAO_File::buildAttachment( $form, 'civicrm_activity', $form->_activityId );
   }
@@ -83,6 +91,8 @@ class CRM_Case_Form_Activity_OpenCase {
    * the default values are retrieved from the database
    *
    * @access public
+   *
+   * @param $form
    *
    * @return void
    */
@@ -95,23 +105,22 @@ class CRM_Case_Form_Activity_OpenCase {
     list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
 
     // set default case status, case type, encounter medium, location type and phone type defaults are set in DB
-    $caseStatus = CRM_Core_OptionGroup::values('case_status', FALSE, FALSE, FALSE, 'AND is_default = 1');
-    if (count($caseStatus) == 1) {
-      $defaults['status_id'] = key($caseStatus);
+    if ($form->_caseStatusId) {
+      $caseStatus = $form->_caseStatusId;
     }
+    else {
+      $caseStatus = CRM_Core_OptionGroup::values('case_status', FALSE, FALSE, FALSE, 'AND is_default = 1');
+      if (count($caseStatus) == 1) {
+        $caseStatus = key($caseStatus); //$defaults['status_id'] = key($caseStatus);
+      }
+    }
+    $defaults['status_id'] = $caseStatus;
 
     // set default case type passed in url
     if ($form->_caseTypeId) {
       $caseType = $form->_caseTypeId;
+      $defaults['case_type_id'] = $caseType;
     }
-    else {
-      // set default case type if only one of it exists
-      $caseType = CRM_Core_OptionGroup::values('case_type', FALSE, FALSE, FALSE, 'AND is_default = 1');
-      if (count($caseType) == 1) {
-        $caseType = key($caseType);
-      }
-    }
-    $defaults['case_type_id'] = $caseType;
 
     $medium = CRM_Core_OptionGroup::values('encounter_medium', FALSE, FALSE, FALSE, 'AND is_default = 1');
     if (count($medium) == 1) {
@@ -142,17 +151,24 @@ class CRM_Case_Form_Activity_OpenCase {
       $form->addEntityRef('client_id', ts('Client'), array('create' => TRUE, 'multiple' => $form->_allowMultiClient), TRUE);
     }
 
-    $element = $form->addSelect(
-      'case_type_id',
-      array('onchange' => "CRM.buildCustomData('Case', this.value);"),
-      TRUE
+    $caseTypes = CRM_Case_PseudoConstant::caseType();
+    $element = $form->add('select',
+      'case_type_id', ts('Case Type'), $caseTypes,
+      TRUE, array('onchange' => "CRM.buildCustomData('Case', this.value);")
     );
 
     if ($form->_caseTypeId) {
       $element->freeze();
     }
 
-    $form->addSelect('status_id', array(), TRUE);
+    $csElement = $form->add('select', 'status_id', ts('Case Status'),
+      CRM_Case_PseudoConstant::caseStatus(),
+      FALSE
+    );
+
+    if ($form->_caseStatusId) {
+      $csElement->freeze();
+    }
 
     $form->add('text', 'duration', ts('Activity Duration'), array('size' => 4, 'maxlength' => 8));
     $form->addRule('duration', ts('Please enter the duration as number of minutes (integers only).'), 'positiveInteger');
@@ -195,6 +211,9 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @access public
    *
+   * @param $form
+   * @param $params
+   *
    * @return void
    */
   static function beginPostProcess(&$form, &$params) {
@@ -231,7 +250,11 @@ class CRM_Case_Form_Activity_OpenCase {
   /**
    * global validation rules for the form
    *
-   * @param array $values posted values of the form
+   * @param $fields
+   * @param $files
+   * @param $form
+   *
+   * @internal param array $values posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -250,6 +273,9 @@ class CRM_Case_Form_Activity_OpenCase {
    * Function to process the form
    *
    * @access public
+   *
+   * @param $form
+   * @param $params
    *
    * @return void
    */

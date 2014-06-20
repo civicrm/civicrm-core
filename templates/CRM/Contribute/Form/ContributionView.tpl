@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -194,14 +194,14 @@
   {/if}
 </table>
 
-{if $softContributions and !$pcp_id} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
+{if count($softContributions)} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
   <div class="crm-accordion-wrapper crm-soft-credit-pane">
     <div class="crm-accordion-header">
       {ts}Soft Credit{/ts}
     </div>
     <div class="crm-accordion-body">
       <table class="crm-info-panel crm-soft-credit-listing">
-        {foreach from=$softContributions.soft_credit item="softCont"}
+        {foreach from=$softContributions item="softCont"}
           <tr>
             <td>
               <a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$softCont.contact_id`"}"
@@ -247,14 +247,14 @@
       <table class="crm-info-panel">
         <tr>
           <td class="label">{ts}Personal Campaign Page{/ts}</td>
-          <td><a href="{crmURL p="civicrm/pcp/info" q="reset=1&id=`$pcp_id`"}">{$pcp}</a><br/>
+          <td><a href="{crmURL p="civicrm/pcp/info" q="reset=1&id=`$pcp_id`"}">{$pcp_title}</a><br/>
             <span class="description">{ts}Contribution was made through this personal campaign page.{/ts}</span>
           </td>
         </tr>
         <tr>
           <td class="label">{ts}Soft Credit To{/ts}</td>
-          <td><a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$soft_credit_to`"}" id="view_contact"
-                 title="{ts}View contact record{/ts}">{$softCreditToName}</a></td>
+          <td><a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$pcp_soft_credit_to_id`"}" id="view_contact"
+                 title="{ts}View contact record{/ts}">{$pcp_soft_credit_to_name}</a></td>
         </tr>
         <tr>
           <td class="label">{ts}In Public Honor Roll?{/ts}</td>

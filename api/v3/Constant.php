@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @deprecated
  * @package CiviCRM_APIv3
  * @subpackage API_Constant
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Constant.php 30171 2010-10-14 09:11:27Z mover $
  */
 
@@ -128,6 +128,9 @@ function civicrm_api3_constant_get($params) {
   return civicrm_api3_create_error('Unknown civicrm constant or method not callable');
 }
 
+/**
+ * @param $params
+ */
 function _civicrm_api3_constant_get_spec(&$params) {
 
   $params = (array

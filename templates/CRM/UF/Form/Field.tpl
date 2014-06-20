@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,7 +34,7 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout-compressed">
     <tr class="crm-uf-field-form-block-field_name">
-      <td class="label">{$form.field_name.label}</td>
+      <td class="label">{$form.field_name.label} {help id='field_name_0'}</td>
       <td>{$form.field_name.html}<br />
         <span class="description">&nbsp;{ts}Select the type of CiviCRM record and the field you want to include in this Profile.{/ts}</span></td>
     </tr>
@@ -96,7 +96,7 @@ var otherModule = new Array( );
 otherModule[{/literal}{$mkey}{literal}] = '{/literal}{$mval}{literal}';
 {/literal}{/foreach}{literal}
 
-cj(function($) {
+CRM.$(function($) {
   if ( $.inArray( "Profile", otherModule ) > -1 && $.inArray( "Search Profile", otherModule ) == -1 ){
     $('#profile_visibility').show();
   }
@@ -202,7 +202,7 @@ cj("#field_name_1").bind( 'change blur', function( ) {
   showHideSeletorSearch( );
 });
 
-cj( function( ) {
+CRM.$(function($) {
   cj("#field_name_1").addClass( 'huge' );
   viewOnlyShowHide( );
   cj("#is_view").click( function(){
@@ -216,7 +216,7 @@ cj("#field_name_1").change(
     multiSummaryToggle(cj(this).val());
   });
 
-cj( function( ) {
+CRM.$(function($) {
   var fieldId = cj("#field_name_1").val();
   multiSummaryToggle(fieldId);
 });
@@ -306,6 +306,3 @@ function verify( ) {
 
 </script>
 {/literal}
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}

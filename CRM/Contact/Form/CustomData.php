@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -131,7 +131,22 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
       if ($this->_multiRecordDisplay) {
         $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
         $this->_tableID = $this->_entityId;
+        $this->_contactType = CRM_Contact_BAO_Contact::getContactType($this->_tableID);
+        $mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
+        $hasReachedMax = CRM_Core_BAO_CustomGroup::hasReachedMaxLimit($this->_groupID, $this->_tableID);
+        if ($hasReachedMax && $mode == 'add') {
+          CRM_Core_Error::statusBounce(ts('The maximum record limit is reached'));
+        }
         $this->_copyValueId = CRM_Utils_Request::retrieve('copyValueId', 'Positive', $this);
+
+        $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_groupID);
+        $mode = CRM_Utils_Request::retrieve('mode', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'GET');
+        $mode = ucfirst($mode);
+        CRM_Utils_System::setTitle(ts('%1 %2 Record', array(1 => $mode, 2 => $groupTitle)));
+
+        if (!empty($_POST['hidden_custom'])) {
+          $this->assign('postedInfo', TRUE);
+        }
       }
       return;
     }
@@ -177,6 +192,11 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
                 'type' => 'upload',
                 'name' => ts('%1', array(1 => $saveButtonName)),
                 'isDefault' => TRUE,
+              ),
+              array(
+                'type' => 'upload',
+                'name' => ts('Save and New'),
+                'subName' => 'new',
               ),
               array(
                 'type' => 'cancel',
@@ -277,13 +297,20 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   public function postProcess() {
     // Get the form values and groupTree
     $params = $this->controller->exportValues($this->_name);
+
     CRM_Core_BAO_CustomValueTable::postProcess($params,
       $this->_groupTree[$this->_groupID]['fields'],
       'civicrm_contact',
       $this->_tableID,
       $this->_entityType
     );
-
+    $table = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_groupID, 'table_name');
+    $cgcount = CRM_Core_BAO_CustomGroup::customGroupDataExistsForEntity($this->_tableID, $table, TRUE);
+    $cgcount += 1;
+    $buttonName = $this->controller->getButtonName();
+    if ($buttonName == $this->getButtonName('upload', 'new')) {
+      CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/cd/edit', "reset=1&type={$this->_contactType}&groupID={$this->_groupID}&entityID={$this->_tableID}&cgcount={$cgcount}&multiRecordDisplay=single&mode=add"));
+    }
     // reset the group contact cache for this group
     CRM_Contact_BAO_GroupContactCache::remove();
   }

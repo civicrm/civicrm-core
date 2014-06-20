@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -159,6 +159,9 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * @access public
    * @return void
    */
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array();
 
@@ -223,6 +226,11 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
         )
       );
       return;
+    }
+
+    // We want the "new group" form to redirect the user
+    if ($this->_action == CRM_Core_Action::ADD) {
+      $this->preventAjaxSubmit();
     }
 
     $this->applyFilter('__ALL__', 'trim');
@@ -300,6 +308,9 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * global validation rules for the form
    *
    * @param array $fields posted values of the form
+   *
+   * @param $fileParams
+   * @param $options
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -439,6 +450,11 @@ WHERE  title = %1
    * @static
    * @access public
    */
+  /**
+   * @param $obj
+   *
+   * @return array
+   */
   static function buildParentGroups( &$obj ) {
     $groupNames = CRM_Core_PseudoConstant::group();
     $parentGroups = $parentGroupElements = array();
@@ -467,7 +483,7 @@ WHERE  title = %1
       $potentialParentGroupIds = array_keys($groupNames);
     }
 
-    $parentGroupSelectValues = array('' => '- ' . ts('select') . ' -');
+    $parentGroupSelectValues = array('' => '- ' . ts('select group') . ' -');
     foreach ($potentialParentGroupIds as $potentialParentGroupId) {
       if (array_key_exists($potentialParentGroupId, $groupNames)) {
         $parentGroupSelectValues[$potentialParentGroupId] = $groupNames[$potentialParentGroupId];
@@ -484,7 +500,7 @@ WHERE  title = %1
       else {
         $required = FALSE;
       }
-      $obj->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required);
+      $obj->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required, array('class' => 'crm-select2'));
     }
 
     return $parentGroups;

@@ -9,6 +9,10 @@
     padding: 4px;
 }
 
+.crm-container .crm-profile-selector-preview .icon {
+  float: none;
+}
+
 .crm-designer-toolbar {
   width: 290px;
   position: absolute;
@@ -244,6 +248,6 @@ button#crm-designer-add-custom-set {
 }
 
 /* Hide annoying 'preview' message */
-.crm-profile-selector-preview-pane > div.messages.status.info {
+.crm-profile-selector-preview-pane div.profile-preview-msg {
   display: none;
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_ACL_AssignUsersToRolesTest
+ */
 class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -48,9 +52,9 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
 
     $label = "TestAclRole" . substr(sha1(rand()), 0, 4);
     $this->type("label", $label);
-    $this->clickLink("_qf_Options_next-bottom");
+    $this->click("_qf_Options_next-bottom");
 
-    $this->waitForText('crm-notification-container', "The Acl Role '{$label}' has been saved");
+    $this->waitForText('crm-notification-container', "The ACL Role '{$label}' has been saved.");
 
     $this->openCiviPage("acl/entityrole", "action=add&reset=1");
 

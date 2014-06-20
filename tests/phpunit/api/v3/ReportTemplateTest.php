@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,7 +40,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
-    $this->_sethtmlGlobals();
   }
 
   function tearDown() {}
@@ -60,7 +59,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertEquals(7, $result['values'][$entityId]['component_id'], 'In line ' . __LINE__);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
-      AND option_group_id = 41 ');
+      AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"');
 
@@ -72,7 +71,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
-      AND option_group_id = 41');
+      AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       AND component_id IS NULL');
@@ -85,7 +84,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
-      AND option_group_id = 41');
+      AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
     $this->assertDBQuery(0, 'SELECT is_active FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"');
 
@@ -97,7 +96,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
-      AND option_group_id = 41');
+      AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"');
 

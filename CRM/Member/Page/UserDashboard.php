@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -72,7 +72,14 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
           'default_renewal_contribution_page'
         );
         if ($defaultRenewPageId) {
-          $membership[$dao->id]['renewPageId'] = $defaultRenewPageId;
+          //CRM-14831 - check if membership type is present in contrib page
+          $memBlock = CRM_Member_BAO_Membership::getMembershipBlock($defaultRenewPageId);
+          if ( !empty($memBlock['membership_types']) ) {
+            $memTypes = explode(',', $memBlock['membership_types']);
+            if ( in_array($dao->membership_type_id, $memTypes) ) {
+              $membership[$dao->id]['renewPageId'] = $defaultRenewPageId;
+            }
+          }
         }
       }
     }

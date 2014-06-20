@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
     // expire cookie in one day
@@ -225,6 +228,13 @@ SELECT  petition.id                         as id,
     return $activity;
   }
 
+  /**
+   * @param $activity_id
+   * @param $contact_id
+   * @param $petition_id
+   *
+   * @return bool
+   */
   function confirmSignature($activity_id, $contact_id, $petition_id) {
     // change activity status to completed (status_id = 2)
     // I wonder why do we need contact_id when we have activity_id anyway? [chastell]
@@ -271,8 +281,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * Function to get Petition Signature Total
    *
-   * @param boolean $all
-   * @param int $id
+   * @param $surveyId
+   *
+   * @return array
+   * @internal param bool $all
+   * @internal param int $id
    * @static
    */
   static function getPetitionSignatureTotalbyCountry($surveyId) {
@@ -313,8 +326,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * Function to get Petition Signature Total
    *
-   * @param boolean $all
-   * @param int $id
+   * @param $surveyId
+   *
+   * @return array
+   * @internal param bool $all
+   * @internal param int $id
    * @static
    */
   static function getPetitionSignatureTotal($surveyId) {
@@ -339,6 +355,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
 
+  /**
+   * @param null $surveyId
+   *
+   * @return array
+   */
   public static function getSurveyInfo($surveyId = NULL) {
     $surveyInfo = array();
 
@@ -368,8 +389,12 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * Function to get Petition Signature Details
    *
-   * @param boolean $all
-   * @param int $id
+   * @param $surveyId
+   * @param null $status_id
+   *
+   * @return array
+   * @internal param bool $all
+   * @internal param int $id
    * @static
    */
   static function getPetitionSignature($surveyId, $status_id = NULL) {
@@ -466,6 +491,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    *
    * @param int $surveyId
    * @param int $contactId
+   *
+   * @return array
    * @static
    */
   static function checkSignature($surveyId, $contactId) {
@@ -517,8 +544,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @return
-   * @access public
+   * @param $sendEmailMode
+   *
+   * @throws Exception
+   * @return void
+  @access public
    * @static
    */
   public static function sendEmail($params, $sendEmailMode) {

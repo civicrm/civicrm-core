@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -441,7 +441,9 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
               $endDate,
               $joinDate,
               'today',
-              $excludeIsAdmin
+              $excludeIsAdmin,
+              $formatted['membership_type_id'],
+              $formatted
             );
 
             if (empty($formatted['status_id'])) {
@@ -529,7 +531,9 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           $endDate,
           $joinDate,
           'today',
-          $excludeIsAdmin
+          $excludeIsAdmin,
+          $formatted['membership_type_id'],
+          $formatted
         );
         if (empty($formatted['status_id'])) {
           $formatted['status_id'] = CRM_Utils_Array::value('id', $calcStatus);
@@ -579,11 +583,13 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
   /**
    *  to calculate join, start and end dates
    *
-   *  @param Array $calcDates array of dates returned by getDatesForMembershipType()
+   * @param Array $calcDates array of dates returned by getDatesForMembershipType()
    *
-   *  @return Array formatted containing date values
+   * @param $formatted
    *
-   *  @access public
+   * @return Array formatted containing date values
+   *
+   * @access public
    */
   function formattedDates($calcDates, &$formatted) {
     $dates = array(
@@ -603,19 +609,21 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       }
     }
   }
+
   /**
    * @deprecated - this function formats params according to v2 standards but
    * need to be sure about the impact of not calling it so retaining on the import class
    * take the input parameter list as specified in the data model and
    * convert it into the same format that we use in QF and BAO object
    *
-   * @param array  $params       Associative array of property name/value
+   * @param array $params Associative array of property name/value
    *                             pairs to insert in new contact.
-   * @param array  $values       The reformatted properties that we can use internally
+   * @param array $values The reformatted properties that we can use internally
    *
-   * @param array  $create       Is the formatted Values array going to
+   * @param array|bool $create Is the formatted Values array going to
    *                             be used for CRM_Member_BAO_Membership:create()
    *
+   * @throws Exception
    * @return array|error
    * @access public
    */

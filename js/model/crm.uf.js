@@ -1,5 +1,4 @@
-(function($) {
-  var CRM = (window.CRM) ? (window.CRM) : (window.CRM = {});
+(function($, _) {
   if (!CRM.UF) CRM.UF = {};
 
   var YESNO = [
@@ -88,6 +87,8 @@
         return 'membership_1';
       case 'Participant':
         return 'participant_1';
+      case 'Case':
+        return 'case_1';
       default:
         throw "Cannot guess entity name for field_type=" + field_type;
     }
@@ -687,8 +688,14 @@
 
       // set proper entity model based on selected profile
       var contactTypes = ['Individual', 'Household', 'Organization'];
-      var profileType = ufGroupModel.get('group_type');
+      var profileType = ufGroupModel.get('group_type') || '';
+
+      // check if selected profile have subtype defined eg: ["Individual,Contact,Case", "caseType:7"]
+      if (_.isArray(profileType) && profileType[0]) {
+        profileType = profileType[0];
+      }
       profileType = profileType.split(',');
+
       var ufEntityModel;
       _.each(profileType, function (ptype) {
         if ($.inArray(ptype, contactTypes) > -1) {
@@ -704,7 +711,7 @@
 
       var newUfEntityModels = [];
       _.each(allEntityModels, function (values) {
-        if (values.entity_name == 'contact_1') {
+        if (entityType && values.entity_name == 'contact_1') {
           values.entity_type = entityType;
         }
         newUfEntityModels.push(new CRM.UF.UFEntityModel(values));
@@ -776,4 +783,4 @@
   CRM.UF.UFGroupCollection = CRM.Backbone.Collection.extend({
     model: CRM.UF.UFGroupModel
   });
-})(cj);
+})(CRM.$, CRM._);

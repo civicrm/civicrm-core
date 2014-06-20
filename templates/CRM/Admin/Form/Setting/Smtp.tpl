@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 
     <p>If you do not want users to send outbound mail from CiviCRM, select "Disable Outbound Email". NOTE: If you disable outbound email, and you are using Online Contribution pages or online Event Registration - you will need to disable automated receipts and registration confirmations.</p>
 
-   <p>If you choose Redirect to Database, all emails will be recorded as archived mailings instead of being sent out.</p>{/ts}
+   <p>If you choose Redirect to Database, all emails will be recorded as archived mailings instead of being sent out. They can be found in the civicrm_mailing_spool table in the CiviCRM database.</p>{/ts}
 
 </div>
      <table class="form-layout-compressed">
@@ -100,7 +100,7 @@
 
 {literal}
 <script type="text/javascript">
-    cj( function( ) {
+    CRM.$(function($) {
       var mailSetting = cj("input[name='outBound_option']:checked").val( );
 
       var archiveWarning = "{/literal}{ts escape='js'}WARNING: You are switching from a testing mode (Redirect to Database) to a live mode. Check Mailings > Archived Mailings, and delete any test mailings that are not in Completed status prior to running the mailing cron job for the first time. This will ensure that test mailings are not actually sent out.{/ts}{literal}"

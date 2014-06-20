@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -91,7 +91,7 @@
 </div>
 {literal}
 <script type="text/javascript">
-cj(function(){
+CRM.$(function($) {
     //if price set is set we use below below code to show for showing auto renew
     var autoRenewOption =  {/literal}'{$autoRenewOption}'{literal};
     cj('#allow_auto_renew').hide();
@@ -240,7 +240,7 @@ cj(function(){
 {if $membershipBlock AND $quickConfig}
 {literal}
 <script type="text/javascript">
-cj(function(){
+CRM.$(function($) {
     showHideAutoRenew( null );
 });
 function showHideAutoRenew( memTypeId )
@@ -291,7 +291,7 @@ function showHideAutoRenew( memTypeId )
 }
 
 {/literal}{if $allowAutoRenewMembership}{literal}
-  cj( function( ) {
+  CRM.$(function($) {
      //keep read only always checked.
      cj( "#auto_renew" ).click(function( ) {
         if ( cj(this).attr( 'readonly' ) ) {

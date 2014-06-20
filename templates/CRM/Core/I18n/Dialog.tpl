@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,8 +37,6 @@ function loadDialog( url, fieldName ) {
       width       : 290,
       height      : 290,
       resizable   : true,
-      bgiframe    : true,
-      overlay     : { opacity: 0.5, background: "black" },
       beforeclose : function(event, ui) {
                      cj(this).dialog("destroy");
                        }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -45,6 +45,9 @@ class CRM_Contact_Form_Search_Custom_Group
   protected $_aclFrom = NULL;
   protected $_aclWhere = NULL;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     $this->_formValues = $formValues;
     $this->_columns = array(
@@ -87,6 +90,9 @@ class CRM_Contact_Form_Search_Custom_Group
     // in other parts after the object is destroyed
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
 
     $this->setTitle(ts('Include / Exclude Search'));
@@ -164,6 +170,9 @@ class CRM_Contact_Form_Search_Custom_Group
   /*
    * Set search form field defaults here.
    */
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array( 'andOr' => '1' );
 
@@ -177,6 +186,15 @@ class CRM_Contact_Form_Search_Custom_Group
     return $defaults;
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return string
+   */
   function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
@@ -241,6 +259,9 @@ class CRM_Contact_Form_Search_Custom_Group
         $sql .= " ORDER BY contact_id ASC";
       }
     }
+    else {
+      $sql .= " ORDER BY contact_a.id ASC";
+    }
 
     if ($offset >= 0 && $rowcount > 0) {
       $sql .= " LIMIT $offset, $rowcount ";
@@ -249,6 +270,10 @@ class CRM_Contact_Form_Search_Custom_Group
     return $sql;
   }
 
+  /**
+   * @return string
+   * @throws Exception
+   */
   function from() {
 
     $iGroups = $xGroups = $iTags = $xTags = 0;
@@ -547,6 +572,11 @@ WHERE  gcc.group_id = {$ssGroup->id}
     return $from;
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     if ($includeContactIDs) {
       $contactIDs = array();
@@ -575,6 +605,9 @@ WHERE  gcc.group_id = {$ssGroup->id}
   /*
      * Functions below generally don't need to be modified
      */
+  /**
+   * @return mixed
+   */
   function count() {
     $sql = $this->all();
 
@@ -582,22 +615,42 @@ WHERE  gcc.group_id = {$ssGroup->id}
     return $dao->N;
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $returnSQL
+   *
+   * @return string
+   */
   function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
+  /**
+   * @return array
+   */
   function &columns() {
     return $this->_columns;
   }
 
+  /**
+   * @return null
+   */
   function summary() {
     return NULL;
   }
 
+  /**
+   * @return string
+   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
@@ -607,6 +660,9 @@ WHERE  gcc.group_id = {$ssGroup->id}
     }
   }
 
+  /**
+   * @param string $tableAlias
+   */
   function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }

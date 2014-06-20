@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -100,24 +100,24 @@
 
 {literal}
 <script type="text/javascript">
-cj(function($) {
+CRM.$(function($) {
   var tag;
-  $('.merge_tag').click(function() {
+  $('.merge_tag').click(function(e) {
     tag = $(this).crmEditableEntity();
     mergeTagDialog();
-    return false;
+    e.preventDefault();
   });
 
   function mergeTagDialog() {
     var tagUrl = {/literal}"{crmURL p='civicrm/ajax/mergeTagList' h=0}"{literal};
     var title = {/literal}'{ts escape="js" 1="%1"}Merge tag %1 into:{/ts}'{literal};
-    CRM.confirm(doMergeTag, {
+    CRM.confirm({
       title: ts(title, {1: tag.name}),
       message: '<input name="select_merge_tag" class="big" />',
       open: function() {
         var dialog = this;
         $('input[name=select_merge_tag]', dialog)
-          .select2({
+          .crmSelect2({
             placeholder: {/literal}'{ts escape="js"}- select tag -{/ts}'{literal},
             minimumInputLength: 1,
             ajax: {
@@ -136,34 +136,33 @@ cj(function($) {
               $(dialog).append('<div class="messages status">{/literal}{ts escape='js'}Note: the selected tag is used by additional entities.{/ts}{literal}</div>');
             }
           });
-      },
-      close: function() {
+      }
+    })
+      .on('dialogclose', function() {
         $('input[name=select_merge_tag]', this).select2('destroy');
-        $(this).dialog('destroy').remove();
-      }
-    });
-  }
-
-  function doMergeTag() {
-    var toId = $("input[name=select_merge_tag]").val();
-    if (!toId) {
-      return false;
-    }
-    /* send synchronous request so that disabling any actions for slow servers*/
-    var postUrl = {/literal}"{crmURL p='civicrm/ajax/mergeTags' h=0 }"{literal};
-    var data = {fromId: tag.id, toId: toId, key:{/literal}"{crmKey name='civicrm/ajax/mergeTags'}"{literal}};
-    cj.ajax({
-      type: "POST",
-      url: postUrl,
-      data: data,
-      dataType: "json",
-      success: function(values) {
-        if ( values.status == true ) {
-          $('#tag-' + toId).children('td.crm-tag-used_for').text(values.tagB_used_for);
-          $('#tag-' + tag.id).html('<td colspan="8"><div class="status message"><div class="icon inform-icon"></div>' + values.message + '</div></td>');
+      })
+      .on('crmConfirm:yes', function() {
+        var toId = $("input[name=select_merge_tag]", this).val();
+        if (!toId) {
+          $("input[name=select_merge_tag]", this).crmError(ts('Select a tag'));
+          return false;
         }
-      }
-    });
+        /* send synchronous request so that disabling any actions for slow servers*/
+        var postUrl = {/literal}"{crmURL p='civicrm/ajax/mergeTags' h=0 }"{literal};
+        var data = {fromId: tag.id, toId: toId, key:{/literal}"{crmKey name='civicrm/ajax/mergeTags'}"{literal}};
+        cj.ajax({
+          type: "POST",
+          url: postUrl,
+          data: data,
+          dataType: "json",
+          success: function(values) {
+            if ( values.status == true ) {
+              $('#tag-' + toId).children('td.crm-tag-used_for').text(values.tagB_used_for);
+              $('#tag-' + tag.id).html('<td colspan="8"><div class="status message"><div class="icon inform-icon"></div>' + values.message + '</div></td>');
+            }
+          }
+        });
+      });
   }
 });
 </script>

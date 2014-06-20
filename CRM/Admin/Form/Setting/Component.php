@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -95,6 +95,9 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
     return $errors;
   }
 
+  /**
+   * @return array
+   */
   private function _getComponentSelectValues() {
     $ret = array();
     $this->_components = CRM_Core_Component::getComponents();
@@ -115,6 +118,11 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
     CRM_Core_BAO_Navigation::resetNavigation();
   }
 
+  /**
+   * @param $dsn
+   * @param $fileName
+   * @param bool $lineMode
+   */
   public static function loadCaseSampleData($dsn, $fileName, $lineMode = FALSE) {
     global $crmPath;
 

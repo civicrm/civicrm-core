@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -41,8 +41,19 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
    */
   protected $_isRedact;
 
+  /**
+   *
+   */
   public function __construct() {}
 
+  /**
+   * @param $clientID
+   * @param $caseID
+   * @param $activitySetName
+   * @param $params
+   *
+   * @return mixed
+   */
   function run($clientID, $caseID, $activitySetName, $params) {
     $contents = self::getCaseReport($clientID,
       $caseID,
@@ -77,6 +88,12 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
     }
   }
 
+  /**
+   * @param $clientID
+   * @param $caseID
+   *
+   * @return array
+   */
   function &caseInfo($clientID,
     $caseID
   ) {
@@ -129,6 +146,12 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
     return $case;
   }
 
+  /**
+   * @param $xml
+   * @param $activitySetName
+   *
+   * @return array|bool
+   */
   function getActivityTypes($xml, $activitySetName) {
     foreach ($xml->ActivitySets as $activitySetsXML) {
       foreach ($activitySetsXML->ActivitySet as $activitySetXML) {
@@ -151,6 +174,12 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
     return FALSE;
   }
 
+  /**
+   * @param $xml
+   * @param $activitySetName
+   *
+   * @return null|string
+   */
   function getActivitySetLabel($xml, $activitySetName) {
     foreach ($xml->ActivitySets as $activitySetsXML) {
       foreach ($activitySetsXML->ActivitySet as $activitySetXML) {
@@ -162,6 +191,12 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
     return NULL;
   }
 
+  /**
+   * @param $clientID
+   * @param $caseID
+   * @param $activityTypes
+   * @param $activities
+   */
   function getActivities($clientID, $caseID, $activityTypes, &$activities) {
     // get all activities for this case that in this activityTypes set
     foreach ($activityTypes as $aType) {
@@ -200,6 +235,14 @@ AND    ac.case_id = %1
     }
   }
 
+  /**
+   * @param $clientID
+   * @param $activityID
+   * @param bool $anyActivity
+   * @param int $redact
+   *
+   * @return mixed
+   */
   function &getActivityInfo($clientID, $activityID, $anyActivity = FALSE, $redact = 0) {
     static $activityInfos = array();
     if ($redact) {
@@ -261,6 +304,13 @@ WHERE      a.id = %1
     return $activityInfos[$index];
   }
 
+  /**
+   * @param $clientID
+   * @param $activityDAO
+   * @param $activityTypeInfo
+   *
+   * @return array
+   */
   function &getActivity($clientID, $activityDAO, &$activityTypeInfo) {
     if (empty($this->_redactionStringRules)) {
       $this->_redactionStringRules = array();
@@ -483,6 +533,13 @@ WHERE      a.id = %1
     return $activity;
   }
 
+  /**
+   * @param $clientID
+   * @param $activityDAO
+   * @param $activityTypeInfo
+   *
+   * @return array|null
+   */
   function getCustomData($clientID, $activityDAO, &$activityTypeInfo) {
     list($typeValues, $options, $sql) = $this->getActivityTypeCustomSQL($activityTypeInfo['id'], '%Y-%m-%d');
 
@@ -536,6 +593,12 @@ WHERE      a.id = %1
     return empty($customGroups) ? NULL : $customGroups;
   }
 
+  /**
+   * @param $activityTypeID
+   * @param null $dateFormat
+   *
+   * @return mixed
+   */
   function getActivityTypeCustomSQL($activityTypeID, $dateFormat = NULL) {
     static $cache = array();
 
@@ -632,6 +695,11 @@ WHERE  entity_id = %1
     return $cache[$activityTypeID];
   }
 
+  /**
+   * @param $activityID
+   *
+   * @return null|string
+   */
   function getCreatedBy($activityID) {
     $query = "
 SELECT c.display_name
@@ -647,6 +715,13 @@ LIMIT  1
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
+  /**
+   * @param $string
+   * @param bool $printReport
+   * @param array $replaceString
+   *
+   * @return mixed
+   */
   private function redact($string, $printReport = FALSE, $replaceString = array(
     )) {
     if ($printReport) {
@@ -659,7 +734,16 @@ LIMIT  1
     return $string;
   }
 
-  function getCaseReport($clientID, $caseID, $activitySetName, $params, $form) {
+  /**
+   * @param $clientID
+   * @param $caseID
+   * @param $activitySetName
+   * @param $params
+   * @param $form
+   *
+   * @return mixed
+   */
+  static function getCaseReport($clientID, $caseID, $activitySetName, $params, $form) {
 
     $template = CRM_Core_Smarty::singleton();
 
@@ -721,7 +805,7 @@ LIMIT  1
     return $contents;
   }
 
-  function printCaseReport() {
+  static function printCaseReport() {
     $caseID            = CRM_Utils_Request::retrieve('caseID', 'Positive', CRM_Core_DAO::$_nullObject);
     $clientID          = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject);
     $activitySetName   = CRM_Utils_Request::retrieve('asn', 'String', CRM_Core_DAO::$_nullObject);

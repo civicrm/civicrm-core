@@ -2,7 +2,13 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Core_RegionTest
+ */
 class CRM_Core_RegionTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name'    => 'Region',
@@ -111,7 +117,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
       . "callback-return<br/>"
       . "<script type=\"text/javascript\" src=\"/foo%20bar.js\">\n</script>\n"
       . "<script type=\"text/javascript\">\nalert(\"hi\");\n</script>\n"
-      . "<script type=\"text/javascript\">\ncj(function(\$){\n\$(\"div\");\n});\n</script>\n"
+      . "<script type=\"text/javascript\">\nCRM.\$(function(\$) {\n\$(\"div\");\n});\n</script>\n"
       . "<link href=\"/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
       . "<style type=\"text/css\">\nbody { background: black; }\n</style>\n"
       ;

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,16 +28,28 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: $
  *
  */
 class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
 
+  /**
+   * class constructor
+   *
+   * @access public
+   * @return \CRM_SMS_DAO_Provider
+   */
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
 
+  /**
+   * @return null|string
+   */
   static function activeProviderCount() {
     $activeProviders = CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_sms_provider WHERE is_active = 1');
     return $activeProviders;
@@ -49,6 +61,14 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
    * @access public
    * $selectArr array of coloumns to fetch
    * $getActive boolean to get active providers
+   */
+  /**
+   * @param null $selectArr
+   * @param null $filter
+   * @param bool $getActive
+   * @param string $orderBy
+   *
+   * @return array
    */
   static function getProviders($selectArr = NULL, $filter = NULL, $getActive = TRUE, $orderBy = 'id') {
 
@@ -76,12 +96,19 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
     return $providers;
   }
 
+  /**
+   * @param $values
+   */
   static function saveRecord($values) {
     $dao = new CRM_SMS_DAO_Provider();
     $dao->copyValues($values);
     $dao->save();
   }
 
+  /**
+   * @param $values
+   * @param $providerId
+   */
   static function updateRecord($values, $providerId) {
     $dao = new CRM_SMS_DAO_Provider();
     $dao->id = $providerId;
@@ -91,10 +118,22 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
     }
   }
 
+  /**
+   * @param $id
+   * @param $is_active
+   *
+   * @return bool
+   */
   static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_SMS_DAO_Provider', $id, 'is_active', $is_active);
   }
 
+  /**
+   * @param $providerID
+   *
+   * @return null
+   * @throws Exception
+   */
   static function del($providerID) {
     if (!$providerID) {
       CRM_Core_Error::fatal(ts('Invalid value passed to delete function'));
@@ -108,6 +147,13 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
     $dao->delete();
   }
 
+  /**
+   * @param $providerID
+   * @param null $returnParam
+   * @param null $returnDefaultString
+   *
+   * @return mixed
+   */
   public static function getProviderInfo($providerID, $returnParam = NULL, $returnDefaultString = NULL) {
     static $providerInfo = array();
 

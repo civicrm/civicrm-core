@@ -59,17 +59,17 @@ INSERT INTO `civicrm_contact` (`id`, `contact_type`, `contact_sub_type`, `do_not
 -- Dumping data for table `civicrm_contribution`
 --
 
-INSERT INTO `civicrm_contribution` (`id`, `contact_id`, `financial_type_id`, `contribution_page_id`, `payment_instrument_id`, `receive_date`, `non_deductible_amount`, `total_amount`, `fee_amount`, `net_amount`, `trxn_id`, `invoice_id`, `currency`, `cancel_date`, `cancel_reason`, `receipt_date`, `thankyou_date`, `source`, `amount_level`, `contribution_recur_id`, `honor_contact_id`, `is_test`, `is_pay_later`, `contribution_status_id`, `honor_type_id`, `address_id`, `check_number`, `campaign_id`) VALUES
-(1, 2, 1, NULL, 4, '2010-04-11 00:00:00', 0.00, 125.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, NULL, 0, 0, 1, NULL, NULL, '1041', NULL),
-(2, 4, 1, NULL, 1, '2010-03-21 00:00:00', 0.00, 50.00, NULL, NULL, 'P20901X1', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Save the Penguins', NULL, NULL, NULL, 0, 0, 1, NULL, NULL, NULL, NULL),
-(3, 6, 1, NULL, 4, '2010-04-29 00:00:00', 0.00, 25.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, NULL, 0, 0, 1, NULL, NULL, '2095', NULL),
-(4, 8, 1, NULL, 4, '2010-04-11 00:00:00', 0.00, 50.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, NULL, 0, 0, 1, NULL, NULL, '10552', NULL),
-(5, 16, 1, NULL, 4, '2010-04-15 00:00:00', 0.00, 500.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, NULL, 0, 0, 1, NULL, NULL, '509', NULL),
-(6, 19, 1, NULL, 4, '2010-04-11 00:00:00', 0.00, 175.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, NULL, 0, 0, 1, NULL, NULL, '102', NULL),
-(7, 82, 1, NULL, 1, '2010-03-27 00:00:00', 0.00, 50.00, NULL, NULL, 'P20193L2', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Save the Penguins', NULL, NULL, NULL, 0, 0, 1, NULL, NULL, NULL, NULL),
-(8, 92, 1, NULL, 1, '2010-03-08 00:00:00', 0.00, 10.00, NULL, NULL, 'P40232Y3', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM', NULL, NULL, NULL, 0, 0, 1, NULL, NULL, NULL, NULL),
-(9, 34, 1, NULL, 1, '2010-04-22 00:00:00', 0.00, 250.00, NULL, NULL, 'P20193L6', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM', NULL, NULL, NULL, 0, 0, 1, NULL, NULL, NULL, NULL),
-(10, 71, 1, NULL, 1, '2009-07-01 11:53:50', 0.00, 500.00, NULL, NULL, 'PL71', NULL, 'USD', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, NULL, NULL, NULL, NULL);
+INSERT INTO `civicrm_contribution` (`id`, `contact_id`, `financial_type_id`, `contribution_page_id`, `payment_instrument_id`, `receive_date`, `non_deductible_amount`, `total_amount`, `fee_amount`, `net_amount`, `trxn_id`, `invoice_id`, `currency`, `cancel_date`, `cancel_reason`, `receipt_date`, `thankyou_date`, `source`, `amount_level`, `contribution_recur_id`, `is_test`, `is_pay_later`, `contribution_status_id`, `address_id`, `check_number`, `campaign_id`) VALUES
+(1, 2, 1, NULL, 4, '2010-04-11 00:00:00', 0.00, 125.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, 0, 0, 1, NULL, '1041', NULL),
+(2, 4, 1, NULL, 1, '2010-03-21 00:00:00', 0.00, 50.00, NULL, NULL, 'P20901X1', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Save the Penguins', NULL, NULL, 0, 0, 1, NULL, NULL, NULL),
+(3, 6, 1, NULL, 4, '2010-04-29 00:00:00', 0.00, 25.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, 0, 0, 1, NULL, '2095', NULL),
+(4, 8, 1, NULL, 4, '2010-04-11 00:00:00', 0.00, 50.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, 0, 0, 1, NULL, '10552', NULL),
+(5, 16, 1, NULL, 4, '2010-04-15 00:00:00', 0.00, 500.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, 0, 0, 1, NULL, '509', NULL),
+(6, 19, 1, NULL, 4, '2010-04-11 00:00:00', 0.00, 175.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, 0, 0, 1, NULL, '102', NULL),
+(7, 82, 1, NULL, 1, '2010-03-27 00:00:00', 0.00, 50.00, NULL, NULL, 'P20193L2', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Save the Penguins', NULL, NULL, 0, 0, 1, NULL, NULL, NULL),
+(8, 92, 1, NULL, 1, '2010-03-08 00:00:00', 0.00, 10.00, NULL, NULL, 'P40232Y3', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM', NULL, NULL, 0, 0, 1, NULL, NULL, NULL),
+(9, 34, 1, NULL, 1, '2010-04-22 00:00:00', 0.00, 250.00, NULL, NULL, 'P20193L6', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM', NULL, NULL, 0, 0, 1, NULL, NULL, NULL),
+(10, 71, 1, NULL, 1, '2009-07-01 11:53:50', 0.00, 500.00, NULL, NULL, 'PL71', NULL, 'USD', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, NULL, NULL, NULL);
 
 --
 -- Dumping data for table `civicrm_email`

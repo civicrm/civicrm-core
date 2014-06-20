@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -122,7 +122,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       if ($element->getAttribute('data-api-entity') && $element->getAttribute('data-entity-value')) {
         $this->renderFrozenEntityRef($el, $element);
       }
-      $el['html'] = '<div class="crm-frozen-field">' . $el['html'] . '</div>';
+      $el['html'] = '<span class="crm-frozen-field">' . $el['html'] . '</span>';
     }
     // Active form elements
     else {
@@ -186,6 +186,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     elseif (strpos($class, 'crm-form-entityref') !== FALSE) {
       self::preProcessEntityRef($element);
     }
+    elseif (strpos($class, 'crm-form-contact-reference') !== FALSE) {
+      self::preprocessContactReference($element);
+    }
 
     if ($required) {
       $class .= ' required';
@@ -201,6 +204,8 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
 
   /**
    * Convert IDs to values and format for display
+   *
+   * @param $field HTML_QuickForm_element
    */
   static function preProcessEntityRef($field) {
     $val = $field->getValue();
@@ -248,6 +253,37 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     }
 
     $el['html'] = implode('; ', $display) . '<input type="hidden" value="'. $field->getValue() . '" name="' . $field->getAttribute('name') . '">';
+  }
+
+  /**
+   * Pre-fill contact name for a custom field of type ContactReference
+   *
+   * Todo: Migrate contact reference fields to use EntityRef
+   *
+   * @param $field HTML_QuickForm_element
+   */
+  static function preprocessContactReference($field) {
+    $val = $field->getValue();
+    if ($val && is_numeric($val)) {
+
+      $list = array_keys(CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+        'contact_reference_options'
+      ), '1');
+
+      $return = array_unique(array_merge(array('sort_name'), $list));
+
+      $contact = civicrm_api('contact', 'getsingle', array('id' => $val, 'return' => $return, 'version' => 3));
+
+      if (!empty($contact['id'])) {
+        $view = array();
+        foreach ($return as $fld) {
+          if (!empty($contact[$fld])) {
+            $view[] = $contact[$fld];
+          }
+        }
+        $field->setAttribute('data-entity-value', json_encode(array('id' => $contact['id'], 'text' => implode(' :: ', $view))));
+      }
+    }
   }
 
   /**

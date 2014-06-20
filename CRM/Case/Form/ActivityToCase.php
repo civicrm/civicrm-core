@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -65,17 +65,12 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    * @return array
    */
   function setDefaultValues() {
-    $targetContactValues = $defaults = array();
+    $defaults = array();
     $params = array('id' => $this->_activityId);
 
     CRM_Activity_BAO_Activity::retrieve($params, $defaults);
-    $defaults['case_activity_subject'] = $defaults['subject'];
-    if (!CRM_Utils_Array::crmIsEmptyArray($defaults['target_contact'])) {
-      $targetContactValues = array_combine(array_unique($defaults['target_contact']),
-        explode(';', trim($defaults['target_contact_value']))
-      );
-    }
-    $this->assign('targetContactValues', empty($targetContactValues) ? FALSE : $targetContactValues);
+    $defaults['file_on_case_activity_subject'] = $defaults['subject'];
+    $defaults['file_on_case_target_contact_id'] = $defaults['target_contact'];
 
     return $defaults;
   }
@@ -87,13 +82,9 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
-    // tokeninput url
-    $tokenUrl = CRM_Utils_System::url("civicrm/ajax/checkemail", "noemail=1", FALSE, NULL, FALSE);
-    $this->assign('tokenUrl', $tokenUrl);
-
-    $this->add('text', 'unclosed_case_id', ts('Select Case'), array('class' => 'huge'), TRUE);
-    $this->add('text', 'target_contact_id', ts('With Contact(s)'));
-    $this->add('text', 'case_activity_subject', ts('Subject'), array('size' => 50));
+    $this->add('text', 'file_on_case_unclosed_case_id', ts('Select Case'), array('class' => 'huge'), TRUE);
+    $this->addEntityRef('file_on_case_target_contact_id', ts('With Contact(s)'), array('multiple' => TRUE));
+    $this->add('text', 'file_on_case_activity_subject', ts('Subject'), array('size' => 50));
   }
 }
 

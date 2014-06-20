@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -44,12 +44,14 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
   /**
    * Function to delete the discount
    *
-   * @param int $id   discount id
+   * @param $entityId
+   * @param $entityTable
+   *
+   * @internal param int $id discount id
    *
    * @return boolean
    * @access public
    * @static
-   *
    */
   static function del($entityId,$entityTable) {
     // delete all discount records with the selected discounted id
@@ -106,9 +108,10 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
   /**
    * Determine in which discount set the registration date falls
    *
-   * @param  integer  $entityId      entity id to be searched
-   * @param  string   $entityTable   entity table to be searched
+   * @param $entityID
+   * @param  string $entityTable entity table to be searched
    *
+   * @internal param int $entityId entity id to be searched
    * @return integer  $dao->id       discount id of the set which matches
    *                                 the date criteria
    */

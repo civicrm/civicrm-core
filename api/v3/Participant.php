@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Participant
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Participant.php 30486 2010-11-02 16:12:09Z shot $
  *
  */
@@ -138,35 +138,15 @@ function _civicrm_api3_participant_create_spec(&$params) {
  * @access public
  */
 function civicrm_api3_participant_get($params) {
+  $mode = CRM_Contact_BAO_Query::MODE_EVENT;
+  $entity = 'participant';
 
-  $options          = _civicrm_api3_get_options_from_params($params, TRUE,'participant','get');
-  $sort             = CRM_Utils_Array::value('sort', $options, NULL);
-  $offset           = CRM_Utils_Array::value('offset', $options);
-  $rowCount         = CRM_Utils_Array::value('limit', $options);
-  $smartGroupCache  = CRM_Utils_Array::value('smartGroupCache', $params);
-  $inputParams      = CRM_Utils_Array::value('input_params', $options, array());
-  $returnProperties = CRM_Utils_Array::value('return', $options, NULL);
-
-  if (empty($returnProperties)) {
-    $returnProperties = CRM_Event_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_EVENT);
-  }
-  $newParams = CRM_Contact_BAO_Query::convertFormValues($inputParams);
-  $query = new CRM_Contact_BAO_Query($newParams, $returnProperties, NULL,
-    FALSE, FALSE, CRM_Contact_BAO_Query::MODE_EVENT
-  );
-  list($select, $from, $where, $having) = $query->query();
-
-  $sql = "$select $from $where $having";
-
-  if (!empty($sort)) {
-    $sql .= " ORDER BY $sort ";
-  }
-  $sql .= " LIMIT $offset, $rowCount ";
-  $dao = CRM_Core_DAO::executeQuery($sql);
+  list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, $entity);
 
   $participant = array();
   while ($dao->fetch()) {
     $participant[$dao->participant_id] = $query->store($dao);
+    //@todo - is this required - contribution & pledge use the same query but don't self-retrieve custom data
     _civicrm_api3_custom_data_get($participant[$dao->participant_id], 'Participant', $dao->participant_id, NULL);
   }
 
@@ -188,9 +168,11 @@ function _civicrm_api3_participant_get_spec(&$params) {
  *
  * This API is used for deleting a contact participant
  *
- * @param  array  $params Array containing  Id of the contact participant to be deleted
+ * @param  array $params Array containing  Id of the contact participant to be deleted
  *
  * {@getfields participant_delete}
+ * @throws Exception
+ * @return array
  * @access public
  */
 function civicrm_api3_participant_delete($params) {

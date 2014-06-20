@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -85,7 +85,7 @@
         {capture assign=ccModeLink}{crmURL p='civicrm/payment/add' q="reset=1&action=add&cid=`$contactId`&id=`$id`&component=`$component`&mode=live"}{/capture}
        {/if}
       {if $paymentType eq 'owed'}
-        <span class="action-link crm-link-credit-card-mode">&nbsp;<a href="{$ccModeLink}">&raquo; {ts}submit credit card payment{/ts}</a>
+        <span class="action-link crm-link-credit-card-mode">&nbsp;<a class="open-inline crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card payment{/ts}</a></span>
       {/if}
     {/if}
   </div>
@@ -186,7 +186,7 @@
 
     var url = "{/literal}{$dataUrl}{literal}";
 
-      cj( function( ) {
+      CRM.$(function($) {
         showHideByValue( 'is_email_receipt', '', 'notice', 'table-row', 'radio', false );
         showHideByValue( 'is_email_receipt', '', 'fromEmail', 'table-row', 'radio', false );
       });
@@ -211,7 +211,7 @@
 
     {literal}
     <script type="text/javascript">
-      cj( function( ) {
+      CRM.$(function($) {
         checkEmailDependancies( );
         cj('#is_email_receipt').click( function( ) {
           checkEmailDependancies( );
@@ -233,7 +233,7 @@
 
     // bind first click of accordion header to load crm-accordion-body with snippet
     // everything else taken care of by cj().crm-accordions()
-    cj(function() {
+    CRM.$(function($) {
       cj('#adjust-option-type').hide();
       cj('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
         loadPanes(cj(this).attr('id'));
@@ -283,15 +283,4 @@ cj('#fee_amount').change( function() {
         invert              = 0
         }
     {/if}
- 
-  {* include jscript to warn if unsaved form field changes *}
-  {include file="CRM/common/formNavigate.tpl"}
-
 {/if}
-{literal}
-<script type="text/javascript">
-cj(function() {
-  cj().crmAccordions();
-});
-</script>
-{/literal}

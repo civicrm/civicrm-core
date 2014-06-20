@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -36,11 +36,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -139,7 +141,6 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
 
     // finally browse the acl's
     if ($action & CRM_Core_Action::BROWSE) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     }
 
     // parent run
@@ -154,7 +155,6 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
    * @static
    */
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
 
     // get all acl's sorted by weight
     $entityRoles = array();
@@ -214,6 +214,8 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
 
   /**
    * Get user context.
+   *
+   * @param null $mode
    *
    * @return string user context.
    */

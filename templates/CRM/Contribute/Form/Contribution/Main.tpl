@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -151,8 +151,19 @@
         {$form.frequency_unit.html}
       {/if}
       {if $is_recur_installments}
+        <span id="recur_installments_num">
         {ts}for{/ts} {$form.installments.html} {$form.installments.label}
+        </span>
       {/if}
+      <div id="recurHelp" class="description">
+				{ts}Your recurring contribution will be processed automatically.{/ts}
+				{if $is_recur_installments}
+					{ts}You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.{/ts}
+				{/if}
+        {if $is_email_receipt}
+          {ts}You will receive an email receipt for each recurring contribution.{/ts}
+        {/if}
+      </div>
     </div>
     <div class="clear"></div>
   </div>
@@ -340,31 +351,36 @@
   {elseif $onBehalfRequired}
     showOnBehalf(true);
   {/if}
-
-  {if $honor_block_is_active AND $form.soft_credit_type_id.html}
-    enableHonorType();
-  {/if}
   {literal}
 
+	cj('input[name="soft_credit_type_id"]').on('change', function() {
+		enableHonorType();
+	});
+	
   function enableHonorType( ) {
-    var element = document.getElementsByName("soft_credit_type_id");
-    for (var i = 0; i < element.length; i++ ) {
-      var isHonor = false;
-      if ( element[i].checked == true ) {
-        var isHonor = true;
-        break;
-      }
-    }
-    if ( isHonor ) {
+    var selectedValue = cj('input[name="soft_credit_type_id"]:checked'); 
+    if ( selectedValue.val() > 0) {
       cj('#honorType').show();
-      cj('#honorTypeEmail').show();
     }
     else {
       cj('#honorType').hide();
-      cj('#honorTypeEmail').hide();
     }
   }
 
+	cj('input[id="is_recur"]').on('change', function() {
+		showRecurHelp();
+	});
+
+  function showRecurHelp( ) {
+    var showHelp = cj('input[id="is_recur"]:checked'); 
+    if ( showHelp.val() > 0) {
+      cj('#recurHelp').show();
+    }
+    else {
+      cj('#recurHelp').hide();
+    }
+  }
+	
   function pcpAnonymous( ) {
     // clear nickname field if anonymous is true
     if (document.getElementsByName("pcp_is_anonymous")[1].checked) {
@@ -417,8 +433,10 @@
     toggleConfirmButton();
   });
 
-  cj(function() {
+  CRM.$(function($) {
     toggleConfirmButton();
+		enableHonorType();
+		showRecurHelp();
   });
 
   function showHidePayPalExpressOption() {
@@ -432,11 +450,11 @@
     }
   }
 
-  cj(function(){
+  CRM.$(function($) {
     // highlight price sets
     function updatePriceSetHighlight() {
-      cj('#priceset .price-set-row').removeClass('highlight');
-      cj('#priceset .price-set-row input:checked').parent().parent().addClass('highlight');
+      cj('#priceset .price-set-row span').removeClass('highlight');
+      cj('#priceset .price-set-row input:checked').parent().addClass('highlight');
     }
     cj('#priceset input[type="radio"]').change(updatePriceSetHighlight);
     updatePriceSetHighlight();

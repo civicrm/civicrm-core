@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Pledge_Payment
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: PledgePayment.php
  *
  */
@@ -128,6 +128,13 @@ function civicrm_api3_pledge_payment_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * @param $pledgeId
+ * @param $paymentStatusId
+ * @param $paymentIds
+ *
+ * @return mixed
+ */
 function updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds) {
 
   $result = updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds = NULL);
@@ -136,6 +143,8 @@ function updatePledgePayments($pledgeId, $paymentStatusId, $paymentIds) {
 
 /**
  * Gets field for civicrm_pledge_payment functions
+ *
+ * @param $params
  *
  * @return array fields valid for other functions
  */

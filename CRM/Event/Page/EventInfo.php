@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -55,7 +55,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $config = CRM_Core_Config::singleton();
     // ensure that the user has permission to see this page
     if (!CRM_Core_Permission::event(CRM_Core_Permission::VIEW,
-        $this->_id
+        $this->_id, 'view event info'
       )) {
       CRM_Utils_System::setUFMessage(ts('You do not have permission to view this event'));
       return CRM_Utils_System::permissionDenied();
@@ -90,7 +90,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     // Add Event Type to $values in case folks want to display it
     $values['event']['event_type'] = CRM_Utils_Array::value($values['event']['event_type_id'], CRM_Event_PseudoConstant::eventType());
-    
+
     $this->assign('isShowLocation', CRM_Utils_Array::value('is_show_location', $values['event']));
 
     // show event fees.
@@ -119,10 +119,16 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
           $fieldCnt = 1;
           $visibility = CRM_Core_PseudoConstant::visibility('name');
 
+          // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
+          $adminFieldVisible = false;
+          if (CRM_Core_Permission::check('administer CiviCRM')) {
+            $adminFieldVisible = true;
+          }
+
           foreach ($priceSetFields as $fid => $fieldValues) {
             if (!is_array($fieldValues['options']) ||
               empty($fieldValues['options']) ||
-              CRM_Utils_Array::value('visibility_id', $fieldValues) != array_search('public', $visibility)
+              (CRM_Utils_Array::value('visibility_id', $fieldValues) != array_search('public', $visibility) && $adminFieldVisible == false)
             ) {
               continue;
             }
@@ -219,8 +225,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     if (CRM_Core_Permission::check('view event participants') &&
       CRM_Core_Permission::check('view all contacts')
     ) {
-      $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
-      $statusTypesPending = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0');
+      $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1', 'label');
+      $statusTypesPending = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0', 'label');
       $findParticipants['statusCounted'] = implode(', ', array_values($statusTypes));
       $findParticipants['statusNotCounted'] = implode(', ', array_values($statusTypesPending));
       $this->assign('findParticipants', $findParticipants);
@@ -329,6 +335,9 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     return parent::run();
   }
 
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     if ($this->_id) {
       $templateFile = "CRM/Event/Page/{$this->_id}/EventInfo.tpl";

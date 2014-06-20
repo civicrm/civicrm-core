@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -136,6 +136,12 @@ class CiviContributeProcessor {
     ),
   );
 
+  /**
+   * @param $paymentProcessor
+   * @param $paymentMode
+   * @param $start
+   * @param $end
+   */
   static
   function paypal($paymentProcessor, $paymentMode, $start, $end) {
     $url = "{$paymentProcessor['url_api']}nvp";
@@ -236,6 +242,12 @@ class CiviContributeProcessor {
     } while ($result['l_errorcode0'] == '11002');
   }
 
+  /**
+   * @param $paymentProcessor
+   * @param $paymentMode
+   * @param $start
+   * @param $end
+   */
   static
   function google($paymentProcessor, $paymentMode, $start, $end) {
     require_once "CRM/Contribute/BAO/Contribution/Utils.php";

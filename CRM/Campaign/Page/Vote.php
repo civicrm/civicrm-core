@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  --------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,6 +40,9 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
   private $_surveyId;
   private $_interviewerId;
 
+  /**
+   * @return mixed
+   */
   function reserve() {
     //build ajax voter search and selector.
     $controller = new CRM_Core_Controller_Simple('CRM_Campaign_Form_Gotv', ts('Reserve Respondents'));
@@ -50,6 +53,9 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
     return $controller->run();
   }
 
+  /**
+   * @return mixed
+   */
   function interview() {
     //build interview and release voter interface.
     $controller = new CRM_Core_Controller_Simple('CRM_Campaign_Form_Task_Interview', ts('Interview Respondents'));
@@ -93,6 +99,9 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
       )));
   }
 
+  /**
+   * @return string
+   */
   function run() {
     $this->browse();
 

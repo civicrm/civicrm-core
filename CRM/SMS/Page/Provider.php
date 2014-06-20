@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -37,6 +37,8 @@
  * Page for displaying list of Providers
  */
 class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -124,12 +126,13 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
   /**
    * Browse all Providers.
    *
+   * @param null $action
+   *
    * @return void
    * @access public
    * @static
    */
   function browse($action = NULL) {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $providers = CRM_SMS_BAO_Provider::getProviders();
     $rows = array();
     foreach ($providers as $provider) {
@@ -178,6 +181,8 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
 
   /**
    * Get user context.
+   *
+   * @param null $mode
    *
    * @return string user context.
    */

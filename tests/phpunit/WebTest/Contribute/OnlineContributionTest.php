@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_OnlineContributionTest
+ */
 class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -163,10 +167,10 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->typeKeys("css=input#sort_name_navigation", $honorSortName);
 
     // wait for result list
-    $this->waitForElementPresent("css=div.ac_results-inner li");
+    $this->waitForElementPresent("css=ul.ui-autocomplete li");
 
     // visit contact summary page
-    $this->click("css=div.ac_results-inner li");
+    $this->click("css=ul.ui-autocomplete li");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is contact present?
@@ -247,6 +251,10 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->_doContributionAndVerifyData($pageId, TRUE);
   }
 
+  /**
+   * @param $pageId
+   * @param bool $priceSet
+   */
   function _doContributionAndVerifyData($pageId, $priceSet = FALSE) {
     //logout
     $this->webtestLogout();

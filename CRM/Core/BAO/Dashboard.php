@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -79,6 +79,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *
    * @param boolean $flatFormat this is true if you want simple associated array of contact dashlets
    *
+   * @param null $contactID
+   *
    * @return array $dashlets array of dashlets
    * @access public
    * @static
@@ -118,6 +120,12 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     return $defaultDashlet ? $defaultDashlet : $dashlets;
   }
 
+  /**
+   * @param $hasDashlets
+   *
+   * @return bool
+   * @throws CiviCRM_API3_Exception
+   */
   static function initializeDashlets($hasDashlets) {
     $getDashlets = civicrm_api3("Dashboard", "get", array('domain_id' => CRM_Core_Config::domainID()));
     $contactID = CRM_Core_Session::singleton()->get('userID');
@@ -155,7 +163,10 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   /**
    * Function to check dashlet permission for current user
    *
-   * @param string permission string
+   * @param $permission
+   * @param $operator
+   *
+   * @internal param \permission $string string
    *
    * @return boolean true if use has permission else false
    */
@@ -267,7 +278,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       // -lets use relative url for internal use.
       // -make sure relative url should not be htmlize.
       if (substr($dashboadDAO->url, 0, 4) != 'http') {
-        $urlParam = CRM_Utils_System::explode('&', $dashboadDAO->url, 2);
+        $urlParam = explode('?', $dashboadDAO->url);
         $url = CRM_Utils_System::url($urlParam[0], $urlParam[1], TRUE, NULL, FALSE);
       }
 
@@ -286,7 +297,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     if ($dashboadDAO->is_fullscreen) {
       $fullscreenUrl = $dashboadDAO->fullscreen_url;
       if (substr($fullscreenUrl, 0, 4) != 'http') {
-        $urlParam = CRM_Utils_System::explode('&', $dashboadDAO->fullscreen_url, 2);
+        $urlParam = explode('?', $dashboadDAO->fullscreen_url);
         $fullscreenUrl = CRM_Utils_System::url($urlParam[0], $urlParam[1], TRUE, NULL, FALSE);
       }
       $dashletInfo['fullscreenUrl'] = $fullscreenUrl;
@@ -299,6 +310,9 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *
    * @param array $columns associated array
    *
+   * @param null $contactID
+   *
+   * @throws RuntimeException
    * @return void
    * @access public
    * @static
@@ -413,6 +427,11 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     return $dashlet;
   }
 
+  /**
+   * @param $url
+   *
+   * @return string
+   */
   static function getDashletName($url) {
     $urlElements = explode('/', $url);
     if ($urlElements[1] == 'dashlet') {
@@ -508,6 +527,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
   /**
    * Delete Dashlet
+   *
+   * @param $dashletID
    *
    * @return void
    * @static

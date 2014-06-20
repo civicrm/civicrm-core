@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -49,6 +49,8 @@ class CRM_Touchstone_PseudoConstant extends CRM_Core_PseudoConstant {
    * Get all values for $pseudoConst pseudoconstant
    *
    * @access public
+   *
+   * @param null $id
    *
    * @return array - array reference of all $pseudoConst values
    */

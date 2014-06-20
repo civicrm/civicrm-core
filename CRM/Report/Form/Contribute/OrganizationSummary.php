@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -43,6 +43,12 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     self::validRelationships();
     $config = CRM_Core_Config::singleton();
@@ -334,6 +340,11 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact_organization']}.organization_name, {$this->_aliases['civicrm_relationship']}.$this->orgContact, {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_relationship']}.$this->otherContact";
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -401,6 +412,9 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $type = substr($this->_params['relationship_type_id_value'], -3);

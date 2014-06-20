@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -39,6 +39,9 @@
  * @param $params array with keys:
  *  - ext: string, extension name. see CRM_Core_Resources::getUrl
  *  - file: string, relative file path. see CRM_Core_Resources::getUrl
+ * @param $smarty
+ *
+ * @return string
  */
 function smarty_function_crmResURL($params, &$smarty) {
   $res = CRM_Core_Resources::singleton();

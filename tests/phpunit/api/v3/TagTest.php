@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -130,28 +130,28 @@ class api_v3_TagTest extends CiviUnitTestCase {
       'description' => 'Outside undie-wearers',
     );
     $result = $this->callAPIAndDocument('tag', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertNotNull($result['id'], 'In line ' . __LINE__);
+    $this->assertNotNull($result['id']);
     $params['used_for'] = 'civicrm_contact';
     $this->getAndCheck($params, $result['id'], 'tag');
   }
 
   /**
-   * Test civicrm_tag_create contribution tag- success expected. Test checks that used_for is set
+   * Test civicrm_tag_create activity tag- success expected. Test checks that used_for is set
    * and not over-written by default on update
    */
-  function testCreateContributionTag() {
+  function testCreateEntitySpecificTag() {
     $params = array(
       'name' => 'New Tag4',
-      'description' => 'This is description for New Cont tag',
-      'used_for' => 'civicrm_contribution',
+      'description' => 'This is description for New Activity tag',
+      'used_for' => 'civicrm_activity',
     );
     $result = $this->callAPISuccess('tag', 'create', $params);
-    $check = $this->callAPISuccess('tag', 'get', array());
+    $this->callAPISuccess('tag', 'get', array());
     $this->getAndCheck($params, $result['id'], 'tag', 0, __FUNCTION__ . ' tag first created');
     unset($params['used_for']);
     $params['id'] = $result['id'];
     $result = $this->callAPISuccess('tag', 'create', $params);
-    $params['used_for'] = 'civicrm_contribution';
+    $params['used_for'] = 'civicrm_activity';
     $this->getAndCheck($params, $result['id'], 'tag', 1, __FUNCTION__ . ' tag updated in line ' . __LINE__);
   }
   ///////////////// civicrm_tag_delete methods

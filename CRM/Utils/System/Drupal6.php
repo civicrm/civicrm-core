@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -124,6 +124,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *  @param integer $ufID User ID in CMS
    *  @param string $ufName User name
    */
+  /**
+   * @param $ufID
+   * @param $ufName
+   */
   function updateCMSName($ufID, $ufName) {
     // CRM-5555
     if (function_exists('user_load')) {
@@ -141,6 +145,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @params $params    array   array of name and mail values
    * @params $errors    array   array of errors
    * @params $emailName string  field label for the 'email'
+   *
+   * @param $params
+   * @param $errors
+   * @param string $emailName
    *
    * @return void
    */
@@ -206,7 +214,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     }
   }
 
-  /*
+  /**
    * Function to get the drupal destination string. When this is passed in the
    * URL the user will be directed to it after filling in the drupal form
    *
@@ -248,6 +256,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * sets the title of the page
    *
    * @param string $title
+   * @param null $pageTitle
+   *
    * @paqram string $pageTitle
    *
    * @return void
@@ -266,8 +276,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb
    *
-   * @param string $title
-   * @param string $url
+   * @param $breadCrumbs
+   *
+   * @internal param string $title
+   * @internal param string $url
    *
    * @return void
    * @access public
@@ -497,7 +509,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     return FALSE;
   }
 
-  /*
+  /**
    * Load user into session
    */
   function loadUser($username) {
@@ -555,6 +567,9 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     drupal_set_message($message);
   }
 
+  /**
+   * @return mixed
+   */
   function logout() {
     module_load_include('inc', 'user', 'user.pages');
     return user_logout();
@@ -597,6 +612,9 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->language, 0, 2));
   }
 
+  /**
+   * @return string
+   */
   function getVersion() {
     return defined('VERSION') ? VERSION : 'Unknown';
   }
@@ -608,6 +626,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param boolean $loadUser boolean Require CMS user load.
    * @param boolean $throwError If true, print error on failure and exit.
    * @param boolean|string $realPath path to script
+   *
+   * @return bool
    */
   function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     //take the cms root path.
@@ -795,6 +815,9 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @param string $url
    *
+   * @param bool $addLanguagePart
+   * @param bool $removeLanguagePart
+   *
    * @return string $url, formatted url.
    * @static
    */
@@ -938,25 +961,20 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Get timezone from Drupal
-   * @return boolean|string
+   * Over-ridable function to get timezone as a string eg.
+   * @return string Timezone e.g. 'America/Los_Angeles'
    */
-  function getTimeZoneOffset(){
+  function getTimeZoneString() {
     global $user;
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
       $timezone = $user->timezone;
     } else {
       $timezone = variable_get('date_default_timezone', null);
     }
-    if(empty($timezone)){
-      return false;
+    if (!$timezone) {
+      $timezone = parent::getTimeZoneString();
     }
-    $hour = $user->timezone / 3600;
-    $timeZoneOffset = sprintf("%02d:%02d", $timezone / 3600, ($timezone/60)%60 );
-    if($timeZoneOffset > 0){
-      $timeZoneOffset = '+' . $timeZoneOffset;
-    }
-    return $timeZoneOffset;
+    return $timezone;
   }
 
 

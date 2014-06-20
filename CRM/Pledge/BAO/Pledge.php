@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -255,8 +255,9 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   /**
    * Function to delete the pledge
    *
-   * @param int $id  pledge id
+   * @param int $id pledge id
    *
+   * @return mixed
    * @access public
    * @static
    *
@@ -489,7 +490,7 @@ GROUP BY  currency
    *
    * @return void.
    */
-  function sendAcknowledgment(&$form, $params) {
+  static function sendAcknowledgment(&$form, $params) {
     //handle Acknowledgment.
     $allPayments = $payments = array();
 
@@ -785,7 +786,9 @@ GROUP BY  currency
   /**
    * Function to get pledge record count for a Contact
    *
-   * @param int $contactId Contact ID
+   * @param $contactID
+   *
+   * @internal param int $contactId Contact ID
    *
    * @return int count of pledge records
    * @access public
@@ -796,6 +799,11 @@ GROUP BY  currency
     return CRM_Core_DAO::singleValueQuery($query);
   }
 
+  /**
+   * @param $params
+   *
+   * @return array
+   */
   public static function updatePledgeStatus($params) {
 
     $returnMessages = array();

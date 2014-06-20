@@ -67,7 +67,15 @@
 {foreach from=$honoreeProfile item=value key=label}
 {$label}: {$value}
 {/foreach}
-
+{elseif $softCreditTypes and $softCredits}
+{foreach from=$softCreditTypes item=softCreditType key=n}
+===========================================================
+{$softCreditType}
+===========================================================
+{foreach from=$softCredits.$n item=value key=label}
+{$label}: {$value}
+{/foreach}
+{/foreach}
 {/if}
 {if $pcpBlock}
 ===========================================================

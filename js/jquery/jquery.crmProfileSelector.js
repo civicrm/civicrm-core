@@ -1,4 +1,4 @@
-(function($) {
+(function($, _) {
   var ufGroupCollection = new CRM.UF.UFGroupCollection(_.sortBy(CRM.initialProfileList.values, 'title'));
   //var ufGroupCollection = new CRM.UF.UFGroupCollection(CRM.initialProfileList.values, {
   //  comparator: 'title' // no point, this doesn't work with subcollections
@@ -45,7 +45,7 @@
       });
       view.on('change:ufGroupId', function() {
         $(select).val(view.getUfGroupId()).change();
-      })
+      });
       view.render();
       $(select).after(view.el);
       setTimeout(function() {
@@ -63,4 +63,4 @@
     });
   });
 
-})(cj);
+})(CRM.$, CRM._);

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,39 +40,7 @@
 /**
  * This file is for civievent search
  */
-class CRM_Event_Form_Search extends CRM_Core_Form {
-
-  /**
-   * Are we forced to run a search
-   *
-   * @var int
-   * @access protected
-   */
-  protected $_force;
-
-  /**
-   * name of search button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_searchButtonName;
-
-  /**
-   * name of action button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_actionButtonName;
-
-  /**
-   * form values that we will be using
-   *
-   * @var array
-   * @access protected
-   */
-  protected $_formValues;
+class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * the params that are sent to the query
@@ -81,14 +49,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
    * @access protected
    */
   protected $_queryParams;
-
-  /**
-   * have we already done this search
-   *
-   * @access protected
-   * @var boolean
-   */
-  protected $_done;
 
   /**
    * are we restricting ourselves to a single contact
@@ -105,14 +65,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
    * @var boolean
    */
   protected $_limit = NULL;
-
-  /**
-   * what context are we being invoked from
-   *
-   * @access protected
-   * @var string
-   */
-  protected $_context = NULL;
 
   /**
    * prefix for the controller
@@ -224,34 +176,19 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
    * @return void
    */
   function buildQuickForm() {
+    parent::buildQuickForm();
     $this->addElement('text', 'sort_name', ts('Participant Name or Email'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
     CRM_Event_BAO_Query::buildSearchForm($this);
 
-    /*
-     * add form checkboxes for each row. This is needed out here to conform to QF protocol
-     * of all elements being declared in builQuickForm
-     */
     $rows = $this->get('rows');
     if (is_array($rows)) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js');
       $lineItems = $eventIds = array();
       if (!$this->_single) {
-        $this->addElement('checkbox',
-          'toggleSelect',
-          NULL,
-          NULL,
-          array('onclick' => "toggleTaskAction( true );", 'class' => 'select-rows')
-        );
+        $this->addRowSelectors($rows);
       }
       foreach ($rows as $row) {
         $eventIds[$row['event_id']] = $row['event_id'];
-        if (!$this->_single) {
-          $this->addElement('checkbox', $row['checkbox'],
-            NULL, NULL,
-            array('onclick' => "toggleTaskAction( true );", 'class' => 'select-row')
-          );
-        }
         if (CRM_Event_BAO_Event::usesPriceSet($row['event_id'])) {
           // add line item details if applicable
           $lineItems[$row['participant_id']] = CRM_Price_BAO_LineItem::getLineItems($row['participant_id']);
@@ -285,11 +222,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
       $this->assign('participantCount', $participantCount);
       $this->assign('lineItems', $lineItems);
 
-      $total = $cancel = 0;
-
       $permission = CRM_Core_Permission::getPermission();
 
-      $tasks = array('' => ts('- actions -')) + CRM_Event_Task::permissionedTaskTitles($permission);
+      $tasks = CRM_Event_Task::permissionedTaskTitles($permission);
       if (isset($this->_ssID)) {
         if ($permission == CRM_Core_Permission::EDIT) {
           $tasks = $tasks + CRM_Event_Task::optionalTaskTitle();
@@ -303,32 +238,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
         $this->assign('ssID', $this->_ssID);
       }
 
-      $this->add('select', 'task', ts('Actions:') . ' ', $tasks);
-      $this->add('submit', $this->_actionButtonName, ts('Go'),
-        array(
-          'class' => 'form-submit',
-          'id' => 'Go',
-          'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 0);",
-        )
-      );
-
-      // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel',
-        array('checked' => 'checked')
-      );
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all',
-        array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );")
-      );
+      $this->addTaskMenu($tasks);
     }
 
-    // add buttons
-    $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      ));
   }
 
   /**
@@ -536,6 +448,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @return null
+   */
   function getFormValues() {
     return NULL;
   }

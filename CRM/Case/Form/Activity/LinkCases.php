@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -38,6 +38,11 @@
  *
  */
 class CRM_Case_Form_Activity_LinkCases {
+  /**
+   * @param $form
+   *
+   * @throws Exception
+   */
   static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
@@ -65,12 +70,17 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function setDefaultValues(&$form) {
     return $defaults = array();
   }
 
+  /**
+   * @param $form
+   */
   static function buildQuickForm(&$form) {
     $form->add('text', 'link_to_case_id', ts('Link To Case'), array('class' => 'huge'), TRUE);
   }
@@ -79,6 +89,9 @@ class CRM_Case_Form_Activity_LinkCases {
    * global validation rules for the form
    *
    * @param array $values posted values of the form
+   *
+   * @param $files
+   * @param $form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -106,6 +119,9 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @access public
    *
+   * @param $form
+   * @param $params
+   *
    * @return void
    */
   static function beginPostProcess(&$form, &$params) {}
@@ -114,6 +130,10 @@ class CRM_Case_Form_Activity_LinkCases {
    * Function to process the form
    *
    * @access public
+   *
+   * @param $form
+   * @param $params
+   * @param $activity
    *
    * @return void
    */

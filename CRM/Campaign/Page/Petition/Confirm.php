@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,15 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
+  /**
+   * @return string
+   * @throws Exception
+   */
   function run() {
     $contact_id   = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);
     $subscribe_id = CRM_Utils_Request::retrieve('sid', 'Integer', CRM_Core_DAO::$_nullObject);
@@ -84,9 +88,12 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
   /**
    * Confirm email verification
    *
-   * @param int $contact_id       The id of the contact
-   * @param int $subscribe_id     The id of the subscription event
-   * @param string $hash          The hash
+   * @param int $contact_id The id of the contact
+   * @param int $subscribe_id The id of the subscription event
+   * @param string $hash The hash
+   *
+   * @param $activity_id
+   * @param $petition_id
    *
    * @return boolean              True on success
    * @access public

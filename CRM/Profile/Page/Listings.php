@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -400,7 +400,10 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   /**
    * Function to get the list of contacts for a profile
    *
-   * @param $form object
+   * @param $gid
+   *
+   * @return array
+   * @internal param object $form
    *
    * @access public
    */
@@ -456,6 +459,11 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     return $contactIds;
   }
 
+  /**
+   * @param string $suffix
+   *
+   * @return null|string
+   */
   function checkTemplateFileExists($suffix = '') {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/Listings.{$suffix}tpl";
@@ -476,11 +484,30 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     return NULL;
   }
 
+  /**
+   * Use the form name to create the tpl file name
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
 
+  /**
+   * Default extra tpl file basically just replaces .tpl with .extra.tpl
+   * i.e. we dont override
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();

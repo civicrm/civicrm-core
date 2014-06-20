@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -48,8 +48,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    * price field object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params    (reference ) an assoc array of name/value pairs
-   * @param array  $ids       the array that holds all the db ids
+   * @param array $params (reference ) an assoc array of name/value pairs
+   *
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return object CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field object
    * @access public
@@ -205,13 +206,18 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   /**
    * This function for building custom fields
    *
-   * @param object  $qf             form object (reference)
-   * @param string  $elementName    name of the custom field
+   * @param object $qf form object (reference)
+   * @param string $elementName name of the custom field
+   * @param $fieldId
    * @param boolean $inactiveNeeded
-   * @param boolean $useRequired    true if required else false
-   * @param boolean $search         true if used for search else false
-   * @param string  $label          label for custom field
+   * @param boolean $useRequired true if required else false
+   * @param string $label label for custom field
    *
+   * @param null $fieldOptions
+   * @param array $feezeOptions
+   *
+   * @return null
+   * @internal param bool $search true if used for search else false
    * @access public
    * @static
    */
@@ -469,6 +475,12 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
     return $options[$fieldId];
   }
 
+  /**
+   * @param $optionLabel
+   * @param $fid
+   *
+   * @return mixed
+   */
   public static function getOptionId($optionLabel, $fid) {
     if (!$optionLabel || !$fid) {
       return;
@@ -525,6 +537,9 @@ WHERE
     return NULL;
   }
 
+  /**
+   * @return array
+   */
   static function &htmlTypes() {
     static $htmlTypes = NULL;
     if (!$htmlTypes) {
@@ -541,13 +556,15 @@ WHERE
   /**
    * Validate the priceset
    *
-   * @param int $priceSetId, array $fields
+   * @param int $priceSetId , array $fields
    *
    * retrun the error string
    *
+   * @param $fields
+   * @param $error
+   *
    * @access public
    * @static
-   *
    */
 
   public static function priceSetValidation($priceSetId, $fields, &$error) {

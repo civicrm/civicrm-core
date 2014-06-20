@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -82,8 +82,11 @@ class CRM_Contact_Form_Edit_Household {
    *
    * @params array $fields array of form values
    *
-   * @return $error
-   * @static
+   * @param $fields
+   * @param $files
+   * @param null $contactID
+   *
+   * @return array|bool $error@static
    * @public
    */
   static function formRule($fields, $files, $contactID = NULL) {

@@ -15,12 +15,12 @@ CiviDesk - Nicolas Ganivet
 CiviHosting - Hershel Robinson
 Community Builders
 Compucorp
-Confluence - Frank Gomez
 Dave D
 EE-atWork - Erik Hommel
 Electronic Frontier Foundation - Micah Lee, Kellie Brownell
 Emphanos - Allen Shaw
 Fuzion, NZ - Eileen McNaughton, Peter Davis, Torrance Hodgeson
+Ginkgo Street Labs - Frank J. Gómez, Michael Daryabeygi
 Jim Meehan
 JMA Consulting - Joe Murray, Pradeep Nayak
 Keith Morgan
@@ -81,7 +81,6 @@ Lisa Jervis
 Mathieu Lutfy
 Matt Neimayer
 Micah Lee
-Michael Daryabeygi
 Michael McAndrew
 Nicolas Ganivet
 Noah Miller

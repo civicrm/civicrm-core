@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -42,6 +42,12 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
 
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
     $this->_columns = array(
@@ -299,6 +305,9 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
     parent::postProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $checkList = array();

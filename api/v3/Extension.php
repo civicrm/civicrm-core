@@ -4,9 +4,9 @@ define('API_V3_EXTENSION_DELIMITER', ',');
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,7 +34,7 @@ define('API_V3_EXTENSION_DELIMITER', ',');
  * @package CiviCRM_APIv3
  * @subpackage API_Extension
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id$
  *
  */
@@ -145,15 +145,15 @@ function civicrm_api3_extension_uninstall($params) {
 /**
  * Download and install an extension
  *
- * @param  array       $params input parameters
+ * @param  array $params input parameters
  *                          - key: string, eg "com.example.myextension"
  *                          - url: string eg "http://repo.com/myextension-1.0.zip"
  *
+ * @throws API_Exception
  * @return array API result
  * @static void
  * @access public
  * @example ExtensionDownload.php
- *
  */
 function civicrm_api3_extension_download($params) {
   if (! array_key_exists('key', $params)) {
@@ -230,11 +230,12 @@ function civicrm_api3_extension_refresh($params) {
 /**
  * Get a list of available extensions
  *
+ * @param $params
+ *
  * @return array API result
  * @static void
  * @access public
  * @example ExtensionGet.php
- *
  */
 function civicrm_api3_extension_get($params) {
   $statuses = CRM_Extension_System::singleton()->getManager()->getStatuses();

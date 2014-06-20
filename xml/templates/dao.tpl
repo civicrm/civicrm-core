@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  *
  * Generated from {$table.sourceFile}
  * {$generated}
@@ -137,19 +137,18 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
      *
      * @static
      * @access public
-     * @return array of CRM_Core_EntityReference
+     * @return array of CRM_Core_Reference_Interface
      */
     static function getReferenceColumns() {ldelim}
       if (!self::$_links) {ldelim}
-        self::$_links = array(
+        self::$_links = static::createReferenceColumns(__CLASS__);
 {foreach from=$table.foreignKey item=foreign}
-          new CRM_Core_EntityReference(self::getTableName(), '{$foreign.name}', '{$foreign.table}', '{$foreign.key}'),
+        self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName(), '{$foreign.name}', '{$foreign.table}', '{$foreign.key}');
 {/foreach}
 
 {foreach from=$table.dynamicForeignKey item=foreign}
-          new CRM_Core_EntityReference(self::getTableName(), '{$foreign.idColumn}', NULL, '{$foreign.key|default:'id'}', '{$foreign.typeColumn}'),
+        self::$_links[] = new CRM_Core_Reference_Dynamic(self::getTableName(), '{$foreign.idColumn}', NULL, '{$foreign.key|default:'id'}', '{$foreign.typeColumn}');
 {/foreach}
-        );
       {rdelim}
       return self::$_links;
     {rdelim}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -159,7 +159,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     $this->preProcess();
 
     // check if we can process credit card registration
-    CRM_Core_Payment::allowBackofficeCreditCard($this);
+    $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
 
     // Only show credit card registration button if user has CiviContribute permission
     if (CRM_Core_Permission::access('CiviContribute')) {
@@ -195,6 +195,8 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
       'String', $this
     );
 
+    $searchContext = CRM_Utils_Request::retrieve('searchContext', 'String', $this);
+
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
 
     //validate the qfKey
@@ -216,6 +218,9 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
 
         if ($compContext == 'advanced') {
           $url = CRM_Utils_System::url('civicrm/contact/search/advanced', $urlParams);
+        }
+        else if ($searchContext) {
+          $url = CRM_Utils_System::url("civicrm/$searchContext/search", $urlParams);
         }
         else {
           $url = CRM_Utils_System::url('civicrm/event/search', $urlParams);

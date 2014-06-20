@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* Template for to create a link between two cases. *}{debug}
+{* Template for to create a link between two cases. *}
    <div class="crm-block crm-form-block crm-case-linkcases-form-block">
     <tr class="crm-case-linkcases-form-block-link_to_case_id">
       <td class="label">{$form.link_to_case_id.label}</td>
@@ -32,9 +32,9 @@
 
 {literal}
 <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
     var $form = $("#{/literal}{$form.formName}{literal}");
-    $('input[name=link_to_case_id]', $form).select2({
+    $('input[name=link_to_case_id]', $form).crmSelect2({
       placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
       minimumInputLength: 1,
       ajax: {

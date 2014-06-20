@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -71,6 +71,8 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    * Get all the survey activity types
    *
    * @access public
+   *
+   * @param string $returnColumn
    *
    * @return array - array reference of all survey activity types.
    * @static
@@ -157,8 +159,7 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param boolean $name pseudoconstant to be flushed
-   *
+   * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'cache') {
    if (isset(self::$$name)) {

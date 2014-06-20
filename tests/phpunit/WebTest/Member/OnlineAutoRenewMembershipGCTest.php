@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_OnlineAutoRenewMembershipGCTest
+ */
 class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -94,6 +98,9 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     // has changed a bit. No point in adding test for external page as we 'll test with fake transactions.
   }
 
+  /**
+   * @return null
+   */
   function _configureMembershipPage() {
     static $pageId = NULL;
 
@@ -115,8 +122,6 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
 
-      //wait for the auto-complete member_of_contact to populate
-      $this->waitForValue('member_of_contact', '::');
 
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -129,8 +134,6 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
 
-      //wait for the auto-complete member_of_contact to populate
-      $this->waitForValue('member_of_contact', '::');
 
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -174,7 +177,7 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
       );
 
       //make sure we do have required permissions.
-      $permissions = array("edit-1-make-online-contributions");
+      $permissions = array("edit-1-make-online-contributions", "edit-1-profile-listings-and-forms");
       $this->changePermissions($permissions);
 
       // now logout and do membership test that way

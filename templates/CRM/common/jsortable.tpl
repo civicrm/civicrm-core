@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
 *}
 {literal}
 <script type="text/javascript">
-cj( function( ) {
+CRM.$(function($) {
 // for date sorting see http://wiki.civicrm.org/confluence/display/CRMDOC/Sorting+Date+Fields+in+dataTables+Widget
 var useAjax = {/literal}{if $useAjax}1{else}0{/if}{literal};
 var sortEnabled = true;
@@ -76,8 +76,8 @@ eval('tableId =[' + tableId + ']');
                     sortColumn += '[' + count + ', "asc" ],';
                 }
                 sortId   = getRowId(tdObject, cj(this).attr('id') +' hiddenElement' );
-                sortEnabled = false;
-                columns += '{ "sType": \'' + stype + '\', "fnRender": function (oObj) { return oObj.aData[' + sortId + ']; },"bUseRendered": false},';
+                sortEnabled = true;
+                columns += '{ "render": function ( data, type, row ) { return "<div style=\'display:none\'>"+ data +"</div>" + row[sortId] ; }, "targets": sortColumn,"bUseRendered": false},';
             break;
             case 'nosort':
                 columns += '{ "bSortable": false, "sClass": "'+ getElementClass( this ) +'"},';
@@ -167,29 +167,6 @@ eval('tableId =[' + tableId + ']');
               });
     }
     var object;
-
-    if ( !useAjax ) {
-    cj('a.action-item').click( function(){
-        object = cj(this);
-        cj('table.display').one( 'mouseover', function() {
-            var nNodes     = oTable.fnGetNodes( );
-            var tdSelected = cj(object).closest('td');
-            var closestEle = cj(object).closest('tr').attr('id');
-            cj.each( nNodes, function(i,n) {
-                //operation on selected row element.
-                if ( closestEle == n.id ){
-                    var col = 0;
-                    cj('tr#' + closestEle + ' td:not(.hiddenElement)').each( function() {
-                        if ( tdSelected.get(0) !== cj(this).get(0)  ){
-                            oTable.fnUpdate( cj(this).html() , i, col );
-                        }
-                        col++;
-                    });
-                }
-            });
-        });
-    });
-    }
 
     });
 });

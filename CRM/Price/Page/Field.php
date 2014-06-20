@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -42,6 +42,8 @@
  *
  */
 class CRM_Price_Page_Field extends CRM_Core_Page {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The price set group id of the field
@@ -122,7 +124,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @access public
    */
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $priceField    = array();
     $priceFieldBAO = new CRM_Price_BAO_PriceField();
 
@@ -315,7 +316,9 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
   /**
    * Preview price field
    *
-   * @param int  $id    price field id
+   * @param $fid
+   *
+   * @internal param int $id price field id
    *
    * @return void
    * @access public

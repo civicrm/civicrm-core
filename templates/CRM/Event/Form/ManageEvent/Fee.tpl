@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -230,7 +230,7 @@
             {if $discountSection eq 2}
                 <script type="text/javascript">
                 {literal}
-                    cj( function() {
+                    CRM.$(function($) {
                         cj('#discounted_label_1').focus( );
                     });
                 {/literal}
@@ -342,8 +342,6 @@
     invert              = 0
 }
 
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
 {if $isQuick}
 {literal}
 <script type="text/javascript">

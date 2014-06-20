@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -40,39 +40,7 @@
 /**
  * advanced search, extends basic search
  */
-class CRM_Contribute_Form_Search extends CRM_Core_Form {
-
-  /**
-   * Are we forced to run a search
-   *
-   * @var int
-   * @access protected
-   */
-  protected $_force;
-
-  /**
-   * name of search button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_searchButtonName;
-
-  /**
-   * name of action button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_actionButtonName;
-
-  /**
-   * form values that we will be using
-   *
-   * @var array
-   * @access public
-   */
-  public $_formValues;
+class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * the params that are sent to the query
@@ -81,14 +49,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
    * @access protected
    */
   protected $_queryParams;
-
-  /**
-   * have we already done this search
-   *
-   * @access protected
-   * @var boolean
-   */
-  protected $_done;
 
   /**
    * are we restricting ourselves to a single contact
@@ -105,14 +65,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
    * @var boolean
    */
   protected $_limit = NULL;
-
-  /**
-   * what context are we being invoked from
-   *
-   * @access protected
-   * @var string
-   */
-  protected $_context = NULL;
 
   protected $_defaults;
 
@@ -229,6 +181,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
    * @return void
    */
   function buildQuickForm() {
+    parent::buildQuickForm();
     // text for sort_name
     $this->addElement('text',
       'sort_name',
@@ -258,57 +211,23 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
 
     CRM_Contribute_BAO_Query::buildSearchForm($this);
 
-    /*
-     * add form checkboxes for each row. This is needed out here to conform to QF protocol
-     * of all elements being declared in builQuickForm
-     */
-
     $rows = $this->get('rows');
     if (is_array($rows)) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js');
       if (!$this->_single) {
-        $this->addElement('checkbox',
-          'toggleSelect',
-          NULL,
-          NULL,
-          array('onclick' => "toggleTaskAction( true );", 'class' => 'select-rows')
-        );
-        foreach ($rows as $row) {
-          $this->addElement('checkbox', $row['checkbox'],
-            NULL, NULL,
-            array('onclick' => "toggleTaskAction( true );", 'class' => 'select-row')
-          );
-        }
+        $this->addRowSelectors($rows);
       }
-
-      $total = $cancel = 0;
 
       $permission = CRM_Core_Permission::getPermission();
 
-      $tasks = array('' => ts('- actions -')) + CRM_Contribute_Task::permissionedTaskTitles($permission);
-      $this->add('select', 'task', ts('Actions:') . ' ', $tasks);
-      $this->add('submit', $this->_actionButtonName, ts('Go'),
-        array(
-          'class' => 'form-submit',
-          'id' => 'Go',
-          'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 0);",
-        )
-      );
-
-      // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );"));
+      $queryParams = $this->get('queryParams');
+      $softCreditFiltering = FALSE;
+      if (!empty($queryParams)) {
+        $softCreditFiltering = CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($queryParams);
+      }
+      $tasks = CRM_Contribute_Task::permissionedTaskTitles($permission, $softCreditFiltering);
+      $this->addTaskMenu($tasks);
     }
 
-    // add buttons
-    $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      )
-    );
   }
 
   /**
@@ -354,43 +273,44 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
     }
 
     $config = CRM_Core_Config::singleton();
-    // CRM-13848
-    $financialType = CRM_Utils_Array::value('financial_type_id', $this->_formValues);
-    if ($financialType && is_array($financialType)) {
-      unset($this->_formValues['financial_type_id']);
-      foreach($financialType as $notImportant => $typeID) {
-        $this->_formValues['financial_type_id'][$typeID] = 1;
-      }
-    }
-
-    $tags = CRM_Utils_Array::value('contact_tags', $this->_formValues);
-    if ($tags && !is_array($tags)) {
-      unset($this->_formValues['contact_tags']);
-      $this->_formValues['contact_tags'][$tags] = 1;
-    }
-
-    if ($tags && is_array($tags)) {
-      unset($this->_formValues['contact_tags']);
-      foreach($tags as $notImportant => $tagID) {
-        $this->_formValues['contact_tags'][$tagID] = 1;
-      }
-    }
-
-
-    if (!$config->groupTree) {
-      $group = CRM_Utils_Array::value('group', $this->_formValues);
-      if ($group && !is_array($group)) {
-        unset($this->_formValues['group']);
-        $this->_formValues['group'][$group] = 1;
-      }
-
-      if ($group && is_array($group)) {
-        unset($this->_formValues['group']);
-        foreach($group as $notImportant => $groupID) {
-          $this->_formValues['group'][$groupID] = 1;
+    if (!empty($_POST)) {
+      // CRM-13848
+      $financialType = CRM_Utils_Array::value('financial_type_id', $this->_formValues);
+      if ($financialType && is_array($financialType)) {
+        unset($this->_formValues['financial_type_id']);
+        foreach($financialType as $notImportant => $typeID) {
+          $this->_formValues['financial_type_id'][$typeID] = 1;
         }
       }
 
+      $tags = CRM_Utils_Array::value('contact_tags', $this->_formValues);
+      if ($tags && !is_array($tags)) {
+        unset($this->_formValues['contact_tags']);
+        $this->_formValues['contact_tags'][$tags] = 1;
+      }
+
+      if ($tags && is_array($tags)) {
+        unset($this->_formValues['contact_tags']);
+        foreach($tags as $notImportant => $tagID) {
+          $this->_formValues['contact_tags'][$tagID] = 1;
+        }
+      }
+
+
+      if (!$config->groupTree) {
+        $group = CRM_Utils_Array::value('group', $this->_formValues);
+        if ($group && !is_array($group)) {
+          unset($this->_formValues['group']);
+          $this->_formValues['group'][$group] = 1;
+        }
+
+        if ($group && is_array($group)) {
+          unset($this->_formValues['group']);
+          foreach($group as $notImportant => $groupID) {
+            $this->_formValues['group'][$groupID] = 1;
+          }
+        }
+      }
     }
 
     CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($this->_formValues);
@@ -458,7 +378,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
     // note that this means that GET over-rides POST :)
-
     if (!$this->_force) {
       return;
     }

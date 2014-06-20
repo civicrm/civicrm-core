@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -56,6 +56,9 @@ class CRM_Core_Key {
     return self::$_key;
   }
 
+  /**
+   * @return mixed|null|string
+   */
   static function sessionID() {
     if (!self::$_sessionID) {
       $session = CRM_Core_Session::singleton();
@@ -72,7 +75,10 @@ class CRM_Core_Key {
    * Generate a form key based on form name, the current user session
    * and a private key. Modelled after drupal's form API
    *
-   * @param string  $value       name of the form
+   * @param $name
+   * @param bool $addSequence
+   *
+   * @internal param string $value name of the form
    * @paeam boolean $addSequence should we add a unique sequence number to the end of the key
    *
    * @return string       valid formID
@@ -95,9 +101,12 @@ class CRM_Core_Key {
   /**
    * Validate a form key based on the form name
    *
-   * @param string $formKey
+   * @param $key
    * @param string $name
    *
+   * @param bool $addSequence
+   *
+   * @internal param string $formKey
    * @return string $formKey if valid, else null
    * @static
    * @acess public
@@ -125,6 +134,11 @@ class CRM_Core_Key {
     return $key;
   }
 
+  /**
+   * @param $key
+   *
+   * @return bool
+   */
   static function valid($key) {
     // a valid key is a 32 digit hex number
     // followed by an optional _ and a number between 1 and 10000

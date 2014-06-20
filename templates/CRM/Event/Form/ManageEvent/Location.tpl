@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -146,6 +146,12 @@ function showLocFields( ) {
    var useExisting = document.getElementsByName("location_option")[1].checked;
    if ( createNew ) {
      cj('#existingLoc').hide();
+     //clear all location fields values.
+     cj("input[id *= 'address_1_']").val("");
+     cj("input[id *= 'email_1_']").val("");
+     cj("input[id *= 'phone_1_']").val("");
+     //reset country/state.
+     cj("select[id *= 'address_1_']").val("");
      displayMessage(false);
    } else if ( useExisting ) {
      cj('#existingLoc').show();
@@ -159,8 +165,5 @@ showLocFields( );
 
 {* include common additional blocks tpl *}
 {include file="CRM/common/additionalBlocks.tpl"}
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
 
 {/if} {* add block if end*}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,19 +28,19 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 
 /**
- * This class generates form components for processing a ontribution
+ * This class generates form components for processing a contribution
  *
  */
 class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
-   * the id of the contribution page that we are proceessing
+   * the id of the contribution page that we are processsing
    *
    * @var int
    * @public
@@ -89,6 +89,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_membershipBlock = NULL;
 
   /**
+   * Does this form support a separate membership payment
+   * @var bool
+   */
+  protected $_separateMembershipPayment;
+  /**
    * the default values for the form
    *
    * @var array
@@ -110,7 +115,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @var array
    * @public
    */
-  public $_fields;
+  public $_fields = array();
 
   /**
    * The billing location id for this contribiution page
@@ -155,9 +160,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * The contact id of the person for whom membership is being added or renewed based on the cid in the url,
    * checksum, or session
-   * @var unknown_type
+   * @var int
    */
-  protected $_contactID;
+  public $_contactID;
 
   protected $_userID;
 
@@ -196,6 +201,17 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_honor_block_is_active = FALSE;
 
   /**
+   * Contribution mode e.g express for payment express, notify for off-site + notification back to CiviCRM
+   * @var string
+   */
+  public $_contributeMode;
+
+  /**
+   * contribution page supports memberships
+   * @var boolean
+   */
+  public $_useForMember;
+  /**
    * Function to set variables up before form is built
    *
    * @return void
@@ -217,7 +233,15 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->_userID = $session->get('userID');
 
     //Check if honor block is enabled for current contribution
-    $this->_honor_block_is_active = (boolean) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $this->_id, 'is_active', 'entity_id');
+    $ufJoinParams = array(
+      'module' => 'soft_credit',
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $this->_id,
+    );
+    $ufJoin = new CRM_Core_DAO_UFJoin();
+    $ufJoin->copyValues($ufJoinParams);
+    $ufJoin->find(TRUE);
+    $this->_honor_block_is_active = $ufJoin->is_active;
 
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
     $this->_mid = NULL;
@@ -645,6 +669,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Function to add the custom fields
    *
+   * @param $id
+   * @param $name
+   * @param bool $viewOnly
+   * @param null $profileContactType
+   * @param null $fieldTypes
+   *
    * @return void
    * @access public
    */
@@ -787,6 +817,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Check template file exists
+   * @param null $suffix
+   *
+   * @return null|string
+   */
   function checkTemplateFileExists($suffix = NULL) {
     if ($this->_id) {
       $templateFile = "CRM/Contribute/Form/Contribution/{$this->_id}/{$this->_name}.{$suffix}tpl";
@@ -798,11 +834,30 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     return NULL;
   }
 
+  /**
+   * Use the form name to create the tpl file name
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
 
+  /**
+   * Default extra tpl file basically just replaces .tpl with .extra.tpl
+   * i.e. we dont override
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();

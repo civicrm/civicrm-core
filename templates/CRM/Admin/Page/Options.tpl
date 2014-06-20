@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -50,7 +50,7 @@
     {ts}This page lists the credit card options that will be offered to contributors using your Online Contribution pages. You will need to verify which cards are accepted by your chosen Payment Processor and update these entries accordingly.{/ts}<br /><br />
     {ts}IMPORTANT: This page does NOT control credit card/payment method choices for sites and/or contributors using the PayPal Express service (e.g. where billing information is collected on the Payment Processor's website).{/ts}
   {elseif $gName eq "acl_role"}
-    {capture assign=docLink}{docURL page="user/initial-set-up/access-control" text="Access Control Documentation"}{/capture}
+    {capture assign=docLink}{docURL page="user/current/initial-set-up/permissions-and-access-control/" text="Access Control Documentation"}{/capture}
     {capture assign=aclURL}{crmURL p='civicrm/acl' q='reset=1'}{/capture}
     {capture assign=erURL}{crmURL p='civicrm/acl/entityrole' q='reset=1'}{/capture}
     {ts 1=$docLink}ACLs allow you control access to CiviCRM data. An ACL consists of an <strong>Operation</strong> (e.g. 'View' or 'Edit'), a <strong>set of data</strong> that the operation can be performed on (e.g. a group of contacts), and a <strong>Role</strong> that has permission to do this operation. Refer to the %1 for more info.{/ts}<br /><br />
@@ -70,7 +70,7 @@
 
 <div class="crm-content-block crm-block">
 {if $rows}
-{if $action ne 1 and $action ne 2}
+{if $action ne 1 and $action ne 2 and $isLocked ne 1}
     <div class="action-link">
         <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
     </div>
@@ -153,7 +153,7 @@
         {include file="CRM/common/crmeditable.tpl"}
         {/strip}
 
-        {if $action ne 1 and $action ne 2}
+        {if $action ne 1 and $action ne 2 and $isLocked ne 1}
             <div class="action-link">
                 <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
             </div>
@@ -162,8 +162,8 @@
 {else}
     <div class="messages status no-popup">
          <div class="icon inform-icon"></div>
-        {capture assign=crmURL}{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}{/capture}
-        {ts 1=$crmURL}There are no option values entered. You can <a href='%1'>add one</a>.{/ts}
+        {capture assign=link}class="action-item" href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}"{/capture}
+        {ts 1=$link}There are no option values entered. You can <a %1>add one</a>.{/ts}
     </div>
 {/if}
 </div>

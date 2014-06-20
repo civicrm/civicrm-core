@@ -1,14 +1,26 @@
 <?php
 
+/**
+ * Class CRM_Case_Audit_Audit
+ */
 class CRM_Case_Audit_Audit {
   private $auditConfig;
   private $xmlString;
 
+  /**
+   * @param $xmlString
+   * @param $confFilename
+   */
   public function __construct($xmlString, $confFilename) {
     $this->xmlString = $xmlString;
     $this->auditConfig = new CRM_Case_Audit_AuditConfig($confFilename);
   }
 
+  /**
+   * @param bool $printReport
+   *
+   * @return array
+   */
   public function getActivities($printReport = FALSE) {
     $retval = array();
 
@@ -53,7 +65,7 @@ class CRM_Case_Audit_Audit {
           $value = $value_elements->item(0)->nodeValue;
 
           $category_elements = $field->getElementsByTagName("Category");
-          if (!empty($category_elements)) {
+          if (!empty($category_elements->length)) {
             $category = $category_elements->item(0)->nodeValue;
           }
 
@@ -173,6 +185,12 @@ class CRM_Case_Audit_Audit {
    *
    */
 
+  /**
+   * @param $a
+   * @param $b
+   *
+   * @return int
+   */
   public function compareActivities($a, $b) {
     // This should work
     foreach ($this->auditConfig->getSortByLabels() as $label) {
@@ -191,6 +209,14 @@ class CRM_Case_Audit_Audit {
     }
   }
 
+  /**
+   * @param $xmlString
+   * @param $clientID
+   * @param $caseID
+   * @param bool $printReport
+   *
+   * @return mixed
+   */
   static
   function run($xmlString, $clientID, $caseID, $printReport = FALSE) {
     /*

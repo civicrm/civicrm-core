@@ -31,6 +31,7 @@
       <is_active>1</is_active>
       <is_view>0</is_view>
       <column_name>our_select_field_1</column_name>
+      <in_selector>0</in_selector>
       <option_group_name>our_select_field_20130818044104</option_group_name>
       <custom_group_name>example</custom_group_name>
     </CustomField>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.2                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2012                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -109,7 +109,10 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
    *
    * Create and auth a Clickatell session.
    *
-   * @return void
+   * @param array $provider
+   * @param bool $skipAuth
+   *
+   * @return \org_civicrm_sms_clickatell
    */
   function __construct($provider = array( ), $skipAuth = FALSE) {
     // initialize vars
@@ -146,9 +149,10 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
   /**
    * singleton function used to manage this object
    *
+   * @param array $providerParams
+   * @param bool $force
    * @return object
    * @static
-   *
    */
   static function &singleton($providerParams = array(
     ), $force = FALSE) {
@@ -204,6 +208,13 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
     }
   }
 
+  /**
+   * @param $url
+   * @param $postDataArray
+   * @param null $id
+   *
+   * @return object|string
+   */
   function formURLPostData($url, &$postDataArray, $id = NULL) {
     $url = $this->_providerInfo['api_url'] . $url;
     $postDataArray['session_id'] = $this->_sessionID;
@@ -219,7 +230,12 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
   /**
    * Send an SMS Message via the Clickatell API Server
    *
-   * @param array the message with a to/from/text
+   * @param $recipients
+   * @param $header
+   * @param $message
+   * @param null $jobID
+   * @param null $userID
+   * @internal param \the $array message with a to/from/text
    *
    * @return mixed true on sucess or PEAR_Error object
    * @access public
@@ -297,6 +313,9 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
     }
   }
 
+  /**
+   * @return bool
+   */
   function callback() {
     $apiMsgID = $this->retrieve('apiMsgId', 'String');
 
@@ -385,6 +404,9 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
     return FALSE;
   }
 
+  /**
+   * @return $this|null|object
+   */
   function inbound() {
     $like      = "";
     $fromPhone = $this->retrieve('from', 'String');

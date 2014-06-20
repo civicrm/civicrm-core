@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -125,12 +125,6 @@
 
 </table>
 {/strip}
-
-{*include activity view js file*}
-{include file="CRM/common/activityView.tpl"}
-<div id="view-activity" style="display:none;">
-     <div id="activity-content"></div>
-</div>
 
 {if $context EQ 'Search'}
     {include file="CRM/common/pager.tpl" location="bottom"}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -256,9 +256,11 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get PDF Page Format field from associative array
    *
-   * @param string              $field         name of a PDF Page Format field
-   * @param array (reference)   $values        associative array of name/value pairs containing
+   * @param string $field name of a PDF Page Format field
+   * @param array (reference) $values associative array of name/value pairs containing
    *                                           PDF Page Format field selections
+   *
+   * @param null $default
    *
    * @return value
    * @access public
@@ -361,7 +363,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
     // serialize PDF Page Format fields into a single string to store in the 'value' column of the Option Value table
     $v = json_decode($this->value, TRUE);
     foreach (self::$optionValueFields as $name => $field) {
-      $v[$name] = self::getValue($name, $values, $v[$name]);
+      $v[$name] = self::getValue($name, $values, CRM_Utils_Array::value($name, $v));
     }
     $this->value = json_encode($v);
 

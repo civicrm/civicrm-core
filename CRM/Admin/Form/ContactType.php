@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -83,7 +83,10 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
+   * @param array $fields the input form values
+   *
+   * @param $files
+   * @param $self
    *
    * @return true if no errors, else array of errors
    * @access public

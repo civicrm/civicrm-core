@@ -31,7 +31,7 @@ if [ -d $TRG ] ; then
 fi
 
 # copy all the stuff
-for CODE in css i js packages PEAR templates bin CRM api drupal extern Reports install settings; do
+for CODE in css i js packages PEAR templates bin CRM api drupal extern Reports install settings Civi; do
   echo $CODE
   [ -d $SRC/$CODE ] && $RSYNCCOMMAND $SRC/$CODE $TRG
 done
@@ -49,7 +49,7 @@ if [ ! -d $TRG/sql ] ; then
 	mkdir $TRG/sql
 fi
 
-for F in $SRC/sql/civicrm*.mysql $SRC/sql/counties.US.sql.gz $SRC/sql/case_sample*.mysql; do
+for F in $SRC/sql/civicrm*.mysql $SRC/sql/case_sample*.mysql; do
 	cp $F $TRG/sql
 done
 

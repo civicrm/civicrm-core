@@ -163,6 +163,24 @@
          </td>
         </tr>
       {/foreach}
+      {elseif $softCreditTypes and $softCredits}
+      {foreach from=$softCreditTypes item=softCreditType key=n}
+       <tr>
+        <th {$headerStyle}>
+         {$softCreditType}
+        </th>
+       </tr>
+       {foreach from=$softCredits.$n item=value key=label}
+         <tr>
+          <td {$labelStyle}>
+           {$label}
+          </td>
+          <td {$valueStyle}>
+           {$value}
+          </td>
+         </tr>
+        {/foreach}
+       {/foreach}
      {/if}
 
      {if $pcpBlock}

@@ -1,5 +1,14 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_Controller_Checkout
+ */
 class CRM_Event_Cart_Controller_Checkout extends CRM_Core_Controller {
+  /**
+   * @param null $title
+   * @param bool|int $action
+   * @param bool $modal
+   */
   function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
     parent::__construct($title, $modal);
 

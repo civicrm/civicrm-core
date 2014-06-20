@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Profile_BatchUpdateTest
+ */
 class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -68,7 +72,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
     $this->type('sort_name', "Smiths_x");
     $this->click('_qf_Basic_refresh');
-    $this->waitForElementPresent('_qf_Basic_next_print');
+    $this->waitForElementPresent('Go');
 
     // Batch Update Via Profile
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
@@ -154,7 +158,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
     $this->type('sort_name', $lastName);
     $this->click('_qf_Basic_refresh');
-    $this->waitForElementPresent('_qf_Basic_next_print');
+    $this->waitForElementPresent('Go');
 
     // Batch Update Via Profile
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
@@ -335,7 +339,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
     $this->type('sort_name', $lastName);
     $this->click('_qf_Basic_refresh');
-    $this->waitForElementPresent('_qf_Basic_next_print');
+    $this->waitForElementPresent('Go');
 
     // Batch Update Via Profile
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
@@ -399,8 +403,8 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
 
     //Reserve and interview respondents
     $this->openCiviPage('campaign', 'reset=1&subPage=survey');
-    $this->waitForElementPresent("xpath=//table[@id='surveys']/tbody//tr/td[2]/a[text()='{$surveyTitle}']/../following-sibling::td[@class='crm-campaign-voterLinks']/span/ul/li/a");
-    $this->click("xpath=//table[@id='surveys']/tbody//tr/td[2]/a[text()='{$surveyTitle}']/../following-sibling::td[@class='crm-campaign-voterLinks']/span/ul/li/a");
+    $this->waitForElementPresent("xpath=//table[@id='surveys']/tbody//tr/td[2]/a[text()='{$surveyTitle}']/../following-sibling::td[@class=' crm-campaign-voterLinks']/span/ul/li/a");
+    $this->click("xpath=//table[@id='surveys']/tbody//tr/td[2]/a[text()='{$surveyTitle}']/../following-sibling::td[@class=' crm-campaign-voterLinks']/span/ul/li/a");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("xpath=//div[@id='search_form_reserve']/div");
     $this->waitForElementPresent('sort_name');
@@ -408,6 +412,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Search_refresh');
     $this->clickLink('_qf_Search_refresh', 'Go');
     $this->click('toggleSelect');
+    $this->select('task', "value=2");
     $this->click('Go');
     $this->waitForElementPresent('_qf_Reserve_next_reserveToInterview-top');
     $this->clickLink('_qf_Reserve_next_reserveToInterview-top', '_qf_Interview_cancel_interview');
@@ -571,6 +576,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
+  /**
+   * @param $profileTitle
+   * @param $customDataArr
+   * @param $profileFor
+   */
   function _addProfile($profileTitle, $customDataArr, $profileFor) {
 
     $this->openCiviPage('admin/uf/group', 'reset=1');
@@ -598,6 +608,11 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $profileFor
+   *
+   * @return array
+   */
   function _addCustomData($profileFor) {
     $returnArray = array();
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 4);
@@ -652,12 +667,12 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->waitForText('crm-notification-container', "Your custom field '$checkLabel1' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$checkLabel1' has been saved.");
     $returnArray[1] = array($customGroupTitle, $checkLabel1);
 
+    $this->waitForElementPresent("xpath=//*[@id='newCustomField']/span");
     // create another custom field - Integer Radio
-    $this->click("//a[@id='newCustomField']/span");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//*[@id='newCustomField']/span", "_qf_Field_cancel-bottom", FALSE);
 
     //for checkbox 2
     $checkLabel2 = 'Custom Check Two Text_' . substr(sha1(rand()), 0, 4);
@@ -679,16 +694,14 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('option_value_3', 3);
 
     //clicking save
-    $this->click('_qf_Field_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Field_next', "xpath=//*[@id='newCustomField']", FALSE);
 
     //Is custom field created
-    $this->waitForText('crm-notification-container', "Your custom field '$checkLabel2' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$checkLabel2' has been saved.");
     $returnArray[2] = array($customGroupTitle, $checkLabel2);
 
     // create another custom field - Integer Radio
-    $this->click("//a[@id='newCustomField']/span");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//*[@id='newCustomField']/span", "_qf_Field_cancel-bottom", FALSE);
 
     // create another custom field - Date
     $dateFieldLabel = 'Custom Date Field' . substr(sha1(rand()), 0, 4);
@@ -708,16 +721,14 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->select('time_format', "value=2");
 
     //clicking save
-    $this->click('_qf_Field_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Field_next', "xpath=//*[@id='newCustomField']", FALSE);
 
     //Is custom field created
-    $this->waitForText('crm-notification-container', "Your custom field '$dateFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$dateFieldLabel' has been saved.");
     $returnArray[3] = array($customGroupTitle, $dateFieldLabel);
 
     // create another custom field - Integer Radio
-    $this->click("//a[@id='newCustomField']/span");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//*[@id='newCustomField']/span", "_qf_Field_cancel-bottom", FALSE);
 
     //create rich text editor field
     $richTextField = 'Custom Rich TextField_' . substr(sha1(rand()), 0, 4);
@@ -727,16 +738,14 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->select('data_type[1]', "label=RichTextEditor");
 
     //clicking save
-    $this->click('_qf_Field_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Field_next', "xpath=//*[@id='newCustomField']", FALSE);
 
     //Is custom field created
-    $this->waitForText('crm-notification-container', "Your custom field '$richTextField' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$richTextField' has been saved.");
     $returnArray[4] = array($customGroupTitle, $richTextField);
 
     // create another custom field - Integer Radio
-    $this->click("//a[@id='newCustomField']/span");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//*[@id='newCustomField']/span", "_qf_Field_cancel-bottom", FALSE);
 
     //create radio button field
     //for radio 1
@@ -759,16 +768,14 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('option_value_3', 3);
 
     //clicking save
-    $this->click('_qf_Field_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Field_next', "xpath=//*[@id='newCustomField']", FALSE);
 
     //Is custom field created
-    $this->assertElementContainsText('crm-container', "Your custom field '$radioLabel1' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$radioLabel1' has been saved.");
     $returnArray[5] = array($customGroupTitle, $radioLabel1);
 
     // create another custom field - Integer Radio
-    $this->click("//a[@id='newCustomField']/span");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//*[@id='newCustomField']/span", "_qf_Field_cancel-bottom", FALSE);
 
     //for radio 2
     $radioLabel2 = 'Custom Radio Two Text_' . substr(sha1(rand()), 0, 4);
@@ -790,11 +797,10 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('option_value_3', 3);
 
     //clicking save
-    $this->click('_qf_Field_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Field_next', "xpath=//*[@id='newCustomField']", FALSE);
 
     //Is custom field created
-    $this->waitForText('crm-notification-container', "Your custom field '$radioLabel2' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$radioLabel2' has been saved.");
     $returnArray[6] = array($customGroupTitle, $radioLabel2);
 
     return $returnArray;

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,7 +43,7 @@
 {else}
   {foreach from=$groupTree item=cd_edit key=group_id name=custom_sets}
     {if $cd_edit.is_multiple and $multiRecordDisplay eq 'single'}
-      <div id="{$cd_edit.name}">
+      <div class="custom-group custom-group-{$cd_edit.name}">
         {if $cd_edit.help_pre}
           <div class="messages help">{$cd_edit.help_pre}</div>
         {/if}
@@ -58,13 +58,13 @@
         {/if}
       </div>
     {else}
-     <div id="{$cd_edit.name}" class="crm-accordion-wrapper {if $cd_edit.collapse_display and !$skipTitle}collapsed{/if}">
+     <div class="custom-group custom-group-{$cd_edit.name} crm-accordion-wrapper {if $cd_edit.collapse_display and !$skipTitle}collapsed{/if}">
       {if !$skipTitle}
       <div class="crm-accordion-header">
         {$cd_edit.title}
        </div><!-- /.crm-accordion-header -->
       {/if}
-      <div id="{$cd_edit.name}" class="crm-accordion-body">
+      <div class="crm-accordion-body">
         {if $cd_edit.help_pre}
           <div class="messages help">{$cd_edit.help_pre}</div>
         {/if}
@@ -92,13 +92,6 @@
     {/if}
     <div id="custom_group_{$group_id}_{$cgCount}"></div>
   {/foreach}
-  <script type="text/javascript">
-    {literal}
-      cj(function() {
-        cj().crmAccordions();
-      });
-    {/literal}
-  </script>
 
 {/if}
 

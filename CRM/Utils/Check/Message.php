@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -43,9 +43,20 @@ class CRM_Utils_Check_Message {
    */
   private $message;
 
-  function __construct($name, $message) {
+  /**
+   * @var string
+   */
+  private $title;
+
+  /**
+   * @param $name
+   * @param $message
+   * @param $title
+   */
+  function __construct($name, $message, $title) {
     $this->name = $name;
     $this->message = $message;
+    $this->title = $title;
   }
 
   /**
@@ -63,12 +74,20 @@ class CRM_Utils_Check_Message {
   }
 
   /**
+   * @return string
+   */
+  public function getTitle() {
+    return $this->title;
+  }
+
+  /**
    * @return array
    */
   function toArray() {
     return array(
       'name' => $this->name,
       'message' => $this->message,
+      'title' => $this->title,
     );
   }
 }

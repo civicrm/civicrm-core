@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -32,7 +32,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: Contact.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
@@ -40,12 +40,13 @@
 /**
  * Create or update a contact (note you should always call this via civicrm_api() & never directly)
  *
- * @param  array   $params   input parameters
+ * @param  array $params input parameters
  *
  * Allowed @params array keys are:
  * {@getfields contact_create}
  *
  *
+ * @throws API_Exception
  * @example ContactCreate.php Example of Create Call
  *
  * @return array  API Result Array
@@ -153,6 +154,11 @@ function civicrm_api3_contact_get($params) {
   return civicrm_api3_create_success($contacts, $params, 'contact');
 }
 
+/**
+ * @param $params
+ *
+ * @return int
+ */
 function civicrm_api3_contact_getcount($params) {
   $options = array();
   _civicrm_api3_contact_get_supportanomalies($params, $options);
@@ -201,6 +207,10 @@ function _civicrm_api3_contact_get_spec(&$params) {
   $params['group_id']['title'] = 'Group Memberships (filter)';
   $params['group']['title'] = 'Group Memberships (filter, array)';
   $params['tag']['title'] = 'Assigned tags (filter, array)';
+  $params['birth_date_low'] = array('name' => 'birth_date_low', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birthdate is equal to or greater than'));
+  $params['birth_date_high'] = array('name' => 'birth_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birthdate is equal to or less than'));
+  $params['deceased_date_low'] = array('name' => 'deceased_date_low','type' => CRM_Utils_Type::T_DATE, 'title' => ts('Deceased Date is equal to or greater than'));
+  $params['deceased_date_high'] = array('name' => 'deceased_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Deceased Date is equal to or less than'));
 }
 
 /**
@@ -281,6 +291,17 @@ function civicrm_api3_contact_delete($params) {
 }
 
 
+/**
+ * @param $params
+ * @param bool $dupeCheck
+ * @param bool $dupeErrorArray
+ * @param bool $obsoletevalue
+ * @param null $dedupeRuleGroupID
+ *
+ * @return null
+ * @throws API_Exception
+ * @throws CiviCRM_API3_Exception
+ */
 function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeErrorArray = false, $obsoletevalue = true, $dedupeRuleGroupID = null )
 {
 
@@ -325,17 +346,18 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
       $dedupeParams['check_permission'] = $params['check_permission'];
     }
 
-    $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['contact_type'], 'Strict', array());
+    $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['contact_type'], 'Unsupervised', array());
 
     if (count($ids) >0) {
       throw new API_Exception("Found matching contacts: ". implode(',',$ids),"duplicate",array("ids"=>$ids));
     }
   }
 
-  //check for organisations with same name
+  // The BAO no longer supports the legacy param "current_employer" so here is a shim for api backward-compatability
   if (!empty($params['current_employer'])) {
-    $organizationParams = array();
-    $organizationParams['organization_name'] = $params['current_employer'];
+    $organizationParams = array(
+      'organization_name' => $params['current_employer'],
+    );
 
     $dedupParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
 
@@ -350,6 +372,17 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
     // show error if multiple organisation with same name exist
     if (empty($params['employer_id']) && (count($dupeIds) > 1)) {
       throw new API_Exception('Found more than one Organisation with same Name.');
+    }
+
+    if ($dupeIds) {
+      $params['employer_id'] = $dupeIds[0];
+    }
+    else {
+      $result = civicrm_api3('contact', 'create', array(
+        'organization_name' => $params['current_employer'],
+        'contact_type' => 'Organization'
+      ));
+      $params['employer_id'] = $result['id'];
     }
   }
 
@@ -379,10 +412,10 @@ function _civicrm_api3_contact_update($params, $contactID = NULL) {
 /**
  * Validate the addressee or email or postal greetings
  *
- * @param  $params                   Associative array of property name/value
+ * @param  array $params  Associative array of property name/value
  *                                   pairs to insert in new contact.
  *
- * @return array (reference )        null on success, error message otherwise
+ * @throws API_Exception
  *
  * @access public
  */
@@ -839,12 +872,21 @@ function civicrm_api3_contact_merge($params) {
   }
 }
 
+/**
+ * @param $params
+ */
 function _civicrm_api3_contact_proximity_spec(&$params) {
   $params['latitude']['api.required'] = 1;
   $params['longitude']['api.required'] = 1;
   $params['unit']['api.default'] = 'meter';
 }
 
+/**
+ * @param $params
+ *
+ * @return array
+ * @throws Exception
+ */
 function civicrm_api3_contact_proximity($params) {
   $latitude  = CRM_Utils_Array::value('latitude', $params);
   $longitude = CRM_Utils_Array::value('longitude', $params);
@@ -891,7 +933,7 @@ WHERE     $whereClause
 
 
 /**
- * Overrides _civicrm_api3_generic_getlist_params.
+ * @see _civicrm_api3_generic_getlist_params
  *
  * @param $request array
  */
@@ -934,7 +976,7 @@ function _civicrm_api3_contact_getlist_params(&$request) {
 }
 
 /**
- * Overrides _civicrm_api3_generic_getlist_output
+ * @see _civicrm_api3_generic_getlist_output
  *
  * @param $result array
  * @param $request array

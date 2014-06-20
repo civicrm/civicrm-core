@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -37,6 +37,8 @@
  * Page for displaying list of membership types
  */
 class CRM_Member_Page_MembershipStatus extends CRM_Core_Page_Basic {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -134,7 +136,6 @@ class CRM_Member_Page_MembershipStatus extends CRM_Core_Page_Basic {
    * @static
    */
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     // get all custom groups sorted by weight
     $membershipStatus = array();
     $dao = new CRM_Member_DAO_MembershipStatus();
@@ -201,6 +202,8 @@ class CRM_Member_Page_MembershipStatus extends CRM_Core_Page_Basic {
 
   /**
    * Get user context.
+   *
+   * @param null $mode
    *
    * @return string user context.
    */

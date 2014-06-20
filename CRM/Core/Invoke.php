@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * Serves as a wrapper between the UserFrameWork and Core CRM
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -57,6 +57,9 @@ class CRM_Core_Invoke {
     }
   }
 
+  /**
+   * @param $args
+   */
   protected static function _invoke($args) {
     if ($args[0] !== 'civicrm') {
       return;
@@ -342,6 +345,9 @@ class CRM_Core_Invoke {
    *
    * @param $action
    *
+   * @param $contact_type
+   * @param $contact_sub_type
+   *
    * @static
    * @access public
    */
@@ -372,17 +378,23 @@ class CRM_Core_Invoke {
     $template->assign('newer_civicrm_version', $newerVersion);
   }
 
+  /**
+   * @param bool $triggerRebuild
+   * @param bool $sessionReset
+   *
+   * @throws Exception
+   */
   static function rebuildMenuAndCaches($triggerRebuild = FALSE, $sessionReset = FALSE) {
     $config = CRM_Core_Config::singleton();
     $config->clearModuleList();
+
+    // also cleanup all caches
+    $config->cleanupCaches($sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
 
     CRM_Core_Menu::store();
 
     // also reset navigation
     CRM_Core_BAO_Navigation::resetNavigation();
-
-    // also cleanup all caches
-    $config->cleanupCaches($sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
 
     // also cleanup module permissions
     $config->cleanupPermissions();
@@ -404,4 +416,3 @@ class CRM_Core_Invoke {
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }
 }
-

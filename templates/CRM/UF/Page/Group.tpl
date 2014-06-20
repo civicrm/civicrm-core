@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -155,7 +155,7 @@
 
   </div> {* maincontainer*}
   <script type='text/javascript'>
-      cj( function() {ldelim}
+      CRM.$(function($) {ldelim}
         var selectedTab = '{if $selectedChild}{$selectedChild}{else}user-profiles{/if}';
         var tabIndex = cj('#tab_' + selectedTab).prevAll().length;
         {literal}

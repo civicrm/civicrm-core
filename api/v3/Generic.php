@@ -52,13 +52,15 @@ function civicrm_api3_generic_getfields($apiRequest) {
   // defaults based on data model and API policy
   switch ($action) {
     case 'getfields':
-      $values = _civicrm_api_get_fields($entity, false, $apiRequest['params']);
+      $values = _civicrm_api_get_fields($entity, FALSE, $apiRequest['params']);
       return civicrm_api3_create_success($values, $apiRequest['params'], $entity, 'getfields');
     case 'create':
     case 'update':
     case 'replace':
       $unique = FALSE;
     case 'get':
+    case 'getsingle':
+    case 'getcount':
       $metadata = _civicrm_api_get_fields($apiRequest['entity'], $unique, $apiRequest['params']);
       if (empty($metadata['id'])){
         // if id is not set we will set it eg. 'id' from 'case_id', case_id will be an alias
@@ -80,7 +82,9 @@ function civicrm_api3_generic_getfields($apiRequest) {
 
     case 'delete':
       $metadata = array(
-        'id' => array('title' => 'Unique Identifier',
+        'id' => array(
+          'title' => $entity . ' ID',
+          'name' => 'id',
           'api.required' => 1,
           'api.aliases' => array($lcase_entity . '_id'),
           'type' => CRM_Utils_Type::T_INT,
@@ -90,11 +94,13 @@ function civicrm_api3_generic_getfields($apiRequest) {
     case 'getoptions':
       $metadata = array(
         'field' => array(
-          'title' => 'Field to retrieve options for',
+          'name' => 'field',
+          'title' => 'Field name',
           'api.required' => 1,
         ),
         'context' => array(
-          'title' => 'Context string',
+          'name' => 'context',
+          'title' => 'Context',
         ),
       );
         break;
@@ -105,8 +111,17 @@ function civicrm_api3_generic_getfields($apiRequest) {
 
   // find any supplemental information
   $hypApiRequest = array('entity' => $apiRequest['entity'], 'action' => $action, 'version' => $apiRequest['version']);
-  $hypApiRequest += _civicrm_api_resolve($hypApiRequest);
-  $helper = '_' . $hypApiRequest['function'] . '_spec';
+  try {
+    list ($apiProvider, $hypApiRequest) = \Civi\Core\Container::singleton()->get('civi_api_kernel')->resolve($hypApiRequest);
+    if (isset($hypApiRequest['function'])) {
+      $helper = '_' . $hypApiRequest['function'] . '_spec';
+    } else {
+      // not implemented MagicFunctionProvider
+      $helper = NULL;
+    }
+  } catch (\Civi\API\Exception\NotImplementedException $e) {
+    $helper = NULL;
+  }
   if (function_exists($helper)) {
     // alter
     $helper($metadata, $apiRequest);
@@ -115,7 +130,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
   $fieldsToResolve = (array) CRM_Utils_Array::value('get_options', $apiOptions, array());
 
   foreach ($metadata as $fieldname => $fieldSpec) {
-    _civicrm_api3_generic_get_metadata_options($metadata, $apiRequest['entity'], $fieldname, $fieldSpec, $fieldsToResolve);
+    _civicrm_api3_generic_get_metadata_options($metadata, $apiRequest, $fieldname, $fieldSpec, $fieldsToResolve);
   }
 
   $results[$entity][$action][$sequential] = civicrm_api3_create_success($metadata, $apiRequest['params'], NULL, 'getfields');
@@ -127,6 +142,7 @@ function civicrm_api3_generic_getfields($apiRequest) {
  *
  * @param array $apiRequest api request as an array. Keys are
  *
+ * @throws API_Exception
  * @return integer count of results
  */
 function civicrm_api3_generic_getcount($apiRequest) {
@@ -195,6 +211,39 @@ function civicrm_api3_generic_getvalue($apiRequest) {
 }
 
 /**
+ * @param $params
+ */
+function _civicrm_api3_generic_getrefcount_spec(&$params) {
+  $params['id']['api.required'] = 1;
+}
+
+/**
+ * API to determine if a record is in-use
+ *
+ * @param array $apiRequest api request as an array
+ *
+ * @throws API_Exception
+ * @return array API result (int 0 or 1)
+ */
+function civicrm_api3_generic_getrefcount($apiRequest) {
+  $entityToClassMap = CRM_Core_DAO_AllCoreTables::daoToClass();
+  if (!isset($entityToClassMap[$apiRequest['entity']])) {
+    throw new API_Exception("The entity '{$apiRequest['entity']}' is unknown or unsupported by 'getrefcount'. Consider implementing this API.", 'getrefcount_unsupported');
+  }
+  $daoClass = $entityToClassMap[$apiRequest['entity']];
+
+  /* @var $dao CRM_Core_DAO */
+  $dao = new $daoClass();
+  $dao->id = $apiRequest['params']['id'];
+  if ($dao->find(TRUE)) {
+    return civicrm_api3_create_success($dao->getReferenceCounts());
+  }
+  else {
+    return civicrm_api3_create_success(array());
+  }
+}
+
+/**
  * API wrapper for replace function
  *
  * @param array $apiRequest api request as an array. Keys are
@@ -245,16 +294,18 @@ function civicrm_api3_generic_getoptions($apiRequest) {
  * 2) the field is a pseudoconstant and is NOT an FK
  * - the reason for this is that checking / transformation is done on pseudoconstants but
  * - if the field is an FK then mysql will enforce the data quality (& we have handling on failure)
- * @todo - if may be we should define a 'resolve' key on the psuedoconstant for when these rules are not fine enough
+ * @todo - if may be we should define a 'resolve' key on the pseudoconstant for when these rules are not fine enough
  *
  * This function is only split out for the purpose of code clarity / comment block documentation
+ *
  * @param array $metadata the array of metadata that will form the result of the getfields function
+ * @param $apiRequest
  * @param string $fieldname field currently being processed
  * @param array $fieldSpec metadata for that field
  * @param array $fieldsToResolve anny field resolutions specifically requested
  */
-function _civicrm_api3_generic_get_metadata_options(&$metadata, $entity, $fieldname, $fieldSpec, $fieldsToResolve){
-  if (empty($fieldSpec['pseudoconstant'])) {
+function _civicrm_api3_generic_get_metadata_options(&$metadata, $apiRequest, $fieldname, $fieldSpec, $fieldsToResolve){
+  if (empty($fieldSpec['pseudoconstant']) && empty($fieldSpec['option_group_id'])) {
     return;
   }
 
@@ -262,7 +313,7 @@ function _civicrm_api3_generic_get_metadata_options(&$metadata, $entity, $fieldn
     return;
   }
 
-  $options = civicrm_api($entity, 'getoptions', array('version' => 3, 'field' => $fieldname));
+  $options = civicrm_api($apiRequest['entity'], 'getoptions', array('version' => 3, 'field' => $fieldname, 'sequential' => !empty($apiRequest['params']['sequential'])));
   if (is_array(CRM_Utils_Array::value('values', $options))) {
     $metadata[$fieldname]['options'] = $options['values'];
   }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * by every scheduled job (cron task) in CiviCRM.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -58,6 +58,9 @@ class CRM_Core_JobManager {
    * @access public
    *
    */
+  /**
+   *
+   */
   public function __construct() {
     $config = CRM_Core_Config::singleton();
     $config->fatalErrorHandler = 'CRM_Core_JobManager_scheduledJobFatalErrorHandler';
@@ -70,6 +73,9 @@ class CRM_Core_JobManager {
    * @param void
    * @access private
    *
+   */
+  /**
+   * @param bool $auth
    */
   public function execute($auth = TRUE) {
 
@@ -101,11 +107,18 @@ class CRM_Core_JobManager {
    */
   public function __destruct() {}
 
+  /**
+   * @param $entity
+   * @param $action
+   */
   public function executeJobByAction($entity, $action) {
     $job = $this->_getJob(NULL, $entity, $action);
     $this->executeJob($job);
   }
 
+  /**
+   * @param $id
+   */
   public function executeJobById($id) {
     $job = $this->_getJob($id);
     $this->executeJob($job);
@@ -147,6 +160,9 @@ class CRM_Core_JobManager {
    * @access private
    *
    */
+  /**
+   * @return array
+   */
   private function _getJobs() {
     $jobs = array();
     $dao = new CRM_Core_DAO_Job();
@@ -169,6 +185,14 @@ class CRM_Core_JobManager {
    * @access private
    *
    */
+  /**
+   * @param null $id
+   * @param null $entity
+   * @param null $action
+   *
+   * @return CRM_Core_ScheduledJob
+   * @throws Exception
+   */
   private function _getJob($id = NULL, $entity = NULL, $action = NULL) {
     if (is_null($id) && is_null($action)) {
       CRM_Core_Error::fatal('You need to provide either id or name to use this method');
@@ -185,6 +209,12 @@ class CRM_Core_JobManager {
     return $job;
   }
 
+  /**
+   * @param $entity
+   * @param $job
+   * @param $params
+   * @param null $source
+   */
   public function setSingleRunParams($entity, $job, $params, $source = NULL) {
     $this->_source = $source;
     $key = strtolower($entity . '_' . $job);
@@ -197,6 +227,9 @@ class CRM_Core_JobManager {
    * @return array|null collection of permissions, null if none
    * @access public
    *
+   */
+  /**
+   * @param $message
    */
   public function logEntry($message) {
     $domainID = CRM_Core_Config::domainID();
@@ -231,6 +264,11 @@ class CRM_Core_JobManager {
     $dao->save();
   }
 
+  /**
+   * @param $apiResult
+   *
+   * @return string
+   */
   private function _apiResultToMessage($apiResult) {
     $status = $apiResult['is_error'] ? ts('Failure') : ts('Success');
     $msg    = CRM_Utils_Array::value('error_message', $apiResult, 'empty error_message!');
@@ -246,6 +284,11 @@ class CRM_Core_JobManager {
   }
 }
 
+/**
+ * @param $message
+ *
+ * @throws Exception
+ */
 function CRM_Core_JobManager_scheduledJobFatalErrorHandler($message) {
   throw new Exception("{$message['message']}: {$message['code']}");
 }

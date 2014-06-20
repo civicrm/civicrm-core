@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright Tech To The People (c) 2010                              |
  +--------------------------------------------------------------------+
@@ -32,11 +32,6 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Survey
  */
-
-/**
- * Include utility functions
- */
-require_once 'api/v3/utils.php';
 
 /**
  * Get the list of signatories

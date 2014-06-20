@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -205,6 +205,9 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
    *
    * @param array $fields posted values of the form
    *
+   * @param $files
+   * @param $self
+   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public
@@ -300,6 +303,11 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     }
   }
 
+  /**
+   * @param $contactIds
+   *
+   * @return array
+   */
   private function _addRespondentToGroup($contactIds) {
     $groupAdditions = array();
     if (empty($contactIds)) {

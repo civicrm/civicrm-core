@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -139,6 +139,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $isActive = ts('Send email');
     $recordActivity = ts('Record activity for automated email');
     if ($providersCount) {
+      $this->assign('sms', $providersCount);
       $title = ts('Email or SMS');
       $isActive = ts('Send email or SMS');
       $recordActivity = ts('Record activity for automated email or SMS');
@@ -212,13 +213,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $recipientListing->setMultiple(TRUE);
     $this->add('hidden', 'is_recipient_listing', empty($recipientListingOptions) ? FALSE : TRUE, array('id' => 'is_recipient_listing'));
 
-    //token input url
-    $tokenUrl = CRM_Utils_System::url('civicrm/ajax/checkemail',
-      'noemail=1',
-      FALSE, NULL, FALSE
-    );
-    $this->assign('tokenUrl', $tokenUrl);
-    $this->add('text', 'recipient_manual_id', ts('Manual Recipients'));
+    $this->addEntityRef('recipient_manual_id', ts('Manual Recipients'), array('multiple' => TRUE, 'create' => TRUE));
 
     $this->addElement(
       'select',
@@ -249,10 +244,19 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    */
   static function formRule($fields) {
     $errors = array();
-    if ((array_key_exists(1, $fields['entity']) && $fields['entity'][1][0] == 0) ||
+    if ((array_key_exists(1, $fields['entity']) && $fields['entity'][1][0] === 0) ||
       (array_key_exists(2, $fields['entity']) && $fields['entity'][2][0] == 0)
     ) {
       $errors['entity'] = ts('Please select appropriate value');
+    }
+
+    if (array_key_exists(1, $fields['entity']) && !is_numeric($fields['entity'][1][0])) {
+      if (count($fields['entity'][1]) > 1) {
+        $errors['entity'] = ts('You may only select one contact field per reminder');
+      }
+      elseif (!(array_key_exists(2, $fields['entity']) && $fields['entity'][2][0] > 0)) {
+        $errors['entity'] = ts('Please select whether the reminder is sent each year.');
+      }
     }
 
     if (!empty($fields['is_active']) &&
@@ -278,6 +282,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * @return int
+   */
   function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['is_active'] = 1;
@@ -313,14 +320,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       }
       elseif (!empty($defaults['recipient_manual'])) {
         $defaults['recipient'] = 'manual';
-        $recipients = array();
-        foreach (explode(',', $defaults['recipient_manual']) as $cid) {
-          $recipients[$cid] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-            $cid,
-            'sort_name'
-          );
-        }
-        $this->assign('recipients', $recipients);
+        $defaults['recipient_manual_id'] = $defaults['recipient_manual'];
       }
     }
 

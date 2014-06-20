@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -93,6 +93,10 @@ require_once '../civicrm.config.php';
 // autoload
 require_once 'CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
+
+/**
+ * Class CRM_GCD
+ */
 class CRM_GCD {
 
   /**
@@ -275,6 +279,9 @@ class CRM_GCD {
     return $string;
   }
 
+  /**
+   * @return string
+   */
   private function randomChar() {
     return chr(mt_rand(65, 90));
   }
@@ -300,15 +307,30 @@ class CRM_GCD {
     return $items[mt_rand(0, count($items) - 1)];
   }
 
+  /**
+   * @param $items
+   *
+   * @return mixed
+   */
   private function randomIndex($items) {
     return $this->randomItem(array_keys($items));
   }
 
+  /**
+   * @param $items
+   *
+   * @return array
+   */
   private function randomKeyValue($items) {
     $key = $this->randomIndex($items);
     return array($key, $items[$key]);
   }
 
+  /**
+   * @param $chance
+   *
+   * @return int
+   */
   private function probability($chance) {
     if (mt_rand(0, 100) < ($chance * 100)) {
       return 1;
@@ -457,6 +479,9 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @return string
+   */
   public function randomName() {
     $first_name = $this->randomItem(($this->probability(.5) ? 'fe' : '') . 'male_name');
     $middle_name = ucfirst($this->randomChar());
@@ -805,6 +830,8 @@ class CRM_GCD {
    *
    * @param $cid int: contact id
    * @param $masterContactId int: set if this is a shared address
+   *
+   * @return array
    */
   private function _addAddress($cid, $masterContactId = NULL) {
 
@@ -862,6 +889,8 @@ class CRM_GCD {
    * Add a phone number for a contact
    *
    * @param $cid int: contact id
+   *
+   * @return array
    */
   private function _addPhone($cid) {
     $area = $this->probability(.5) ? '' : mt_rand(201, 899);
@@ -882,6 +911,10 @@ class CRM_GCD {
    * Add an email for a contact
    *
    * @param $cid int: contact id
+   * @param $email
+   * @param $locationType
+   *
+   * @return array
    */
   private function _addEmail($cid, $email, $locationType) {
     $params = array(
@@ -899,6 +932,8 @@ class CRM_GCD {
    *
    * @param $cid int: contact id
    * @param $name str: contact name
+   *
+   * @return array
    */
   private function _addWebsite($cid, $name) {
     $part = array_pad(split(' ', strtolower($name)), 3, '');
@@ -933,8 +968,11 @@ class CRM_GCD {
   /**
    * Create an email address based on a person's name
    * Using common naming patterns
+   *
    * @param $contact obj: individual contact record
    * @param $domain str: supply a domain (i.e. for a work address)
+   *
+   * @return string
    */
   private function _individualEmail($contact, $domain = NULL) {
     $first = $contact->first_name;
@@ -1175,6 +1213,9 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @return array
+   */
   function getZipCodeInfo() {
 
     if (!$this->stateMap) {
@@ -1206,6 +1247,11 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @param $zipCode
+   *
+   * @return array
+   */
   static function getLatLong($zipCode) {
     $query = "http://maps.google.com/maps?q=$zipCode&output=js";
     $userAgent = "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.7.5) Gecko/20041107 Firefox/1.0";
@@ -1351,6 +1397,11 @@ VALUES
     $this->_query($activityContact);
   }
 
+  /**
+   * @param $date
+   *
+   * @return string
+   */
   static function repairDate($date) {
     $dropArray = array('-' => '', ':' => '', ' ' => '');
     return strtr($date, $dropArray);
@@ -1792,6 +1843,10 @@ WHERE cefa.account_relationship = 1";
     $this->addFinancialItem($result);
   }
 
+  /**
+   * @param $result
+   * @param null $financialAccountId
+   */
   private function addFinancialItem($result, $financialAccountId = NULL) {
     $defaultFinancialAccount = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1");
     while($result->fetch()){
@@ -1902,10 +1957,18 @@ AND    a.details = 'Participant Payment'
   }
 }
 
+/**
+ * @param null $str
+ *
+ * @return bool
+ */
 function user_access($str = NULL) {
   return TRUE;
 }
 
+/**
+ * @return array
+ */
 function module_list() {
   return array();
 }

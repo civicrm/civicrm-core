@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -146,6 +146,9 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    *
    * @param array $fields posted values of the form
    *
+   * @param $files
+   * @param $self
+   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public
@@ -171,6 +174,17 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * the default values are retrieved from the database
+   *
+   * @access public
+   *
+   * @return array
+   */
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     return $this->_defaults;
   }
@@ -196,7 +210,7 @@ UPDATE civicrm_dedupe_rule_group
    AND used = %2";
       $queryParams = array(
         1 => array($this->_contactType, 'String'),
-        2 => array($this->_options[$used], 'String'),
+        2 => array($values['used'], 'String'),
       );
 
       CRM_Core_DAO::executeQuery($query, $queryParams);
@@ -288,6 +302,7 @@ UPDATE civicrm_dedupe_rule_group
 
     // also create an index for this dedupe rule
     // CRM-3837
+    CRM_Utils_Hook::dupeQuery($ruleDao, 'dedupeIndexes', $tables);
     CRM_Core_BAO_SchemaHandler::createIndexes($tables, 'dedupe_index', $substrLenghts);
 
     //need to clear cache of deduped contacts

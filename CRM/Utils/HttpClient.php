@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,7 +34,7 @@
  * want to deal with that so late in the 4.3 dev cycle.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -54,6 +54,9 @@ class CRM_Utils_HttpClient {
    */
   protected $connectionTimeout;
 
+  /**
+   * @return CRM_Utils_HttpClient
+   */
   public static function singleton() {
     if (!self::$singleton) {
       self::$singleton = new CRM_Utils_HttpClient();
@@ -61,6 +64,9 @@ class CRM_Utils_HttpClient {
     return self::$singleton;
   }
 
+  /**
+   * @param null $connectionTimeout
+   */
   public function __construct($connectionTimeout = NULL) {
     $this->connectionTimeout = $connectionTimeout;
   }
@@ -145,7 +151,9 @@ class CRM_Utils_HttpClient {
    * Send an HTTP POST for a remote resource
    *
    * @param string $remoteFile URL of a .zip file
-   * @param string $localFile path at which to store the .zip file
+   * @param $params
+   *
+   * @internal param string $localFile path at which to store the .zip file
    * @return array array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
    */
   public function post($remoteFile, $params) {
@@ -205,8 +213,11 @@ class CRM_Utils_HttpClient {
     return array($ch, $caConfig);
   }
 
+  /**
+   * @return bool
+   */
   public function isRedirectSupported() {
-    return ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off';
+    return (ini_get('open_basedir') == '') && (ini_get('safe_mode') == 'Off' || ini_get('safe_mode') === FALSE);
   }
 
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -48,7 +48,7 @@ class CRM_Core_Smarty extends Smarty {
   CONST
     // use print.tpl and bypass the CMS. Civi prints a valid html file
     PRINT_PAGE = 1,
-    // this and all the below bypasses the CMS html surronding it and assumes we will embed this within other pages
+    // this and all the below bypasses the CMS html surrounding it and assumes we will embed this within other pages
     PRINT_SNIPPET = 2,
     // sends the generated html to the chosen pdf engine
     PRINT_PDF = 3,
@@ -189,6 +189,8 @@ class CRM_Core_Smarty extends Smarty {
    * @param string $cache_id
    * @param string $compile_id
    * @param boolean $display
+   *
+   * @return bool|mixed|string
    */
   function fetch($resource_name, $cache_id = NULL, $compile_id = NULL, $display = FALSE) {
     if (preg_match( '/^(\s+)?string:/', $resource_name)) {
@@ -202,6 +204,10 @@ class CRM_Core_Smarty extends Smarty {
     return $output;
   }
 
+  /**
+   * @param $name
+   * @param $value
+   */
   function appendValue($name, $value) {
     $currentValue = $this->get_template_vars($name);
     if (!$currentValue) {
@@ -228,6 +234,9 @@ class CRM_Core_Smarty extends Smarty {
     civicrm_smarty_register_string_resource();
   }
 
+  /**
+   * @param $path
+   */
   function addTemplateDir($path) {
     if ( is_array( $this->template_dir ) ) {
       array_unshift( $this->template_dir, $path );

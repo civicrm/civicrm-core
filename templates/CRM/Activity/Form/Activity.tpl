@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,9 +30,6 @@
   {if $action eq 4}
     <div class="crm-block crm-content-block crm-activity-view-block">
   {else}
-    {if $context NEQ 'standalone'}
-    <h3>{if $action eq 1 or $action eq 1024}{ts 1=$activityTypeName}New activity: %1{/ts}{elseif $action eq 8}{ts 1=$activityTypeName}Delete %1{/ts}{else}{ts 1=$activityTypeName}Edit %1{/ts}{/if}</h3>
-    {/if}
     {if $activityTypeDescription }
       <div class="help">{$activityTypeDescription}</div>
     {/if}
@@ -56,7 +53,6 @@
   <table class="{if $action eq 4}crm-info-panel{else}form-layout{/if}">
 
   {if $action eq 4}
-  <h3>{$activityTypeName}</h3>
     {if $activityTypeDescription }
     <div class="help">{$activityTypeDescription}</div>
     {/if}
@@ -82,14 +78,14 @@
   </tr>
 
   <tr class="crm-activity-form-block-target_contact_id">
-      <td class="label">{$form.target_contact_id.label}</td>
-      <td class="view-value">
-        {$form.target_contact_id.html}
-        {if $action eq 1}
-        <br/>
-        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
-        {/if}
-      </td>
+  <td class="label">{$form.target_contact_id.label}</td>
+    <td class="view-value">
+      {$form.target_contact_id.html}
+      {if $action eq 1 or $single eq false}
+      <br/>
+      {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
+      {/if}
+    </td>
   </tr>
 
   <tr class="crm-activity-form-block-assignee_contact_id">
@@ -139,7 +135,7 @@
     {if $action neq 4}
       <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</td>
       {else}
-      <td class="view-value">{$form.activity_date_time.html|crmDate}</td>
+      <td class="view-value">{$form.activity_date_time.value|crmDate}</td>
     {/if}
   </tr>
   <tr class="crm-activity-form-block-duration">
@@ -183,8 +179,8 @@
   </tr>
   {/if}
 
-  {if $tagsetInfo_activity}
-  <tr class="crm-activity-form-block-tag_set"><td colspan="2">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td></tr>
+  {if $tagsetInfo.activity}
+  <tr class="crm-activity-form-block-tag_set">{include file="CRM/common/Tagset.tpl" tagsetType='activity' tableLayout=true}</tr>
   {/if}
 
   {if $action neq 4 OR $viewCustomData}
@@ -242,8 +238,7 @@
       </div><!-- /.crm-accordion-wrapper -->
       {literal}
         <script type="text/javascript">
-          cj(function($) {
-            cj().crmAccordions();
+          CRM.$(function($) {
             cj('.crm-accordion-body').each( function() {
               //open tab if form rule throws error
               if ( cj(this).children( ).find('span.crm-error').text( ).length > 0 ) {
@@ -296,7 +291,7 @@
   {include file="CRM/common/customData.tpl"}
     {literal}
     <script type="text/javascript">
-    cj(function() {
+    CRM.$(function($) {
     {/literal}
     {if $customDataSubType}
       CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
@@ -307,9 +302,6 @@
     });
     </script>
     {/literal}
-  {/if}
-  {if ! $form.case_select}
-  {include file="CRM/common/formNavigate.tpl"}
   {/if}
   </div>{* end of form block*}
 {/if} {* end of snippet if*}

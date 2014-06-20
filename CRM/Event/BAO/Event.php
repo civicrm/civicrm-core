@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -123,6 +123,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *
    * @param array $params reference array contains the values submitted by the form
    *
+   * @return object
    * @access public
    * @static
    *
@@ -143,7 +144,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     }
 
     $event = self::add($params);
-
+    CRM_Price_BAO_PriceSet::setPriceSets($params, $event, 'event');
     if (is_a($event, 'CRM_Core_Error')) {
       CRM_Core_DAO::transaction('ROLLBACK');
       return $event;
@@ -179,8 +180,9 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   /**
    * Function to delete the event
    *
-   * @param int $id  event id
+   * @param int $id event id
    *
+   * @return mixed|null
    * @access public
    * @static
    *
@@ -229,12 +231,14 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * Function to delete the location block associated with an event,
    * if not being used by any other event.
    *
-   * @param int $loc_block_id    location block id to be deleted
-   * @param int $eventid         event id with which loc block is associated
+   * @param $locBlockId
+   * @param null $eventId
+   *
+   * @internal param int $loc_block_id location block id to be deleted
+   * @internal param int $eventid event id with which loc block is associated
    *
    * @access public
    * @static
-   *
    */
   static function deleteEventLocBlock($locBlockId, $eventId = NULL) {
     $query = "SELECT count(ce.id) FROM civicrm_event ce WHERE ce.loc_block_id = $locBlockId";
@@ -256,10 +260,11 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @param $all              int     0 returns current and future events
    *                                  1 if events all are required
    *                                  2 returns events since 3 months ago
-   * @param $id               int     id of a specific event to return
+   * @param bool|int $id int     id of a specific event to return
    * @param $isActive         boolean true if you need only active events
    * @param $checkPermission  boolean true if you need to check permission else false
    *
+   * @return array
    * @static
    */
   static function getEvents($all = 0,
@@ -357,12 +362,13 @@ WHERE      civicrm_event.is_active = 1 AND
     }
 
     //get the participant status type values.
-    $query = 'SELECT id, name, class FROM civicrm_participant_status_type';
+    $query = 'SELECT id, name, label, class FROM civicrm_participant_status_type';
     $status = CRM_Core_DAO::executeQuery($query);
     $statusValues = array();
     while ($status->fetch()) {
       $statusValues[$status->id]['id'] = $status->id;
       $statusValues[$status->id]['name'] = $status->name;
+      $statusValues[$status->id]['label'] = $status->label;
       $statusValues[$status->id]['class'] = $status->class;
     }
 
@@ -372,6 +378,21 @@ WHERE      civicrm_event.is_active = 1 AND
     $optionGroupId = NULL;
     if ($optionGroupDAO->find(TRUE)) {
       $optionGroupId = $optionGroupDAO->id;
+    }
+    // Get the event summary display preferences
+    $show_max_events = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
+                       'show_events'
+    );
+    // default to 10 if no option is set
+    if (is_null($show_max_events)) {
+      $show_max_events = 10;
+    }
+    // show all events if show_events is set to a negative value
+    if ($show_max_events >= 0) {
+      $event_summary_limit = "LIMIT      0, $show_max_events";
+    }
+    else {
+      $event_summary_limit = "";
     }
 
     $query = "
@@ -393,7 +414,7 @@ WHERE      civicrm_event.is_active = 1 AND
            $validEventIDs
 GROUP BY   civicrm_event.id
 ORDER BY   civicrm_event.start_date ASC
-LIMIT      0, 10
+$event_summary_limit
 ";
     $eventParticipant = array();
 
@@ -530,6 +551,7 @@ LIMIT      0, 10
           $urlString = "reset=1&force=1&event={$dao->id}&status=$statusId";
           $statusInfo = array('url' => CRM_Utils_System::url('civicrm/event/search', $urlString),
             'name' => $statusValue['name'],
+            'label' => $statusValue['label'],
             'count' => $statusCount,
           );
           $eventSummary['events'][$dao->id]['statuses'][$class][] = $statusInfo;
@@ -556,12 +578,14 @@ LIMIT      0, 10
   /**
    * Function to get participant count
    *
+   * @param $eventId
    * @param  boolean $considerStatus consider status for participant count.
-   * @param  boolean $status         consider counted participant.
-   * @param  boolean $considerRole   consider role for participant count.
-   * @param  boolean $role           consider counted( is filter role) participant.
-   * @param  array   $eventIds       consider participants from given events.
-   * @param  boolean $countWithStatus  retrieve participant count w/ each participant status.
+   * @param  boolean $status consider counted participant.
+   * @param  boolean $considerRole consider role for participant count.
+   * @param  boolean $role consider counted( is filter role) participant.
+   *
+   * @internal param array $eventIds consider participants from given events.
+   * @internal param bool $countWithStatus retrieve participant count w/ each participant status.
    *
    * @access public
    *
@@ -618,7 +642,9 @@ LIMIT      0, 10
   /**
    * function to get the information to map a event
    *
-   * @param  array  $ids    the list of ids for which we want map info
+   * @param $id
+   *
+   * @internal param array $ids the list of ids for which we want map info
    *
    * @return null|string     title of the event
    * @static
@@ -800,6 +826,12 @@ WHERE civicrm_event.is_active = 1
     }
 
     // check 'view event info' permission
+    //@todo - per CRM-14626 we have resolved that 'view event info' means 'view ALL event info'
+    // and passing in the specific permission here will short-circuit the evaluation of permission to
+    // see specific events (doesn't seem relevant to this call
+    // however, since this function is accessed only by a convoluted call from a joomla block function
+    // it seems safer not to touch here. Suggestion is that CRM_Core_Permission::check(array or relevant permissions) would
+    // be clearer & safer here
     $permissions = CRM_Core_Permission::event(CRM_Core_Permission::VIEW);
 
     // check if we're in shopping cart mode for events
@@ -864,9 +896,12 @@ WHERE civicrm_event.is_active = 1
    * This function is to make a copy of a Event, including
    * all the fields in the event Wizard
    *
-   * @param int     $id          the event id to copy
+   * @param int $id the event id to copy
    *        obj     $newEvent    object of CRM_Event_DAO_Event
    *        boolean $afterCreate call to copy after the create function
+   * @param null $newEvent
+   * @param bool $afterCreate
+   *
    * @return void
    * @access public
    */
@@ -1011,6 +1046,12 @@ WHERE civicrm_event.is_active = 1
   /**
    * Process that send e-mails
    *
+   * @param $contactID
+   * @param $values
+   * @param $participantId
+   * @param bool $isTest
+   * @param bool $returnMessageText
+   *
    * @return void
    * @access public
    */
@@ -1098,9 +1139,16 @@ WHERE civicrm_event.is_active = 1
             'email' => $email,
             'confirm_email_text' => CRM_Utils_Array::value('confirm_email_text', $values['event']),
             'isShowLocation' => CRM_Utils_Array::value('is_show_location', $values['event']),
-            'contributeMode' => NULL,
+            'contributeMode' => CRM_Utils_Array::value('contributeMode', $template->_tpl_vars),
             'participantID' => $participantId,
             'conference_sessions' => $sessions,
+            'credit_card_number' =>
+                CRM_Utils_System::mungeCreditCard(
+                    CRM_Utils_Array::value('credit_card_number', $participantParams)),
+            'credit_card_exp_date' =>
+                CRM_Utils_Date::mysqlToIso(
+                    CRM_Utils_Date::format(
+                        CRM_Utils_Array::value('credit_card_exp_date', $participantParams))),
           ));
 
         // CRM-13890 : NOTE wait list condition need to be given so that
@@ -1176,6 +1224,15 @@ WHERE civicrm_event.is_active = 1
   /**
    * Function to add the custom fields OR array of participant's
    * profile info
+   *
+   * @param $id
+   * @param $name
+   * @param $cid
+   * @param $template
+   * @param $participantId
+   * @param $isTest
+   * @param bool $isCustomProfile
+   * @param array $participantParams
    *
    * @return void
    * @access public
@@ -1356,6 +1413,8 @@ WHERE civicrm_event.is_active = 1
    * @param int $gid profile Id
    * @param array $groupTitle Profile Group Title.
    * @param array $values formatted array of key value
+   *
+   * @param array $profileFields
    *
    * @return void
    * @access public
@@ -1614,14 +1673,16 @@ WHERE  id = $cfID
   /**
    * Function to build the array for Additional participant's information  array of priamry and additional Ids
    *
-   *@param int $participantId id of Primary participant
-   *@param array $values key/value event info
-   *@param int $contactId contact id of Primary participant
-   *@param boolean $isTest whether test or live transaction
-   *@param boolean $isIdsArray to return an array of Ids
+   * @param int $participantId id of Primary participant
+   * @param array $values key/value event info
+   * @param int $contactId contact id of Primary participant
+   * @param boolean $isTest whether test or live transaction
+   * @param boolean $isIdsArray to return an array of Ids
    *
-   *@return array $customProfile array of Additional participant's info OR array of Ids.
-   *@access public
+   * @param bool $skipCancel
+   *
+   * @return array $customProfile array of Additional participant's info OR array of Ids.
+   * @access public
    */
   static function buildCustomProfile($participantId,
     $values,
@@ -1735,6 +1796,9 @@ WHERE  id = $cfID
    *
    * @return array $events array of all events.
    */
+  /**
+   * @return array
+   */
   static function getLocationEvents() {
     $events = array();
 
@@ -1755,6 +1819,11 @@ ORDER BY sp.name, ca.city, ca.street_address ASC
     return $events;
   }
 
+  /**
+   * @param $locBlockId
+   *
+   * @return int|null|string
+   */
   static function countEventsUsingLocBlockId($locBlockId) {
     if (!$locBlockId) {
       return 0;
@@ -1769,15 +1838,27 @@ WHERE  ce.loc_block_id = $locBlockId";
     return CRM_Core_DAO::singleValueQuery($query);
   }
 
-  static function validRegistrationRequest($values, $contactID) {
+  /**
+   * Check if event registration is valid according to permissions AND Dates
+   *
+   * @param array $values
+   * @param integer $eventID
+   * @return boolean
+   */
+  static function validRegistrationRequest($values, $eventID) {
     // check that the user has permission to register for this event
     $hasPermission = CRM_Core_Permission::event(CRM_Core_Permission::EDIT,
-      $contactID
+      $eventID, 'register for events'
     );
 
     return $hasPermission && self::validRegistrationDate($values);
   }
 
+  /**
+   * @param $values
+   *
+   * @return bool
+   */
   static function validRegistrationDate(&$values) {
     // make sure that we are between  registration start date and registration end date
     $startDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('registration_start_date', $values));
@@ -1803,6 +1884,11 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @param  array   $values key/value event info
    * @return boolean true if allow registration otherwise false
    * @access public
+   */
+  /**
+   * @param $values
+   *
+   * @return bool
    */
   static function showHideRegistrationLink($values) {
 
@@ -1836,6 +1922,11 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @return boolean $alreadyRegistered true/false
    * @access public
    */
+  /**
+   * @param $params
+   *
+   * @return bool
+   */
   static function checkRegistration($params) {
     $alreadyRegistered = FALSE;
     if (empty($params['contact_id'])) {
@@ -1860,8 +1951,11 @@ WHERE  ce.loc_block_id = $locBlockId";
   /**
    * make sure that the user has permission to access this event
    *
-   * @param int $id   the id of the event
-   * @param int $name the name or title of the event
+   * @param null $eventId
+   * @param int $type
+   *
+   * @internal param int $id the id of the event
+   * @internal param int $name the name or title of the event
    *
    * @return string   the permission that the user has (or null)
    * @access public
@@ -2009,7 +2103,12 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
    *
    * @return $defaults an array of custom data defaults.
    */
-  public function getTemplateDefaultValues($templateId) {
+  /**
+   * @param $templateId
+   *
+   * @return array
+   */
+  static function getTemplateDefaultValues($templateId) {
     $defaults = array();
     if (!$templateId) {
       return $defaults;
@@ -2030,6 +2129,11 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     return $defaults;
   }
 
+  /**
+   * @param $event_id
+   *
+   * @return object
+   */
   static function get_sub_events($event_id) {
     $params = array('parent_event_id' => $event_id);
     $defaults = array();
@@ -2042,6 +2146,10 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
    * @params int $eventID event id.
    * @params int $eventCampaignID campaign id of that event
    *
+   */
+  /**
+   * @param $eventID
+   * @param $eventCampaignID
    */
   static function updateParticipantCampaignID($eventID, $eventCampaignID) {
     $params = array();

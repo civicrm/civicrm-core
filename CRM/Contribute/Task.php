@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -151,10 +151,12 @@ class CRM_Contribute_Task {
    *
    * @param int $permission
    *
+   * @param bool $softCreditFiltering
+   *
    * @return array set of tasks that are valid for the user
    * @access public
    */
-  static function &permissionedTaskTitles($permission) {
+  static function &permissionedTaskTitles($permission, $softCreditFiltering = FALSE) {
     $tasks = array();
     if (($permission == CRM_Core_Permission::EDIT)
       || CRM_Core_Permission::check('edit contributions')
@@ -172,6 +174,9 @@ class CRM_Contribute_Task {
       if (CRM_Core_Permission::check('delete in CiviContribute')) {
         $tasks[1] = self::$_tasks[1]['title'];
       }
+    }
+    if ($softCreditFiltering) {
+      unset($tasks[4], $tasks[7]);
     }
     return $tasks;
   }

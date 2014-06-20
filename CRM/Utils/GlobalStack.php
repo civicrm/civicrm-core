@@ -1,8 +1,8 @@
 <?php /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -64,6 +64,9 @@ class CRM_Utils_GlobalStack {
     return self::$_singleton;
   }
 
+  /**
+   * @param $newFrame
+   */
   public function push($newFrame) {
     $this->backups[] = $this->createBackup($newFrame);
     $this->applyFrame($newFrame);
@@ -91,6 +94,9 @@ class CRM_Utils_GlobalStack {
     return $frame;
   }
 
+  /**
+   * @param $newFrame
+   */
   public function applyFrame($newFrame) {
     foreach ($newFrame as $globalKey => $values) {
       if (is_array($values)) {

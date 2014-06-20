@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -156,6 +156,8 @@ class CRM_Core_I18n_Schema {
    * @param $retain string  the locale to retain
    * @param $table  string  the table containing the column
    * @param $class  string  schema structure class to use to recreate indices
+   *
+   * @param array $triggers
    *
    * @return void
    */
@@ -369,6 +371,12 @@ class CRM_Core_I18n_Schema {
     return $query;
   }
 
+  /**
+   * @param null $version
+   * @param bool $force
+   *
+   * @return array
+   */
   static function schemaStructureTables($version = NULL, $force = FALSE) {
     static $_tables = NULL;
     if ($_tables === NULL || $force) {
@@ -388,6 +396,11 @@ class CRM_Core_I18n_Schema {
     return $_tables;
   }
 
+  /**
+   * @param $version
+   *
+   * @return mixed
+   */
   static function getLatestSchema($version) {
     // remove any .upgrade sub-str from version. Makes it easy to do version_compare & give right result
     $version = str_ireplace(".upgrade", "", $version);
@@ -478,6 +491,10 @@ class CRM_Core_I18n_Schema {
     return "CREATE OR REPLACE VIEW {$table}_{$locale} AS SELECT " . implode(', ', $cols) . " FROM {$table}";
   }
 
+  /**
+   * @param $info
+   * @param null $tableName
+   */
   static function triggerInfo(&$info, $tableName = NULL) {
     // get the current supported locales
     $domain = new CRM_Core_DAO_Domain();

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * uninstalling extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -59,7 +59,18 @@ interface CRM_Extension_Manager_Interface {
    */
   public function onPostPostInstall(CRM_Extension_Info $info);
 
+  /**
+   * @param CRM_Extension_Info $info
+   *
+   * @return mixed
+   */
   public function onPreEnable(CRM_Extension_Info $info);
+
+  /**
+   * @param CRM_Extension_Info $info
+   *
+   * @return mixed
+   */
   public function onPostEnable(CRM_Extension_Info $info);
 
   /**
@@ -98,6 +109,18 @@ interface CRM_Extension_Manager_Interface {
    */
   public function onPostUninstall(CRM_Extension_Info $info);
 
+  /**
+   * @param CRM_Extension_Info $oldInfo
+   * @param CRM_Extension_Info $newInfo
+   *
+   * @return mixed
+   */
   public function onPreReplace(CRM_Extension_Info $oldInfo, CRM_Extension_Info $newInfo);
-  public function onPostReplace(CRM_Extension_Info $oldInfo, CRM_Extension_Info $newInfo);
+
+  /**
+   * @param CRM_Extension_Info $oldInfo
+   * @param CRM_Extension_Info $newInfo
+   *
+   * @return mixed
+   */public function onPostReplace(CRM_Extension_Info $oldInfo, CRM_Extension_Info $newInfo);
 }

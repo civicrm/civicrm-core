@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -116,8 +116,17 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $values['billing_address'] = $addressDetails[0]['display'];
     }
 
-    //get soft credit record if exists.
-    $values['softContributions'] = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($values['contribution_id']);
+    //assign soft credit record if exists.
+    $SCRecords = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($values['contribution_id'], TRUE);
+    if (!empty($SCRecords['soft_credit'])) {
+      $this->assign('softContributions', $SCRecords['soft_credit']);
+      unset($SCRecords['soft_credit']);
+    }
+
+    //assign pcp record if exists
+    foreach ($SCRecords as $name => $value) {
+      $this->assign($name, $value);
+    }
 
     $lineItems = array();
     if ($id) {

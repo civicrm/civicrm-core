@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_AdditionalPaymentTest
+ */
 class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
   protected function setUp() {
     parent::setUp();
@@ -46,10 +50,10 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->webtestFillAutocomplete($firstName);
 
     // Select event. Based on label for now.
-    $this->select('event_id', "label=regexp:Rain-forest Cup Youth Soccer Tournament.");
+    $this->select2('event_id', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select role
-    $this->click('role_id[2]');
+    $this->select('role_id', "value=2");
 
     // Choose Registration Date.
     // Using helper webtestFillDate function.
@@ -69,7 +73,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     // Select an event fee
     $this->waitForElementPresent('priceset');
 
-    $this->click("xpath=//input[@class='form-radio']");
+    $this->click("xpath=//input[@class='crm-form-radio']");
     sleep(1);
     // record payment total amount
     // amount populated after fee selection
@@ -114,7 +118,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData(
       array(
         'Event' => 'Rain-forest Cup Youth Soccer Tournament',
-        'Participant Role' => 'Attendee',
+        'Participant Role' => 'Volunteer',
         'Status' => 'Partially paid',
         'Event Source' => 'Event Partially Paid Webtest',
       )
@@ -124,7 +128,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->_checkPaymentInfoTable(800.00, 400.00);
     $balance = 800.00 - 400.00;
     //click through to the contribution view screen
-    $this->click("xpath=id('ParticipantView')/div[2]/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=id('ParticipantView')/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -139,27 +143,25 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     );
 
     $this->click('_qf_ContributionView_cancel-top');
-    $this->waitForElementPresent("xpath=id('ParticipantView')/div[2]/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=id('ParticipantView')/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     // make additional payment
     // 1 - check for links presence on participant view and edit page
-    $this->assertElementPresent("xpath=id('Search')/table[@class='selector']/tbody/tr[1]/td[8]/span[2]/ul/li[2]/a[text()='Record Payment']");
-    $this->click("xpath=id('Search')/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->assertElementPresent("xpath=id('Search')/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span[2]/ul/li[2]/a[text()='Record Payment']");
+    $this->click("xpath=id('Search')/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent("xpath=id('ParticipantView')");
     $this->assertElementPresent("xpath=id('ParticipantView')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]");
 
     $this->click("xpath=id('ParticipantView')//div[@class='action-link']/div/a/span[contains(text(), 'Edit')]");
     $this->waitForElementPresent("xpath=id('Participant')");
-    $this->assertElementPresent("xpath=id('Participant')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]");
+    $this->assertElementPresent("xpath=id('Participant')//td[@id='payment-info']//a/span[contains(text(), 'Record Payment')]");
     $location = $this->getAttribute("xpath=id('Participant')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]/../@href");
 
     $this->open($location);
     $this->waitForElementPresent("xpath=id('AdditionalPayment')");
     $this->assertElementContainsText("xpath=id('AdditionalPayment')/h3", 'New Event Payment');
 
-    // input data
-    $this->select('financial_type_id', 'label=Donation');
     // verify balance
-    $text = $this->getText("xpath=id('AdditionalPayment')/div[2]/table/tbody/tr[4]/td[2]");
+    $text = $this->getText("xpath=id('AdditionalPayment')/div[2]//table/tbody/tr[3]/td[2]");
     $this->assertTrue((bool)preg_match("/{$balance}/", $text));
 
     // check form rule error
@@ -172,14 +174,14 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->click('_qf_AdditionalPayment_upload-bottom');
     $this->waitForText('crm-notification-container', 'The payment record has been processed.');
 
-    $this->waitForElementPresent("xpath=id('Search')/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
-    $this->click("xpath=id('Search')/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=id('Search')/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=id('Search')/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_ParticipantView_cancel-top");
 
     $this->webtestVerifyTabularData(
       array(
         'Event' => 'Rain-forest Cup Youth Soccer Tournament',
-        'Participant Role' => 'Attendee',
+        'Participant Role' => 'Volunteer',
         'Status' => 'Registered',
         'Event Source' => 'Event Partially Paid Webtest',
       )
@@ -188,9 +190,9 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->_checkPaymentInfoTable(800.00, 800.00);
 
     // check for not apprence of record payment button
-    $this->assertFalse($this->isElementPresent("xpath=id('ParticipantView')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]"));
+    $this->assertFalse($this->isElementPresent("xpath=id('ParticipantView')//td[@id='payment-info']//a/span[contains(text(), 'Record Payment')]"));
 
-    $this->click("xpath=id('ParticipantView')/div[2]/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=id('ParticipantView')/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -213,8 +215,12 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//table[@id='info']/tbody/tr/th[6][contains(text(), 'Status')]/../../tr[2]/td[6][contains(text(), 'Completed')]/../../tr[3]/td[6][contains(text(), 'Completed')]");
   }
 
+  /**
+   * @param $feeAmt
+   * @param $amtPaid
+   */
   function _checkPaymentInfoTable($feeAmt, $amtPaid) {
     $this->assertElementContainsText("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td", "$ {$feeAmt}", 'Missing text: appropriate fee amount');
-    $this->assertElementContainsText("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td[2]/a", "$ {$amtPaid}", 'Missing text: appropriate fee amount');
+    $this->assertElementContainsText("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td[2]", "$ {$amtPaid}", 'Missing text: appropriate fee amount');
   }
 }

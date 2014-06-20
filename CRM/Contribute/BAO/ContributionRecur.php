@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -54,8 +54,9 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * contribution object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
-   * @param array $ids    the array that holds all the db ids
+   * @param array $params (reference ) an assoc array of name/value pairs
+   *
+   * @internal param array $ids the array that holds all the db ids
    *
    * @return object CRM_Contribute_BAO_Contribution object
    * @access public
@@ -153,6 +154,12 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     return $result;
   }
 
+  /**
+   * @param $id
+   * @param $mode
+   *
+   * @return array|null
+   */
   static function getPaymentProcessor($id, $mode) {
     //FIX ME:
     $sql = "
@@ -200,6 +207,8 @@ SELECT r.payment_processor_id
   /**
    * Delete Recurring contribution.
    *
+   * @param $recurId
+   *
    * @return true / false.
    * @access public
    * @static
@@ -220,9 +229,11 @@ SELECT r.payment_processor_id
   /**
    * Cancel Recurring contribution.
    *
-   * @param integer  $recurId recur contribution id.
-   * @param array    $objects an array of objects that is to be cancelled like
+   * @param integer $recurId recur contribution id.
+   * @param array $objects an array of objects that is to be cancelled like
    *                          contribution, membership, event. At least contribution object is a must.
+   *
+   * @param array $activityParams
    *
    * @return true / false.
    * @access public
@@ -335,7 +346,7 @@ SELECT r.payment_processor_id
       $params[$recurDAO->id]['contactId'] = $recurDAO->contact_id;
       $params[$recurDAO->id]['start_date'] = $recurDAO->start_date;
       $params[$recurDAO->id]['end_date'] = $recurDAO->end_date;
-      $params[$recurDAO->id]['next_sched_contribution_date'] = $recurDAO->next_sched_contribution;
+      $params[$recurDAO->id]['next_sched_contribution_date'] = $recurDAO->next_sched_contribution_date;
       $params[$recurDAO->id]['amount'] = $recurDAO->amount;
       $params[$recurDAO->id]['currency'] = $recurDAO->currency;
       $params[$recurDAO->id]['frequency_unit'] = $recurDAO->frequency_unit;
@@ -366,6 +377,12 @@ SELECT r.payment_processor_id
     return FALSE;
   }
 
+  /**
+   * @param $entityID
+   * @param string $entity
+   *
+   * @return null|Object
+   */
   static function getSubscriptionDetails($entityID, $entity = 'recur') {
     $sql = "
 SELECT rec.id                   as recur_id,

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -104,7 +104,7 @@
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
     {if $action neq 1}
   <div class="action-link">
-      <a class="no-popup" href="{$crmURL}">&raquo; {ts}Contacts in this Group{/ts}</a>
+      <a {$crmURL}>&raquo; {ts}Contacts in this Group{/ts}</a>
       {if $group.saved_search_id}
           <br />
     {if $group.mapping_id}

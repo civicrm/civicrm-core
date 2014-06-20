@@ -1,7 +1,14 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Utils_NumberTest
+ */
 class CRM_Utils_NumberTest extends CiviUnitTestCase {
 
+  /**
+   * @return array
+   */
   function randomDecimalCases() {
     $cases = array();
     // array(array $precision, int $expectedMinInclusive, int $expectedMaxExclusive)
@@ -32,6 +39,9 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * @return array
+   */
   function truncDecimalCases() {
     $cases = array();
     // array($value, $precision, $expectedValue)

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -52,6 +52,9 @@ class CRM_Utils_Migrate_Export {
    */
   protected $_xml;
 
+  /**
+   *
+   */
   function __construct() {
     $this->_xml = array(
       'customGroup' => array(
@@ -392,6 +395,11 @@ class CRM_Utils_Migrate_Export {
     return $result;
   }
 
+  /**
+   * @param $groupName
+   * @param $daoName
+   * @param null $sql
+   */
   function fetch($groupName, $daoName, $sql = NULL) {
     $idNameFields = isset($this->_xml[$groupName]['idNameFields']) ? $this->_xml[$groupName]['idNameFields'] : NULL;
     $mappedFields = isset($this->_xml[$groupName]['mappedFields']) ? $this->_xml[$groupName]['mappedFields'] : NULL;
@@ -444,8 +452,10 @@ class CRM_Utils_Migrate_Export {
   }
 
   /**
-   * @param CRM_Core_DAO $object
    * @param string $objectName business-entity/xml-tag name
+   * @param CRM_Core_DAO $object
+   * @param $mappedFields
+   *
    * @return array
    */
   function exportDAO($objectName, $object, $mappedFields) {
@@ -525,7 +535,8 @@ class CRM_Utils_Migrate_Export {
   /**
    * @param string $tagName
    * @param array $keyValues
-   * @param string $additional XML
+   * @throws Exception
+   * @internal param string $additional XML
    * @return string XML
    */
   public function renderKeyValueXML($tagName, $keyValues) {
@@ -541,6 +552,8 @@ class CRM_Utils_Migrate_Export {
    * @param string $name tag name
    * @param string $value text
    * @param string $prefix
+   *
+   * @throws Exception
    * @return string XML
    */
   function renderTextTag($name, $value, $prefix = '') {

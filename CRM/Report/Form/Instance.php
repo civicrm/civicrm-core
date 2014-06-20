@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,12 +28,15 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Report_Form_Instance {
 
+  /**
+   * @param $form
+   */
   static function buildForm(&$form) {
     // we should not build form elements in dashlet mode
     if ($form->_section) {
@@ -81,6 +84,14 @@ class CRM_Report_Form_Instance {
       $attributes['email_subject']
     );
 
+    $form->add('text',
+      'row_count',
+      ts('Limit Dashboard Results'),
+      array('maxlength' => 64,
+        'size' => 5
+      )
+    );
+
     $form->add('textarea',
       'report_header',
       ts('Report Header'),
@@ -97,7 +108,8 @@ class CRM_Report_Form_Instance {
       array('onclick' => "return showHideByValue('is_navigation','','navigation_menu','table-row','radio',false);")
     );
 
-    $form->addElement('checkbox', 'addToDashboard', ts('Available for Dashboard?'));
+    $form->addElement('checkbox', 'addToDashboard', ts('Available for Dashboard?'), NULL,
+      array('onclick' => "return showHideByValue('addToDashboard','','limit_result','table-row','radio',false);"));
     $form->addElement('checkbox', 'is_reserved', ts('Reserved Report?'));
     if (!CRM_Core_Permission::check('administer reserved reports')) {
       $form->freeze('is_reserved');
@@ -163,6 +175,13 @@ class CRM_Report_Form_Instance {
     $form->addFormRule(array('CRM_Report_Form_Instance', 'formRule'), $form);
   }
 
+  /**
+   * @param $fields
+   * @param $errors
+   * @param $self
+   *
+   * @return array|bool
+   */
   static function formRule($fields, $errors, $self) {
     $buttonName = $self->controller->getButtonName();
     $selfButtonName = $self->getVar('_instanceButtonName');
@@ -178,6 +197,10 @@ class CRM_Report_Form_Instance {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * @param $form
+   * @param $defaults
+   */
   static function setDefaultValues(&$form, &$defaults) {
     // we should not build form elements in dashlet mode
     if ($form->_section) {
@@ -240,6 +263,10 @@ class CRM_Report_Form_Instance {
     }
   }
 
+  /**
+   * @param $form
+   * @param bool $redirect
+   */
   static function postProcess(&$form, $redirect = TRUE) {
     $params = $form->getVar('_params');
     $instanceID = $form->getVar('_id');

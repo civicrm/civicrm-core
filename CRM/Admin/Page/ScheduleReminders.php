@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -38,6 +38,8 @@
  * Page for displaying list of Reminders
  */
 class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
+
+  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -61,7 +63,7 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
    *
    * @return array (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
       self::$_links = array(
@@ -114,6 +116,8 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
   /**
    * Get user context.
    *
+   * @param null $mode
+   *
    * @return string user context.
    */
   function userContext($mode = NULL) {
@@ -123,12 +127,13 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
   /**
    * Browse all Scheduled Reminders settings.
    *
+   * @param null $action
+   *
    * @return void
    * @access public
    * @static
    */
   function browse($action = NULL) {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     // Get list of configured reminders
     $reminderList = CRM_Core_BAO_ActionSchedule::getList();
 
