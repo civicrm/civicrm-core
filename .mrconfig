@@ -1,6 +1,6 @@
 [.]
 # Clean-up after each update
-fixups = bin/cividesk_cleanup.sh
+fixups = pushd $MR_REPO ; ../itbliss/civicrm_cleanup.sh ; popd
 
 [packages]
 checkout = git clone 'https://github.com/cividesk/civicrm-packages.git' 'packages'
