@@ -141,7 +141,7 @@ AND li.entity_id = {$entityId}
 
     $fromClause = "
       FROM      civicrm_%2 as %2
-      LEFT JOIN civicrm_line_item li ON ( li.entity_id = %2.id AND li.entity_table = 'civicrm_%2')
+      LEFT JOIN civicrm_line_item li ON (( li.entity_id = %2.id AND li.entity_table = 'civicrm_%2') OR (li.contribution_id = %2.id AND li.entity_table = 'civicrm_membership'))
       LEFT JOIN civicrm_price_field_value pfv ON ( pfv.id = li.price_field_value_id )
       LEFT JOIN civicrm_price_field pf ON (pf.id = li.price_field_id )";
     $whereClause = "
