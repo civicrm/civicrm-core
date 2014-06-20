@@ -895,7 +895,7 @@ ORDER BY    fixed_sort_order
         $values[$activityID]['case_subject'] = $dao->case_subject;
       }
       else {
-        $values[$activityID]['recipients'] =  ts('(%1 contacts)', array(1 => $dao->counter));
+        $values[$activityID]['recipients'] =  ts('(%1 recipients)', array(1 => $dao->counter));
         $values[$activityID]['mailingId'] = false;
         if (
           $accessCiviMail &&
