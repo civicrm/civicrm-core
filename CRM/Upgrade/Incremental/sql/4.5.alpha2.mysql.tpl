@@ -15,9 +15,10 @@ UPDATE civicrm_dashboard
 	WHERE civicrm_dashboard.fullscreen_url LIKE "%&%" AND civicrm_dashboard.fullscreen_url NOT LIKE "%?%";
 
 -- CRM-14843 Added States for Chile and Modify Santiago Metropolitan for consistency
-INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
-	(NULL, 1044, "LR", "Los Rios"),
-	(NULL, 1044, "AP", "Arica y Parinacota");
+INSERT IGNORE INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
+	(NULL, 1044, "LR",  "Los Rios"),
+	(NULL, 1044, "AP",  "Arica y Parinacota"),
+	(NULL, 1169, "AMA", "Amazonas");
 
 UPDATE civicrm_state_province
 	SET name = "Santiago Metropolitan", abbreviation = "SM"
