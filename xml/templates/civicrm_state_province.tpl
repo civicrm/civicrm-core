@@ -3914,4 +3914,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 
 -- CRM-14843 Added States for Chile and Modify Santiago Metropolitan for consistency
 (NULL, 1044, "LR", "Los Rios"),
-(NULL, 1044, "AP", "Arica y Parinacota");
+(NULL, 1044, "AP", "Arica y Parinacota"),
+
+-- Add missing Peruvian State (Amazonas)
+(NULL, 1169, "AMA", "Amazonas");
