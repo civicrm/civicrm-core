@@ -69,12 +69,14 @@ class CRM_GenCode_Util_File {
     if (!is_array($sources)) {
       $sources = array($sources);
     }
-    $result = file_exists($target);
-    foreach ($sources as $source) {
-      if (substr($source, -4) == '.tpl') $source = 'templates/'.$source;
-      $result = $result && (filemtime($source) > filemtime($target));
+    if ($result = file_exists($target)) {
+      foreach ($sources as $source) {
+        if (substr($source, -4) == '.tpl') $source = 'templates/'.$source;
+        $result = $result && (filemtime($source) < filemtime($target));
+      }
     }
-    return $result;
+    // return opposite of result, ie. true if needs update
+    return !$result;
   }
 }
 
@@ -279,7 +281,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     $oldTsLocale = $tsLocale;
     foreach ($locales as $locale) {
 
-      $sources = array(
+      $sources = $templates = array(
         'civicrm_country.tpl',
         'civicrm_state_province.tpl',
         'civicrm_currency.tpl',
@@ -287,7 +289,12 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
         'civicrm_navigation.tpl'
       );
       if ($locale != 'en_US') {
-        $sources[] = "{$this->localeDir}/$locale/civicrm.mo";
+        // Compatibility with CRM-13068: load .mo files from l10n/xx_XX/LC_MESSAGES/civicrm.mo
+        $mo_file = "{$this->localeDir}/$locale/LC_MESSAGES/civicrm.mo";
+        if (!file_exists($mo_file)) {
+          $mo_file = "{$this->localeDir}/$locale/civicrm.mo";
+        }
+        $sources[] = $mo_file;
       }
 
       $ext = ($locale != 'en_US' ? ".$locale" : '');
@@ -298,8 +305,8 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
         $this->smarty->assign('locale', $locale);
 
         $data   = array();
-        foreach ($sources as $source) {
-          $data[] = $this->smarty->fetch($source);
+        foreach ($templates as $template) {
+          $data[] = $this->smarty->fetch($template);
         }
         $data[] = " UPDATE civicrm_domain SET version = '" . $this->db_version . "';";
 
