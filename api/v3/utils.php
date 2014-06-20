@@ -289,7 +289,9 @@ function _civicrm_api3_get_DAO($name) {
     $name = substr($name, 13, $last - 13);
   }
 
-  if (strtolower($name) == 'individual' || strtolower($name) == 'household' || strtolower($name) == 'organization') {
+  $name = _civicrm_api_get_camel_name($name, 3);
+
+  if ($name == 'Individual' || $name == 'Household' || $name == 'Organization') {
     $name = 'Contact';
   }
 
@@ -303,7 +305,21 @@ function _civicrm_api3_get_DAO($name) {
   if(strtolower($name) == 'im'){
     return 'CRM_Core_BAO_IM';
   }
-  return CRM_Core_DAO_AllCoreTables::getFullName(_civicrm_api_get_camel_name($name, 3));
+  $dao = CRM_Core_DAO_AllCoreTables::getFullName($name);
+  if ($dao || !$name) {
+    return $dao;
+  }
+
+  // Really weird apis can declare their own DAO name. Not sure if this is a good idea...
+  if(file_exists("api/v3/$name.php")) {
+    include_once "api/v3/$name.php";
+  }
+  $daoFn = "_civicrm_api3_" . _civicrm_api_get_entity_name_from_camel($name) . "_DAO";
+  if (function_exists($daoFn)) {
+    return $daoFn();
+  }
+
+  return NULL;
 }
 
 /**
