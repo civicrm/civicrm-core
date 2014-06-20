@@ -130,6 +130,7 @@ AND li.entity_id = {$entityId}
       li.participant_count,
       li.price_field_value_id,
       li.financial_type_id,
+      li.tax_amount,
       pfv.description";
 
     $fromClause = "
@@ -180,7 +181,10 @@ AND li.entity_id = {$entityId}
         'financial_type_id' => $dao->financial_type_id,
         'membership_type_id' => $dao->membership_type_id,
         'membership_num_terms' => $dao->membership_num_terms,
+        'tax_amount' => $dao->tax_amount,
       );
+      $lineItems[$dao->id]['tax_rate'] = CRM_Price_BAO_LineItem::calculateTaxRate($lineItems[$dao->id]);
+      $lineItems[$dao->id]['subTotal'] = $lineItems[$dao->id]['qty'] * $lineItems[$dao->id]['unit_price'];
     }
     return $lineItems;
   }
@@ -417,5 +421,25 @@ AND li.entity_id = {$entityId}
         }
       }
     }
+  }
+
+  /**
+   * Calculate tax rate in percentage
+   *
+   * @param $lineItemId an assoc array of lineItem
+   *
+   * @return tax rate
+   *
+   * @access public
+   * @static
+   */
+  public static function calculateTaxRate($lineItemId) {
+    if ($lineItemId['html_type'] == 'Text') {
+      $tax = (($lineItemId['line_total'] - ($lineItemId['unit_price'] * $lineItemId['qty'])))/($lineItemId['unit_price'] * $lineItemId['qty'])*100;
+    }
+    else {
+      $tax = (($lineItemId['line_total'] - $lineItemId['unit_price'])/$lineItemId['unit_price']) * 100;
+    }
+    return $tax;
   }
 }
