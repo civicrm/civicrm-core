@@ -15,6 +15,8 @@ else
 	. $CFFILE
 fi
 
+. "$P/common.sh"
+
 RSYNCOPTIONS="-avC $DM_EXCLUDES_RSYNC --include=core"
 RSYNCCOMMAND="$DM_RSYNC $RSYNCOPTIONS"
 SRC=$DM_SOURCEDIR
@@ -26,11 +28,7 @@ if [ -d $TRG ] ; then
 fi
 
 # copy all the stuff
-for CODE in l10n; do
-  echo $CODE
-  [ -d $SRC/$CODE ] && $RSYNCCOMMAND $SRC/$CODE $TRG
-done
-
+dm_install_l10n "$SRC/l10n" "$TRG/l10n"
 
 # copy selected sqls
 if [ ! -d $TRG/sql ] ; then

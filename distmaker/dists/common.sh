@@ -113,6 +113,13 @@ function dm_install_joomla() {
   dm_install_dir "$repo" "$to"
 }
 
+## usage: dm_install_l10n <l10n_repo_path> <to_path>
+function dm_install_l10n() {
+  local repo="$1"
+  local to="$2"
+  dm_install_dir "$repo" "$to"
+}
+
 ## Generate civicrm-version.php
 ## usage: dm_generate_version <file> <ufname>
 function dm_generate_version() {
