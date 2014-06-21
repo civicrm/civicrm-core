@@ -21,7 +21,6 @@ dm_generate_version "$TRG/civicrm-version.php" Drupal
 dm_install_core "$SRC" "$TRG"
 dm_install_packages "$SRC/packages" "$TRG/packages"
 dm_install_drupal "$SRC/drupal" "$TRG/drupal"
-dm_install_drupal_info "$DM_SOURCEDIR/drupal"
 
 # gen tarball
 cd $TRG/..
