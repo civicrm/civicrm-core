@@ -81,10 +81,16 @@ check_conf()
 	else
 		source "$P/distmaker.conf"
 		export DM_SOURCEDIR DM_GENFILESDIR DM_TMPDIR DM_TARGETDIR DM_PHP DM_RSYNC DM_ZIP DM_VERSION DM_REF_CORE DM_REF_DRUPAL DM_REF_DRUPAL6 DM_REF_JOOMLA DM_REF_WORDPRESS DM_REF_PACKAGES
-		for k in "$DM_SOURCEDIR" "$DM_GENFILESDIR" "$DM_TARGETDIR" "$DM_TMPDIR"; do
-			if [ ! -d "$k" ] ; then
+		if [ ! -d "$DM_SOURCEDIR" ]; then
+			echo; echo "ERROR! " DM_SOURCEDIR "directory not found!"; echo "(if you get empty directory name, it might mean that one of necessary variables is not set)"; echo;
+		fi
+		for k in "$DM_GENFILESDIR" "$DM_TARGETDIR" "$DM_TMPDIR"; do
+			if [ -z "$k" ] ; then
 				echo; echo "ERROR! " $k "directory not found!"; echo "(if you get empty directory name, it might mean that one of necessary variables is not set)"; echo;
 				exit 1
+			fi
+			if [ ! -d "$k" ]; then
+				mkdir -p "$k"
 			fi
 		done
 	fi
