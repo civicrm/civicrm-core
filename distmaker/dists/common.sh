@@ -9,7 +9,7 @@ function dm_install_dir() {
   if [ ! -d "$to" ]; then
     mkdir -p "$to"
   fi
-  rsync -va "$from/./"  "$to/./"
+  rsync -avC --exclude=.git --exclude=.svn "$from/./"  "$to/./"
 }
 
 ## Copy listed files
@@ -84,14 +84,7 @@ function dm_install_packages() {
 function dm_install_drupal() {
   local repo="$1"
   local to="$2"
-
-  local excludes_rsync=""
-  for exclude in .git .svn ; do
-    excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
-  done
-
-  [ ! -d "$to" ] && mkdir "$to"
-  rsync -avC $excludes_rsync "$repo/./" "$to/./"
+  dm_install_dir "$repo" "$to"
 }
 
 ## TODO: Merge this into dm_install_drupal; use on all Drupal releases
@@ -117,14 +110,7 @@ function dm_install_drupal_info() {
 function dm_install_joomla() {
   local repo="$1"
   local to="$2"
-
-  local excludes_rsync=""
-  for exclude in .git .svn ; do
-    excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
-  done
-
-  [ ! -d "$to" ] && mkdir "$to"
-  rsync -avC $excludes_rsync "$repo/./" "$to/./"
+  dm_install_dir "$repo" "$to"
 }
 
 ## Generate civicrm-version.php
