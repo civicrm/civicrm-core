@@ -1,0 +1,14 @@
+<!--
+Controller: CaseTypeCtrl
+Required vars: activitySet
+-->
+<br>
+<select multiple chsgroup ng-model="incGroup" ng-options="grp.name as grp.name for grp in groupNamesList">
+  <option value=""></option>
+</select>
+<br> <br>
+
+<select multiple chsgroup placeholder="Exclude Group" ng-model="excGroup" ng-options="grp.name as grp.name for grp in groupNamesList">
+  <option value=""></option>
+</select>
+<br> <br>
