@@ -9,7 +9,7 @@ function dm_install_dir() {
   if [ ! -d "$to" ]; then
     mkdir -p "$to"
   fi
-  rsync -avC --exclude=.git --exclude=.svn "$from/./"  "$to/./"
+  $DM_RSYNC -avC --exclude=.git --exclude=.svn "$from/./"  "$to/./"
 }
 
 ## Copy listed files
@@ -75,8 +75,13 @@ function dm_install_packages() {
     excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
   done
 
+  ## Note: These small folders have items that previously were not published,
+  ## but there's no real cost to including them, and excluding them seems
+  ## likely to cause confusion as the codebase evolves:
+  ##   packages/Files packages/PHP packages/Text
+
   [ ! -d "$to" ] && mkdir "$to"
-  rsync -avC $excludes_rsync --include=core "$repo/./" "$to/./"
+  $DM_RSYNC -avC $excludes_rsync --include=core "$repo/./" "$to/./"
 }
 
 ## Copy Drupal-integration module
