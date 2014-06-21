@@ -15,6 +15,8 @@ else
 	. $CFFILE
 fi
 
+. "$P/common.sh"
+
 RSYNCOPTIONS="-avC $DM_EXCLUDES_RSYNC --include=core"
 RSYNCCOMMAND="$DM_RSYNC $RSYNCOPTIONS"
 SRC=$DM_SOURCEDIR
@@ -31,36 +33,13 @@ if [ -d $TRG ] ; then
 fi
 
 # copy all the rest of the stuff
-for CODE in css i install js packages PEAR templates bin joomla CRM api extern Reports settings; do
+dm_install_core "$SRC" "$TRG"
+for CODE in packages joomla ; do
   echo $CODE
   [ -d $SRC/$CODE ] && $RSYNCCOMMAND $SRC/$CODE $TRG
 done
 
-# delete any setup.sh or setup.php4.sh if present
-if [ -d $TRG/bin ] ; then
-  rm -f $TRG/bin/setup.sh
-  rm -f $TRG/bin/setup.php4.sh
-  rm -f $TRG/bin/setup.bat
-fi
-
-# copy selected sqls
-if [ ! -d $TRG/sql ] ; then
-	mkdir $TRG/sql
-fi
-for F in $SRC/sql/civicrm*.mysql $SRC/sql/counties.US.sql.gz $SRC/sql/case_sample*.mysql; do
-	cp $F $TRG/sql
-done
-
-set +e
-rm -rf $TRG/sql/civicrm_*.??_??.mysql
-set -e
-
 # copy docs
-cp $SRC/agpl-3.0.txt $TRG
-cp $SRC/gpl.txt $TRG
-cp $SRC/README.txt $TRG
-cp $SRC/CONTRIBUTORS.txt $TRG
-cp $SRC/agpl-3.0.exception.txt $TRG
 cp $SRC/civicrm.config.php $TRG
 
 # final touch

@@ -15,6 +15,8 @@ else
 	. $CFFILE
 fi
 
+. "$P/common.sh"
+
 RSYNCOPTIONS="-avC $DM_EXCLUDES_RSYNC --include=core"
 RSYNCCOMMAND="$DM_RSYNC $RSYNCOPTIONS"
 SRC=$DM_SOURCEDIR
@@ -43,30 +45,11 @@ if [ ! -d $TRG/civicrm/civicrm ] ; then
 fi
 
 # copy all the stuff
-for CODE in css i js packages PEAR templates bin CRM api extern Reports install settings; do
+dm_install_core "$SRC" "$TRG/civicrm/civicrm"
+for CODE in packages ; do
   echo $CODE
   [ -d $SRC/$CODE ] && $RSYNCCOMMAND $SRC/$CODE $TRG/civicrm/civicrm
 done
-
-# delete any setup.sh or setup.php4.sh if present
-if [ -d $TRG/civicrm/civicrm/bin ] ; then
-  rm -f $TRG/civicrm/civicrm/bin/setup.sh
-  rm -f $TRG/civicrm/civicrm/bin/setup.php4.sh
-  rm -f $TRG/civicrm/civicrm/bin/setup.bat
-fi
-
-# copy selected sqls
-if [ ! -d $TRG/civicrm/civicrm/sql ] ; then
-	mkdir $TRG/civicrm/civicrm/sql
-fi
-
-for F in $SRC/sql/civicrm*.mysql $SRC/sql/counties.US.sql.gz $SRC/sql/case_sample*.mysql; do
-	cp $F $TRG/civicrm/civicrm/sql
-done
-
-set +e
-rm -rf $TRG/civicrm/civicrm/sql/civicrm_*.??_??.mysql
-set -e
 
 for F in $SRC/WordPress/*; do
 	cp $F $TRG/civicrm
@@ -74,9 +57,6 @@ done
 rm -f $TRG/civicrm/civicrm.config.php.wordpress
 
 # copy docs
-cp $SRC/agpl-3.0.txt $TRG/civicrm/civicrm
-cp $SRC/gpl.txt $TRG/civicrm/civicrm
-cp $SRC/README.txt $TRG/civicrm/civicrm
 cp $SRC/WordPress/civicrm.config.php.wordpress $TRG/civicrm/civicrm/civicrm.config.php
 
 # final touch
