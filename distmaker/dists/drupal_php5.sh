@@ -1,20 +1,14 @@
 #!/bin/bash
 set -ex
 
-# This script assumes
-# that DAOs are generated
-# and all the necessary conversions had place!
-
 P=`dirname $0`
 CFFILE=$P/../distmaker.conf
-
 if [ ! -f $CFFILE ] ; then
 	echo "NO DISTMAKER.CONF FILE!"
 	exit 1
 else
 	. $CFFILE
 fi
-
 . "$P/common.sh"
 
 SRC=$DM_SOURCEDIR
@@ -27,9 +21,7 @@ git checkout "$DM_REF_DRUPAL"
 popd
 
 # make sure and clean up before
-if [ -d $TRG ] ; then
-	rm -rf $TRG/*
-fi
+[ -d $TRG ] && rm -rf $TRG/*
 
 # copy all the stuff
 dm_install_core "$SRC" "$TRG"
