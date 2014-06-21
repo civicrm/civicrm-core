@@ -62,24 +62,15 @@ cp civicrm/joomla/site/civicrm.php           com_civicrm/site
 cp -r civicrm/joomla/site/views              com_civicrm/site
 cp -r -p civicrm/joomla/site/elements/*      com_civicrm/site/elements
 
-# copy civicrm code
-cp -r -p civicrm/* com_civicrm/admin/civicrm
-
-# generate alt version of civicrm.xml
-$DM_PHP $DM_SOURCEDIR/distmaker/utils/joomlaxml.php $DM_SOURCEDIR com_civicrm $DM_VERSION alt
-
 # generate alt version of package
+cp -r -p civicrm/* com_civicrm/admin/civicrm
+$DM_PHP $DM_SOURCEDIR/distmaker/utils/joomlaxml.php $DM_SOURCEDIR com_civicrm $DM_VERSION alt
 $DM_ZIP -q -r -9 $DM_TARGETDIR/civicrm-$DM_VERSION-joomla-alt.zip com_civicrm
-
-# delete the civicrm directory
 rm -rf com_civicrm/admin/civicrm
 
 # generate zip version of civicrm.xml
 $DM_PHP $DM_SOURCEDIR/distmaker/utils/joomlaxml.php $DM_SOURCEDIR com_civicrm $DM_VERSION zip
-
 $DM_ZIP -q -r -9 com_civicrm/admin/civicrm.zip civicrm
-
-# generate zip within zip file
 $DM_ZIP -q -r -9 $DM_TARGETDIR/civicrm-$DM_VERSION-joomla.zip com_civicrm -x 'com_civicrm/admin/civicrm'
 
 # clean up
