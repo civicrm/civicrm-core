@@ -1,0 +1,54 @@
+<!--
+Controller: MailCtrl
+-->
+<div class="crm-block crm-form-block "> 
+<!-- what should you replace crmCaseType with?
+-->
+  <div ui-jq="tabs" id="alltabs">
+    <ul>
+      <li><a href="#acttab-0">Recipients</a></li>
+      <li><a href="#acttab-1">Content</a></li>
+      <li><a href="#acttab-2">Schedule and Send</a></li>
+    </ul>
+
+
+    <div id="acttab-0">
+      <div ng-include="partialUrl('recipient.html')"></div>
+      <a nexttab class="button" ><span>Next</span></a>
+      <a ng-click="save()" class="button"><span>Save and Continue Later</span></a>
+      <a ng-href="#/mailing" class="button"><span>Cancel</span></a>
+      <br><br>       
+	</div>
+    
+    <div id="acttab-1">
+      <div ng-include="partialUrl('content.html')"></div>
+      <br>
+      <a prevtab class="button" ><span>Previous</span></a>         
+      <a nexttab class="button" ><span>Next</span></a> 
+      <a ng-click="save()" class="button"><span>Save and Continue Later</span></a>
+      <a ng-href="#/mailing" class="button"><span>Cancel</span></a>   
+      <br><br> 
+	</div>
+    
+    <div id="acttab-2">
+      <div ng-include="partialUrl('send.html')"></div>
+      <br>
+      <a prevtab class="button" ><span>Previous</span></a>  
+      <a ng-click="save()" class="button"><span>Save and Continue Later</span></a>
+      <a ng-href="#/mailing" class="button"><span>Cancel</span></a>   
+      <br><br>
+    </div>
+   
+ <!--  <a class="nexttab" href="#">Next Tab</a>
+   <button type="submit" class="btn btn-primary" value=">> Compose" id="campaignbutton" nexttab={{adi}} >Next</button> <br> -->
+   	
+
+  </div>   
+</div>
+  <!--<button ng-click="dump()">Log</button>-->
+<!--  <div class="action-link">
+    <a ng-click="save()" class="button"><span>Save and Continue Later</span></a>
+    <a ng-href="#/newMail" class="button"><span>Cancel</span></a>
+  </div>
+</div>
+-->
