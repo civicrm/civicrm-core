@@ -32,7 +32,6 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     );
 
 
-
     foreach ($testSet as $in => $expected) {
       $out = CRM_Utils_String::stripPathChars($in);
       $this->assertEquals($out, $expected, "Output does not match");
@@ -97,7 +96,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     );
     foreach ($cases as $input => $expected) {
       $this->assertEquals($expected, CRM_Utils_String::ellipsify($input, $maxLen));
-}
+    }
   }
 
   function testRandom() {
