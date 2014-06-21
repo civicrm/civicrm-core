@@ -6,10 +6,11 @@
 	</td>
   </tr>
   <tr>
-    <td class="label">Track Click Throughs</td>
     <td>
-      <input type="checkbox" ng-model="currentMailing.url_tracking" ng-true-value="1" ng-false-value="0"/>
+      <input type="checkbox" ng-model="currentMailing.url_tracking" ng-true-value="1" ng-false-value="0">&nbsp Track Click Throughs</input>
     </td>
+  </tr>
+  <tr>  
     <td>
       <div id="help">
 		 Track the number of times recipients click each link in this mailing. NOTE: When this feature is enabled, all links in the message body will be automaticallly re-written to route through your CiviCRM server prior to redirecting to the target page.
@@ -17,11 +18,13 @@
     </td>      
   </tr>
   <tr>
-    <td class="label">Track Opens</td>
+ <!--   <td class="label">Track Opens</td> -->
     <td>
-      <input type="checkbox" ng-model="currentMailing.open_tracking" ng-true-value="1" ng-false-value="0"/>
+      <input type="checkbox" ng-model="currentMailing.open_tracking" ng-true-value="1" ng-false-value="0">&nbsp Track Opens</input>
     </td>
-    <td>
+  </tr>
+  <tr>
+	<td>
       <div id="help">
 		Track the number of times recipients open this mailing in their email software.
 	  </div>
@@ -33,10 +36,11 @@
 	</td>
   </tr>  
   <tr>
-    <td class="label">Track Replies</td>
     <td>
-      <input type="checkbox" ng-model="trackreplies" ng-true-value="1" ng-false-value="0"/>
+      <input type="checkbox" ng-model="trackreplies" ng-true-value="1" ng-false-value="0">&nbsp Track Replies</input>
     </td>
+  </tr>
+  <tr>
     <td>
       <div id="help">
 		Recipients' replies are sent to a CiviMail specific address instead of the sender's address so they can be stored within CiviCRM.
@@ -44,22 +48,20 @@
     </td>     
   </tr>
   <tr ng-show= "trackr(trackreplies)">
-    <td class="label">Forward Replies</td>
-    <td>
-      <input type="checkbox" ng-model="currentMailing.forward_replies" ng-true-value="1" ng-false-value="0"/>
+	<td>
+      <input type="checkbox" ng-model="currentMailing.forward_replies" ng-true-value="1" ng-false-value="0">&nbsp Forward Replies</input>
     </td>
+  </tr>
+  <tr ng-show= "trackr(trackreplies)">
     <td>
       <div id="help">
 		If a recipient replies to this mailing, forward the reply to the FROM Email address specified for the mailing.
 	  </div>
-    </td>    
+    </td>   
   </tr>
   <tr ng-show= "trackr(trackreplies)">
-    <td class="label">Auto-Responder</td>
     <td>
-      <input type="checkbox" ng-model="currentMailing.auto_responder" ng-true-value="1" ng-false-value="0" />
-    </td>
-    <td>
+      <input type="checkbox" ng-model="currentMailing.auto_responder" ng-true-value="1" ng-false-value="0">&nbsp Auto-Respond to Replies &nbsp &nbsp</input>
       <select>
         <option value="">Auto-Responder</option>
       </select>
@@ -77,8 +79,11 @@
 		<h3 style ="text-decoration:underline"> Online Publication</h3>
 	</td>
   </tr>
-  <tr> 
-	<td class="label">Mailing Visibility</td>	  
+</table>
+
+<table class="form-layout-compressed">
+  <tr>  
+	<td class="label">Mailing Visibility</td>
     <td>
       <select ng-model="currentMailing.visibility">
         <option value="Public Pages">Public Pages</option>

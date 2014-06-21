@@ -6,10 +6,7 @@
 
   var crmMailing = angular.module('crmMailing', ['ngRoute', 'ui.utils']);
 
- /* var sid = {
-	  collapsible: true,
-	  active: false
-  };*/
+
 //-------------------------------------------------------------------------------------------------------
  crmMailing.config(['$routeProvider',
     function($routeProvider) {
@@ -59,12 +56,6 @@
 	$scope.incGroup = [];
 	$scope.excGroup = [];
     $scope.currentMailing = selectedMail;
-    /*$scope.currentMailing.name = $scope.currentMailing.name || [];
-    $scope.currentMailing.visibility = $scope.currentMailing.visibility || [];
-    $scope.currentMailing.url_tracking = $scope.currentMailing.url_tracking || [];
-    $scope.currentMailing.forward_replies = $scope.currentMailing.forward_replies || [];
-    $scope.currentMailing.auto_responder = $scope.currentMailing.auto_responder || [];
-    $scope.currentMailing.open_tracking = $scope.currentMailing.open_tracking || [];*/
     window.ct = $scope.currentMailing;
     $scope.acttab=0;
 	$scope.composeS="1";
@@ -99,100 +90,7 @@
     
     
     
-   /* $scope.addActivitySet = function(workflow) {
-      var activitySet = {};
-      activitySet[workflow] = '1';
-      activitySet.activityTypes = [];
 
-      var offset = 1;
-      var names = _.pluck($scope.caseType.definition.activitySets, 'name');
-      while (_.contains(names, workflow + '_' + offset)) offset++;
-      activitySet.name = workflow + '_' + offset;
-      activitySet.label = (offset == 1  ) ? $scope.workflows[workflow] : ($scope.workflows[workflow] + ' #' + offset);
-
-      $scope.caseType.definition.activitySets.push(activitySet);
-      _.defer(function() {
-        $('.crmCaseType-acttab').tabs('refresh').tabs({active: -1});
-      });
-    };
-
-    /// Add a new activity entry to an activity-set
-    $scope.addActivity = function(activitySet, activityType) {
-      activitySet.activityTypes.push({
-        name: activityType
-      });
-      if (!_.contains($scope.activityTypeNames, activityType)) {
-        $scope.activityTypeNames.push(activityType);
-      }
-    };
-
-    /// Add a new top-level activity-type entry
-    $scope.addActivityType = function(activityType) {
-      var names = _.pluck($scope.caseType.definition.activityTypes, 'name');
-      if (!_.contains(names, activityType)) {
-        $scope.caseType.definition.activityTypes.push({
-          name: activityType
-        });
-
-      }
-      if (!_.contains($scope.activityTypeNames, activityType)) {
-        $scope.activityTypeNames.push(activityType);
-      }
-    };
-
-    /// Add a new role
-    $scope.addRole = function(roles, roleName) {
-      var names = _.pluck($scope.caseType.definition.caseRoles, 'name');
-      if (!_.contains(names, roleName)) {
-        roles.push({
-          name: roleName
-        });
-      }
-      if (!_.contains($scope.relationshipTypeNames, roleName)) {
-        $scope.relationshipTypeNames.push(roleName);
-      }
-    };
-
-    $scope.onManagerChange = function(managerRole) {
-      angular.forEach($scope.caseType.definition.caseRoles, function(caseRole) {
-        if (caseRole != managerRole) {
-          caseRole.manager = '0';
-        }
-      });
-    };
-
-    $scope.removeItem = function(array, item) {
-      var idx = _.indexOf(array, item);
-      if (idx != -1) {
-        array.splice(idx, 1);
-      }
-    };
-
-    $scope.isNewActivitySetAllowed = function(workflow) {
-      switch (workflow) {
-        case 'timeline':
-          return true;
-        case 'sequence':
-          return 0 == _.where($scope.caseType.definition.activitySets, {sequence: '1'}).length;
-        default:
-          if (console && console.log) console.log('Denied access to unrecognized workflow: (' + workflow + ')');
-          return false;
-      }
-    };
-
-    $scope.getWorkflowName = function(activitySet) {
-      var result = 'Unknown';
-      _.each($scope.workflows, function(value, key) {
-        if (activitySet[key]) result = value;
-      });
-      return result;
-    };
-
-    /**
-     * Determine which HTML partial to use for a particular
-     *
-     * @return string URL of the HTML partial
-     */
 	  $scope.save = function() {
       var result = crmApi('Mailing', 'create', $scope.currentMailing, true);
       result.success(function(data) {
@@ -205,70 +103,9 @@
     };
   });
  
- 
-/* crmMailing.directive('crmAddMail', function() {
-    return {
-      restrict: 'AE',
-      template: '<input class="add-activity" type="hidden" />',
-      link: function(scope, element, attrs) {
-        /// Format list of options for select2's "data"
-        var getFormattedOptions = function() {
-          return {
-            results: _.map(scope[attrs.crmOptions], function(option){
-              return {id: option, text: option};
-            })
-          };
-        };
-
-        var input = $('input', element);
-
-        scope._resetSelection = function() {
-          $(input).select2('close');
-          $(input).select2('val', '');
-          scope[attrs.crmVar] = '';
-        };
-
-        $(input).select2({
-          data: getFormattedOptions,
-          createSearchChoice: function(term) {
-            return {id: term, text: term};
-          }
-        });
-        $(input).on('select2-selecting', function(e) {
-          scope[attrs.crmVar] = e.val;
-          scope.$evalAsync(attrs.crmOnAdd);
-          scope.$evalAsync('_resetSelection()');
-          e.preventDefault();
-        });
-
-        scope.$watch(attrs.crmOptions, function(value) {
-          $(input).select2('data', getFormattedOptions);
-          $(input).select2('val', '');
-        });
-      }
-    };
-  }); */
 
 
-    /*crmMailing.directive('nexttab', function() {
-        return {
-            // Restrict it to be an attribute in this case
-            restrict: 'A',
-            // responsible for registering DOM listeners as well as updating the DOM
-            link: function(scope, element, attrs) {
-
-				$(element).parent().parent().tabs();
-				$(element).on("click",function() {
-                    var selected =  $(element).parent().parent().tabs("option","selected");
-                    $(element).parent().parent().tabs("select", selected + 1);
-                    
-                    
-                });
-            }
-        };
-    });*/
-    
-        crmMailing.directive('nexttab', function() {
+  crmMailing.directive('nexttab', function() {
         return {
 
             restrict: 'A',
@@ -285,7 +122,7 @@
         };
     });
      
-        crmMailing.directive('prevtab', function() {
+  crmMailing.directive('prevtab', function() {
         return {
 
             restrict: 'A',
@@ -318,6 +155,110 @@
   
 
  
+crmMailing.controller('browse', function(){
+FileUploadCtrl.$inject = ['$scope']
+function FileUploadCtrl(scope) {
+    //============== DRAG & DROP =============
+    // source for drag&drop: http://www.webappers.com/2011/09/28/drag-drop-file-upload-with-html5-javascript/
+    var dropbox = document.getElementById("dropbox")
+    scope.dropText = 'Drop files here...'
+
+    // init event handlers
+    function dragEnterLeave(evt) {
+        evt.stopPropagation()
+        evt.preventDefault()
+        scope.$apply(function(){
+            scope.dropText = 'Drop files here...'
+            scope.dropClass = ''
+        })
+    }
+    dropbox.addEventListener("dragenter", dragEnterLeave, false)
+    dropbox.addEventListener("dragleave", dragEnterLeave, false)
+    dropbox.addEventListener("dragover", function(evt) {
+        evt.stopPropagation()
+        evt.preventDefault()
+        var clazz = 'not-available'
+        var ok = evt.dataTransfer && evt.dataTransfer.types && evt.dataTransfer.types.indexOf('Files') >= 0
+        scope.$apply(function(){
+            scope.dropText = ok ? 'Drop files here...' : 'Only files are allowed!'
+            scope.dropClass = ok ? 'over' : 'not-available'
+        })
+    }, false)
+    dropbox.addEventListener("drop", function(evt) {
+        console.log('drop evt:', JSON.parse(JSON.stringify(evt.dataTransfer)))
+        evt.stopPropagation()
+        evt.preventDefault()
+        scope.$apply(function(){
+            scope.dropText = 'Drop files here...'
+            scope.dropClass = ''
+        })
+        var files = evt.dataTransfer.files
+        if (files.length > 0) {
+            scope.$apply(function(){
+                scope.files = []
+                for (var i = 0; i < files.length; i++) {
+                    scope.files.push(files[i])
+                }
+            })
+        }
+    }, false)
+    //============== DRAG & DROP =============
+
+    scope.setFiles = function(element) {
+    scope.$apply(function(scope) {
+      console.log('files:', element.files);
+      // Turn the FileList object into an Array
+        scope.files = []
+        for (var i = 0; i < element.files.length; i++) {
+          scope.files.push(element.files[i])
+        }
+      scope.progressVisible = false
+      });
+    };
+
+    scope.uploadFile = function() {
+        var fd = new FormData()
+        for (var i in scope.files) {
+            fd.append("uploadedFile", scope.files[i])
+        }
+        var xhr = new XMLHttpRequest()
+        xhr.upload.addEventListener("progress", uploadProgress, false)
+        xhr.addEventListener("load", uploadComplete, false)
+        xhr.addEventListener("error", uploadFailed, false)
+        xhr.addEventListener("abort", uploadCanceled, false)
+        xhr.open("POST", "/fileupload")
+        scope.progressVisible = true
+        xhr.send(fd)
+    }
+
+    function uploadProgress(evt) {
+        scope.$apply(function(){
+            if (evt.lengthComputable) {
+                scope.progress = Math.round(evt.loaded * 100 / evt.total)
+            } else {
+                scope.progress = 'unable to compute'
+            }
+        })
+    }
+
+    function uploadComplete(evt) {
+        /* This event is raised when the server send back a response */
+        alert(evt.target.responseText)
+    }
+
+    function uploadFailed(evt) {
+        alert("There was an error attempting to upload the file.")
+    }
+
+    function uploadCanceled(evt) {
+        scope.$apply(function(){
+            scope.progressVisible = false
+        })
+        alert("The upload has been canceled by the user or the browser dropped the connection.")
+    }
+}
+});
+
 
  
  
@@ -327,5 +268,6 @@
   });
 
 })(angular, CRM.$, CRM._);
+
 
 
