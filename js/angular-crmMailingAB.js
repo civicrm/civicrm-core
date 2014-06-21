@@ -30,7 +30,7 @@
             });
 
             $routeProvider.when('/mailing/abtesting', {
-                templateUrl: partialUrl('helloworld.html'),
+                templateUrl: partialUrl('main.html'),
                 controller: 'TabsDemoCtrl',
                 resolve: {
                     metaData: function($route, crmApi) {
@@ -52,23 +52,24 @@
         $scope.groups = metaData.values;
         $scope.mailings = mailingList.values;
         $scope.tab_val=0;
+        $scope.max_tab=0;
         $scope.campaign_clicked= function(){
-            if($scope.tab_val >= 0 ){
+            if($scope.max_tab >= 0 ){
                 $scope.tab_val  =0;
             }
         };
         $scope.compose_clicked=function(){
-            if($scope.tab_val >=1){
+            if($scope.max_tab >=1){
                 $scope.tab_val =1;
             }
         };
         $scope.rec_clicked=function(){
-            if($scope.tab_val >=2){
+            if($scope.max_tab >=2){
                 $scope.tab_val =2;
             }
         };
         $scope.preview_clicked=function(){
-            if($scope.tab_val>=3){
+            if($scope.max_tab>=3){
                 $scope.tab_val=3;
             }
         };
@@ -111,6 +112,7 @@
         return {
             // Restrict it to be an attribute in this case
             restrict: 'A',
+
             priority: 500,
             // responsible for registering DOM listeners as well as updating the DOM
             link: function(scope, element, attrs) {
@@ -121,12 +123,15 @@
 
                 $(element).on("click",function() {
                     scope.tab_val=scope.tab_val +1;
+
+                    scope.max_tab= Math.max(scope.tab_val,scope.max_tab);
                     var myArray1 = new Array(  );
-                    for ( var i = scope.tab_val+1; i < 4; i++ ) {
+                    for ( var i = scope.max_tab+1; i < 4; i++ ) {
                         myArray1.push(i);
                     }
                     $(element).parent().parent().parent().parent().parent().tabs( "option", "disabled", myArray1 );
-                    $(element).parent().parent().parent().parent().parent().tabs({active:scope.tab_val});
+                    $(element).parent().parent().parent().parent().parent().tabs("option", "active", scope.tab_val);
+                    scope.$apply();
                     console.log("Adir");
                 });
             }
@@ -144,10 +149,19 @@
 
 
                 $(element).on("click",function() {
+                    var temp= scope.tab_val -1 ;
                     scope.tab_val=scope.tab_val -1;
 
-                    $(element).parent().parent().parent().parent().parent().tabs({active:scope.tab_val});
-                    console.log("Adir");
+                    console.log(temp);
+                    if(temp==3){
+
+                    }
+                    else {
+                        $(element).parent().parent().parent().parent().parent().tabs("option", "active", temp);
+                    }
+
+                    scope.$apply();
+
                 });
             }
         };

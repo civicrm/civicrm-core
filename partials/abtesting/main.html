@@ -1,4 +1,8 @@
+
+
 <div>
+
+    {{tab_val}}
     <div ui-jq="tabs" id="alltabs" >
         <ul>
 
@@ -131,10 +135,11 @@
             &nbsp &nbsp <input type="text" datepick class = "dateplugin" ng-show="start=='later'" ng-model="send_date" >
             </div>
             <br><br>
-            <div prevbutton></div><div class="crm-submit-buttons" id="campaignbutton">
+            <div>
+            <div style="position:relative; left:200px; top:30px;" prevbutton></div><div class="crm-submit-buttons"  style="position:relative; left:300px;">
             <div class = "crm-button crm-button-type-upload crm-button_qf_Contact_upload_view"   >
                 <input type="submit" value="Submit & Send"  id="campaignbutton _qf_Contact_upload_view-top" class="btn btn-primary" nexttab={{tab_val}}>
-                </div></div>
+                </div></div></div>
 
         </div>
     </div>
