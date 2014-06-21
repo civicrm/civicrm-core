@@ -26,11 +26,7 @@ popd
 # copy all the stuff
 dm_install_core "$SRC" "$TRG/civicrm/civicrm"
 dm_install_packages "$SRC/packages" "$TRG/civicrm/civicrm/packages"
-
-for F in $SRC/WordPress/*; do
-	cp $F $TRG/civicrm
-done
-rm -f $TRG/civicrm/civicrm.config.php.wordpress
+dm_install_wordpress "$SRC/WordPress" "$TRG/civicrm"
 
 # copy docs
 cp $SRC/WordPress/civicrm.config.php.wordpress $TRG/civicrm/civicrm/civicrm.config.php
