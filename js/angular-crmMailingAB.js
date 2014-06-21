@@ -88,7 +88,7 @@
             $scope.ifyes=false;
         };
 
-        $scope.send_date ="10/4/2004";
+        $scope.send_date ="01/01/2000";
 
         $scope.mailA={};
 
@@ -115,9 +115,9 @@
             // responsible for registering DOM listeners as well as updating the DOM
             link: function(scope, element, attrs) {
 
-                $(element).parent().parent().parent().tabs(scope.$eval(attrs.nexttab));
+                $(element).parent().parent().parent().parent().tabs(scope.$eval(attrs.nexttab));
                 var myarr = new Array(1,2,3)
-                $(element).parent().parent().parent().tabs({disabled:myarr});
+                $(element).parent().parent().parent().parent().tabs({disabled:myarr});
 
                 $(element).on("click",function() {
                     scope.tab_val=scope.tab_val +1;
@@ -125,8 +125,28 @@
                     for ( var i = scope.tab_val+1; i < 4; i++ ) {
                         myArray1.push(i);
                     }
-                    $(element).parent().parent().parent().tabs( "option", "disabled", myArray1 );
-                    $(element).parent().parent().parent().tabs({active:scope.tab_val});
+                    $(element).parent().parent().parent().parent().parent().tabs( "option", "disabled", myArray1 );
+                    $(element).parent().parent().parent().parent().parent().tabs({active:scope.tab_val});
+                    console.log("Adir");
+                });
+            }
+        };
+    });
+
+    crmMailingAB.directive('prevtab', function() {
+        return {
+            // Restrict it to be an attribute in this case
+            restrict: 'A',
+            priority: 500,
+            // responsible for registering DOM listeners as well as updating the DOM
+            link: function(scope, element, attrs) {
+
+
+
+                $(element).on("click",function() {
+                    scope.tab_val=scope.tab_val -1;
+
+                    $(element).parent().parent().parent().parent().parent().tabs({active:scope.tab_val});
                     console.log("Adir");
                 });
             }
@@ -258,5 +278,32 @@
 
     });
 
+    crmMailingAB.directive('nextbutton',function(){
+        return {
+            restrict: 'AE',
+            replace:'true',
+            template:'<div class="crm-submit-buttons" id="campaignbutton">'+
+                '<div class = "crm-button crm-button-type-upload crm-button_qf_Contact_upload_view"   >' +
+                '<input type="submit" value="Next"  id="campaignbutton _qf_Contact_upload_view-top" class="btn btn-primary" nexttab={{tab_val}}>'+
+                '</div></div>'
+
+        };
+    });
+
+    crmMailingAB.directive('prevbutton',function(){
+        return {
+            restrict: 'AE',
+            replace:'true',
+            template:'<div class="crm-submit-buttons" >'+
+                '<div class = "crm-button crm-button-type-upload crm-button_qf_Contact_upload_view"   >' +
+                '<input type="submit" value="Previous"  id="campaignbutton _qf_Contact_upload_view-top" class="btn btn-primary" prevtab={{tab_val}}>'+
+                '</div></div>'
+
+        };
+    });
+
+
+
 
 })(angular, CRM.$, CRM._);
+
