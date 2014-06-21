@@ -145,8 +145,18 @@ function dm_install_l10n() {
 function dm_install_wordpress() {
   local repo="$1"
   local to="$2"
-  dm_install_dir "$repo" "$to"
-  dm_remove_files "$to" civicrm.config.php.wordpress .gitignore
+
+  if [ ! -d "$to" ]; then
+    mkdir -p "$to"
+  fi
+  $DM_RSYNC -avC \
+    --exclude=.git \
+    --exclude=.svn \
+    --exclude=civicrm.config.php.wordpress \
+    --exclude=.gitignore \
+    --exclude=civicrm \
+    "$repo/./"  "$to/./"
+  ## Need --exclude=civicrm for self-building on WP site
 }
 
 ## Generate civicrm-version.php
