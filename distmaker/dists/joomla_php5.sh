@@ -14,11 +14,6 @@ fi
 SRC=$DM_SOURCEDIR
 TRG=$DM_TMPDIR/civicrm
 
-# checkout the right code revisions
-pushd "$DM_SOURCEDIR/joomla"
-git checkout "$DM_REF_JOOMLA"
-popd
-
 # copy all the rest of the stuff
 dm_reset_dirs "$TRG" "$DM_TMPDIR/com_civicrm"
 cp $SRC/civicrm.config.php $TRG

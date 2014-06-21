@@ -14,12 +14,6 @@ fi
 SRC=$DM_SOURCEDIR
 TRG=$DM_TMPDIR/civicrm
 
-# checkout the right code revisions
-pushd "$DM_SOURCEDIR/drupal"
-git checkout .
-git checkout "$DM_REF_DRUPAL6"
-popd
-
 # copy all the stuff
 dm_reset_dirs "$TRG"
 cp $SRC/drupal/civicrm.config.php.drupal $TRG/civicrm.config.php

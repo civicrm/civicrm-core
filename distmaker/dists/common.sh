@@ -174,3 +174,12 @@ function civicrmVersion( ) {
 }
 " > "$to"
 }
+
+## Perform a hard checkout on a given report
+## usage: dm_git_checkout <repo_path> <tree-ish>
+function dm_git_checkout() {
+  pushd "$1"
+    git checkout .
+    git checkout "$2"
+  popd
+}
