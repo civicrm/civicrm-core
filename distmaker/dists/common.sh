@@ -111,3 +111,19 @@ function dm_install_drupal_info() {
     fi
   done
 }
+
+## Generate civicrm-version.php
+## usage: dm_generate_version <file> <ufname>
+function dm_generate_version() {
+  local to="$1"
+  local ufname="$2"
+
+  # final touch
+  echo "<?php
+function civicrmVersion( ) {
+  return array( 'version'  => '$DM_VERSION',
+                'cms'      => '$ufname',
+                'revision' => '$DM_REVISION' );
+}
+" > "$to"
+}
