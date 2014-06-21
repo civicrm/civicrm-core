@@ -19,22 +19,13 @@ TRG=$DM_TMPDIR/civicrm
 
 # copy all the stuff
 dm_install_l10n "$SRC/l10n" "$TRG/l10n"
+dm_install_files "$SRC" "$TRG" {agpl-3.0,agpl-3.0.exception,gpl,README,CONTRIBUTORS}.txt
 
 # copy selected sqls
-if [ ! -d $TRG/sql ] ; then
-	mkdir $TRG/sql
-fi
-
-for F in $SRC/sql/civicrm*.mysql $SRC/sql/counties.US.sql.gz $SRC/sql/case_sample*.mysql; do
+[ ! -d $TRG/sql ] && mkdir $TRG/sql
+for F in $SRC/sql/civicrm*.mysql $SRC/sql/case_sample*.mysql; do
 	cp $F $TRG/sql
 done
-
-# copy docs
-cp $SRC/agpl-3.0.txt $TRG
-cp $SRC/gpl.txt $TRG
-cp $SRC/README.txt $TRG
-cp $SRC/CONTRIBUTORS.txt $TRG
-cp $SRC/agpl-3.0.exception.txt $TRG
 
 # gen tarball
 cd $TRG/..

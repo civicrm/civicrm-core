@@ -27,8 +27,6 @@ popd
 dm_install_core "$SRC" "$TRG/civicrm/civicrm"
 dm_install_packages "$SRC/packages" "$TRG/civicrm/civicrm/packages"
 dm_install_wordpress "$SRC/WordPress" "$TRG/civicrm"
-
-# copy docs
 cp $SRC/WordPress/civicrm.config.php.wordpress $TRG/civicrm/civicrm/civicrm.config.php
 dm_generate_version "$TRG/civicrm/civicrm/civicrm-version.php" Wordpress
 
