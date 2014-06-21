@@ -35,10 +35,7 @@ fi
 # copy all the rest of the stuff
 dm_install_core "$SRC" "$TRG"
 dm_install_packages "$SRC/packages" "$TRG/packages"
-for CODE in joomla ; do
-  echo $CODE
-  [ -d $SRC/$CODE ] && $RSYNCCOMMAND $SRC/$CODE $TRG
-done
+dm_install_joomla "$SRC/joomla" "$TRG/joomla"
 
 # copy docs
 cp $SRC/civicrm.config.php $TRG
