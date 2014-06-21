@@ -78,3 +78,36 @@ function dm_install_packages() {
   [ ! -d "$to" ] && mkdir "$to"
   rsync -avC $excludes_rsync --include=core "$repo/./" "$to/./"
 }
+
+## Copy Drupal-integration module
+## usage: dm_install_drupal <drupal_repo_path> <to_path>
+function dm_install_drupal() {
+  local repo="$1"
+  local to="$2"
+
+  local excludes_rsync=""
+  for exclude in .git .svn ; do
+    excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
+  done
+
+  [ ! -d "$to" ] && mkdir "$to"
+  rsync -avC $excludes_rsync "$repo/./" "$to/./"
+}
+
+## TODO: Merge this into dm_install_drupal; use on all Drupal releases
+## usage: dm_install_drupal_info <to_path>
+function dm_install_drupal_info() {
+  local to="$1"
+
+  # set full version in .info files
+  local MODULE_DIRS=`find "$to" -type f -name "*.info"`
+  for INFO in $MODULE_DIRS; do
+    if [ $(uname) = "Darwin" ]; then
+      ## BSD sed
+      sed -i '' "s/version = [1-9.]*/version = $DM_VERSION/g" $INFO
+    else
+      ## GNU sed
+      sed -i'' "s/version = [1-9.]*/version = $DM_VERSION/g" $INFO
+    fi
+  done
+}

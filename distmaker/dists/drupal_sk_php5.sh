@@ -35,10 +35,7 @@ fi
 # copy all the stuff
 dm_install_core "$SRC" "$TRG"
 dm_install_packages "$SRC/packages" "$TRG/packages"
-for CODE in drupal; do
-  echo $CODE
-  [ -d $SRC/$CODE ] && $RSYNCCOMMAND $SRC/$CODE $TRG
-done
+dm_install_drupal "$SRC/drupal" "$TRG/drupal"
 
 # delete packages that distributions on Drupal.org repalce if present
 # also delete stuff that we dont really use and should not be included

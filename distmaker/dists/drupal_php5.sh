@@ -36,25 +36,10 @@ fi
 # copy all the stuff
 dm_install_core "$SRC" "$TRG"
 dm_install_packages "$SRC/packages" "$TRG/packages"
-for CODE in drupal; do
-  echo $CODE
-  [ -d $SRC/$CODE ] && $RSYNCCOMMAND $SRC/$CODE $TRG
-done
+dm_install_drupal "$SRC/drupal" "$TRG/drupal"
+dm_install_drupal_info "$DM_SOURCEDIR/drupal"
 
 cp $SRC/drupal/civicrm.config.php.drupal $TRG/civicrm.config.php
-
-# set full version in .info files
-MODULE_DIRS=`find "$DM_SOURCEDIR/drupal" -type f -name "*.info"`
-for INFO in $MODULE_DIRS; do
-  if [ $(uname) = "Darwin" ]; then
-    ## BSD sed
-    sed -i '' "s/version = [1-9.]*/version = $DM_VERSION/g" $INFO
-  else
-    ## GNU sed
-    sed -i'' "s/version = [1-9.]*/version = $DM_VERSION/g" $INFO
-  fi
-done
-
 
 # final touch
 echo "<?php
@@ -67,6 +52,7 @@ function civicrmVersion( ) {
 
 # gen tarball
 cd $TRG/..
+
 tar czf $DM_TARGETDIR/civicrm-$DM_VERSION-drupal.tar.gz civicrm
 
 # clean up

@@ -37,10 +37,7 @@ fi
 # copy all the stuff
 dm_install_core "$SRC" "$TRG"
 dm_install_packages "$SRC/packages" "$TRG/packages"
-for CODE in drupal; do
-  echo $CODE
-  [ -d $SRC/$CODE ] && $RSYNCCOMMAND $SRC/$CODE $TRG
-done
+dm_install_drupal "$SRC/drupal" "$TRG/drupal"
 
 # copy docs
 cp $SRC/drupal/civicrm.config.php.drupal $TRG/civicrm.config.php
