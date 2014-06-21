@@ -14,10 +14,8 @@ fi
 SRC=$DM_SOURCEDIR
 TRG=$DM_TMPDIR/civicrm
 
-# make sure and clean up before
-[ -d $TRG ] && rm -rf $TRG/*
-
 # copy all the stuff
+dm_reset_dirs "$TRG"
 dm_install_l10n "$SRC/l10n" "$TRG/l10n"
 
 [ ! -d $TRG/sql ] && mkdir $TRG/sql

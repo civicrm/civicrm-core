@@ -1,5 +1,15 @@
 #!/bin/bash
 
+## Delete/create a dir
+## usage: dm_reset_dirs <path1> <path2> ...
+function dm_reset_dirs() {
+  for d in "$@" ; do
+    [ -d "$d" ] && rm -rf "$d"
+  done
+
+  mkdir -p "$@"
+}
+
 ## Copy files from one dir into another dir
 ## usage: dm_install_dir <from-dir> <to-dir>
 function dm_install_dir() {
