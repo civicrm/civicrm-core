@@ -126,6 +126,12 @@ function dm_install_joomla() {
   local repo="$1"
   local to="$2"
   dm_install_dir "$repo" "$to"
+
+  ## Before this change, the zip file included the joomla-integration
+  ## modules twice. The two were basically identical -- except that
+  ## one included .gitignore and the omitted it. We'll now omit it
+  ## consistently.
+  rm -f "$to/.gitignore"
 }
 
 ## usage: dm_install_l10n <l10n_repo_path> <to_path>
