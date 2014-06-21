@@ -125,6 +125,14 @@ function dm_install_l10n() {
   dm_install_dir "$repo" "$to"
 }
 
+##  usage: dm_install_wordpress <wp_repo_path> <to_path>
+function dm_install_wordpress() {
+  local repo="$1"
+  local to="$2"
+  dm_install_dir "$repo" "$to"
+  dm_remove_files "$to" civicrm.config.php.wordpress .gitignore
+}
+
 ## Generate civicrm-version.php
 ## usage: dm_generate_version <file> <ufname>
 function dm_generate_version() {
