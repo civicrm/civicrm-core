@@ -34,7 +34,8 @@ fi
 
 # copy all the rest of the stuff
 dm_install_core "$SRC" "$TRG"
-for CODE in packages joomla ; do
+dm_install_packages "$SRC/packages" "$TRG/packages"
+for CODE in joomla ; do
   echo $CODE
   [ -d $SRC/$CODE ] && $RSYNCCOMMAND $SRC/$CODE $TRG
 done

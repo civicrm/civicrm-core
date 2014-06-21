@@ -63,3 +63,18 @@ function dm_install_core() {
   rm -rf $to/sql/civicrm_*.??_??.mysql
   set -e
 }
+
+## Copy all packages
+## usage: dm_install_packages <packages_repo_path> <to_path>
+function dm_install_packages() {
+  local repo="$1"
+  local to="$2"
+
+  local excludes_rsync=""
+  for exclude in .git .svn _ORIGINAL_ SeleniumRC PHPUnit PhpDocumentor SymfonyComponents amavisd-new git-footnote ; do
+    excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
+  done
+
+  [ ! -d "$to" ] && mkdir "$to"
+  rsync -avC $excludes_rsync --include=core "$repo/./" "$to/./"
+}

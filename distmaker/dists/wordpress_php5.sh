@@ -46,10 +46,7 @@ fi
 
 # copy all the stuff
 dm_install_core "$SRC" "$TRG/civicrm/civicrm"
-for CODE in packages ; do
-  echo $CODE
-  [ -d $SRC/$CODE ] && $RSYNCCOMMAND $SRC/$CODE $TRG/civicrm/civicrm
-done
+dm_install_packages "$SRC/packages" "$TRG/civicrm/civicrm/packages"
 
 for F in $SRC/WordPress/*; do
 	cp $F $TRG/civicrm
