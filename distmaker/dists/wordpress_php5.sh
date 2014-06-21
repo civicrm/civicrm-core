@@ -1,20 +1,14 @@
 #!/bin/bash
 set -ex
 
-# This script assumes
-# that DAOs are generated
-# and all the necessary conversions had place!
-
 P=`dirname $0`
 CFFILE=$P/../distmaker.conf
-
 if [ ! -f $CFFILE ] ; then
 	echo "NO DISTMAKER.CONF FILE!"
 	exit 1
 else
 	. $CFFILE
 fi
-
 . "$P/common.sh"
 
 SRC=$DM_SOURCEDIR
@@ -26,21 +20,8 @@ git checkout "$DM_REF_WORDPRESS"
 popd
 
 # make sure and clean up before
-if [ -d $TRG ] ; then
-	rm -rf $TRG/*
-fi
-
-if [ ! -d $TRG ] ; then
-	mkdir $TRG
-fi
-
-if [ ! -d $TRG/civicrm ] ; then
-	mkdir $TRG/civicrm
-fi
-
-if [ ! -d $TRG/civicrm/civicrm ] ; then
-	mkdir $TRG/civicrm/civicrm
-fi
+[ -d $TRG ] && rm -rf $TRG/*
+[ ! -d $TRG/civicrm/civicrm ] && mkdir -p $TRG/civicrm/civicrm
 
 # copy all the stuff
 dm_install_core "$SRC" "$TRG/civicrm/civicrm"
