@@ -112,6 +112,21 @@ function dm_install_drupal_info() {
   done
 }
 
+## Copy Joomla-integration module
+## usage: dm_install_joomla <joomla_repo_path> <to_path>
+function dm_install_joomla() {
+  local repo="$1"
+  local to="$2"
+
+  local excludes_rsync=""
+  for exclude in .git .svn ; do
+    excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
+  done
+
+  [ ! -d "$to" ] && mkdir "$to"
+  rsync -avC $excludes_rsync "$repo/./" "$to/./"
+}
+
 ## Generate civicrm-version.php
 ## usage: dm_generate_version <file> <ufname>
 function dm_generate_version() {
