@@ -20,17 +20,14 @@ git checkout .
 git checkout "$DM_REF_DRUPAL"
 popd
 
-# make sure and clean up before
-[ -d $TRG ] && rm -rf $TRG/*
-
 # copy all the stuff
+dm_reset_dirs "$TRG"
+cp $SRC/drupal/civicrm.config.php.drupal $TRG/civicrm.config.php
+dm_generate_version "$TRG/civicrm-version.php" Drupal
 dm_install_core "$SRC" "$TRG"
 dm_install_packages "$SRC/packages" "$TRG/packages"
 dm_install_drupal "$SRC/drupal" "$TRG/drupal"
 dm_install_drupal_info "$DM_SOURCEDIR/drupal"
-
-cp $SRC/drupal/civicrm.config.php.drupal $TRG/civicrm.config.php
-dm_generate_version "$TRG/civicrm-version.php" Drupal
 
 # gen tarball
 cd $TRG/..

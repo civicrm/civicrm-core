@@ -19,15 +19,13 @@ pushd "$DM_SOURCEDIR/joomla"
 git checkout "$DM_REF_JOOMLA"
 popd
 
-# make sure and clean up before
-[ -d $TRG ] && rm -rf $TRG/*
-
 # copy all the rest of the stuff
+dm_reset_dirs "$TRG"
+cp $SRC/civicrm.config.php $TRG
+dm_generate_version "$TRG/civicrm-version.php" Joomla
 dm_install_core "$SRC" "$TRG"
 dm_install_packages "$SRC/packages" "$TRG/packages"
 dm_install_joomla "$SRC/joomla" "$TRG/joomla"
-cp $SRC/civicrm.config.php $TRG
-dm_generate_version "$TRG/civicrm-version.php" Joomla
 
 # gen zip file
 cd $DM_TMPDIR;
