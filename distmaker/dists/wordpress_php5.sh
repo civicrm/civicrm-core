@@ -14,11 +14,6 @@ fi
 SRC=$DM_SOURCEDIR
 TRG=$DM_TMPDIR/civicrm
 
-# checkout the right code revisions
-pushd "$DM_SOURCEDIR/WordPress"
-git checkout "$DM_REF_WORDPRESS"
-popd
-
 # copy all the stuff
 dm_reset_dirs "$TRG" "$TRG/civicrm/civicrm"
 cp $SRC/WordPress/civicrm.config.php.wordpress $TRG/civicrm/civicrm/civicrm.config.php

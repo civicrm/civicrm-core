@@ -28,6 +28,7 @@ set -e
 P=`dirname $0`
 # Current dir
 ORIGPWD=`pwd`
+source "$P/dists/common.sh"
 
 # Set no actions by default
 D5PACK=0
@@ -156,16 +157,11 @@ case $1 in
 esac
 
 ## Make sure we have the right branch or tag
-pushd "$DM_SOURCEDIR"
-git checkout "$DM_REF_CORE"
-popd
-pushd "$DM_SOURCEDIR/packages"
-git checkout "$DM_REF_PACKAGES"
-popd
+dm_git_checkout "$DM_SOURCEDIR" "$DM_REF_CORE"
+dm_git_checkout "$DM_SOURCEDIR/packages" "$DM_REF_PACKAGES"
+
 ## in theory, this shouldn't matter, but GenCode is CMS-dependent, and we've been doing our past builds based on D7
-pushd "$DM_SOURCEDIR/drupal"
-git checkout "$DM_REF_DRUPAL"
-popd
+dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
 
 # Before anything - regenerate DAOs
 
@@ -181,26 +177,31 @@ fi
 
 if [ "$D56PACK" = 1 ]; then
 	echo; echo "Packaging for Drupal6, PHP5 version"; echo;
+	dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL6"
 	bash $P/dists/drupal6_php5.sh
 fi
 
 if [ "$D5PACK" = 1 ]; then
 	echo; echo "Packaging for Drupal7, PHP5 version"; echo;
+	dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
 	bash $P/dists/drupal_php5.sh
 fi
 
 if [ "$SKPACK" = 1 ]; then
 	echo; echo "Packaging for Drupal7, PHP5 StarterKit version"; echo;
+	dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
 	bash $P/dists/drupal_sk_php5.sh
 fi
 
 if [ "$J5PACK" = 1 ]; then
 	echo; echo "Packaging for Joomla, PHP5 version"; echo;
+	dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
 	bash $P/dists/joomla_php5.sh
 fi
 
 if [ "$WP5PACK" = 1 ]; then
 	echo; echo "Packaging for Wordpress, PHP5 version"; echo;
+	dm_git_checkout "$DM_SOURCEDIR/WordPress" "$DM_REF_WORDPRESS"
 	bash $P/dists/wordpress_php5.sh
 fi
 
