@@ -100,12 +100,6 @@ function dm_install_drupal() {
   local repo="$1"
   local to="$2"
   dm_install_dir "$repo" "$to"
-}
-
-## TODO: Merge this into dm_install_drupal; use on all Drupal releases
-## usage: dm_install_drupal_info <to_path>
-function dm_install_drupal_info() {
-  local to="$1"
 
   # set full version in .info files
   local MODULE_DIRS=`find "$to" -type f -name "*.info"`
