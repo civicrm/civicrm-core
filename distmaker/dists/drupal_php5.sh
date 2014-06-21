@@ -40,19 +40,10 @@ dm_install_drupal "$SRC/drupal" "$TRG/drupal"
 dm_install_drupal_info "$DM_SOURCEDIR/drupal"
 
 cp $SRC/drupal/civicrm.config.php.drupal $TRG/civicrm.config.php
-
-# final touch
-echo "<?php
-function civicrmVersion( ) {
-  return array( 'version'  => '$DM_VERSION',
-                'cms'      => 'Drupal',
-                'revision' => '$DM_REVISION' );
-}
-" > $TRG/civicrm-version.php
+dm_generate_version "$TRG/civicrm-version.php" Drupal
 
 # gen tarball
 cd $TRG/..
-
 tar czf $DM_TARGETDIR/civicrm-$DM_VERSION-drupal.tar.gz civicrm
 
 # clean up

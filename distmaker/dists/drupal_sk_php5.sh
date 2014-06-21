@@ -49,15 +49,7 @@ rm -rf $TRG/WordPress
 
 # copy docs
 cp $SRC/drupal/civicrm.config.php.drupal $TRG/civicrm.config.php
-
-# final touch
-echo "<?php
-function civicrmVersion( ) {
-  return array( 'version'  => '$DM_VERSION',
-                'cms'      => 'Drupal',
-                'revision' => '$DM_REVISION' );
-}
-" > $TRG/civicrm-version.php
+dm_generate_version "$TRG/civicrm-version.php" Drupal
 
 # gen tarball
 cd $TRG/..

@@ -55,15 +55,7 @@ rm -f $TRG/civicrm/civicrm.config.php.wordpress
 
 # copy docs
 cp $SRC/WordPress/civicrm.config.php.wordpress $TRG/civicrm/civicrm/civicrm.config.php
-
-# final touch
-echo "<?php
-function civicrmVersion( ) {
-  return array( 'version'  => '$DM_VERSION',
-                'cms'      => 'Wordpress',
-                'revision' => '$DM_REVISION' );
-}
-" > $TRG/civicrm/civicrm/civicrm-version.php
+dm_generate_version "$TRG/civicrm/civicrm/civicrm-version.php" Wordpress
 
 # gen tarball
 cd $TRG

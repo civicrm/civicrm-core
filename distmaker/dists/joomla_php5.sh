@@ -42,15 +42,7 @@ done
 
 # copy docs
 cp $SRC/civicrm.config.php $TRG
-
-# final touch
-echo "<?php
-function civicrmVersion( ) {
-  return array( 'version'  => '$DM_VERSION',
-                'cms'      => 'Joomla',
-                'revision' => '$DM_REVISION' );
-}
-" > $TRG/civicrm-version.php
+dm_generate_version "$TRG/civicrm-version.php" Joomla
 
 # gen zip file
 cd $DM_TMPDIR;
