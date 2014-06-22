@@ -357,9 +357,12 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
 
   function generateDAOs($tables) {
     foreach (array_keys($tables) as $name) {
-      $source = str_replace('CRM/', '', $this->phpCodePath . $tables[$name]['sourceFile']);
+      $sources = array(
+        str_replace('CRM/', '', $this->phpCodePath . $tables[$name]['sourceFile']),
+        'dao.tpl',
+      );
       $target = $this->phpCodePath . $tables[$name]['base'] . $tables[$name]['fileName'];
-      if (!CRM_GenCode_Util_File::needsUpdate($source, $target)) {
+      if (!CRM_GenCode_Util_File::needsUpdate($sources, $target)) {
         continue;
       }
 
