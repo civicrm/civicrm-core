@@ -22,7 +22,7 @@ INSERT IGNORE INTO civicrm_state_province (id, country_id, abbreviation, name) V
 
 UPDATE civicrm_state_province
 	SET name = "Santiago Metropolitan", abbreviation = "SM"
-	WHERE id = "2100";
+	WHERE name = "Region Metropolitana de Santiago" AND abbreviation = "RM";
 
 -- CRM-14879 contact fields for scheduled reminders
 INSERT INTO civicrm_action_mapping
