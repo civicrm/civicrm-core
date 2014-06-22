@@ -1,10 +1,10 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
+  --------------------------------------------------------------------+
   | CiviCRM version 4.5                                                |
-  +--------------------------------------------------------------------+
+  --------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2014                                |
-  +--------------------------------------------------------------------+
+  --------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
   | CiviCRM is free software; you can copy, modify, and distribute it  |
@@ -22,7 +22,7 @@
   | at info[AT]civicrm[DOT]org. If you have questions about the        |
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+  --------------------------------------------------------------------+
 */
 
 /**
@@ -1495,7 +1495,12 @@ class CRM_Report_Form extends CRM_Core_Form {
       // entries.
       $clause = $this->whereTagClause($field, $value, $op);
     }
-
+    elseif (!empty($field['membership_org']) && $clause) {
+      $clause = $this->whereMembershipOrgClause($field, $value, $op);
+    }
+    elseif (!empty($field['membership_type']) && $clause) {
+      $clause = $this->whereMembershipTypeClause($field, $value, $op);
+    }
     return $clause;
   }
 
@@ -2982,6 +2987,42 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                           WHERE entity_table = 'civicrm_contact' AND {$clause} ) ";
   }
 
+  function whereMembershipOrgClause($field, $value, $op) {
+    $sqlOp = $this->getSQLOperator($op);
+    if (!is_array($value)) {
+      $value = array($value);
+    }
+    
+    $tmp_membership_org_sql_list = implode(', ', $value);
+    return " {$this->_aliases['civicrm_contact']}.id {$sqlOp} (
+                          SELECT DISTINCT mem.contact_id
+                  			  FROM civicrm_membership mem 
+                  			  LEFT JOIN civicrm_membership_status mem_status ON mem.status_id = mem_status.id
+                  			  LEFT JOIN civicrm_membership_type mt ON mem.membership_type_id = mt.id 
+                  			  WHERE mt.member_of_contact_id IN (".$tmp_membership_org_sql_list.")
+                  			  AND mt.is_active = '1'
+                  			  AND mem_status.is_current_member = '1'
+                    		  AND mem_status.is_active = '1' )  ";
+    }    
+
+  function whereMembershipTypeClause($field, $value, $op) {
+    $sqlOp = $this->getSQLOperator($op);
+    if (!is_array($value)) {
+      $value = array($value);
+    }
+      
+    $tmp_membership_sql_list  = implode(', ', $value);
+    return " {$this->_aliases['civicrm_contact']}.id {$sqlOp} (
+                          SELECT DISTINCT mem.contact_id
+        								  FROM civicrm_membership mem 
+        								  LEFT JOIN civicrm_membership_status mem_status ON mem.status_id = mem_status.id 
+        								  LEFT JOIN civicrm_membership_type mt ON mem.membership_type_id = mt.id 
+        								  WHERE mem.membership_type_id IN (".$tmp_membership_sql_list.")
+        								  AND mt.is_active = '1'
+          							  AND mem_status.is_current_member = '1'
+        								  AND mem_status.is_active = '1' ) ";
+  }
+    
   /**
    * @param string $tableAlias
    */
