@@ -37,6 +37,13 @@
  * Drupal specific stuff goes here
  */
 abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
+
+  /**
+   * Does this CMS / UF support a CMS specific logging mechanism?
+   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
+   * @var bool
+   */
+  var $supports_UF_Logging = TRUE;
   /**
    *
    */
@@ -258,6 +265,16 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   function checkPermissionAddUser() {
     if (CRM_Core_Permission::check('administer users')) {
       return TRUE;
+    }
+  }
+
+
+  /**
+   * Log error to CMS
+   */
+  function logger($message) {
+    if (CRM_Core_Config::singleton()->userFrameworkLogging) {
+      watchdog('civicrm', $message, NULL, WATCHDOG_DEBUG);
     }
   }
 }
