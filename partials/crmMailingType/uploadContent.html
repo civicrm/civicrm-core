@@ -1,0 +1,17 @@
+<body ng-controller="browse">
+	<table>
+	  <tr>
+	    <td class="label">Upload TEXT Message</td>
+		<td>
+		  <input type="file" ng-model-instant id="fileToUpload" multiple onchange="angular.element(this).scope().setFiles(this)" />
+		</td>
+	  </tr>
+	  <tr>
+	    <td class="label">Upload HTML Message</td>
+		<td>
+		  <input type="file" ng-model-instant id="fileToUpload2" multiple onchange="angular.element(this).scope().setFiles(this)" />
+		</td>
+	  </tr>
+	</table>
+
+</body>

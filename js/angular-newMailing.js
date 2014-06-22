@@ -32,7 +32,7 @@
               return crmApi('Mailing', 'getsingle', {id: $route.current.params.id}); 
             }
             else {
-              return {name: "New Mail", visibility: "Public Pages",  url_tracking:"1", forward_replies:"0", auto_responder:"0", open_tracking:"1",
+              return {name: "New Mail", visibility: "Public Pages",  url_tracking:"1", forward_replies:"0", created_id: "202", auto_responder:"0", open_tracking:"1",
                  };
             }
           }
@@ -55,11 +55,13 @@
 	$scope.groupNamesList = CRM.crmMailing.groupNames;
 	$scope.incGroup = [];
 	$scope.excGroup = [];
-    $scope.currentMailing = selectedMail;
-    window.ct = $scope.currentMailing;
-    $scope.acttab=0;
+	$scope.testGroup = [];
+  $scope.currentMailing = selectedMail;
+  window.ct = $scope.currentMailing;
+  $scope.acttab=0;
 	$scope.composeS="1";
 	$scope.trackreplies="0";
+	$scope.now="1";
 	///changing upload on screen
 
 	$scope.upldChange= function(composeS){
@@ -259,7 +261,24 @@ function FileUploadCtrl(scope) {
 }
 });
 
-
+   crmMailing.directive('chsdate',function(){
+        return {
+            scope :{
+                dat : '=send_date'
+            },
+          restrict: 'AE',
+          link: function(scope,element,attrs){
+                $(element).datepicker({
+									  //dateFormat: 'yyyy-MM-dd HH:mm:ss',
+                    onSelect: function(date) {
+                        $(".ui-datepicker a").removeAttr("href");
+                        scope.dat =date;
+                        console.log(date);
+                    }
+                });
+            }
+        };
+    });
  
  
  crmMailing.controller('mailingListCtrl', function($scope, crmApi, mailingList) {

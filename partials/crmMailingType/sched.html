@@ -1,0 +1,22 @@
+<br>
+<table class="form-layout-compressed">
+  <tbody>
+  <tr>
+    <td class="label">Send Immediately</td>
+    <td>
+      <input type="checkbox" ng-model="now" ng-true-value="1" ng-false-value="0"/>
+    </td>
+  <tr ng-show="now==0">
+		<td class="label">OR</td>
+  </tr>
+  <tr ng-show="now==0">
+    <td class="label">Schedule Mailing</td>
+    <td>
+			<input type="date" chsdate>
+    </td>
+  </tr>
+ </tbody>
+</table>
+<br>  
+
+<!--ng-model="crmMailing.scheduled_date" -->
