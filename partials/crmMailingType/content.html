@@ -39,11 +39,11 @@ The original form used table layout; don't know if we have an alternative, CSS-b
 <br>
 <div class="crm-accordion-wrapper collapsed" ng-show= "upldChange(composeS)">
   <div class="crm-accordion-header">Compose on Screen</div>
-  <div class="crm-accordion-body" ng-include="partialUrl('mailingGroup.html')"></div>
+  <div class="crm-accordion-body" ng-include="partialUrl('composeonScreen.html')"></div>
 </div>
 <div class="crm-accordion-wrapper collapsed" ng-show= "!(upldChange(composeS))">
   <div class="crm-accordion-header">Upload Content</div>
-  <div class="crm-accordion-body" ng-include="partialUrl('mailingGroup.html')"></div>
+  <div class="crm-accordion-body" ng-include="partialUrl('uploadContent.html')"></div>
 </div>
 <div class="crm-accordion-wrapper collapsed">
   <div class="crm-accordion-header">Attachments</div>
@@ -51,7 +51,7 @@ The original form used table layout; don't know if we have an alternative, CSS-b
 </div>
 <div class="crm-accordion-wrapper collapsed">
   <div class="crm-accordion-header">Header and Footer</div>
-  <div class="crm-accordion-body" ng-include="partialUrl('mailingGroup.html')"></div>
+  <div class="crm-accordion-body" ng-include="partialUrl('headerandFooter.html')"></div>
 </div>
 <div class="crm-accordion-wrapper collapsed">
   <div class="crm-accordion-header">Track and Respond</div>

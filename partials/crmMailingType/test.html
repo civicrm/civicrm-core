@@ -1,0 +1,24 @@
+<table class="form-layout-compressed">
+  <tbody>
+  <tr>
+    <td class="label">Send to address</td>
+    <td>
+      <input type="text"/>
+    </td>
+  </tr>
+  <tr>
+    <td class="label">Send to this Group</td>
+    <td>
+      <select ng-model="testGroup" ng-options="grp.name as grp.name for grp in groupNamesList">
+			  <option value="">-none-</option>
+		  </select>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <button id="testbutton">Send a Test Mailing</button> 
+    </td>
+  </tr>
+  
+  </tbody>
+</table>
