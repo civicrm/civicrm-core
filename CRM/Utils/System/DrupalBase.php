@@ -48,6 +48,12 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    *
    */
   function __construct() {
+    /**
+     * deprecated property to check if this is a drupal install. The correct method is to have functions on the UF classes for all UF specific
+     * functions and leave the codebase oblivious to the type of CMS
+     * @deprecated
+     * @var bool
+     */
     $this->is_drupal = TRUE;
     $this->supports_form_extensions = TRUE;
   }
