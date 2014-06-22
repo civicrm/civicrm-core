@@ -64,16 +64,20 @@ class CRM_GenCode_Util_File {
     return $newTempDir;
   }
 
-  static function needsUpdate($sources, $target) {
+  static function needsUpdate($sources, $target, $otherTS = 0) {
     // each $source is assumed to be checked upstream for existence (as otherwise $target can't be generated!)
     if (!is_array($sources)) {
       $sources = array($sources);
     }
-    if ($result = file_exists($target)) {
-      foreach ($sources as $source) {
-        if (substr($source, -4) == '.tpl') $source = 'templates/'.$source;
-        $result = $result && (filemtime($source) < filemtime($target));
-      }
+    if (!file_exists($target)) {
+      return true;
+    }
+
+    $targetTS = filemtime($target);
+    $result = $otherTS < $targetTS;
+    foreach ($sources as $source) {
+      if (substr($source, -4) == '.tpl') $source = 'templates/'.$source;
+      $result = $result && (filemtime($source) < $targetTS);
     }
     // return opposite of result, ie. true if needs update
     return !$result;
@@ -97,6 +101,9 @@ class CRM_GenCode_Main {
 
   var $smarty;
 
+  // older timestamp for generic dependencies
+  var $genericDependenciesTS;
+
   function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $smartyPluginDirs, $argCms, $argVersion, $schemaPath) {
     $this->CoreDAOCodePath = $CoreDAOCodePath;
     $this->sqlCodePath = $sqlCodePath;
@@ -115,6 +122,18 @@ class CRM_GenCode_Main {
     // CRM-5308 / CRM-3507 - we need {localize} to work in the templates
     require_once 'CRM/Core/Smarty/plugins/block.localize.php';
     $this->smarty->register_block('localize', 'smarty_block_localize');
+
+    // CRM-14885 - add generic dependencies (thanks Tim)
+    $cd = dirname(__FILE__);
+    foreach (array($cd, $cd . DIRECTORY_SEPARATOR . 'plugins') as $directory) {
+      foreach (scandir($directory) as $entry) {
+        if (is_dir($entry)) continue;
+        $this->genericDependenciesTS = max(
+          $this->genericDependenciesTS,
+          filemtime($directory . DIRECTORY_SEPARATOR . $entry)
+        );
+      }
+    }
 
     require_once 'PHP/Beautifier.php';
     // create a instance
@@ -144,6 +163,13 @@ class CRM_GenCode_Main {
 
   function __destruct() {
     CRM_GenCode_Util_File::removeDir($this->compileDir);
+  }
+
+  /**
+   * Utility functions
+   */
+  function needsUpdate($sources, $target) {
+    return CRM_GenCode_Util_File::needsUpdate($sources, $target, $this->genericDependenciesTS);
   }
 
   /**
@@ -299,7 +325,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
 
       $ext = ($locale != 'en_US' ? ".$locale" : '');
       $target = $this->sqlCodePath . "civicrm_data$ext.mysql";
-      if (CRM_GenCode_Util_File::needsUpdate($sources, $target)) {
+      if ($this->needsUpdate($sources, $target)) {
         echo "Generating data file for $locale\n";
         $tsLocale = $locale;
         $this->smarty->assign('locale', $locale);
@@ -318,7 +344,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
 
       $source = 'civicrm_acl.tpl';
       $target = $this->sqlCodePath . "civicrm_acl$ext.mysql";
-      if (CRM_GenCode_Util_File::needsUpdate($source, $target)) {
+      if ($this->needsUpdate($source, $target)) {
         echo "Generating acl file for $locale\n";
         $tsLocale = $locale;
         $this->smarty->assign('locale', $locale);
@@ -333,7 +359,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   function generateSample() {
     $sources = array('civicrm_sample.tpl', 'civicrm_acl.tpl');
     $target = $this->sqlCodePath . 'civicrm_sample.mysql';
-    if (CRM_GenCode_Util_File::needsUpdate($sources, $target)) {
+    if ($this->needsUpdate($sources, $target)) {
       $this->reset_smarty_assignments();
       $sample = '';
       foreach ($sources as $source) {
@@ -362,7 +388,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
         'dao.tpl',
       );
       $target = $this->phpCodePath . $tables[$name]['base'] . $tables[$name]['fileName'];
-      if (!CRM_GenCode_Util_File::needsUpdate($sources, $target)) {
+      if (!$this->needsUpdate($sources, $target)) {
         continue;
       }
 
@@ -475,7 +501,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       }
     }
 
-    if (CRM_GenCode_Util_File::needsUpdate('civicrm_version.tpl', $this->phpCodePath . 'civicrm-version.php')) {
+    if ($this->needsUpdate('civicrm_version.tpl', $this->phpCodePath . 'civicrm-version.php')) {
       echo "Generating civicrm-version file\n";
       $this->smarty->assign('db_version', $this->db_version);
       $this->smarty->assign('cms', ucwords($this->cms));
