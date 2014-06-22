@@ -1,6 +1,6 @@
 <?php
 /*
-  --------------------------------------------------------------------+
+  +--------------------------------------------------------------------+
   | CiviCRM version 4.5                                                |
   --------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2014                                |
@@ -22,7 +22,7 @@
   | at info[AT]civicrm[DOT]org. If you have questions about the        |
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  --------------------------------------------------------------------+
+  +--------------------------------------------------------------------+
 */
 
 /**
