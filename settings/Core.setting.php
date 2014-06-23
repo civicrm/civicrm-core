@@ -307,7 +307,7 @@ return array (
     'group' => 'core',
     'name' => 'maxFileSize',
     'prefetch' => 1,
-    'config_only' => 1,
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -370,7 +370,7 @@ return array (
     'group' => 'core',
     'name' => 'versionCheck',
     'prefetch' => 1,
-    'config_only'=> 1,
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -402,7 +402,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group' => 'core',
     'name' => 'doNotAttachPDFReceipt',
     'prefetch' => 1,
-    'config_only'=> 1,
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -418,7 +418,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group' => 'core',
     'name' => 'wkhtmltopdfPath',
     'prefetch' => 1,
-    'config_only'=> 1,
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -440,7 +440,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group' => 'core',
     'name' => 'recaptchaPublicKey',
     'prefetch' => 1,
-    'config_only'=> 1,
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -462,7 +462,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group' => 'core',
     'name' => 'recaptchaPrivateKey',
     'prefetch' => 1,
-    'config_only'=> 1,
+    'config_only'=> 1,//@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -484,7 +484,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group' => 'core',
     'name' => 'recaptchaPrivateKey',
     'prefetch' => 1,
-    'config_only'=> 1,
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -506,7 +506,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group' => 'core',
     'name' => 'dashboardCacheTimeout',
     'prefetch' => 1,
-    'config_only'=> 1,
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -528,7 +528,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group' => 'core',
     'name' => 'checksumTimeout',
     'prefetch' => 1,
-    'config_only'=> 1,
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -571,7 +571,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group' => 'core',
     'name' => 'communityMessagesUrl',
     'prefetch' => 0,
-    'config_only'=> 1,
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -593,7 +593,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group' => 'core',
     'name' => 'resCacheCode',
     'prefetch' => 1,
-    'config_only'=> 1,
+    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
