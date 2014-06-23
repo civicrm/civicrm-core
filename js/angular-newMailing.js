@@ -32,7 +32,7 @@
               return crmApi('Mailing', 'getsingle', {id: $route.current.params.id}); 
             }
             else {
-              return {name: "New Mail", visibility: "Public Pages",  url_tracking:"1", forward_replies:"0", created_id: "202", auto_responder:"0", open_tracking:"1",
+              return {name: "New Mail", visibility: "Public Pages", url_tracking:"1", forward_replies:"0", created_id: "202", auto_responder:"0", open_tracking:"1",
                  };
             }
           }
@@ -48,11 +48,12 @@
 
  
  
-  crmMailing.controller('mailingCtrl', function($scope, crmApi, selectedMail) {
-    $scope.partialUrl = partialUrl;
+crmMailing.controller('mailingCtrl', function($scope, crmApi, selectedMail) {
+  $scope.partialUrl = partialUrl;
 	$scope.campaignList =  CRM.crmMailing.campNames;
 	$scope.mailNameList = _.pluck(CRM.crmCaseType.civiMails, 'name');
 	$scope.groupNamesList = CRM.crmMailing.groupNames;
+	$scope.headerfooter = CRM.crmMailing.headerfooterList;
 	$scope.incGroup = [];
 	$scope.excGroup = [];
 	$scope.testGroup = [];
@@ -62,8 +63,19 @@
 	$scope.composeS="1";
 	$scope.trackreplies="0";
 	$scope.now="1";
+	$scope.scheddate={};
+  $scope.scheddate.date = ""; 
+  $scope.scheddate.time = ""; 
+  $scope.ans="";
+  $scope.mailAutoResponder="";
 	///changing upload on screen
+/*		if(selectedMail.scheduled_date != ""){
+			$scope.ans= selectedMail.scheduled_date.split(" ");
+			$scope.scheddate.date=$scope.ans[0];
+			$scope.scheddate.time=$scope.ans[1];
+		}*/
 
+	console.log(selectedMail); 
 	$scope.upldChange= function(composeS){
 		if(composeS=="1"){
 			return true;
@@ -72,6 +84,18 @@
 			return false;
 	}
 	
+	$scope.isHeader= function(hf){
+		return hf.component_type == "Header";
+	};
+
+	$scope.isFooter= function(f){
+		return f.component_type == "Footer";
+	};
+	
+	$scope.isAuto= function(au){
+		return au.component_type == "Auto-responder";
+	};
+
 	$scope.trackr= function(trackreplies){
 		if(trackreplies=="1"){
 			return true;
@@ -94,6 +118,11 @@
     
 
 	  $scope.save = function() {
+	    $scope.currentMailing.scheduled_date= $scope.scheddate.date + " " + $scope.scheddate.time ;
+			if($scope.currentMailing.scheduled_date!=" "){
+					$scope.currentMailing.scheduled_id= "202";
+					$scope.currentMailing.scheduled_date= "";
+			  }
       var result = crmApi('Mailing', 'create', $scope.currentMailing, true);
       result.success(function(data) {
         if (data.is_error == 0) {
@@ -156,7 +185,26 @@
     }); 
   
 
- 
+crmMailing.directive('chsdate',function(){
+        return {
+            scope :{
+                dat : '=send_date'
+            },
+          restrict: 'AE',
+          link: function(scope,element,attrs){
+                $(element).datepicker({
+									  dateFormat: 'yy-mm-dd',
+                    onSelect: function(date) {
+                        $(".ui-datepicker a").removeAttr("href");
+                        scope.dat =date;
+                        console.log(date);
+                    }
+                });
+            }
+        };
+    });
+    
+
 crmMailing.controller('browse', function(){
 FileUploadCtrl.$inject = ['$scope']
 function FileUploadCtrl(scope) {
@@ -259,28 +307,8 @@ function FileUploadCtrl(scope) {
         alert("The upload has been canceled by the user or the browser dropped the connection.")
     }
 }
-});
+}); 
 
-   crmMailing.directive('chsdate',function(){
-        return {
-            scope :{
-                dat : '=send_date'
-            },
-          restrict: 'AE',
-          link: function(scope,element,attrs){
-                $(element).datepicker({
-									  //dateFormat: 'yyyy-MM-dd HH:mm:ss',
-                    onSelect: function(date) {
-                        $(".ui-datepicker a").removeAttr("href");
-                        scope.dat =date;
-                        console.log(date);
-                    }
-                });
-            }
-        };
-    });
- 
- 
  crmMailing.controller('mailingListCtrl', function($scope, crmApi, mailingList) {
     $scope.mailingList = mailingList.values;
     $scope.mailStatus = _.pluck(CRM.crmMailing.mailStatus, 'status');

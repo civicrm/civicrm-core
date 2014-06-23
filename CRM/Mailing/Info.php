@@ -65,14 +65,16 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $civiMails = civicrm_api3('Mailing', 'get', array());
     $campNames = civicrm_api3('Campaign', 'get', array());
     $mailStatus = civicrm_api3('MailingJob', 'get', array());
-	$groupNames = civicrm_api3('Group', 'get', array());
-
+		$groupNames = civicrm_api3('Group', 'get', array());
+		$headerfooterList = civicrm_api3('MailingComponent', 'get', array());
+		
     CRM_Core_Resources::singleton()->addSetting(array(
       'crmMailing' => array(
         'civiMails' => array_values($civiMails['values']),
         'campNames' => array_values($campNames['values']),
         'mailStatus' => array_values($mailStatus['values']),
         'groupNames' => array_values($groupNames['values']),
+        'headerfooterList' => array_values($headerfooterList['values']),
         ),
       ));
     return $result;
