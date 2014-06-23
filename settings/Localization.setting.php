@@ -42,7 +42,7 @@ return array(
     'group' => 'localization',
     'name' => 'monetaryThousandSeparator',
     'prefetch' => 1,
-    'config_only' => 1,
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -62,7 +62,7 @@ return array(
     'group' => 'localization',
     'name' => 'monetaryDecimalPoint',
     'prefetch' => 1,
-    'config_only' => 1,
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -82,7 +82,7 @@ return array(
     'group' => 'localization',
     'name' => 'moneyformat',
     'prefetch' => 1,
-    'config_only' => 1,
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -99,7 +99,7 @@ return array(
     'group' => 'localization',
     'name' => 'moneyvalueformat',
     'prefetch' => 1,
-    'config_only' => 1,
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -116,7 +116,7 @@ return array(
     'group' => 'localization',
     'name' => 'defaultCurrency',
     'prefetch' => 1,
-    'config_only' => 1,
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -136,7 +136,7 @@ return array(
     'group' => 'localization',
     'name' => 'defaultContactCountry',
     'prefetch' => 1,
-    'config_only' => 1,
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -156,7 +156,7 @@ return array(
     'group' => 'localization',
     'name' => 'countryLimit',
     'prefetch' => 1,
-    'config_only' => 1,
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Array',
     'quick_form_type' => 'Element',
     'html_type' => 'advmultiselect',
@@ -178,7 +178,7 @@ return array(
     'group' => 'localization',
     'name' => 'provinceLimit',
     'prefetch' => 1,
-    'config_only' => 1,
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Array',
     'quick_form_type' => 'Element',
     'html_type' => 'advmultiselect',
@@ -200,7 +200,7 @@ return array(
     'group' => 'localization',
     'name' => 'inheritLocale',
     'prefetch' => 1,
-    'config_only' => 1,
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => '0',
@@ -216,7 +216,7 @@ return array(
     'group' => 'localization',
     'name' => 'dateformatDatetime',
     'prefetch' => 1,
-    'config_only' => 1,
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'default' => '%B %E%f, %Y %l:%M %P',
     'add' => '4.3',
@@ -231,7 +231,7 @@ return array(
     'group' => 'localization',
     'name' => 'dateformatFull',
     'prefetch' => 1,
-    'config_only' => 1,
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'default' => '%B %E%f, %Y',
     'add' => '4.3',
@@ -246,7 +246,7 @@ return array(
     'group' => 'localization',
     'name' => 'dateformatPartial',
     'prefetch' => 1,
-    'config_only' => 1,
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'default' => '%B %Y',
     'add' => '4.3',
@@ -261,7 +261,7 @@ return array(
     'group' => 'localization',
     'name' => 'lcMessages',
     'prefetch' => 1,
-    'config_only' => 1,
+    'config_only' => 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'default' => 'en_US',
     'add' => '4.3',
