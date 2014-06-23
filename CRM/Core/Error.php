@@ -580,6 +580,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @static
    */
   static function debug_log_message($message, $out = FALSE, $comp = '') {
+    $config = CRM_Core_Config::singleton();
 
     $file_log = self::createDebugLogger($comp);
     $file_log->log("$message\n");
@@ -589,7 +590,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
     $file_log->close();
 
-    if (CRM_Core_Config::singleton()->userSystem->logger($message));
+    if ($config->userFrameworkLogging) {
+      if ($config->userSystem->is_drupal and function_exists('watchdog')) {
+        watchdog('civicrm', $message, NULL, WATCHDOG_DEBUG);
+      }
+    }
 
     return $str;
   }
