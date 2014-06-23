@@ -4,9 +4,36 @@
  * Base class for UF system integrations
  */
 abstract class CRM_Utils_System_Base {
+  /**
+   * deprecated property to check if this is a drupal install. The correct method is to have functions on the UF classes for all UF specific
+   * functions and leave the codebase oblivious to the type of CMS
+   * @deprecated
+   * @var bool
+   */
   var $is_drupal = FALSE;
+
+  /**
+   * deprecated property to check if this is a joomla install. The correct method is to have functions on the UF classes for all UF specific
+   * functions and leave the codebase oblivious to the type of CMS
+   * @deprecated
+   * @var bool
+   */
   var $is_joomla = FALSE;
+
+    /**
+     * deprecated property to check if this is a wordpress install. The correct method is to have functions on the UF classes for all UF specific
+     * functions and leave the codebase oblivious to the type of CMS
+     * @deprecated
+     * @var bool
+     */
   var $is_wordpress = FALSE;
+
+  /**
+   * Does this CMS / UF support a CMS specific logging mechanism?
+   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
+   * @var bool
+   */
+  var $supports_UF_Logging = FALSE;
 
   /*
    * Does the CMS allow CMS forms to be extended by hooks
@@ -319,6 +346,13 @@ abstract class CRM_Utils_System_Base {
    */
   function outputError($content) {
     echo CRM_Utils_System::theme($content);
+  }
+
+  /**
+   * Log error to CMS
+   */
+  function logger($message) {
+
   }
 }
 
