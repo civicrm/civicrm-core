@@ -5364,7 +5364,7 @@ AND   displayRelType.is_active = 1
     $useIDsOnly = FALSE
   ) {
 
-    if (!empty($selectValues)) {
+    if (!empty($selectValues) && !empty($selectValues[$value])) {
       $qill = $selectValues[$value];
     }
     else {
