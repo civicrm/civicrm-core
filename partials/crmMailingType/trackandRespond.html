@@ -62,9 +62,9 @@
   <tr ng-show= "trackr(trackreplies)">
     <td>
       <input type="checkbox" ng-model="currentMailing.auto_responder" ng-true-value="1" ng-false-value="0">&nbsp Auto-Respond to Replies &nbsp &nbsp</input>
-      <select>
-        <option value="">Auto-Responder</option>
-      </select>
+			<select ng-model="mailAutoResponder" ng-options="au.id as au.name for au in headerfooter| filter:isAuto">
+				<option value="">-none-</option>
+			</select>
     </td>  
    </tr>
   <tr ng-show= "trackr(trackreplies)">
