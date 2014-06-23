@@ -528,7 +528,6 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group' => 'core',
     'name' => 'checksumTimeout',
     'prefetch' => 1,
-    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
