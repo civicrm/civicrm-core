@@ -571,7 +571,6 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group' => 'core',
     'name' => 'communityMessagesUrl',
     'prefetch' => 0,
-    'config_only'=> 1, //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
