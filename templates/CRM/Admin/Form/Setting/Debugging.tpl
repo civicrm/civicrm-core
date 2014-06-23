@@ -30,8 +30,8 @@
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
          <table class="form-layout">
             <tr class="crm-debugging-form-block-debug">
-                <td class="label">{$form.debug.label}</td>
-                <td>{$form.debug.html}<br />
+                <td class="label">{$form.debug_enabled.label}</td>
+                <td>{$form.debug_enabled.html}<br />
                 <span class="description">{ts}Set this value to <strong>Yes</strong> if you want to use one of CiviCRM's debugging tools. <strong>This feature should NOT be enabled for production sites</strong>{/ts} {help id='debug'}</span></td>
             </tr>
             {if $form.userFrameworkLogging}

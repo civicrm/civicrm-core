@@ -48,6 +48,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'maxFileSize' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'doNotAttachPDFReceipt' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'secondDegRelPermissions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'checksumTimeout' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
 
   /**
@@ -90,20 +91,16 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
       'text', 'dashboardCacheTimeout', ts('Dashboard cache timeout'),
       array('size' => 3, 'maxlength' => 5)
     );
-    $this->addElement(
-      'text', 'checksumTimeout', ts('CheckSum Lifespan'),
-      array('size' => 2, 'maxlength' => 8)
-    );
+
     $this->addElement(
       'text', 'recaptchaOptions', ts('Recaptcha Options'),
       array('size' => 64, 'maxlength' => 64)
     );
 
-    $this->addRule('checksumTimeout', ts('Value should be a positive number'), 'positiveInteger');
-
     $this->addFormRule(array('CRM_Admin_Form_Setting_Miscellaneous', 'formRule'), $this);
 
     parent::buildQuickForm();
+    $this->addRule('checksumTimeout', ts('Value should be a positive number'), 'positiveInteger');
   }
 
   /**
@@ -137,18 +134,6 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     return $errors;
   }
 
-  function setDefaultValues() {
-    parent::setDefaultValues();
-
-    $this->_defaults['checksumTimeout'] =
-      CRM_Core_BAO_Setting::getItem(
-        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'checksum_timeout',
-        NULL,
-        7
-      );
-    return $this->_defaults;
-  }
 
   public function postProcess() {
     // store the submitted values in an array
