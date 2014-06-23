@@ -66,7 +66,7 @@ class CRM_Activity_Form_Task_Delete extends CRM_Activity_Form_Task {
    * @return void
    */
   function buildQuickForm() {
-    $this->addDefaultButtons(ts('Delete Activites'), 'done');
+    $this->addDefaultButtons(ts('Delete Activities'), 'done');
   }
 
   /**

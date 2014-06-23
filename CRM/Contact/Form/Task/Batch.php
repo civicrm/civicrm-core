@@ -142,7 +142,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     // CRM-6794
     $preserveDefaultsArray = array(
       'first_name', 'last_name', 'middle_name',
-      'organization_name',
+      'organization_name', 'prefix_id', 'suffix_id',
       'household_name',
     );
 
