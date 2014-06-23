@@ -502,7 +502,7 @@
      <title>Cleanup Caches and Update Paths</title>
      <desc>Reset the Base Directory Path and Base URL settings - generally when a CiviCRM site is moved to another location in the file system and/or to another domain.</desc>
      <page_callback>CRM_Admin_Form_Setting_UpdateConfigBackend</page_callback>
-     <adminGroup>Configure</adminGroup>
+     <adminGroup>System Settings</adminGroup>
      <icon>admin/small/updatepath.png</icon>
      <weight>80</weight>
   </item>
