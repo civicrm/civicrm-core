@@ -71,6 +71,7 @@
   <thead>
     <tr>
       <th class='crm-group-name'>{ts}Name{/ts}</th>
+      <th class='hide_column'>{ts}ID{/ts}</th>
       <th class='crm-group-created_by'>{ts}Created By{/ts}</th>
       <th class='crm-group-description'>{ts}Description{/ts}</th>
       <th class='crm-group-group_type'>{ts}Group Type{/ts}</th>
@@ -88,6 +89,11 @@
 {include file="CRM/common/enableDisable.tpl"}
 
 {literal}
+<style>
+.hide_column{
+    display : none;
+}
+</style>
 <script type="text/javascript">
 cj( function() {
   // for CRM-11310 and CRM-10635 : processing just parent groups on initial display
@@ -127,6 +133,7 @@ function buildGroupSelector( filterSearch, parentsOnlyArg ) {
         "aaSorting"  : [],
         "aoColumns"  : [
                         {sClass:'crm-group-name'},
+                        {sClass:'hide_column'},
                         {sClass:'crm-group-created_by'},
                         {sClass:'crm-group-description', bSortable:false},
                         {sClass:'crm-group-group_type'},
@@ -278,6 +285,7 @@ function showChildren( parent_id, showOrgInfo, group_id, levelClass) {
             else {
               appendHTML += '<td class="crm-group-name ' + levelClass + '"><span class="crm-no-children"></span>' + val.group_name + '</td>';
             }
+            //appendHTML += "<td>" + val.group_id + "</td>";
             appendHTML += "<td>" + val.created_by + "</td>";
             if (val.group_description) {
               appendHTML += "<td>" + val.group_description + "</td>";
