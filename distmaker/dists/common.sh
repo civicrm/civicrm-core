@@ -51,7 +51,7 @@ function dm_install_core() {
   local repo="$1"
   local to="$2"
 
-  for dir in css i js PEAR templates bin CRM api extern Reports install settings Civi ; do
+  for dir in css i js PEAR templates bin CRM api extern Reports install settings Civi partials ; do
     [ -d "$repo/$dir" ] && dm_install_dir "$repo/$dir" "$to/$dir"
   done
 
