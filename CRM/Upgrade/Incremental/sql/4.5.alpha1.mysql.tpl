@@ -532,10 +532,6 @@ ALTER TABLE civicrm_line_item ADD contribution_id INT(10) unsigned COMMENT 'Cont
 ALTER TABLE civicrm_line_item
 ADD CONSTRAINT `FK_civicrm_contribution_id` FOREIGN KEY (`contribution_id`) REFERENCES civicrm_contribution (`id`) ON DELETE SET NULL;
 
-ALTER TABLE `civicrm_line_item`
-DROP INDEX `UI_line_item_value`,
-ADD UNIQUE INDEX `UI_line_item_value` (`entity_table`, `entity_id`, `contribution_id`, `price_field_value_id`, `price_field_id`);
-
 -- store contribution id for participant records
 UPDATE  civicrm_line_item li LEFT JOIN civicrm_participant_payment pp ON pp.participant_id = li.entity_id
 SET li.contribution_id = pp.contribution_id
@@ -551,10 +547,15 @@ AND pv.membership_type_id IS NOT NULL
 AND membership_id IS NOT NULL;
 
 -- update line items for contributions with contribution id
-UPDATE civicrm_line_item cln
-LEFT JOIN civicrm_contribution cc ON cc.id = cln.entity_id AND cln.contribution_id  IS NULL and cln.entity_table = 'civicrm_contribution'
-SET contribution_id = entity_id
+UPDATE civicrm_line_item li
+LEFT JOIN civicrm_contribution cc ON cc.id = li.entity_id AND li.contribution_id IS NULL AND li.entity_table = 'civicrm_contribution'
+SET li.contribution_id = li.entity_id
 WHERE cc.id IS NOT NULL;
+
+-- update index to ensure that it is unique
+ALTER TABLE `civicrm_line_item`
+DROP INDEX `UI_line_item_value`,
+ADD UNIQUE INDEX `UI_line_item_value` (`entity_table`, `entity_id`, `contribution_id`, `price_field_value_id`, `price_field_id`);
 
 -- update case type menu
 UPDATE civicrm_navigation set url = 'civicrm/a/#/caseType' WHERE url LIKE 'civicrm/admin/options/case_type%';
