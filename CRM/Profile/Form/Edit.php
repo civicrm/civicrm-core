@@ -113,6 +113,13 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
 
     parent::preProcess();
 
+    // make sure the gid is set and valid
+    if (!$this->_gid) {
+      CRM_Core_Error::fatal(ts('The requested Profile (gid=%1) is disabled, OR there is no Profile with that ID, OR a valid \'gid=\' integer value is missing from the URL. Contact the site administrator if you need assistance.',
+          array(1 => $this->_gid)
+          ));
+    }
+
     // and also the profile is of type 'Profile'
     $query = "
 SELECT module
