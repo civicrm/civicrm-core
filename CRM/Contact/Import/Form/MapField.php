@@ -986,7 +986,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   function formatCustomFieldName(&$fields) {
     //CRM-2676, replacing the conflict for same custom field name from different custom group.
-    $fieldIds = $formattedFieldNames = self::$customFields = array();
+    $fieldIds = $formattedFieldNames = array();
     foreach ($fields as $key => $value) {
       if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key)) {
         $fieldIds[] = $customFieldId;
