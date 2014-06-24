@@ -94,12 +94,12 @@ var toContact = ccContact = bccContact = '';
 
 {literal}
 CRM.$(function($){
-  cj('#addcc').toggle( function() { cj(this).text('Remove CC');
+  cj('#addcc').toggleClick( function() { cj(this).text('Remove CC');
                                   cj('tr#cc').show().find('ul').find('input').focus();
                    },function() { cj(this).text('Add CC');cj('#cc_id').val('');
                                   cj('tr#cc ul li:not(:last)').remove();cj('#cc').hide();
 });
-  cj('#addbcc').toggle( function() { cj(this).text('Remove BCC');
+  cj('#addbcc').toggleClick( function() { cj(this).text('Remove BCC');
                                    cj('tr#bcc').show().find('ul').find('input').focus();
                     },function() { cj(this).text('Add BCC');cj('#bcc_id').val('');
                                    cj('tr#bcc ul li:not(:last)').remove();cj('#bcc').hide();
