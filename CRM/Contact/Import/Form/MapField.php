@@ -57,6 +57,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   protected $_dedupeFields;
 
+  protected static $customFields;
+
   /**
    * Attempt to match header labels with our mapper fields
    * FIXME: This is essentially the same function as parent::defaultFromHeader
@@ -152,8 +154,15 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
 
+    $formattedFieldNames = $this->formatCustomFieldName($this->_mapperFields);
+    self::$customFields = CRM_Core_BAO_CustomField::getFields($this->_contactType);
+    foreach(self::$customFields as $key => $attr) {
+      if (!empty($attr['is_required'])) {
+        $highlightedFields[] = "custom_$key";
+      }
+    }
     $this->assign('highlightedFields', $highlightedFields);
-    $this->_formattedFieldNames[$contactType] = $this->_mapperFields = array_merge($this->_mapperFields, $this->formatCustomFieldName($this->_mapperFields));
+    $this->_formattedFieldNames[$contactType] = $this->_mapperFields = array_merge($this->_mapperFields, $formattedFieldNames);
 
     $columnNames = array();
     //get original col headers from csv if present.
@@ -977,7 +986,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   function formatCustomFieldName(&$fields) {
     //CRM-2676, replacing the conflict for same custom field name from different custom group.
-    $fieldIds = $formattedFieldNames = array();
+    $fieldIds = $formattedFieldNames = self::$customFields = array();
     foreach ($fields as $key => $value) {
       if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key)) {
         $fieldIds[] = $customFieldId;
