@@ -1146,6 +1146,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         if (!array_key_exists($customFieldID, $customFields)) {
           self::addToErrorMsg(ts('field ID'), $errorMessage);
         }
+
+        if ($customFields[$customFieldID]['is_required'] && (empty($params['custom_'.$customFieldID]) && $params['custom_'.$customFieldID] !== 0) && $customFields[$customFieldID]['data_type'] == 'Boolean') {
+          self::addToErrorMsg($customFields[$customFieldID]['label'].'::'.$customFields[$customFieldID]['groupTitle'], $errorMessage);
+        }
+
         //For address custom fields, we do get actual custom field value as an inner array of
         //values so need to modify
         if (array_key_exists($customFieldID, $addressCustomFields)) {
@@ -1870,7 +1875,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           self::formatCustomDate($params, $formatted, $dateType, $key);
         }
         elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
-          $params[$key] = CRM_Utils_String::strtoboolstr($val);
+          if (empty($val) && !empty($params['id']) && !is_numeric($val) && $this->_onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
+            unset($params[$key]);
+          }
+          else {
+            $params[$key] = CRM_Utils_String::strtoboolstr($val);
           }
         }
 
@@ -1888,14 +1897,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         $params[$key] = $this->checkGender($val);
       }
     }
+   }
 
     //now format custom data.
     foreach ($params as $key => $field) {
-      if (!isset($field) || empty($field)){
-        unset($params[$key]);
-        continue;
-      }
-
       if (is_array($field)) {
         $isAddressCustomField = FALSE;
         foreach ($field as $value) {
