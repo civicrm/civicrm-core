@@ -153,7 +153,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         }
       }
     }
-
+    // retrieve and highlight required custom fields
     $formattedFieldNames = $this->formatCustomFieldName($this->_mapperFields);
     self::$customFields = CRM_Core_BAO_CustomField::getFields($this->_contactType);
     foreach(self::$customFields as $key => $attr) {

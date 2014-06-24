@@ -1146,7 +1146,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         if (!array_key_exists($customFieldID, $customFields)) {
           self::addToErrorMsg(ts('field ID'), $errorMessage);
         }
-
+        // validate null values for required custom fields of type boolean
         if ($customFields[$customFieldID]['is_required'] && (empty($params['custom_'.$customFieldID]) && $params['custom_'.$customFieldID] !== 0) && $customFields[$customFieldID]['data_type'] == 'Boolean') {
           self::addToErrorMsg($customFields[$customFieldID]['label'].'::'.$customFields[$customFieldID]['groupTitle'], $errorMessage);
         }
@@ -1792,7 +1792,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
                   }
                 }
                 else {
-                  if ($getValue[$cnt]['location_type_id'] == $params[$locKeys][$key]['location_type_id']) {
+                  if ((!empty($getValue[$cnt]['location_type_id']) && !empty($params[$locKeys][$key]['location_type_id'])) && $getValue[$cnt]['location_type_id'] == $params[$locKeys][$key]['location_type_id']) {
                     unset($params[$locKeys][$key]);
                   }
                 }
@@ -1875,7 +1875,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           self::formatCustomDate($params, $formatted, $dateType, $key);
         }
         elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
-          if (empty($val) && !empty($params['id']) && !is_numeric($val) && $this->_onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
+          if (empty($val) && !empty($params['id']) && !is_numeric($val) && $this->_onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {  //retain earlier value when Import mode is `Fill`
             unset($params[$key]);
           }
           else {
