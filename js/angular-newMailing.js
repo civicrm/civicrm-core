@@ -5,7 +5,9 @@
   };
 
   var crmMailing = angular.module('crmMailing', ['ngRoute', 'ui.utils']);
+  
 
+ 
 
 //-------------------------------------------------------------------------------------------------------
  crmMailing.config(['$routeProvider',
@@ -49,11 +51,27 @@
  
  
 crmMailing.controller('mailingCtrl', function($scope, crmApi, selectedMail) {
+	  
+//Making some dummy api to see if my from email, reply to email works. To see if all options come in select 
+//
+  $scope.cool_api= [
+    {'name': 'Nexus S',
+     'from_mail': 'rajgo94@gmail.com',
+     'reply_mail': 'rajgo94@gmail.com'  },
+    {'name': 'Motorola XOOM™ with Wi-Fi',
+     'from_mail': 'rajgo94@gmail2.com',
+     'reply_mail': 'rajgo94@gmail2.com'},
+    {'name': 'MOTOROLA XOOM™',
+     'from_mail': 'rajgo94@gmail3.com',
+     'reply_mail': 'rajgo94@gmail3.com'}
+  ];
+
   $scope.partialUrl = partialUrl;
 	$scope.campaignList =  CRM.crmMailing.campNames;
 	$scope.mailNameList = _.pluck(CRM.crmCaseType.civiMails, 'name');
 	$scope.groupNamesList = CRM.crmMailing.groupNames;
 	$scope.headerfooter = CRM.crmMailing.headerfooterList;
+	$scope.tmpList = CRM.crmMailing.mesTemplate;
 	$scope.incGroup = [];
 	$scope.excGroup = [];
 	$scope.testGroup = [];
@@ -93,8 +111,12 @@ crmMailing.controller('mailingCtrl', function($scope, crmApi, selectedMail) {
 	};
 	
 	$scope.isAuto= function(au){
-		return au.component_type == "Auto-responder";
+		return au.component_type == "Reply";
 	};
+	
+	$scope.isUserDriven= function(mstemp){
+		return (parseInt(mstemp.id)>58);
+	};	
 
 	$scope.trackr= function(trackreplies){
 		if(trackreplies=="1"){
@@ -114,10 +136,7 @@ crmMailing.controller('mailingCtrl', function($scope, crmApi, selectedMail) {
       }
     }; */
     
-    
-    
-
-	  $scope.save = function() {
+    $scope.save = function() {
 	    $scope.currentMailing.scheduled_date= $scope.scheddate.date + " " + $scope.scheddate.time ;
 			if($scope.currentMailing.scheduled_date!=" "){
 					$scope.currentMailing.scheduled_id= "202";
@@ -171,7 +190,7 @@ crmMailing.controller('mailingCtrl', function($scope, crmApi, selectedMail) {
     }); 
 
     
-    crmMailing.directive('chsgroup',function(){
+  crmMailing.directive('chsgroup',function(){
        return {
            restrict : 'AE',
            link: function(scope,element, attrs){
@@ -197,118 +216,48 @@ crmMailing.directive('chsdate',function(){
                     onSelect: function(date) {
                         $(".ui-datepicker a").removeAttr("href");
                         scope.dat =date;
-                        console.log(date);
                     }
                 });
             }
         };
     });
+
+
+
+crmMailing.controller('browse', function($scope){
+    $scope.fileList = [];
+    $('#fileupload').bind('fileuploadadd', function(e, data){
+        // Add the files to the list
+        numFiles = $scope.fileList.length
+        for (var i=0; i < data.files.length; ++i) {
+            var file = data.files[i];
+        // .$apply to update angular when something else makes changes
+        $scope.$apply(
+            $scope.fileList.push({name: file.name})
+            );
+        }
+        // Begin upload immediately
+        data.submit();
+    });
+});
+
     
+  crmMailing.directive('add',function(){
+       return {
+           restrict : 'AE',
+           link: function(scope,element, attrs){
+               $(document).ready(function(){
+									$('#fileupload').fileupload({
+									dataType: 'json'
+									});
+								});
 
-crmMailing.controller('browse', function(){
-FileUploadCtrl.$inject = ['$scope']
-function FileUploadCtrl(scope) {
-    //============== DRAG & DROP =============
-    // source for drag&drop: http://www.webappers.com/2011/09/28/drag-drop-file-upload-with-html5-javascript/
-    var dropbox = document.getElementById("dropbox")
-    scope.dropText = 'Drop files here...'
-
-    // init event handlers
-    function dragEnterLeave(evt) {
-        evt.stopPropagation()
-        evt.preventDefault()
-        scope.$apply(function(){
-            scope.dropText = 'Drop files here...'
-            scope.dropClass = ''
-        })
-    }
-    dropbox.addEventListener("dragenter", dragEnterLeave, false)
-    dropbox.addEventListener("dragleave", dragEnterLeave, false)
-    dropbox.addEventListener("dragover", function(evt) {
-        evt.stopPropagation()
-        evt.preventDefault()
-        var clazz = 'not-available'
-        var ok = evt.dataTransfer && evt.dataTransfer.types && evt.dataTransfer.types.indexOf('Files') >= 0
-        scope.$apply(function(){
-            scope.dropText = ok ? 'Drop files here...' : 'Only files are allowed!'
-            scope.dropClass = ok ? 'over' : 'not-available'
-        })
-    }, false)
-    dropbox.addEventListener("drop", function(evt) {
-        console.log('drop evt:', JSON.parse(JSON.stringify(evt.dataTransfer)))
-        evt.stopPropagation()
-        evt.preventDefault()
-        scope.$apply(function(){
-            scope.dropText = 'Drop files here...'
-            scope.dropClass = ''
-        })
-        var files = evt.dataTransfer.files
-        if (files.length > 0) {
-            scope.$apply(function(){
-                scope.files = []
-                for (var i = 0; i < files.length; i++) {
-                    scope.files.push(files[i])
-                }
-            })
-        }
-    }, false)
-    //============== DRAG & DROP =============
-
-    scope.setFiles = function(element) {
-    scope.$apply(function(scope) {
-      console.log('files:', element.files);
-      // Turn the FileList object into an Array
-        scope.files = []
-        for (var i = 0; i < element.files.length; i++) {
-          scope.files.push(element.files[i])
-        }
-      scope.progressVisible = false
-      });
-    };
-
-    scope.uploadFile = function() {
-        var fd = new FormData()
-        for (var i in scope.files) {
-            fd.append("uploadedFile", scope.files[i])
-        }
-        var xhr = new XMLHttpRequest()
-        xhr.upload.addEventListener("progress", uploadProgress, false)
-        xhr.addEventListener("load", uploadComplete, false)
-        xhr.addEventListener("error", uploadFailed, false)
-        xhr.addEventListener("abort", uploadCanceled, false)
-        xhr.open("POST", "/fileupload")
-        scope.progressVisible = true
-        xhr.send(fd)
-    }
-
-    function uploadProgress(evt) {
-        scope.$apply(function(){
-            if (evt.lengthComputable) {
-                scope.progress = Math.round(evt.loaded * 100 / evt.total)
-            } else {
-                scope.progress = 'unable to compute'
-            }
-        })
-    }
-
-    function uploadComplete(evt) {
-        /* This event is raised when the server send back a response */
-        alert(evt.target.responseText)
-    }
-
-    function uploadFailed(evt) {
-        alert("There was an error attempting to upload the file.")
-    }
-
-    function uploadCanceled(evt) {
-        scope.$apply(function(){
-            scope.progressVisible = false
-        })
-        alert("The upload has been canceled by the user or the browser dropped the connection.")
-    }
-}
-}); 
-
+			     
+          }
+       };
+		}); 
+    
+    
  crmMailing.controller('mailingListCtrl', function($scope, crmApi, mailingList) {
     $scope.mailingList = mailingList.values;
     $scope.mailStatus = _.pluck(CRM.crmMailing.mailStatus, 'status');

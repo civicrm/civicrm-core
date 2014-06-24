@@ -1,22 +1,22 @@
 <!-- based on: http://www.matlus.com/html5-file-upload-with-progress/ -->
-<body ng-controller="browse">
+<body>
 	<table>
 	  <tr>
 	    <td class="label">Attach Files</td>
 		<td>
-		  <input type="file" ng-model-instant id="fileToUpload" multiple onchange="angular.element(this).scope().setFiles(this)" />
+		  <input type="file"/>
 		</td>
 	  </tr>
 	  <tr>
 	    <td class="label">Attach Files</td>
 		<td>
-		  <input type="file" ng-model-instant id="fileToUpload2" multiple onchange="angular.element(this).scope().setFiles(this)" />
+		  <input type="file"/>
 		</td>
 	  </tr>
 	  <tr>
 	    <td class="label">Attach Files</td>
 		<td>
-		  <input type="file" ng-model-instant id="fileToUpload3" multiple onchange="angular.element(this).scope().setFiles(this)" />
+		  <input type="file"/>
 		</td>
 	  </tr>
 	  
@@ -24,31 +24,3 @@
 
 </body>
 
-
-
-<!-- 
-<html ng-app="app">
-<body ng-controller="FileUploadCtrl">
-    <div class="row">
-        <label for="fileToUpload">Select a File to Upload</label><br />
-        <input type="file" ng-model-instant id="fileToUpload" multiple onchange="angular.element(this).scope().setFiles(this)" />
-    </div>
-    <div id="dropbox" class="dropbox" ng-class="dropClass"><span>{{dropText}}</span></div>
-    <div ng-show="files.length">
-        <div ng-repeat="file in files.slice(0)">
-            <span>{{file.webkitRelativePath || file.name}}</span>
-            (<span ng-switch="file.size > 1024*1024">
-                <span ng-switch-when="true">{{file.size / 1024 / 1024 | number:2}} MB</span>
-                <span ng-switch-default>{{file.size / 1024 | number:2}} kB</span>
-            </span>)
-        </div>
-        <input type="button" ng-click="uploadFile()" value="Upload" />
-        <div ng-show="progressVisible">
-            <div class="percent">{{progress}}%</div>
-            <div class="progress-bar">
-                <div class="uploaded" ng-style="{'width': progress+'%'}"></div>
-            </div>
-        </div>
-    </div>
-</body>
-</html> -->
