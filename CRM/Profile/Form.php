@@ -245,10 +245,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
       $this->set('gid', $this->_gid);
     }
 
-    if (!$this->_gid) {
-      CRM_Core_Error::fatal(ts('The required parameter "gid" is missing or malformed.'));
-    }
-
     $this->_activityId = CRM_Utils_Request::retrieve('aid', 'Positive', $this, FALSE, 0, 'GET');
     if (is_numeric($this->_activityId)) {
       $latestRevisionId = CRM_Activity_BAO_Activity::getLatestActivityId($this->_activityId);
@@ -268,14 +264,14 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $this->_ufGroup = (array) $dao;
       }
       $dao->free();
+
+      if (!CRM_Utils_Array::value('is_active', $this->_ufGroup)) {
+        CRM_Core_Error::fatal(ts('The requested profile (gid=%1) is inactive or does not exist.', array(
+          1 => $this->_gid,
+        )));
+      }
     }
     $this->assign('ufGroupName', $this->_ufGroup['name']);
-
-    if (!CRM_Utils_Array::value('is_active', $this->_ufGroup)) {
-      CRM_Core_Error::fatal(ts('The requested profile (gid=%1) is inactive or does not exist.', array(
-        1 => $this->_gid,
-      )));
-    }
 
     $gids = empty($this->_profileIds) ? $this->_gid : $this->_profileIds;
 
