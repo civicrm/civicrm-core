@@ -18,7 +18,7 @@ ADD UNIQUE INDEX UI_name ( name );
 DELETE FROM civicrm_currency WHERE name = 'EEK';
 
 -- CRM-8769
-INSERT INTO civicrm_state_province
+INSERT IGNORE INTO civicrm_state_province
   (`name`, `abbreviation`, `country_id`)
 VALUES
   ('Metropolitan Manila' , 'MNL', '1170');
