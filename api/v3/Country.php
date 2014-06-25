@@ -61,10 +61,7 @@ function civicrm_api3_country_create($params) {
  * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_country_create_spec(&$params) {
-  // TODO a 'clever' default should be introduced
-  $params['is_primary']['api.default'] = 0;
-  $params['country']['api.required'] = 1;
-  $params['contact_id']['api.required'] = 1;
+  $params['name']['api.required'] = 1;
 }
 
 /**
