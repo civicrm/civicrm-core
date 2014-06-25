@@ -113,31 +113,30 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
 
     parent::preProcess();
 
-      // and also the profile is of type 'Profile'
-      $query = "
+    // and also the profile is of type 'Profile'
+    $query = "
 SELECT module,is_reserved
   FROM civicrm_uf_group
   LEFT JOIN civicrm_uf_join ON uf_group_id = civicrm_uf_group.id
   WHERE civicrm_uf_group.id = %1
 ";
 
-      $params = array(1 => array($this->_gid, 'Integer'));
-      $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $params = array(1 => array($this->_gid, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
 
-      $isProfile = false;
-      while ($dao->fetch()) {
-          $isProfile = ($isProfile || ($dao->module == "Profile"));
-      }
+    $isProfile = FALSE;
+    while ($dao->fetch()) {
+      $isProfile = ($isProfile || ($dao->module == "Profile"));
+    }
 
+    //Check that the user has the "add contacts" Permission
+    $canAdd = CRM_Core_Permission::check("add contacts");
 
-      //Check that the user has the "add contacts" Permission
-      $canAdd = CRM_Core_Permission::check("add contacts");
-
-      //Remove need for Profile module type when using reserved profiles [CRM-14488]
-      if( !$dao->N || (!$isProfile && !($dao->is_reserved && $canAdd))) {
+    //Remove need for Profile module type when using reserved profiles [CRM-14488]
+    if (!$dao->N || (!$isProfile && !($dao->is_reserved && $canAdd))) {
       CRM_Core_Error::fatal(ts('The requested Profile (gid=%1) is not configured to be used for \'Profile\' edit and view forms in its Settings. Contact the site administrator if you need assistance.',
-          array(1 => $this->_gid)
-        ));
+        array(1 => $this->_gid)
+      ));
     }
   }
 
