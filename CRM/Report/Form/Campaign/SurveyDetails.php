@@ -81,7 +81,12 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
       'civicrm_activity_contact' =>
       array(
         'dao' => 'CRM_Activity_DAO_ActivityContact',
-        'fields' => array('contact_id' => array('title' => ts('Interviewer Name'))),
+        'fields' => array(
+          'contact_id' => array(
+            'title' => ts('Interviewer Name'),
+            'dbAlias' => 'civicrm_activity_assignment.contact_id',
+          )
+        ),
         'filters' => array(
           'contact_id' => array('name' => 'contact_id',
             'alias' => 'civicrm_activity_assignment',
@@ -612,8 +617,8 @@ INNER JOIN  civicrm_option_value val ON ( val.option_group_id = survey.result_id
       }
 
 
-      if (array_key_exists('civicrm_activity_assignment_assignee_contact_id', $row)) {
-        $rows[$rowNum]['civicrm_activity_assignment_assignee_contact_id'] = CRM_Utils_Array::value($row['civicrm_activity_assignment_assignee_contact_id'],
+      if (array_key_exists('civicrm_activity_contact_contact_id', $row)) {
+        $rows[$rowNum]['civicrm_activity_contact_contact_id'] = CRM_Utils_Array::value($row['civicrm_activity_contact_contact_id'],
           CRM_Campaign_BAO_Survey::getInterviewers()
         );
         $entryFound = TRUE;
