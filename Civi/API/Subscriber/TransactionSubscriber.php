@@ -58,6 +58,9 @@ class TransactionSubscriber implements EventSubscriberInterface {
    * @return bool
    */
   public function isTransactional($apiProvider, $apiRequest) {
+    if (isset($apiRequest['params']['is_transactional'])) {
+      return \CRM_Utils_String::strtobool($apiRequest['params']['is_transactional']);
+    }
     return strtolower($apiRequest['action']) == 'create' || strtolower($apiRequest['action']) == 'delete' || strtolower($apiRequest['action']) == 'submit';
   }
 
