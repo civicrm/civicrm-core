@@ -61,6 +61,10 @@
           <th>{ts}Default{/ts}</th>
           <th>{ts}Financial Type{/ts}</th>
             <th id="order" class="sortable">{ts}Order{/ts}</th>
+            {if $getTaxDetails}
+              <th>{ts}Tax Label{/ts}</th>
+              <th>{ts}Tax Amount{/ts}</th>
+            {/if}
           <th>{ts}Enabled?{/ts}</th>
             <th></th>
             <th class="hiddenElement"></th>
@@ -73,6 +77,16 @@
       <td class="crm-price-option-is_default">{if $row.is_default}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}</td>
       <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id}</td>
             <td class="nowrap crm-price-option-order">{$row.weight}</td>
+            {if $getTaxDetails}
+              <td>{if $row.tax_rate != '' }
+                    {if $row.tax_rate == 0.00}
+                      VAT(Exempt)
+                    {else}
+                      VAT({$row.tax_rate|string_format:"%.2f"}%)
+                    {/if}
+                  {/if}</td>
+              <td>{$row.tax_amount|crmMoney}</td>
+            {/if}
             <td id="row_{$row.id}_status" class="crm-price-option-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td>{$row.action|replace:'xx':$row.id}</td>
             <td class="order hiddenElement">{$row.weight}</td>
