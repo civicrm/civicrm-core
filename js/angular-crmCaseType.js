@@ -232,6 +232,7 @@
       result.success(function(data) {
         if (data.is_error == 0) {
           $scope.caseType.id = data.id;
+          window.location.href = '#/caseType';
         }
       });
     };
