@@ -4,7 +4,7 @@
     return CRM.resourceUrls['civicrm'] + '/partials/crmCaseType/' + relPath;
   };
 
-  var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils']);
+  var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils', 'crmUi']);
 
   var newCaseTypeDefinitionTemplate = {
     activityTypes: [
@@ -106,6 +106,7 @@
     $scope.activityTypes = CRM.crmCaseType.actTypes;
     $scope.activityTypeNames = _.pluck(CRM.crmCaseType.actTypes, 'name');
     $scope.relationshipTypeNames = _.pluck(CRM.crmCaseType.relTypes, 'label_b_a'); // label_b_a is CRM_Case_XMLProcessor::REL_TYPE_CNAME
+    $scope.locks = {caseTypeName: true};
 
     $scope.workflows = {
       'timeline': 'Timeline',
@@ -139,7 +140,11 @@
     /// Add a new activity entry to an activity-set
     $scope.addActivity = function(activitySet, activityType) {
       activitySet.activityTypes.push({
-        name: activityType
+        name: activityType,
+        status: 'Scheduled',
+        reference_activity: 'Open Case',
+        reference_offset: '1',
+        reference_select: 'newest'
       });
       if (!_.contains($scope.activityTypeNames, activityType)) {
         $scope.activityTypeNames.push(activityType);
@@ -242,6 +247,15 @@
         $('.crmCaseType-acttab').tabs('refresh');
       });
     });
+
+    var updateCaseTypeName = function () {
+      if (!$scope.caseType.id && $scope.locks.caseTypeName) {
+        // Should we do some filtering? Lowercase? Strip whitespace?
+        $scope.caseType.name = $scope.caseType.title;
+      }
+    };
+    $scope.$watch('locks.caseTypeName', updateCaseTypeName);
+    $scope.$watch('caseType.title', updateCaseTypeName);
   });
 
   crmCaseType.controller('CaseTypeListCtrl', function($scope, crmApi, caseTypes) {
