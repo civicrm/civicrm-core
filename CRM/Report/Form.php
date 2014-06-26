@@ -2995,14 +2995,14 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     
     $tmp_membership_org_sql_list = implode(', ', $value);
     return " {$this->_aliases['civicrm_contact']}.id {$sqlOp} (
-                          SELECT DISTINCT mem.contact_id
-                  			  FROM civicrm_membership mem 
-                  			  LEFT JOIN civicrm_membership_status mem_status ON mem.status_id = mem_status.id
-                  			  LEFT JOIN civicrm_membership_type mt ON mem.membership_type_id = mt.id 
-                  			  WHERE mt.member_of_contact_id IN (".$tmp_membership_org_sql_list.")
-                  			  AND mt.is_active = '1'
-                  			  AND mem_status.is_current_member = '1'
-                    		  AND mem_status.is_active = '1' )  ";
+													SELECT DISTINCT mem.contact_id
+													FROM civicrm_membership mem 
+													LEFT JOIN civicrm_membership_status mem_status ON mem.status_id = mem_status.id
+													LEFT JOIN civicrm_membership_type mt ON mem.membership_type_id = mt.id 
+													WHERE mt.member_of_contact_id IN (".$tmp_membership_org_sql_list.")
+													AND mt.is_active = '1'
+													AND mem_status.is_current_member = '1'
+													AND mem_status.is_active = '1' )  ";
     }    
 
   function whereMembershipTypeClause($field, $value, $op) {
@@ -3013,14 +3013,14 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       
     $tmp_membership_sql_list  = implode(', ', $value);
     return " {$this->_aliases['civicrm_contact']}.id {$sqlOp} (
-                          SELECT DISTINCT mem.contact_id
-        								  FROM civicrm_membership mem 
-        								  LEFT JOIN civicrm_membership_status mem_status ON mem.status_id = mem_status.id 
-        								  LEFT JOIN civicrm_membership_type mt ON mem.membership_type_id = mt.id 
-        								  WHERE mem.membership_type_id IN (".$tmp_membership_sql_list.")
-        								  AND mt.is_active = '1'
-          							  AND mem_status.is_current_member = '1'
-        								  AND mem_status.is_active = '1' ) ";
+													SELECT DISTINCT mem.contact_id
+													FROM civicrm_membership mem 
+													LEFT JOIN civicrm_membership_status mem_status ON mem.status_id = mem_status.id 
+													LEFT JOIN civicrm_membership_type mt ON mem.membership_type_id = mt.id 
+													WHERE mem.membership_type_id IN (".$tmp_membership_sql_list.")
+													AND mt.is_active = '1'
+													AND mem_status.is_current_member = '1'
+													AND mem_status.is_active = '1' ) ";
   }
     
   /**
