@@ -109,6 +109,10 @@
                   <div class="clear"></div>
                     {/foreach}
                 </div>
+                {if $totalTaxAmount}
+                  <div class="content bold">{ts}Tax Total{/ts}:&nbsp;&nbsp;{$totalTaxAmount|crmMoney}</div>
+                  <div class="clear"></div>
+                {/if}
                 {if $totalAmount}
                  <div class="crm-section no-label total-amount-section">
                     <div class="content bold">{ts}Event Total{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney}</div>

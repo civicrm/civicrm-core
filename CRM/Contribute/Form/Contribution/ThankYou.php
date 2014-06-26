@@ -119,6 +119,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('useForMember', $this->get('useForMember'));
 
     $params = $this->_params;
+    $this->assign('totalTaxAmount', $params['tax_amount']);
     if ($this->_honor_block_is_active && !empty($params['soft_credit_type_id'])) {
       $honorName = null;
       $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
