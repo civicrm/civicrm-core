@@ -156,6 +156,13 @@ class CRM_Core_InnoDBIndexer {
    * @return array (string $indexName => string $indexName)
    */
   public function findActualFtsIndexNames($table) {
+    $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+    if (version_compare($mysqlVersion, '5.6', '<')) {
+      // If we're not on 5.6+, then there cannot be any InnoDB FTS indices!
+      // Also: information_schema.innodb_sys_indexes is only available on 5.6+.
+      return array();
+    }
+
     // Note: this only works in MySQL 5.6,  but this whole system is intended to only work in MySQL 5.6
     $sql = "
       SELECT i.name as index_name
