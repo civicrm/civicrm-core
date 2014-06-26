@@ -181,6 +181,11 @@ registration process.{/ts}</p>
              <th>{ts}Item{/ts}</th>
              <th>{ts}Qty{/ts}</th>
              <th>{ts}Each{/ts}</th>
+             {if $totalTaxAmount}
+              <th>{ts}SubTotal{/ts}</th>
+              <th>{ts}Tax Rate{/ts}</th>
+              <th>{ts}Tax Amount{/ts}</th>
+             {/if}
              <th>{ts}Total{/ts}</th>
        {if $pricesetFieldsCount }<th>{ts}Total Participants{/ts}</th>{/if}
             </tr>
@@ -195,6 +200,17 @@ registration process.{/ts}</p>
               <td>
                {$line.unit_price|crmMoney}
               </td>
+              {if $totalTaxAmount}
+               <td>
+                {$line.unit_price*$line.qty|crmMoney}
+               </td>
+               <td>
+                {$line.tax_rate|crmMoney}
+               </td>
+               <td>
+                {$line.tax_amount|crmMoney}
+               </td>
+              {/if}
               <td>
                {$line.line_total|crmMoney}
               </td>
@@ -210,6 +226,27 @@ registration process.{/ts}</p>
          </tr>
         {/if}
        {/foreach}
+       {if $dataArray && $totalTaxAmount}
+        <tr>
+         <td {$labelStyle}>
+          {ts} Amount Before Tax : {/ts}
+         </td>
+         <td {$valueStyle}>
+          {$totalAmount-$totalTaxAmount|crmMoney}
+         </td>
+        </tr>
+        {foreach from=$dataArray item=value key=priceset}
+          <tr>
+           {if $priceset}
+             <td>&nbsp;Vat {$priceset|string_format:"%.2f"}%</td>    
+             <td>&nbsp;{$value|crmMoney:$currency}</td>
+           {elseif  $priceset == 0}
+             <td>&nbsp;No Vat </td>
+             <td>&nbsp;{$value|crmMoney:$currency}</td>
+           {/if}
+          </tr>
+        {/foreach}
+       {/if}
       {/if}
 
       {if $amount && !$lineItem}
@@ -220,6 +257,16 @@ registration process.{/ts}</p>
          </td>
         </tr>
        {/foreach}
+      {/if}
+      {if $totalTaxAmount}
+       <tr>
+        <td {$labelStyle}>
+         {ts}Total Tax Amount{/ts}
+        </td>
+        <td {$valueStyle}>
+         {$totalTaxAmount|crmMoney:$currency}
+        </td>
+       </tr>
       {/if}
       {if $isPrimary}
        <tr>
