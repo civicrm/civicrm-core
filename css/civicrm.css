@@ -4672,3 +4672,21 @@ span.crm-status-icon {
 .crm-container .survey-completed {
   text-decoration: line-through;
 }
+
+.crm-printButton {
+  padding-left: 469px;
+}
+
+.crm-invoiceButton {
+  text-shadow: 0 1px 0 black;
+  background: #70716B url(../i/crm-button-bg.gif) repeat-x top left;
+  color: #FFFFFF !important;
+  font-size: 13px;
+  font-weight: normal;
+  margin-right: 16px;
+  padding: 2px 6px;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid #3e3e3e;
+  border-radius: 3px 3px 3px 3px;
+}
