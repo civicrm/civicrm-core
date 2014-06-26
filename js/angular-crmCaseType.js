@@ -139,7 +139,11 @@
     /// Add a new activity entry to an activity-set
     $scope.addActivity = function(activitySet, activityType) {
       activitySet.activityTypes.push({
-        name: activityType
+        name: activityType,
+        status: 'Scheduled',
+        reference_activity: 'Open Case',
+        reference_offset: '1',
+        reference_select: 'newest'
       });
       if (!_.contains($scope.activityTypeNames, activityType)) {
         $scope.activityTypeNames.push(activityType);
