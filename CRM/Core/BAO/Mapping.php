@@ -100,13 +100,13 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * contact object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params         (reference) an assoc array of name/value pairs
+   * @param array  $params an array of name/value pairs
    *
    * @return object    CRM_Core_DAO_Mapper object on success, otherwise null
    * @access public
    * @static
    */
-  static function add(&$params) {
+  static function add($params) {
     $mapping = new CRM_Core_DAO_Mapping();
     $mapping->copyValues($params);
     $mapping->save();
@@ -988,7 +988,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @return array $returnFields  formatted associated array of elements@static
    * @public
    */
-  static function &formattedFields(&$params, $row = FALSE) {
+  static function formattedFields(&$params, $row = FALSE) {
     $fields = array();
 
     if (empty($params) || !isset($params['mapper'])) {
