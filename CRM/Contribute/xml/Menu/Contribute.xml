@@ -300,4 +300,22 @@
     <access_arguments>access CiviContribute,administer CiviCRM</access_arguments>
     <adminGroup>CiviContribute</adminGroup>
   </item>
+  <item>
+    <path>civicrm/contribute/invoice</path>
+    <title>CiviContributePdf</title>
+    <page_callback>CRM_Financial_Page_AJAX::getPrintPDF</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <weight>620</weight>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/contribute/invoice/email</path>
+    <title>CiviContributePdf</title>
+    <page_callback>CRM_Contribute_Form_Task_Invoice</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <weight>630</weight>
+    <component>CiviContribute</component>
+  </item>
 </menu>
