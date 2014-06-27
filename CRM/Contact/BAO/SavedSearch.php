@@ -137,7 +137,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    */
   static function getSearchParams($id) {
     $fv = self::getFormValues($id);
-    //check if the saved seach has mapping id
+    //check if the saved search has mapping id
     if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $id, 'mapping_id')) {
       return CRM_Core_BAO_Mapping::formattedFields($fv);
     }
