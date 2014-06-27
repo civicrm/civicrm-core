@@ -712,7 +712,7 @@ UNION (
     $elements = explode(',', $pathArgs);
     //CRM_Core_Error::debug( 'e', $elements );
     foreach ($elements as $keyVal) {
-      list($key, $val) = explode('=', $keyVal);
+      list($key, $val) = explode('=', $keyVal, 2);
       $arr[$key] = $val;
     }
 
