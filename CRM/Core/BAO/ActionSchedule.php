@@ -614,11 +614,12 @@ WHERE   cas.entity_value = $id AND
     $tokenFields = array();
     $session = CRM_Core_Session::singleton();
 
-    if ($actionSchedule->from_email)
-      $fromEmailAddress = "$actionSchedule->from_name <$actionSchedule->from_email>";
-
     while ($actionSchedule->fetch()) {
       $extraSelect = $extraJoin = $extraWhere = $extraOn = '';
+
+    if ($actionSchedule->from_email)
+            $fromEmailAddress = "$actionSchedule->from_name <$actionSchedule->from_email>";
+
 
       if ($actionSchedule->record_activity) {
         if ($mapping->entity == 'civicrm_membership') {

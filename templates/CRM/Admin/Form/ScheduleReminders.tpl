@@ -72,8 +72,8 @@
      </td>
     </tr>
     <tr>
-      <td class="label" width="20%">{$form.from_email.label}</td>
-      <td>{$form.from_email.html}&nbsp;&nbsp;</td>
+      <td class="label" width="20%">{$form.from_name.label}</td>
+      <td>{$form.from_name.html}&nbsp;&nbsp;</td>
     </tr>
     <tr>
       <td class="label" width="20%">{$form.from_email.label}</td>
