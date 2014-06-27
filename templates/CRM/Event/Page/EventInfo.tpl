@@ -216,7 +216,11 @@
                       <tr>
                           <td class="{$lClass} crm-event-label">{$feeBlock.label.$idx}</td>
                           {if $isPriceSet & $feeBlock.isDisplayAmount.$idx}
-                          <td class="fee_amount-value right">{$feeBlock.value.$idx|crmMoney}</td>
+                              {if $feeBlock.tax_amount.$idx}
+                               <td class="fee_amount-value right">{$feeBlock.value.$idx}</td>
+                              {else}
+                               <td class="fee_amount-value right">{$feeBlock.value.$idx|crmMoney}</td>
+                              {/if}
                           {/if}
                       </tr>
                       {/if}
