@@ -848,7 +848,6 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
                               civicrm_email.email as email,
                               civicrm_phone.phone as phone,
                               civicrm_contact.id as civicrm_contact_id,
-                              civicrm_contact.contact_type as contact_type,
                               civicrm_relationship.contact_id_b as contact_id_b,
                               civicrm_relationship.contact_id_a as contact_id_a,
                               civicrm_relationship_type.id as civicrm_relationship_type_id,
@@ -862,11 +861,13 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
 
       if ($direction == 'a_b') {
         $select .= ', civicrm_relationship_type.label_a_b as label_a_b,
-                              civicrm_relationship_type.label_b_a as relation ';
+                              civicrm_relationship_type.label_b_a as relation,
+                              civicrm_contact.contact_type as contact_type_a_b ';
       }
       else {
         $select .= ', civicrm_relationship_type.label_a_b as label_a_b,
-                              civicrm_relationship_type.label_a_b as relation ';
+                              civicrm_relationship_type.label_a_b as relation,
+                              civicrm_contact.contact_type as contact_type_b_a ';
       }
     }
 
@@ -1054,6 +1055,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         $values[$rid]['cid'] = $cid;
         $values[$rid]['contact_id_a'] = $relationship->contact_id_a;
         $values[$rid]['contact_id_b'] = $relationship->contact_id_b;
+        $values[$rid]['contact_type_a_b'] = $relationship->contact_type_a_b;
+        $values[$rid]['contact_type_b_a'] = $relationship->contact_type_b_a;
         $values[$rid]['relationship_type_id'] = $relationship->civicrm_relationship_type_id;
         $values[$rid]['relation'] = $relationship->relation;
         $values[$rid]['name'] = $relationship->sort_name;
@@ -1706,9 +1709,7 @@ AND cc.sort_name LIKE '%$name%'";
       // format params
       foreach ($relationships as $relationshipId => $values) {
         //Add image icon for related contacts: CRM-14919
-        $subType = CRM_Contact_BAO_Contact::getContactSubType($values['cid']);
-        $cType = CRM_Contact_BAO_Contact::getContactType($values['cid']);
-        $icon = CRM_Contact_BAO_Contact_Utils::getImage($subType ? $subType : $cType,
+        $icon = CRM_Contact_BAO_Contact_Utils::getImage($values['contact_type_a_b'],
           FALSE,
           $values['cid']
         );
