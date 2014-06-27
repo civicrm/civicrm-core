@@ -153,16 +153,31 @@ class api_v3_CaseTypeTest extends CiviUnitTestCase {
    * test create methods with xml file
    * success expected
    */
-  function testCaseTypeCreateWithXML() {
-    $caseXMLFile = dirname(__FILE__) . '/dataset/sample_case.xml';
-
+  function testCaseTypeCreateWithDefinition() {
     // Create Case Type
     $params = array(
-      'title' => 'Application with XML',
-      'name' => 'Application_with_XML',
+      'title' => 'Application with Definition',
+      'name' => 'Application_with_Definition',
       'is_active' => 1,
       'weight' => 4,
-      'definition' => file_get_contents($caseXMLFile),
+      'definition' => array(
+        'activityTypes' => array(
+          array('name' => 'First act'),
+        ),
+        'activitySets' => array(
+          array(
+            'name' => 'set1',
+            'label' => 'Label 1',
+            'timeline' => 1,
+            'activityTypes' => array(
+              array('name' => 'Open Case', 'status' => 'Completed'),
+            ),
+          ),
+        ),
+        'caseRoles' => array(
+          array('name' => 'First role', 'creator' => 1, 'manager' => 1),
+        ),
+      )
     );
 
     $result = $this->callAPISuccess('CaseType', 'create', $params);
@@ -172,7 +187,7 @@ class api_v3_CaseTypeTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('CaseType', 'get', array('id' => $id));
     $this->assertEquals($result['values'][$id]['id'], $id, 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$id]['title'], $params['title'], 'in line ' . __LINE__);
-    $this->assertEquals($result['values'][$id]['xml_definition'], $params['xml_definition'], 'in line ' . __LINE__);
+    $this->assertEquals($result['values'][$id]['definition'], $params['definition'], 'in line ' . __LINE__);
   }
 }
 
