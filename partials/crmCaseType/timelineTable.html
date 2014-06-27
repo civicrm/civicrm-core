@@ -22,6 +22,8 @@ Required vars: activitySet
     </td>
     <td>
       <select
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true}"
         ng-model="activity.status"
         ng-options="actStatus.name as actStatus.name for actStatus in activityStatuses|orderBy:'name'"
         >
@@ -30,6 +32,8 @@ Required vars: activitySet
     </td>
     <td>
       <select
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true}"
         ng-model="activity.reference_activity"
         ng-options="actType.name as actType.name for actType in activityTypes|orderBy:'name'"
         ng-hide="activity.name == 'Open Case'"
@@ -48,6 +52,8 @@ Required vars: activitySet
     </td>
     <td>
       <select
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true}"
         ng-model="activity.reference_select"
         ng-options="key as value for (key,value) in {newest: 'Newest', oldest: 'Oldest'}"
         ng-hide="activity.name == 'Open Case'"

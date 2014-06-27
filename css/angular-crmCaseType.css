@@ -28,3 +28,7 @@
 .crmCaseType .add-activity {
     width: 50%;
 }
+
+.crmCaseType table td select {
+    width: 10em;
+}
