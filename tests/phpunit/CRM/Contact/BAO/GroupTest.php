@@ -133,7 +133,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    * SELECT * FROM civicrm_saved_search WHERE mapping_id = @mappingID;
    * SELECT g.* FROM civicrm_saved_search s LEFT JOIN civicrm_group g ON g.saved_search_id =  s.id WHERE  mapping_id = @mappingID;
    *
-   *  Copy the output to a single xml file and place in the SavedSearchDataSets folder - use the group number as the prefix.
+   *  Copy the output to a single sql file and place in the SavedSearchDataSets folder - use the group number as the prefix.
    *  Try to keep as much of the real world irregular glory as you can! Don't change the table ids to be number 1 as this can hide errors
    */
   function testGroupData() {
@@ -142,6 +142,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       $group = new CRM_Contact_BAO_Group();
       $group->id = $groupID;
       $group->find(TRUE);
+
       CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
     }
   }
