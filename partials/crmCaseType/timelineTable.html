@@ -35,7 +35,7 @@ Required vars: activitySet
         ui-jq="select2"
         ui-options="{dropdownAutoWidth : true}"
         ng-model="activity.reference_activity"
-        ng-options="actType.name as actType.name for actType in activityTypes|orderBy:'name'"
+        ng-options="actTypeName as actTypeName for actTypeName in activityTypeNames"
         ng-hide="activity.name == 'Open Case'"
         >
       </select>
