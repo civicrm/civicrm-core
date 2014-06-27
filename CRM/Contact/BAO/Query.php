@@ -2514,6 +2514,9 @@ class CRM_Contact_BAO_Query {
           elseif (strpos($name, '-phone') != 0) {
             $locationTypeName = 'phone';
           }
+          elseif (strpos($name, '-email') != 0) {
+            $locationTypeName = 'email';
+          }
           if($locationTypeName) {
             //we have a join on an location table - possibly in conjunction with search builder - CRM-14263
             $parts = explode('-', $name);
