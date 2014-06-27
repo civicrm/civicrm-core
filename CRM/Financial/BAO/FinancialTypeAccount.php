@@ -89,7 +89,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   static function add(&$params, &$ids = NULL) {
     // action is taken depending upon the mode
     $financialTypeAccount = new CRM_Financial_DAO_EntityFinancialAccount();
-    if ($params['entity_table'] != 'civicrm_financial_type') {
+    if ($params['entity_table'] != 'civicrm_financial_type' && !empty($ids)) {
       $financialTypeAccount->entity_id = $params['entity_id'];
       $financialTypeAccount->entity_table = $params['entity_table'];
       $financialTypeAccount->find(TRUE);
@@ -252,7 +252,15 @@ WHERE cog.name = 'payment_instrument' ";
       'account_type_code' => 'INC',
       'is_active' => 1,
     );
+    // Add financial account if not already present.
+    $financialTypeName = array('name' => $financialType->name);
+    $financialAccountObject = CRM_Financial_BAO_FinancialAccount::retrieve($financialTypeName, $defaults);
+    if (empty($financialAccountObject->name)) {
     $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, CRM_Core_DAO::$_nullArray);
+    }
+    else {
+      $financialAccount->id = $financialAccountObject->id;
+    }
     $params = array (
       'entity_table' => 'civicrm_financial_type',
       'entity_id' => $financialType->id,
