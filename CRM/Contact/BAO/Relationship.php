@@ -1705,7 +1705,14 @@ AND cc.sort_name LIKE '%$name%'";
 
       // format params
       foreach ($relationships as $relationshipId => $values) {
-        $contactRelationships[$relationshipId]['name'] = CRM_Utils_System::href(
+        //Add image icon for related contacts: CRM-14919
+        $subType = CRM_Contact_BAO_Contact::getContactSubType($values['cid']);
+        $cType = CRM_Contact_BAO_Contact::getContactType($values['cid']);
+        $icon = CRM_Contact_BAO_Contact_Utils::getImage($subType ? $subType : $cType,
+          FALSE,
+          $values['cid']
+        );
+        $contactRelationships[$relationshipId]['name'] = $icon.' '.CRM_Utils_System::href(
           $values['name'],
           'civicrm/contact/view',
           "reset=1&cid={$values['cid']}");
