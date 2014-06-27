@@ -119,6 +119,7 @@
 
         {if $ppID}{ts}<a href='#' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
         <br /><span class="description">{ts}Total amount of this contribution.{/ts}{if $hasPriceSets} {ts}Alternatively, you can use a price set.{/ts}{/if}</span>
+        <br /><span id="totalTaxAmount" class="label"></span>
       </td>
     </tr>
 
@@ -621,5 +622,35 @@ cj('#fee_amount').change( function() {
     cj('#net_amount').val(netAmount);
   }
 });
+
+cj("#financial_type_id").on("change",function(){
+    cj('#total_amount').trigger("change");
+})
+
+cj('#total_amount').on("change",function(event) {
+if(event.handled !== true) {
+    var financialType = cj('#financial_type_id').val();
+    var taxRates = '{/literal}{$taxRates}{literal}';
+    var taxRates = JSON.parse(taxRates);
+    var taxRate = taxRates[financialType];   
+    var totalAmount = cj('#total_amount').val();
+    var taxAmount = calculateTaxAmount(totalAmount,taxRate);
+    var totalTaxAmount = Number(taxAmount)+Number(totalAmount);
+    cj( "#totalTaxAmount" ).html('Total Amount : '+totalTaxAmount);
+    event.handled = true;
+    }
+     return false;
+});
+
+function calculateTaxAmount(totalAmount,taxRate) {
+    var taxAmount = (taxRate/100)*totalAmount;
+    if(!taxAmount){
+	cj('#totalTaxAmount').html('Total Amount : '+totalAmount);
+    	return false;
+    }
+    else{
+	return taxAmount;
+    }
+}
 </script>
 {/literal}
