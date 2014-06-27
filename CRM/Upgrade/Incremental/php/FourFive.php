@@ -57,6 +57,12 @@ class CRM_Upgrade_Incremental_php_FourFive {
    * @return void
    */
   function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    if ($rev == '4.5.alpha3') {
+      $caseTypeIssues = self::getCaseTypeNameIssues();
+      if ($caseTypeIssues) {
+        $preUpgradeMessage .= '<br/>' . $this->formatCaseTypeNameIssues($caseTypeIssues);
+      }
+    }
   }
 
   /**
@@ -71,6 +77,12 @@ class CRM_Upgrade_Incremental_php_FourFive {
       $postUpgradeMessage .= '<br /><br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Contributions - Receipt (off-line)</li><li>Contributions - Receipt (on-line)</li><li>Memberships - Receipt (on-line)</li><li>Pledges - Acknowledgement</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages). (<a href="%1">learn more...</a>)', array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Updating+System+Workflow+Message+Templates+after+Upgrades+-+method+1+-+kdiff'));
       $postUpgradeMessage .= '<br /><br />' . ts('This release allows you to view and edit multiple-record custom field sets in a table format which will be more usable in some cases. You can try out the format by navigating to Administer > Custom Data & Screens > Custom Fields. Click Settings for a custom field set and change Display Style to "Tab with Tables".');
       $postUpgradeMessage .= '<br /><br />' . ts('This release changes the way that anonymous event registrations match participants with existing contacts.  By default, all event participants will be matched with existing individuals using the Unsupervised rule, even if multiple registrations with the same email address are allowed.  However, you can now select a different matching rule to use for each event.  Please review your events to make sure you choose the appropriate matching rule and collect sufficient information for it to match contacts.');
+    }
+    if ($rev == '4.5.alpha3') {
+      $caseTypeIssues = self::getCaseTypeNameIssues();
+      if ($caseTypeIssues) {
+        $postUpgradeMessage .= '<br/>' . $this->formatCaseTypeNameIssues($caseTypeIssues);
+      }
     }
   }
 
@@ -194,6 +206,56 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
     }
 
     return TRUE;
+  }
+
+  /**
+   * In 4.4, it was required that the CaseType XML file be
+   * named "mungeCaseType($dao->name)". In 4.5, the requirement
+   * is simply that the file be named "$dao->name".
+   *
+   * @return array (string $nameInDB => string $nameOfFile)
+   */
+  static function getCaseTypeNameIssues() {
+    if (CRM_Core_DAO::checkTableExists('civicrm_case_type')) {
+      // Upgrade from previous 4.5.alpha
+      $sql = "
+        SELECT name
+        FROM civicrm_case_type
+      ";
+    } else {
+      // Upgrade from <=4.4.x
+      $sql = "
+        SELECT cov.name as name
+        FROM civicrm_option_group cog
+        INNER JOIN civicrm_option_value cov on cov.option_group_id = cog.id
+        WHERE cog.name = 'case_type'
+        ";
+    }
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $changes = array();
+    while ($dao->fetch()) {
+      $mungedName = CRM_Upgrade_Snapshot_V4p2_Case_XMLProcessor::mungeCaseType($dao->name);
+      if ($dao->name != $mungedName) {
+        $changes[$dao->name] = $mungedName;
+      }
+    }
+    return $changes;
+  }
+
+  /**
+   * @param array $issues (string $nameInDB => string $nameOfFile)
+   * @return string
+   */
+  protected function formatCaseTypeNameIssues($issues) {
+    $strings = array();
+    foreach ($issues as $nameInDB => $nameOfFile) {
+      $strings[] = "'{$nameInDB}' vs '{$nameOfFile}.xml'";
+    }
+    $message = ts('WARNING: There are %1 case-type(s) which have a mismatch between the DB-name and file-name (%2). After upgrading, you should change the DB-name or the file-name.', array(
+      1 => count($issues),
+      2 => implode('; ', $strings),
+    ));
+    return $message;
   }
 
   /**
