@@ -54,9 +54,23 @@ class CRM_Case_XMLProcessor {
   }
 
   /**
-   * @param $caseType
+   * This function was previously used to convert a case-type's
+   * machine-name to a file-name. However, it's mind-boggling
+   * that the file-name might be a munged version of the
+   * machine-name (which is itself a munged version of the
+   * display-name), and naming is now a more visible issue (since
+   * the overhaul of CaseType admin UI).
    *
-   * @return mixed|string
+   * Usage note: This is called externally by civix stubs as a
+   * sort of side-ways validation of the case-type's name
+   * (validation which was needed because of the unintuitive
+   * double-munge). We should update civix templates and then
+   * remove this function in Civi 4.6 or 5.0.
+   *
+   * @param string $caseType
+   * @return string
+   * @deprecated
+   * @see CRM_Case_BAO_CaseType::isValidName
    */
   public static function mungeCaseType($caseType) {
     // trim all spaces from $caseType
