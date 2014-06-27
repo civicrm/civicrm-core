@@ -70,6 +70,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     if (!$nameParam && empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
+    if (!empty($params['name']) && !CRM_Case_BAO_CaseType::isValidName($params['name'])) {
+      throw new CRM_Core_Exception("Cannot create caseType with malformed name [{$params['name']}]");
+    }
 
     // function to format definition column
     if (isset($params['definition']) && is_array($params['definition'])) {
@@ -307,5 +310,15 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     $caseType = new CRM_Case_DAO_CaseType();
     $caseType->id = $caseTypeId;
     return $caseType->delete();
+  }
+
+  /**
+   * Determine if a case-type name is well-formed
+   *
+   * @param string $caseType
+   * @return bool
+   */
+  static function isValidName($caseType) {
+    return preg_match('/^[a-zA-Z0-9_]+$/',  $caseType);
   }
 }

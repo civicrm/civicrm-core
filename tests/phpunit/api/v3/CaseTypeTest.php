@@ -103,6 +103,22 @@ class api_v3_CaseTypeTest extends CiviUnitTestCase {
   }
 
   /**
+   * Create a case with an invalid name
+   */
+  function testCaseTypeCreate_invalidName() {
+    // Create Case Type
+    $params = array(
+      'title' => 'Application',
+      'name' => 'Appl ication', // spaces are not allowed
+      'is_active' => 1,
+      'weight' => 4,
+    );
+
+    $this->callAPIFailure('CaseType', 'create', $params);
+  }
+
+
+  /**
    * Test update (create with id) function with valid parameters
    */
   function testCaseTypeUpdate() {

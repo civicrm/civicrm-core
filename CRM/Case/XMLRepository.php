@@ -84,7 +84,10 @@ class CRM_Case_XMLRepository {
       return simplexml_load_string($definition);
     }
 
-    $caseType = CRM_Case_XMLProcessor::mungeCaseType($caseType);
+    if (!CRM_Case_BAO_CaseType::isValidName($caseType)) {
+      // perhaps caller provider a the label instead of the name?
+      throw new CRM_Core_Exception("Cannot load caseType with malformed name [$caseType]");
+    }
 
     if (!CRM_Utils_Array::value($caseType, $this->xml)) {
       // first check custom templates directory
