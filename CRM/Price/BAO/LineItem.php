@@ -162,6 +162,7 @@ AND li.entity_id = {$entityId}
     );
 
     $dao = CRM_Core_DAO::executeQuery("$selectClause $fromClause $whereClause", $params);
+    $getTaxDetails = FALSE;
     while ($dao->fetch()) {
       if (!$dao->id) {
         continue;
@@ -185,7 +186,12 @@ AND li.entity_id = {$entityId}
       );
       $lineItems[$dao->id]['tax_rate'] = CRM_Price_BAO_LineItem::calculateTaxRate($lineItems[$dao->id]);
       $lineItems[$dao->id]['subTotal'] = $lineItems[$dao->id]['qty'] * $lineItems[$dao->id]['unit_price'];
+      if ($lineItems[$dao->id]['tax_amount'] != '') {
+        $getTaxDetails = TRUE;
+      }
     }
+    $smarty = CRM_Core_Smarty::singleton();
+    $smarty->assign('getTaxDetails', $getTaxDetails);
     return $lineItems;
   }
 
