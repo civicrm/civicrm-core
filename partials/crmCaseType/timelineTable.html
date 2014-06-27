@@ -25,6 +25,7 @@ Required vars: activitySet
         ng-model="activity.status"
         ng-options="actStatus.name as actStatus.name for actStatus in activityStatuses|orderBy:'name'"
         >
+        <option value=""></option>
       </select>
     </td>
     <td>
