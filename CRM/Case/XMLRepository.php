@@ -90,61 +90,17 @@ class CRM_Case_XMLRepository {
     }
 
     if (!CRM_Utils_Array::value($caseType, $this->xml)) {
-      // first check custom templates directory
-      $fileName = NULL;
+      // Search for a file based directly on the $caseType name
+      $fileName = $this->findXmlFile($caseType);
 
+      // For backward compatibility, also search for double-mungd file names
+      // TODO In 4.6 or 5.0, remove support for loading double-munged file names
       if (!$fileName || !file_exists($fileName)) {
-        $caseTypesViaHook = $this->getCaseTypesViaHook();
-        if (isset($caseTypesViaHook[$caseType], $caseTypesViaHook[$caseType]['file'])) {
-          $fileName = $caseTypesViaHook[$caseType]['file'];
-        }
+        $fileName = $this->findXmlFile(CRM_Case_XMLProcessor::mungeCaseType($caseType));
       }
 
       if (!$fileName || !file_exists($fileName)) {
-        $config = CRM_Core_Config::singleton();
-        if (isset($config->customTemplateDir) && $config->customTemplateDir) {
-          // check if the file exists in the custom templates directory
-          $fileName = implode(DIRECTORY_SEPARATOR,
-            array(
-              $config->customTemplateDir,
-              'CRM',
-              'Case',
-              'xml',
-              'configuration',
-              "$caseType.xml",
-            )
-          );
-        }
-      }
-
-      if (!$fileName || !file_exists($fileName)) {
-        if (!file_exists($fileName)) {
-          // check if file exists locally
-          $fileName = implode(DIRECTORY_SEPARATOR,
-            array(
-              dirname(__FILE__),
-              'xml',
-              'configuration',
-              "$caseType.xml",
-            )
-          );
-        }
-
-        if (!file_exists($fileName)) {
-          // check if file exists locally
-          $fileName = implode(DIRECTORY_SEPARATOR,
-            array(
-              dirname(__FILE__),
-              'xml',
-              'configuration.sample',
-              "$caseType.xml",
-            )
-          );
-        }
-
-        if (!file_exists($fileName)) {
-          return FALSE;
-        }
+        return FALSE;
       }
 
       // read xml file
@@ -154,6 +110,65 @@ class CRM_Case_XMLRepository {
       $this->xml[$caseType] = simplexml_import_dom($dom);
     }
     return $this->xml[$caseType];
+  }
+
+  /**
+   * @param string $caseType
+   * @return null|string file path
+   */
+  public function findXmlFile($caseType) { // first check custom templates directory
+    $fileName = NULL;
+
+    if (!$fileName || !file_exists($fileName)) {
+      $caseTypesViaHook = $this->getCaseTypesViaHook();
+      if (isset($caseTypesViaHook[$caseType], $caseTypesViaHook[$caseType]['file'])) {
+        $fileName = $caseTypesViaHook[$caseType]['file'];
+      }
+    }
+
+    if (!$fileName || !file_exists($fileName)) {
+      $config = CRM_Core_Config::singleton();
+      if (isset($config->customTemplateDir) && $config->customTemplateDir) {
+        // check if the file exists in the custom templates directory
+        $fileName = implode(DIRECTORY_SEPARATOR,
+          array(
+            $config->customTemplateDir,
+            'CRM',
+            'Case',
+            'xml',
+            'configuration',
+            "$caseType.xml",
+          )
+        );
+      }
+    }
+
+    if (!$fileName || !file_exists($fileName)) {
+      if (!file_exists($fileName)) {
+        // check if file exists locally
+        $fileName = implode(DIRECTORY_SEPARATOR,
+          array(
+            dirname(__FILE__),
+            'xml',
+            'configuration',
+            "$caseType.xml",
+          )
+        );
+      }
+
+      if (!file_exists($fileName)) {
+        // check if file exists locally
+        $fileName = implode(DIRECTORY_SEPARATOR,
+          array(
+            dirname(__FILE__),
+            'xml',
+            'configuration.sample',
+            "$caseType.xml",
+          )
+        );
+      }
+    }
+    return file_exists($fileName) ? $fileName : NULL;
   }
 
   /**
