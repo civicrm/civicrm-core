@@ -6,7 +6,11 @@
 (function(angular, $, _) {
 
     var partialUrl = function(relPath) {
-        return CRM.resourceUrls['civicrm'] + '/partials/abtesting/' + relPath;
+        //console.log(CRM.resourceUrls['civicrm']);
+        //return CRM.resourceUrls['civicrm'] + '/partials/abtesting/' + relPath;
+        return '/drupal-7.28/sites/all/modules/civicrm/partials/abtesting/' + relPath;
+
+
     };
 
     var crmMailingAB = angular.module('crmMailingAB', ['ngRoute', 'ui.utils']);
