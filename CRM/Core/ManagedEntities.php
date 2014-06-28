@@ -37,6 +37,20 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
+   * Perform an asynchronous reconciliation when the transaction ends.
+   */
+  public static function scheduleReconcilation() {
+    CRM_Core_Transaction::addCallback(
+      CRM_Core_Transaction::PHASE_POST_COMMIT,
+      function () {
+        CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+      },
+      array(),
+      'ManagedEntities::reconcile'
+    );
+  }
+
+  /**
    * @param array $modules CRM_Core_Module
    * @param array $declarations per hook_civicrm_managed
    */
