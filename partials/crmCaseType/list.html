@@ -21,8 +21,8 @@ Required vars: caseTypes
 	    <td>{{caseType.title}}</td>
 	    <td>{{caseType.name}}</td>
 	    <td>{{caseType.description}}</td>
-	    <td>{{caseType.is_active}}</td>
-	    <td><a ng-href="#/caseType/{{caseType.id}}">Edit</a</td>
+	    <td>{{caseType.is_active == 1 ? 'Yes' : 'No'}}</td>
+	    <td><a ng-href="#/caseType/{{caseType.id}}">Edit</a></td>
   	</tr>
 	</tbody>
 </table>
