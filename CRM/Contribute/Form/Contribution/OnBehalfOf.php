@@ -73,7 +73,7 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
       if (!empty($form->_membershipContactID) && $contactID != $form->_membershipContactID) {
         // renewal case - membership being renewed may or may not be for organization
         if (!empty($form->_employers) && array_key_exists($form->_membershipContactID, $form->_employers)) {
-          // if _membershipContactID belongs to employers list, we can say: 
+          // if _membershipContactID belongs to employers list, we can say:
           $form->_relatedOrganizationFound = TRUE;
         }
       } else if (!empty($form->_employers)) {
@@ -93,6 +93,11 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
         }
         $locDataURL = CRM_Utils_System::url('civicrm/ajax/permlocation', $args, FALSE, NULL, FALSE);
         $form->assign('locDataURL', $locDataURL);
+
+        if (!empty($form->_submitValues['onbehalf'])) {
+          $form->assign('submittedOnBehalf', $form->_submitValues['onbehalfof_id']);
+          $form->assign('submittedOnBehalfInfo', json_encode($form->_submitValues['onbehalf']));
+        }
       }
 
       if ($form->_values['is_for_organization'] != 2) {
@@ -192,4 +197,3 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
     $form->addElement('hidden', 'hidden_onbehalf_profile', 1);
   }
 }
-
