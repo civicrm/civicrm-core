@@ -680,6 +680,8 @@ WHERE   cas.entity_value = $id AND
     while ($actionSchedule->fetch()) {
       $extraSelect = $extraJoin = $extraWhere = $extraOn = '';
 
+      $activityTypeID = false;
+      $activityStatusID = false;
       if ($actionSchedule->record_activity) {
         if ($mapping->entity == 'civicrm_membership') {
           $activityTypeID =
@@ -697,7 +699,7 @@ WHERE   cas.entity_value = $id AND
       if ($mapping->entity == 'civicrm_activity') {
         $tokenEntity = 'activity';
         $tokenFields = array('activity_id', 'activity_type', 'subject', 'details', 'activity_date_time');
-        $extraSelect = ', ov.label as activity_type, e.id as activity_id';
+        $extraSelect = ', ov.label as activity_type, e.id as activity_id, civicrm_case_activity.case_id as case_id';
         $extraJoin   = "
 INNER JOIN civicrm_option_group og ON og.name = 'activity_type'
 INNER JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
@@ -707,6 +709,10 @@ INNER JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.optio
 LEFT JOIN civicrm_option_group og ON og.name = 'activity_type'
 LEFT JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
         }
+        
+        //join for caseId
+        $extraJoin .= "
+            LEFT JOIN `civicrm_case_activity` ON `e`.`id` = `civicrm_case_activity`.`activity_id`";
       }
 
       if ($mapping->entity == 'civicrm_participant') {
@@ -861,7 +867,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         CRM_Core_BAO_ActionLog::create($logParams);
 
         // insert activity log record if needed
-        if ($actionSchedule->record_activity) {
+        if ($actionSchedule->record_activity && $activityTypeID) {
           $activityParams = array(
             'subject' => $actionSchedule->title,
             'details' => $actionSchedule->body_html,
@@ -874,6 +880,14 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
             'source_record_id' => $dao->entityID,
           );
           $activity = CRM_Activity_BAO_Activity::create($activityParams);
+          //file reminder on case if source activity is a case activity
+          if (!empty($dao->case_id)) {
+            $caseActivityParams = array();
+            $caseActivityParams['case_id'] = $dao->case_id;
+            $caseActivityParams['activity_id'] = $activity->id;
+            CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
+          }
+          
         }
       }
 
