@@ -1,14 +1,16 @@
 <!--
-Controller: CaseTypeCtrl
-Required vars: activitySet
+Controller: MailCtrl
+Required vars: groupNamesList 
+MailingGroup api needs to be improved to bind the chosen groups
 -->
+
 <br>
-<select multiple chsgroup ng-model="incGroup" ng-options="grp.name as grp.title for grp in groupNamesList">
+<select multiple chsgroup ng-model="incGroup" ng-options="grp.name as grp.title for grp in groupNamesList| filter: isGrp ">
   <option value=""></option>
 </select>
 <br> <br>
 
-<select multiple chsgroup placeholder="Exclude Group" ng-model="excGroup" ng-options="grp.name as grp.title for grp in groupNamesList">
+<select multiple chsgroup placeholder="Exclude Group" ng-model="excGroup" ng-options="grp.name as grp.title for grp in groupNamesList| filter: isGrp">
   <option value=""></option>
 </select>
 <br> <br>

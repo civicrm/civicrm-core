@@ -1,68 +1,10 @@
 <!--
-Controller: CaseTypeCtrl
-Required vars: caseType
+Controller: MailCtrl
+Required Variables: cool_api and currentMailing
 
-The original form used table layout; don't know if we have an alternative, CSS-based layout
+Comment lines 8-72 and uncomment from 74 if you want to use the from_email from civiApi
+However this will not be a select option because I could not find the Api to get all the stored from_email addresses
 -->
-<!--<br>
-<table class="form-layout-compressed">
-  <tbody>
-  <tr>
-    <td class="label">From E-mail Address</td>
-    <td>
-      <input type="text" ng-model="currentMailing.from_email"/>
-    </td>
-  </tr>
-  <tr>
-    <td class="label">Reply to E-mail Address</td>
-     <td>
-      <input type="text" ng-model="currentMailing.replyto_email"/>
-    </td>
-  </tr>   
-  <tr>
-    <td class="label">Mailing Subject</td>
-     <td>
-      <input type="text" ng-model="currentMailing.subject"/>
-    </td>
-  </tr>
-  <tr>
-    <td class="label">Use Template</td>
-     <td>
-      <select  style="width: 100px" ng-model="currentMailing.msg_template_id" ng-options="mstemp.id as mstemp.msg_title for mstemp in tmpList| filter:isUserDriven">
-				<option value="">-none-</option>
-			</select>
-    </td>
-  </tr>
-  <tr>
-		<td class="label">I want to</td>
-		<td class="label">Compose on screen</td>
-    <td><input type="radio" ng-model="composeS" value="1" /></td>
-    <td class="label">Upload Content</td>
-    <td><input type="radio" ng-model="composeS" value="0" /></td>
-  </tr>  
-  </tbody>
-</table>  
-<br>
-<div class="crm-accordion-wrapper collapsed" ng-show= "upldChange(composeS)">
-  <div class="crm-accordion-header">Compose on Screen</div>
-  <div class="crm-accordion-body" ng-include="partialUrl('composeonScreen.html')"></div>
-</div>
-<div class="crm-accordion-wrapper collapsed" ng-show= "!(upldChange(composeS))">
-  <div class="crm-accordion-header">Upload Content</div>
-  <div class="crm-accordion-body" ng-include="partialUrl('uploadContent.html')"></div>
-</div>
-<div class="crm-accordion-wrapper collapsed">
-  <div class="crm-accordion-header">Attachments</div>
-  <div class="crm-accordion-body" ng-include="partialUrl('attachments.html')"></div>
-</div>
-<div class="crm-accordion-wrapper collapsed">
-  <div class="crm-accordion-header">Header and Footer</div>
-  <div class="crm-accordion-body" ng-include="partialUrl('headerandFooter.html')"></div>
-</div>
-<div class="crm-accordion-wrapper collapsed">
-  <div class="crm-accordion-header">Track and Respond</div>
-  <div class="crm-accordion-body" ng-include="partialUrl('trackandRespond.html')"></div>
-</div> -->
 
 <br>
 <table class="form-layout-compressed">
@@ -129,3 +71,63 @@ The original form used table layout; don't know if we have an alternative, CSS-b
   <div class="crm-accordion-header">Track and Respond</div>
   <div class="crm-accordion-body" ng-include="partialUrl('trackandRespond.html')"></div>
 </div>
+
+<!--<br>
+<table class="form-layout-compressed">
+  <tbody>
+  <tr>
+    <td class="label">From E-mail Address</td>
+    <td>
+      <input type="text" ng-model="currentMailing.from_email"/>
+    </td>
+  </tr>
+  <tr>
+    <td class="label">Reply to E-mail Address</td>
+     <td>
+      <input type="text" ng-model="currentMailing.replyto_email"/>
+    </td>
+  </tr>   
+  <tr>
+    <td class="label">Mailing Subject</td>
+     <td>
+      <input type="text" ng-model="currentMailing.subject"/>
+    </td>
+  </tr>
+  <tr>
+    <td class="label">Use Template</td>
+     <td>
+      <select  style="width: 100px" ng-model="currentMailing.msg_template_id" ng-options="mstemp.id as mstemp.msg_title for mstemp in tmpList| filter:isUserDriven">
+				<option value="">-none-</option>
+			</select>
+    </td>
+  </tr>
+  <tr>
+		<td class="label">I want to</td>
+		<td class="label">Compose on screen</td>
+    <td><input type="radio" ng-model="composeS" value="1" /></td>
+    <td class="label">Upload Content</td>
+    <td><input type="radio" ng-model="composeS" value="0" /></td>
+  </tr>  
+  </tbody>
+</table>  
+<br>
+<div class="crm-accordion-wrapper collapsed" ng-show= "upldChange(composeS)">
+  <div class="crm-accordion-header">Compose on Screen</div>
+  <div class="crm-accordion-body" ng-include="partialUrl('composeonScreen.html')"></div>
+</div>
+<div class="crm-accordion-wrapper collapsed" ng-show= "!(upldChange(composeS))">
+  <div class="crm-accordion-header">Upload Content</div>
+  <div class="crm-accordion-body" ng-include="partialUrl('uploadContent.html')"></div>
+</div>
+<div class="crm-accordion-wrapper collapsed">
+  <div class="crm-accordion-header">Attachments</div>
+  <div class="crm-accordion-body" ng-include="partialUrl('attachments.html')"></div>
+</div>
+<div class="crm-accordion-wrapper collapsed">
+  <div class="crm-accordion-header">Header and Footer</div>
+  <div class="crm-accordion-body" ng-include="partialUrl('headerandFooter.html')"></div>
+</div>
+<div class="crm-accordion-wrapper collapsed">
+  <div class="crm-accordion-header">Track and Respond</div>
+  <div class="crm-accordion-body" ng-include="partialUrl('trackandRespond.html')"></div>
+</div> -->
