@@ -1,3 +1,8 @@
+<!--
+Controller: MailCtrl
+Required vars: groupNamesList
+-->
+
 <table class="form-layout-compressed">
   <tbody>
   <tr>
@@ -9,7 +14,7 @@
   <tr>
     <td class="label">Send to this Group</td>
     <td>
-      <select ng-model="testGroup" ng-options="grp.name as grp.title for grp in groupNamesList">
+      <select ng-model="testGroup" ng-options="grp.name as grp.title for grp in groupNamesList| filter: isGrp">
 			  <option value="">-none-</option>
 		  </select>
     </td>

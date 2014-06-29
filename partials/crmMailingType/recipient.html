@@ -1,9 +1,9 @@
 <!--
-Controller: CaseTypeCtrl
-Required vars: caseType
-
-The original form used table layout; don't know if we have an alternative, CSS-based layout
+Controller: MailCtrl
+Required vars: currentMailing
+Remove duplicates not functional
 -->
+
 <br>
 <table class="form-layout-compressed">
   <tbody>
@@ -16,7 +16,6 @@ The original form used table layout; don't know if we have an alternative, CSS-b
   <tr>
     <td class="label">Campaign</td>
     <td class="addRow">
-      <!-- <select ng-model="activity.status" ng-options="value for (key,value) in activityStatuses|orderBy:'value'"> -->
       <select ng-model="currentMailing.campaign_id" ng-options="camp.id as camp.name for camp in campaignList|orderBy:'name'">
         <option value="">Please select a campaign</option>
       </select>
@@ -28,45 +27,15 @@ The original form used table layout; don't know if we have an alternative, CSS-b
       <input type="checkbox" />
     </td>
   </tr>
-<!--  <tr>
-    <td class="label">Remove Duplicates?</td>
-    <td>
-      <input type="checkbox" ng-model="caseType.is_active" ng-true-value="1" ng-false-value="0"/>
-    </td>
-  </tr>-->
-  
   </tbody>
 </table>
 <br>  
     
-<div class="crm-accordion-wrapper collapsed">
+<div class="crm-accordion-wrapper">
   <div class="crm-accordion-header">Mailing Recipients</div>
   <div class="crm-accordion-body" ng-include="partialUrl('mailingGroup.html')"></div>
 </div>
 
 
 <br> 
- <!--   
-	<td class="label">Include Group</td>
-    <td class="addRow">
-     
-      <select ng-model="campaign.name" ng-options="camp.name as camp.name for camp in campNames|orderBy:'name'">
-        <option value=""></option>
-      </select>
-    </td>
-    
-    <td class="label">Exclude Group</td>
-    <td class="addRow">
-    
-      <select ng-model="campaign.name" ng-options="camp.name as camp.name for camp in campNames|orderBy:'name'">
-        <option value=""></option>
-      </select>
-    </td>
-    
-    <td class="label">Campaign</td>
-    <td class="addRow">
-     
-      <select ng-model="campaign.name" ng-options="camp.name as camp.name for camp in campNames|orderBy:'name'">
-        <option value=""></option>
-      </select>
-    </td>    -->
+ 
