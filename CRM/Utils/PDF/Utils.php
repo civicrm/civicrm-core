@@ -119,8 +119,8 @@ class CRM_Utils_PDF_Utils {
       return self::_html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName);
     }
     else {
-      //return self::_html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName);
-      return self::_html2pdf_tcpdf($paper_size, $orientation, $margins, $html, $output, $fileName,  $stationery_path);
+      return self::_html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName);
+      //return self::_html2pdf_tcpdf($paper_size, $orientation, $margins, $html, $output, $fileName,  $stationery_path);
     }
   }
 
