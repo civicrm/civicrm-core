@@ -87,7 +87,7 @@ class CRM_Core_Payment_BaseIPN {
       return FALSE;
     }
 
-    if (!$input['net_amount']) {
+    if (!isset($input['net_amount'])) {
       $input['net_amount'] = (float) $input['total_amount'] - (float) CRM_Utils_Array::value('fee_amount', $input);
     }
 
