@@ -206,7 +206,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     $input['response_code'] = self::retrieve('x_response_code', 'Integer');
     $input['MD5_Hash'] = self::retrieve('x_MD5_Hash', 'String', FALSE, '');
     $input['fee_amount'] = self::retrieve('x_fee_amount', 'Money', FALSE, '0.00');
-    $input['net_amount'] = self::retrieve('x_net_amount', 'Money', FALSE, '0.00');
     $input['response_reason_code'] = self::retrieve('x_response_reason_code', 'String', FALSE);
     $input['response_reason_text'] = self::retrieve('x_response_reason_text', 'String', FALSE);
     $input['subscription_paynum'] = self::retrieve('x_subscription_paynum', 'Integer', FALSE, 0);
