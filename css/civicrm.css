@@ -107,7 +107,7 @@ div.crm-container fieldset label{
 
 .crm-container tr {
   font-size: .95em;
-  background: none;
+  background: none !important;
 }
 
 .crm-container td {
