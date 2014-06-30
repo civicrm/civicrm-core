@@ -70,6 +70,19 @@ class CRM_Core_Config_Defaults {
 
     $size = trim(ini_get('upload_max_filesize'));
     if ($size) {
+      $this->maxImportFileSize = self::formatUnitSize($size);
+    }
+  }
+
+  /**
+   * Function to format size
+   *
+   * @access public
+   * @static
+   */
+
+  public static function formatUnitSize($size, $checkForPostMax = FALSE) {
+    if ($size) {
       $last = strtolower($size{strlen($size) - 1});
       switch ($last) {
         // The 'G' modifier is available since PHP 5.1.0
@@ -81,7 +94,14 @@ class CRM_Core_Config_Defaults {
         case 'k':
           $size *= 1024;
       }
-      $this->maxImportFileSize = $size;
+
+      if ($checkForPostMax) {
+        $config     = CRM_Core_Config::singleton();
+        if($config->maxImportFileSize > $size) {
+          CRM_Core_Session::setStatus(ts("Note: Upload max filesize ('upload_max_filesize') should not exceed Post max size ('post_max_size') as defined in PHP.ini, please check with your system administrator."), ts("Warning"), "alert");
+        }
+      }
+      return $size;
     }
   }
 
