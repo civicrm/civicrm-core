@@ -67,16 +67,16 @@ class CRM_Utils_PDF_Utils {
     $orientation = CRM_Core_BAO_PdfFormat::getValue('orientation', $format);
     $metric      = CRM_Core_BAO_PdfFormat::getValue('metric', $format);
     $t           = CRM_Core_BAO_PdfFormat::getValue('margin_top', $format);
-    $r            = CRM_Core_BAO_PdfFormat::getValue('margin_right', $format);
+    $r           = CRM_Core_BAO_PdfFormat::getValue('margin_right', $format);
     $b           = CRM_Core_BAO_PdfFormat::getValue('margin_bottom', $format);
     $l           = CRM_Core_BAO_PdfFormat::getValue('margin_left', $format);
 
     $stationery_path_partial  = CRM_Core_BAO_PdfFormat::getValue('stationery', $format);
 
     $stationery_path = NULL;
-    if(strlen($stationery_path_partial)) {
-	    $doc_root = $_SERVER['DOCUMENT_ROOT'];
-	    $stationery_path = $doc_root."/".$stationery_path_partial;
+    if (strlen($stationery_path_partial)) {
+      $doc_root = $_SERVER['DOCUMENT_ROOT'];
+      $stationery_path = $doc_root . "/" . $stationery_path_partial;
     }
 
     $margins     = array($metric,$t,$r,$b,$l);
@@ -95,6 +95,7 @@ class CRM_Utils_PDF_Utils {
     // Strip <html>, <header>, and <body> tags from each page
     $htmlElementstoStrip = array(
       '@<head[^>]*?>.*?</head>@siu',
+      '@<script[^>]*?>.*?</script>@siu',
       '@<body>@siu',
       '@</body>@siu',
       '@<html[^>]*?>@siu',
@@ -118,8 +119,8 @@ class CRM_Utils_PDF_Utils {
       return self::_html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName);
     }
     else {
-      //return self::_html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName);
-      return self::_html2pdf_tcpdf($paper_size, $orientation, $margins, $html, $output, $fileName,  $stationery_path);
+      return self::_html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName);
+      //return self::_html2pdf_tcpdf($paper_size, $orientation, $margins, $html, $output, $fileName,  $stationery_path);
     }
   }
 
@@ -132,8 +133,7 @@ class CRM_Utils_PDF_Utils {
 
     $paper_size_arr  = array( $paper_size[2], $paper_size[3]);
 
-    // print_r(  $paper_size_arr );
-    $pdf = new TCPDF($orientation, 'pt', $paper_size_arr, 'UTF-8', FALSE);
+    $pdf = new TCPDF($orientation, 'pt', $paper_size_arr);
     $pdf->Open();
 
     if (is_readable($stationery_path)){
@@ -155,7 +155,7 @@ class CRM_Utils_PDF_Utils {
     $reset_parm = false;
     $cell = false;
     $align = '' ;
-    //print $html;
+
     // output the HTML content
     $pdf->writeHTML($html, $ln, $fill, $reset_parm, $cell, $align);
 
@@ -167,7 +167,6 @@ class CRM_Utils_PDF_Utils {
     $pdf_file =  'CiviLetter'.'.pdf';
     $pdf->Output($pdf_file, 'D');
     CRM_Utils_System::civiExit(1);
-
   }
 
   /**
