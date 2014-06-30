@@ -337,7 +337,10 @@ class CiviCRM_For_WordPress {
         header( 'Location: ' . admin_url() . 'options-general.php?page=civicrm-install' );
         return FALSE;
       }
-
+      
+      // access global defined in civicrm.settings.php
+      global $civicrm_root;
+      
       // this does pretty much all of the civicrm initialization
       if ( ! file_exists( $civicrm_root . 'CRM/Core/Config.php' ) ) {
         $error = FALSE;
