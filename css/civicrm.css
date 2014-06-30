@@ -2569,7 +2569,8 @@ div.grippie {
   text-indent: -10000px;
 }
 
-.crm-container span.icon {
+.crm-container span.icon,
+.crm-container a.ui-icon {
   float: none;
   display: inline-block;
 }
