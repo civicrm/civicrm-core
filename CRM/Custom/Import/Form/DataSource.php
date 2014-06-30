@@ -54,6 +54,9 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
       $params = "reset=1";
     }
     $session->pushUserContext(CRM_Utils_System::url('civicrm/import/custom', $params));
+
+    // check for post max size
+    CRM_Core_Config_Defaults::formatUnitSize(ini_get('post_max_size'), TRUE);
   }
 
   /**
@@ -87,20 +90,18 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
 
     //Setting Upload File Size
     $config = CRM_Core_Config::singleton();
-    if ($config->maxImportFileSize >= 8388608) {
+
+    $uploadFileSize = CRM_Core_Config_Defaults::formatUnitSize($config->maxFileSize.'m');
+    if ($uploadFileSize >= 8388608) {
       $uploadFileSize = 8388608;
-    }
-    else {
-      $uploadFileSize = $config->maxImportFileSize;
     }
     $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
 
     $this->assign('uploadSize', $uploadSize);
-    $this->add('file', 'uploadFile', ts('Import Data File'), 'size=30 maxlength=255', TRUE);
-
-    $this->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
-    $this->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', array(1 => $uploadSize, 2 => $uploadFileSize)), 'maxfilesize', $uploadFileSize);
+    $this->add('File', 'uploadFile', ts('Import Data File'), 'size=30 maxlength=255', TRUE);
     $this->setMaxFileSize($uploadFileSize);
+    $this->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', array(1 => $uploadSize, 2 => $uploadFileSize)), 'maxfilesize', $uploadFileSize);
+    $this->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
     $this->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
 
     $this->addElement('checkbox', 'skipColumnHeader', ts('First row contains column headers'));
