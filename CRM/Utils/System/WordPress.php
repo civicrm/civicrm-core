@@ -481,6 +481,16 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       date_default_timezone_set($wpUserTimezone);
       CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
     }
+    require_once ($cmsRootPath . DIRECTORY_SEPARATOR . 'wp-includes/pluggable.php');
+    $uid = CRM_Utils_Array::value('uid', $name);
+    if ($uid) {
+      $account = wp_set_current_user($uid);
+      if ($account && $account->data->ID) {
+        global $user;
+        $user = $account;
+        return TRUE;
+      }
+    }
     return true;
   }
 
