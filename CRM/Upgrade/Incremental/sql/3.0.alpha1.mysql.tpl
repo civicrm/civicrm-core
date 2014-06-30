@@ -534,7 +534,7 @@
 
     -- State / province
     -- CRM-4534 CRM-4686 CRM-4769
-        INSERT INTO civicrm_state_province
+        INSERT IGNORE INTO civicrm_state_province
             (id, name, abbreviation, country_id)
         VALUES
             (5218,  'Distrito Federal', 'DIF', 1140),
