@@ -72,6 +72,9 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     $handler    = opendir($config->uploadDir);
     $errorFiles = array('sqlImport.errors', 'sqlImport.conflicts', 'sqlImport.duplicates', 'sqlImport.mismatch');
 
+    // check for post max size
+    CRM_Core_Config_Defaults::formatUnitSize(ini_get('post_max_size'), TRUE);
+
     while ($file = readdir($handler)) {
       if ($file != '.' && $file != '..' &&
         in_array($file, $errorFiles) && !is_writable($config->uploadDir . $file)
