@@ -232,7 +232,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     ) {
       $this->_amount = array();
 
+      $taxAmount = 0;
       foreach ($this->_params as $k => $v) {
+        //display tax amount on confirmation page
+        $taxAmount += $v['tax_amount'];
         if (is_array($v)) {
           foreach (array(
             'first_name', 'last_name') as $name) {
@@ -272,6 +275,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
 
+      $this->assign('totalTaxAmount', $taxAmount);
       $this->assign('part', $this->_part);
       $this->set('part', $this->_part);
       $this->assign('amounts', $this->_amount);
@@ -669,6 +673,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
 
       $entityTable = 'civicrm_participant';
+      $totalTaxAmount = 0;
+      $dataArray = array();
       foreach ($this->_lineItem as $key => $value) {
         if (($value != 'skip') &&
           ($entityId = CRM_Utils_Array::value($key, $allParticipantIds))
@@ -681,7 +687,20 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $lineItem[$this->_priceSetId] = $value;
           CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, $entityTable);
         }
+        foreach ($value as $line) {
+          if (isset($line['tax_amount']) && isset($line['tax_rate'])) {
+            $totalTaxAmount = $line['tax_amount'] + $totalTaxAmount;
+            if (isset($dataArray[$line['tax_rate']])) {
+              $dataArray[$line['tax_rate']] = $dataArray[$line['tax_rate']] + CRM_Utils_Array::value('tax_amount', $line);
+            }
+            else {
+              $dataArray[$line['tax_rate']] = CRM_Utils_Array::value('tax_amount', $line);
+            }
+          }
+        }
       }
+      $this->assign('dataArray', $dataArray);
+      $this->assign('totalTaxAmount', $totalTaxAmount);
     }
 
     //update status and send mail to cancelled additonal participants, CRM-4320
