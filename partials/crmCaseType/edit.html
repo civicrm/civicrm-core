@@ -2,10 +2,15 @@
 Controller: CaseTypeCtrl
 Required vars: caseType
 -->
+<form name="editCaseTypeFrom">
 <div class="crm-block crm-form-block crmCaseType">
   <div class="crm-submit-buttons">
-    <a ng-click="save()" class="button"><span>Save</span></a>
-    <a ng-href="#/caseType" class="button"><span>Cancel</span></a>
+    <span class="crm-button">
+      <input type="button" ng-click="save()" ng-disabled="editCaseTypeFrom.$invalid" value="Save" />
+    </span>
+    <span class="crm-button">
+      <input type="button" ng-click="goto('caseType')" value="Cancel" />
+    </span>
   </div>
 
   <div ng-include="partialUrl('caseTypeDetails.html')"></div>
@@ -52,7 +57,12 @@ Required vars: caseType
 
   <!--<button ng-click="dump()">Log</button>-->
   <div class="crm-submit-buttons">
-    <a ng-click="save()" class="button"><span>Save</span></a>
-    <a ng-href="#/caseType" class="button"><span>Cancel</span></a>
+    <span class="crm-button">
+      <input type="button" ng-click="save()" ng-disabled="editCaseTypeFrom.$invalid" value="Save" />
+    </span>
+    <span class="crm-button">
+      <input type="button" ng-click="goto('caseType')" value="Cancel" />
+    </span>
   </div>
 </div>
+</form>

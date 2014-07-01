@@ -37,6 +37,7 @@ Required vars: activitySet
         ng-model="activity.reference_activity"
         ng-options="actTypeName as actTypeName for actTypeName in activityTypeNames"
         ng-hide="activity.name == 'Open Case'"
+        ng-required="activity.name != 'Open Case'"
         >
       </select>
     </td>
@@ -47,7 +48,7 @@ Required vars: activitySet
         ng-pattern="/^[0-9]*$/"
         ng-model="activity.reference_offset"
         ng-hide="activity.name == 'Open Case'"
-        required
+        ng-required="activity.name != 'Open Case'"
         />
     </td>
     <td>
@@ -57,6 +58,7 @@ Required vars: activitySet
         ng-model="activity.reference_select"
         ng-options="key as value for (key,value) in {newest: 'Newest', oldest: 'Oldest'}"
         ng-hide="activity.name == 'Open Case'"
+        ng-required="activity.name != 'Open Case'"
         >
       </select>
     </td>
