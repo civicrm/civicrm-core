@@ -504,6 +504,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // build price set form.
     $buildPriceSet = FALSE;
+
+    // showing tax amount on edit contribution page
+    if ($this->_action & CRM_Core_Action::UPDATE && isset($this->_values['tax_amount'])) {
+      $this->assign('totalTaxAmount', $this->_values['tax_amount']);
+    }
+
     if (empty($this->_lineItems) &&
       ($this->_priceSetId || !empty($_POST['price_set_id']))
     ) {
@@ -1018,6 +1024,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         CRM_Price_BAO_LineItem::deleteLineItems($this->_id, 'civicrm_contribution');
       }
     }
+
+    // assign dataArray for contribution receipts
+    $dataArray = array();
+    foreach ($this->_lineItems as $key => $value) {
+      foreach ($value as $v) {
+        if (isset($dataArray[$v['tax_rate']])) {
+          $dataArray[$v['tax_rate']] = $dataArray[$v['tax_rate']] + CRM_Utils_Array::value('tax_amount', $v);
+        }
+        else {
+          $dataArray[$v['tax_rate']] = CRM_Utils_Array::value('tax_amount', $v);
+        }
+      }
+    }
+    $smarty = CRM_Core_Smarty::singleton();
+    $smarty->assign('dataArray', $dataArray);
 
     // process price set and get total amount and line items.
     $lineItem = array();
