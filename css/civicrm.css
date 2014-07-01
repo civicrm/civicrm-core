@@ -4715,9 +4715,9 @@ span.crm-status-icon {
   text-decoration: line-through;
 }
 
-.crm-container .ng-invalid {
+.crm-container .ng-invalid.ng-dirty {
     border: 1px solid red;
 }
-.crm-container .ng-valid {
+.crm-container .ng-valid, .crm-container .ng-pristine {
     border: 1px solid #666;
 }
