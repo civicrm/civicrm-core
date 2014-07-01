@@ -514,7 +514,7 @@ class CRM_Financial_Page_AJAX {
   static function getPrintPDF() {
 
     $contribIDs = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
-    $contributionIDs = array('0' => $contribIDs);
+    $contributionIDs = array($contribIDs);
     $contactIds = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE);
     $params = array('output' => 'pdf_invoice');
     CRM_Contribute_Form_Task_Invoice::printPDF($contributionIDs , $params, $contactIds);
