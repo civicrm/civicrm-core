@@ -2390,6 +2390,14 @@ div.grippie {
   border: 1px solid #3e3e3e;
 }
 
+.crm-container input.form-submit[disabled],
+.crm-container .crm-button[disabled],
+#crm-container input[type=button][disabled],
+#crm-container input.form-submit-inline[disabled],
+#crm-container .crm-button[disabled] {
+    color: #999;
+}
+
 .crm-container .crm-button,
 #crm-container .crm-button {
   padding: 1px;
