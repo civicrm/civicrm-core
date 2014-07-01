@@ -634,23 +634,16 @@ if(event.handled !== true) {
     var taxRates = JSON.parse(taxRates);
     var taxRate = taxRates[financialType];   
     var totalAmount = cj('#total_amount').val();
-    var taxAmount = calculateTaxAmount(totalAmount,taxRate);
-    var totalTaxAmount = Number(taxAmount)+Number(totalAmount);
+    if (taxRate) { 
+       var totalTaxAmount = Number((taxRate/100)*totalAmount)+Number(totalAmount);
+    }
+    else {
+    	 totalTaxAmount = totalAmount ;
+    }
     cj( "#totalTaxAmount" ).html('Total Amount : '+totalTaxAmount);
     event.handled = true;
     }
      return false;
 });
-
-function calculateTaxAmount(totalAmount,taxRate) {
-    var taxAmount = (taxRate/100)*totalAmount;
-    if(!taxAmount){
-	cj('#totalTaxAmount').html('Total Amount : '+totalAmount);
-    	return false;
-    }
-    else{
-	return taxAmount;
-    }
-}
 </script>
 {/literal}
