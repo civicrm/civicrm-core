@@ -251,7 +251,8 @@
     var updateCaseTypeName = function () {
       if (!$scope.caseType.id && $scope.locks.caseTypeName) {
         // Should we do some filtering? Lowercase? Strip whitespace?
-        $scope.caseType.name = $scope.caseType.title;
+        var t = $scope.caseType.title ? $scope.caseType.title : '';
+        $scope.caseType.name = t.replace(/ /g, '_').replace(/[^a-zA-Z0-9_]/g, '').toLowerCase();
       }
     };
     $scope.$watch('locks.caseTypeName', updateCaseTypeName);
