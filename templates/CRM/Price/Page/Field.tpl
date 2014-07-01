@@ -90,9 +90,9 @@
             {if $getTaxDetails}
               <td>{if $row.tax_rate != '' && $row.html_type eq "Text / Numeric Quantity"}
                     {if $row.tax_rate == 0.00}
-                      VAT(Exempt)
+                     {ts}VAT(Exempt){/ts}
                     {else}
-                      VAT({$row.tax_rate|string_format:"%.2f"}%)
+                     {ts}VAT{/ts}({$row.tax_rate|string_format:"%.2f"}%)
                     {/if}
                   {/if}</td>
               <td>{if $row.html_type eq "Text / Numeric Quantity" }{$row.tax_amount|crmMoney}{/if}</td>

@@ -72,13 +72,13 @@
        <td class="right">{$line.line_total-$line.tax_amount|crmMoney}</td>
        {if $line.tax_rate != ""}
          {if $line.tax_rate == 0}
-           <td class="right">VAT(exempt)</td>
+           <td class="right">{ts}VAT(exempt){/ts}</td>
 	 {else}
-	   <td class="right">VAT({$line.tax_rate|string_format:"%.2f"}%)</td>
+	   <td class="right">{ts}VAT{/ts}({$line.tax_rate|string_format:"%.2f"}%)</td>
 	 {/if}
 	   <td class="right">{$line.tax_amount|crmMoney}</td>
        {elseif $line.tax_amount != ''}
-         <td class="right">VAT(exempt)</td>
+         <td class="right">{ts}VAT(exempt){/ts}</td>
          <td class="right">{$line.tax_amount|crmMoney}</td>
        {else}
          <td></td>
