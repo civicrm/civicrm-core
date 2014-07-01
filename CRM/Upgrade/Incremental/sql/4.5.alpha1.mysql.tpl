@@ -531,3 +531,17 @@ VALUES
 -- Add new column tax_amount in contribution and lineitem table
 ALTER TABLE `civicrm_contribution` ADD `tax_amount` DECIMAL( 20, 2 ) DEFAULT NULL COMMENT 'Total tax amount of this contribution.';
 ALTER TABLE `civicrm_line_item` ADD `tax_amount` DECIMAL( 20, 2 ) DEFAULT NULL COMMENT 'tax of each item';
+
+-- Insert menu item at Administer > CiviContribute, below the Payment Processors.
+SELECT @parent_id := id from `civicrm_navigation` where name = 'CiviContribute' AND domain_id = {$domainID};
+SELECT @add_weight_id := weight from `civicrm_navigation` where `name` = 'Payment Processors' and `parent_id` = @parent_id;
+
+UPDATE `civicrm_navigation`
+SET `weight` = `weight`+1
+WHERE `parent_id` = @parent_id
+AND `weight` > @add_weight_id;
+
+INSERT INTO `civicrm_navigation`
+        ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+VALUES
+  ( {$domainID}, 'civicrm/admin/setting/preferences/contribute',      '{ts escape="sql" skip="true"}CiviContribute Component Settings{/ts}', 'CiviContribute Component Settings', 'administer CiviCRM', '', @parent_id, '1', NULL, @add_weight_id + 1 );
