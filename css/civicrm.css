@@ -331,6 +331,9 @@ input.crm-form-entityref {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ffffff', endColorstr = '#eeeeee', GradientType = 0);
   background-image: linear-gradient(top, #fff 0%, #eee 50%);
 }
+.crm-container input.crm-form-text.ng-invalid {
+    border: 1px solid #FF0000;
+}
 .crm-container input.crm-form-text,
 .crm-container input.dateplugin {
   border: 1px solid #999;
