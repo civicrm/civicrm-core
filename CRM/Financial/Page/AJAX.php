@@ -507,4 +507,16 @@ class CRM_Financial_Page_AJAX {
     echo json_encode($batchSummary);
     CRM_Utils_System::civiExit();
   }
+
+  /**
+   * Callback to perform action on Print Invoice button.
+   */
+  static function getPrintPDF() {
+
+    $contribIDs = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
+    $contributionIDs = array($contribIDs);
+    $contactIds = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE);
+    $params = array('output' => 'pdf_invoice');
+    CRM_Contribute_Form_Task_Invoice::printPDF($contributionIDs , $params, $contactIds);
+  }
 }

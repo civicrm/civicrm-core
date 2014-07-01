@@ -34,6 +34,9 @@
                 <th>{ts}Received date{/ts}</th>
                 <th>{ts}Receipt Sent{/ts}</th>
                 <th>{ts}Status{/ts}</th>
+		{if $invoices}
+                  <th></th>
+		{/if}
             </tr>
 
             {foreach from=$contribute_rows item=row}
@@ -47,6 +50,18 @@
                     <td>{$row.receive_date|truncate:10:''|crmDate}</td>
                     <td>{$row.receipt_date|truncate:10:''|crmDate}</td>
                     <td>{$row.contribution_status}</td>
+                    {if $invoices}
+                      <td>
+                      	{assign var='urlParams' value="reset=1&id=$row.contribution_id&cid=$row.contact_id"}
+			<a class="crm-invoiceButton" href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
+		      	{if $row.contribution_status != 'Refunded'}
+                          <span>{ts}Print Invoice{/ts}</span>
+		        {else}
+			  <span>{ts}Print Credit Note{/ts}</span>
+		        {/if}
+                        </a>
+                      </td>
+		    {/if}
                 </tr>
             {/foreach}
         </table>
