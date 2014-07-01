@@ -156,9 +156,9 @@ You were registered by: {$payer.name}
 
 {foreach from=$dataArray item=value key=priceset}
 {if $priceset}
-{ts}Vat {$priceset|string_format:"%.2f"}%{/ts}: {$value|crmMoney:$currency}
+{ts}Vat{/ts}{$priceset|string_format:"%.2f"}%: {$value|crmMoney:$currency}
 {elseif  $priceset == 0}
-{ts}No Vat {/ts}: {$value|crmMoney:$currency}
+{ts}No Vat{/ts}: {$value|crmMoney:$currency}
 {/if}
 {/foreach}
 {/if}
