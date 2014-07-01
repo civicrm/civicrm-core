@@ -132,6 +132,8 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     $priceFieldBAO->orderBy('weight, label');
     $priceFieldBAO->find();
 
+    $getTaxDetails = FALSE;
+    $taxRate = CRM_Core_PseudoConstant::getTaxRates();
     while ($priceFieldBAO->fetch()) {
       $priceField[$priceFieldBAO->id] = array();
       CRM_Core_DAO::storeValues($priceFieldBAO, $priceField[$priceFieldBAO->id]);
@@ -143,7 +145,16 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
 
         CRM_Price_BAO_PriceFieldValue::retrieve($params, $optionValues);
 
+        $financialTypeId = $optionValues['financial_type_id'];
         $priceField[$priceFieldBAO->id]['price'] = CRM_Utils_Array::value('amount', $optionValues);
+        if (isset($taxRate[$financialTypeId])) {
+          $priceField[$priceFieldBAO->id]['tax_rate'] = $taxRate[$financialTypeId];
+          $getTaxDetails = TRUE;
+        }
+        if (isset($priceField[$priceFieldBAO->id]['tax_rate'])) {
+          $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($priceField[$priceFieldBAO->id]['price'], $priceField[$priceFieldBAO->id]['tax_rate']);
+          $priceField[$priceFieldBAO->id]['tax_amount'] = $taxAmount['tax_amount'];
+        }
       }
 
       $action = array_sum(array_keys($this->actionLinks()));
@@ -185,6 +196,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
         'PriceField',
         $priceFieldBAO->id
       );
+      $this->assign('getTaxDetails', $getTaxDetails);
     }
 
     $returnURL = CRM_Utils_System::url('civicrm/admin/price/field', "reset=1&action=browse&sid={$this->_sid}");

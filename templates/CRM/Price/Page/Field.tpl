@@ -69,6 +69,10 @@
             <th>{ts}Active On{/ts}</th>
             <th>{ts}Expire On{/ts}</th>
             <th id="nosort">{ts}Price{/ts}</th>
+            {if $getTaxDetails}
+              <th>{ts}Tax Label{/ts}</th>
+              <th>{ts}Tax Amount{/ts}</th>
+            {/if}
             <th></th>
             <th class="hiddenElement"></th>
         </tr>
@@ -83,6 +87,16 @@
             <td>{if $row.active_on}{$row.active_on|date_format:"%Y-%m-%d %T"}{/if}</td>
             <td>{if $row.expire_on}{$row.expire_on|date_format:"%Y-%m-%d %T"}{/if}</td>
             <td>{if $row.html_type eq "Text / Numeric Quantity"}{$row.price|crmMoney}{else}<a href="{crmURL p="civicrm/admin/price/field/option" q="action=browse&reset=1&sid=$sid&fid=$fid"}">{if $isReserved}{ts}View Price Options{/ts}{else}{ts}Edit Price Options{/ts}{/if}</a>{/if}</td>
+            {if $getTaxDetails}
+              <td>{if $row.tax_rate != '' && $row.html_type eq "Text / Numeric Quantity"}
+                    {if $row.tax_rate == 0.00}
+                     {ts}VAT(Exempt){/ts}
+                    {else}
+                     {ts}VAT{/ts}({$row.tax_rate|string_format:"%.2f"}%)
+                    {/if}
+                  {/if}</td>
+              <td>{if $row.html_type eq "Text / Numeric Quantity" }{$row.tax_amount|crmMoney}{/if}</td>
+            {/if}
             <td class="field-action">{$row.action|replace:'xx':$row.id}</td>
             <td class="order hiddenElement">{$row.weight}</td>
         </tr>

@@ -115,6 +115,9 @@
             <strong> -------------------------------------------</strong><br />
             {ts}Total{/ts}: <strong>{$amount+$membership_amount|crmMoney}</strong><br />
           {else}
+            {if $totalTaxAmount}
+              {ts}Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney}</strong><br />
+            {/if}
             {ts}Amount{/ts}: <strong>{$amount|crmMoney} {if $amount_level} - {$amount_level} {/if}</strong><br />
           {/if}
     {/if}

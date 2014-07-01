@@ -144,6 +144,9 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     // assign values to the template
     $this->assign($values);
+    if (isset($values['tax_amount'])) {
+      $this->assign('totalTaxAmount', $values['tax_amount']);
+    }
 
     $displayName = CRM_Contact_BAO_Contact::displayName($values['contact_id']);
     $this->assign('displayName', $displayName);

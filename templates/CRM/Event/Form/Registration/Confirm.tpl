@@ -117,6 +117,12 @@
                   <div class="clear"></div>
                     {/foreach}
             </div>
+                {if $totalTaxAmount}
+                  <div class="crm-section no-label total-amount-section">
+                  <div class="content bold">{ts}Total Tax Amount{/ts}:&nbsp;&nbsp;{$totalTaxAmount|crmMoney}</div>
+                  <div class="clear"></div>
+                  </div>
+                {/if}
                 {if $totalAmount}
                 <div class="crm-section no-label total-amount-section">
                     <div class="content bold">{ts}Total Amount{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney}</div>
