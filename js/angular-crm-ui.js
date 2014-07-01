@@ -64,6 +64,12 @@
         }
       };
     })
+    .run(function($rootScope, $location) {
+      /// Example: <button ng-click="goto('home')">Go home!</button>
+      $rootScope.goto = function(path) {
+        $location.path(path);
+      };
+    })
   ;
 
 })(angular, CRM.$, CRM._);
