@@ -70,9 +70,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
 
     $config = CRM_Core_Config::singleton();
 
-    // FIXME: why do we limit the file size to 8 MiB if it's larger in config?
-    $sizeInBytes = CRM_Core_Config_Defaults::formatUnitSize($config->maxFileSize.'m');
-    $uploadFileSize = $sizeInBytes >= 8388608 ? 8388608 : $sizeInBytes;
+    $uploadFileSize = CRM_Core_Config_Defaults::formatUnitSize($config->maxFileSize.'m');
     $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
     $form->assign('uploadSize', $uploadSize);
     $form->add('File', 'uploadFile', ts('Import Data File'), 'size=30 maxlength=255', TRUE);

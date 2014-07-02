@@ -92,9 +92,6 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
     $config = CRM_Core_Config::singleton();
 
     $uploadFileSize = CRM_Core_Config_Defaults::formatUnitSize($config->maxFileSize.'m');
-    if ($uploadFileSize >= 8388608) {
-      $uploadFileSize = 8388608;
-    }
     $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
 
     $this->assign('uploadSize', $uploadSize);
