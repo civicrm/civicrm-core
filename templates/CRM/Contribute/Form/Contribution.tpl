@@ -632,14 +632,12 @@ if(event.handled !== true) {
     var financialType = cj('#financial_type_id').val();
     var taxRates = '{/literal}{$taxRates}{literal}';
     var taxRates = JSON.parse(taxRates);
-    var taxRate = taxRates[financialType];   
+    var taxRate = taxRates[financialType]; 
+    if (!taxRate) {
+       taxRate = 0;
+    }  
     var totalAmount = cj('#total_amount').val();
-    if (taxRate) { 
-       var totalTaxAmount = Number((taxRate/100)*totalAmount)+Number(totalAmount);
-    }
-    else {
-    	 totalTaxAmount = totalAmount ;
-    }
+    var totalTaxAmount = Number((taxRate/100)*totalAmount)+Number(totalAmount);
     cj( "#totalTaxAmount" ).html('Total Amount : '+totalTaxAmount);
     event.handled = true;
     }
