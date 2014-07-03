@@ -4,7 +4,7 @@
     return CRM.resourceUrls['civicrm'] + '/partials/crmCaseType/' + relPath;
   };
 
-  var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils', 'crmUi']);
+  var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges']);
 
   var newCaseTypeDefinitionTemplate = {
     activityTypes: [
