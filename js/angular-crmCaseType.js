@@ -6,6 +6,7 @@
 
   var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges']);
 
+  // Note: This template will be passed to cloneDeep(), so don't put any funny stuff in here!
   var newCaseTypeDefinitionTemplate = {
     activityTypes: [
       {name: 'Open Case', max_instances: 1 }
@@ -46,7 +47,7 @@
             }
             else {
               return { title: "", name: "", is_active: "1", weight: "1",
-                definition: _.extend({}, newCaseTypeDefinitionTemplate) };
+                definition: _.cloneDeep(newCaseTypeDefinitionTemplate) };
             }
           }
         }
