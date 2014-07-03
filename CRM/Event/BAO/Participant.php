@@ -806,7 +806,7 @@ WHERE  civicrm_participant.id = {$participantId}
    * the api needs the name => value conversion, also the view layer typically
    * requires value => name conversion
    */
-  static function lookupValue(&$defaults, $property, &$lookup, $reverse) {
+  static function lookupValue(&$defaults, $property, $lookup, $reverse) {
     $id = $property . '_id';
 
     $src = $reverse ? $property : $id;
