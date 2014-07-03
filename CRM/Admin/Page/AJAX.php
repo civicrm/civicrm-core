@@ -58,7 +58,7 @@ class CRM_Admin_Page_AJAX {
       $navigation = CRM_Core_BAO_Navigation::createNavigation($contactID);
       $smarty->assign('timeGenerated', date('d M Y H:i:s'));
       $smarty->assign('navigation', $navigation);
-      print $smarty->fetch('CRM/common/Navigation.tpl');
+      print $smarty->fetch('CRM/common/navigation.js.tpl');
     }
     CRM_Utils_System::civiExit();
   }
