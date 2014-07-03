@@ -4,7 +4,7 @@
 </div>
 
 <script type="text/javascript">
-  (function() {
+  (function(angular, _) {
     var crmApp = angular.module('crmApp', CRM.angular.modules);
     crmApp.config(['$routeProvider',
       function($routeProvider) {
@@ -16,10 +16,14 @@
     crmApp.factory('crmApi', function(){
       return function(entity, action, params, message) {
         // JSON serialization in CRM.api3 is not aware of Angular metadata like $$hash
-        return CRM.api3(entity, action, eval('('+angular.toJson(params)+')'), message);
+        if (_.isObject(entity)) {
+          return CRM.api3(eval('('+angular.toJson(entity)+')'), message);
+        } else {
+          return CRM.api3(entity, action, eval('('+angular.toJson(params)+')'), message);
+        }
       };
     });
-  })();
+  })(angular, CRM._);
 </script>
 
 {/literal}

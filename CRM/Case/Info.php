@@ -65,29 +65,10 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       'js' => array('js/angular-crmCaseType.js'),
       'css' => array('css/angular-crmCaseType.css'),
     );
-    // Need full OptionValue records
-    $actStatuses = civicrm_api3('OptionValue', 'get', array('option_group_id' => 'activity_status'));
-    $actTypes = civicrm_api3('OptionValue', 'get', array(
-      'option_group_id' => 'activity_type',
-      'options' => array(
-        'sort' => 'name',
-        'limit' => 0,
-      ),
-    ));
-    $relTypes = civicrm_api3('RelationshipType', 'get', array(
-      'options' => array(
-        'sort' => CRM_Case_XMLProcessor::REL_TYPE_CNAME,
-        'limit' => 0,
-      )
-    ));
 
     CRM_Core_Resources::singleton()->addSetting(array(
       'crmCaseType' => array(
-        'actStatuses' => array_values($actStatuses['values']),
-        'actTypes' => array_values($actTypes['values']),
-        'relTypes' => array_values($relTypes['values']),
-        //CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name'),
-
+        'REL_TYPE_CNAME' => CRM_Case_XMLProcessor::REL_TYPE_CNAME,
       ),
     ));
     return $result;
