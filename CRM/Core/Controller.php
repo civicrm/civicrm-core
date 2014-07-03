@@ -239,8 +239,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
         $this->_generateQFKey = FALSE;
       }
       elseif ($snippet == 5) {
-        // this is used for popups and inlined ajax forms
-        // also used for the various tabs via TabHeader
+        // mode deprecated in favor of json
+        // still used by dashlets, probably nothing else
         $this->_print = CRM_Core_Smarty::PRINT_NOFORM;
       }
       // Respond with JSON if in AJAX context (also support legacy value '6')
