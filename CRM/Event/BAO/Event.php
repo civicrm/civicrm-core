@@ -362,7 +362,9 @@ WHERE      civicrm_event.is_active = 1 AND
     }
 
     //get the participant status type values.
-    $query = 'SELECT id, name, label, class FROM civicrm_participant_status_type';
+    $cpstObject = new CRM_Event_DAO_ParticipantStatusType();
+    $cpst = $cpstObject->getTableName();
+    $query = "SELECT id, name, label, class FROM $cpst";
     $status = CRM_Core_DAO::executeQuery($query);
     $statusValues = array();
     while ($status->fetch()) {
