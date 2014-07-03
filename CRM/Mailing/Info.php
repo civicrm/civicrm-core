@@ -67,6 +67,11 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $mailStatus = civicrm_api3('MailingJob', 'get', array());
 		$groupNames = civicrm_api3('Group', 'get', array());
 		$headerfooterList = civicrm_api3('MailingComponent', 'get', array());
+		$emailAdd = civicrm_api3('Email', 'get', array(
+				'sequential' => 1,
+				'return' => "email",
+				'contact_id' => 202,
+				));
 		$mesTemplate = civicrm_api3('MessageTemplate', 'get', array( 'sequential' => 1,
 			'return' => "msg_title",
 			'id' => array('>' => 58),)
@@ -80,6 +85,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'groupNames' => array_values($groupNames['values']),
         'headerfooterList' => array_values($headerfooterList['values']),
         'mesTemplate' => array_values($mesTemplate['values']),
+        'emailAdd' => array_values($emailAdd['values']),
         ),
       ));
     return $result;

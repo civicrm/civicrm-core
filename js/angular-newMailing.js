@@ -66,6 +66,7 @@
 		$scope.mailNameList = _.pluck(CRM.crmCaseType.civiMails, 'name');
 		$scope.groupNamesList = CRM.crmMailing.groupNames;
 		$scope.headerfooter = CRM.crmMailing.headerfooterList;
+		$scope.eMailing = CRM.crmMailing.emailAdd;
 		$scope.tmpList = CRM.crmMailing.mesTemplate;
 		$scope.currentMailing = selectedMail;
 		$scope.testGroup = "";
@@ -206,6 +207,8 @@
 					scheduled_date: $scope.currentMailing.scheduled_date,
 					scheduled_id: $scope.currentMailing.scheduled_id,
 					campaign_id:	$scope.currentMailing.campaign_id,
+					header_id:	$scope.currentMailing.header_id,
+					footer_id:	$scope.currentMailing.footer_id,
 					}, 
 				true);
 				//var result = crmApi('Mailing', 'create', $scope.currentMailing, true);
