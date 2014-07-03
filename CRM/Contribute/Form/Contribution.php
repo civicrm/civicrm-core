@@ -501,6 +501,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return;
     }
     $allPanes = array();
+    //tax rate from financialType
+    $this->assign('taxRates', json_encode(CRM_Core_PseudoConstant::getTaxRates()));
 
     // build price set form.
     $buildPriceSet = FALSE;
