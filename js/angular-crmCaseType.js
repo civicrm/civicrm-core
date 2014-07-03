@@ -7,23 +7,29 @@
   var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges']);
 
   // Note: This template will be passed to cloneDeep(), so don't put any funny stuff in here!
-  var newCaseTypeDefinitionTemplate = {
-    activityTypes: [
-      {name: 'Open Case', max_instances: 1 }
-    ],
-    activitySets: [
-      {
-        name: 'standard_timeline',
-        label: 'Standard Timeline',
-        timeline: '1', // Angular won't bind checkbox correctly with numeric 1
-        activityTypes: [
-          {name: 'Open Case', status: 'Completed' }
-        ]
-      }
-    ],
-    caseRoles: [
-      { name: 'Case Coordinator', creator: '1', manager: '1'}
-    ]
+  var newCaseTypeTemplate = {
+    title: "",
+    name: "",
+    is_active: "1",
+    weight: "1",
+    definition: {
+      activityTypes: [
+        {name: 'Open Case', max_instances: 1 }
+      ],
+      activitySets: [
+        {
+          name: 'standard_timeline',
+          label: 'Standard Timeline',
+          timeline: '1', // Angular won't bind checkbox correctly with numeric 1
+          activityTypes: [
+            {name: 'Open Case', status: 'Completed' }
+          ]
+        }
+      ],
+      caseRoles: [
+        { name: 'Case Coordinator', creator: '1', manager: '1'}
+      ]
+    }
   };
 
   crmCaseType.config(['$routeProvider',
@@ -46,8 +52,7 @@
               return crmApi('CaseType', 'getsingle', {id: $route.current.params.id});
             }
             else {
-              return { title: "", name: "", is_active: "1", weight: "1",
-                definition: _.cloneDeep(newCaseTypeDefinitionTemplate) };
+              return _.cloneDeep(newCaseTypeTemplate);
             }
           }
         }
