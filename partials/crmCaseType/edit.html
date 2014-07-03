@@ -2,14 +2,14 @@
 Controller: CaseTypeCtrl
 Required vars: caseType
 -->
-<form name="editCaseTypeFrom">
+<form name="editCaseTypeForm" unsaved-warning-form>
 <div class="crm-block crm-form-block crmCaseType">
   <div class="crm-submit-buttons">
     <span class="crm-button">
-      <input type="button" ng-click="save()" ng-disabled="editCaseTypeFrom.$invalid" value="Save" />
+      <input type="submit" ng-click="editCaseTypeForm.$setPristine(); save()" ng-disabled="editCaseTypeForm.$invalid" value="Save" />
     </span>
     <span class="crm-button">
-      <input type="button" ng-click="goto('caseType')" value="Cancel" />
+      <input type="submit" ng-click="editCaseTypeForm.$setPristine(); goto('caseType')" value="Cancel" />
     </span>
   </div>
 
@@ -58,10 +58,10 @@ Required vars: caseType
   <!--<button ng-click="dump()">Log</button>-->
   <div class="crm-submit-buttons">
     <span class="crm-button">
-      <input type="button" ng-click="save()" ng-disabled="editCaseTypeFrom.$invalid" value="Save" />
+      <input type="submit" ng-click="editCaseTypeForm.$setPristine(); save()" ng-disabled="editCaseTypeForm.$invalid" value="Save" />
     </span>
     <span class="crm-button">
-      <input type="button" ng-click="goto('caseType')" value="Cancel" />
+      <input type="submit" ng-click="editCaseTypeForm.$setPristine(); goto('caseType')" value="Cancel" />
     </span>
   </div>
 </div>
