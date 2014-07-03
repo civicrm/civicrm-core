@@ -396,13 +396,13 @@ SELECT rec.id                   as recur_id,
        rec.currency,
        con.id                   as contribution_id,
        con.contribution_page_id,
-       con.contact_id,
+       rec.contact_id,
        mp.membership_id";
 
     if ($entity == 'recur') {
       $sql .= "
       FROM civicrm_contribution_recur rec
-INNER JOIN civicrm_contribution       con ON ( con.contribution_recur_id = rec.id )
+LEFT JOIN civicrm_contribution       con ON ( con.contribution_recur_id = rec.id )
 LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
      WHERE rec.id = %1
   GROUP BY rec.id";
