@@ -5,7 +5,8 @@
   };
 
   var crmMailing = angular.module('crmMailing', ['ngRoute', 'ui.utils']);
-  
+  var incGroup = [];
+
 //-------------------------------------------------------------------------------------------------------
  crmMailing.config(['$routeProvider',
     function($routeProvider) {
@@ -61,11 +62,13 @@
 	//setting variables to the values we have got to the api
 		$scope.partialUrl = partialUrl;
 		$scope.campaignList =  CRM.crmMailing.campNames;
+		$scope.mailList = CRM.crmMailing.civiMails;
 		$scope.mailNameList = _.pluck(CRM.crmCaseType.civiMails, 'name');
 		$scope.groupNamesList = CRM.crmMailing.groupNames;
 		$scope.headerfooter = CRM.crmMailing.headerfooterList;
 		$scope.tmpList = CRM.crmMailing.mesTemplate;
 		$scope.currentMailing = selectedMail;
+		$scope.testGroup = "";
 		window.ct = $scope.currentMailing;
 		
 	//initializing variables we will use for checkboxes, or for purpose of ng-show
@@ -79,6 +82,7 @@
 		$scope.scheddate.date = ""; 
 		$scope.scheddate.time = ""; 
 		$scope.ans="";
+
 		
 		
 		$scope.mailAutoResponder="";
@@ -130,6 +134,51 @@
 		
 		
 		$scope.save = function() {
+				$scope.incGrp=[];
+				$scope.excGrp=[];
+				$scope.incMail=[];
+				$scope.excMail=[];
+				console.log($scope.testGroup + " test group");
+				console.log(incGroup);
+				$scope.answer="";
+				for(req_id in incGroup){
+					$scope.answer = incGroup[req_id].split(" ");
+			
+					if($scope.answer[1] == "mail" && $scope.answer[2]=="include"){
+						$scope.incMail.push($scope.answer[0]);
+						}
+					else if($scope.answer[1] == "mail" && $scope.answer[2]=="exclude"){
+						$scope.excMail.push($scope.answer[0]);
+						}
+					if($scope.answer[1] == "group" && $scope.answer[2]=="include"){
+						$scope.incGrp.push($scope.answer[0]);
+						}
+					else if($scope.answer[1] == "group" && $scope.answer[2]=="exclude"){
+						$scope.excGrp.push($scope.answer[0]);
+						}
+				}
+				
+				console.log($scope.incMail + " inc mail");
+				console.log($scope.excMail + " exc mail");
+				console.log($scope.incGrp + " inc group");
+				console.log($scope.excGrp + " exc group");
+				
+				for(a in $scope.incMail){
+					for(b in $scope.excMail){
+						if($scope.excMail[b]==$scope.incMail[a]){
+							console.log("should not happen same mail with id " + $scope.incMail[a] + " excluded and included");
+						}
+					}
+				}
+				
+				for(a in $scope.incGrp){
+					for(b in $scope.excGrp){
+						if($scope.excGrp[b]==$scope.incGrp[a]){
+							console.log("should not happen same group with id " + $scope.incGrp[a] + " excluded and included");
+						}
+					}
+				}
+				
 				$scope.currentMailing.scheduled_date= $scope.scheddate.date + " " + $scope.scheddate.time ;
 				if($scope.currentMailing.scheduled_date!=" "){
 						$scope.currentMailing.scheduled_id= "202";
@@ -137,7 +186,29 @@
 				else {
 						$scope.currentMailing.scheduled_date= "";
 				}
-				var result = crmApi('Mailing', 'create', $scope.currentMailing, true);
+				var result = crmApi('Mailing', 'create', {
+					name: $scope.currentMailing.name, 
+					visibility:  $scope.currentMailing.visibility, 
+					created_id: $scope.currentMailing.created_id, 
+					subject: $scope.currentMailing.subject, 
+					msg_template_id: $scope.currentMailing.msg_template_id,
+					open_tracking: $scope.currentMailing.open_tracking,
+					url_tracking: $scope.currentMailing.url_tracking,
+					forward_replies: $scope.currentMailing.forward_replies,
+					auto_responder: $scope.currentMailing.auto_responder,
+					from_name: $scope.currentMailing.from_name,
+					from_email: $scope.currentMailing.from_email,
+					replyto_email: $scope.currentMailing.replyto_email,
+					unsubscribe_id: $scope.currentMailing.unsubscribe_id,
+					resubscribe_id: $scope.currentMailing.resubscribe_id,
+					body_html: $scope.currentMailing.body_html,
+					body_text: $scope.currentMailing.body_text,
+					scheduled_date: $scope.currentMailing.scheduled_date,
+					scheduled_id: $scope.currentMailing.scheduled_id,
+					campaign_id:	$scope.currentMailing.campaign_id,
+					}, 
+				true);
+				//var result = crmApi('Mailing', 'create', $scope.currentMailing, true);
 				result.success(function(data) {
 					if (data.is_error == 0) {
 						$scope.currentMailing.id = data.id;
@@ -186,8 +257,12 @@
 			link: function(scope,element, attrs){
 			$(element).select2({
 				width:"400px",
-				placeholder: "Include Group",
+				placeholder: "Choose Recipients",
 				});
+			$(element).on('select2-selecting', function(e) {
+					incGroup.push(e.val);
+          console.log(incGroup);
+        });
 			}
 		};
 	}); 

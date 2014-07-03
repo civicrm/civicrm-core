@@ -4,13 +4,26 @@ Required vars: groupNamesList
 MailingGroup api needs to be improved to bind the chosen groups
 -->
 
-<br>
+<!--<br>
 <select multiple chsgroup ng-model="incGroup" ng-options="grp.name as grp.title for grp in groupNamesList| filter: isGrp ">
   <option value=""></option>
 </select>
 <br> <br>
 
-<select multiple chsgroup placeholder="Exclude Group" ng-model="excGroup" ng-options="grp.name as grp.title for grp in groupNamesList| filter: isGrp">
+
+<br>
+<select multiple placeholder: "Exclude Group" chsgroup ng-model="excGroup" ng-options="grp.name as grp.title for grp in groupNamesList| filter: isGrp ">
   <option value=""></option>
+</select>
+<br> <br>
+-->
+
+<br>
+<select multiple chsgroup>
+	<option ng-repeat="grp in groupNamesList| filter: isGrp" value="{{grp.id}} group include" > Include {{grp.title}}</option>
+	<option ng-repeat="grp in groupNamesList| filter: isGrp" value="{{grp.id}} group exclude" > Exclude {{grp.title}}</option>
+	<option ng-repeat="ml in mailList" value="{{ml.id}} mail include" > Include Mailing {{ml.name}}</option>
+	<option ng-repeat="ml in mailList" value="{{ml.id}} mail exclude" > Exclude Mailing {{ml.name}}</option>
+
 </select>
 <br> <br>
