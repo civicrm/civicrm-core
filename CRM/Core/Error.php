@@ -834,7 +834,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
     $session->setStatus($status, $title);
     if (CRM_Utils_Array::value('snippet', $_REQUEST) === CRM_Core_Smarty::PRINT_JSON) {
-      CRM_Core_Page_AJAX::returnJsonResponse(array('status' => 'error'));
+      CRM_Core_Page_AJAX::returnJsonResponse(array('status' => 'error', 'crmBounceUrl' => $redirect));
     }
     CRM_Utils_System::redirect($redirect);
   }
