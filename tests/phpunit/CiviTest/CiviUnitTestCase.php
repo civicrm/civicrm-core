@@ -914,7 +914,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       $params[$key] = $values[$seq % sizeof($values)];
     }
     if ($contact_type == 'Individual' ) {
-        $employer = $this->sampleContact('Organization', $seq);
         $params['email'] = strtolower(
           $params['first_name'] . '.' . $params['last_name'] . '@civicrm.org'
         );
