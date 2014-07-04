@@ -211,7 +211,9 @@
     _onFailure: function(data) {
       this.options.block && this.element.unblock();
       this.element.trigger('crmAjaxFail', data);
-      CRM.alert(ts('Unable to reach the server. Please refresh this page in your browser and try again.'), ts('Network Error'), 'error');
+      if (! data.crmPreventWarning) {
+        CRM.alert(ts('Unable to reach the server. Please refresh this page in your browser and try again.'), ts('Network Error'), 'error');
+      }
     },
     _formatUrl: function(url) {
       // Strip hash
@@ -294,6 +296,12 @@
       $(settings.target).on('dialogclose', function() {
         if ($(this).attr('data-unsaved-changes') !== 'true') {
           $(this).crmSnippet('destroy').dialog('destroy').remove();
+        }
+      });
+      $(settings.target).on('crmAjaxFail', function(event, data) {
+        if (typeof(data) == 'object' && data.crmBounceUrl) {
+          data.crmPreventWarning = true;
+          $(event.target).dialog('close');
         }
       });
     }
