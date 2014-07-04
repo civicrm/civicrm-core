@@ -827,12 +827,15 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @access public
    * @static
    */
-  public static function statusBounce($status, $redirect = NULL, $title = '') {
+  public static function statusBounce($status, $redirect = NULL, $title = NULL) {
     $session = CRM_Core_Session::singleton();
     if (!$redirect) {
       $redirect = $session->readUserContext();
     }
-    $session->setStatus($status, $title);
+    if ($title === NULL) {
+      $title = ts('Error');
+    }
+    $session->setStatus($status, $title, 'alert', array('expires' => 0));
     if (CRM_Utils_Array::value('snippet', $_REQUEST) === CRM_Core_Smarty::PRINT_JSON) {
       CRM_Core_Page_AJAX::returnJsonResponse(array('status' => 'error'));
     }
