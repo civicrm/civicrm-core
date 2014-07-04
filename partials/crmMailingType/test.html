@@ -14,9 +14,8 @@ Required vars: groupNamesList
   <tr>
     <td class="label">Send to this Group</td>
     <td>
-      <select ng-model="testGroup">
-			  <option value="">-none-</option>
-			  <option ui-select ng-repeat="grp in groupNamesList| filter: isGrp" value="{{grp.id}}" > {{grp.title}}</option>
+      <select  style="width: 200px" ng-model="testGroup" ng-options="grp.id as grp.title for grp in groupNamesList| filter: isGrp">
+				<option value="">-none-</option>
 			</select>
     </td>
   </tr>
@@ -28,3 +27,4 @@ Required vars: groupNamesList
   
   </tbody>
 </table>
+
