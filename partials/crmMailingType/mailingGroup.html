@@ -4,26 +4,17 @@ Required vars: groupNamesList
 MailingGroup api needs to be improved to bind the chosen groups
 -->
 
-<!--<br>
-<select multiple chsgroup ng-model="incGroup" ng-options="grp.name as grp.title for grp in groupNamesList| filter: isGrp ">
-  <option value=""></option>
-</select>
-<br> <br>
-
-
-<br>
-<select multiple placeholder: "Exclude Group" chsgroup ng-model="excGroup" ng-options="grp.name as grp.title for grp in groupNamesList| filter: isGrp ">
-  <option value=""></option>
-</select>
-<br> <br>
--->
-
 <br>
 <select multiple chsgroup>
 	<option ng-repeat="grp in groupNamesList| filter: isGrp" value="{{grp.id}} group include" > Include {{grp.title}}</option>
 	<option ng-repeat="grp in groupNamesList| filter: isGrp" value="{{grp.id}} group exclude" > Exclude {{grp.title}}</option>
-	<option ng-repeat="ml in mailList" value="{{ml.id}} mail include" > Include Mailing {{ml.name}}</option>
-	<option ng-repeat="ml in mailList" value="{{ml.id}} mail exclude" > Exclude Mailing {{ml.name}}</option>
-
+	<option ng-repeat="ml in mailList| filter:isCompMail" value="{{ml.id}} mail include" > Include Mailing {{ml.name}}</option>
+	<option ng-repeat="ml in mailList| filter:isCompMail" value="{{ml.id}} mail exclude" > Exclude Mailing {{ml.name}}</option>
 </select>
 <br> <br>
+
+
+<!--<a class="crm-add-entity crm-hover-button" href="/siddhant/drupal-7.27/civicrm/profile/create?reset=1&context=dialog&gid=4">
+<span class="icon Individual-profile-icon"></span>
+New Individual
+</a>-->

@@ -84,15 +84,14 @@
 		$scope.scheddate.time = ""; 
 		$scope.ans="";
 
-		
-		
-		$scope.mailAutoResponder="";
 	// To split the scheduled_date into date and time. The date format is not accepting 
-	/*		if(selectedMail.scheduled_date != ""){
+		if(selectedMail.scheduled_date != null){
 				$scope.ans= selectedMail.scheduled_date.split(" ");
 				$scope.scheddate.date=$scope.ans[0];
 				$scope.scheddate.time=$scope.ans[1];
-			}*/
+				console.log("scheddate.date is " + $scope.scheddate.date);
+				console.log("scheddate.time is " + $scope.scheddate.time);
+			}
 
 		console.log(selectedMail); 
 		
@@ -133,6 +132,9 @@
 			return grp.visibility == "Public Pages";
 		};
 		
+		$scope.isCompMail= function(ml){
+			return ml.is_completed == 1;
+		};
 		
 		$scope.save = function() {
 				$scope.incGrp=[];
@@ -185,9 +187,10 @@
 						$scope.currentMailing.scheduled_id= "202";
 					}
 				else {
-						$scope.currentMailing.scheduled_date= "";
+						$scope.currentMailing.scheduled_date= null;
 				}
 				var result = crmApi('Mailing', 'create', {
+					id: $scope.currentMailing.id,
 					name: $scope.currentMailing.name, 
 					visibility:  $scope.currentMailing.visibility, 
 					created_id: $scope.currentMailing.created_id, 
@@ -209,8 +212,15 @@
 					campaign_id:	$scope.currentMailing.campaign_id,
 					header_id:	$scope.currentMailing.header_id,
 					footer_id:	$scope.currentMailing.footer_id,
+					groups: {include: $scope.incGrp,
+									 exclude: $scope.excGrp
+									 },
+					mailings: {include: $scope.incMail,
+										 exclude: $scope.excMail
+										},
+					is_completed: $scope.currentMailing.is_completed,
 					}, 
-				true);
+				true);			
 				//var result = crmApi('Mailing', 'create', $scope.currentMailing, true);
 				result.success(function(data) {
 					if (data.is_error == 0) {
@@ -279,7 +289,7 @@
 			restrict: 'AE',
 			link: function(scope,element,attrs){
 					$(element).datepicker({
-						dateFormat: 'yy-mm-dd',
+						dateFormat: "yy-mm-dd",
 						onSelect: function(date) {
 							$(".ui-datepicker a").removeAttr("href");
 							scope.dat =date;
