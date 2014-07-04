@@ -372,6 +372,7 @@
       cj('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function(index) {
         loadPanes(cj(this).attr('id'));
       });
+      cj('#total_amount').trigger("change");
     });
     // load panes function calls for snippet based on id of crm-accordion-header
     function loadPanes( id ) {
@@ -627,18 +628,30 @@ cj("#financial_type_id").on("change",function(){
     cj('#total_amount').trigger("change");
 })
 
+cj("#currency").on("change",function(){
+    cj('#total_amount').trigger("change");
+})
+
 cj('#total_amount').on("change",function(event) {
 if(event.handled !== true) {
     var financialType = cj('#financial_type_id').val();
     var taxRates = '{/literal}{$taxRates}{literal}';
     var taxRates = JSON.parse(taxRates);
+    var currencies = '{/literal}{$currencies}{literal}';
+    var currencies = JSON.parse(currencies);
+    var currencySelect = cj('#currency').val();
+    var currencySymbol = currencies[currencySelect];
+    var re= /\((.*?)\)/g;
+    for(m = re.exec(currencySymbol); m; m = re.exec(currencySymbol)){
+       var currencySymbol = m[1];
+    }
     var taxRate = taxRates[financialType]; 
     if (!taxRate) {
        taxRate = 0;
     }  
     var totalAmount = cj('#total_amount').val();
-    var totalTaxAmount = Number((taxRate/100)*totalAmount)+Number(totalAmount);
-    cj( "#totalTaxAmount" ).html('Total Amount : '+totalTaxAmount);
+    var totalTaxAmount = parseFloat(Number((taxRate/100)*totalAmount)+Number(totalAmount)).toFixed(2);
+    cj( "#totalTaxAmount" ).html('Total Amount : <span id="currencySymbolShow">'+currencySymbol+'</span> '+totalTaxAmount);
     event.handled = true;
     }
      return false;

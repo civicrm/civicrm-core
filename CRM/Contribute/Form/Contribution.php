@@ -397,7 +397,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // fix the display of the monetary value, CRM-4038
     if (isset($defaults['total_amount'])) {
-      $defaults['total_amount'] = CRM_Utils_Money::format($defaults['total_amount'], NULL, '%a');
+      if (!empty($defaults['tax_amount'])) {
+        $defaults['total_amount'] = CRM_Utils_Money::format($defaults['total_amount'] - $defaults['tax_amount'], NULL, '%a');
+      }
+      else {
+        $defaults['total_amount'] = CRM_Utils_Money::format($defaults['total_amount'], NULL, '%a');
+      }
     }
 
     if (isset($defaults['non_deductible_amount'])) {
@@ -503,6 +508,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $allPanes = array();
     //tax rate from financialType
     $this->assign('taxRates', json_encode(CRM_Core_PseudoConstant::getTaxRates()));
+    $this->assign('currencies', json_encode(CRM_Core_OptionGroup::values('currencies_enabled')));
 
     // build price set form.
     $buildPriceSet = FALSE;
@@ -1094,6 +1100,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
         $lineItems[$itemId]['unit_price'] = $lineItems[$itemId]['line_total'] = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('total_amount', $submittedValues));
+        // Update line total and total amount with tax on edit
+        if ($lineItems[$itemId]['tax_amount']) {
+          $lineItems[$itemId]['line_total'] = CRM_Utils_Rule::cleanMoney($lineItems[$itemId]['line_total'] + $lineItems[$itemId]['tax_amount']);
+          $submittedValues['total_amount'] = $lineItems[$itemId]['line_total'];
+        }
       }
       // 10117 update th line items for participants
       if (!empty($lineItems[$itemId]['price_field_id'])) {
