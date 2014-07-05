@@ -134,13 +134,17 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     $config = CRM_Core_Config::singleton();
     $financialType = CRM_Contribute_PseudoConstant::financialType();
     $taxRate = CRM_Core_PseudoConstant::getTaxRates();
+    // display taxTerm for priceFields
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $getTaxDetails = FALSE;
     foreach ($customOption as $id => $values) {
       $action = array_sum(array_keys($this->actionLinks()));
       // Adding the required fields in the array
       if (isset($taxRate[$values['financial_type_id']])) {
         $customOption[$id]['tax_rate'] = $taxRate[$values['financial_type_id']];
-        if (isset($customOption[$id]['tax_rate'])) {
+        if ($invoicing && isset($customOption[$id]['tax_rate'])) {
           $getTaxDetails = TRUE;
         }
         $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($customOption[$id]['amount'], $customOption[$id]['tax_rate']);
@@ -188,6 +192,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       'id', $returnURL, $filter
     );
 
+    $this->assign('taxTerm', $taxTerm);
     $this->assign('getTaxDetails', $getTaxDetails);
     $this->assign('customOption', $customOption);
     $this->assign('sid', $this->_sid);

@@ -275,7 +275,13 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
 
-      $this->assign('totalTaxAmount', $taxAmount);
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+      $this->assign('taxTerm', $taxTerm);
+      if ($invoicing) {
+        $this->assign('totalTaxAmount', $taxAmount);
+      }
       $this->assign('part', $this->_part);
       $this->set('part', $this->_part);
       $this->assign('amounts', $this->_amount);
@@ -285,9 +291,19 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $lineItemForTemplate = array();
+      $getTaxDetails = FALSE;
       foreach ($this->_lineItem as $key => $value) {
         if (!empty($value)) {
           $lineItemForTemplate[$key] = $value;
+        }
+        if ($invoicing) {
+          foreach ($value as $v) {
+            if (isset($v['tax_rate'])) {
+              if ($v['tax_rate'] != '') {
+                $getTaxDetails = TRUE;
+              }
+            }
+          }
         }
       }
       if (!empty($lineItemForTemplate)) {
@@ -295,6 +311,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
 
+    $this->assign('getTaxDetails', $getTaxDetails);
     //display additional participants profile.
     self::assignProfiles($this);
 
@@ -673,6 +690,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
 
       $entityTable = 'civicrm_participant';
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       $totalTaxAmount = 0;
       $dataArray = array();
       foreach ($this->_lineItem as $key => $value) {
@@ -687,20 +706,24 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $lineItem[$this->_priceSetId] = $value;
           CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, $entityTable);
         }
-        foreach ($value as $line) {
-          if (isset($line['tax_amount']) && isset($line['tax_rate'])) {
-            $totalTaxAmount = $line['tax_amount'] + $totalTaxAmount;
-            if (isset($dataArray[$line['tax_rate']])) {
-              $dataArray[$line['tax_rate']] = $dataArray[$line['tax_rate']] + CRM_Utils_Array::value('tax_amount', $line);
-            }
-            else {
-              $dataArray[$line['tax_rate']] = CRM_Utils_Array::value('tax_amount', $line);
+        if ($invoicing) {
+          foreach ($value as $line) {
+            if (isset($line['tax_amount']) && isset($line['tax_rate'])) {
+              $totalTaxAmount = $line['tax_amount'] + $totalTaxAmount;
+              if (isset($dataArray[$line['tax_rate']])) {
+                $dataArray[$line['tax_rate']] = $dataArray[$line['tax_rate']] + CRM_Utils_Array::value('tax_amount', $line);
+              }
+              else {
+                $dataArray[$line['tax_rate']] = CRM_Utils_Array::value('tax_amount', $line);
+              }
             }
           }
         }
       }
-      $this->assign('dataArray', $dataArray);
-      $this->assign('totalTaxAmount', $totalTaxAmount);
+      if ($invoicing) {
+        $this->assign('dataArray', $dataArray);
+        $this->assign('totalTaxAmount', $totalTaxAmount);
+      }
     }
 
     //update status and send mail to cancelled additonal participants, CRM-4320

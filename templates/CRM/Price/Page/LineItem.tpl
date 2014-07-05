@@ -41,12 +41,12 @@
                 {else}
         <th class="right">{ts}Qty{/ts}</th>
                     <th class="right">{ts}Unit Price{/ts}</th>
-        {if !$totalTaxAmount}
+        {if !$getTaxDetails}
           <th class="right">{ts}Total Price{/ts}</th>
         {/if}
               {/if}
 
-        {if $totalTaxAmount}
+        {if $getTaxDetails}
           <th class="right">{ts}Subtotal{/ts}</th>
           <th class="right">{ts}Tax Rate{/ts}</th>
           <th class="right">{ts}Tax Amount{/ts}</th>
@@ -65,20 +65,13 @@
     {else}
                 <td class="right">{$line.line_total|crmMoney}</td>
 {/if}
-     {if !$totalTaxAmount && $context NEQ "Membership"}
+     {if !$getTaxDetails && $context NEQ "Membership"}
           <td class="right">{$line.line_total|crmMoney}</td>
      {/if}
-     {if $totalTaxAmount}
+     {if $getTaxDetails}
        <td class="right">{$line.line_total-$line.tax_amount|crmMoney}</td>
-       {if $line.tax_rate != ""}
-         {if $line.tax_rate == 0}
-           <td class="right">{ts}VAT(exempt){/ts}</td>
-	 {else}
-	   <td class="right">{ts}VAT{/ts}({$line.tax_rate|string_format:"%.2f"}%)</td>
-	 {/if}
-	   <td class="right">{$line.tax_amount|crmMoney}</td>
-       {elseif $line.tax_amount != ''}
-         <td class="right">{ts}VAT(exempt){/ts}</td>
+       {if $line.tax_rate != "" || $line.tax_amount != ""}
+        <td class="right">{$taxTerm} ({$line.tax_rate|string_format:"%.2f"}%)</td>
          <td class="right">{$line.tax_amount|crmMoney}</td>
        {else}
          <td></td>

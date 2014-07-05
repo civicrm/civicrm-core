@@ -150,10 +150,10 @@
        {foreach from=$dataArray item=value key=priceset}
         <tr>
         {if $priceset}
-          <td>&nbsp;{ts}VAT{/ts}{$priceset|string_format:"%.2f"}%</td>    
+          <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>    
           <td>&nbsp;{$value|crmMoney:$currency}</td>
         {elseif  $priceset == 0}
-          <td>&nbsp;{ts}VAT{/ts}</td>
+          <td>&nbsp;{ts}No{/ts} {$taxTerm}</td>
           <td>&nbsp;{$value|crmMoney:$currency}</td>
         {/if}
         </tr>

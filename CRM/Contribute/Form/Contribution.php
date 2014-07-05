@@ -506,9 +506,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // build price set form.
     $buildPriceSet = FALSE;
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
 
-    // showing tax amount on edit contribution page
-    if ($this->_action & CRM_Core_Action::UPDATE && isset($this->_values['tax_amount'])) {
+    // display tax amount on edit contribution page
+    if ($invoicing && $this->_action & CRM_Core_Action::UPDATE && isset($this->_values['tax_amount'])) {
       $this->assign('totalTaxAmount', $this->_values['tax_amount']);
     }
 

@@ -17,42 +17,48 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     $this->_varNames = array(
                              CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME  =>
                              array(
+                                   'invoicing' => array(
+                                                       'html_type' => 'checkbox',
+                                                       'title' => ts('Sales Taxes and Invoicing'),
+                                                       'weight' => 1,                             
+                                                       ),
                                    'invoice_prefix' => array(
                                                              'html_type' => 'text',
                                                              'title' => ts('Invoice Prefix'),
-                                                             'weight' => 1,
+                                                             'weight' => 2,
                                                              'description' => ts('Enter prefix to be display on PDF for invoice'),
                                                              ),
                                    'credit_notes_prefix' => array(
                                                                   'html_type' => 'text',
                                                                   'title' => ts('Credit Notes Prefix'),
-                                                                  'weight' => 2,
+                                                                  'weight' => 3,
                                                                   'description' => ts('Enter prefix to be display on PDF for credit notes.'),
-                                                                  ),	
+                                                                  ),
                                    'due_date' => array(
                                                        'html_type' => 'text',
                                                        'title' => ts('Due Date'),
-                                                       'weight' => 3,
+                                                       'weight' => 4,
                                                        ),
                                    'due_date_period' => array(
                                                               'html_type' => 'select',
-                                                              'weight' => 4,
+                                                              'weight' => 5,
                                                               'description' => ts('Select the interval for due date.'),
                                                               ),
                                    'notes' => array(
                                                     'html_type' => 'textarea',
                                                     'title' => ts('Notes or Standard Terms'),
-                                                    'weight' => 5,
+                                                    'weight' => 6,
                                                     'description' => ts('Enter note or message to be display on PDF invoice or credit notes '),
                                                     ),
+
                                    'tax_term' => array(
                                                        'html_type' => 'text',
                                                        'title' => ts('Tax Term'),
-                                                       'weight' => 6,
+                                                       'weight' => 7,                             
                                                        ),
                                    'tax_display_settings'=> array(
                                                                   'html_type' => 'select',
-                                                                  'weight' => 7,
+                                                                  'weight' => 8,
                                                                   ),
                                    ),
                              );
@@ -77,7 +83,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
                );
     $this->add('select','tax_display_settings', ts('Tax Display Settings'),
                array(
-                     'Do_not_show' => ts('Do not show brakedown, only show total -i.e '.$config->defaultCurrencySymbol.'120.00'),
+                     'Do_not_show' => ts('Do not show breakdown, only show total -i.e '.$config->defaultCurrencySymbol.'120.00'),
                      'Inclusive' => ts('Show [tax term] inclusive price - i.e. '.$config->defaultCurrencySymbol.'120.00 (includes [tax term] of '.$config->defaultCurrencySymbol.'20.00)'),
                      'Exclusive' => ts('Show [tax term] exclusive price - i.e. '.$config->defaultCurrencySymbol.'100.00 + '.$config->defaultCurrencySymbol.'20.00 [tax term]')
                      )    
