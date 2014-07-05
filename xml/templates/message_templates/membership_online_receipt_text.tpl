@@ -80,9 +80,9 @@
 
 {foreach from=$dataArray item=value key=priceset}
 {if $priceset}
-{ts}Vat{/ts}{$priceset|string_format:"%.2f"}%: {$value|crmMoney:$currency}
+{$taxTerm} {$priceset|string_format:"%.2f"}%: {$value|crmMoney:$currency}
 {elseif  $priceset == 0}
-{ts}No Vat{/ts}: {$value|crmMoney:$currency}
+{ts}No{/ts} {$taxTerm}: {$value|crmMoney:$currency}
 {/if}
 {/foreach}
 {/if}

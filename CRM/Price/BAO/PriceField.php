@@ -283,6 +283,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     //use value field.
     $valueFieldName = 'amount';
     $seperator = '|';
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $displayOpt = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
     $displayOpt = CRM_Utils_Array::value('tax_display_settings', $displayOpt);
     switch ($field->html_type) {
@@ -291,8 +294,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         $count = CRM_Utils_Array::value('count', $customOption[$optionKey], '');
         $max_value = CRM_Utils_Array::value('max_value', $customOption[$optionKey], '');
         $taxAmount = CRM_Utils_Array::value('tax_amount', $customOption[$optionKey]);
-        if ($taxAmount && $displayOpt) {
+        if ($taxAmount && $displayOpt && $invoicing) {
           $qf->assign('displayOpt', $displayOpt);
+          $qf->assign('taxTerm', $taxTerm);
         }
         $priceVal = implode($seperator, array($customOption[$optionKey][$valueFieldName] + $taxAmount, $count, $max_value));
 
@@ -355,7 +359,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $taxAmount = CRM_Utils_Array::value('tax_amount', $opt);
           if ($field->is_display_amounts) {
             $opt['label'] = !empty($opt['label']) ? $opt['label'] : '';
-            if ($taxAmount) {
+            if ($taxAmount && $invoicing) {
               if ($displayOpt == 'Do_not_show') {
                 $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName] + $taxAmount) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
               }
@@ -370,7 +374,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             }
             else {
               $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
-              if (isset($opt['tax_amount']) && $displayOpt != 'Do_not_show') {
+              if (isset($opt['tax_amount']) && $displayOpt != 'Do_not_show' && $invoicing) {
                 $opt['label'] .= '<span class="crm-price-amount-label">'. ts(' VAT (exempt)') .'</span>';
               }
             }
@@ -452,12 +456,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
           if ($field->is_display_amounts) {
             $opt['label'] .= '&nbsp;-&nbsp;';
-            if ($taxAmount) {
+            if ($taxAmount && $invoicing) {
               $opt['label'] .= self::getTaxLabel($opt, $valueFieldName, $displayOpt);
             }
             else {
               $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
-              if (isset($opt['tax_amount']) && $displayOpt != 'Do_not_show') {
+              if (isset($opt['tax_amount']) && $displayOpt != 'Do_not_show' && $invoicing) {
                 $opt['label'] .= '<span class="crm-price-amount-label">'. ts(' VAT (exempt)') .'</span>';
               }
             }
@@ -496,12 +500,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
           if ($field->is_display_amounts) {
             $opt['label'] .= '&nbsp;-&nbsp;';
-            if ($taxAmount) {
+            if ($taxAmount && $invoicing) {
               $opt['label'] .= self::getTaxLabel($opt, $valueFieldName, $displayOpt);
             }
             else {
               $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
-              if (isset($opt['tax_amount']) && $displayOpt != 'Do_not_show') {
+              if (isset($opt['tax_amount']) && $displayOpt != 'Do_not_show' && $invoicing) {
                 $opt['label'] .= '<span class="crm-price-amount-label">'. ts(' VAT (exempt)') .'</span>';
               }
             }

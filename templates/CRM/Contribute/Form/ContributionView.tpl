@@ -47,16 +47,18 @@
       </a>
     {/if}
     {include file="CRM/common/formButtons.tpl" location="top"}
+    {assign var='pdfUrlParams' value="reset=1&id=$id&cid=$contact_id"}
     {assign var='emailUrlParams' value="reset=1&id=$id&cid=$contact_id&select=email"}
-    {assign var='invoiceUrlParams' value="reset=1&id=$id&cid=$contact_id"}
-    {if $contribution_status != 'Refunded'}
-      <div class="crm-printButton"><a class="button" href="{crmURL p='civicrm/contribute/invoice' q=$invoiceUrlParams}">
-      {ts}Print Invoice{/ts}</a>
-      <a class="button" href="{crmURL p='civicrm/contribute/invoice/email' q=$emailUrlParams}">
-      {ts}Email Invoice{/ts}</a></div>
-    {else}
-      <div class="crm-printButton"><a class="button" href="{crmURL p='civicrm/contribute/invoice' q=$invoiceUrlParams}">
-      {ts}Print invoice and Credit note{/ts}</a></div>
+    {if $invoicing}
+      {if $contribution_status != 'Refunded'}
+        <div class="crm-printButton"><a class="button" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
+        {ts}Print Invoice{/ts}</a>
+        <a class="button" href="{crmURL p='civicrm/contribute/invoice/email' q=$emailUrlParams}">
+        {ts}Email Invoice{/ts}</a></div>
+      {else}
+        <div class="crm-printButton"><a class="button" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
+        {ts}Print Invoice and Credit Note{/ts}</a></div>
+      {/if}
     {/if}
   </div>
 </div>
@@ -92,7 +94,7 @@
       </td>
     </tr>
   {/if}
-  {if $tax_amount}
+  {if $tax_amount && $invoicing}
     <tr>
       <td class="label">{ts}Total Tax Amount{/ts}</td>
       <td>{$tax_amount|crmMoney:$currency}</td>
@@ -323,14 +325,16 @@
           class="icon delete-icon"></div>{ts}Delete{/ts}</span></a>
   {/if}
   {include file="CRM/common/formButtons.tpl" location="bottom"}
-  {if $contribution_status != 'Refunded'}
-    <div class="crm-printButton"><a class="button" href="{crmURL p='civicrm/contribute/invoice' q=$invoiceUrlParams}">
-    {ts}Print Invoice{/ts}</a>
-    <a class="button" href="{crmURL p='civicrm/contribute/invoice/email' q=$emailUrlParams}">
-    {ts}Email Invoice{/ts}</a></div>
-  {else}
-    <div class="crm-printButton"><a class="button" href="{crmURL p='civicrm/contribute/invoice' q=$invoiceUrlParams}">
-    {ts}Print invoice and Credit note{/ts}</a></div>
+  {if $invoicing}
+    {if $contribution_status != 'Refunded'}
+      <div class="crm-printButton"><a class="button" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
+      {ts}Print Invoice{/ts}</a>
+      <a class="button" href="{crmURL p='civicrm/contribute/invoice/email' q=$emailUrlParams}">
+      {ts}Email Invoice{/ts}</a></div>
+    {else}
+      <div class="crm-printButton"><a class="button" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
+      {ts}Print Invoice and Credit Note{/ts}</a></div>
+    {/if}
   {/if}
 </div>
 </div>

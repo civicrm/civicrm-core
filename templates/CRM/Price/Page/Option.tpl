@@ -79,12 +79,9 @@
             <td class="nowrap crm-price-option-order">{$row.weight}</td>
             {if $getTaxDetails}
               <td>{if $row.tax_rate != '' }
-                    {if $row.tax_rate == 0.00}
-                      {ts}VAT(Exempt){/ts}
-                    {else}
-                      {ts}VAT{/ts}({$row.tax_rate|string_format:"%.2f"}%)
-                    {/if}
-                  {/if}</td>
+                    {$taxTerm} ({$row.tax_rate|string_format:"%.2f"}%)
+                  {/if}
+              </td>
               <td>{$row.tax_amount|crmMoney}</td>
             {/if}
             <td id="row_{$row.id}_status" class="crm-price-option-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
