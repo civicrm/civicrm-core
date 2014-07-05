@@ -1147,7 +1147,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           self::addToErrorMsg(ts('field ID'), $errorMessage);
         }
         // validate null values for required custom fields of type boolean
-        if ($customFields[$customFieldID]['is_required'] && (empty($params['custom_'.$customFieldID]) && !is_numeric($params['custom_'.$customFieldID])) && $customFields[$customFieldID]['data_type'] == 'Boolean') {
+        if (!empty($customFields[$customFieldID]['is_required']) && (empty($params['custom_'.$customFieldID]) && !is_numeric($params['custom_'.$customFieldID])) && $customFields[$customFieldID]['data_type'] == 'Boolean') {
           self::addToErrorMsg($customFields[$customFieldID]['label'].'::'.$customFields[$customFieldID]['groupTitle'], $errorMessage);
         }
 
