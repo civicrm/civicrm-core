@@ -133,7 +133,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     // check if we can process credit card registration
     CRM_Core_Payment::allowBackofficeCreditCard($this);
 
-    $this->setContext();
+    self::setContext($this);
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->view();
@@ -154,10 +154,10 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     return parent::run();
   }
 
-  function setContext() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
+  public static function setContext(&$form) {
+    $context = CRM_Utils_Request::retrieve('context', 'String', $form, FALSE, 'search');
 
-    $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
+    $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
     //validate the qfKey
     if (!CRM_Utils_Rule::qfKey($qfKey)) {
       $qfKey = NULL;
@@ -184,7 +184,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
 
       case 'pledge':
         $url = CRM_Utils_System::url('civicrm/contact/view',
-          "reset=1&force=1&cid={$this->_contactId}&selectedChild=pledge"
+          "reset=1&force=1&cid={$form->_contactId}&selectedChild=pledge"
         );
         break;
 
@@ -194,7 +194,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
 
       case 'activity':
         $url = CRM_Utils_System::url('civicrm/contact/view',
-          "reset=1&force=1&cid={$this->_contactId}&selectedChild=activity"
+          "reset=1&force=1&cid={$form->_contactId}&selectedChild=activity"
         );
         break;
 
@@ -204,8 +204,8 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
 
       default:
         $cid = NULL;
-        if ($this->_contactId) {
-          $cid = '&cid=' . $this->_contactId;
+        if ($form->_contactId) {
+          $cid = '&cid=' . $form->_contactId;
         }
         $url = CRM_Utils_System::url('civicrm/pledge/search',
           'force=1' . $cid
