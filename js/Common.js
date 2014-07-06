@@ -524,12 +524,12 @@ CRM.validate = CRM.validate || {
             $el.data('origSize', null);
           } else {
             $el.data('origSize', {
-              position: 'center',
+              position: {my: 'center', at: 'center', of: window},
               width: $el.dialog('option', 'width'),
               height: $el.dialog('option', 'height')
             });
             var menuHeight = $('#civicrm-menu').height();
-            $el.dialog('option', {width: '100%', height: ($(window).height() - menuHeight), position: [0, menuHeight]});
+            $el.dialog('option', {width: '100%', height: ($(window).height() - menuHeight), position: {my: "top", at: "top+"+menuHeight, of: window}});
           }
           e.preventDefault();
         });
