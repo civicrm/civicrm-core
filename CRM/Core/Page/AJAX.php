@@ -200,6 +200,27 @@ class CRM_Core_Page_AJAX {
   }
 
   /**
+   * Render and output a template as a javascript file
+   * @param string $tplFile
+   * @param array $vars - template variables
+   */
+  static function returnDynamicJS($tplFile, $vars = array()) {
+    // Set headers to encourage browsers to cache for a long time
+    $year = 60*60*24*364;
+    header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + $year));
+    header('Content-Type:	application/javascript');
+    header("Cache-Control: max-age=$year, public");
+
+    $smarty = CRM_Core_Smarty::singleton();
+    $vars += array('timeGenerated' => date('d M Y H:i:s'));
+    foreach ($vars as $name => $val) {
+      $smarty->assign($name, $val);
+    }
+    print $smarty->fetch($tplFile);
+    CRM_Utils_System::civiExit();
+  }
+
+  /**
    * Send autocomplete results to the client. Input can be a simple or nested array.
    * @param array $results - If nested array, also provide:
    * @param string $val - array key to use as the value

@@ -195,10 +195,6 @@ function showHideRow(index) {
 
 CRM.utils = CRM.utils || {};
 CRM.strings = CRM.strings || {};
-CRM.validate = CRM.validate || {
-  params: {},
-  functions: []
-};
 
 (function ($, _, undefined) {
   "use strict";
@@ -479,6 +475,24 @@ CRM.validate = CRM.validate || {
       markup += link.label + '</a>';
     });
     return markup;
+  }
+
+  /**
+   * Wrapper for jQuery validate initialization function; supplies defaults
+   * @param options object
+   */
+  $.fn.crmValidate = function(params) {
+    return $(this).each(function () {
+      var that = this,
+        settings = $.extend({}, CRM.validate._defaults, CRM.validate.params);
+      $(this).validate(settings);
+      // Call any post-initialization callbacks
+      if (CRM.validate.functions && CRM.validate.functions.length) {
+        $.each(CRM.validate.functions, function(i, func) {
+          func.call(that);
+        });
+      }
+    });
   }
 
   // Initialize widgets

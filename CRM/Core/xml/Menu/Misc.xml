@@ -175,4 +175,8 @@
     <page_callback>CRM_Core_Page_Angular</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/ajax/localizationjs</path>
+    <page_callback>CRM_Core_Resources::outputLocalizationJS</page_callback>
+  </item>
 </menu>
