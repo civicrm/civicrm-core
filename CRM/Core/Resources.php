@@ -587,9 +587,9 @@ class CRM_Core_Resources {
     // Scripts needed by everyone, everywhere
     // FIXME: This is too long; list needs finer-grained segmentation
     $items = array(
-      "packages/jquery/jquery-1.11.0$min.js",
-      "packages/jquery/jquery-ui/js/jquery-ui-1.10.4.custom$min.js",
-      "packages/jquery/jquery-ui/css/theme/jquery-ui-1.10.4.custom$min.css",
+      "packages/jquery/jquery-1.11.1$min.js",
+      "packages/jquery/jquery-ui/jquery-ui$min.js",
+      "packages/jquery/jquery-ui/jquery-ui$min.css",
 
       "packages/backbone/lodash.compat$min.js",
 
@@ -635,9 +635,9 @@ class CRM_Core_Resources {
     if ($config->lcMessages && $config->lcMessages != 'en_US') {
       // Search for i18n file in order of specificity (try fr-CA, then fr)
       list($lang) = explode('_', $config->lcMessages);
-      $path = "packages/jquery/jquery-ui/development-bundle/ui/" . ($min ? 'minified/' : '') . "i18n";
+      $path = "packages/jquery/jquery-ui/i18n";
       foreach (array(str_replace('_', '-', $config->lcMessages), $lang) as $language) {
-        $localizationFile = "$path/jquery.ui.datepicker-{$language}{$min}.js";
+        $localizationFile = "$path/datepicker-{$language}.js";
         if ($this->getPath('civicrm', $localizationFile)) {
           $items[] = $localizationFile;
           break;
