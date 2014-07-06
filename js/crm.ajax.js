@@ -215,7 +215,7 @@
     },
     _onError: function(data) {
       this.element.attr('data-unsaved-changes', 'false').trigger('crmAjaxError', data);
-      if (this.options.crmForm.autoClose && this.element.data('uiDialog')) {
+      if (this.options.crmForm && this.options.crmForm.autoClose && this.element.data('uiDialog')) {
         this.element.dialog('close');
       }
     },
