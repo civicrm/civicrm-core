@@ -24,7 +24,18 @@
  +--------------------------------------------------------------------+
 *}// http://civicrm.org/licensing
 // <script> Generated {$timeGenerated}
+{* This file should only contain strings and settings which rarely change *}
 (function($) {ldelim}
+  // Config settings
+  CRM.config.userFramework = {$config->userFramework|@json_encode};
+  CRM.config.resourceBase = {$config->resourceBase|@json_encode};
+  CRM.config.lcMessages = {$config->lcMessages|@json_encode};
+
+  // Contact create links
+  if (CRM.profileCreate !== false) {ldelim}
+    CRM.profileCreate = {$contactCreate|@json_encode};
+  {rdelim}
+  
   // Initialize CRM.url and CRM.formatMoney
   CRM.url('init', '{crmURL p="civicrm/example" q="placeholder" h=0}');
   CRM.formatMoney('init', {$moneyFormat});

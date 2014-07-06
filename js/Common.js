@@ -375,14 +375,14 @@ CRM.strings = CRM.strings || {};
       if ($el.data('create-links') && entity.toLowerCase() === 'contact') {
         selectParams.formatInputTooShort = function() {
           var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
-          if ($el.data('create-links')) {
+          if ($el.data('create-links') && CRM.profileCreate) {
             txt += ' ' + ts('or') + '<br />' + formatSelect2CreateLinks($el);
           }
           return txt;
         };
         selectParams.formatNoMatches = function() {
           var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
-          return txt + '<br />' + formatSelect2CreateLinks($el);
+          return txt + (CRM.profileCreate ? ('<br />' + formatSelect2CreateLinks($el)) : '');
         };
         $el.on('select2-open.crmEntity', function() {
           var $el = $(this);
@@ -464,7 +464,7 @@ CRM.strings = CRM.strings || {};
       api = $el.data('api-params') || {},
       type = api.params ? api.params.contact_type : null;
     if (createLinks === true) {
-      createLinks = type ? _.where(CRM.profile.contactCreate, {type: type}) : CRM.profile.contactCreate;
+      createLinks = type ? _.where(CRM.profileCreate, {type: type}) : CRM.profileCreate;
     }
     var markup = '';
     _.each(createLinks, function(link) {
