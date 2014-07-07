@@ -807,7 +807,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $this->fillupPrevNextCache($sort, $cacheKey);
     }
     elseif ($firstRecord >= $countRow) {
-      $this->fillupPrevNextCache($sort, $cacheKey, $countRow, $firstRecord + 500);
+      $this->fillupPrevNextCache($sort, $cacheKey, $countRow, 500);
     }
     return $cacheKey;
   }
@@ -918,7 +918,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
     $insertSQL = "
 INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cacheKey, data )
-SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.display_name
+SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.display_name
 ";
 
     $sql = str_replace($replaceSQL, $insertSQL, $sql);
