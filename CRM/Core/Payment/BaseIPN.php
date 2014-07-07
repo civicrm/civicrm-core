@@ -380,9 +380,13 @@ LIMIT 1;";
                */
               CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, $changeToday);
 
+              $num_terms = $contribution->getNumTermsByContributionAndMembershipType($membership->membership_type_id);
+              // @todo - we should pass membership_type_id instead of null here but not
+              // adding as not sure of testing
               $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership->id,
-                $changeToday
+                $changeToday, NULL, $num_terms
               );
+
               $dates['join_date'] = CRM_Utils_Date::customFormat($currentMembership['join_date'], $format);
             }
             else {
