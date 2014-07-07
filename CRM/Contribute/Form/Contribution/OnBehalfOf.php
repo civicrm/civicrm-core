@@ -95,6 +95,11 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
         }
         $locDataURL = CRM_Utils_System::url('civicrm/ajax/permlocation', $args, FALSE, NULL, FALSE);
         $form->assign('locDataURL', $locDataURL);
+
+        if (!empty($form->_submitValues['onbehalf'])) {
+          $form->assign('submittedOnBehalf', $form->_submitValues['onbehalfof_id']);
+          $form->assign('submittedOnBehalfInfo', json_encode($form->_submitValues['onbehalf']));
+        }
       }
 
       if ($form->_values['is_for_organization'] != 2) {
@@ -201,4 +206,3 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
     $form->addElement('hidden', 'hidden_onbehalf_profile', 1);
   }
 }
-

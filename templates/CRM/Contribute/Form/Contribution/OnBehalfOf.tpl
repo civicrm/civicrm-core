@@ -198,7 +198,17 @@ function setOrgName( ) {
 }
 
 
-function setLocationDetails(contactID) {
+function setLocationDetails(contactID , reset) {
+  var submittedCID = {/literal}"{$submittedOnBehalf}"{literal};
+  var submittedOnBehalfInfo = {/literal}'{$submittedOnBehalfInfo}'{literal};
+  submittedOnBehalfInfo = cj.parseJSON(submittedOnBehalfInfo);
+  if (submittedCID == contactID) {
+    cj.each(submittedOnBehalfInfo, function(key, value) {
+      cj('#onbehalf_' + key ).val(value);
+    });
+    return;
+  }
+
   resetValues();
   var locationUrl = {/literal}"{$locDataURL}"{literal} + contactID + "&ufId=" + {/literal}"{$profileId}"{literal};
   cj.ajax({
