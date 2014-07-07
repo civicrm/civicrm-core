@@ -1710,6 +1710,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           $sent[] = $contactID;
           foreach ($participants as $ids => $values) {
             if ($values->contact_id == $contactID) {
+              $values->details = CRM_Utils_Array::value('receipt_text', $params);
               CRM_Activity_BAO_Activity::addActivity($values, 'Email');
               break;
             }
