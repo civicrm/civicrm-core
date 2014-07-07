@@ -271,7 +271,7 @@ cj('#onbehalfof_id').change(function() {
 function selectCreateOrg( orgOption, reset ) {
   if (orgOption == 0) {
     cj("#onbehalfof_id").show().change();
-    cj("input#onbehalf_organization_name").hide()
+    cj("input#onbehalf_organization_name").hide();
   }
   else if ( orgOption == 1 ) {
     cj("input#onbehalf_organization_name").show();
