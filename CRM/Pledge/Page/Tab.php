@@ -159,7 +159,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     return parent::run();
   }
 
-  function setContext(&$form) {
+  public static function setContext(&$form) {
     $context = CRM_Utils_Request::retrieve('context', 'String', $form, FALSE, 'search');
 
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
@@ -189,7 +189,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
 
       case 'pledge':
         $url = CRM_Utils_System::url('civicrm/contact/view',
-          "reset=1&force=1&cid={$this->_contactId}&selectedChild=pledge"
+          "reset=1&force=1&cid={$form->_contactId}&selectedChild=pledge"
         );
         break;
 
@@ -199,7 +199,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
 
       case 'activity':
         $url = CRM_Utils_System::url('civicrm/contact/view',
-          "reset=1&force=1&cid={$this->_contactId}&selectedChild=activity"
+          "reset=1&force=1&cid={$form->_contactId}&selectedChild=activity"
         );
         break;
 
