@@ -1760,6 +1760,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
           $sent[] = $contactID;
           foreach ($participants as $ids => $values) {
             if ($values->contact_id == $contactID) {
+              $values->details = CRM_Utils_Array::value('receipt_text', $params);
               CRM_Activity_BAO_Activity::addActivity($values, 'Email');
               break;
             }
