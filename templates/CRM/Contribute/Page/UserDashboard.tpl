@@ -52,7 +52,9 @@
                     <td>{$row.contribution_status}</td>
                     {if $invoices}
                       <td>
-                      	{assign var='urlParams' value="reset=1&id=$row.contribution_id&cid=$row.contact_id"}
+		        {assign var='id' value=$row.contribution_id}
+			{assign var='contact_id' value=$row.contact_id}
+                      	{assign var='urlParams' value="reset=1&id=$id&cid=$contact_id"}
 			<a class="crm-invoiceButton" href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
 		      	{if $row.contribution_status != 'Refunded'}
                           <span>{ts}Print Invoice{/ts}</span>
