@@ -84,7 +84,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $ids['custom_group_id'] = $result['id'];
     $customTable = $result['values'][$result['id']]['table_name'];
     $result = $this->customFieldCreate(array(
-      'html_type' => 'Checkbox',
+      'html_type' => 'CheckBox',
       'custom_group_id' => $ids['custom_group_id'],
       'option_values' => array(
         array('label' => 'my valley', 'value' => 'valley', 'is_active' => TRUE, 'weight' => 1),
