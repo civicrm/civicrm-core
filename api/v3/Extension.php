@@ -69,6 +69,36 @@ function civicrm_api3_extension_install($params) {
 }
 
 /**
+ * Upgrade an extension - runs upgrade_N hooks and system.flush
+ *
+ * @return array API result
+ * @static void
+ * @access public
+ *
+ */
+function civicrm_api3_extension_upgrade() {
+  CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+  $queue = CRM_Extension_Upgrades::createQueue();
+  $runner = new CRM_Queue_Runner(array(
+    'title' => 'Extension Upgrades',
+    'queue' => $queue,
+    'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+  ));
+
+  try {
+    $result = $runner->runAll();
+  } catch (CRM_Extension_Exception $e) {
+    return civicrm_api3_create_error($e->getMessage());
+  }
+
+  if ($result === TRUE) {
+    return civicrm_api3_create_success();
+  } else {
+    return $result;
+  }
+}
+
+/**
  * Enable an extension
  *
  * @param  array       $params input parameters
