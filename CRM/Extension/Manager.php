@@ -190,7 +190,7 @@ class CRM_Extension_Manager {
     }
 
     $this->refresh();
-    CRM_Core_Invoke::rebuildMenuAndCache(TRUE);
+    CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
   }
 
   /**
