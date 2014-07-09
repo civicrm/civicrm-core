@@ -152,6 +152,11 @@
   <field>
       <name>domain_id</name>
       <type>int unsigned</type>
+      <pseudoconstant>
+          <table>civicrm_domain</table>
+          <keyColumn>id</keyColumn>
+          <labelColumn>name</labelColumn>
+      </pseudoconstant>
       <comment>Which Domain is this option value for</comment>
       <add>3.1</add>
   </field>
