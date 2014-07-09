@@ -794,12 +794,13 @@ SELECT     ac.activity_id,
            c.sort_name,
            c.is_deleted
 FROM       {$activityTempTable}
-INNER JOIN civicrm_activity a ON ( a.id = {$activityTempTable}.activity_id AND a.activity_type_id != {$bulkActivityTypeID} )
+INNER JOIN civicrm_activity a ON ( a.id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_activity_contact ac ON ( ac.activity_id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_contact c ON c.id = ac.contact_id
-
+WHERE ac.record_type_id != %1
 ";
-    CRM_Core_DAO::executeQuery($query);
+    $params = array(1 => array($targetID, 'Integer'));
+    CRM_Core_DAO::executeQuery($query, $params);
 
     // for each activity insert one target contact
     // if we load all target contacts the performance will suffer a lot for mass-activities;
@@ -812,13 +813,13 @@ SELECT     ac.activity_id,
            c.is_deleted,
            count(ac.contact_id)
 FROM       {$activityTempTable}
-INNER JOIN civicrm_activity a ON ( a.id = {$activityTempTable}.activity_id AND a.activity_type_id = {$bulkActivityTypeID} )
+INNER JOIN civicrm_activity a ON ( a.id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_activity_contact ac ON ( ac.activity_id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_contact c ON c.id = ac.contact_id
 WHERE ac.record_type_id = %1
 GROUP BY ac.activity_id
 ";
-    $params = array(1 => array($targetID, 'Integer'));
+
     CRM_Core_DAO::executeQuery($query, $params);
 
     // step 3: Combine all temp tables to get final query for activity selector
@@ -869,6 +870,7 @@ ORDER BY    fixed_sort_order
 
       if (empty($values[$activityID]['target_contact_name'])) {
         $values[$activityID]['target_contact_name'] = array();
+        $values[$activityID]['target_contact_counter'] = $dao->counter;
       }
 
       // if deleted, wrap in <del>
@@ -2513,27 +2515,18 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
         elseif (!empty($values['recipients'])) {
           $contactActivities[$activityId]['target_contact'] = $values['recipients'];
         }
+        elseif (isset($values['target_contact_counter']) && $values['target_contact_counter']) {
+          foreach ($values['target_contact_name'] as $tcID => $tcName) {
+            $contactActivities[$activityId]['target_contact'] .= CRM_Utils_System::href($tcName,
+              'civicrm/contact/view', "reset=1&cid={$tcID}");
+          }
+
+          if ($extraCount = $values['target_contact_counter'] - 1) {
+            $contactActivities[$activityId]['target_contact'] .= ";<br />" . "(" . ts('%1 more', array(1 => $extraCount)) . ")";
+          }
+        }
         elseif (!$values['target_contact_name']) {
           $contactActivities[$activityId]['target_contact'] = '<em>n/a</em>';
-        }
-        elseif (!empty($values['target_contact_name'])) {
-          $count = 0;
-          $contactActivities[$activityId]['target_contact'] = '';
-          foreach ($values['target_contact_name'] as $tcID => $tcName) {
-            if ($tcID && $count < 5) {
-              $contactActivities[$activityId]['target_contact'] .= CRM_Utils_System::href($tcName,
-                'civicrm/contact/view', "reset=1&cid={$tcID}");
-              $count++;
-              if ($count) {
-                $contactActivities[$activityId]['target_contact'] .= ";&nbsp;";
-              }
-
-              if ($count == 4) {
-                $contactActivities[$activityId]['target_contact'] .= "(" . ts('more') . ")";
-                break;
-              }
-            }
-          }
         }
 
         if (empty($values['assignee_contact_name'])) {
