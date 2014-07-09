@@ -1835,7 +1835,6 @@ SELECT  display_name
       ),
       'subject' => $subject,
       'activity_date_time' => $date,
-      'details' => $activity->details,
       'is_test' => $activity->is_test,
       'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
         'Completed',
@@ -1853,6 +1852,10 @@ SELECT  display_name
       $activityParams['target_contact_id'][] = $activity->contact_id;
     }
 
+    // CRM-14945
+    if (property_exists($activity, 'details')) {
+      $activityParams['details'] = $activity->details;
+    }
     //CRM-4027
     if ($targetContactID) {
       $activityParams['target_contact_id'][] = $targetContactID;
