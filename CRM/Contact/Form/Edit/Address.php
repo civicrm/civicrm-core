@@ -473,7 +473,8 @@ class CRM_Contact_Form_Edit_Address {
     // CRM-7296 freeze the select for state if address is shared with household
     // CRM-9070 freeze the select for state if it is view only
     if (isset($form->_fields) && !empty($form->_fields[$stateElementName]) &&
-      (!empty($form->_fields[$stateElementName]['is_shared']) || !empty($form->_fields[$stateElementName]['is_view']))
+      (!empty($form->_fields[$stateElementName]['is_shared']) || !empty($form->_fields[$stateElementName]['is_view'])) &&
+      !empty($stateSelect)
     ) {
       $stateSelect->freeze();
     }
