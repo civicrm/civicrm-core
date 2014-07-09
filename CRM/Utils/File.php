@@ -687,5 +687,52 @@ HTACCESS;
     }
     return TRUE;
   }
+
+  /**
+   * Create a static file (e.g. css or js) in the dynamic resource directory
+   * Note: if the file already exists it will be overwritten
+   * @param string $fileName
+   * @param string $contents
+   */
+  static function addDynamicResource($fileName, $contents) {
+    // First ensure the directory exists
+    $path = self::baseFilePath() . 'dynamic';
+    if (!is_dir($path)) {
+      self::createDir($path);
+      self::restrictBrowsing($path);
+    }
+    file_put_contents($path . DIRECTORY_SEPARATOR . $fileName, $contents);
+  }
+
+  /**
+   * Get the path of a dynamic resource file
+   * @param string $fileName
+   * @return string
+   */
+  static function dynamicResourcePath($fileName) {
+    return self::baseFilePath() . 'dynamic' . DIRECTORY_SEPARATOR . $fileName;
+  }
+
+  /**
+   * Get the URL of a dynamic resource file
+   * @param string $fileName
+   * @return string
+   */
+  static function dynamicResourceUrl($fileName) {
+    $config = CRM_Core_Config::singleton();
+    return str_replace('persist/contribute', 'dynamic', $config->imageUploadURL) . $fileName;
+  }
+
+  /**
+   * Flush the dynamic resource directory
+   */
+  static function flushDynamicResources() {
+    $files = glob(self::dynamicResourcePath('*'));
+    foreach ($files ? $files : array() as $file) {
+      if (is_file($file)) {
+        unlink($file);
+      }
+    }
+  }
 }
 
