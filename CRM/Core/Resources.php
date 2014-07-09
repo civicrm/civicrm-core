@@ -468,7 +468,7 @@ class CRM_Core_Resources {
       }
 
       // Dynamic localization script
-      $this->addScriptUrl(CRM_Utils_System::url('civicrm/ajax/localizationjs/' . $config->lcMessages), $jsWeight++, $region);
+      $this->addScriptUrl($this->addLocalizationJs(), $jsWeight++, $region);
 
       // Add global settings
       $settings = array('config' => array(
@@ -547,9 +547,22 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Callback to add dymanic script for localizing js widgets
+   * Add dynamic l10n js
    */
-  static function outputLocalizationJS() {
+  private function addLocalizationJs() {
+    $config = CRM_Core_Config::singleton();
+    $fileName = 'l10n-' . $config->lcMessages . '.js';
+    if (!is_file(CRM_Utils_File::dynamicResourcePath($fileName))) {
+      $this->createLocalizationJs($fileName);
+    }
+    // Dynamic localization script
+    return CRM_Utils_File::dynamicResourceUrl($fileName);
+  }
+
+  /**
+   * Create dymanic script for localizing js widgets
+   */
+  private function createLocalizationJs($fileName) {
     $config = CRM_Core_Config::singleton();
     $vars = array(
       'moneyFormat' => json_encode(CRM_Utils_Money::format(1234.56)),
@@ -557,7 +570,7 @@ class CRM_Core_Resources {
       'otherSearch' => json_encode(ts('Enter search term...')),
       'contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks(),
     );
-    CRM_Core_Page_AJAX::returnDynamicJS('CRM/common/localization.js.tpl', $vars);
+    CRM_Utils_File::addDynamicResource($fileName, CRM_Core_Page_AJAX::returnDynamicJS('CRM/common/localization.js.tpl', $vars));
   }
 
   /**
