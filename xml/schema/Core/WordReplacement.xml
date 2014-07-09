@@ -64,6 +64,11 @@
   <field>
     <name>domain_id</name>
     <type>int unsigned</type>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <comment>FK to Domain ID. This is for Domain specific word replacement</comment>
     <add>1.1</add>
   </field>
