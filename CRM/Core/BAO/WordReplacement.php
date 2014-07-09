@@ -207,6 +207,8 @@ WHERE  domain_id = %1
       CRM_Core_BAO_Navigation::resetNavigation();
       // Clear js string cache
       CRM_Core_Resources::singleton()->flushStrings();
+      // Clear dynamic js files which may contain localization
+      CRM_Utils_File::flushDynamicResources();
 
       return TRUE;
     }
