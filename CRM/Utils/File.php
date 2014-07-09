@@ -724,7 +724,7 @@ HTACCESS;
   }
 
   /**
-   * Flush the dynamic resource directory
+   * Delete all files from the dynamic resource directory
    */
   static function flushDynamicResources() {
     $files = glob(self::dynamicResourcePath('*'));
