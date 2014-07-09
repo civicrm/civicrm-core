@@ -22,8 +22,13 @@
       <name>domain_id</name>
       <title>Report Instance Domain ID</title>
       <type>int unsigned</type>
+      <pseudoconstant>
+        <table>civicrm_domain</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>name</labelColumn>
+      </pseudoconstant>
       <required>true</required>
-      <comment>Which Domain is this instance for</comment>      
+      <comment>Which Domain is this instance for</comment>
       <add>3.1</add>
   </field>
   <foreignKey>
