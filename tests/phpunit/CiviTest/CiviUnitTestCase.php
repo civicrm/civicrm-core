@@ -885,7 +885,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return int    id of Household created
    */
   function householdCreate($params = array(), $seq = 0) {
-    $params = array_merge($this->sampleContact('Organization', $seq), $params);
+    $params = array_merge($this->sampleContact('Household', $seq), $params);
     return $this->_contactCreate($params);
   }
 
