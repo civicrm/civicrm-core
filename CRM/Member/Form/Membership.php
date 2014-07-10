@@ -1855,6 +1855,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     elseif (isset($form->_onlinePendingContributionId)) {
       $form->assign('contributionID', $form->_onlinePendingContributionId);
     }
+    elseif (!empty($form->_defaultValues['contribution_id'])) {
+      $form->assign('contributionID', $form->_defaultValues['contribution_id']);
+    }
 
     if (!empty($formValues['contribution_status_id'])) {
       $form->assign('contributionStatusID', $formValues['contribution_status_id']);
