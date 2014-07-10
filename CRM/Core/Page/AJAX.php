@@ -200,19 +200,6 @@ class CRM_Core_Page_AJAX {
   }
 
   /**
-   * Render and output a template as a javascript file
-   * @param string $tplFile
-   * @param array $vars - template variables
-   */
-  static function returnDynamicJS($tplFile, $vars = array()) {
-    $smarty = CRM_Core_Smarty::singleton();
-    foreach ($vars as $name => $val) {
-      $smarty->assign($name, $val);
-    }
-    return $smarty->fetch($tplFile);
-  }
-
-  /**
    * Send autocomplete results to the client. Input can be a simple or nested array.
    * @param array $results - If nested array, also provide:
    * @param string $val - array key to use as the value

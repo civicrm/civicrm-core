@@ -210,6 +210,27 @@ class CRM_Core_Smarty extends Smarty {
   }
 
   /**
+   * Fetch a template (while using certain variables)
+   *
+   * @param string $resource_name
+   * @param array $vars (string $name => mixed $value) variables to export to Smarty
+   * @throws Exception
+   * @return bool|mixed|string
+   */
+  function fetchWith($resource_name, $vars) {
+    $this->pushScope($vars);
+    try {
+      $result = $this->fetch($resource_name);
+    } catch (Exception $e) {
+      // simulate try { ... } finally { ... }
+      $this->popScope();
+      throw $e;
+    }
+    $this->popScope();
+    return $result;
+  }
+
+  /**
    * @param $name
    * @param $value
    */
