@@ -127,11 +127,51 @@
         }
       };
     })
+    // Example: <button crm-confirm="{message: ts('Frobincation is a footastical operation')}" on-yes="frobnicate(123)">Frobincate</button>
+    // Example: <button crm-confirm="{type: 'disable', obj: myObject}" on-yes="myObject.is_active=0; myObject.save()">Disable</button>
+    .directive('crmConfirm', function () {
+      // Helpers to calculate default options from CRM.confirm()
+      var defaultFuncs = {
+        'disable': function (options) {
+          return {
+            message: ts('Are you sure you want to disable this?'),
+            options: {no: ts('Cancel'), yes: ts('Disable')},
+            width: 300,
+            title: ts('Disable %1?', {
+              1: options.obj.title || options.obj.label || options.obj.name || ts('the record')
+            })
+          };
+        },
+        'delete': function (options) {
+          return {
+            message: ts('Are you sure you want to delete this?'),
+            options: {no: ts('Cancel'), yes: ts('Delete')},
+            width: 300,
+            title: ts('Delete %1?', {
+              1: options.obj.title || options.obj.label || options.obj.name || ts('the record')
+            })
+          };
+        }
+      };
+      return {
+        template: '',
+        link: function (scope, element, attrs) {
+          $(element).click(function () {
+            var options = scope.$eval(attrs['crmConfirm']);
+            var defaults = (options.type) ? defaultFuncs[options.type](options) : {};
+            CRM.confirm(_.extend(defaults, options))
+              .on('crmConfirm:yes', function () { scope.$apply(attrs['onYes']); })
+              .on('crmConfirm:no', function () { scope.$apply(attrs['onNo']); });
+          });
+        }
+      };
+    })
     .run(function($rootScope, $location) {
       /// Example: <button ng-click="goto('home')">Go home!</button>
       $rootScope.goto = function(path) {
         $location.path(path);
       };
+      // useful for debugging: $rootScope.log = console.log || function() {};
     })
   ;
 
