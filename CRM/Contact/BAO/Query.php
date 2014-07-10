@@ -4673,8 +4673,14 @@ civicrm_relationship.is_permission_a_b = 0
         if (!$count) {
           $this->_useDistinct = TRUE;
         }
-        $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
-        $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+
+        if (empty($this->_fromClause)) {
+          $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+        }
+
+        if (empty($this->_simpleFromClause)) {
+          $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+        }
       }
     }
     else {
@@ -5493,7 +5499,13 @@ AND   displayRelType.is_active = 1
           //preserve id value
           $idColumn = "{$key}_id";
           $dao->$idColumn = $val;
-          $dao->$value['pseudoField'] = $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
+
+          if ($key == 'state_province_name') {
+            $dao->$value['pseudoField'] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);
+          }
+          else {
+            $dao->$value['pseudoField'] = $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
+          }
         }
         elseif ($value['pseudoField'] == 'state_province_abbreviation') {
           $dao->$key = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);
