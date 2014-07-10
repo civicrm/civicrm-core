@@ -284,7 +284,7 @@ UNION
    * @access public
    * @static
    */
-  static function createCurrentEmployerRelationship($contactID, $organizationId, $previousEmployerID = NULL) {
+  static function createCurrentEmployerRelationship($contactID, $organizationId, $previousEmployerID = NULL, $newContact = FALSE) {
     if ($organizationId && is_numeric($organizationId)) {
       $cid = array('contact' => $contactID);
 
@@ -305,8 +305,8 @@ UNION
       ) = CRM_Contact_BAO_Relationship::create($relationshipParams, $cid);
 
 
-      // In case we change employer, clean prveovious employer related records.
-      if (!$previousEmployerID) {
+      // In case we change employer, clean previous employer related records.
+      if (!$previousEmployerID && !$newContact) {
         $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
       }
       if ($previousEmployerID &&
