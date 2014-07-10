@@ -88,7 +88,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
     }
 
-    if ($id = CRM_Utils_Array::value('id', $ids)) {
+    if ($id = CRM_Utils_Array::value('id', $ids) && !empty($params['weight'])) {
       if (isset($params['name']))unset($params['name']);
 
       $oldWeight = NULL;
@@ -100,7 +100,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceFieldValue', $oldWeight, $params['weight'], $fieldValues);
     }
     else {
-      if (empty($params['name'])) {
+      if (!$id && empty($params['name'])) {
         $params['name'] = CRM_Utils_String::munge(CRM_Utils_Array::value('label', $params), '_', 64);
       }
       if (empty($params['weight'])) {
