@@ -53,7 +53,7 @@
     {/if}
     {$navigation}
   </ul>
-{/strip}{/capture}// <script> Generated {$timeGenerated}
+{/strip}{/capture}// <script> Generated {$smarty.now|date_format:'%d %b %Y %H:%M:%S'}
 {literal}
 (function($) {
   var menuMarkup = {/literal}{$menuMarkup|@json_encode};
