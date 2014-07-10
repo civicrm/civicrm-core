@@ -1,5 +1,7 @@
 {* file to handle db changes in 4.5.beta2 during upgrade *}
 
+{include file='../CRM/Upgrade/4.5.beta2.msg_template/civicrm_msg_template.tpl'}
+
 --CRM-14948 To delete list of outdated Russian provinance
 DELETE FROM `civicrm_state_province` WHERE `name` IN ('Komi-Permyatskiy avtonomnyy okrug','Taymyrskiy (Dolgano-Nenetskiy)','Evenkiyskiy avtonomnyy okrug','Koryakskiy avtonomnyy okrug','Ust\'-Ordynskiy Buryatskiy','Aginskiy Buryatskiy avtonomnyy');
 
