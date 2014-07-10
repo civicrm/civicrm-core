@@ -570,7 +570,7 @@ class CRM_Core_Resources {
       'otherSearch' => json_encode(ts('Enter search term...')),
       'contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks(),
     );
-    CRM_Utils_File::addDynamicResource($fileName, CRM_Core_Page_AJAX::returnDynamicJS('CRM/common/localization.js.tpl', $vars));
+    CRM_Utils_File::addDynamicResource($fileName, CRM_Core_Smarty::singleton()->fetchWith('CRM/common/localization.js.tpl', $vars));
   }
 
   /**

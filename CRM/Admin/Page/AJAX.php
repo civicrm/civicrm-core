@@ -51,7 +51,7 @@ class CRM_Admin_Page_AJAX {
       header('Content-Type:	application/javascript');
       header("Cache-Control: max-age=$year, public");
 
-      print CRM_Core_Page_AJAX::returnDynamicJS('CRM/common/navigation.js.tpl', array(
+      print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/navigation.js.tpl', array(
         'navigation' => CRM_Core_BAO_Navigation::createNavigation($contactID),
       ));
     }
