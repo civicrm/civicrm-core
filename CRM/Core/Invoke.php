@@ -402,6 +402,9 @@ class CRM_Core_Invoke {
     // also rebuild word replacement cache
     CRM_Core_BAO_WordReplacement::rebuild();
 
+    // Clear dynamic js files
+    CRM_Utils_File::flushDynamicResources();
+
     CRM_Core_BAO_Setting::updateSettingsFromMetaData();
     CRM_Core_Resources::singleton()->resetCacheCode();
     CRM_Case_XMLRepository::singleton(TRUE);
