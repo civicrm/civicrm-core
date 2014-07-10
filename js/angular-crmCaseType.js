@@ -284,6 +284,25 @@
 
   crmCaseType.controller('CaseTypeListCtrl', function($scope, crmApi, caseTypes) {
     $scope.caseTypes = caseTypes.values;
+    $scope.toggleCaseType = function (caseType) {
+      caseType.is_active = (caseType.is_active == '1') ? '0' : '1';
+      crmApi('CaseType', 'create', caseType, true)
+        .then(function (data) {
+          if (data.is_error) {
+            caseType.is_active = (caseType.is_active == '1') ? '0' : '1'; // revert
+            $scope.$digest();
+          }
+        });
+    };
+    $scope.deleteCaseType = function (caseType) {
+      crmApi('CaseType', 'delete', {id: caseType.id}, true)
+        .then(function (data) {
+          if (!data.is_error) {
+            delete caseTypes.values[caseType.id];
+            $scope.$digest();
+          }
+        });
+    };
   });
 
 })(angular, CRM.$, CRM._);
