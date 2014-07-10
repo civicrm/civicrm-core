@@ -74,6 +74,11 @@ class CRM_Core_Smarty extends Smarty {
   static private $_singleton = NULL;
 
   /**
+   * @var array (string $name => mixed $value) a list of variables ot save temporarily
+   */
+  private $backupFrames = array();
+
+  /**
    * class constructor
    *
    * @return CRM_Core_Smarty
@@ -244,6 +249,57 @@ class CRM_Core_Smarty extends Smarty {
       $this->template_dir = array( $path, $this->template_dir );
     }
 
+  }
+
+  /**
+   * Temporarily assign a list of variables.
+   *
+   * @code
+   * $smarty->pushScope(array(
+   *   'first_name' => 'Alice',
+   *   'last_name' => 'roberts',
+   * ));
+   * $html = $smarty->fetch('view-contact.tpl');
+   * $smarty->popScope();
+   * @endcode
+   *
+   * @param array $vars (string $name => mixed $value)
+   * @return CRM_Core_Smarty
+   * @see popScope
+   */
+  public function pushScope($vars) {
+    $oldVars = $this->get_template_vars();
+    $backupFrame = array();
+    foreach ($vars as $key => $value) {
+      $backupFrame[$key] = isset($oldVars[$key]) ? $oldVars[$key] : NULL;
+    }
+    $this->backupFrames[] = $backupFrame;
+
+    $this->assignAll($vars);
+
+    return $this;
+  }
+
+  /**
+   * Remove any values that were previously pushed.
+   *
+   * @return CRM_Core_Smarty
+   * @see pushScope
+   */
+  public function popScope() {
+    $this->assignAll(array_pop($this->backupFrames));
+    return $this;
+  }
+
+  /**
+   * @param array $vars (string $name => mixed $value)
+   * @return CRM_Core_Smarty
+   */
+  public function assignAll($vars) {
+    foreach ($vars as $key => $value) {
+      $this->assign($key, $value);
+    }
+    return $this;
   }
 }
 
