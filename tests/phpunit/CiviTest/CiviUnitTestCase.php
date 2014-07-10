@@ -919,7 +919,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     if ($contact_type == 'Individual' ) {
         $employer = $this->sampleContact('Organization', $seq);
         $params['email'] = strtolower(
-          $params['first_name'] . '.' . $params['last_name'] . '@civicrm.org'
+          $params['first_name'] . '_' . $params['last_name'] . '@civicrm.org'
         );
         $params['prefix_id'] = 3;
         $params['suffix_id'] = 3;
