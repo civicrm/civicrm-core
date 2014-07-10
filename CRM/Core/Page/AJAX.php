@@ -206,7 +206,6 @@ class CRM_Core_Page_AJAX {
    */
   static function returnDynamicJS($tplFile, $vars = array()) {
     $smarty = CRM_Core_Smarty::singleton();
-    $vars += array('timeGenerated' => date('d M Y H:i:s'));
     foreach ($vars as $name => $val) {
       $smarty->assign($name, $val);
     }

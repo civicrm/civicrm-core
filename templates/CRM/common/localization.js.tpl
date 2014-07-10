@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}// http://civicrm.org/licensing
-// <script> Generated {$timeGenerated}
+// <script> Generated {$smarty.now|date_format:'%d %b %Y %H:%M:%S'}
 {* This file should only contain strings and settings which rarely change *}
 (function($) {ldelim}
   // Config settings
