@@ -1682,6 +1682,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       $formValues['contact_id'] = $this->_contactID;
 
+      $formValues['contribution_id'] = CRM_Member_BAO_Membership::getMembershipContributionId($membership->id);
       // send email receipt
       $mailSend = self::emailReceipt($this, $formValues, $membership);
     }
@@ -1854,9 +1855,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
     elseif (isset($form->_onlinePendingContributionId)) {
       $form->assign('contributionID', $form->_onlinePendingContributionId);
-    }
-    elseif (!empty($form->_defaultValues['contribution_id'])) {
-      $form->assign('contributionID', $form->_defaultValues['contribution_id']);
     }
 
     if (!empty($formValues['contribution_status_id'])) {
