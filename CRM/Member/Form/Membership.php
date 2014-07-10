@@ -1682,6 +1682,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       $formValues['contact_id'] = $this->_contactID;
 
+      $formValues['contribution_id'] = CRM_Member_BAO_Membership::getMembershipContributionId($membership->id);
       // send email receipt
       $mailSend = self::emailReceipt($this, $formValues, $membership);
     }
