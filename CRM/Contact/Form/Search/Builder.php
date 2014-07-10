@@ -307,7 +307,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    *
    * @return array
    */
-  public function &convertFormValues(&$formValues) {
+  public function convertFormValues(&$formValues) {
     return CRM_Core_BAO_Mapping::formattedFields($formValues);
   }
 
@@ -395,7 +395,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       $this->_sortByCharacter = NULL;
     }
 
-    $this->_params = &$this->convertFormValues($this->_formValues);
+    $this->_params = $this->convertFormValues($this->_formValues);
     $this->_returnProperties = &$this->returnProperties();
 
     // CRM-10338 check if value is empty array
