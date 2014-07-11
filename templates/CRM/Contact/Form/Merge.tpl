@@ -41,7 +41,7 @@
 <table>
   <tr class="columnheader">
     <th>&nbsp;</th>
-    <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$other_cid"}">{$other_name}&nbsp;<em>{$other_contact_subtype}</em></a> ({ts}duplicate{/ts})</th>
+    <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$other_cid"}">{$other_name}&nbsp;</a> ({ts}duplicate{/ts})</th>
     <th>{ts}Mark All{/ts}<br />=={$form.toggleSelect.html} ==&gt;</th>
     <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$main_cid"}">{$main_name}&nbsp;<em>{$main_contact_subtype}</em></a></th>
   </tr>
@@ -52,7 +52,7 @@
            {if !is_array($row.other)}
                {$row.other}
            {else}
-               {$row.other.fileName}
+               {','|implode:$row.other}
            {/if}
         </td>
         <td style='white-space: nowrap'>{if $form.$field}=={$form.$field.html}==&gt;{/if}</td>
