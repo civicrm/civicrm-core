@@ -467,24 +467,20 @@ class CRM_Core_Resources {
         }
       }
 
-      // Initialize CRM.url and CRM.formatMoney
-      $url = CRM_Utils_System::url('civicrm/example', 'placeholder', FALSE, NULL, FALSE);
-      $js = "CRM.url('init', '$url');\n";
-      $js .= "CRM.formatMoney('init', " . json_encode(CRM_Utils_Money::format(1234.56)) . ");";
-
-      $this->addLocalization($js);
-      $this->addScript($js, $jsWeight++, $region);
+      // Dynamic localization script
+      $this->addScriptUrl($this->addLocalizationJs(), $jsWeight++, $region);
 
       // Add global settings
-      $settings = array(
-        'userFramework' => $config->userFramework,
-        'resourceBase' => $config->resourceBase,
-        'lcMessages' => $config->lcMessages,
+      $settings = array('config' => array(
         'ajaxPopupsEnabled' => $this->ajaxPopupsEnabled,
-      );
-      $this->addSetting(array('config' => $settings));
+      ));
+      // Disable profile creation if user lacks permission
+      if (!CRM_Core_Permission::check('edit all contacts') && !CRM_Core_Permission::check('add contacts')) {
+        $settings['profileCreate'] = FALSE;
+      }
+      $this->addSetting($settings);
 
-      // Give control of jQuery back to the CMS - this loads last
+      // Give control of jQuery and _ back to the CMS - this loads last
       $this->addScriptFile('civicrm', 'js/noconflict.js', 9999, $region, FALSE);
 
       $this->addCoreStyles($region);
@@ -551,26 +547,34 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Add inline scripts needed to localize js widgets
-   * @param string $js
+   * Add dynamic l10n js
+   *
+   * @return string URL of JS file
    */
-  function addLocalization(&$js) {
+  private function addLocalizationJs() {
     $config = CRM_Core_Config::singleton();
-
-    // Localize select2 strings
-    $contactSearch = json_encode($config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...'));
-    $otherSearch = json_encode(ts('Enter search term...'));
-    $js .= "
-      $.fn.select2.defaults.formatNoMatches = " . json_encode(ts("None found.")) . ";
-      $.fn.select2.defaults.formatLoadMore = " . json_encode(ts("Loading...")) . ";
-      $.fn.select2.defaults.formatSearching = " . json_encode(ts("Searching...")) . ";
-      $.fn.select2.defaults.formatInputTooShort = function(){return CRM.$(this).data('api-entity') == 'contact' ? $contactSearch : $otherSearch};
-    ";
-
-    // Contact create profiles with localized names
-    if (CRM_Core_Permission::check('edit all contacts') || CRM_Core_Permission::check('add contacts')) {
-      $this->addSetting(array('profile' => array('contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks())));
+    $fileName = 'l10n-' . $config->lcMessages . '.js';
+    if (!is_file(CRM_Utils_File::dynamicResourcePath($fileName))) {
+      CRM_Utils_File::addDynamicResource($fileName, $this->createLocalizationJs());
     }
+    // Dynamic localization script
+    return CRM_Utils_File::dynamicResourceUrl($fileName);
+  }
+
+  /**
+   * Create dynamic script for localizing js widgets
+   *
+   * @return string javascript content
+   */
+  private function createLocalizationJs() {
+    $config = CRM_Core_Config::singleton();
+    $vars = array(
+      'moneyFormat' => json_encode(CRM_Utils_Money::format(1234.56)),
+      'contactSearch' => json_encode($config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...')),
+      'otherSearch' => json_encode(ts('Enter search term...')),
+      'contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks(),
+    );
+    return CRM_Core_Smarty::singleton()->fetchWith('CRM/common/localization.js.tpl', $vars);
   }
 
   /**

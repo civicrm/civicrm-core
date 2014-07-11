@@ -687,5 +687,60 @@ HTACCESS;
     }
     return TRUE;
   }
+
+  /**
+   * Create a static file (e.g. css or js) in the dynamic resource directory
+   * Note: if the file already exists it will be overwritten
+   * @param string $fileName
+   * @param string $contents
+   */
+  static function addDynamicResource($fileName, $contents) {
+    // First ensure the directory exists
+    $path = self::dynamicResourcePath();
+    if (!is_dir($path)) {
+      self::createDir($path);
+      self::restrictBrowsing($path);
+    }
+    file_put_contents("$path/$fileName", $contents);
+  }
+
+  /**
+   * Get the path of a dynamic resource file
+   * With no fileName supplied, returns the path of the directory
+   * @param string $fileName
+   * @return string
+   */
+  static function dynamicResourcePath($fileName = NULL) {
+    $config = CRM_Core_Config::singleton();
+    // FIXME: Use self::baseFilePath once url issue has been resolved
+    $path = self::addTrailingSlash(str_replace('/persist/contribute', '', $config->imageUploadDir)) . 'dynamic';
+    if ($fileName !== NULL) {
+      $path .= "/$fileName";
+    }
+    return $path;
+  }
+
+  /**
+   * Get the URL of a dynamic resource file
+   * @param string $fileName
+   * @return string
+   */
+  static function dynamicResourceUrl($fileName) {
+    $config = CRM_Core_Config::singleton();
+    // FIXME: Need a better way of getting the url of the baseFilePath
+    return self::addTrailingSlash(str_replace('/persist/contribute', '', $config->imageUploadURL)) . 'dynamic/' . $fileName;
+  }
+
+  /**
+   * Delete all files from the dynamic resource directory
+   */
+  static function flushDynamicResources() {
+    $files = glob(self::dynamicResourcePath('*'));
+    foreach ($files ? $files : array() as $file) {
+      if (is_file($file)) {
+        unlink($file);
+      }
+    }
+  }
 }
 
