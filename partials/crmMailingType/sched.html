@@ -2,7 +2,7 @@
 Controller: MailCtrl
 Required vars: currentMailing
 -->
-
+<!--<script src="../../packages/jquery/plugins/jquery.validate.min.js"><script>-->
 <br>
 <table class="form-layout-compressed">
   <tbody>
@@ -17,7 +17,7 @@ Required vars: currentMailing
   <tr ng-show="now==0">
     <td class="label">Schedule Mailing</td>
     <td>
-		 <input type="text" chsdate ng-model="scheddate.date">
+		 <input type="text" ng-model="scheddate.date" chsdate >
     </td>
     <td class="label" >Time</td>
 		<td>

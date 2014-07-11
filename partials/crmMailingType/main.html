@@ -2,43 +2,47 @@
 Controller: MailCtrl
 Submit Mailing is not functional yet
 -->
+ <style>
+.crm-container .ng-invalid {
+    border: 1px solid black;
+}
+</style>
 
-
-<div class="crm-block crm-form-block "> 
+<form name="mailing_form" class="ng-valid" novalidate ng-submit="mailingForm()">
   <div ui-jq="tabs" id="alltabs">
     <ul>
-      <li><a href="#acttab-0">Recipients</a></li>
-      <li><a href="#acttab-1">Content</a></li>
-      <li><a href="#acttab-2">Schedule and Send</a></li>
+      <li><a href="#acttab-0" ng-click= "recclicked()">Recipients</a></li>
+      <li><a href="#acttab-1" ng-click= "conclicked()">Content</a></li>
+      <li><a href="#acttab-2" ng-click= "schedclicked()">Schedule and Send</a></li>
     </ul>
 
 
     <div id="acttab-0">
       <div ng-include="partialUrl('recipient.html')"></div>
-      <a nexttab class="button" ><span>Next</span></a>
-      <a ng-click="save()" class="button"><span>Save and Continue Later</span></a>
-      <a ng-href="#/mailing" class="button"><span>Cancel</span></a>
+      <button nexttab type= "button"><span>Next</span></button>
+      <button ng-click="save()" ng-disabled="mailing_form.$invalid" type= "submit"><span>Save and Continue Later</span></button>
+      <button ng-click="back()"><span>Cancel</span></button>
       <br><br>       
 	</div>
     
     <div id="acttab-1">
       <div ng-include="partialUrl('content.html')"></div>
       <br>
-      <a prevtab class="button" ><span>Previous</span></a>         
-      <a nexttab class="button" ><span>Next</span></a> 
-      <a ng-click="save()" class="button"><span>Save and Continue Later</span></a>
-      <a ng-href="#/mailing" class="button"><span>Cancel</span></a>   
+      <button prevtab type= "button"><span>Previous</span></button>         
+      <button nexttab type= "button"><span>Next</span></button>
+      <button ng-click="save()" ng-disabled="mailing_form.$invalid" type="submit"><span>Save and Continue Later</span></button>
+      <button ng-click="back()" ><span>Cancel</span></button>
       <br><br> 
 	</div>
     
     <div id="acttab-2">
       <div ng-include="partialUrl('send.html')"></div>
       <br>
-      <a prevtab class="button" ><span>Previous</span></a>  
-      <a ng-click="save()" class="button"><span>Save and Continue Later</span></a>
-      <a class="button"><span>Submit Mailing</span></a>      
-      <a ng-href="#/mailing" class="button"><span>Cancel</span></a>   
+      <button prevtab type="button" ><span>Previous</span></button>         
+      <button ng-click="save()" ng-disabled="mailing_form.$invalid" type= "submit"><span>Save and Continue Later</span></button>
+      <button> <span>Submit Mailing</span></button>      
+      <button ng-click="back()" ><span>Cancel</span></button>  
 			<br><br>
     </div>
   </div>   
-</div>
+</form>
