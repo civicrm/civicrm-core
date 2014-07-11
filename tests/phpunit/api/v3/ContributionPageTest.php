@@ -80,9 +80,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     foreach ($this->contactIds as $id) {
       $this->callAPISuccess('contact', 'delete', array('id' => $id));
     }
-    if (!empty($this->id)){
-       $this->callAPISuccess('contribution_page', 'delete', array('id' => $this->id));
-    }
+    $this->quickCleanUpFinancialEntities();
   }
 
   public function testCreateContributionPage() {
@@ -145,60 +143,14 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
   }
-
   /**
    * Test submit with a membership block in place
    */
-  public function testSubmitMembershipBlock() {
-    $this->_ids['price_set'][] = $this->callAPISuccess('price_set', 'getvalue', array('name'  => 'default_membership_type_amount', 'return' => 'id'));
-    $this->params['payment_processor_id'] = $this->paymentProcessorCreate(array('payment_processor_type_id' => 'Dummy',));
-    $this->setUpContributionPage();
-    $contributionPageID = $this->_ids['contribution_page'];
-    /*
-            [billing_street_address-5] => d
-            [billing_city-5] => s
-            [billing_state_province_id-5] => 1011
-            [billing_postal_code-5] => 7070
-            [billing_country_id-5] => 1228
-            [credit_card_number] => 4111111111111111
-            [cvv2] => 123
-            [credit_card_exp_date] => Array
-                (
-                    [M] => 2
-                    [Y] => 2016
-                )
-
-            [credit_card_type] => Visa
-            [email-5] => demo@example.com
-            [payment_processor] => 13
-            [priceSetId] => 11
-            [price_18] => 30
-            [selectProduct] =>
-            [billing_state_province-5] => ID
-            [billing_country-5] => US
-            [year] => 2016
-            [month] => 2
-            [ip_address] => 192.168.56.1
-            [amount] => 100
-            [amount_level] =>
-            [selectMembership] => 1
-            [currencyID] => USD
-            [payment_action] => Sale
-            [is_pay_later] => 0
-            [invoiceID] => 78bc8c7ebf99c609067caac81128720d
-            [is_quick_config] => 1
-     */
-    $this->_ids['membership_type'] = $this->membershipTypeCreate();
-    $this->callAPISuccess('membership_block', 'create', array(
-      'entity_id' => $contributionPageID,
-      'entity_table' => 'civicrm_contribution_page',
-      'is_required' => TRUE,
-      'is_active' => TRUE,
-      'membership_type_default' => $this->_ids['membership_type'],
-    ));
+  public function testSubmitMembershipBlockNotSeparatePayment() {
+    $this->setUpMembershipContributionPage();
     $submitParams = array(
-      'price_' . reset($this->_ids['price_field']) => reset($this->_ids['price_field_value']),
-      'id' => (int) $contributionPageID,
+      'price_' . $this->_ids['price_field'] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
       'amount' => 10,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
@@ -208,11 +160,93 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $contributionPageID));
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
     $this->callAPISuccess('membership_payment', 'getsingle', array('contribution_id' => $contribution['id']));
-
   }
 
+  /**
+   * Test submit with a membership block in place
+   */
+  public function testSubmitMembershipBlockIsSeparatePayment() {
+    $this->setUpMembershipContributionPage(TRUE);
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'selectMembership' => $this->_ids['membership_type'],
+    );
+
+    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
+    $contributions = $this->callAPISuccess('contribution', 'get', array('contribution_page_id' => $this->_ids['contribution_page']));
+    $this->assertCount(2, $contributions['values']);
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
+    $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
+    $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
+    $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
+  }
+
+  /**
+   * set up membership contribution page
+   * @param bool $isSeparatePayment
+   */
+  function setUpMembershipContributionPage($isSeparatePayment = FALSE) {
+    $this->setUpMembershipBlockPriceSet();
+    $this->params['payment_processor_id'] = $this->_ids['payment_processor'] = $this->paymentProcessorCreate(array('payment_processor_type_id' => 'Dummy',));
+    $this->setUpContributionPage();
+
+    $this->callAPISuccess('membership_block', 'create', array(
+      'entity_id' => $this->_ids['contribution_page'],
+      'entity_table' => 'civicrm_contribution_page',
+      'is_required' => TRUE,
+      'is_active' => TRUE,
+      'is_separate_payment' => $isSeparatePayment,
+      'membership_type_default' => $this->_ids['membership_type'],
+    ));
+  }
+
+  /**
+   * The default data set does not include a complete default membership price set - not quite sure why
+   * This function ensures it exists & populates $this->_ids with it's data
+   */
+  function setUpMembershipBlockPriceSet() {
+    $this->_ids['price_set'][] = $this->callAPISuccess('price_set', 'getvalue', array('name' => 'default_membership_type_amount', 'return' => 'id'));
+    if (empty($this->_ids['membership_type'])) {
+      $this->_ids['membership_type'] = $this->membershipTypeCreate(array('minimum_fee' => 1));
+    }
+    try {
+      $this->_ids['price_field'] = $this->callAPISuccessGetValue('price_field', array(
+          'return' => 'id',
+          'name' => 'membership_amount',
+          'price_set_id' => reset($this->_ids['price_set']),
+          'options' => array('limit' => 1))
+      );
+      $this->_ids['price_field_value'] =  array($this->callAPISuccessGetValue('price_field_value', array('weight' => 1, 'return' => 'id', 'name' => 'membership_amount', 'price_field_id' => $this->_ids['price_field'])));
+      $this->callAPISuccess('price_field_value', 'create', array('id' => $this->_ids['price_field_value'][0],  'membership_type_id' => $this->_ids['membership_type'],));
+    }
+    catch (Exception $e) {
+      //default price set likely not set up correctly :-(
+      $priceField = $this->callAPISuccess('price_field', 'create', array(
+        'price_set_id' => reset($this->_ids['price_set']),
+        'name' => 'membership_amount',
+        'label' => 'Membership Amount',
+        'html_type' => 'Radio',
+        'sequential' => 1,
+        'api.price_field_value.create' => array(
+          'name' => 'membership_amount',
+          'label' => 'Membership Amount',
+          'amount' => 1,
+          'financial_type_id' => 1,
+          'format.only_id' => TRUE,
+          'membership_type_id' => $this->_ids['membership_type']
+        )
+      ));
+      $this->_ids['price_field'] = $priceField['id'];
+      $this->_ids['price_field_value'] = array($priceField['values'][0]['api.price_field_value.create']);
+    }
+  }
   /**
    * help function to set up contribution page with some defaults
    */
@@ -224,29 +258,33 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     }
     $priceSetID = reset($this->_ids['price_set']);
     CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSetID );
-    $priceField = $this->callAPISuccess('price_field', 'create', array(
-      'price_set_id' => $priceSetID ,
-      'label' => 'Goat Breed',
-      'html_type' => 'Radio',
-    ));
-    $this->callAPISuccess('price_field_value', 'create', array(
-        'price_set_id' => $priceSetID ,
-        'price_field_id' => $priceField['id'],
-        'label' => 'Long Haired Goat',
-        'amount' => 20,
-      )
-    );
-    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
-        'price_set_id' => $priceSetID ,
-        'price_field_id' => $priceField['id'],
-        'label' => 'Shoe-eating Goat',
-        'amount' => 10,
-      )
-    );
+
+    if (empty($this->_ids['price_field'])) {
+      $priceField = $this->callAPISuccess('price_field', 'create', array(
+        'price_set_id' => $priceSetID,
+        'label' => 'Goat Breed',
+        'html_type' => 'Radio',
+      ));
+      $this->_ids['price_field'] = array($priceField['id']);
+    }
+    if (empty($this->_ids['price_field_value'])) {
+      $this->callAPISuccess('price_field_value', 'create', array(
+          'price_set_id' => $priceSetID,
+          'price_field_id' => $priceField['id'],
+          'label' => 'Long Haired Goat',
+          'amount' => 20,
+        )
+      );
+      $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+          'price_set_id' => $priceSetID,
+          'price_field_id' => $priceField['id'],
+          'label' => 'Shoe-eating Goat',
+          'amount' => 10,
+        )
+      );
+      $this->_ids['price_field_value'] = array($priceFieldValue['id']);
+    }
     $this->_ids['contribution_page'] = $contributionPageResult['id'];
-    $this->_ids['price_field'] = array($priceField['id']);
-    $this->_ids['price_field_value'] = array($priceFieldValue['id']
-    );
   }
 
   public static function setUpBeforeClass() {

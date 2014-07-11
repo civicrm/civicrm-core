@@ -2346,7 +2346,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'civicrm_membership_type',
       'civicrm_membership_payment',
       'civicrm_membership_log',
-      'civicrm_membership_status',
+      'civicrm_membership_block',
       'civicrm_event',
       'civicrm_participant',
       'civicrm_participant_payment',
