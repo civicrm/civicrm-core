@@ -195,10 +195,6 @@ function showHideRow(index) {
 
 CRM.utils = CRM.utils || {};
 CRM.strings = CRM.strings || {};
-CRM.validate = CRM.validate || {
-  params: {},
-  functions: []
-};
 
 (function ($, _, undefined) {
   "use strict";
@@ -379,14 +375,14 @@ CRM.validate = CRM.validate || {
       if ($el.data('create-links') && entity.toLowerCase() === 'contact') {
         selectParams.formatInputTooShort = function() {
           var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
-          if ($el.data('create-links')) {
+          if ($el.data('create-links') && CRM.profileCreate) {
             txt += ' ' + ts('or') + '<br />' + formatSelect2CreateLinks($el);
           }
           return txt;
         };
         selectParams.formatNoMatches = function() {
           var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
-          return txt + '<br />' + formatSelect2CreateLinks($el);
+          return txt + (CRM.profileCreate ? ('<br />' + formatSelect2CreateLinks($el)) : '');
         };
         $el.on('select2-open.crmEntity', function() {
           var $el = $(this);
@@ -468,7 +464,7 @@ CRM.validate = CRM.validate || {
       api = $el.data('api-params') || {},
       type = api.params ? api.params.contact_type : null;
     if (createLinks === true) {
-      createLinks = type ? _.where(CRM.profile.contactCreate, {type: type}) : CRM.profile.contactCreate;
+      createLinks = type ? _.where(CRM.profileCreate, {type: type}) : CRM.profileCreate;
     }
     var markup = '';
     _.each(createLinks, function(link) {
@@ -479,6 +475,24 @@ CRM.validate = CRM.validate || {
       markup += link.label + '</a>';
     });
     return markup;
+  }
+
+  /**
+   * Wrapper for jQuery validate initialization function; supplies defaults
+   * @param options object
+   */
+  $.fn.crmValidate = function(params) {
+    return $(this).each(function () {
+      var that = this,
+        settings = $.extend({}, CRM.validate._defaults, CRM.validate.params);
+      $(this).validate(settings);
+      // Call any post-initialization callbacks
+      if (CRM.validate.functions && CRM.validate.functions.length) {
+        $.each(CRM.validate.functions, function(i, func) {
+          func.call(that);
+        });
+      }
+    });
   }
 
   // Initialize widgets
