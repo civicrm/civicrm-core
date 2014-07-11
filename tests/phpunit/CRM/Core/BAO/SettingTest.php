@@ -95,6 +95,23 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $civicrm_setting[CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME]['imageUploadDir'] = '/test/override';
     $values = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME);
     $this->assertEquals('/test/override', $values['imageUploadDir']);
+
+    // CRM-14974 test suite
+    $civicrm_setting['Test Preferences']['overrideSetting'] = '/test/override';
+    $values = CRM_Core_BAO_Setting::getItem('Test Preferences');
+    $this->assertEquals('/test/override', $values['overrideSetting']);
+    CRM_Core_BAO_Setting::setItem('/test/database', 'Test Preferences', 'databaseSetting');
+    $values = CRM_Core_BAO_Setting::getItem('Test Preferences');
+    $this->assertEquals('/test/override', $values['overrideSetting']);
+    $this->assertEquals('/test/database', $values['databaseSetting']);
+    $civicrm_setting['Test Preferences']['databaseSetting'] = '/test/dataride';
+    $values = CRM_Core_BAO_Setting::getItem('Test Preferences');
+    $this->assertEquals('/test/override', $values['overrideSetting']);
+    $this->assertEquals('/test/dataride', $values['databaseSetting']);
+    // CRM-14974 tear down
+    unset($civicrm_setting['Test Preferences']);
+    $query = "DELETE FROM civicrm_setting WHERE group_name = 'Test Preferences';";
+    CRM_Core_DAO::executeQuery($query);
   }
 
   /**
