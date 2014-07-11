@@ -696,21 +696,28 @@ HTACCESS;
    */
   static function addDynamicResource($fileName, $contents) {
     // First ensure the directory exists
-    $path = self::baseFilePath() . 'dynamic';
+    $path = self::dynamicResourcePath();
     if (!is_dir($path)) {
       self::createDir($path);
       self::restrictBrowsing($path);
     }
-    file_put_contents($path . DIRECTORY_SEPARATOR . $fileName, $contents);
+    file_put_contents("$path/$fileName", $contents);
   }
 
   /**
    * Get the path of a dynamic resource file
+   * With no fileName supplied, returns the path of the directory
    * @param string $fileName
    * @return string
    */
-  static function dynamicResourcePath($fileName) {
-    return self::baseFilePath() . 'dynamic' . DIRECTORY_SEPARATOR . $fileName;
+  static function dynamicResourcePath($fileName = NULL) {
+    $config = CRM_Core_Config::singleton();
+    // FIXME: Use self::baseFilePath once url issue has been resolved
+    $path = self::addTrailingSlash(str_replace('/persist/contribute', '', $config->imageUploadDir)) . 'dynamic';
+    if ($fileName !== NULL) {
+      $path .= "/$fileName";
+    }
+    return $path;
   }
 
   /**
@@ -720,7 +727,8 @@ HTACCESS;
    */
   static function dynamicResourceUrl($fileName) {
     $config = CRM_Core_Config::singleton();
-    return str_replace('persist/contribute', 'dynamic', $config->imageUploadURL) . $fileName;
+    // FIXME: Need a better way of getting the url of the baseFilePath
+    return self::addTrailingSlash(str_replace('/persist/contribute', '', $config->imageUploadURL)) . 'dynamic/' . $fileName;
   }
 
   /**
