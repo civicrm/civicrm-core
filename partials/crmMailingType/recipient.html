@@ -8,11 +8,16 @@ Remove duplicates not functional
 <table class="form-layout-compressed">
   <tbody>
   <tr>
-    <td class="label">Name your Mailing</td>
+    <td class="label">Name your Mailing *</td>
     <td>
-      <input type="text" ng-model="currentMailing.name"/>
+      <input placeholder="New Mail" name = "name" type="text" required ng-model="currentMailing.name"/>
     </td>
   </tr>
+  <tr> 
+    <td class="label"  style= "color:red" ng-show="mailing_form.name.$invalid">
+					Your name is required.
+		</td>
+	</tr>
   <tr>
     <td class="label">Campaign</td>
     <td class="addRow">

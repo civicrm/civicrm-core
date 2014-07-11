@@ -33,7 +33,7 @@
             }
             else {
             //created_id has been set to my id. Does not save without created_id. Needs to made generic based on the user
-              return {name: "New Mail", visibility: "Public Pages", url_tracking:"1", forward_replies:"0", created_id: "202", auto_responder:"0", open_tracking:"1",
+              return {visibility: "Public Pages", url_tracking:"1", forward_replies:"0", created_id: "202", auto_responder:"0", open_tracking:"1",
                  };
             }
           }
@@ -45,7 +45,7 @@
  
 
 //This controller is used in creating new mail and editing current mails
-	crmMailing.controller('mailingCtrl', function($scope, crmApi, selectedMail) {
+	crmMailing.controller('mailingCtrl', function($scope, crmApi, selectedMail, $location) {
 			
 	//Making some dummy api to see if my from email, reply to email works. To see if all options come in select box
 		$scope.cool_api= [
@@ -60,6 +60,7 @@
 			 'reply_mail': 'rajgo94@gmail_3.com'}
 		];
 	//setting variables to the values we have got to the api
+	  $scope.submitted = false;
 		$scope.partialUrl = partialUrl;
 		$scope.campaignList =  CRM.crmMailing.campNames;
 		$scope.mailList = CRM.crmMailing.civiMails;
@@ -71,13 +72,54 @@
 		$scope.currentMailing = selectedMail;
 		$scope.testGroup = "";
 		window.ct = $scope.currentMailing;
+		$scope.param = {};
+		$scope.mailingForm = function() {
+			if ($scope.mailing_form.$valid) {
+				// Submit as normal
+			} else {
+				$scope.mailing_form.submitted = true;
+			}
+		}
 		
+		$scope.back = function (){
+			$location.path( "mailing" );
+		};
+
 	//initializing variables we will use for checkboxes, or for purpose of ng-show
 		$scope.acttab=0;
 		$scope.composeS="1";
-		$scope.trackreplies="0";
+		if($scope.currentMailing.forward_replies==0 && $scope.currentMailing.auto_responder==0){
+				$scope.trackreplies="0";
+		}
+		else {
+				$scope.trackreplies="1";
+		}
+		
 		$scope.now="1";
+		
+		$scope.reply = function(){
+			if($scope.trackreplies==0){
+					$scope.trackreplies=1;
+				}
+			else{
+					$scope.trackreplies=0;
+					$scope.currentMailing.forward_replies=0;
+					$scope.currentMailing.auto_responder=0;
+				}
+			}
+			
+		$scope.recclicked = function(){
+			$scope.acttab=0;
+		};
 
+		$scope.conclicked = function(){
+			$scope.acttab=1;
+		};		
+		
+		$scope.schedclicked = function(){
+			$scope.acttab=2;
+		};		
+		
 	//to split the value of selectedMail.scheduled_date into the date and time separately	
 		$scope.scheddate={};
 		$scope.scheddate.date = ""; 
@@ -102,7 +144,7 @@
 			}
 			else 
 				return false;
-		}
+		};
 	//filter so we only get headers from mailing component 
 		$scope.isHeader= function(hf){
 			return hf.component_type == "Header";
@@ -136,6 +178,19 @@
 			return ml.is_completed == 1;
 		};
 		
+		$scope.upload = function(){
+			console.log($scope.param.file);
+			};
+		
+		$scope.upload_2 = function(){
+			console.log($scope.param.file_2);
+			};
+		
+		$scope.upload_3 = function(){
+			console.log($scope.param.file_3);
+		};
+				
+			
 		$scope.save = function() {
 				$scope.incGrp=[];
 				$scope.excGrp=[];
@@ -268,9 +323,30 @@
 		return {
 			restrict : 'AE',
 			link: function(scope,element, attrs){
+			   function format(item) {
+         if(!item.id) {
+            // return `text` for optgroup
+            return item.text;
+          }
+          // return item template
+          var a = item.id.split(" ");
+          console.log(a);
+          if(a[1]=="group" && a[2]=="include")
+						return "<img src='../../sites/all/modules/civicrm/i/include.jpeg' height=12 width=12/>" + "   " + "<img src='../../sites/all/modules/civicrm/i/group.png' height=12 width=12/>" + item.text;
+				  if(a[1]=="group" && a[2]=="exclude")
+						return "<img src='../../sites/all/modules/civicrm/i/Error.gif' height=12 width=12/>" + "   " + "<img src='../../sites/all/modules/civicrm/i/group.png' height=12 width=12/>" + item.text;
+					if(a[1]=="mail" && a[2]=="include")
+						return "<img src='../../sites/all/modules/civicrm/i/include.jpeg' height=12 width=12/>" + "   "  + "<img src='../../sites/all/modules/civicrm/i/EnvelopeIn.gif' height=12 width=12/>" + item.text;
+					if(a[1]=="mail" && a[2]=="exclude")
+						return "<img src='../../sites/all/modules/civicrm/i/Error.gif' height=12 width=12/>" + "   " + "<img src='../../sites/all/modules/civicrm/i/EnvelopeIn.gif' height=12 width=12/>" + item.text;
+        }
+
 			$(element).select2({
 				width:"400px",
 				placeholder: "Choose Recipients",
+				formatResult: format,
+				formatSelection: format,
+				escapeMarkup: function(m) { return m; }
 				});
 			$(element).on('select2-selecting', function(e) {
 					incGroup.push(e.val);
@@ -283,55 +359,38 @@
 	// Used for the select date option. This is used for giving scheduled_date its date value
 	crmMailing.directive('chsdate',function(){
 		return {
-			scope :{
-				dat : '=send_date'
-				},
 			restrict: 'AE',
 			link: function(scope,element,attrs){
 					$(element).datepicker({
 						dateFormat: "yy-mm-dd",
 						onSelect: function(date) {
 							$(".ui-datepicker a").removeAttr("href");
-							scope.dat =date;
+							var ngModelName = this.attributes['ng-model'].value;
+              scope[ngModelName] = date;
+              scope.$apply();
 						}
 				});
 			}
 		};
 	});
 
-/*
-	//browsing controller. to add selected files. not working currently
-	crmMailing.controller('browse', function($scope){
-			$scope.fileList = [];
-			$('#fileupload').bind('fileuploadadd', function(e, data){
-					// Add the files to the list
-					numFiles = $scope.fileList.length
-					for (var i=0; i < data.files.length; ++i) {
-							var file = data.files[i];
-					// .$apply to update angular when something else makes changes
-					$scope.$apply(
-							$scope.fileList.push({name: file.name})
-							);
+	crmMailing.directive('file', function(){
+			return {
+					scope: {
+							file: '='
+					},
+					link: function(scope, el, attrs){
+							el.bind('change', function(event){
+									var files = event.target.files;
+									var file = files[0];
+									scope.file = file ? file.name : undefined;
+									scope.$apply();
+							});
 					}
-					// Begin upload immediately
-					data.submit();
-			});
+			};
 	});
 
-	//adding directive. to add selected files. not working currently
-	crmMailing.directive('add',function(){
-		return {
-			restrict : 'AE',
-			link: function(scope,element, attrs){
-				$(document).ready(function(){
-					$('#fileupload').fileupload({
-						dataType: 'json'
-					});
-				});
-			}
-		};
-	}); 
-*/			
+			
 	 //This controller is used for creating the mailing list. Simply gets all the mailing data from civiAPI   
 	crmMailing.controller('mailingListCtrl', function($scope, crmApi, mailingList) {
 		$scope.mailingList = mailingList.values;
@@ -340,5 +399,6 @@
 
 })(angular, CRM.$, CRM._);
 
-
-
+/* example of params
+ [attachFile_1] => Array ( [uri] => /var/www/siddhant/drupal-7.27/sites/default/files/civicrm/custom/blog_2_odt_2c622a7b5e32415a92e81ed97d6554c7.unknown [type] => application/vnd.oasis.opendocument.text [location] => /var/www/siddhant/drupal-7.27/sites/default/files/civicrm/custom/blog_2_odt_2c622a7b5e32415a92e81ed97d6554c7.unknown [description] => dasdas [upload_date] => 20140706105804 [tag] => Array ( ) [attachment_taglist] => Array ( ) )
+*/
