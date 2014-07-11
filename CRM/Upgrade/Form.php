@@ -522,11 +522,11 @@ SET    version = '$version'
    * Perform an incremental version update
    *
    * @param $rev string, the target (intermediate) revision e.g '3.2.alpha1'
-   * @param $currentVer string, the original revision
+   * @param $originalVer string, the original revision
    * @param $latestVer string, the target (final) revision
    * @param $postUpgradeMessageFile string, path of a modifiable file which lists the post-upgrade messages
    */
-  static function doIncrementalUpgradeStep(CRM_Queue_TaskContext$ctx, $rev, $currentVer, $latestVer, $postUpgradeMessageFile) {
+  static function doIncrementalUpgradeStep(CRM_Queue_TaskContext$ctx, $rev, $originalVer, $latestVer, $postUpgradeMessageFile) {
     $upgrade = new CRM_Upgrade_Form();
 
     $phpFunctionName = 'upgrade_' . str_replace('.', '_', $rev);
@@ -568,7 +568,7 @@ SET    version = '$version'
 
       if (is_callable(array(
         $versionObject, $phpFunctionName))) {
-        $versionObject->$phpFunctionName($rev);
+        $versionObject->$phpFunctionName($rev, $originalVer, $latestVer);
       }
       else {
         $upgrade->processSQL($rev);
