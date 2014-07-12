@@ -19,29 +19,29 @@ Submit Mailing is not functional yet
 
     <div id="acttab-0">
       <div ng-include="partialUrl('recipient.html')"></div>
-      <button nexttab type= "button"><span>Next</span></button>
-      <button ng-click="save()" ng-disabled="mailing_form.$invalid" type= "submit"><span>Save and Continue Later</span></button>
-      <button ng-click="back()"><span>Cancel</span></button>
+      <button nexttab class="crm-button" type= "button"><span>Next</span></button>
+      <button class="crm-button" ng-click="save()" ng-disabled="mailing_form.$invalid" type= "submit"><span>Save and Continue Later</span></button>
+      <button class="crm-button" ng-click="back()"><span>Cancel</span></button>
       <br><br>       
 	</div>
     
     <div id="acttab-1">
       <div ng-include="partialUrl('content.html')"></div>
       <br>
-      <button prevtab type= "button"><span>Previous</span></button>         
-      <button nexttab type= "button"><span>Next</span></button>
-      <button ng-click="save()" ng-disabled="mailing_form.$invalid" type="submit"><span>Save and Continue Later</span></button>
-      <button ng-click="back()" ><span>Cancel</span></button>
+      <button prevtab class="crm-button" type= "button"><span>Previous</span></button>         
+      <button nexttab class="crm-button" type= "button"><span>Next</span></button>
+      <button class="crm-button" ng-click="save()" ng-disabled="mailing_form.$invalid" type="submit"><span>Save and Continue Later</span></button>
+      <button class="crm-button" ng-click="back()" ><span>Cancel</span></button>
       <br><br> 
 	</div>
     
     <div id="acttab-2">
       <div ng-include="partialUrl('send.html')"></div>
       <br>
-      <button prevtab type="button" ><span>Previous</span></button>         
-      <button ng-click="save()" ng-disabled="mailing_form.$invalid" type= "submit"><span>Save and Continue Later</span></button>
-      <button> <span>Submit Mailing</span></button>      
-      <button ng-click="back()" ><span>Cancel</span></button>  
+      <button class="crm-button" prevtab type="button" ><span>Previous</span></button>         
+      <button class="crm-button" ng-click="save()" ng-disabled="mailing_form.$invalid" type= "submit"><span>Save and Continue Later</span></button>
+      <button class="crm-button" ng-disabled="mailing_form.$invalid" type= "submit"> <span>Submit Mailing</span></button>      
+      <button class="crm-button" ng-click="back()" ><span>Cancel</span></button>  
 			<br><br>
     </div>
   </div>   

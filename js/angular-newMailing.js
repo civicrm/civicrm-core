@@ -7,6 +7,7 @@
   var crmMailing = angular.module('crmMailing', ['ngRoute', 'ui.utils']);
   var incGroup = [];
 
+
 //-------------------------------------------------------------------------------------------------------
  crmMailing.config(['$routeProvider',
     function($routeProvider) {
@@ -73,17 +74,40 @@
 		$scope.testGroup = "";
 		window.ct = $scope.currentMailing;
 		$scope.param = {};
+		$scope.tst=""
+		if($scope.currentMailing.msg_template_id!=null){
+				$scope.tst=$scope.currentMailing.msg_template_id;
+				}
+		console.log($scope.tst);
+    
 		$scope.mailingForm = function() {
 			if ($scope.mailing_form.$valid) {
 				// Submit as normal
 			} else {
 				$scope.mailing_form.submitted = true;
 			}
-		}
+		};
 		
 		$scope.back = function (){
 			$location.path( "mailing" );
 		};
+
+		$scope.tmp = function (tst){
+		console.log(tst);
+		$scope.currentMailing.msg_template_id=tst;
+		if($scope.currentMailing.msg_template_id == ""){
+			$scope.currentMailing.body_html="";
+		}
+		else{
+			for(var a in $scope.tmpList){
+			 
+				if($scope.tmpList[a].id==$scope.currentMailing.msg_template_id){
+					$scope.currentMailing.body_html=$scope.tmpList[a].msg_html;
+					}
+				}
+		}	
+		};
+		
 
 	//initializing variables we will use for checkboxes, or for purpose of ng-show
 		$scope.acttab=0;
@@ -330,7 +354,6 @@
           }
           // return item template
           var a = item.id.split(" ");
-          console.log(a);
           if(a[1]=="group" && a[2]=="include")
 						return "<img src='../../sites/all/modules/civicrm/i/include.jpeg' height=12 width=12/>" + "   " + "<img src='../../sites/all/modules/civicrm/i/group.png' height=12 width=12/>" + item.text;
 				  if(a[1]=="group" && a[2]=="exclude")
@@ -352,10 +375,15 @@
 					incGroup.push(e.val);
           console.log(incGroup);
         });
+        $(element).on("select2-removed", function(e) {
+          var index = incGroup.indexOf(e.val);
+          incGroup.splice(index, 1);
+          console.log(incGroup);
+        });
 			}
 		};
 	}); 
-		
+	
 	// Used for the select date option. This is used for giving scheduled_date its date value
 	crmMailing.directive('chsdate',function(){
 		return {
