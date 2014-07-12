@@ -36,7 +36,7 @@ Required Variables: cool_api and currentMailing and eMailing
   <tr>
     <td class="label">Use Template</td>
      <td>
-      <select  style="width: 100px" ng-model="currentMailing.msg_template_id" ng-options="mstemp.id as mstemp.msg_title for mstemp in tmpList">
+      <select ng-change="tmp(tst)" ng-model="tst" ng-options= "mstemp.id as mstemp.msg_title for mstemp in tmpList">
 				<option value="">-none-</option>
 			</select>
     </td>

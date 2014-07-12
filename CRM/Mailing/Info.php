@@ -72,10 +72,11 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 				'return' => "email",
 				'contact_id' => 202,
 				));
-		$mesTemplate = civicrm_api3('MessageTemplate', 'get', array( 'sequential' => 1,
-			'return' => "msg_title",
-			'id' => array('>' => 58),)
-			);
+		$mesTemplate = civicrm_api3('MessageTemplate', 'get', array(  'sequential' => 1,
+			'return' => array("msg_html", "id", "msg_title"),
+			'id' => array('>' => 58),
+			));
+		
 				
     CRM_Core_Resources::singleton()->addSetting(array(
       'crmMailing' => array(
