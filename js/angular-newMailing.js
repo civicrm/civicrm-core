@@ -74,7 +74,8 @@
 		$scope.testGroup = "";
 		window.ct = $scope.currentMailing;
 		$scope.param = {};
-		$scope.tst=""
+		$scope.tst="";
+		
 		if($scope.currentMailing.msg_template_id!=null){
 				$scope.tst=$scope.currentMailing.msg_template_id;
 				}
@@ -83,7 +84,8 @@
 		$scope.mailingForm = function() {
 			if ($scope.mailing_form.$valid) {
 				// Submit as normal
-			} else {
+			} 
+			else {
 				$scope.mailing_form.submitted = true;
 			}
 		};
@@ -93,19 +95,23 @@
 		};
 
 		$scope.tmp = function (tst){
-		console.log(tst);
-		$scope.currentMailing.msg_template_id=tst;
-		if($scope.currentMailing.msg_template_id == ""){
-			$scope.currentMailing.body_html="";
-		}
-		else{
-			for(var a in $scope.tmpList){
-			 
-				if($scope.tmpList[a].id==$scope.currentMailing.msg_template_id){
-					$scope.currentMailing.body_html=$scope.tmpList[a].msg_html;
+			console.log(tst);
+			$scope.currentMailing.msg_template_id=tst;
+			if($scope.currentMailing.msg_template_id == ""){
+				$scope.currentMailing.body_html="";
+			}
+			else{
+				for(var a in $scope.tmpList){
+				 
+					if($scope.tmpList[a].id==$scope.currentMailing.msg_template_id){
+						$scope.currentMailing.body_html=$scope.tmpList[a].msg_html;
+						}
 					}
-				}
-		}	
+				}	
+		};
+		
+		$scope.testing = function (testGroup){
+			console.log(testGroup);
 		};
 		
 
@@ -216,11 +222,11 @@
 				
 			
 		$scope.save = function() {
+				console.log($scope.scheddate.date)
 				$scope.incGrp=[];
 				$scope.excGrp=[];
 				$scope.incMail=[];
 				$scope.excMail=[];
-				console.log($scope.testGroup + " test group");
 				console.log(incGroup);
 				$scope.answer="";
 				for(req_id in incGroup){
@@ -393,9 +399,9 @@
 						dateFormat: "yy-mm-dd",
 						onSelect: function(date) {
 							$(".ui-datepicker a").removeAttr("href");
-							var ngModelName = this.attributes['ng-model'].value;
-              scope[ngModelName] = date;
+							scope.scheddate.date=date.toString();
               scope.$apply();
+              console.log(scope.scheddate.date);
 						}
 				});
 			}
