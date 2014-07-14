@@ -199,12 +199,12 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->assign('contact_type', $main['contact_type']);
     if (!empty($main['contact_sub_type'])) {
       $this->assign('main_contact_subtype',
-        CRM_Utils_Array::value('contact_sub_type', $subtypes[$main['contact_sub_type'][0]])
+        CRM_Utils_Array::value($main['contact_sub_type'][0], $subtypes)
       );
     }
     if (!empty($other['contact_sub_type'])) {
       $this->assign('other_contact_subtype',
-        CRM_Utils_Array::value('contact_sub_type', $subtypes[$other['contact_sub_type'][0]])
+        CRM_Utils_Array::value($other['contact_sub_type'][0], $subtypes)
       );
     }
     $this->assign('main_name', $main['display_name']);
