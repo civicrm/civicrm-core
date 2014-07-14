@@ -234,13 +234,14 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     }
 
     if ($contact->contact_type == 'Individual' && (isset($params['current_employer']) || isset($params['employer_id']))) {
-      $newEmployer = !empty($params['employer_id']) ? $params['employer_id'] : CRM_Utils_Array::value('current_employer', $params);
       // create current employer
+      $newEmployer = !empty($params['employer_id']) ? $params['employer_id'] : CRM_Utils_Array::value('current_employer', $params);
+
+      $newContact = FALSE;
+      if (empty($params['contact_id'])) {
+        $newContact = TRUE;
+      }
       if ($newEmployer) {
-        $newContact = FALSE;
-        if (empty($params['contact_id'])) {
-          $newContact = TRUE;
-        }
         CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($contact->id, $newEmployer, $employerId, $newContact);
       }
       else {
