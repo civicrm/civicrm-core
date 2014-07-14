@@ -417,7 +417,7 @@ function _civicrm_api3_case_read($caseId, $options) {
  */
 function _civicrm_api3_case_format_params(&$params) {
   // figure out case type id from case type and vice-versa
-  $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
+  $caseTypes = CRM_Case_PseudoConstant::caseType('name', FALSE);
   if (empty($params['case_type_id'])) {
     $params['case_type_id'] = array_search($params['case_type'], $caseTypes);
   }
