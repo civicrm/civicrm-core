@@ -97,7 +97,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $params = $this->_params;
     // Test using label instead of value
     unset($params['case_type_id']);
-    $params['case_type'] = 'Housing Support';
+    $params['case_type'] = $this->caseType;
     $result = $this->callAPISuccess('case', 'create', $params);
     $id = $result['id'];
 
@@ -116,7 +116,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $params = $this->_params;
     // Test using name instead of value
     unset($params['case_type_id']);
-    $params['case_type'] = 'Housing Support';
+    $params['case_type'] = $this->caseType;
     $result = $this->callAPISuccess('case', 'create', $params);
     $id = $result['id'];
     $result = $this->callAPISuccess('case', 'get', array('id' => $id));

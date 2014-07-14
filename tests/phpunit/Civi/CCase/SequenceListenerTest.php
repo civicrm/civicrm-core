@@ -8,7 +8,7 @@ class SequenceListenerTest extends \CiviCaseTestCase {
   public function setUp() {
     parent::setUp();
     $this->_params = array(
-      'case_type' => 'Housing Support', // FIXME: $this->caseType,
+      'case_type' => $this->caseType,
       'subject' => 'Test case',
       'contact_id' => 17,
     );
