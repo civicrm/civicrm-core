@@ -1854,7 +1854,12 @@ SELECT contact_id
   }
 
   /**
-   * @return array
+   * @return array each item has keys:
+   *  - name: string
+   *  - type: string
+   *  - count: int
+   *  - table: string|null SQL table name
+   *  - key: string|null SQL column name
    */
   function getReferenceCounts() {
     $links = self::getReferencesToTable(static::getTableName());
