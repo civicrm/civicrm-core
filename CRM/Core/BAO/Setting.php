@@ -1017,8 +1017,9 @@ AND domain_id = %3
     global $civicrm_setting;
     if ($group && $name && isset($civicrm_setting[$group][$name])) {
       return $civicrm_setting[$group][$name];
-    }
-    else {
+    } else if ($group && !isset($name) && isset($civicrm_setting[$group])) {
+      return $civicrm_setting[$group];
+    } else {
       return $default;
     }
   }
