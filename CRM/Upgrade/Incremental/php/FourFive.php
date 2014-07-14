@@ -57,6 +57,10 @@ class CRM_Upgrade_Incremental_php_FourFive {
    * @return void
    */
   function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    // CRM-14362
+    if ($rev == '4.5.beta2' && self::renameFinancialType(TRUE)) {
+      $preUpgradeMessage .= '<br /><br />' . ts('Financial Types having the same names will be changed. Please click <a href="%1" target="_blank">here</a> to review.', array(1 => CRM_Utils_System::url('civicrm/admin/financial/financialType', 'reset=1')));
+    }
   }
 
   /**
@@ -114,7 +118,41 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
 
     return TRUE;
   }
-
+  
+  /**
+   * @param $rev
+   *
+   * @return bool
+   */
+  function upgrade_4_5_beta2($rev) {
+    $this->addTask(ts('Upgrade DB to 4.5.beta2: SQL'), 'task_4_5_x_runSql', $rev);
+    self::renameFinancialType();
+  }
+  
+  /**
+   * Add defaults for the newly introduced name fields configuration in 'contact_edit_options' setting
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   *
+   * @return bool TRUE for success
+   */
+  static function renameFinancialType($isUpgradeText = NULL) {
+    $dao = CRM_Core_DAO::executeQuery('SELECT GROUP_CONCAT(id) ids FROM civicrm_financial_type GROUP BY name HAVING count(id) > 1;');
+    if ($isUpgradeText) {
+      return $dao->N;
+    }
+    
+    while ($dao->fetch()) {
+      if ($dao->ids) {
+      CRM_Core_DAO::executeQuery("UPDATE `civicrm_financial_type`, (SELECT @count := 0) AS temp
+        SET name = IF (((SELECT @count := @count + 1) <= 1), name, CONCAT(name, '-', (@count - 1)))
+        WHERE id IN ({$dao->ids})");
+      }
+    }
+    CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_financial_type` ADD UNIQUE INDEX `UI_name` (`name`);');
+    return TRUE;
+  }
+  
   /**
    * Add defaults for the newly introduced name fields configuration in 'contact_edit_options' setting
    *

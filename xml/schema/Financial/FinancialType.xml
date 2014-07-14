@@ -77,4 +77,10 @@
     <unique>true</unique>
     <add>4.3</add>
   </index>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>4.5</add>
+  </index>
 </table>
