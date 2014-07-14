@@ -277,6 +277,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       CRM_Utils_Hook::post('create', 'CaseType', $caseType->id, $case);
     }
     $transaction->commit();
+    CRM_Case_XMLRepository::singleton(TRUE);
 
     return $caseType;
   }
@@ -310,7 +311,14 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   static function del($caseTypeId) {
     $caseType = new CRM_Case_DAO_CaseType();
     $caseType->id = $caseTypeId;
-    return $caseType->delete();
+    $refCounts = $caseType->getReferenceCounts();
+    $total = array_sum(CRM_Utils_Array::collect('count', $refCounts));
+    if ($total) {
+      throw new CRM_Core_Exception("Cannot delete case type -- {$total} record(s) depend on it");
+    }
+    $result = $caseType->delete();
+    CRM_Case_XMLRepository::singleton(TRUE);
+    return $result;
   }
 
   /**
