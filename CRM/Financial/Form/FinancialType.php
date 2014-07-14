@@ -71,8 +71,10 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
     if ($this->_action == CRM_Core_Action::UPDATE && CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_id, 'is_reserved','vid')) {
       $this->freeze(array('is_active'));
     }
-
-    //$this->addFormRule( array( 'CRM_Financial_Form_FinancialType', 'formRule'), $this );
+    
+    $this->addRule('name', ts('A financial type with this name already exists. Please select another name.'),'objectExists',
+      array('CRM_Financial_DAO_FinancialType', $this->_id)
+    );
   }
 
   /**
@@ -110,11 +112,17 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
         $statusArray = array(
           1 => $financialType->name,
           2 => $financialType->name,
-          3 => $financialType->titles[0],
-          4 => $financialType->titles[1],
-          5 => $financialType->titles[2],
+          3 => CRM_Utils_Array::value(0, $financialType->titles),
+          4 => CRM_Utils_Array::value(1, $financialType->titles),
+          5 => CRM_Utils_Array::value(2, $financialType->titles),
         );
-        CRM_Core_Session::setStatus(ts('Your Financial \'%1\' Type has been created, along with a corresponding income account \'%2\'. That income account, along with standard financial accounts \'%3\', \'%4\' and \'%5\' have been linked to the financial type. You may edit or replace those relationships here.', $statusArray));
+        if (empty($financialType->titles)) {
+          $text = 'Your Financial \'%1\' Type has been created and assigned to an existing financial account with the same title. You should review the assigned account and determine whether additional account relationships are needed.';
+        }
+        else {
+          $text = 'Your Financial \'%1\' Type has been created, along with a corresponding income account \'%2\'. That income account, along with standard financial accounts \'%3\', \'%4\' and \'%5\' have been linked to the financial type. You may edit or replace those relationships here.';
+        }
+        CRM_Core_Session::setStatus(ts($text, $statusArray));
       }
 
       $session = CRM_Core_Session::singleton();
