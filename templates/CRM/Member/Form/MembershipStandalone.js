@@ -1,14 +1,12 @@
 CRM.$(function($) {
   memberResults = new Array;
-  $("input[name='contact[1]']").result( function() {
-    var contact_id = cj("input[name='contact_select_id[1]']").val();
+    var contact_id = cj("#contact_id").val();
     CRM.api('Membership', 'get', {'sequential': 1, 'contact_id': contact_id},
       {success: function(data) {
         if (data['values']) {
           memberResults = data['values'];
           checkExistingMemOrg();
         }
-      }});
     });
       
   checkExistingMemOrg();
