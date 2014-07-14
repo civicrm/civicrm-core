@@ -295,7 +295,11 @@
         });
     };
     $scope.deleteCaseType = function (caseType) {
-      crmApi('CaseType', 'delete', {id: caseType.id}, true)
+      crmApi('CaseType', 'delete', {id: caseType.id}, {
+        error: function (data) {
+          CRM.alert(data.error_message, ts('Error'));
+        }
+      })
         .then(function (data) {
           if (!data.is_error) {
             delete caseTypes.values[caseType.id];
