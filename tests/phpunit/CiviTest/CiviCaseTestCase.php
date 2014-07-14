@@ -95,6 +95,7 @@ class CiviCaseTestCase extends CiviUnitTestCase {
       'civicrm_case_activity',
       'civicrm_case_type',
       'civicrm_activity_contact',
+      'civicrm_managed',
       'civicrm_relationship',
       'civicrm_relationship_type',
     );

@@ -130,7 +130,7 @@
     // Example: <button crm-confirm="{message: ts('Frobincation is a footastical operation')}" on-yes="frobnicate(123)">Frobincate</button>
     // Example: <button crm-confirm="{type: 'disable', obj: myObject}" on-yes="myObject.is_active=0; myObject.save()">Disable</button>
     .directive('crmConfirm', function () {
-      // Helpers to calculate default options from CRM.confirm()
+      // Helpers to calculate default options for CRM.confirm()
       var defaultFuncs = {
         'disable': function (options) {
           return {

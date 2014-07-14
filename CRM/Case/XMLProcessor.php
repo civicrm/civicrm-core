@@ -35,6 +35,22 @@
 class CRM_Case_XMLProcessor {
 
   /**
+   * FIXME: This does *NOT* belong in a static property, but we're too late in
+   * the 4.5-cycle to do the necessary cleanup.
+   *
+   * @var array|null array(int $id => string $relTypeCname)
+   */
+  public static $activityTypes = NULL;
+
+  /**
+   * FIXME: This does *NOT* belong in a static property, but we're too late in
+   * the 4.5-cycle to do the necessary cleanup.
+   *
+   * @var array|null array(int $id => string $relTypeCname)
+   */
+  public static $relationshipTypes = NULL;
+
+  /**
    * Relationship-types have four name fields (name_a_b, name_b_a, label_a_b,
    * label_b_a), but CiviCase XML refers to reltypes by a single name.
    * REL_TYPE_CNAME identifies the canonical name field as used by CiviCase XML.
@@ -86,29 +102,34 @@ class CRM_Case_XMLProcessor {
    * @return array
    */
   function &allActivityTypes($indexName = TRUE, $all = FALSE) {
-    static $activityTypes = NULL;
-    if (!$activityTypes) {
-      $activityTypes = CRM_Case_PseudoConstant::caseActivityType($indexName, $all);
+    if (self::$activityTypes === NULL) {
+      self::$activityTypes = CRM_Case_PseudoConstant::caseActivityType($indexName, $all);
     }
-    return $activityTypes;
+    return self::$activityTypes;
   }
 
   /**
    * @return array
    */
   function &allRelationshipTypes() {
-    static $relationshipTypes = array();
+    if (self::$relationshipTypes === NULL) {
+      $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE);
 
-    if (!$relationshipTypes) {
-      $relationshipInfo = CRM_Core_PseudoConstant::relationshipType();
-
-      $relationshipTypes = array();
+      self::$relationshipTypes = array();
       foreach ($relationshipInfo as $id => $info) {
-        $relationshipTypes[$id] = $info[CRM_Case_XMLProcessor::REL_TYPE_CNAME];
+        self::$relationshipTypes[$id] = $info[CRM_Case_XMLProcessor::REL_TYPE_CNAME];
       }
     }
 
-    return $relationshipTypes;
+    return self::$relationshipTypes;
+  }
+
+  /**
+   * FIXME: This should not exist
+   */
+  public static function flushStaticCaches() {
+    self::$activityTypes = NULL;
+    self::$relationshipTypes = NULL;
   }
 }
 

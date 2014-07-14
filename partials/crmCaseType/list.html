@@ -29,11 +29,11 @@ Required vars: caseTypes
     <!-- FIXME: Can't figure out how styling in other tables gets the nowrap effect... in absence of a consistent fix, KISS -->
     <td style="white-space: nowrap">
       <span>
-	      <a class="action-item crm-hover-button" ng-href="#/caseType/{{caseType.id}}">Edit</a>
+        <a class="action-item crm-hover-button" ng-href="#/caseType/{{caseType.id}}">Edit</a>
 
-	      <span class="btn-slide crm-hover-button">
-	        more
-	        <ul class="panel" style="display: none;">
+        <span class="btn-slide crm-hover-button">
+          more
+          <ul class="panel" style="display: none;">
             <li ng-hide="caseType.is_active">
               <a class="action-item crm-hover-button" ng-click="toggleCaseType(caseType)">
                 Enable
@@ -54,8 +54,8 @@ Required vars: caseTypes
               </a>
             </li>
           </ul>
-	      </span>
-	    </span>
+        </span>
+      </span>
     </td>
   </tr>
   </tbody>
