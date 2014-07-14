@@ -41,19 +41,21 @@
 <table>
   <tr class="columnheader">
     <th>&nbsp;</th>
-    <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$other_cid"}">{$other_name}&nbsp;<em>{$other_contact_subtype}</em></a> ({ts}duplicate{/ts})</th>
+    <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$other_cid"}">{$other_name}</a> ({ts}duplicate{/ts})</th>
     <th>{ts}Mark All{/ts}<br />=={$form.toggleSelect.html} ==&gt;</th>
-    <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$main_cid"}">{$main_name}&nbsp;<em>{$main_contact_subtype}</em></a></th>
+    <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$main_cid"}">{$main_name}</a></th>
   </tr>
   {foreach from=$rows item=row key=field}
      <tr class="{cycle values="odd-row,even-row"}">
         <td>{$row.title}</td>
         <td>
-           {if !is_array($row.other)}
-               {$row.other}
-           {else}
-               {$row.other.fileName}
-           {/if}
+          {if !is_array($row.other)}
+            {$row.other}
+          {elseif $row.other.fileName}
+            {$row.other.fileName}
+          {else}
+            {', '|implode:$row.other}
+          {/if}
         </td>
         <td style='white-space: nowrap'>{if $form.$field}=={$form.$field.html}==&gt;{/if}</td>
         <td>
@@ -100,8 +102,10 @@
             <span id="main_{$blockName}_{$blockId}">
               {if !is_array($row.main)}
                 {$row.main}
-              {else}
+              {elseif $row.main.fileName}
                 {$row.main.fileName}
+              {else}
+                {', '|implode:$row.main}
               {/if}
             </span>
         </td>
