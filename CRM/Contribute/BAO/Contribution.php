@@ -239,6 +239,31 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
+   * Get the number of terms for this contribution for a given membership type
+   * based on querying the line item table and relevant price field values
+   * Note that any one contribution should only be able to have one line item relating to a particular membership
+   * type
+   * @param int $membershipTypeID
+   *
+   * @return int
+   */
+  public function getNumTermsByContributionAndMembershipType($membershipTypeID) {
+    if (!is_numeric($membershipTypeID)) {
+      //precautionary measure - this is being introduced to a mature release hence adding extra checks that
+      // might be removed later
+      return 1;
+    }
+    $numTerms = CRM_Core_DAO::singleValueQuery("
+      SELECT membership_num_terms FROM civicrm_line_item li
+      LEFT JOIN civicrm_price_field_value v ON li.price_field_value_id = v.id
+      WHERE entity_id = %1 AND entity_table = 'civicrm_contribution' AND membership_type_id = %2",
+      array(1 => array($this->id, 'Integer') , 2 => array($membershipTypeID, 'Integer'))
+    );
+    // default of 1 is precautionary
+    return empty($numTerms) ? 1 : $numTerms;
+  }
+
+  /**
    * takes an associative array and creates a contribution object
    *
    * @param array $params (reference ) an assoc array of name/value pairs
