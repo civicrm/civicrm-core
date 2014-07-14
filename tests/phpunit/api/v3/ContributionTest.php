@@ -1214,10 +1214,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     $params = array_merge($this->_params, array('contribution_status_id' => 1,));
     $contribution = $this->callAPISuccess('contribution','create', $params);
-    $apiResult = $this->callAPISuccess('contribution', 'completetransaction', array(
+    $this->callAPISuccess('contribution', 'completetransaction', array(
       'id' => $contribution['id'],
-    )
-    );
+    ));
     $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id'], 'sequential' => 1,));
     $this->assertEquals('Completed', $contribution['values'][0]['contribution_status']);
     $mut->checkMailLog(array(
@@ -1263,9 +1262,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->clearMessages();
     $this->createLoggedInUser();
     $contributionID = $this->createPendingParticipantContribution();
-    $apiResult = $this->callAPISuccess('contribution', 'completetransaction', array(
-      'id' => $contributionID,
-    )
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contributionID,)
     );
     $participantStatus = $this->callAPISuccessGetValue('participant', array('id' => $this->ids['participant'], 'return' => 'participant_status_id'));
     $this->assertEquals(1, $participantStatus);
@@ -1274,8 +1272,143 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'Event',
       'This letter is a confirmation that your registration has been received and your status has been updated to Registered.',
     ));
-  $mut->stop();
+    $mut->stop();
+  }
 
+  /**
+   * test membership is renewed when transaction completed
+   */
+  function testCompleteTransactionMembershipPriceSet() {
+    $this->createPriceSetWithPage('membership');
+    $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
+    $this->callAPISuccess('contribution', 'completetransaction', array('id' =>  $this->_ids['contribution']));
+    $membership = $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
+    $this->assertEquals(date('Y-m-d', strtotime('yesterday + 1 year')), $membership['end_date']);
+    $this->cleanUpAfterPriceSets();
+  }
+
+  /**
+   * test membership is renewed when transaction completed
+   */
+  function testCompleteTransactionMembershipPriceSetTwoTerms() {
+    $this->createPriceSetWithPage('membership');
+    $this->setUpPendingContribution($this->_ids['price_field_value'][1]);
+    $this->callAPISuccess('contribution', 'completetransaction', array('id' =>  $this->_ids['contribution']));
+    $membership = $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
+    $this->assertEquals(date('Y-m-d', strtotime('yesterday + 2 years')), $membership['end_date']);
+    $this->cleanUpAfterPriceSets();
+  }
+
+  function cleanUpAfterPriceSets() {
+    $this->contactDelete($this->_ids['contact']);
+    $this->quickCleanup(array('civicrm_price_set_entity', 'civicrm_line_item', 'civicrm_contribution', 'civicrm_membership', 'civicrm_membership_payment'));
+    $this->callAPISuccess('price_field_value', 'delete', array('id' => $this->_ids['price_field_value'][0]));
+    $this->callAPISuccess('price_field_value', 'delete', array('id' => $this->_ids['price_field_value'][1]));
+    $this->callAPISuccess('price_field', 'delete', array('id' => $this->_ids['price_field'][0]));
+    $this->callAPISuccess('price_set', 'delete', array('id' => $this->_ids['price_set']));
+    $this->membershipTypeDelete(array('id' => $this->_ids['membership_type']));
+  }
+
+
+  /**
+   * this could be merged with 4.5 function setup in api_v3_ContributionPageTest::setUpContributionPage
+   * on parent class at some point (fn is not in 4.4)
+   * @param $entity
+   * @param array $params
+   */
+  function createPriceSetWithPage($entity, $params = array()) {
+    $membershipTypeID = $this->membershipTypeCreate();
+    $contributionPageResult = $this->callAPISuccess('contribution_page', 'create', array(
+      'title' => "Test Contribution Page",
+      'financial_type_id' => 1,
+      'currency' => 'NZD',
+      'goal_amount' => 50,
+      'is_pay_later' => 1,
+      'is_monetary' => TRUE,
+      'is_email_receipt' => FALSE,
+    ));
+    $priceSet = $this->callAPISuccess('price_set', 'create', array(
+      'is_quick_config' => 0,
+      'extends' => 'CiviMember',
+      'financial_type_id' => 1,
+      'title' => 'my Page'
+    ));
+    $priceSetID = $priceSet['id'];
+
+    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSetID );
+    $priceField = $this->callAPISuccess('price_field', 'create', array(
+      'price_set_id' => $priceSetID ,
+      'label' => 'Goat Breed',
+      'html_type' => 'Radio',
+    ));
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+        'price_set_id' => $priceSetID ,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Long Haired Goat',
+        'amount' => 20,
+        'membership_type_id' => $membershipTypeID,
+        'membership_num_terms' => 1,
+      )
+    );
+    $this->_ids['price_field_value'] = array($priceFieldValue['id']);
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+        'price_set_id' => $priceSetID ,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Shoe-eating Goat',
+        'amount' => 10,
+        'membership_type_id' => $membershipTypeID,
+        'membership_num_terms' => 2,
+      )
+    );
+    $this->_ids['price_field_value'][] = $priceFieldValue['id'];
+    $this->_ids['price_set'] = $priceSetID;
+    $this->_ids['contribution_page'] = $contributionPageResult['id'];
+    $this->_ids['price_field'] = array($priceField['id']);
+
+    $this->_ids['membership_type'] = $membershipTypeID;
+  }
+
+  /**
+   * Set up a pending transaction with a specific price field id
+   * @param $priceFieldValueID
+   */
+  function setUpPendingContribution($priceFieldValueID){
+    $contactID = $this->individualCreate();
+    $membership = $this->callAPISuccess('membership', 'create', array(
+      'contact_id' => $contactID,
+      'membership_type_id' => $this->_ids['membership_type'],
+      'start_date' => 'yesterday - 1 year',
+      'end_date' => 'yesterday',
+    ));
+    $contribution = $this->callAPISuccess('contribution', 'create', array(
+      'domain_id' => 1,
+      'contact_id' => $contactID,
+      'receive_date' => date('Ymd'),
+      'total_amount' => 100.00,
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 'Credit Card',
+      'non_deductible_amount' => 10.00,
+      'trxn_id' => 'jdhfi88',
+      'invoice_id' => 'djfhiewuyr',
+      'source' => 'SSF',
+      'contribution_status_id' => 2,
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'api.membership_payment.create' => array('membership_id' => $membership['id']),
+    ));
+
+    $this->callAPISuccess('line_item', 'create', array(
+      'entity_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+      'price_field_id' => $this->_ids['price_field'][0],
+      'qty' => 1,
+      'unit_price' => 20,
+      'line_total' => 20,
+      'financial_type_id' => 1,
+      'price_field_value_id' => $priceFieldValueID,
+    ));
+    $this->_ids['contact'] = $contactID;
+    $this->_ids['contribution'] = $contribution['id'];
+    $this->_ids['membership'] = $membership['id'];
   }
 
   /**
@@ -1327,8 +1460,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'participant_id' => $participant['id'],
       'contribution_id' => $contribution['id'],
     ));
-    $apiResult = $this->callAPISuccess('contribution', 'sendconfirmation', array(
-
+    $this->callAPISuccess('contribution', 'sendconfirmation', array(
       'id' => $contribution['id'],
       'receipt_from_email' => 'api@civicrm.org',
       )
