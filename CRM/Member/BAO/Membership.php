@@ -1264,7 +1264,7 @@ AND civicrm_membership.is_test = %2";
   public static function postProcessMembership($membershipParams, $contactID, &$form, $premiumParams,
     $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeID, $isPaidMembership, $membershipID,
     $isProcessSeparateMembershipTransaction, $defaultContributionTypeID, $membershipLineItems) {
-    $result      = NULL;
+    $result      = $membershipContribution = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = array();
 
@@ -1298,36 +1298,36 @@ AND civicrm_membership.is_test = %2";
     }
 
     $membership = NULL;
-    if (!empty($membershipContribution) && !is_a($membershipContribution, 'CRM_Core_Error')) { {
+    if (!empty($membershipContribution) && !is_a($membershipContribution, 'CRM_Core_Error')) {
       $membershipContributionID = $membershipContribution->id;
     }
-      //@todo - why is this nested so deep? it seems like it could be just set on the calling function on the form layer
-      if (isset($membershipParams['onbehalf']) && !empty($membershipParams['onbehalf']['member_campaign_id'])) {
-        $form->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
+
+    //@todo - why is this nested so deep? it seems like it could be just set on the calling function on the form layer
+    if (isset($membershipParams['onbehalf']) && !empty($membershipParams['onbehalf']['member_campaign_id'])) {
+      $form->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
+    }
+    //@todo it should no longer be possible for it to get to this point & membership to not be an array
+    if (is_array($membershipTypeID)) {
+      $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
+      foreach ($membershipTypeID as $memType) {
+        $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
+        $createdMemberships[$memType] = self::createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, $form);
       }
-      //@todo it should no longer be possible for it to get to this point & membership to not be an array
-      if (is_array($membershipTypeID)) {
-        $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
-        foreach ($membershipTypeID as $memType) {
-          $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
-          $createdMemberships[$memType] = self::createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, $form);
-        }
-        if ($form->_priceSetId && !empty($form->_useForMember) && !empty($form->_lineItem)) {
-          foreach ($form->_lineItem[$form->_priceSetId] as & $priceFieldOp) {
-            if (!empty($priceFieldOp['membership_type_id']) &&
-              isset($createdMemberships[$priceFieldOp['membership_type_id']])
-            ) {
-              $membershipOb = $createdMemberships[$priceFieldOp['membership_type_id']];
-              $priceFieldOp['start_date'] = $membershipOb->start_date ? CRM_Utils_Date::customFormat($membershipOb->start_date, '%d%f %b, %Y') : '-';
-              $priceFieldOp['end_date'] = $membershipOb->end_date ? CRM_Utils_Date::customFormat($membershipOb->end_date, '%d%f %b, %Y') : '-';
-            }
-            else {
-              $priceFieldOp['start_date'] = $priceFieldOp['end_date'] = 'N/A';
-            }
+      if ($form->_priceSetId && !empty($form->_useForMember) && !empty($form->_lineItem)) {
+        foreach ($form->_lineItem[$form->_priceSetId] as & $priceFieldOp) {
+          if (!empty($priceFieldOp['membership_type_id']) &&
+            isset($createdMemberships[$priceFieldOp['membership_type_id']])
+          ) {
+            $membershipOb = $createdMemberships[$priceFieldOp['membership_type_id']];
+            $priceFieldOp['start_date'] = $membershipOb->start_date ? CRM_Utils_Date::customFormat($membershipOb->start_date, '%d%f %b, %Y') : '-';
+            $priceFieldOp['end_date'] = $membershipOb->end_date ? CRM_Utils_Date::customFormat($membershipOb->end_date, '%d%f %b, %Y') : '-';
           }
-          $form->_values['lineItem'] = $form->_lineItem;
-          $form->assign('lineItem', $form->_lineItem);
+          else {
+            $priceFieldOp['start_date'] = $priceFieldOp['end_date'] = 'N/A';
+          }
         }
+        $form->_values['lineItem'] = $form->_lineItem;
+        $form->assign('lineItem', $form->_lineItem);
       }
     }
 
@@ -2191,10 +2191,10 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       $membershipID
     );
 
-    // update recurring id for membership record
-    self::updateRecurMembership($membership, $membershipContribution);
-
     if (!empty($membershipContribution)) {
+      // update recurring id for membership record
+      self::updateRecurMembership($membership, $membershipContribution);
+
       self::linkMembershipPayment($membership, $membershipContribution);
     }
     return $membership;
