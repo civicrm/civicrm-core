@@ -958,17 +958,18 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       if (!empty($membershipParams['selectMembership'])) {
         // CRM-12233
+        $membershipLineItems = array();
         if ($this->_separateMembershipPayment && $this->_values['amount_block_is_active']) {
           foreach ($this->_values['fee'] as $key => $feeValues) {
-            if ($feeValues['name'] == 'membership_amount') {
+             if ($feeValues['name'] == 'membership_amount') {
               $fieldId = $this->_params['price_' . $key];
-              $this->_memLineItem[$this->_priceSetId][$fieldId] = $this->_lineItem[$this->_priceSetId][$fieldId];
+              $membershipLineItems[$this->_priceSetId][$fieldId] = $this->_lineItem[$this->_priceSetId][$fieldId];
               unset($this->_lineItem[$this->_priceSetId][$fieldId]);
               break;
             }
           }
         }
-        $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams);
+        $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems);
         if (!$this->_amount > 0.0 || !$membershipParams['amount']) {
           // we need to explicitly create a CMS user in case of free memberships
           // since it is done under processConfirm for paid memberships
@@ -1691,18 +1692,22 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * @param $membershipParams
-   * @param $contactID
-   * @param $customFieldsFormatted
-   * @param $fieldTypes
-   * @param $premiumParams
+   * @param array $membershipParams
+   * @param integer $contactID
+   * @param array $customFieldsFormatted
+   * @param array $fieldTypes
+   * @param array $premiumParams
+   * @param array $membershipLineItems line items specifically relating to memberships
    */
-  public function processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams) {
+  public function processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems) {
     try {
       $membershipTypeID = (array) $membershipParams['selectMembership'];
 
-      $membershipDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this);
-      $this->assign('membership_name', CRM_Utils_Array::value('name', $membershipDetails));
+      $membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this);
+
+      $membershipType = empty($membershipTypes) ? array() : reset($membershipTypes);
+      $this->assign('membership_name', CRM_Utils_Array::value('name', $membershipType));
+
       $isPaidMembership = FALSE;
       if($this->_amount > 0.0 && $membershipParams['amount']) {
         //amount must be greater than zero for
@@ -1717,14 +1722,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $contributionTypeId = $this->_values['financial_type_id'];
       }
       else {
-        $contributionTypeId = CRM_Utils_Array::value( 'financial_type_id', $membershipDetails );
-        if (!$contributionTypeId) {
-          $contributionTypeId = CRM_Utils_Array::value('financial_type_id' ,$membershipParams);
-        }
+        $contributionTypeId = CRM_Utils_Array::value('financial_type_id', $membershipType, CRM_Utils_Array::value('financial_type_id' ,$membershipParams));
       }
 
       CRM_Member_BAO_Membership::postProcessMembership($membershipParams, $contactID,
-        $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipDetails,  $membershipTypeID, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction, $contributionTypeId
+        $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipType,  $membershipTypeID, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction, $contributionTypeId,
+        $membershipLineItems
       );
       $this->assign('membership_assign', TRUE);
       $this->set('membershipTypeID', $membershipParams['selectMembership']);
@@ -1838,6 +1841,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $priceFields = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
     $priceSetFields = reset($priceFields);
     $form->_values['fee'] = $priceSetFields['fields'];
+    $form->_priceSetId = $priceSetID;
     $form->setFormAmountFields($priceSetID);
     $priceFields = $priceFields[$priceSetID]['fields'];
     CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution');
