@@ -72,7 +72,8 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
       $this->freeze(array('is_active'));
     }
 
-    //$this->addFormRule( array( 'CRM_Financial_Form_FinancialType', 'formRule'), $this );
+    $this->addRule('name', ts('A financial type with this name already exists. Please select another name.'),'objectExists',
+       array('CRM_Financial_DAO_FinancialType', $this->_id));
   }
 
   /**
@@ -114,7 +115,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
           4 => $financialType->titles[1],
           5 => $financialType->titles[2],
         );
-        CRM_Core_Session::setStatus(ts('Your Financial \'%1\' Type has been created, along with a corresponding income account \'%2\'. That income account, along with standard financial accounts \'%3\', \'%4\' and \'%5\' have been linked to the financial type. You may edit or replace those relationships here.', $statusArray));
+        CRM_Core_Session::setStatus(ts('Your Financial \'%1\' Type has been created and assigned to an existing financial account with the same title. You should review the assigned account and determine whether additional account relationships are needed.', $statusArray)); 
       }
 
       $session = CRM_Core_Session::singleton();
