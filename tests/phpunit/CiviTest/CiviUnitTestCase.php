@@ -2377,6 +2377,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'civicrm_participant',
       'civicrm_participant_payment',
       'civicrm_pledge',
+      'civicrm_price_set_entity',
     );
     $this->quickCleanup($tablesToTruncate);
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_membership_status WHERE name NOT IN('New', 'Current', 'Grace', 'Expired', 'Pending', 'Cancelled', 'Deceased')");
