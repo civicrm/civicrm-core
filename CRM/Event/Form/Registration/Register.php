@@ -536,7 +536,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       );
     }
 
-    $this->addFormRule(array('CRM_Event_Form_Registration_Register', 'formRule'), $this);
+    //$this->addFormRule(array('CRM_Event_Form_Registration_Register', 'formRule'), $this);
 
     // add pcp fields
     if ($this->_pcpId) {
@@ -556,6 +556,433 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @static
    */
   static public function buildAmount(&$form, $required = TRUE, $discountId = NULL) {
+		
+// ////////////////////////////////////////////////
+// START SOLD OUT CODE
+// ////////////////////////////////////////////////
+// print("Confirm - line items :: <pre>".print_r($lineItemForTemplate,true)."</pre>");
+// print("this :: <pre>".print_r($this,true)."</pre>");
+// print("form :: <pre>".print_r($form->_values,true)."</pre>");
+// print("session :: <pre>".print_r($_SESSION, true)."</pre>");
+// @@TODO Check this is actually the right key? - Does the array have more qfkeys?
+// print("QF :: <pre>".$this->_submitValues['qfKey']."</pre>");
+// CRM_Core_Session::setStatus(ts("<pre>".print_r($_SESSION,true)."</pre>"), ts('DEBUG LINE ITEMS FOR TEMPLATE'), 'error');
+// People in database
+
+$recordedOptionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($form->_values['event']['id'], array());
+
+// print("Recorded options ::<pre>".print_r($recordedOptionsCount,true)."</pre>");
+// Get current count and max values for each
+
+$currentOptionsCount = array();
+$optionsMaxValues = array();
+$removed_options = array();
+
+// Copied from build form
+
+if ($form->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $form->_priceSetId, 'is_quick_config')) {
+  $lineItemForTemplate = array();
+  foreach($form->_lineItem as $key => $value) {
+    if (!empty($value)) {
+      $lineItemForTemplate[$key] = $value;
+    }
+  }
+}
+
+// DEBUG Print the line items for the template
+// CRM_Core_Session::setStatus(ts("<pre>".print_r($lineItemForTemplate,true)."</pre>"), ts('DEBUG LINE ITEMS FOR TEMPLATE'), 'error');
+// Get information about the session
+
+if (!empty($form->_submitValues['qfKey'])) {
+  $QFKEY = $form->_submitValues['qfKey'];
+}
+else {
+
+  // qfkey has moved on additional particpants page (not sure why)
+
+  $QFKEY = $form->controller->_key;
+}
+
+$session_is_in_CRM_container = false;
+$session_is_inCRM = false;
+$session_is_inCRM_params = false;
+
+// account for all the different session layouts
+
+if (!empty($_SESSION['_CRM_Event_Controller_Registration_' . $QFKEY . '_container'])) {
+
+  // key - values - Register/Particiapnt_1 - price_id - optionID
+
+  $session_is_in_CRM_container = true;
+  $session_gfkey_CRM = '_CRM_Event_Controller_Registration_' . $QFKEY . '_container';
+}
+
+if (!empty($_SESSION['CiviCRM']['CRM_Event_Controller_Registration_' . $QFKEY]['lineItem'])) {
+
+  // ['CiviCRM'] - [CRM_Event_Controller_Registration_gfkey] - lineItem -> participantID - optionID
+
+  $session_is_inCRM = true;
+  $session_gfkeyCRM = 'CRM_Event_Controller_Registration_' . $QFKEY;
+}
+
+if (!empty($_SESSION['CiviCRM']['CRM_Event_Controller_Registration_' . $QFKEY]['params'])) {
+
+  // ['CiviCRM'] - [CRM_Event_Controller_Registration_gfkey] - params -> participantID - optionID
+
+  $session_is_inCRM_params = true;
+  $session_gfkeyCRM = 'CRM_Event_Controller_Registration_' . $QFKEY;
+}
+
+// DEBUG THE SESSION
+// CRM_Core_Session::setStatus(ts("<pre>".print_r($_SESSION[$session_gfkey],true)."</pre>"), ts('DEBUG SESSION'), 'error');
+
+foreach($lineItemForTemplate as $participant_number => $participant_line_item) {
+  foreach($participant_line_item as $price_option_key => $price_option) {
+
+    // print("<br />".$price_option_key. "<br />");
+    // print_r($price_option);
+    // DEBUG
+    // CRM_Core_Session::setStatus(ts("Looking at paricipant ".$participant_number.", price option key ".$price_option_key), ts('DEBUG'), 'error');
+    // DEBUG - Print the current options count array
+    // CRM_Core_Session::setStatus(ts("<pre>".print_r($currentOptionsCount,true)."</pre>"), ts('Current options count before'), 'error');
+    // Add the number of participants if already set, otherwise set it
+
+    if (!empty($currentOptionsCount[$price_option_key])) {
+      $currentOptionsCount[$price_option_key] = $currentOptionsCount[$price_option_key] + $price_option['qty'];
+    }
+    else {
+      $currentOptionsCount[$price_option_key] = $price_option['qty'];
+    }
+
+    // DEBUG - Print the current options count array
+    // CRM_Core_Session::setStatus(ts("<pre>".print_r($currentOptionsCount,true)."</pre>"), ts('Current options count after'), 'error');
+    // If this event has a maximum capacity  e.g. 2
+
+    if ($price_option['max_value']) {
+
+      // $optionsMaxValues[$price_option_key] = $price_option['max_value'];
+      // Check for sold out event
+
+      if (empty($recordedOptionsCount[$price_option_key])) {
+
+        // print_r($recordedOptionsCount[$price_option_key]);
+
+        $recordedOptionsCount[$price_option_key] = 0;
+      }
+
+      //	CRM_Core_Session::setStatus(ts("<pre>".print_r($price_option,true)."</pre>"), ts('Price option'), 'error');
+      //	CRM_Core_Session::setStatus(ts("<pre>".print_r($price_option_key,true)."</pre>"), ts('Price option key'), 'error');
+      // CRM_Core_Session::setStatus(ts("<pre>".print_r($recordedOptionsCount,true)."</pre>"), ts('Recorded options count'), 'error');
+      //	CRM_Core_Session::setStatus(ts("<pre>".print_r($currentOptionsCount,true)."</pre>"), ts('Current options count'), 'error');
+      // print_r($recordedOptionsCount);
+      // CRM_Core_Session::setStatus(ts("<pre>".print_r($recordedOptionsCount[$price_option_key],true)."</pre>"), ts('Recorded options count [key]'), 'error');
+      // eg over booked by 2 = 2 + 2 - 2
+
+      $line_item_overbooked_by_quantity = ($currentOptionsCount[$price_option_key] + $recordedOptionsCount[$price_option_key]) - $price_option['max_value'];
+
+      // If it's sold out  // yes, it is overbooked by 2
+
+      if ($line_item_overbooked_by_quantity > 0) {
+
+        //	CRM_Core_Session::setStatus(ts("<pre>".print_r($price_option_key,true).print_r($price_option,true)."</pre>"), ts('Overbooking of:'), 'error');
+
+        $overbooked_quantity_left_over = 0;
+
+        // test example
+        // 2 - 1 >= 0
+        // @@! Shouldn't this just be > 0 ?------------------------------------------------------------------------\
+
+        if (($line_item_overbooked_by_quantity - $form->_lineItem[$participant_number][$price_option_key]['qty']) > 0) {
+
+          // we have some quantity left over as this participant is only responsible for some of the over booking.
+          // left over quantity is 1
+          // 1 = 2 - 1
+
+          $overbooked_quantity_left_over = $line_item_overbooked_by_quantity - $form->_lineItem[$participant_number][$price_option_key]['qty'];
+
+          // new quantity for this participant is 0 as they didn't have enough to remove it all
+
+          $new_quantity = 0;
+        }
+        else {
+
+          // new quantity is taken entirely off this participant as they have enough quantity
+
+          $new_quantity = $form->_lineItem[$participant_number][$price_option_key]['qty'] - $line_item_overbooked_by_quantity;
+        }
+
+        // DEBUGGING
+
+        /*CRM_Core_Session::setStatus(ts("<br />Participant: ".$participant_number."</br >
+        Option: [".$price_option_key."] ".$price_option['label']."<br />
+        Overbooked by: ".$line_item_overbooked_by_quantity."<br />
+        Overbooked by left over: ".$overbooked_quantity_left_over),
+        ts('DEBUG - Overbook detected'),
+        'error');
+        */
+
+        // we need this to update the counts later
+        // 1 = 2 - 1
+
+        $quantity_removed = $form->_lineItem[$participant_number][$price_option_key]['qty'] - $new_quantity;
+
+        // CRM_Core_Session::setStatus(ts("<pre>".print_r($removed_options,true)."</pre>"), ts('DEBUG REMOVED OPTIONS ARRAY'), 'error');
+        // Add the event to the array to notify them
+
+        $removed_options[$participant_number][$price_option_key]['label'] = $price_option['label'];
+
+        // Remove the right quantity from their booking
+
+        $form->_lineItem[$participant_number][$price_option_key]['qty'] = $new_quantity;
+
+        // print("new quantity for : " . $participant_number . " " . $price_option_key . " : " . $form->_lineItem[$participant_number][$price_option_key]['qty']);
+        // @@ SET THE NEW QUANTITY in the session before redirecting to start of registration
+        // update this session with updated selections:
+
+        /*
+        Line items are stored like this:
+        Participant number eg [0]
+        Participant line item key eg [127]
+        Price field id eg [13]
+        SESSION is like this:
+        Register OR Particiant_n
+        Price field id eg [13]
+        THEN EITHER Array() of
+        Participant line item key eg [127]
+        Quantity
+        OR
+        Participant line item key eg [127]
+        So I think we've called the 'participant line item key' the wrong thing, it's really the 'price option key' ?
+        [CiviCRM] => Array
+        (
+        ['CRM_Event_Controller_Registration_'.$QFKEY] => Array
+        (
+        [lineItem] => Array
+        (
+        [0] => Array
+        (
+        [130] => Array
+        (
+        [price_field_id] => 13
+        [price_field_value_id] => 130
+        [label] => 12.00pm - 1.30pm : Treasures of the University Library	5
+        [field_title] => Friday morning
+        [description] =>
+        [qty] => 1
+        [unit_price] => 0
+        [line_total] => 0
+        [participant_count] => 0
+        [max_value] => 3
+        [membership_type_id] =>
+        [membership_num_terms] =>
+        [auto_renew] =>
+        [html_type] => CheckBox
+        [financial_type_id] => 4
+        )
+        */
+
+        // First participant price options are in 'Register', otherwise they are in 'Participant_n'
+
+        if ($participant_number < 1) {
+          $session_participant_array_key = 'Register';
+        }
+        else {
+          $session_participant_array_key = 'Participant_' . $participant_number;
+        }
+
+        // DEBUG Check if participant has booked the event
+
+        /*CRM_Core_Session::setStatus(ts("<br />Array key: price_".$price_option['price_field_id']."<br />
+        Inside the array [". $session_participant_array_key ."]....<br />
+        <pre>".
+
+        // print_r($_SESSION[$session_gfkey]['values'][$session_participant_array_key], true).
+
+        "</pre>"),
+        ts('DEBUG - Checking for the line item in the participant\'s session'),
+        'error');
+        */
+
+        // Check if the array key exists for the PRICESET
+        // @@! Surely it should always exist? We are getting all this information out of the form
+        // if(array_key_exists('price_'.$price_option['price_field_id'], $_SESSION[$session_gfkey]['values'][$session_participant_array_key])) {
+        // DEBUG - Found it
+        // CRM_Core_Session::setStatus(ts("FOUND IT! So unset it from the session."), ts('DEBUG'), 'error');
+        // It exists, so lets grab it (shorter name to handle!)
+        //		print("<br />Before removal");
+        //		print("<pre>".print_r($_SESSION[$session_gfkey]['values'][$session_participant_array_key],true)."</pre>");
+        //		print("<pre>".print_r($_SESSION[$session_gfkey]['values'][$session_participant_array_key]['price_'.$price_option['price_field_id']],true)."</pre>");
+        // $target_session_price_field = $_SESSION['CiviCRM'][$session_gfkey]['lineItem'][$participant_number][$price_option_key];
+        // DEBUG And print it out
+        // CRM_Core_Session::setStatus(ts("<pre>".print_r($target_session_price_field,true)."</pre>"), ts('DEBUG TARGET SESSION PRICEFIELD'), 'error');
+        // DEBUG SESSION UNSET NOT ENABLED
+        // CRM_Core_Session::setStatus(ts("Session unset is currently commented out"), ts('SESSION UNSET IS NOT ENABLED'), 'error');
+        // If it is an array then it is a multi-option
+        // update session
+        // set the quantity of the option to the amount that can actually be booked (calculated above)
+        // TODO this may break if 2(or more) participants are booking on the same wizard and both have selected something that is full (e.g. remaining spaces will be -2 but the person  will probably only have quantity=1)
+        // SO... another addition to this script would be that if quantity ends up less than 0 store the remainder and take it off the next participant!.....
+        // have added the addition above.
+        // echo 1;
+
+        if ($session_is_in_CRM_container) {
+          /*
+          [values] => Array
+          (
+          [Register] => Array
+          (
+          [qfKey] => 986fc727efc649bbacefd4be010b05f7_8575
+          [entryURL] => http://dev2.alumni.internal.admin.cam.ac.uk/civicrm/event/register?id=1&reset=1
+          [prefix_id] => 3
+          [first_name] => Alex
+          [last_name] => Corr
+          [scriptFee] =>
+          [scriptArray] =>
+          [additional_participants] => 2
+          [priceSetId] => 9
+          [price_13] => Array
+          (
+          [56] => 1
+          */
+          if (!empty($_SESSION[$session_gfkey_CRM]['values'][$session_participant_array_key]['price_' . $price_option['price_field_id']][$price_option_key])) {
+            $_SESSION[$session_gfkey_CRM]['values'][$session_participant_array_key]['price_' . $price_option['price_field_id']][$price_option_key] = $new_quantity;
+          } //else {
+
+          // unset($_SESSION[$session_gfkey_CRM]['values'][$session_participant_array_key]['price_'.$price_option['price_field_id']]);
+          // }
+          // echo 1;
+
+        }
+
+        if ($session_is_inCRM) {
+          /*
+          [lineItem] => Array
+          (
+          [0] => Array
+          (
+          [56] => Array
+          (
+          [price_field_id] => 13
+          [price_field_value_id] => 56
+          [label] => 9.30am - 10.30am : Treasures of the University Library
+          [field_title] => Friday morning
+          [description] =>
+          [qty] => 1
+          */
+          if (is_array($_SESSION['CiviCRM'][$session_gfkeyCRM]['lineItem'][$participant_number][$price_option_key])) {
+            $_SESSION['CiviCRM'][$session_gfkeyCRM]['lineItem'][$participant_number][$price_option_key]['qty'] = $new_quantity;
+          }
+          else {
+            unset($_SESSION['CiviCRM'][$session_gfkeyCRM]['lineItem'][$participant_number][$price_option_key]);
+          }
+
+          // echo 2;
+
+        }
+
+        if ($session_is_inCRM_params) {
+          /*
+          [params] => Array
+          (
+          [0] => Array
+          (
+          [qfKey] => 986fc727efc649bbacefd4be010b05f7_8575
+          [entryURL] => http://dev2.alumni.internal.admin.cam.ac.uk/civicrm/event/register?id=1&reset=1
+          [prefix_id] => 3
+          [first_name] => Alex
+          [last_name] => Corr
+          [scriptFee] =>
+          [scriptArray] =>
+          [additional_participants] => 2
+          [priceSetId] => 9
+          [price_13] => Array
+          (
+          [56] => 1
+          */
+          if (!empty($_SESSION['CiviCRM'][$session_gfkeyCRM]['params'][$participant_number]['price_' . $price_option['price_field_id']][$price_option_key])) {
+            $_SESSION['CiviCRM'][$session_gfkeyCRM]['params'][$participant_number]['price_' . $price_option['price_field_id']][$price_option_key] = $new_quantity;
+          } // else {
+
+          //	unset($_SESSION['CiviCRM'][$session_gfkeyCRM]['params'][$participant_number]['price_'.$price_option['price_field_id']][$price_option_key]);
+          // }
+          // echo 3;
+
+        }
+
+        // It exists, so lets grab it (shorter name to handle!)
+        //	print("<br />After removal");
+        //	print("<pre>".print_r($_SESSION[$session_gfkey]['values'][$session_participant_array_key],true)."</pre>");
+        //	print("<pre>".print_r($_SESSION[$session_gfkey]['values'][$session_participant_array_key]['price_'.$price_option['price_field_id']],true)."</pre>");
+        // $_SESSION[$getthis]['values']['Register']['price_'.$price_option_key] = $new_quantity;
+
+        $currentOptionsCount[$price_option_key] = $currentOptionsCount[$price_option_key] - $quantity_removed;
+      }
+
+      // Otherwise we didn't find the price set for that participant
+
+      /*else {
+
+      // DEBUG - Didn't find it
+
+      CRM_Core_Session::setStatus(ts("Didn't find it."), ts('DEBUG'), 'error');
+      }
+
+      */
+
+      // Take the quantity removed from the current options count
+
+    }
+  }
+}
+
+// Print sold outs
+// print("Sold out events ::<pre>".print_r($removed_options,true)."</pre>");
+// Print new line items
+// print("New line items ::<pre>".print_r($this->_lineItem,true)."</pre>");
+// CRM_Core_Session::setStatus(ts("<pre>".print_r($removed_options,true)."</pre>"), ts('DEBUG REMOVED OPTIONS ARRAY'), 'error');
+// Redirect back to beginning of registration process
+
+if (count($removed_options)) {
+
+  // Save this has been changed, then save it to the session.
+  // This whitescreens
+  // CRM_Core_Session::set('this_sold_out_override', $this);
+
+  CRM_Core_Session::setStatus(ts('You have been returned to the start of the resgitration process and any sold out events have been removed from your selections.  You will not be able to continue until you review your booking and select different events if you wish. The following events were sold out:') , ts('Unfortunately some of your options have now sold out for one or more of your participants.') , 'error');
+
+  // DEBUG - print removed options
+  // CRM_Core_Session::setStatus(ts("<pre>".print_r($removed_options,true)."</pre>"), ts('DEBUG REMOVED OPTIONS ARRAY'), 'error');
+
+  foreach($removed_options as $removed_participant => $removed_option) {
+    $removed_participant_number = $removed_participant + 1;
+    foreach($removed_option as $removed_option_key => $removed_option_fields) {
+      CRM_Core_Session::setStatus(ts('Participant ' . $removed_participant_number . ' : ' . $removed_option_fields['label'] . ' has sold out') , ts('Sold out:') , 'error');
+    }
+  }
+
+  // CRM_Utils_System::civiExit();
+
+  if (isset($_REQUEST['stopredirect'])) {
+
+    // Don't loop as session already updated.
+
+  }
+  else {
+
+    // refresh page to make changes to session
+    // @@TODO - Register_display is needed, not Confirm_display
+
+    $redirectURL = CRM_Utils_System::url('civicrm/event/register', "_qf_Register_display=true&qfKey=" . $QFKEY . "&stopredirect=1", true, null, false, true);
+    CRM_Utils_System::redirect($redirectURL);
+  }
+}
+
+// CRM_Utils_System::civiExit();
+// ////////////////////////////////////////////////////////
+// END SOLD OUT CODE
+// ///////////////////////////////////////////////////////
+	
+		
     // build amount only when needed, skip incase of event full and waitlisting is enabled
     // and few other conditions check preProcess()
     if (property_exists($form, '_noFees') && $form->_noFees) {
