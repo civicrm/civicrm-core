@@ -2,7 +2,7 @@
 
 <div>
 
-    {{tab_val}}
+
     <div ui-jq="tabs" id="alltabs" >
         <ul>
 
@@ -21,7 +21,9 @@
                 &nbsp <input type="radio" ng-model="template" ng-value="templates[0]">  Subject Lines <br/><br>
                 &nbsp <input type="radio" ng-model="template" ng-value="templates[1]"> From Names <br/><br>
                 &nbsp <input type="radio" ng-model="template" ng-value="templates[2]"> Two different Emails <br/><br>
-                &nbsp <div style="position:relative; left:250px;" nextbutton></div>
+                &nbsp <div style="position:relative; left:200px; top: 30px;" nextbutton></div> <div style="position:relative; left:300px;" cancelbutton></div>
+
+
             </form>
         </div>
 
@@ -30,7 +32,10 @@
             <form>
             <div  ng-include="template.url">
             </div>
-                <div style="position:relative; left:200px; top:30px;" prevbutton></div><div style="position:relative; left:300px;"nextbutton></div>
+                <div style="position:relative; left:200px; top:60px;" prevbutton></div>
+                <div style="position:relative; left:295px; top: 30px;" nextbutton></div>
+                <div style="position:relative; left:375px;"cancelbutton></div>
+
             </form>
         </div>
 
@@ -38,9 +43,16 @@
 
             <form name="impform"  novalidate>
                 <h3>Select the groups you would like to add</h3><br>
-                &nbsp<select multiple groupselect required name ="grps" required ng-model="groups_selected">
-                <option ng-repeat="grp in groups" value={{grp.title}} >{{grp.title}}</option>
-            </select><br><br>
+
+
+                &nbsp<br>
+                <select multiple groupselect ng-model="incGroup">
+                    <option id= "1" ng-repeat="grp in groups" value="{{grp.id}} group include" > {{grp.title}} </option>
+                    <option ng-repeat="grp in groups" value="{{grp.id}} group exclude" > {{grp.title}} </option>
+                    <option ng-repeat="ml in mailList| filter:isCompMail" value="{{ml.id}} mail include" > {{ml.name}} </option>
+                    <option ng-repeat="ml in mailList| filter:isCompMail" value="{{ml.id}} mail exclude" > {{ml.name}} </option>
+                </select>
+                <br> <br><br><br>
 
 
                 <h3>Select the size of your test group</h3><br>
@@ -48,11 +60,11 @@
 
                 <div sliderbar id="trial" style="margin: 10px;"></div>
 
-                <h3 style="text-decoration: underline;">How will the winner be decided</h3><br>
+                <h3>How will the winner be decided</h3><br>
                 &nbsp <input type="radio" ng-model="winner_criteria" value="Open" name="cri" required> Open <br/><br>
                 &nbsp <input type="radio" ng-model="winner_criteria" value="Total Unique Clicks" name="cri" checked="checked" > Total Unique Clicks <br/><br>
                 &nbsp <input type="radio" ng-model="winner_criteria" value="Total Clicks on a particular link" name="cri" > Total Clicks on a particular link <br/><br>
-
+ <!-- Remove automated
                 <h3>Do you want the A/B test to be automated </h3>
                 &nbsp<input type="radio" ng-model="automated" value="Yes" ng-click="setifyes(1)" name="auto" required>Yes &nbsp
                 &nbsp<input type="radio" ng-model="automated" value="No" ng-click="setifyes(2)" name="auto" checked="checked"> No <br/><br>
@@ -72,7 +84,7 @@
                     <div nextbutton></div>
 
                 </tpmax>
-
+-->
                 <h3>Declare the winner in how much time?</h3><br>
                 &nbsp <input type="text" style="height: 20px; width: 15px;" ng-model="days" numbar=7 name="d"> Days
                 &nbsp <input type="text" style="height: 20px; width: 15px;" ng-model="hours" numbar=23 name="h"> Hours
@@ -82,7 +94,9 @@
                 <br>
 
 
-                <div style="position:relative; left:200px; top:30px;" prevbutton></div><div style="position:relative; left:300px;"nextbutton></div>
+                <div style="position:relative; left:200px; top:30px;" prevbutton></div>
+                <div style="position:relative; left:295px; top: 00px;" nextbutton></div>
+                <div style="position:relative; left:375px; top: -30px;" cancelbutton></div>
 
             </form>
         </div>
@@ -107,10 +121,7 @@
                  <td>Winner Criteria</td>
                  <td>{{winner_criteria}}</td>
             </tr>
-            <tr>
-                 <td>Automated</td>
-                 <td>{{automated}}</td>
-            </tr>
+
             <tr ng-show="automated=='Yes'">
                  <td>Minum Confidence Level</td>
                  <td>{{conf}}%</td>
@@ -132,14 +143,22 @@
             <input type="radio" name="Start" ng-model="start" value="now"> Now &nbsp
             <input type="radio" name="Start"  ng-model="start" value="later"> Later
 
-            &nbsp &nbsp <input type="text" datepick class = "dateplugin" ng-show="start=='later'" ng-model="send_date" >
+            &nbsp &nbsp <input type="text"  class = "dateplugin" ng-show="start=='later'" ng-model="send_date" datepick>
             </div>
+
+
             <br><br>
             <div>
-            <div style="position:relative; left:200px; top:30px;" prevbutton></div><div class="crm-submit-buttons"  style="position:relative; left:300px;">
-            <div class = "crm-button crm-button-type-upload crm-button_qf_Contact_upload_view"   >
-                <input type="submit" value="Submit & Send"  id="campaignbutton _qf_Contact_upload_view-top" class="btn btn-primary" nexttab={{tab_val}}>
-                </div></div></div>
+4
+                <div style="position:relative; left:200px; top:60px;" prevbutton></div>
+                <div class="crm-submit-buttons" style="position:relative; left:295px; top: 30px;" >
+                  <div class = "crm-button crm-button-type-upload crm-button_qf_Contact_upload_view"   >
+                  <input type="submit" value="Submit & Send"  id="campaignbutton _qf_Contact_upload_view-top" class="btn btn-primary" nexttab={{tab_val}}>
+                  </div>
+                </div>
+                <div style="position:relative; left:430px; top:-1px;" cancelbutton></div>
+
+            </div>
 
         </div>
     </div>

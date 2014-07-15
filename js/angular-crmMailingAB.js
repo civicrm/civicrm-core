@@ -7,8 +7,8 @@
 
     var partialUrl = function(relPath) {
         //console.log(CRM.resourceUrls['civicrm']);
-        //return CRM.resourceUrls['civicrm'] + '/partials/abtesting/' + relPath;
-        return '/drupal-7.28/sites/all/modules/civicrm/partials/abtesting/' + relPath;
+        return CRM.resourceUrls['civicrm'] + '/partials/abtesting/' + relPath;
+        //return '/drupal-7.28/sites/all/modules/civicrm/partials/abtesting/' + relPath;
 
 
     };
@@ -95,6 +95,8 @@
 
         $scope.send_date ="01/01/2000";
 
+        $scope.dt="";
+
         $scope.mailA={};
 
         $scope.mailB={};
@@ -107,7 +109,19 @@
         $scope.init=function(par){
 
             $scope.whatnext=par.toString()
-        }
+        };
+
+        $scope.setdate= function(par){
+            console.log("called")
+            console.log("av "+par)
+            $scope.send_date =par;
+            $scope.dt=par;
+            $scope.apply();
+        };
+
+        $scope.scheddate={};
+        $scope.scheddate.date = "6";
+        $scope.scheddate.time = "";
 
 
     });
@@ -177,6 +191,30 @@
            link: function(scope,element, attrs){
                $(element).select2({width:"400px",placeholder: "Select the groups you wish to include"});
                $(element).select2("data",groups)
+               function format(item) {
+                   if(!item.id) {
+                       // return `text` for optgroup
+                       return item.text;
+                   }
+                   // return item template
+                   var a = item.id.split(" ");
+                   if(a[1]=="group" && a[2]=="include")
+                       return "<img src='../../sites/all/modules/civicrm/i/include.jpeg' height=12 width=12/>" + " " + "<img src='../../sites/all/modules/civicrm/i/group.png' height=12 width=12/>" + item.text;
+                   if(a[1]=="group" && a[2]=="exclude")
+                       return "<img src='../../sites/all/modules/civicrm/i/Error.gif' height=12 width=12/>" + " " + "<img src='../../sites/all/modules/civicrm/i/group.png' height=12 width=12/>" + item.text;
+                   if(a[1]=="mail" && a[2]=="include")
+                       return "<img src='../../sites/all/modules/civicrm/i/include.jpeg' height=12 width=12/>" + " " + "<img src='../../sites/all/modules/civicrm/i/EnvelopeIn.gif' height=12 width=12/>" + item.text;
+                   if(a[1]=="mail" && a[2]=="exclude")
+                       return "<img src='../../sites/all/modules/civicrm/i/Error.gif' height=12 width=12/>" + " " + "<img src='../../sites/all/modules/civicrm/i/EnvelopeIn.gif' height=12 width=12/>" + item.text;
+               }
+
+               $(element).select2({
+                   width:"400px",
+                   placeholder: "Select the groups you wish to include",
+                   formatResult: format,
+                   formatSelection: format,
+                   escapeMarkup: function(m) { return m; }
+               });
            }
        };
 
@@ -232,17 +270,22 @@
 
     crmMailingAB.directive('datepick',function(){
         return {
-            scope :{
-                foo : '=send_date'
-            },
+
+
           restrict: 'AE',
           link: function(scope,element,attrs){
                 $(element).datepicker({
+                    dateFormat: "yy-mm-dd",
                     onSelect: function(date) {
                         $(".ui-datepicker a").removeAttr("href");
-                        scope.foo =date;
-                        console.log(date);
+
+                        scope.scheddate.date=date.toString();
+                        scope.$apply();
+                        console.log(scope.scheddate.date);
+
                     }
+
+
                 });
             }
         };
@@ -303,6 +346,18 @@
             template:'<div class="crm-submit-buttons" id="campaignbutton">'+
                 '<div class = "crm-button crm-button-type-upload crm-button_qf_Contact_upload_view"   >' +
                 '<input type="submit" value="Next"  id="campaignbutton _qf_Contact_upload_view-top" class="btn btn-primary" nexttab={{tab_val}}>'+
+                '</div></div>'
+
+        };
+    });
+
+    crmMailingAB.directive('cancelbutton',function(){
+        return {
+            restrict: 'AE',
+            replace:'true',
+            template:'<div class="crm-submit-buttons" id="campaignbutton">'+
+                '<div class = "crm-button crm-button-type-upload crm-button_qf_Contact_upload_view"   >' +
+                '<input type="submit" value="Cancel"  id="campaignbutton _qf_Contact_upload_view-top" class="btn btn-primary" >'+
                 '</div></div>'
 
         };
