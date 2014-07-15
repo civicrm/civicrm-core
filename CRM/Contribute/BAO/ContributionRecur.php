@@ -35,7 +35,7 @@
 class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
 
   /**
-   * funtion to create recurring contribution
+   * function to create recurring contribution
    *
    * @param array  $params           (reference ) an assoc array of name/value pairs
    *
@@ -209,7 +209,7 @@ SELECT r.payment_processor_id
    *
    * @param $recurId
    *
-   * @return true / false.
+   * @return bool
    * @access public
    * @static
    */
@@ -235,7 +235,7 @@ SELECT r.payment_processor_id
    *
    * @param array $activityParams
    *
-   * @return true / false.
+   * @return bool
    * @access public
    * @static
    */
@@ -329,7 +329,7 @@ SELECT r.payment_processor_id
    *
    * @param int $contactId Contact ID
    *
-   * @return return the list of recurring contribution fields
+   * @return array list of recurring contribution fields
    *
    * @access public
    * @static
@@ -367,7 +367,7 @@ SELECT r.payment_processor_id
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
    *
-   * @return Object             DAO object on sucess, null otherwise
+   * @return Object             DAO object on success, null otherwise
    * @static
    */
   static function setIsActive($id, $is_active) {
