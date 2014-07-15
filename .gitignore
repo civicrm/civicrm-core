@@ -10,6 +10,13 @@ packages/cache
 packages/doc
 packages/temp
 packages/test
+packages/PHPUnit
+packages/PhpDocumentor
+packages/_ORIGINAL_
+packages/SeleniumRC
+packages/SymfonyComponents
+packages/amavisd-new
+packages/git-footnote
 settings_location.php
 drupal
 WordPress
