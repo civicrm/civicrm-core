@@ -195,10 +195,6 @@ function showHideRow(index) {
 
 CRM.utils = CRM.utils || {};
 CRM.strings = CRM.strings || {};
-CRM.validate = CRM.validate || {
-  params: {},
-  functions: []
-};
 
 (function ($, _, undefined) {
   "use strict";
@@ -253,6 +249,38 @@ CRM.validate = CRM.validate || {
       }
     });
     return isDirty;
+  };
+
+   /**
+   * Wrapper for toggle function which is deprecated in from jQuery 1.8;
+   * @param fn1,fn2 handlers
+   */
+
+  $.fn.toggleClick = function( fn1, fn2 ) {
+    // Don't mess with animation or css toggles
+    if ( !$.isFunction( fn1 ) || !$.isFunction( fn2 ) ) {
+      return;
+    }
+    // migrateWarn("jQuery.fn.toggle(handler, handler...) is deprecated");
+    // Save reference to arguments for access in closure
+    var args = arguments,
+    guid = fn1.guid || $.guid++,
+    i = 0,
+    toggler = function( event ) {
+      // Figure out which function to execute
+      var lastToggle = ( $._data( this, "lastToggle" + fn1.guid ) || 0 ) % i;
+      $._data( this, "lastToggle" + fn1.guid, lastToggle + 1 );
+      // Make sure that clicks stop
+      event.preventDefault();
+      // and execute the function
+      return args[ lastToggle ].apply( this, arguments ) || false;
+    };
+    // link all the functions, so any of them can unbind this click handler
+    toggler.guid = guid;
+    while ( i < args.length ) {
+      args[ i++ ].guid = guid;
+    }
+    return this.click( toggler );
   };
 
   /**
@@ -347,14 +375,14 @@ CRM.validate = CRM.validate || {
       if ($el.data('create-links') && entity.toLowerCase() === 'contact') {
         selectParams.formatInputTooShort = function() {
           var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
-          if ($el.data('create-links')) {
+          if ($el.data('create-links') && CRM.profileCreate) {
             txt += ' ' + ts('or') + '<br />' + formatSelect2CreateLinks($el);
           }
           return txt;
         };
         selectParams.formatNoMatches = function() {
           var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
-          return txt + '<br />' + formatSelect2CreateLinks($el);
+          return txt + (CRM.profileCreate ? ('<br />' + formatSelect2CreateLinks($el)) : '');
         };
         $el.on('select2-open.crmEntity', function() {
           var $el = $(this);
@@ -436,7 +464,7 @@ CRM.validate = CRM.validate || {
       api = $el.data('api-params') || {},
       type = api.params ? api.params.contact_type : null;
     if (createLinks === true) {
-      createLinks = type ? _.where(CRM.profile.contactCreate, {type: type}) : CRM.profile.contactCreate;
+      createLinks = type ? _.where(CRM.profileCreate, {type: type}) : CRM.profileCreate;
     }
     var markup = '';
     _.each(createLinks, function(link) {
@@ -447,6 +475,24 @@ CRM.validate = CRM.validate || {
       markup += link.label + '</a>';
     });
     return markup;
+  }
+
+  /**
+   * Wrapper for jQuery validate initialization function; supplies defaults
+   * @param options object
+   */
+  $.fn.crmValidate = function(params) {
+    return $(this).each(function () {
+      var that = this,
+        settings = $.extend({}, CRM.validate._defaults, CRM.validate.params);
+      $(this).validate(settings);
+      // Call any post-initialization callbacks
+      if (CRM.validate.functions && CRM.validate.functions.length) {
+        $.each(CRM.validate.functions, function(i, func) {
+          func.call(that);
+        });
+      }
+    });
   }
 
   // Initialize widgets
@@ -492,12 +538,12 @@ CRM.validate = CRM.validate || {
             $el.data('origSize', null);
           } else {
             $el.data('origSize', {
-              position: 'center',
+              position: {my: 'center', at: 'center', of: window},
               width: $el.dialog('option', 'width'),
               height: $el.dialog('option', 'height')
             });
             var menuHeight = $('#civicrm-menu').height();
-            $el.dialog('option', {width: '100%', height: ($(window).height() - menuHeight), position: [0, menuHeight]});
+            $el.dialog('option', {width: '100%', height: ($(window).height() - menuHeight), position: {my: "top", at: "top+"+menuHeight, of: window}});
           }
           e.preventDefault();
         });

@@ -627,7 +627,7 @@ ORDER BY   gc.contact_id, g.children
       $contactGroup[$prevContactID]['groupTitle'] = implode(', ', $contactGroup[$prevContactID]['groupTitle']);
     }
 
-    if (is_numeric($contactID)) {
+    if ((!empty($contactGroup[$contactID]) && is_numeric($contactID))) {
       return $contactGroup[$contactID];
     }
     else {

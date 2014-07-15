@@ -591,6 +591,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $file_log->close();
 
     if ($config->userFrameworkLogging) {
+      // should call $config->userSystem->logger($message) here - but I got a situation where userSystem was not an object - not sure why
       if ($config->userSystem->is_drupal and function_exists('watchdog')) {
         watchdog('civicrm', $message, NULL, WATCHDOG_DEBUG);
       }
@@ -826,12 +827,15 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @access public
    * @static
    */
-  public static function statusBounce($status, $redirect = NULL, $title = '') {
+  public static function statusBounce($status, $redirect = NULL, $title = NULL) {
     $session = CRM_Core_Session::singleton();
     if (!$redirect) {
       $redirect = $session->readUserContext();
     }
-    $session->setStatus($status, $title);
+    if ($title === NULL) {
+      $title = ts('Error');
+    }
+    $session->setStatus($status, $title, 'alert', array('expires' => 0));
     if (CRM_Utils_Array::value('snippet', $_REQUEST) === CRM_Core_Smarty::PRINT_JSON) {
       CRM_Core_Page_AJAX::returnJsonResponse(array('status' => 'error'));
     }

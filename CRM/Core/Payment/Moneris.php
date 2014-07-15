@@ -55,7 +55,7 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
    *
    * @return \CRM_Core_Payment_Moneris
    */
-  function __construct($mode, &$paymentProcessor) {
+  function __construct($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('Moneris');

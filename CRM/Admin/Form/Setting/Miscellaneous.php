@@ -48,7 +48,21 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'maxFileSize' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'doNotAttachPDFReceipt' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'secondDegRelPermissions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'checksumTimeout' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
+
+  public $_uploadMaxSize;
+
+  /**
+   * Basic setup
+   */
+
+  public function preProcess() {
+    $config     = CRM_Core_Config::singleton();
+    $this->_uploadMaxSize = (int) ini_get('upload_max_filesize');
+    // check for post max size
+    CRM_Core_Config_Defaults::formatUnitSize(ini_get('post_max_size'), TRUE);
+  }
 
   /**
    * Function to build the form
@@ -90,20 +104,16 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
       'text', 'dashboardCacheTimeout', ts('Dashboard cache timeout'),
       array('size' => 3, 'maxlength' => 5)
     );
-    $this->addElement(
-      'text', 'checksumTimeout', ts('CheckSum Lifespan'),
-      array('size' => 2, 'maxlength' => 8)
-    );
+
     $this->addElement(
       'text', 'recaptchaOptions', ts('Recaptcha Options'),
       array('size' => 64, 'maxlength' => 64)
     );
 
-    $this->addRule('checksumTimeout', ts('Value should be a positive number'), 'positiveInteger');
-
     $this->addFormRule(array('CRM_Admin_Form_Setting_Miscellaneous', 'formRule'), $this);
 
     parent::buildQuickForm();
+    $this->addRule('checksumTimeout', ts('Value should be a positive number'), 'positiveInteger');
   }
 
   /**
@@ -119,6 +129,11 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
    */
   static function formRule($fields, $files, $options) {
     $errors = array();
+
+    // validate max file size
+    if ($fields['maxFileSize'] > $options->_uploadMaxSize) {
+      $errors['maxFileSize'] = ts("Maximum file size cannot exceed Upload max size ('upload_max_filesize') as defined in PHP.ini.");
+    }
 
     if (!empty($fields['wkhtmltopdfPath'])) {
       // check and ensure that thi leads to the wkhtmltopdf binary
@@ -137,23 +152,15 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     return $errors;
   }
 
-  function setDefaultValues() {
-    parent::setDefaultValues();
-
-    $this->_defaults['checksumTimeout'] =
-      CRM_Core_BAO_Setting::getItem(
-        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'checksum_timeout',
-        NULL,
-        7
-      );
-    return $this->_defaults;
-  }
 
   public function postProcess() {
     // store the submitted values in an array
     $config = CRM_Core_Config::singleton();
     $params = $this->controller->exportValues($this->_name);
+
+    // update upload max size in DB
+    $params['maxImportFileSize'] = CRM_Core_Config_Defaults::formatUnitSize(ini_get('upload_max_filesize'));
+    CRM_Core_BAO_ConfigSetting::create($params);
 
     // get current logging status
     $values = $this->exportValues();

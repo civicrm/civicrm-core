@@ -7,27 +7,62 @@ The original form used table layout; don't know if we have an alternative, CSS-b
 <table class="form-layout">
   <tbody>
   <tr>
-    <td class="label">Label</td>
+    <td class="label">
+      <label crm-ui-label crm-for="title">
+        Title
+      </label>
+    </td>
     <td>
-      <input type="text" ng-model="caseType.title" class="big crm-form-text"/>
+      <input
+        type="text"
+        name="title"
+        ng-model="caseType.title"
+        class="big crm-form-text"
+        required
+        />
     </td>
   </tr>
   <tr>
-    <td class="label">Name</td>
+    <td class="label">
+      <label crm-ui-label crm-for="caseTypeName">
+        Name
+      </label>
+    </td>
     <td>
-      <input type="text" ng-model="caseType.name" ng-disabled="caseType.id" class="big crm-form-text"/> <!-- FIXME lock -->
+      <input
+        type="text"
+        name="caseTypeName"
+        ng-model="caseType.name"
+        ng-disabled="locks.caseTypeName"
+        ng-pattern="/^[a-zA-Z0-9_]+$/"
+        required
+        class="big crm-form-text"/>
+
+      <a crm-ui-lock binding="locks.caseTypeName"></a>
+
+      <div ng-show="caseType.id && !locks.caseTypeName">
+        <em>WARNING: If any external files or programs reference the old "Name", then they must be updated manually.</em>
+      </div>
     </td>
   </tr>
   <tr>
-    <td class="label">Description</td>
+    <td class="label">
+      <label crm-ui-label crm-for="description">
+        Description
+      </label>
+    </td>
     <td>
-      <textarea ng-model="caseType.description" class="big crm-form-textarea"></textarea>
+      <textarea name="description" ng-model="caseType.description" class="big crm-form-textarea"></textarea>
     </td>
   </tr>
   <tr>
-    <td class="label">Enabled?</td>
+    <td class="label">
+      <label crm-ui-label crm-for="is_active">
+        Enabled?
+      </label>
+    </td>
     <td>
-      <input type="checkbox" ng-model="caseType.is_active" ng-true-value="1" ng-false-value="0"/>
+      <input name="is_active" type="checkbox" ng-model="caseType.is_active" ng-true-value="1" ng-false-value="0"/>
     </td>
   </tr>
   </tbody>

@@ -1165,6 +1165,7 @@ FROM   civicrm_domain
         }
 
         $dbName = $value['name'];
+        $type = CRM_Utils_Type::typeToString($value['type']);
         $newObject->$dbName = $object->$dbName;
         if (isset($fieldsToPrefix[$dbName])) {
           $newObject->$dbName = $fieldsToPrefix[$dbName] . $newObject->$dbName;
@@ -1176,9 +1177,7 @@ FROM   civicrm_domain
           $newObject->$dbName = $fieldsToReplace[$dbName];
         }
 
-        if (substr($name, -5) == '_date' ||
-          substr($name, -10) == '_date_time'
-        ) {
+        if ($type == 'Timestamp') {
           $newObject->$dbName = CRM_Utils_Date::isoToMysql($newObject->$dbName);
         }
 
@@ -1855,7 +1854,12 @@ SELECT contact_id
   }
 
   /**
-   * @return array
+   * @return array each item has keys:
+   *  - name: string
+   *  - type: string
+   *  - count: int
+   *  - table: string|null SQL table name
+   *  - key: string|null SQL column name
    */
   function getReferenceCounts() {
     $links = self::getReferencesToTable(static::getTableName());

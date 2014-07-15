@@ -67,11 +67,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_gid;
 
   /**
-   * The group id that we are editing
-   *
-   * @var string
+   * @var array details of the UFGroup used on this page
    */
-  protected $_ufGroupName = 'unknown';
+  protected $_ufGroup = array('name' => 'unknown');
 
   /**
    * The group id that we are passing in url
@@ -105,13 +103,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @var array
    */
   protected $_contact;
-
-  /**
-   * to store group_id of the group which is to be assigned to the contact
-   *
-   * @var int
-   */
-  protected $_addToGroupID;
 
   /**
    * Do we allow updates of the contact
@@ -199,7 +190,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   function preProcess() {
     $this->_id         = $this->get('id');
-    $this->_gid        = $this->get('gid');
     $this->_profileIds = $this->get('profileIds');
     $this->_grid       = CRM_Utils_Request::retrieve('grid', 'Integer', $this);
     $this->_context    = CRM_Utils_Request::retrieve('context', 'String', $this);
@@ -234,7 +224,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
     $this->_duplicateButtonName = $this->getButtonName('upload', 'duplicate');
 
-    $gids = explode(',', CRM_Utils_Request::retrieve('gid', 'String', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
+    $gids = explode(',', CRM_Utils_Request::retrieve('gid', 'String', CRM_Core_DAO::$_nullObject, FALSE, 0));
 
     if ((count($gids) > 1) && !$this->_profileIds && empty($this->_profileIds)) {
       if (!empty($gids)) {
@@ -257,7 +247,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     if (!$this->_gid) {
-      $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0, 'GET');
+      $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0);
+      $this->set('gid', $this->_gid);
     }
 
     $this->_activityId = CRM_Utils_Request::retrieve('aid', 'Positive', $this, FALSE, 0, 'GET');
@@ -276,13 +267,17 @@ class CRM_Profile_Form extends CRM_Core_Form {
       if ($dao->find(TRUE)) {
         $this->_isUpdateDupe = $dao->is_update_dupe;
         $this->_isAddCaptcha = $dao->add_captcha;
-        if (!empty($dao->name)) {
-          $this->_ufGroupName = $dao->name;
-        }
+        $this->_ufGroup = (array) $dao;
       }
       $dao->free();
+
+      if (!CRM_Utils_Array::value('is_active', $this->_ufGroup)) {
+        CRM_Core_Error::fatal(ts('The requested profile (gid=%1) is inactive or does not exist.', array(
+          1 => $this->_gid,
+        )));
+      }
     }
-    $this->assign('ufGroupName', $this->_ufGroupName);
+    $this->assign('ufGroupName', $this->_ufGroup['name']);
 
     $gids = empty($this->_profileIds) ? $this->_gid : $this->_profileIds;
 
@@ -591,14 +586,16 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
+    $this->add('hidden', 'gid', $this->_gid);
+
     switch ($this->_mode) {
       case self::MODE_CREATE:
       case self::MODE_EDIT:
       case self::MODE_REGISTER:
-        CRM_Utils_Hook::buildProfile($this->_ufGroupName);
+        CRM_Utils_Hook::buildProfile($this->_ufGroup['name']);
         break;
       case self::MODE_SEARCH:
-        CRM_Utils_Hook::searchProfile($this->_ufGroupName);
+        CRM_Utils_Hook::searchProfile($this->_ufGroup['name']);
         break;
       default:
     }
@@ -824,8 +821,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     if ($this->_mode != self::MODE_SEARCH) {
       if (isset($addToGroupId)) {
-        $this->add('hidden', "add_to_group", $addToGroupId);
-        $this->_addToGroupID = $addToGroupId;
+        $this->_ufGroup['add_to_group_id'] = $addToGroupId;
       }
     }
 
@@ -920,7 +916,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @static
    */
   static function formRule($fields, $files, $form) {
-    CRM_Utils_Hook::validateProfile($form->_ufGroupName);
+    CRM_Utils_Hook::validateProfile($form->_ufGroup['name']);
 
     $errors = array();
     // if no values, return
@@ -1118,7 +1114,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         return;
       }
     }
-    CRM_Utils_Hook::processProfile($this->_ufGroupName);
+    CRM_Utils_Hook::processProfile($this->_ufGroup['name']);
     if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
@@ -1216,10 +1212,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
 
-    $addToGroupId = NULL;
-    if (!empty($params['add_to_group'])) {
-      $addToGroupId = $params['add_to_group'];
-
+    $addToGroupId = CRM_Utils_Array::value('add_to_group_id', $this->_ufGroup);
+    if (!empty($addToGroupId)) {
       //run same check whether group is a mailing list
       $groupTypes = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',
         $addToGroupId, 'group_type', 'id'

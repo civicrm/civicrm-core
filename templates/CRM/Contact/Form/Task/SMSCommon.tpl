@@ -84,13 +84,13 @@ return true;
 function maxCharInfoDisplay(){
    var maxLength = {/literal}{$max_sms_length}{literal};
    var enteredCharLength = cj('#text_message').val().length;
-   var count = maxLength - enteredCharLength;
+   var count = enteredCharLength;
 
    if( count < 0 ) {
       cj('#text_message').val(cj('#text_message').val().substring(0, maxLength));
       count = 0;
    }
-   cj('#char-count-message').text( "You can insert upto " + count + " characters" );
+   cj('#char-count-message').text( "You can insert up to " + maxLength + " characters. You have entered " + count + " characters." );
 }
 {/literal}{/if}{literal}
 

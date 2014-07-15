@@ -45,17 +45,17 @@ class api_v3_CountryTest extends CiviUnitTestCase {
     parent::setUp();
     $this->quickCleanup(array('civicrm_country'));
     $this->_params = array(
-      'id' => 1152,
-      'name' => 'Netherlands',
-      'iso_code' => 'NL',
+      'name' => 'Made Up Land',
+      'iso_code' => 'ML',
+      'region_id' => 1,
     );
   }
 
   public function testCreateCountry() {
 
     $result = $this->callAPIAndDocument('country', 'create', $this->_params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
 
     $this->callAPISuccess('country', 'delete', array('id' => $result['id']));
   }
@@ -65,11 +65,11 @@ class api_v3_CountryTest extends CiviUnitTestCase {
     $create = $this->callAPISuccess('country', 'create', $this->_params);
 
     $result = $this->callAPIAndDocument('country', 'delete', array('id' => $create['id'],), __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $get = $this->callAPISuccess('country', 'get', array(
       'id' => $create['id'],
     ));
-    $this->assertEquals(0, $get['count'], 'Country not successfully deleted In line ' . __LINE__);
+    $this->assertEquals(0, $get['count'], 'Country not successfully deleted');
   }
 
   /**
@@ -95,8 +95,8 @@ class api_v3_CountryTest extends CiviUnitTestCase {
       'iso_code' =>  $this->_params['iso_code'],
     );
     $result = $this->callAPIAndDocument('Country', 'Get', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($country['values'][$country['id']]['name'], $result['values'][$country['id']]['name'], 'In line ' . __LINE__);
-    $this->assertEquals($country['values'][$country['id']]['iso_code'], $result['values'][$country['id']]['iso_code'], 'In line ' . __LINE__);
+    $this->assertEquals($country['values'][$country['id']]['name'], $result['values'][$country['id']]['name']);
+    $this->assertEquals($country['values'][$country['id']]['iso_code'], $result['values'][$country['id']]['iso_code']);
   }
 
   ///////////////// civicrm_country_create methods
@@ -106,11 +106,11 @@ class api_v3_CountryTest extends CiviUnitTestCase {
    * We check on the iso code (there should be only one iso code
    *
    */
-  public function testCreatePhonePrimaryHandlingChangeExisting() {
+  public function testCreateDuplicateFail() {
     $params = $this->_params;
     unset($params['id']);
-    $phone1 = $this->callAPISuccess('country', 'create', $params);
-    $phone2 = $this->callAPISuccess('country', 'create', $params);
+    $this->callAPISuccess('country', 'create', $params);
+    $this->callAPIFailure('country', 'create', $params);
     $check = $this->callAPISuccess('country', 'getcount', array(
       'iso_code' => $params['iso_code'],
     ));

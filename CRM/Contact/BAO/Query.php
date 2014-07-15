@@ -1254,11 +1254,15 @@ class CRM_Contact_BAO_Query {
    * @param boolean $count
    * @param boolean $sortByChar
    * @param boolean $groupContacts
+   * @param boolean $onlyDeleted
    *
    * @return array sql query parts as an array
    * @access public
    */
-  function query($count = FALSE, $sortByChar = FALSE, $groupContacts = FALSE) {
+  function query($count = FALSE, $sortByChar = FALSE, $groupContacts = FALSE, $onlyDeleted = FALSE) {
+    // build permission clause
+    $this->generatePermissionClause($onlyDeleted, $count);
+
     if ($count) {
       if (isset($this->_rowCountClause)) {
         $select = "SELECT {$this->_rowCountClause}";
@@ -1333,6 +1337,15 @@ class CRM_Contact_BAO_Query {
     $where = '';
     if (!empty($this->_whereClause)) {
       $where = "WHERE {$this->_whereClause}";
+    }
+
+    if (!empty($this->_permissionWhereClause)) {
+      if (empty($where)) {
+        $where = "WHERE $this->_permissionWhereClause";
+      }
+      else {
+        $where = "$where AND $this->_permissionWhereClause";
+      }
     }
 
     $having = '';
@@ -2553,6 +2566,9 @@ class CRM_Contact_BAO_Query {
           }
           elseif (strpos($name, '-phone') != 0) {
             $locationTypeName = 'phone';
+          }
+          elseif (strpos($name, '-email') != 0) {
+            $locationTypeName = 'email';
           }
           if($locationTypeName) {
             //we have a join on an location table - possibly in conjunction with search builder - CRM-14263
@@ -4456,7 +4472,6 @@ civicrm_relationship.is_permission_a_b = 0
         break;
       }
     }
-    $this->generatePermissionClause($onlyDeleted, $count);
 
     // building the query string
     $groupBy = NULL;
@@ -4563,16 +4578,7 @@ civicrm_relationship.is_permission_a_b = 0
     // note : this modifies _fromClause and _simpleFromClause
     $this->includePseudoFieldsJoin($sort);
 
-    list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts);
-
-    if(!empty($this->_permissionWhereClause)){
-      if (empty($where)) {
-        $where = "WHERE $this->_permissionWhereClause";
-      }
-      else {
-        $where = "$where AND $this->_permissionWhereClause";
-      }
-    }
+    list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
 
     if ($additionalWhereClause) {
       $where = $where . ' AND ' . $additionalWhereClause;
@@ -4667,8 +4673,14 @@ civicrm_relationship.is_permission_a_b = 0
         if (!$count) {
           $this->_useDistinct = TRUE;
         }
-        $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
-        $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+
+        if (empty($this->_fromClause)) {
+          $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+        }
+
+        if (empty($this->_simpleFromClause)) {
+          $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+        }
       }
     }
     else {
@@ -5364,7 +5376,7 @@ AND   displayRelType.is_active = 1
     $useIDsOnly = FALSE
   ) {
 
-    if (!empty($selectValues)) {
+    if (!empty($selectValues) && !empty($selectValues[$value])) {
       $qill = $selectValues[$value];
     }
     else {
@@ -5487,7 +5499,13 @@ AND   displayRelType.is_active = 1
           //preserve id value
           $idColumn = "{$key}_id";
           $dao->$idColumn = $val;
-          $dao->$value['pseudoField'] = $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
+
+          if ($key == 'state_province_name') {
+            $dao->$value['pseudoField'] = $dao->$key = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);
+          }
+          else {
+            $dao->$value['pseudoField'] = $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
+          }
         }
         elseif ($value['pseudoField'] == 'state_province_abbreviation') {
           $dao->$key = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);

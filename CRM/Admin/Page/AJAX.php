@@ -43,22 +43,17 @@ class CRM_Admin_Page_AJAX {
    * @see smarty_function_crmNavigationMenu
    */
   static function getNavigationMenu() {
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
+    $contactID = CRM_Core_Session::singleton()->get('userID');
     if ($contactID) {
       // Set headers to encourage browsers to cache for a long time
-      // If we want to refresh the menu we will send a different url
       $year = 60*60*24*364;
       header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + $year));
       header('Content-Type:	application/javascript');
       header("Cache-Control: max-age=$year, public");
 
-      // Render template as a javascript file
-      $smarty = CRM_Core_Smarty::singleton();
-      $navigation = CRM_Core_BAO_Navigation::createNavigation($contactID);
-      $smarty->assign('timeGenerated', date('d M Y H:i:s'));
-      $smarty->assign('navigation', $navigation);
-      print $smarty->fetch('CRM/common/Navigation.tpl');
+      print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/navigation.js.tpl', array(
+        'navigation' => CRM_Core_BAO_Navigation::createNavigation($contactID),
+      ));
     }
     CRM_Utils_System::civiExit();
   }

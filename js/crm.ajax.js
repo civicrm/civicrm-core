@@ -213,6 +213,12 @@
       this.element.trigger('crmAjaxFail', data);
       CRM.alert(ts('Unable to reach the server. Please refresh this page in your browser and try again.'), ts('Network Error'), 'error');
     },
+    _onError: function(data) {
+      this.element.attr('data-unsaved-changes', 'false').trigger('crmAjaxError', data);
+      if (this.options.crmForm && this.options.crmForm.autoClose && this.element.data('uiDialog')) {
+        this.element.dialog('close');
+      }
+    },
     _formatUrl: function(url) {
       // Strip hash
       url = url.split('#')[0];
@@ -245,8 +251,12 @@
       }
       this.options.block && $('.blockOverlay', this.element).length < 1 && this.element.block();
       $.getJSON(url, function(data) {
-        if (typeof(data) != 'object' || typeof(data.content) != 'string') {
+        if (!$.isPlainObject(data)) {
           that._onFailure(data);
+          return;
+        }
+        if (data.status === 'error') {
+          that._onError(data);
           return;
         }
         data.url = url;
@@ -370,7 +380,7 @@
         }
       });
       if (settings.validate) {
-        $("form", this).validate(typeof(settings.validate) == 'object' ? settings.validate : CRM.validate.params);
+        $("form", this).crmValidate();
       }
       $("form:not('[data-no-ajax-submit=true]')", this).ajaxForm($.extend({
         url: data.url.replace(/reset=1[&]?/, ''),

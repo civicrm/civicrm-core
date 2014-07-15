@@ -70,10 +70,14 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     if (!$nameParam && empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
+    if (!empty($params['name']) && !CRM_Case_BAO_CaseType::isValidName($params['name'])) {
+      throw new CRM_Core_Exception("Cannot create caseType with malformed name [{$params['name']}]");
+    }
 
     // function to format definition column
     if (isset($params['definition']) && is_array($params['definition'])) {
       $params['definition'] = self::convertDefinitionToXML($params['name'], $params['definition']);
+      CRM_Core_ManagedEntities::scheduleReconcilation();
     }
 
     $caseTypeDAO->copyValues($params);
@@ -273,6 +277,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       CRM_Utils_Hook::post('create', 'CaseType', $caseType->id, $case);
     }
     $transaction->commit();
+    CRM_Case_XMLRepository::singleton(TRUE);
 
     return $caseType;
   }
@@ -306,6 +311,23 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   static function del($caseTypeId) {
     $caseType = new CRM_Case_DAO_CaseType();
     $caseType->id = $caseTypeId;
-    return $caseType->delete();
+    $refCounts = $caseType->getReferenceCounts();
+    $total = array_sum(CRM_Utils_Array::collect('count', $refCounts));
+    if ($total) {
+      throw new CRM_Core_Exception(ts("You can not delete this case type -- it is assigned to %1 existing case record(s). If you do not want this case type to be used going forward, consider disabling it instead.", array(1 => $total)));
+    }
+    $result = $caseType->delete();
+    CRM_Case_XMLRepository::singleton(TRUE);
+    return $result;
+  }
+
+  /**
+   * Determine if a case-type name is well-formed
+   *
+   * @param string $caseType
+   * @return bool
+   */
+  static function isValidName($caseType) {
+    return preg_match('/^[a-zA-Z0-9_]+$/',  $caseType);
   }
 }

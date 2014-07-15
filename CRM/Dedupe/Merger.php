@@ -1588,4 +1588,3 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
   }
 }
-

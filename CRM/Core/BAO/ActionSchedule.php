@@ -680,6 +680,10 @@ WHERE   cas.entity_value = $id AND
     while ($actionSchedule->fetch()) {
       $extraSelect = $extraJoin = $extraWhere = $extraOn = '';
 
+    if ($actionSchedule->from_email)
+            $fromEmailAddress = "$actionSchedule->from_name <$actionSchedule->from_email>";
+
+
       if ($actionSchedule->record_activity) {
         if ($mapping->entity == 'civicrm_membership') {
           $activityTypeID =
@@ -1062,7 +1066,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $status_ = explode(',', $status);
         if (in_array(2, $status_)) {
           // anniversary mode:
-          $dateField = 'DATE_ADD(e.' . $dateDBField . ', INTERVAL ROUND(DATEDIFF(NOW(), e.' . $dateDBField . ') / 365) YEAR)';
+          $dateField = 'DATE_ADD(e.' . $dateDBField . ', INTERVAL ROUND(DATEDIFF(DATE(' . $now . '), e.' . $dateDBField . ') / 365) YEAR)';
           $anniversary = true;
         }
         else {

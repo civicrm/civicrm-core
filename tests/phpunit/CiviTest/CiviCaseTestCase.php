@@ -81,8 +81,9 @@ class CiviCaseTestCase extends CiviUnitTestCase {
       $this->optionValues[] = $activityTypes['id'];
     }
 
-    // TODO Our data seems inconsistent on whether name is "HousingSupport" or "housing_support"
-    $this->caseType = 'HousingSupport';
+    // We used to be inconsistent about "HousingSupport" vs "housing_support".
+    // Now, the rule is simply: use the "name" from "civicrm_case_type.name".
+    $this->caseType = 'housing_support';
     $this->caseTypeId = 1;
     $this->tablesToTruncate = array(
       'civicrm_activity',
@@ -94,6 +95,7 @@ class CiviCaseTestCase extends CiviUnitTestCase {
       'civicrm_case_activity',
       'civicrm_case_type',
       'civicrm_activity_contact',
+      'civicrm_managed',
       'civicrm_relationship',
       'civicrm_relationship_type',
     );

@@ -682,6 +682,11 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       'name'
     );
 
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+
     $config = CRM_Core_Config::singleton();
 
     $randomNum = md5(uniqid());
@@ -752,9 +757,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     $input['count'] = FALSE;
-
-    // skip bulk activities in activity tab
-    $input['activity_type_exclude_id'][$bulkActivityTypeID] = $bulkActivityTypeID;
     list($sqlClause, $params) = self::getActivitySQLClause($input);
 
     $query = "{$insertSQL}
@@ -778,7 +780,7 @@ LEFT JOIN  civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.ac
     $activityContactTempTable = "civicrm_temp_activity_contact_{$randomNum}";
     $query = "CREATE TEMPORARY TABLE {$activityContactTempTable} (
                 activity_id int unsigned, contact_id int unsigned, record_type_id varchar(16),
-                 contact_name varchar(255), is_deleted int unsigned, INDEX index_activity_id( activity_id ) )
+                 contact_name varchar(255), is_deleted int unsigned, counter int unsigned, INDEX index_activity_id( activity_id ) )
                 ENGINE=MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
 
     CRM_Core_DAO::executeQuery($query);
@@ -792,11 +794,33 @@ SELECT     ac.activity_id,
            c.sort_name,
            c.is_deleted
 FROM       {$activityTempTable}
-INNER JOIN civicrm_activity a ON ( a.id = {$activityTempTable}.activity_id  )
+INNER JOIN civicrm_activity a ON ( a.id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_activity_contact ac ON ( ac.activity_id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_contact c ON c.id = ac.contact_id
+WHERE ac.record_type_id != %1
 ";
-    CRM_Core_DAO::executeQuery($query);
+    $params = array(1 => array($targetID, 'Integer'));
+    CRM_Core_DAO::executeQuery($query, $params);
+
+    // for each activity insert one target contact
+    // if we load all target contacts the performance will suffer a lot for mass-activities;
+    $query = "
+INSERT INTO {$activityContactTempTable} ( activity_id, contact_id, record_type_id, contact_name, is_deleted, counter )
+SELECT     ac.activity_id,
+           ac.contact_id,
+           ac.record_type_id,
+           c.sort_name,
+           c.is_deleted,
+           count(ac.contact_id)
+FROM       {$activityTempTable}
+INNER JOIN civicrm_activity a ON ( a.id = {$activityTempTable}.activity_id )
+INNER JOIN civicrm_activity_contact ac ON ( ac.activity_id = {$activityTempTable}.activity_id )
+INNER JOIN civicrm_contact c ON c.id = ac.contact_id
+WHERE ac.record_type_id = %1
+GROUP BY ac.activity_id
+";
+
+    CRM_Core_DAO::executeQuery($query, $params);
 
     // step 3: Combine all temp tables to get final query for activity selector
     // sort by the original sort order, stored in fixed_sort_order
@@ -805,12 +829,12 @@ SELECT     {$activityTempTable}.*,
            {$activityContactTempTable}.contact_id,
            {$activityContactTempTable}.record_type_id,
            {$activityContactTempTable}.contact_name,
-           {$activityContactTempTable}.is_deleted
+           {$activityContactTempTable}.is_deleted,
+           {$activityContactTempTable}.counter
 FROM       {$activityTempTable}
 INNER JOIN {$activityContactTempTable} on {$activityTempTable}.activity_id = {$activityContactTempTable}.activity_id
 ORDER BY    fixed_sort_order
         ";
-
 
     $dao = CRM_Core_DAO::executeQuery($query);
 
@@ -824,14 +848,7 @@ ORDER BY    fixed_sort_order
 
     //get all campaigns.
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
-
     $values = array();
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
-    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
-    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-
-
     while ($dao->fetch()) {
       $activityID = $dao->activity_id;
       $values[$activityID]['activity_id'] = $dao->activity_id;
@@ -853,6 +870,7 @@ ORDER BY    fixed_sort_order
 
       if (empty($values[$activityID]['target_contact_name'])) {
         $values[$activityID]['target_contact_name'] = array();
+        $values[$activityID]['target_contact_counter'] = $dao->counter;
       }
 
       // if deleted, wrap in <del>
@@ -879,7 +897,7 @@ ORDER BY    fixed_sort_order
         $values[$activityID]['case_subject'] = $dao->case_subject;
       }
       else {
-        $values[$activityID]['recipients'] = ts('(recipients)');
+        $values[$activityID]['recipients'] =  ts('(%1 recipients)', array(1 => $dao->counter));
         $values[$activityID]['mailingId'] = false;
         if (
           $accessCiviMail &&
@@ -943,14 +961,6 @@ ORDER BY    fixed_sort_order
    * @static
    */
   static function &getActivitiesCount($input) {
-    // skip bulk activities in activity tab
-    $bulkActivityTypeID = CRM_Core_OptionGroup::getValue(
-      'activity_type',
-      'Bulk Email',
-      'name'
-    );
-    $input['activity_type_exclude_id'][$bulkActivityTypeID] = $bulkActivityTypeID;
-
     $input['count'] = TRUE;
     list($sqlClause, $params) = self::getActivitySQLClause($input);
 
@@ -1894,6 +1904,10 @@ SELECT  display_name
       $activityParams['target_contact_id'][] = $activity->contact_id;
     }
 
+    // CRM-14945
+    if (property_exists($activity, 'details')) {
+      $activityParams['details'] = $activity->details;
+    }
     //CRM-4027
     if ($targetContactID) {
       $activityParams['target_contact_id'][] = $targetContactID;
@@ -2504,27 +2518,18 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
         elseif (!empty($values['recipients'])) {
           $contactActivities[$activityId]['target_contact'] = $values['recipients'];
         }
+        elseif (isset($values['target_contact_counter']) && $values['target_contact_counter']) {
+          foreach ($values['target_contact_name'] as $tcID => $tcName) {
+            $contactActivities[$activityId]['target_contact'] .= CRM_Utils_System::href($tcName,
+              'civicrm/contact/view', "reset=1&cid={$tcID}");
+          }
+
+          if ($extraCount = $values['target_contact_counter'] - 1) {
+            $contactActivities[$activityId]['target_contact'] .= ";<br />" . "(" . ts('%1 more', array(1 => $extraCount)) . ")";
+          }
+        }
         elseif (!$values['target_contact_name']) {
           $contactActivities[$activityId]['target_contact'] = '<em>n/a</em>';
-        }
-        elseif (!empty($values['target_contact_name'])) {
-          $count = 0;
-          $contactActivities[$activityId]['target_contact'] = '';
-          foreach ($values['target_contact_name'] as $tcID => $tcName) {
-            if ($tcID && $count < 5) {
-              $contactActivities[$activityId]['target_contact'] .= CRM_Utils_System::href($tcName,
-                'civicrm/contact/view', "reset=1&cid={$tcID}");
-              $count++;
-              if ($count) {
-                $contactActivities[$activityId]['target_contact'] .= ";&nbsp;";
-              }
-
-              if ($count == 4) {
-                $contactActivities[$activityId]['target_contact'] .= "(" . ts('more') . ")";
-                break;
-              }
-            }
-          }
         }
 
         if (empty($values['assignee_contact_name'])) {

@@ -58,7 +58,7 @@ define('API_LATEST_VERSION', 3);
 class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   /**
-   * api version - easier to override than just a defin
+   * api version - easier to override than just a define
    */
   protected $_apiversion = API_LATEST_VERSION;
   /**
@@ -988,38 +988,28 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Generic function to create Organisation, to be used in test cases
    *
    * @param array   parameters for civicrm_contact_add api function call
+   * @param int     sequence number if creating multiple organizations
    *
    * @return int    id of Organisation created
    */
-  function organizationCreate($params = array()) {
+  function organizationCreate($params = array(), $seq = 0) {
     if (!$params) {
       $params = array();
     }
-    $orgParams = array(
-      'organization_name' => 'Unit Test Organization',
-      'contact_type' => 'Organization',
-    );
-    return $this->_contactCreate(array_merge($orgParams, $params));
+    $params = array_merge($this->sampleContact('Organization', $seq), $params);
+    return $this->_contactCreate($params);
   }
 
   /**
    * Generic function to create Individual, to be used in test cases
    *
    * @param array   parameters for civicrm_contact_add api function call
+   * @param int     sequence number if creating multiple individuals
    *
    * @return int    id of Individual created
    */
-  function individualCreate($params = array()) {
-    $params = array_merge(array(
-        'first_name' => 'Anthony',
-        'middle_name' => 'J.',
-        'last_name' => 'Anderson',
-        'prefix_id' => 3,
-        'suffix_id' => 3,
-        'email' => 'anthony_anderson@civicrm.org',
-        'contact_type' => 'Individual',
-      ), $params);
-
+  function individualCreate($params = array(), $seq = 0) {
+    $params = array_merge($this->sampleContact('Individual', $seq), $params);
     return $this->_contactCreate($params);
   }
 
@@ -1027,15 +1017,51 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Generic function to create Household, to be used in test cases
    *
    * @param array   parameters for civicrm_contact_add api function call
+   * @param int     sequence number if creating multiple households
    *
    * @return int    id of Household created
    */
-  function householdCreate($params =  array()) {
-    $params = array_merge(array(
-        'household_name' => 'Unit Test household',
-        'contact_type' => 'Household',
-      ), $params);
+  function householdCreate($params = array(), $seq = 0) {
+    $params = array_merge($this->sampleContact('Household', $seq), $params);
     return $this->_contactCreate($params);
+  }
+
+  /**
+   * Helper function for getting sample contact properties
+   *
+   * @param enum     contact type: Individual, Organization
+   * @param int      sequence number for the values of this type
+   *
+   * @return array   properties of sample contact (ie. $params for API call)
+   */
+  function sampleContact($contact_type, $seq = 0) {
+    $samples = array(
+      'Individual' => array(
+        // The number of values in each list need to be coprime numbers to not have duplicates
+        'first_name' => array('Anthony', 'Joe', 'Terrence', 'Lucie', 'Albert', 'Bill', 'Kim'),
+        'middle_name' => array('J.', 'M.', 'P', 'L.', 'K.', 'A.', 'B.', 'C.', 'D', 'E.', 'Z.'),
+        'last_name' => array('Anderson', 'Miller', 'Smith', 'Collins', 'Peterson'),
+      ),
+      'Organization' => array(
+        'organization_name' => array('Unit Test Organization', 'Acme', 'Roberts and Sons', 'Cryo Space Labs', 'Sharper Pens'),
+      ),
+      'Household' => array(
+        'household_name' => array('Unit Test household'),
+      ),
+    );
+    $params = array('contact_type' => $contact_type);
+    foreach ($samples[$contact_type] as $key => $values) {
+      $params[$key] = $values[$seq % sizeof($values)];
+    }
+    if ($contact_type == 'Individual' ) {
+        $employer = $this->sampleContact('Organization', $seq);
+        $params['email'] = strtolower(
+          $params['first_name'] . '_' . $params['last_name'] . '@civicrm.org'
+        );
+        $params['prefix_id'] = 3;
+        $params['suffix_id'] = 3;
+    }
+    return $params;
   }
 
   /**
@@ -2346,7 +2372,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'civicrm_membership_type',
       'civicrm_membership_payment',
       'civicrm_membership_log',
-      'civicrm_membership_status',
+      'civicrm_membership_block',
       'civicrm_event',
       'civicrm_participant',
       'civicrm_participant_payment',

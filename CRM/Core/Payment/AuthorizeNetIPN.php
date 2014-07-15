@@ -223,8 +223,8 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     $input['subscription_id'] = self::retrieve('x_subscription_id', 'Integer');
     $input['response_code'] = self::retrieve('x_response_code', 'Integer');
     $input['MD5_Hash'] = self::retrieve('x_MD5_Hash', 'String', FALSE, '');
-    $input['fee_amount'] = self::retrieve('x_fee_amount', 'Money', FALSE, '0.00');
-    $input['net_amount'] = self::retrieve('x_net_amount', 'Money', FALSE, '0.00');
+    $input['fee_amount'] = self::retrieve('x_fee_amount', 'Money', FALSE, NULL);
+    $input['net_amount'] = self::retrieve('x_net_amount', 'Money', FALSE, NULL);
     $input['response_reason_code'] = self::retrieve('x_response_reason_code', 'String', FALSE);
     $input['response_reason_text'] = self::retrieve('x_response_reason_text', 'String', FALSE);
     $input['subscription_paynum'] = self::retrieve('x_subscription_paynum', 'Integer', FALSE, 0);
@@ -261,7 +261,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @param $input
    */
   function getIDs(&$ids, &$input) {
-    $ids['contact'] = self::retrieve('x_cust_id', 'Integer');
+    $ids['contact'] = self::retrieve('x_cust_id', 'Integer', FALSE, 0);
     $ids['contribution'] = self::retrieve('x_invoice_num', 'Integer');
 
     // joining with contribution table for extra checks

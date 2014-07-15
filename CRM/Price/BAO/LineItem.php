@@ -149,6 +149,8 @@ AND li.entity_id = {$entityId}
     $whereClause = "
       WHERE     %2.id = %1";
 
+    $orderByClause = " ORDER BY pf.weight, pfv.weight";
+
     if ($isQuick) {
       $fromClause .= " LEFT JOIN civicrm_price_set cps on cps.id = pf.price_set_id ";
       $whereClause .= " and cps.is_quick_config = 0";
@@ -169,7 +171,7 @@ AND li.entity_id = {$entityId}
       2 => array($entity, 'Text'),
     );
 
-    $dao = CRM_Core_DAO::executeQuery("$selectClause $fromClause $whereClause ORDER by li.id", $params);
+    $dao = CRM_Core_DAO::executeQuery("$selectClause $fromClause $whereClause $orderByClause", $params);
     while ($dao->fetch()) {
       if (!$dao->id) {
         continue;

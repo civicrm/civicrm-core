@@ -70,6 +70,15 @@ class CRM_Utils_PDF_Utils {
     $r           = CRM_Core_BAO_PdfFormat::getValue('margin_right', $format);
     $b           = CRM_Core_BAO_PdfFormat::getValue('margin_bottom', $format);
     $l           = CRM_Core_BAO_PdfFormat::getValue('margin_left', $format);
+
+    $stationery_path_partial  = CRM_Core_BAO_PdfFormat::getValue('stationery', $format);
+
+    $stationery_path = NULL;
+    if (strlen($stationery_path_partial)) {
+      $doc_root = $_SERVER['DOCUMENT_ROOT'];
+      $stationery_path = $doc_root . "/" . $stationery_path_partial;
+    }
+
     $margins     = array($metric,$t,$r,$b,$l);
 
     $config = CRM_Core_Config::singleton();
@@ -86,6 +95,7 @@ class CRM_Utils_PDF_Utils {
     // Strip <html>, <header>, and <body> tags from each page
     $htmlElementstoStrip = array(
       '@<head[^>]*?>.*?</head>@siu',
+      '@<script[^>]*?>.*?</script>@siu',
       '@<body>@siu',
       '@</body>@siu',
       '@<html[^>]*?>@siu',
@@ -110,7 +120,53 @@ class CRM_Utils_PDF_Utils {
     }
     else {
       return self::_html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName);
+      //return self::_html2pdf_tcpdf($paper_size, $orientation, $margins, $html, $output, $fileName,  $stationery_path);
     }
+  }
+
+  static function _html2pdf_tcpdf($paper_size, $orientation, $margins, $html, $output, $fileName, $stationery_path) {
+    // Documentation on the TCPDF library can be found at: http://www.tcpdf.org
+    // This function also uses the FPDI library documented at: http://www.setasign.com/products/fpdi/about/
+    // Syntax borrowed from https://github.com/jake-mw/CDNTaxReceipts/blob/master/cdntaxreceipts.functions.inc
+    require_once 'tcpdf/tcpdf.php';
+    require_once('FPDI/fpdi.php'); // This library is only in the 'packages' area as of version 4.5
+
+    $paper_size_arr  = array( $paper_size[2], $paper_size[3]);
+
+    $pdf = new TCPDF($orientation, 'pt', $paper_size_arr);
+    $pdf->Open();
+
+    if (is_readable($stationery_path)){
+      $pdf->SetStationery( $stationery_path );
+    }
+
+    $pdf->SetAuthor('');
+    $pdf->SetKeywords('CiviCRM.org');
+    $pdf->setPageUnit( $margins[0] ) ;
+    $pdf->SetMargins($margins[4], $margins[1], $margins[2], true);
+
+    $pdf->setJPEGQuality('100');
+    $pdf->SetAutoPageBreak(true, $margins[3]);
+
+    $pdf->AddPage();
+
+    $ln = true ;
+    $fill = false ;
+    $reset_parm = false;
+    $cell = false;
+    $align = '' ;
+
+    // output the HTML content
+    $pdf->writeHTML($html, $ln, $fill, $reset_parm, $cell, $align);
+
+    // reset pointer to the last page
+    $pdf->lastPage();
+
+    // close and output the PDF
+    $pdf->Close();
+    $pdf_file =  'CiviLetter'.'.pdf';
+    $pdf->Output($pdf_file, 'D');
+    CRM_Utils_System::civiExit(1);
   }
 
   /**
