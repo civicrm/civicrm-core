@@ -111,14 +111,21 @@ if ( {/literal}"{$locUsed}"{literal} ) {
 cj(document).ready(function() {
   //FIX ME: by default load 2 blocks and hide add and delete links
   //we should make additional block function more flexible to set max block limit
-  buildAdditionalBlocks('Email', 'CRM_Event_Form_ManageEvent_Location');
-  buildAdditionalBlocks('Phone', 'CRM_Event_Form_ManageEvent_Location');
-  hideAddDeleteLinks();
-  function hideAddDeleteLinks() {
-    cj('#addEmail').hide();
-    cj('#addPhone').hide();
-    cj('[id=Email_Block_2] a:last').hide();
-    cj('[id=Phone_Block_2] a:last').hide();
+  buildBlocks('Email');
+  buildBlocks('Phone');
+
+  // build blocks only if it is not built
+  function buildBlocks(element) {
+    if (!cj('[id='+ element +'_Block_2]').length) {
+      buildAdditionalBlocks(element, 'CRM_Event_Form_ManageEvent_Location');
+    }
+  }
+
+  hideAddDeleteLinks('Email');
+  hideAddDeleteLinks('Phone');
+  function hideAddDeleteLinks(element) {
+    cj('#add'+ element).hide();
+    cj('[id='+ element +'_Block_2] a:last').hide();
   }
 
   cj('#loc_event_id').change(function() {
