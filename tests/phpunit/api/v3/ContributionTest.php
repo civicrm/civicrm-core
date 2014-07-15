@@ -1212,7 +1212,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   function testCompleteTransaction() {
     $mut = new CiviMailUtils( $this, true );
     $this->createLoggedInUser();
-    $params = array_merge($this->_params, array('contribution_status_id' => 1,));
+    $params = array_merge($this->_params, array('contribution_status_id' => 2,));
     $contribution = $this->callAPISuccess('contribution','create', $params);
     $this->callAPISuccess('contribution', 'completetransaction', array(
       'id' => $contribution['id'],
@@ -1230,13 +1230,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * CRM-14151
    * Test completing a transaction via the API
    *
-   * For wierd caching-y reasons this test performs differently in isolation than with other
    * tests.
    */
   function testCompleteTransactionWithReceiptDateSet() {
     $mut = new CiviMailUtils( $this, true );
     $this->createLoggedInUser();
-    $params = array_merge($this->_params, array('contribution_status_id' => 1,'receipt_date' => 'now'));
+    $params = array_merge($this->_params, array('contribution_status_id' => 2,'receipt_date' => 'now'));
     $contribution = $this->callAPISuccess('contribution','create', $params);
     $apiResult = $this->callAPISuccess('contribution', 'completetransaction', array(
       'id' => $contribution['id'],
