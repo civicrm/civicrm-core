@@ -1299,13 +1299,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   function cleanUpAfterPriceSets() {
+    $this->quickCleanUpFinancialEntities();
     $this->contactDelete($this->_ids['contact']);
-    $this->quickCleanup(array('civicrm_price_set_entity', 'civicrm_line_item', 'civicrm_contribution', 'civicrm_membership', 'civicrm_membership_payment'));
     $this->callAPISuccess('price_field_value', 'delete', array('id' => $this->_ids['price_field_value'][0]));
     $this->callAPISuccess('price_field_value', 'delete', array('id' => $this->_ids['price_field_value'][1]));
     $this->callAPISuccess('price_field', 'delete', array('id' => $this->_ids['price_field'][0]));
     $this->callAPISuccess('price_set', 'delete', array('id' => $this->_ids['price_set']));
-    $this->membershipTypeDelete(array('id' => $this->_ids['membership_type']));
   }
 
 
