@@ -12,39 +12,39 @@
     </table>
     <center>
       <br/><br/>
-      <table style = "padding-right:19px;" width = "500" height = "100" border = "0" cellpadding = "2" cellspacing = "1">
+      <table style = "padding-right:19px;font-family: Arial, Verdana, sans-serif;" width = "500" height = "100" border = "0" cellpadding = "2" cellspacing = "1">
 	<tr>
 
               <td style = "padding-left:35px;" ><b><font size = "4" align = "center">TAX INVOICE</font></b></td>
         
           <td colspan = "1"></td>
          
-              <td style = "padding-left:88px;"><b><font size = "1" align = "right">Invoice Date:</font></b></td> 
+              <td style = "padding-left:88px;"><b><font size = "1" align = "center" >Invoice Date:</font></b></td> 
           
           <td style="padding-top:13px" ><font size = "1" align = "right">{$organization_name}</font></td>
 	</tr>
         <tr>
          {if $organization_name}
-           <td style = "padding-left:48px;"><font size = "1" align = "center" >{$display_name}  ({$organization_name})</font></td>
+           <td style = "padding-left:37px;"><font size = "1" align = "center" >{$display_name}  ({$organization_name})</font></td>
            {else}
-             <td style = "padding-left:48px;"><font size = "1" align = "center" >{$display_name}</font></td>
+             <td style = "padding-left:37px;"><font size = "1" align = "center" >{$display_name}</font></td>
          {/if}
          <td colspan = "1"></td>
          <td style = "padding-left:88px;"><font size = "1" align = "right">{$invoice_date}</font></td>  
 	</tr>
         <tr>
-          <td style = "padding-left:48px;"><font size = "1" align = "center">{$street_address}   {$supplemental_address_1}</font></td>
+          <td style = "padding-left:37px;"><font size = "1" align = "center">{$street_address}   {$supplemental_address_1}</font></td>
           <td colspan = "1"></td>
               <td style = "padding-left:88px;"><b><font size = "1" align = "right">Incoice Number:</font></b></td> 
 
         </tr>
         <tr>
-          <td style = "padding-left:48px;"><font size = "1" align = "center">{$supplemental_address_2}  {$stateProvinceAbbreviation}</font></td>
+          <td style = "padding-left:37px;"><font size = "1" align = "center">{$supplemental_address_2}  {$stateProvinceAbbreviation}</font></td>
           <td colspan="1"></td>
           <td style = "padding-left:88px;"><font size = "1" align = "right">{$invoice_id}</font></td>
 	</tr>
 	<tr>
-          <td style = "padding-left:48px;"><font size = "1" align = "right">{$city}  {$postal_code}</font></td>    
+          <td style = "padding-left:37px;"><font size = "1" align = "right">{$city}  {$postal_code}</font></td>    
           <td colspan="1"></td>
 	   <td height = "10" style = "padding-left:88px;"><b><font size = "1"align = "right">Reference:</font></b></td>
 	</tr>
@@ -55,7 +55,7 @@
 	</tr>
       </table>
 
-      <table style = "margin-top:75px;padding-right:20px;" width = "590" border = "0"cellpadding = "-5" cellspacing = "19" id = "desc">
+      <table style = "margin-top:75px;padding-right:20px;font-family: Arial, Verdana, sans-serif" width = "590" border = "0"cellpadding = "-5" cellspacing = "19" id = "desc">
 	<tr>
           <td colspan = "2" {$valueStyle}>
             <table> {* FIXME: style this table so that it looks like the text version (justification, etc.) *}
@@ -63,23 +63,25 @@
                 <th style = "padding-right:34px;text-align:left;font-weight:bold;width:200px;"><font size = "1">Description</font></th>
                 <th style = "padding-left:34px;text-align:right;font-weight:bold;" ><font size = "1">Quantity</font></th>
                 <th style = "padding-left:34px;text-align:right;font-weight:bold;"><font size = "1">Unit Price</font></th>
-                <th style = "padding-left:34px;text-align:right;font-weight:bold;width:20px;"><font size = "1">VAT </font></th>
+                <th style = "padding-left:34px;text-align:right;font-weight:bold;width:20px;"><font size = "1">{$taxTerm} </font></th>
                 <th style = "padding-left:34px;text-align:right;font-weight:bold;"><font size = "1">Amount {$defaultCurrency}</font></th>
               </tr>
-              {foreach from=$lineItem item=value key=priceset}
+              {foreach from=$lineItem item=value key=priceset name=taxpricevalue}
+		{if $smarty.foreach.taxpricevalue.index eq 0}
 	        <tr><td  colspan = "5" ><hr size="3" style = "color:#000;"></hr></td></tr>
+		{else}
+		<tr><td  colspan = "5" style = "color:#F5F5F5;"><hr></hr></td></tr>
+		{/if}
                 <tr>
                   <td style="text-align:left;" ><font size = "1">
 		  {if $value.html_type eq 'Text'}{$value.label}{else}{$value.field_title} - {$value.label}{/if} {if $value.description}<div>{$value.description|truncate:30:"..."}</div>{/if}
 		  </font></td>
 		  <td style = "padding-left:34px;text-align:right;"><font size = "1"> {$value.qty}</font></td>
 		  <td style = "padding-left:34px;text-align:right;"><font size = "1"> {$value.unit_price|crmMoney:$currency}</font></td>
-		    {if $value.tax_rate}
+		    {if $value.tax_amount != ''}
 		      <td style = "padding-left:34px;text-align:right;width:20px;"><font size = "1"> {$value.tax_rate}%</font></td>
-		      {elseif $value.tax_amount != ''}
-		        <td style = "padding-left:34px;text-align:right;width:20px;"><font size = "1">VAT (exempt)</font></td>
                         {else}
-		          <td style = "padding-left:34px;text-align:right;width:20px;"><font size = "1">No VAT</font></td>
+		          <td style = "padding-left:34px;text-align:right;width:20px;"><font size = "1">No {$taxTerm}</font></td>
 	            {/if}
 		    <td style = "padding-left:34px;text-align:right;"><font size = "1">{$value.subTotal|crmMoney:$currency}</font></td>
 		</tr>
@@ -94,10 +96,10 @@
 	          <tr>
 		    <td colspan = "3"></td>
 		    {if $priceset}
-		      <td style = "padding-left:34px;text-align:right;"><font size = "1"> TOTAL VAT {$priceset}%</font></td>    
+		      <td style = "padding-left:34px;text-align:right;"><font size = "1"> TOTAL {$taxTerm} {$priceset}%</font></td>    
 		      <td style = "padding-left:34px;text-align:right"><font size = "1" align = "right">{$value|crmMoney:$currency}</font> </td>
                       {elseif $priceset == 0}
-                        <td style = "padding-left:34px;text-align:right;"><font size = "1">TOTAL NO VAT</font></td>
+                        <td style = "padding-left:34px;text-align:right;"><font size = "1">TOTAL NO {$taxTerm}</font></td>
                         <td style = "padding-left:34px;text-align:right"><font size = "1" align = "right">{$value|crmMoney:$currency}</font> </td>
                   </tr>
 		    {/if}
@@ -154,17 +156,17 @@
           <td><img src = "{$imageUploadURL}/img.png" height = "15" width = "630"></td>
         </tr>
       </table>
-	<table style = "margin-top:6px;padding-right:30px;" width = "585" border = "0"cellpadding = "-10" cellspacing="19" id = "desc">
+	<table style = "margin-top:6px;padding-right:30px;font-family: Arial, Verdana, sans-serif" width = "585" border = "0"cellpadding = "-10" cellspacing="19" id = "desc">
 	  <tr>
 	    <td><b><font size = "4" align = "right">PAYMENT ADVICE</font><b/> <br/><br/> <b><font size = "1" align = "right">To:            
               {$organization_name}</font><b/><br/><br/><b><font size="1" align="right">{$notes}</font>
             </td>
             <td>
-	      <table  cellpadding = "-10" cellspacing = "22"  align="center" style="margin-left:60px">
+	      <table  cellpadding = "-10" cellspacing = "22"  align="center" style="margin-left:40px;">
 		<tr>
 	          <td  colspan = "2"></td>
 		  <td><font size = "1" align = "right" style="font-weight:bold;">Customer: </font></td>
-		  <td ><div style="max-width:10px;padding-top:13px"><font size = "1" align = "right">{$display_name}</font></div></td>   
+		  <td ><font size = "1" align = "right">{$display_name}</font></td>   
 		</tr>
 		<tr>
 		  <td colspan = "2"></td>
@@ -207,7 +209,7 @@
     </table>
     <center>
       <br/><br/>
-      <table style = "padding-right:19px;" width = "500" height = "100" border = "0" cellpadding = "2" cellspacing = "1">
+      <table style = "padding-right:19px;font-family: Arial, Verdana, sans-serif" width = "500" height = "100" border = "0" cellpadding = "2" cellspacing = "1">
 	<tr>
           
             <td style = "padding-left:35px;" ><b><font size = "4" align = "center">CREDIT NOTE</font></b></td>
@@ -221,27 +223,27 @@
 	</tr>
         <tr>
          {if $organization_name}
-           <td style = "padding-left:48px;"><font size = "1" align = "center">{$display_name}  ({$organization_name})</font></td>
+           <td style = "padding-left:37px;"><font size = "1" align = "center">{$display_name}  ({$organization_name})</font></td>
            {else}
-             <td style = "padding-left:48px;"><font size = "1" align = "center">{$display_name}</font></td>
+             <td style = "padding-left:37px;"><font size = "1" align = "center">{$display_name}</font></td>
          {/if}
          <td colspan = "1"></td>
          <td style = "padding-left:88px;"><font size = "1" align = "right">{$invoice_date}</font></td>  
 	</tr>
         <tr>
-          <td style = "padding-left:48px;"><font size = "1" align = "center">{$street_address}   {$supplemental_address_1}</font></td>
+          <td style = "padding-left:37px;"><font size = "1" align = "center">{$street_address}   {$supplemental_address_1}</font></td>
           <td colspan = "1"></td>
          
             <td style = "padding-left:88px;"><b><font size = "1" align = "right">Credit Note Number:</font></b></td>     
            
         </tr>
         <tr>
-          <td style = "padding-left:48px;"><font size = "1" align = "center">{$supplemental_address_2}  {$stateProvinceAbbreviation}</font></td>
+          <td style = "padding-left:37px;"><font size = "1" align = "center">{$supplemental_address_2}  {$stateProvinceAbbreviation}</font></td>
           <td colspan="1"></td>
-          <td style = "padding-left:88px;"><font size = "1" align = "right">{$invoice_id}</font></td>
+          <td style = "padding-left:88px;"><font size = "1" align = "right">{$creditnote_id}</font></td>
 	</tr>
 	<tr>
-          <td style = "padding-left:48px;"><font size = "1" align = "right">{$city}  {$postal_code}</font></td>    
+          <td style = "padding-left:37px;"><font size = "1" align = "right">{$city}  {$postal_code}</font></td>    
           <td colspan="1"></td>
           <td height = "10" style = "padding-left:88px;"><b><font size = "1"align = "right">Reference:</font></b></td>  
 	</tr>
@@ -252,7 +254,7 @@
 	</tr>
       </table>
 
-      <table style = "margin-top:75px;padding-right:20px;" width = "590" border = "0"cellpadding = "-5" cellspacing = "19" id = "desc">
+      <table style = "margin-top:75px;padding-right:20px;font-family: Arial, Verdana, sans-serif" width = "590" border = "0"cellpadding = "-5" cellspacing = "19" id = "desc">
 	<tr>
           <td colspan = "2" {$valueStyle}>
             <table> {* FIXME: style this table so that it looks like the text version (justification, etc.) *}
@@ -260,23 +262,25 @@
                 <th style = "padding-right:28px;text-align:left;font-weight:bold;width:200px;"><font size = "1">Description</font></th>
                 <th style = "padding-left:28px;text-align:right;font-weight:bold;"><font size = "1">Quantity</font></th>
                 <th style = "padding-left:28px;text-align:right;font-weight:bold;"><font size = "1">Unit Price</font></th>
-                <th style = "padding-left:28px;text-align:right;font-weight:bold;"><font size = "1">VAT </font></th>
+                <th style = "padding-left:28px;text-align:right;font-weight:bold;"><font size = "1">{$taxTerm} </font></th>
                 <th style = "padding-left:28px;text-align:right;font-weight:bold;"><font size = "1">Amount {$defaultCurrency}</font></th>
               </tr>
-              {foreach from=$lineItem item=value key=priceset}
+              {foreach from=$lineItem item=value key=priceset name=pricevalue}
+		{if $smarty.foreach.pricevalue.index eq 0}
 	        <tr><td  colspan = "5" ><hr size="3" style = "color:#000;"></hr></td></tr>
+		{else}
+		<tr><td  colspan = "5" style = "color:#F5F5F5;"><hr></hr></td></tr>
+		{/if}
                 <tr>
                   <td style ="text-align:left;"  ><font size = "1">
 		  {if $value.html_type eq 'Text'}{$value.label}{else}{$value.field_title} - {$value.label}{/if} {if $value.description}<div>{$value.description|truncate:30:"..."}</div>{/if}
 		  </font></td>
 		  <td style = "padding-left:28px;text-align:right;"><font size = "1"> {$value.qty}</font></td>
 		  <td style = "padding-left:28px;text-align:right;"><font size = "1"> {$value.unit_price|crmMoney:$currency}</font></td>
-		    {if $value.tax_rate}
+		    {if $value.tax_amount != ''}
 		      <td style = "padding-left:28px;text-align:right;"><font size = "1"> {$value.tax_rate}%</font></td>
-		      {elseif $value.tax_amount != ''}
-		        <td style = "padding-left:28px;text-align:right;"><font size = "1">VAT (exempt)</font></td>
                         {else}
-		          <td style = "padding-left:28px;text-align:right"><font size = "1" >No VAT</font></td>
+		          <td style = "padding-left:28px;text-align:right"><font size = "1" >No {$taxTerm}</font></td>
 	            {/if}
 		    <td style = "padding-left:28px;text-align:right;"><font size = "1" >{$value.subTotal|crmMoney:$currency}</font></td>
 		</tr>
@@ -291,11 +295,11 @@
 	          <tr>
 		    <td colspan = "3"></td>
 		    {if $priceset}
-		      <td style = "padding-left:28px;text-align:right;"><font size = "1"> TOTAL VAT {$priceset}%</font></td>    
-		      <td style = "padding-left:28px;"><font size = "1" align = "right">{$value|crmMoney:$currency}</font> </td>
+		      <td style = "padding-left:28px;text-align:right;"><font size = "1"> TOTAL {$taxTerm} {$priceset}%</font></td>    
+		      <td style = "padding-left:28px;text-align:right;"><font size = "1" align = "right">{$value|crmMoney:$currency}</font> </td>
                       {elseif $priceset == 0}
-                        <td style = "padding-left:28px;text-align:right;"><font size = "1">TOTAL NO VAT</font></td>
-                        <td style = "padding-left:28px;"><font size = "1" align = "right">{$value|crmMoney:$currency}</font> </td>
+                        <td style = "padding-left:28px;text-align:right;"><font size = "1">TOTAL NO {$taxTerm}</font></td>
+                        <td style = "padding-left:28px;text-align:right;"><font size = "1" align = "right">{$value|crmMoney:$currency}</font> </td>
                   </tr>
 		    {/if}
 		{/foreach}
@@ -353,20 +357,20 @@
       </table>
 
      
-        <table   style = "margin-top:6px;padding-right:30px;" width = "585" border = "0" cellpadding = "-10" cellspacing = "19" id = "desc">
+        <table   style = "margin-top:6px;padding-right:30px;font-family: Arial, Verdana, sans-serif" width = "585" border = "0" cellpadding = "-10" cellspacing = "19" id = "desc">
 	  <tr>
 	    <td ><b><font size = "4" align = "right">CREDIT ADVICE<br/><br/><font size = "1" >{$notes}</font></font></b></td>
 	    <td>
-              <table style = "margin-top:0px;margin-left:100px" cellpadding = "-10" cellspacing = "22" align="center" >
+              <table style = "margin-top:0px;margin-left:80px;" cellpadding = "-10" cellspacing = "22" align="center" >
 		<tr>
 	          <td colspan = "2"></td>
 		  <td><font size = "1" align = "right" style="font-weight:bold;">Customer: </font></td>
-		  <td><div style="max-width:10px;padding-top:13px"><font size = "1" align = "right" >{$display_name}</font></div></td>   
+		  <td><font size = "1" align = "right" >{$display_name}</font></td>   
 		</tr>
 		<tr>
 		  <td colspan = "2"></td>
 		  <td><font size = "1" align = "right" style="font-weight:bold;">Credit Note#: </font></td>
-		  <td><font size = "1" align = "right">{$invoice_id}</font></td>   
+		  <td><font size = "1" align = "right">{$creditnote_id}</font></td>   
 		</tr>
 		<tr><td  colspan = "5"style = "color:#F5F5F5;"><hr></hr></td></tr>
 		<tr>
@@ -378,8 +382,6 @@
             </td>
 	  </tr>
 	</table>
-
- 
  {/if}
     </center>
   </body>
