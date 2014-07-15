@@ -443,7 +443,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     CRM_Contact_Form_Edit_Address::setDefaultValues( $defaults, $this );
 
     if (CRM_Utils_Array::value('image_URL', $defaults)) {
-      list($imageWidth, $imageHeight) = getimagesize($defaults['image_URL']);
+      list($imageWidth, $imageHeight) = getimagesize(CRM_Utils_String::unstupifyUrl($defaults['image_URL']));
       list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
       $this->assign('imageWidth', $imageWidth);
       $this->assign('imageHeight', $imageHeight);
