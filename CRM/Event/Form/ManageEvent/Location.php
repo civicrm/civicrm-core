@@ -75,6 +75,14 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    * @access public
    */
   function preProcess() {
+    //location blocks.
+    CRM_Contact_Form_Location::preProcess($this);
+
+    //skip rest of postpress when we are building additional email and phone blocks
+    if (!empty($this->_addBlockName)) {
+      return;
+    }
+
     parent::preProcess();
 
     $this->_values = $this->get('values');
@@ -92,9 +100,6 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
       CRM_Event_BAO_Event::retrieve($params, $this->_values);
       $this->set('values', $this->_values);
     }
-
-    //location blocks.
-    CRM_Contact_Form_Location::preProcess($this);
   }
 
   /**
