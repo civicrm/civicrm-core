@@ -30,7 +30,7 @@
   {literal}
   <script type="text/javascript">
     CRM.$(function($) {
-      $("#{$form.formName}").crmValidate();
+      $("#{/literal}{$form.formName}{literal}").crmValidate();
     });
   </script>
   {/literal}
