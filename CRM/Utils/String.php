@@ -652,6 +652,17 @@ class CRM_Utils_String {
     }
   }
 
-
+  /**
+   * Many parts of the codebase have a convention of internally passing around
+   * HTML-encoded URLs. This effectively means that "&" is replaced by "&amp;"
+   * (because most other odd characters are %-escaped in URLs; and %-escaped
+   * strings don't need any extra escaping in HTML).
+   *
+   * @param string $url URL with HTML entities
+   * @return string URL without HTML entities
+   */
+  public static function unstupifyUrl($htmlUrl) {
+    return str_replace('&amp;', '&', $htmlUrl);
+  }
 }
 
