@@ -163,6 +163,16 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $params = array('entity_id' => $this->_id, 'entity_table' => 'civicrm_event');
     $values['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
 
+    // fix phone type labels
+    if (!empty($values['location']['phone'])) {
+      $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+      foreach ($values['location']['phone'] as &$val) {
+        if (!empty($val['phone_type_id'])) {
+          $val['phone_type_display'] = $phoneTypes[$val['phone_type_id']];
+        }
+      }
+    }
+
     //retrieve custom field information
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Event', $this, $this->_id, 0, $values['event']['event_type_id']);
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree);
