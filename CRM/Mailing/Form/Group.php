@@ -236,7 +236,8 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
         ts('Unsubscription Group'),
         array(
           '' => ts('- select -')) + $staticGroups,
-        TRUE
+        TRUE,
+        array('class' => 'crm-select2 huge')
       );
     }
 
@@ -252,7 +253,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
       $groups,
       array(
         'size' => $groupSize,
-        'style' => 'width:auto; min-width:240px;',
+        'style' => 'width:auto; min-width:240px; max-width: 40%',
         'class' => 'advmultiselect',
       )
     );
