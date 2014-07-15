@@ -314,7 +314,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     $refCounts = $caseType->getReferenceCounts();
     $total = array_sum(CRM_Utils_Array::collect('count', $refCounts));
     if ($total) {
-      throw new CRM_Core_Exception("Cannot delete case type -- {$total} record(s) depend on it");
+      throw new CRM_Core_Exception(ts("You can not delete this case type -- it is assigned to %1 existing case record(s). If you do not want this case type to be used going forward, consider disabling it instead.", array(1 => $total)));
     }
     $result = $caseType->delete();
     CRM_Case_XMLRepository::singleton(TRUE);
