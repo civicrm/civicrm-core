@@ -300,6 +300,12 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
   /**
    * function to get the amount details date wise.
+   *
+   * @param string $status
+   * @param string $startDate
+   * @param string $endDate
+   *
+   * @return array|null
    */
   static function getTotalAmountAndCount($status = NULL, $startDate = NULL, $endDate = NULL) {
     $where = array();
@@ -441,7 +447,7 @@ GROUP BY  currency
    *
    * @param int $honorId In Honor of Contact ID
    *
-   * @return return the list of pledge fields
+   * @return array return the list of pledge fields
    *
    * @access public
    * @static
@@ -612,7 +618,7 @@ GROUP BY  currency
       $receiptFrom = $params['from_email_id'];
     }
     elseif ($userID = $session->get('userID')) {
-      //check for loged in user.
+      //check for logged in user.
       list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
     }
     else {
@@ -1080,6 +1086,7 @@ SELECT  pledge.contact_id              as contact_id,
    * & recreating so we want to block that if appropriate
    *
    * @param integer $pledgeID
+   * @param integer $pledgeStatusID
    * @return bool do financial transactions exist for this pledge?
    */
    static function pledgeHasFinancialTransactions($pledgeID, $pledgeStatusID) {
@@ -1105,6 +1112,7 @@ SELECT  pledge.contact_id              as contact_id,
     if (!in_array($statusID, self::getNonTransactionalStatus())) {
       return TRUE;
     }
+    return FALSE;
   }
 
   /**
