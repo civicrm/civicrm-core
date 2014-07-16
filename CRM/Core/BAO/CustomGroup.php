@@ -160,13 +160,11 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       }
     }
 
-    $is_reserved = CRM_Utils_Array::value('is_reserved', $params, 0);
-    if (in_array($is_reserved, array(TRUE, 1, '1'), TRUE)) {
-      $is_reserved = 1;
-    } else {
-      $is_reserved = 0;
+    if (array_key_exists('is_reserved', $params)) {
+      $group->is_reserved = $params['is_reserved'] ? 1 : 0;
     }
-    $group->is_reserved = $is_reserved;
+    $op = isset($params['id']) ? 'edit' : 'create';
+    CRM_Utils_Hook::pre($op, 'CustomGroup', CRM_Utils_Array::value('id', $params), $params);
 
     // enclose the below in a transaction
     $transaction = new CRM_Core_Transaction();
