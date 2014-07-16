@@ -168,6 +168,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     }
     $group->is_reserved = $is_reserved;
 
+    $op = isset($params['id']) ? 'edit' : 'create';
+    CRM_Utils_Hook::pre($op, 'CustomGroup', CRM_Utils_Array::value('id', $params), $params);
+
     // enclose the below in a transaction
     $transaction = new CRM_Core_Transaction();
 
