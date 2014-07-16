@@ -182,7 +182,7 @@ VALUES
 -- new activity types required for partial payments
 SELECT @option_group_id_act     := max(id) from civicrm_option_group where name = 'activity_type';
 SELECT @option_group_id_act_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_act;
-SELECT @option_group_id_act_val := MAX(value) FROM civicrm_option_value WHERE option_group_id = @option_group_id_act;
+SELECT @option_group_id_act_val := MAX(ROUND(value)) FROM civicrm_option_value WHERE option_group_id = @option_group_id_act;
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 
 INSERT INTO
