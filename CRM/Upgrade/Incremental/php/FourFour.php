@@ -96,7 +96,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
       }
     }
     if ($rev == '4.4.6'){
-     $postUpgradeMessage .= '<br /><br /><strong>'. ts('Your contact image urls have been upgraded. If your contact image urls did not follow the standard format for image Urls they have not been upgraded. Please check the log to see image urls that were not upgraded.'); 
+     $postUpgradeMessage .= '<br /><br /><strong>'. ts('Your contact image urls have been upgraded. If your contact image urls did not follow the standard format for image Urls they have not been upgraded. Please check the log to see image urls that were not upgraded.');
     }
   }
 
@@ -299,7 +299,7 @@ ALTER TABLE civicrm_dashboard
   END;
     ";
     CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
- 
+
     // CRM-13998 : missing alter statements for civicrm_report_instance
     $this->addTask(ts('Confirm civicrm_report_instance sql table for upgrades'), 'updateReportInstanceTable');
 
@@ -338,6 +338,7 @@ ALTER TABLE civicrm_dashboard
         $this->addTask($title, 'cleanupBackendImageUrls', $startId, $endId);
       }
     }
+    $this->addTask(ts('Update saved search information'), 'changeSavedSearch');
   }
 
   static function upgradeImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId){
@@ -361,11 +362,56 @@ ALTER TABLE civicrm_dashboard
             $failures[$dao->id] = $dao->image_url;
           }
         }
-        else{     
+        else{
             $failures[$dao->id] = $dao->image_url;
         }
       }
     CRM_Core_Error::debug_var('imageUrlsNotUpgraded', $failures);
+    return TRUE;
+  }
+
+  static function changeSavedSearch(CRM_Queue_TaskContext $ctx) {
+    $membershipStatuses = array_flip(CRM_Member_PseudoConstant::membershipStatus());
+
+    $dao = new CRM_Contact_DAO_SavedSearch();
+    $dao->find();
+    while ($dao->fetch()) {
+      $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($dao->id);
+      if (!empty($formValues['mapper'])) {
+        foreach ($formValues['mapper'] as $key => $value) {
+          foreach ($value as $k => $v) {
+            if ($v[0] == 'Membership' && in_array($v[1], array('membership_status', 'membership_status_id'))) {
+              $value = $formValues['value'][$key][$k];
+              $op = $formValues['operator'][$key][$k];
+              if ($op == 'IN') {
+                $value = trim($value);
+                $value = str_replace('(', '', $value);
+                $value = str_replace(')', '', $value);
+
+                $v = explode(',', $value);
+                $value = array();
+                foreach ($v as $k1 => $v2) {
+                  if (is_numeric($v2)) {
+                    break 2;
+                  }
+                  $value[$k1] = $membershipStatuses[$v2];
+                }
+                $formValues['value'][$key][$k] = "(" . implode(',', $value) . ")";
+              }
+              elseif (in_array($op, array('=', '!='))) {
+                if (is_numeric($value)) {
+                  break;
+                }
+                $formValues['value'][$key][$k] = $membershipStatuses[$value];
+              }
+            }
+          }
+        }
+        $dao->form_values = serialize($formValues);
+        $dao->save();
+      }
+    }
+
     return TRUE;
   }
 
@@ -691,13 +737,13 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
     CRM_Core_BAO_WordReplacement::rebuild();
   }
 
-  
+
   /***
    * CRM-13998 missing alter statements for civicrm_report_instance
    ***/
   public function updateReportInstanceTable() {
 
-    // add civicrm_report_instance.name 
+    // add civicrm_report_instance.name
 
     $sql = "SELECT count(*) FROM information_schema.columns "
       . "WHERE table_schema = database() AND table_name = 'civicrm_report_instance' AND COLUMN_NAME = 'name' ";
@@ -709,7 +755,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
       $res = CRM_Core_DAO::executeQuery($sql);
     }
 
-    // add civicrm_report_instance args 
+    // add civicrm_report_instance args
 
     $sql = "SELECT count(*) FROM information_schema.columns WHERE table_schema = database() AND table_name = 'civicrm_report_instance' AND COLUMN_NAME = 'args' ";
 
