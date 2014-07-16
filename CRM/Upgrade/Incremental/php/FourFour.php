@@ -775,7 +775,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
    * @return bool TRUE if $params is valid
    */
   static function isValidWordReplacement($params) {
-    $result = strlen($params['find_word']) <= self::MAX_WORD_REPLACEMENT_SIZE && strlen($params['replace_word']) > self::MAX_WORD_REPLACEMENT_SIZE;
+    $result = strlen($params['find_word']) <= self::MAX_WORD_REPLACEMENT_SIZE && strlen($params['replace_word']) <= self::MAX_WORD_REPLACEMENT_SIZE;
     if (!$result) {
       CRM_Core_Error::debug_var('invalidWordReplacement', $params);
     }
