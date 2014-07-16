@@ -69,7 +69,7 @@ function civicrm_api3_generic_setValue($apiRequest) {
     $entityDAO = new $dao_name();
     $entityDAO->copyValues($params);
     CRM_Utils_Hook::post('edit', $entity, $entityDAO->id, $entityDAO);
-    return civicrm_api3_create_success($entity);
+    return civicrm_api3_create_success($params);
   }
   else {
     return civicrm_api3_create_error("error assigning $field=$value for $entity (id=$id)");
