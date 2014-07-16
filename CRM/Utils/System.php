@@ -346,8 +346,8 @@ class CRM_Utils_System {
     // replace the &amp; characters with &
     // this is kinda hackish but not sure how to do it right
     $url = str_replace('&amp;', '&', $url);
-    header('Location: ' . $url);
-    self::civiExit();
+    $config = CRM_Core_Config::singleton();
+    $config->userSystem->redirect($status);
   }
 
   /**
@@ -1225,8 +1225,8 @@ class CRM_Utils_System {
   static function civiExit($status = 0) {
     // move things to CiviCRM cache as needed
     CRM_Core_Session::storeSessionObjects();
-
-    exit($status);
+    $config = CRM_Core_Config::singleton();
+    $config->userSystem->civiExit($status);
   }
 
   /**

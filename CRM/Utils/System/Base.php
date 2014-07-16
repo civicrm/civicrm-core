@@ -136,5 +136,18 @@ abstract class CRM_Utils_System_Base {
    */
   function userLoginFinalize($params = array()){
   }
+
+  function civiExit($status) {
+    exit($status);
+  }
+
+  function redirect($url = NULL) {
+    header('Location: ' . $url);
+    CRM_Utils_System::civiExit();
+  }
+
+  function statusBounce($status, $redirect = NULL) {
+    CRM_Utils_System::redirect($redirect);
+  }
 }
 
