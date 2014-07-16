@@ -65,58 +65,57 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     }
 
     $this->_columns = array(
-      'civicrm_contact' =>
-        array(
-          'dao' => 'CRM_Contact_DAO_Contact',
-          'fields' => array(
-            'sort_name' => array(
-              'title' => ts('Contact Name'),
-              'required' => TRUE,
-              'default' => TRUE,
-              'no_repeat' => TRUE,
-            ),
-            'id' => array(
-              'no_display' => TRUE,
-              'required' => TRUE,
-            ),
-            'first_name' => array(
-              'title' => ts('First Name'),
-            ),
-            'id' => array(
-              'no_display' => TRUE,
-              'required' => TRUE,
-            ),
-            'last_name' => array(
-              'title' => ts('Last Name'),
-            ),
-            'id' => array(
-              'no_display' => TRUE,
-              'required' => TRUE,
-            ),
-            'contact_type' => array(
-              'title' => ts('Contact Type'),
-            ),
-            'contact_sub_type' => array(
-              'title' => ts('Contact SubType'),
-            ),
+      'civicrm_contact' => array(
+        'dao' => 'CRM_Contact_DAO_Contact',
+        'fields' => array(
+          'sort_name' => array(
+            'title' => ts('Contact Name'),
+            'required' => TRUE,
+            'default' => TRUE,
+            'no_repeat' => TRUE,
           ),
-          'filters' => array(
-            'sort_name' => array(
-              'title' => ts('Contact Name'),
-              'operator' => 'like',
-            ),
-            'id' => array('no_display' => TRUE),
+          'id' => array(
+            'no_display' => TRUE,
+            'required' => TRUE,
           ),
-          'order_bys' => array(
-            'sort_name' => array(
-              'title' => ts('Last Name, First Name'),
-              'default' => '1',
-              'default_weight' => '0',
-              'default_order' => 'ASC'
-            ),
+          'first_name' => array(
+            'title' => ts('First Name'),
           ),
-          'grouping' => 'contact-fields',
+          'id' => array(
+            'no_display' => TRUE,
+            'required' => TRUE,
+          ),
+          'last_name' => array(
+            'title' => ts('Last Name'),
+          ),
+          'id' => array(
+            'no_display' => TRUE,
+            'required' => TRUE,
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact SubType'),
+          ),
         ),
+        'filters' => array(
+          'sort_name' => array(
+            'title' => ts('Contact Name'),
+            'operator' => 'like',
+          ),
+          'id' => array('no_display' => TRUE),
+        ),
+        'order_bys' => array(
+          'sort_name' => array(
+            'title' => ts('Last Name, First Name'),
+            'default' => '1',
+            'default_weight' => '0',
+            'default_order' => 'ASC'
+          ),
+        ),
+        'grouping' => 'contact-fields',
+      ),
       'civicrm_membership' => array(
         'dao' => 'CRM_Member_DAO_Membership',
         'fields' => array(
