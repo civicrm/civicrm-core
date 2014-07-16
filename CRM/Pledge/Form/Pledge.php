@@ -123,7 +123,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     //build custom data
     CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Pledge', $this->_id);
-
     $this->_values = array();
     // current pledge id
     if ($this->_id) {
@@ -137,36 +136,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       //get the honorID
       $this->_honorID = CRM_Utils_Array::value('honor_contact_id', $this->_values);
 
-      $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+      $this->_isPending = (CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($this->_id, CRM_Utils_Array::value('status_id', $this->_values))) ? FALSE : T;
 
-      //check for pending pledge.
-      if (CRM_Utils_Array::value('status_id', $this->_values) ==
-        array_search('Pending', $paymentStatusTypes)
-      ) {
-        $this->_isPending = TRUE;
-      }
-      elseif (CRM_Utils_Array::value('status_id', $this->_values) ==
-        array_search('Overdue', $paymentStatusTypes)
-      ) {
-
-        $allPledgePayments = array();
-        CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment',
-          'pledge_id',
-          $this->_id,
-          $allPledgePayments,
-          array('status_id')
-        );
-
-        foreach ($allPledgePayments as $key => $value) {
-          $allStatus[$value['id']] = $paymentStatusTypes[$value['status_id']];
-        }
-
-        if (count(array_count_values($allStatus)) <= 2) {
-          if (CRM_Utils_Array::value('Pending', array_count_values($allStatus))) {
-            $this->_isPending = TRUE;
-          }
-        }
-      }
     }
 
     //get the pledge frequency units.
@@ -174,6 +145,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
   }
+
 
   /**
    * This function sets the default values for the form.
