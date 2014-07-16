@@ -445,7 +445,6 @@ class CiviCRM_For_WordPress {
       return;
     }
 
-    $alreadyInvoked = TRUE;
     if ( ! $this->initialize() ) {
       return '';
     }
@@ -494,6 +493,7 @@ class CiviCRM_For_WordPress {
     if ( $this->isPageRequest() && !in_the_loop() && !is_admin() ) {
       return;
     }
+    $alreadyInvoked = TRUE;
 
     // do the business
     CRM_Core_Invoke::invoke($args);
