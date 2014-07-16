@@ -1,0 +1,146 @@
+
+
+<div>
+
+    {{tab_val}}
+    <div ui-jq="tabs" id="alltabs" >
+        <ul>
+
+            <li><a href="#tabs-1" ng-click="campaign_clicked()" >Campaign</a></li>
+            <li><a href="#tabs-2" ng-click="compose_clicked()">Compose</a></li>
+            <li><a href="#tabs-3" ng-click="rec_clicked()">Recipients and Winner Criteria</a> </li>
+            <li><a href="#tabs-4" ng-click="preview_clicked()">Preview and Send</a></li>
+        </ul>
+
+        <div  id="tabs-1" >
+
+            <form name="myForm" >
+
+                <h3> What would you like to test ?</h3><br><br>
+
+                &nbsp <input type="radio" ng-model="template" ng-value="templates[0]">  Subject Lines <br/><br>
+                &nbsp <input type="radio" ng-model="template" ng-value="templates[1]"> From Names <br/><br>
+                &nbsp <input type="radio" ng-model="template" ng-value="templates[2]"> Two different Emails <br/><br>
+                &nbsp <div style="position:relative; left:250px;" nextbutton></div>
+            </form>
+        </div>
+
+        <div id="tabs-2"  >
+
+            <form>
+            <div  ng-include="template.url">
+            </div>
+                <div style="position:relative; left:200px; top:30px;" prevbutton></div><div style="position:relative; left:300px;"nextbutton></div>
+            </form>
+        </div>
+
+        <div id="tabs-3">
+
+            <form name="impform"  novalidate>
+                <h3>Select the groups you would like to add</h3><br>
+                &nbsp<select multiple groupselect required name ="grps" required ng-model="groups_selected">
+                <option ng-repeat="grp in groups" value={{grp.title}} >{{grp.title}}</option>
+            </select><br><br>
+
+
+                <h3>Select the size of your test group</h3><br>
+                &nbsp Percentage Selected - {{slide_value}}%
+
+                <div sliderbar id="trial" style="margin: 10px;"></div>
+
+                <h3 style="text-decoration: underline;">How will the winner be decided</h3><br>
+                &nbsp <input type="radio" ng-model="winner_criteria" value="Open" name="cri" required> Open <br/><br>
+                &nbsp <input type="radio" ng-model="winner_criteria" value="Total Unique Clicks" name="cri" checked="checked" > Total Unique Clicks <br/><br>
+                &nbsp <input type="radio" ng-model="winner_criteria" value="Total Clicks on a particular link" name="cri" > Total Clicks on a particular link <br/><br>
+
+                <h3>Do you want the A/B test to be automated </h3>
+                &nbsp<input type="radio" ng-model="automated" value="Yes" ng-click="setifyes(1)" name="auto" required>Yes &nbsp
+                &nbsp<input type="radio" ng-model="automated" value="No" ng-click="setifyes(2)" name="auto" checked="checked"> No <br/><br>
+
+                <tpmax ng-show="ifyes">
+
+                    <h3> Please enter the confidence level at which a decision can be made</h3>
+                    &nbsp &nbsp <input type="text" style="height: 20px; width: 25px;" ng-model="conf" numbar=99 ><br><br>
+                    <div ng-show="conf==null || conf ==0 || conf>99" style="color: red;">&nbsp Please Enter a Valid Number</div>
+
+                    <h3>If the confidence level is not reached what do you want us to do?</h3>
+                    &nbsp <input type="radio" ng-model="ifnot" value="Inform me" name="ifnot"/> Inform me <br/><br>
+                    &nbsp <input type="radio" checked="checked" ng-model="ifnot" value="Send Version A" name="ifnot" /> Send Version A <br/><br>
+                    &nbsp <input type="radio" ng-model="ifnot" value="Send Version B" name="ifnot"/> Send Version B <br/><br>
+
+
+                    <div nextbutton></div>
+
+                </tpmax>
+
+                <h3>Declare the winner in how much time?</h3><br>
+                &nbsp <input type="text" style="height: 20px; width: 15px;" ng-model="days" numbar=7 name="d"> Days
+                &nbsp <input type="text" style="height: 20px; width: 15px;" ng-model="hours" numbar=23 name="h"> Hours
+                &nbsp <input type="text" style="height: 20px; width: 15px;" ng-model="minutes" numbar=59 name="m"> Minutes
+                <div ng-show="((days == null || days ==0 ) && (hours==null|| hours == 0 ) && (minutes==null || minutes ==0 )|| days>99 || minutes>59 || hours >23) " style="color: red;">&nbsp Please a Valid Time</div>
+                <br>
+                <br>
+
+
+                <div style="position:relative; left:200px; top:30px;" prevbutton></div><div style="position:relative; left:300px;"nextbutton></div>
+
+            </form>
+        </div>
+
+        <div id="tabs-4">
+
+            <h3>Details</h3><br>
+            <table>
+            <tr>
+                <td>Test Criteria</td>
+                <td>{{template.name}}</td>
+            </tr>
+            <tr>
+                 <td>Groups Selected</td>
+                 <td>{{groups_selected}}</td>
+            </tr>
+            <tr>
+                 <td>Size of Test Group</td>
+                 <td>{{slide_value}}</td>
+            </tr>
+            <tr>
+                 <td>Winner Criteria</td>
+                 <td>{{winner_criteria}}</td>
+            </tr>
+            <tr>
+                 <td>Automated</td>
+                 <td>{{automated}}</td>
+            </tr>
+            <tr ng-show="automated=='Yes'">
+                 <td>Minum Confidence Level</td>
+                 <td>{{conf}}%</td>
+            </tr>
+            <tr ng-show="automated=='Yes'">
+                 <td>If Level not Achieved</td>
+                 <td>{{ifnot}}</td>
+            </tr>
+            <tr>
+                 <td>Declare Winner in</td>
+                 <td>{{days}} Days {{hours}} Hours {{minutes}} Minutes</td>
+            </tr>
+            </table>
+
+            <h3><a href="#">Preview Mailing</a></h3><br>
+
+            <h3>When to Start</h3><br>
+            <div>
+            <input type="radio" name="Start" ng-model="start" value="now"> Now &nbsp
+            <input type="radio" name="Start"  ng-model="start" value="later"> Later
+
+            &nbsp &nbsp <input type="text" datepick class = "dateplugin" ng-show="start=='later'" ng-model="send_date" >
+            </div>
+            <br><br>
+            <div>
+            <div style="position:relative; left:200px; top:30px;" prevbutton></div><div class="crm-submit-buttons"  style="position:relative; left:300px;">
+            <div class = "crm-button crm-button-type-upload crm-button_qf_Contact_upload_view"   >
+                <input type="submit" value="Submit & Send"  id="campaignbutton _qf_Contact_upload_view-top" class="btn btn-primary" nexttab={{tab_val}}>
+                </div></div></div>
+
+        </div>
+    </div>
+</div>

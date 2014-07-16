@@ -55,6 +55,31 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     );
   }
 
+  public function getAngularModules() {
+      $result = array();
+      $result['crmMailingAB'] = array(
+        'ext' => 'civicrm',
+        'js' => array('js/angular-crmMailingAB.js'),
+        'css' => array('css/angular-crmMailingAB.css'),
+      );
+
+      $compMails = civicrm_api3('Mailing', 'get', array());
+      $campNames = civicrm_api3('Campaign', 'get', array());
+      $vargroups = civicrm_api3('Group', 'get', array());
+
+      CRM_Core_Resources::singleton()->addSetting(array(
+        'crmMailing' => array(
+          'compMails' => array_values($compMails['values']),
+          'campNames' => array_values($campNames['values']),
+          'vargroups' => array_values($vargroups['values']),
+          ),
+        ));
+
+
+      return $result;
+    }
+
+
   /**
    * @return bool
    */
