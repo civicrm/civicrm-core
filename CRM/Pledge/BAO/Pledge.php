@@ -1076,5 +1076,56 @@ SELECT  pledge.contact_id              as contact_id,
     }
     return $paymentIDs;
   }
+
+  /**
+   * Is this pledge free from financial transactions (this is important to know as we allow editing
+   * when no transactions have taken place - the editing process currently involves deleting all pledge payments & contributions
+   * & recreating so we want to block that if appropriate
+   *
+   * @param integer $pledgeID
+   * @return bool do financial transactions exist for this pledge?
+   */
+   static function pledgeHasFinancialTransactions($pledgeID, $pledgeStatusID) {
+    if (empty($pledgeStatusID)) {
+      //why would this happen? If we can see where it does then we can see if we should look it up
+      //but assuming from form code it CAN be empty
+      return TRUE;
+    }
+    if (self::isTransactedStatus($pledgeStatusID)) {
+      return TRUE;
+    }
+
+    return civicrm_api3('pledge_payment', 'getcount', array('pledge_id' => $pledgeID, 'status_id' => array('IN' => self::getTransactionalStatus())));
+    }
+
+  /**
+   * Does this pledge / pledge payment status mean that a financial transaction has taken place?
+   * @param int $statusID pledge status id
+   *
+   * @return bool is it a transactional status?
+   */
+  protected static function isTransactedStatus($statusID) {
+    if (!in_array($statusID, self::getNonTransactionalStatus())) {
+      return TRUE;
+    }
+  }
+
+  /**
+   * Get array of non transactional statuses
+   * @return array non transactional status ids
+   */
+  protected static function getNonTransactionalStatus() {
+    $paymentStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    return array_flip(array_intersect($paymentStatus, array('Overdue', 'Pending')));
+  }
+
+  /**
+   * Get array of non transactional statuses
+   * @return array non transactional status ids
+   */
+  protected static function getTransactionalStatus() {
+    $paymentStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    return array_diff(array_flip($paymentStatus), self::getNonTransactionalStatus());
+  }
 }
 
