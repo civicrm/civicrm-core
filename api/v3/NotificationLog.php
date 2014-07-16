@@ -22,6 +22,7 @@ function civicrm_api3_notification_log_retry($params) {
       $payPal->main();
     }
   }
+  return civicrm_api3_create_success(array(), $params);
 }
 
 function _civicrm_api3_notification_log_retry_spec(&$params) {
