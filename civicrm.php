@@ -416,11 +416,15 @@ class CiviCRM_For_WordPress {
     }
     $args = array_pad($args, 2, '');
 
+    // FIXME: It's not sustainable to hardcode a whitelist of all of non-HTML
+    // pages. Maybe the menu-XML should include some metadata to make this
+    // unnecessary?
     if (CRM_Utils_Array::value('HTTP_X_REQUESTED_WITH', $_SERVER) == 'XMLHttpRequest'
         || ($args[0] == 'civicrm' && in_array($args[1], array('ajax', 'file')) )
         || !empty($_REQUEST['snippet'])
         || strpos($argString, 'civicrm/event/ical') === 0 && empty($_GET['html'])
-      ) {
+        || strpos($argString, 'civicrm/contact/imagefile') === 0
+    ) {
       return FALSE;
     }
     else {
@@ -441,7 +445,6 @@ class CiviCRM_For_WordPress {
       return;
     }
 
-    $alreadyInvoked = TRUE;
     if ( ! $this->initialize() ) {
       return '';
     }
@@ -490,6 +493,7 @@ class CiviCRM_For_WordPress {
     if ( $this->isPageRequest() && !in_the_loop() && !is_admin() ) {
       return;
     }
+    $alreadyInvoked = TRUE;
 
     // do the business
     CRM_Core_Invoke::invoke($args);
