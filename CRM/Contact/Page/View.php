@@ -167,7 +167,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
         $image_URL = str_replace('http://', 'https://', $image_URL);
       }
 
-      list($imageWidth, $imageHeight) = getimagesize($image_URL);
+      list($imageWidth, $imageHeight) = getimagesize(CRM_Utils_String::unstupifyUrl($image_URL));
       list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
       $this->assign("imageWidth", $imageWidth);
       $this->assign("imageHeight", $imageHeight);

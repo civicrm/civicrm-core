@@ -230,14 +230,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @static
    */
   public function getLoginURL($destination = '') {
-    $config = CRM_Core_Config::singleton();
-    $loginURL = $config->userFrameworkBaseURL;
-    $loginURL .= 'user';
-    if (!empty($destination)) {
-      // append destination so user is returned to form they came from after login
-      $loginURL .= '?destination=' . urlencode($destination);
-    }
-    return $loginURL;
+    $query = $destination ? array('destination' => $destination) : array();
+    return url('user', array('query' => $query));
   }
 
 
