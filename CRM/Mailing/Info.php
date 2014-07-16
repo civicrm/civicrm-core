@@ -63,15 +63,31 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'css' => array('css/angular-crmMailingAB.css'),
       );
 
-      $compMails = civicrm_api3('Mailing', 'get', array());
+
+      $civiMails = civicrm_api3('Mailing', 'get', array());
       $campNames = civicrm_api3('Campaign', 'get', array());
-      $vargroups = civicrm_api3('Group', 'get', array());
+      $mailStatus = civicrm_api3('MailingJob', 'get', array());
+      $groupNames = civicrm_api3('Group', 'get', array());
+      $headerfooterList = civicrm_api3('MailingComponent', 'get', array());
+      $emailAdd = civicrm_api3('Email', 'get', array(
+      'sequential' => 1,
+      'return' => "email",
+      'contact_id' => 202,
+      ));
+      $mesTemplate = civicrm_api3('MessageTemplate', 'get', array( 'sequential' => 1,
+      'return' => array("msg_html", "id", "msg_title"),
+      'id' => array('>' => 58),
+      ));
 
       CRM_Core_Resources::singleton()->addSetting(array(
         'crmMailing' => array(
-          'compMails' => array_values($compMails['values']),
+          'civiMails' => array_values($civiMails['values']),
           'campNames' => array_values($campNames['values']),
-          'vargroups' => array_values($vargroups['values']),
+          'mailStatus' => array_values($mailStatus['values']),
+          'groupNames' => array_values($groupNames['values']),
+          'headerfooterList' => array_values($headerfooterList['values']),
+          'mesTemplate' => array_values($mesTemplate['values']),
+          'emailAdd' => array_values($emailAdd['values']),
           ),
         ));
 

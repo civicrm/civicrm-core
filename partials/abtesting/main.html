@@ -49,8 +49,8 @@
                 <select multiple groupselect ng-model="incGroup">
                     <option id= "1" ng-repeat="grp in groups" value="{{grp.id}} group include" > {{grp.title}} </option>
                     <option ng-repeat="grp in groups" value="{{grp.id}} group exclude" > {{grp.title}} </option>
-                    <option ng-repeat="ml in mailList| filter:isCompMail" value="{{ml.id}} mail include" > {{ml.name}} </option>
-                    <option ng-repeat="ml in mailList| filter:isCompMail" value="{{ml.id}} mail exclude" > {{ml.name}} </option>
+                    <option ng-repeat="ml in mailList" value="{{ml.id}} mail include" > {{ml.name}} </option>
+                    <option ng-repeat="ml in mailList" value="{{ml.id}} mail exclude" > {{ml.name}} </option>
                 </select>
                 <br> <br><br><br>
 

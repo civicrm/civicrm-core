@@ -37,9 +37,7 @@
                 templateUrl: partialUrl('main.html'),
                 controller: 'TabsDemoCtrl',
                 resolve: {
-                    metaData: function($route, crmApi) {
-                        return crmApi('Group', 'get', {});
-                    },
+
                     mailingList: function($route, crmApi) {
                         return crmApi('Mailing', 'get', {});
                     }
@@ -51,10 +49,11 @@
     // Add a new record by name.
     // Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
 
-    crmMailingAB.controller('TabsDemoCtrl', function($scope, crmApi, metaData, mailingList) {
+    crmMailingAB.controller('TabsDemoCtrl', function($scope, crmApi) {
 
-        $scope.groups = metaData.values;
-        $scope.mailings = mailingList.values;
+        $scope.groups= CRM.crmMailing.groupNames;
+        $scope.mailList = CRM.crmMailing.civiMails;
+
         $scope.tab_val=0;
         $scope.max_tab=0;
         $scope.campaign_clicked= function(){
@@ -189,8 +188,6 @@
        return {
            restrict : 'AE',
            link: function(scope,element, attrs){
-               $(element).select2({width:"400px",placeholder: "Select the groups you wish to include"});
-               $(element).select2("data",groups)
                function format(item) {
                    if(!item.id) {
                        // return `text` for optgroup
