@@ -2049,6 +2049,9 @@ SELECT civicrm_contact.id as casemanager_id,
       $search = ($config->includeWildCardInName) ? "%$sortName%" : "$sortName%";
       $where[] = "( sort_name LIKE '$search' )";
     }
+    if ($cid = CRM_Utils_Array::value('contact_id', $params)) {
+      $where[] = " c.id = $cid ";
+    }
     if (is_array($excludeCaseIds) &&
       !CRM_Utils_System::isNull($excludeCaseIds)
     ) {

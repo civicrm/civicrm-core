@@ -53,6 +53,9 @@
         formatSelection: function(row) {
           return row.label;
         },
+        initSelection: function($el, callback) {
+          callback($el.data('value'));
+        },
         ajax: {
           url: {/literal}"{crmURL p='civicrm/case/ajax/unclosed' h=0}"{literal},
           data: function(term) {
