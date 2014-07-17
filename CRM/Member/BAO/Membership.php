@@ -2361,7 +2361,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
           );
         }
 
-        return $membership;
+        return array($membership, $renewalMode, $dates);
       }
 
       // Check and fix the membership if it is STALE
