@@ -361,7 +361,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     extract( ( is_null($configs) ) ? self::getProfileSelectorTypes() : $configs );
     $element = $prefix . "custom_post_id_multiple[$count]";
     $label .= '<br />'.ts('(bottom of page)');
-    $form->addProfileSelector( $element,  $label, $allowCoreTypes, $allowSubTypes, $profileEntitites);
+    $form->addProfileSelector( $element,  $label, $allowCoreTypes, $allowSubTypes, $profileEntities);
   }
 
   /**
