@@ -74,10 +74,10 @@ class CRM_Case_BAO_Query {
       $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['civicrm_case_type'])) {
+    if (!empty($query->_returnProperties['case_type'])) {
       $query->_select['case_type'] = "civicrm_case_type.title as case_type";
       $query->_element['case_type'] = 1;
-      $query->_tables['civicrm_case_type'] = $query->_whereTables['civicrm_case_type'] = 1;
+      $query->_tables['case_type'] = $query->_whereTables['case_type'] = 1;
       $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
     }
 
