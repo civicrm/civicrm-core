@@ -943,5 +943,18 @@ class CRM_Utils_Array {
 
     return $results;
   }
+
+  /**
+   * Get the first elemnet of an array
+   *
+   * @param array $array
+   * @return mixed|NULL
+   */
+  static function first($array) {
+    foreach ($array as $value) {
+      return $value;
+    }
+    return NULL;
+  }
 }
 
