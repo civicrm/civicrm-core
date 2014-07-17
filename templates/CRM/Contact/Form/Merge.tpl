@@ -135,9 +135,6 @@
 The user record associated with the duplicate contact will not be deleted, but will be un-linked from the associated contact record (which will be deleted).
 You will need to manually delete that user (click on the link to open Drupal User account in new screen). You may need to give thought to how you handle any content or contents associated with that user.{/ts}</strong></p>
     {/if}
-    {if $other_contact_subtype}
-      <p><strong>The duplicate contact (the one that will be deleted) is a <em>{$other_contact_subtype}</em>. Any data related to this will be lost forever (there is no undo) if you complete the merge.</strong></p>
-    {/if}
 </div>
 
 <div class="crm-submit-buttons">{if $prev}<a href="{$prev}" class="button"><span>{ts}<< Prev{/ts}</span></a>{/if}{include file="CRM/common/formButtons.tpl" location="bottom"}{if $next}<a href="{$next}" class="button"><span>{ts}Next >>{/ts}</span></a>{/if}</div>
