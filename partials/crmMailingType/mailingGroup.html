@@ -5,11 +5,11 @@ MailingGroup api needs to be improved to bind the chosen groups
 -->
 
 <br>
-<select multiple chsgroup ng-model="incGroup">
-	<option id= "1" ng-repeat="grp in groupNamesList| filter: isGrp" value="{{grp.id}} group include" > {{grp.title}} </option>
-	<option ng-repeat="grp in groupNamesList| filter: isGrp" value="{{grp.id}} group exclude" > {{grp.title}} </option>
-	<option ng-repeat="ml in mailList| filter:isCompMail" value="{{ml.id}} mail include" > {{ml.name}} </option>
-	<option ng-repeat="ml in mailList| filter:isCompMail" value="{{ml.id}} mail exclude" > {{ml.name}} </option>
+<select chsgroup multiple ng-model="incGroup">
+	<option ng-repeat="grp in groupNamesList| filter: isGrp" value="{{grp.id}} civicrm_group include" > {{grp.title}} </option>
+	<option ng-repeat="grp in groupNamesList| filter: isGrp" value="{{grp.id}} civicrm_group exclude" > {{grp.title}} </option>
+	<option ng-repeat="ml in mailList| filter:isCompMail" value="{{ml.id}} civicrm_mailing include" > {{ml.name}} </option>
+	<option ng-repeat="ml in mailList| filter:isCompMail" value="{{ml.id}} civicrm_mailing exclude" > {{ml.name}} </option>
 </select>
 <br> <br>
 

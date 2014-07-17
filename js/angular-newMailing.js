@@ -5,8 +5,8 @@
   };
 
   var crmMailing = angular.module('crmMailing', ['ngRoute', 'ui.utils']);
-  var incGroup = [];
-
+  var chck = []; //to fill the group variable $scope.incGroup
+  var chck2= []; // to get id and text in the required format
 
 //-------------------------------------------------------------------------------------------------------
  crmMailing.config(['$routeProvider',
@@ -70,16 +70,66 @@
 		$scope.headerfooter = CRM.crmMailing.headerfooterList;
 		$scope.eMailing = CRM.crmMailing.emailAdd;
 		$scope.tmpList = CRM.crmMailing.mesTemplate;
+		$scope.mailingGrp = CRM.crmMailing.mailGrp;
 		$scope.currentMailing = selectedMail;
 		$scope.testGroup = "";
 		window.ct = $scope.currentMailing;
 		$scope.param = {};
 		$scope.tst="";
+		chck = [];
+		chck2 = [];
+		$scope.mailid = [];
+		for(var a in $scope.mailingGrp){
+			if($scope.mailingGrp[a].mailing_id==$scope.currentMailing.id){
+				var b = $scope.mailingGrp[a].entity_id + " " + $scope.mailingGrp[a].entity_table +" " + $scope.mailingGrp[a].group_type;
+				var c = $scope.mailingGrp[a].id;
+				chck.push(b);
+				$scope.mailid.push(c);
+			}
+		}
 		
+		for(var a = 0; a<chck.length; a++){
+					var b = chck[a];
+					for(var c= a+1; c<chck.length; c++){
+							if(b==chck[c]){
+								chck.splice(c,1);
+								}
+					}
+				}
+		console.log(chck);
+		console.log($scope.mailid);			
 		if($scope.currentMailing.msg_template_id!=null){
 				$scope.tst=$scope.currentMailing.msg_template_id;
 				}
 		console.log($scope.tst);
+		
+		//Making the object for data
+		
+		for(var a in chck)
+		{	var b ={}
+			b.id = chck[a];
+		 	var splt = chck[a].split(" ");
+		 	
+			if(splt[1] == "civicrm_group"){
+						for(var c in $scope.groupNamesList){
+							if($scope.groupNamesList[c].id==splt[0]){
+								b.text = $scope.groupNamesList[c].title;
+							}
+						}
+					}
+			if(splt[1] == "civicrm_mailing"){
+						for(var c in $scope.mailList){
+							if($scope.mailList[c].id==splt[0]){
+								b.text = $scope.mailList[c].name;
+							}
+						}
+					}
+			chck2.push(b);
+		}
+		
+		console.log(chck2);	
+		$scope.incGroup = chck2;
+		
     
 		$scope.mailingForm = function() {
 			if ($scope.mailing_form.$valid) {
@@ -95,9 +145,9 @@
 		};
 
 		$scope.tmp = function (tst){
-			console.log(tst);
 			$scope.currentMailing.msg_template_id=tst;
-			if($scope.currentMailing.msg_template_id == ""){
+			console.log($scope.currentMailing.msg_template_id+ "sasas");
+			if($scope.currentMailing.msg_template_id == null){
 				$scope.currentMailing.body_html="";
 			}
 			else{
@@ -114,7 +164,7 @@
 			console.log(testGroup);
 		};
 		
-
+ 
 	//initializing variables we will use for checkboxes, or for purpose of ng-show
 		$scope.acttab=0;
 		$scope.composeS="1";
@@ -209,7 +259,7 @@
 		};
 		
 		$scope.upload = function(){
-			console.log($scope.param.file);
+			console.log($scope.param.file_1.type);
 			};
 		
 		$scope.upload_2 = function(){
@@ -222,26 +272,27 @@
 				
 			
 		$scope.save = function() {
-				console.log($scope.scheddate.date)
+				console.log($scope.currentMailing.msg_template_id);
+				console.log($scope.scheddate.date);
 				$scope.incGrp=[];
 				$scope.excGrp=[];
 				$scope.incMail=[];
 				$scope.excMail=[];
-				console.log(incGroup);
+				console.log(chck);
 				$scope.answer="";
-				for(req_id in incGroup){
-					$scope.answer = incGroup[req_id].split(" ");
+				for(req_id in chck){
+					$scope.answer = chck[req_id].split(" ");
 			
-					if($scope.answer[1] == "mail" && $scope.answer[2]=="include"){
+					if($scope.answer[1] == "civicrm_mailing" && $scope.answer[2]=="include"){
 						$scope.incMail.push($scope.answer[0]);
 						}
-					else if($scope.answer[1] == "mail" && $scope.answer[2]=="exclude"){
+					else if($scope.answer[1] == "civicrm_mailing" && $scope.answer[2]=="exclude"){
 						$scope.excMail.push($scope.answer[0]);
 						}
-					if($scope.answer[1] == "group" && $scope.answer[2]=="include"){
+					if($scope.answer[1] == "civicrm_group" && $scope.answer[2]=="include"){
 						$scope.incGrp.push($scope.answer[0]);
 						}
-					else if($scope.answer[1] == "group" && $scope.answer[2]=="exclude"){
+					else if($scope.answer[1] == "civicrm_group" && $scope.answer[2]=="exclude"){
 						$scope.excGrp.push($scope.answer[0]);
 						}
 				}
@@ -274,13 +325,21 @@
 				else {
 						$scope.currentMailing.scheduled_date= null;
 				}
+				if($scope.mailid != null){
+					for(var a in $scope.mailid){
+						var result_2= crmApi('MailingGroup', 'delete', {
+								"id": $scope.mailid[a]
+							})
+					}
+				}
+				
 				var result = crmApi('Mailing', 'create', {
 					id: $scope.currentMailing.id,
 					name: $scope.currentMailing.name, 
 					visibility:  $scope.currentMailing.visibility, 
 					created_id: $scope.currentMailing.created_id, 
 					subject: $scope.currentMailing.subject, 
-					msg_template_id: $scope.currentMailing.msg_template_id,
+					msg_template_id: $scope.currentMailing.msg_template_id==null ? "" : $scope.currentMailing.msg_template_id,
 					open_tracking: $scope.currentMailing.open_tracking,
 					url_tracking: $scope.currentMailing.url_tracking,
 					forward_replies: $scope.currentMailing.forward_replies,
@@ -294,7 +353,7 @@
 					body_text: $scope.currentMailing.body_text,
 					scheduled_date: $scope.currentMailing.scheduled_date,
 					scheduled_id: $scope.currentMailing.scheduled_id,
-					campaign_id:	$scope.currentMailing.campaign_id,
+					campaign_id:	$scope.currentMailing.campaign_id==null ? "" : $scope.currentMailing.campaign_id,
 					header_id:	$scope.currentMailing.header_id,
 					footer_id:	$scope.currentMailing.footer_id,
 					groups: {include: $scope.incGrp,
@@ -350,7 +409,7 @@
 
 	// Select 2 Widget for selecting the group 
 	crmMailing.directive('chsgroup',function(){
-		return {
+		return { 
 			restrict : 'AE',
 			link: function(scope,element, attrs){
 			   function format(item) {
@@ -360,32 +419,47 @@
           }
           // return item template
           var a = item.id.split(" ");
-          if(a[1]=="group" && a[2]=="include")
+          if(a[1]=="civicrm_group" && a[2]=="include")
 						return "<img src='../../sites/all/modules/civicrm/i/include.jpeg' height=12 width=12/>" + "   " + "<img src='../../sites/all/modules/civicrm/i/group.png' height=12 width=12/>" + item.text;
-				  if(a[1]=="group" && a[2]=="exclude")
+				  if(a[1]=="civicrm_group" && a[2]=="exclude")
 						return "<img src='../../sites/all/modules/civicrm/i/Error.gif' height=12 width=12/>" + "   " + "<img src='../../sites/all/modules/civicrm/i/group.png' height=12 width=12/>" + item.text;
-					if(a[1]=="mail" && a[2]=="include")
+					if(a[1]=="civicrm_mailing" && a[2]=="include")
 						return "<img src='../../sites/all/modules/civicrm/i/include.jpeg' height=12 width=12/>" + "   "  + "<img src='../../sites/all/modules/civicrm/i/EnvelopeIn.gif' height=12 width=12/>" + item.text;
-					if(a[1]=="mail" && a[2]=="exclude")
+					if(a[1]=="civicrm_mailing" && a[2]=="exclude")
 						return "<img src='../../sites/all/modules/civicrm/i/Error.gif' height=12 width=12/>" + "   " + "<img src='../../sites/all/modules/civicrm/i/EnvelopeIn.gif' height=12 width=12/>" + item.text;
         }
 
 			$(element).select2({
 				width:"400px",
-				placeholder: "Choose Recipients",
 				formatResult: format,
 				formatSelection: format,
-				escapeMarkup: function(m) { return m; }
-				});
+				escapeMarkup: function(m) { return m; },
+				}).select2("data", scope.incGroup);
+
+
+				$(element).on("select2-opening", function()
+				 { 	scope.incGroup=chck;
+						console.log(scope.incGroup);
+						scope.$apply();
+				 
+				 });
+				 
 			$(element).on('select2-selecting', function(e) {
-					incGroup.push(e.val);
-          console.log(incGroup);
+					chck.push(e.val);
+          scope.incGroup=chck;
+          scope.$apply();
+          console.log(scope.incGroup);
+
         });
+        
         $(element).on("select2-removed", function(e) {
-          var index = incGroup.indexOf(e.val);
-          incGroup.splice(index, 1);
-          console.log(incGroup);
+          var index = chck.indexOf(e.val);
+          chck.splice(index, 1);
+          scope.incGroup=chck;
+          console.log(scope.incGroup);
+          scope.$apply();
         });
+
 			}
 		};
 	}); 
@@ -416,8 +490,9 @@
 					link: function(scope, el, attrs){
 							el.bind('change', function(event){
 									var files = event.target.files;
+									console.log(event);
 									var file = files[0];
-									scope.file = file ? file.name : undefined;
+									scope.file = file ? file : undefined;
 									scope.$apply();
 							});
 					}
