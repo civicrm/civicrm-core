@@ -348,7 +348,7 @@ CRM.strings = CRM.strings || {};
           }
         },
         minimumInputLength: 1,
-        formatResult: formatSelect2Result,
+        formatResult: CRM.utils.formatSelect2Result,
         formatSelection: function(row) {
           return row.label;
         },
@@ -441,7 +441,7 @@ CRM.strings = CRM.strings || {};
     });
   };
 
-  function formatSelect2Result(row) {
+  CRM.utils.formatSelect2Result = function (row) {
     var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
       markup += '<div class="crm-select2-image"><img src="' + row.image + '"/></div>';
@@ -449,14 +449,14 @@ CRM.strings = CRM.strings || {};
     else if (row.icon_class) {
       markup += '<div class="crm-select2-icon"><div class="crm-icon ' + row.icon_class + '-icon"></div></div>';
     }
-    markup += '<div><div class="crm-select2-row-label">' + row.label + '</div>';
+    markup += '<div><div class="crm-select2-row-label '+(row.label_class || '')+'">' + row.label + '</div>';
     markup += '<div class="crm-select2-row-description">';
     $.each(row.description || [], function(k, text) {
       markup += '<p>' + text + '</p>';
     });
     markup += '</div></div></div>';
     return markup;
-  }
+  };
 
   function formatSelect2CreateLinks($el) {
     var

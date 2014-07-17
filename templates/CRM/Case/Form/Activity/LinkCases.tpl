@@ -37,6 +37,10 @@
     $('input[name=link_to_case_id]', $form).crmSelect2({
       placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
       minimumInputLength: 1,
+      formatResult: CRM.utils.formatSelect2Result,
+      formatSelection: function(row) {
+        return row.label;
+      },
       ajax: {
         url: {/literal}"{crmURL p='civicrm/case/ajax/unclosed' h=0}"{literal},
         data: function(term) {
