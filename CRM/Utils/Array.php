@@ -737,11 +737,13 @@ class CRM_Utils_Array {
    */
   static function collect($prop, $records) {
     $result = array();
-    foreach ($records as $key => $record) {
-      if (is_object($record)) {
-        $result[$key] = $record->{$prop};
-      } else {
-        $result[$key] = $record[$prop];
+    if (is_array($records)) {
+      foreach ($records as $key => $record) {
+        if (is_object($record)) {
+          $result[$key] = $record->{$prop};
+        } else {
+          $result[$key] = $record[$prop];
+        }
       }
     }
     return $result;
