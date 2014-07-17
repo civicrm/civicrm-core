@@ -4714,7 +4714,8 @@ span.crm-status-icon {
   background-position: -101px -222px;background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
 }
 
-.crm-container .survey-completed {
+.crm-container .survey-completed,
+.crm-container .strikethrough {
   text-decoration: line-through;
 }
 
