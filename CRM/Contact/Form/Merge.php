@@ -195,12 +195,6 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
 
     $this->assign('contact_type', $main['contact_type']);
-    if (!empty($main['contact_sub_type'])) {
-      $this->assign('main_contact_subtype', $main['contact_sub_type_display']);
-    }
-    if (!empty($other['contact_sub_type'])) {
-      $this->assign('other_contact_subtype', $other['contact_sub_type_display']);
-    }
     $this->assign('main_name', $main['display_name']);
     $this->assign('other_name', $other['display_name']);
     $this->assign('main_cid', $main['contact_id']);
