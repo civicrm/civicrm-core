@@ -194,19 +194,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('The other contact record does not exist'));
     }
 
-    $subtypes = CRM_Contact_BAO_ContactType::subTypePairs(NULL, TRUE, '');
-
     $this->assign('contact_type', $main['contact_type']);
-    if (!empty($main['contact_sub_type'])) {
-      $this->assign('main_contact_subtype',
-        CRM_Utils_Array::value($main['contact_sub_type'][0], $subtypes)
-      );
-    }
-    if (!empty($other['contact_sub_type'])) {
-      $this->assign('other_contact_subtype',
-        CRM_Utils_Array::value($other['contact_sub_type'][0], $subtypes)
-      );
-    }
     $this->assign('main_name', $main['display_name']);
     $this->assign('other_name', $other['display_name']);
     $this->assign('main_cid', $main['contact_id']);

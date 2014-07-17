@@ -816,6 +816,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       CRM_Core_DAO::freeResult();
     }
 
+    // get all contact subtypes
+    $contactSubTypes = CRM_Contact_BAO_ContactType::subTypePairs(NULL, TRUE, '');
+
     // FIXME: there must be a better way
     foreach (array('main', 'other') as $moniker) {
       $contact = &$$moniker;
@@ -823,6 +826,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $value = empty($preferred_communication_method) ? array() : $preferred_communication_method;
       $specialValues[$moniker] = array(
         'preferred_communication_method' => $value,
+        'contact_sub_type' => $value,
+        'communication_style_id' => $value,
       );
 
       if (!empty($contact['preferred_communication_method'])){
@@ -840,6 +845,21 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         ),
       );
       CRM_Core_OptionGroup::lookupValues($specialValues[$moniker], $names);
+
+      if (!empty($contact['contact_sub_type'])) {
+        $specialValues[$moniker]['contact_sub_type'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $contact['contact_sub_type']);
+
+        // fix contact sub type label for contact with sub type
+        $subtypes = array();
+        foreach ($contact['contact_sub_type'] as $key => $value) {
+          $subtypes[] = CRM_Utils_Array::retrieveValueRecursive($contactSubTypes, $value);
+        }
+        $contact['contact_sub_type_display'] = $specialValues[$moniker]['contact_sub_type_display'] = implode(', ', $subtypes);
+      }
+
+      if (!empty($contact['communication_style'])) {
+        $specialValues[$moniker]['communication_style_id_display'] = $contact['communication_style'];
+      }
     }
 
     static $optionValueFields = array();
@@ -1346,6 +1366,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     foreach ($submitted as $key => $value) {
       if (substr($key, 0, 7) == 'custom_') {
         $fid = (int) substr($key, 7);
+        if (empty($cFields[$fid])) {
+          continue;
+        }
         $htmlType = $cFields[$fid]['attributes']['html_type'];
         switch ($htmlType) {
           case 'File':
