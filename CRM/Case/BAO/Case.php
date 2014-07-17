@@ -2038,9 +2038,9 @@ SELECT civicrm_contact.id as casemanager_id,
    *
    * @return array of case and related data keyed on case id
    */
-  static function getUnclosedCases($params = array(), $excludeCaseIds = array(), $excludeDeleted = TRUE) {
+  static function getUnclosedCases($params = array(), $excludeCaseIds = array(), $excludeDeleted = TRUE, $includeClosed = FALSE) {
     //params from ajax call.
-    $where = array('( ca.end_date is null )');
+    $where = array($includeClosed ? '(1)' : '(ca.end_date is null)');
     if ($caseType = CRM_Utils_Array::value('case_type', $params)) {
       $where[] = "( civicrm_case_type.title LIKE '%$caseType%' )";
     }
@@ -2079,15 +2079,18 @@ SELECT civicrm_contact.id as casemanager_id,
             ca.id,
             ca.subject as case_subject,
             civicrm_case_type.title as case_type,
-            ca.start_date as start_date
+            ca.start_date as start_date,
+            ca.end_date as end_date,
+            ca.status_id
       FROM  civicrm_case ca INNER JOIN civicrm_case_contact cc ON ca.id=cc.case_id
  INNER JOIN  civicrm_contact c ON cc.contact_id=c.id
  INNER JOIN  civicrm_case_type ON ca.case_type_id = civicrm_case_type.id
      WHERE  {$whereClause}
-  ORDER BY  c.sort_name
+  ORDER BY  c.sort_name, ca.end_date
             {$limitClause}
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
+    $statuses = CRM_Case_PseudoConstant::caseStatus();
     $unclosedCases = array();
     while ($dao->fetch()) {
       if ($doFilterCases && !array_key_exists($dao->id, $filterCases)) {
@@ -2098,7 +2101,9 @@ SELECT civicrm_contact.id as casemanager_id,
         'case_type' => $dao->case_type,
         'contact_id' => $dao->contact_id,
         'start_date' => $dao->start_date,
+        'end_date' => $dao->end_date,
         'case_subject' => $dao->case_subject,
+        'case_status' => $statuses[$dao->status_id],
       );
     }
     $dao->free();
