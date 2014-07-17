@@ -11,3 +11,10 @@ UPDATE `civicrm_state_province` SET `name`='Perm krai',`abbreviation`='PEK',`cou
 UPDATE `civicrm_state_province` SET `name`='Kamchatka Krai',`country_id`= 1177 WHERE `id` = 4252;
 
 UPDATE `civicrm_state_province` SET `name`='Zabaykalsky Krai',`abbreviation`='ZSK',`country_id`= 1177 WHERE `id` = 4247;
+
+-- CRM-14918
+UPDATE `civicrm_line_item` cl
+INNER JOIN civicrm_membership_payment cmp ON cmp.contribution_id = cl.entity_id
+SET cl.entity_table = 'civicrm_membership',
+ cl.entity_id = cmp.membership_id
+WHERE cl.entity_table = 'civicrm_contribution';
