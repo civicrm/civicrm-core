@@ -4732,3 +4732,8 @@ span.crm-status-icon {
 .crm-container select.ng-pristine{
     border: 1px solid #666;
 }
+
+/* block-ui */
+.crm-container .blockUI.blockOverlay {
+  background: url("../i/loading-overlay.gif") center center no-repeat black;
+}
