@@ -909,6 +909,8 @@ CRM.strings = CRM.strings || {};
   });
 
   $(function () {
+    $.blockUI.defaults.message = null;
+
     // Trigger crmLoad on initial content for consistency. It will also be triggered for ajax-loaded content.
     $('.crm-container').trigger('crmLoad');
 
