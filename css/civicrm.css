@@ -1928,7 +1928,7 @@ div.grippie {
 
 #crm-container .ui-tabs-panel {
   padding: 4px;
-  font-size: 13px;
+  min-height: 12em;
 }
 
 #crm-container div.contact_details {
