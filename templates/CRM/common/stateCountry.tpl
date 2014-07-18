@@ -51,15 +51,13 @@
           $.getJSON(info.callback, {_value: $(this).val()}, function(data) {
             var options = '';
             $.each(data, function() {
-              if (this.value) {
+              if (this.name) {
                 options += '<option value="' + this.value + '">' + this.name + '</option>';
               }
             });
             info.target.html(options).val(val).trigger('change');
           });
         }
-      } else {
-        info.target.trigger('change');
       }
     }
     {/literal}
