@@ -215,7 +215,7 @@
         return;
       }
       var $dialog = this.$el.closest('.crm-designer-dialog'); // FIXME use events
-      $dialog.block({message: 'Saving...', theme: true});
+      $dialog.block();
       var profile = ufGroupModel.toStrictJSON();
       profile["api.UFField.replace"] = {values: ufGroupModel.getRel('ufFieldCollection').toSortedJSON(), 'option.autoweight': 0};
       CRM.api('UFGroup', 'create', profile, {
@@ -257,7 +257,7 @@
         return;
       }
       var $dialog = this.$el.closest('.crm-designer-dialog'); // FIXME use events
-      $dialog.block({message: 'Loading...', theme: true});
+      $dialog.block();
       // CRM-12188
       CRM.designerApp.clearPreviewArea();
       $.post(CRM.url("civicrm/ajax/inline"), {
