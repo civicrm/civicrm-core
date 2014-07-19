@@ -117,7 +117,8 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request) {
       $request['id'] = explode(',', trim($request['id'], ', '));
     }
     // Don't run into search limits when prefilling selection
-    unset($params['options']['limit'], $params['options']['offset'], $request['params']['options']['limit'], $request['params']['options']['offset']);
+    $params['options']['limit'] = NULL;
+    unset($params['options']['offset'], $request['params']['options']['limit'], $request['params']['options']['offset']);
     $params[$request['id_field']] = is_array($request['id']) ? array('IN' => $request['id']) : $request['id'];
   }
   $request['params'] += $params;
