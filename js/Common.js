@@ -367,7 +367,9 @@ CRM.strings = CRM.strings || {};
           } else {
             var params = $.extend({}, $el.data('api-params') || {}, {id: val});
             CRM.api3($el.data('api-entity'), 'getlist', params).done(function(result) {
-              callback(multiple ? result.values : result.values[0])
+              callback(multiple ? result.values : result.values[0]);
+              // Trigger change (store data to avoid an infinite loop of lookups)
+              $el.data('entity-value', result.values).trigger('change');
             });
           }
         }
