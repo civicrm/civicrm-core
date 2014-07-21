@@ -347,7 +347,7 @@ class CRM_Utils_System {
     // this is kinda hackish but not sure how to do it right
     $url = str_replace('&amp;', '&', $url);
     $config = CRM_Core_Config::singleton();
-    $config->userSystem->redirect($status);
+    $config->userSystem->redirect($url);
   }
 
   /**
