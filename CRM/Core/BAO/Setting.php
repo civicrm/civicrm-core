@@ -194,9 +194,13 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $contactID    = NULL,
     $domainID     = NULL
   ) {
-
+    $override_group = array();
     if (NULL !== ($override = self::getOverride($group, $name, NULL))) {
-      return $override;
+      if ( isset($name) ) {
+        return $override;
+      } else {
+        $override_group = $override;
+      }
     }
 
     if (empty($domainID)) {
@@ -220,7 +224,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
         }
       }
       $dao->free();
-
+      if ( ! isset($name) ) {
+        // merge db and override group values
+        $values = array_merge($values, $override_group);
+      }
       $cacheKey = self::setCache($values, $group, $componentID, $contactID, $domainID);
     }
     return $name ? CRM_Utils_Array::value($name, self::$_cache[$cacheKey], $defaultValue) : self::$_cache[$cacheKey];
