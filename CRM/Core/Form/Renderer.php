@@ -216,7 +216,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     }
     if ($val) {
       $entity = $field->getAttribute('data-api-entity');
-      $params = json_decode($field->getAttribute('data-api-params'), TRUE);
+      // Get api params, ensure it is an array
+      $params = $field->getAttribute('data-api-params');
+      $params = $params ? json_decode($params, TRUE) : array();
       // Support serialized values
       if (strpos($val, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
         $val = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($val, CRM_Core_DAO::VALUE_SEPARATOR));
