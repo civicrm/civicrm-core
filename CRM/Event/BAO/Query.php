@@ -333,7 +333,7 @@ class CRM_Event_BAO_Query {
           $status = $value;
         }
 
-        if (count($val) > 1) {
+        if (count($val) > 0) {
           $op = 'IN';
           $status = "({$status})";
         }
@@ -347,7 +347,9 @@ class CRM_Event_BAO_Query {
           }
         }
         else {
-          $names[] = $statusTypes[$value];
+          if (!empty($value)) {
+            $names[] = $statusTypes[$value];
+          }
         }
 
         $query->_qill[$grouping][] = ts('Participant Status %1', array(1 => $op)) . ' ' . implode(' ' . ts('or') . ' ', $names);
@@ -378,7 +380,9 @@ class CRM_Event_BAO_Query {
 
         $names = array();
         foreach ($val as $id => $dontCare) {
-          $names[] = $roleTypes[$id];
+          if (!empty($roleTypes[$id]) ) {
+            $names[] = $roleTypes[$id];
+          }
         }
 
         if (!empty($names)) {

@@ -236,7 +236,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
             // Check Empty values for Integer Or Boolean Or Date type For operators other than IS NULL and IS NOT NULL.
             if (!in_array($v[1],
                 array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
-              if ((($type == 'Int' || $type == 'Boolean') && !trim($v[2])) && $v[2] != '0') {
+              if ((($type == 'Int' || $type == 'Boolean') && !is_array($v[2]) && !trim($v[2])) && $v[2] != '0') {
                 $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter a value.");
               }
               elseif ($type == 'Date' && !trim($v[2])) {
@@ -248,23 +248,25 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
           if ($type && empty($errorMsg)) {
             // check for valid format while using IN Operator
             if ($v[1] == 'IN') {
-              $inVal = trim($v[2]);
-              //checking for format to avoid db errors
-              if ($type == 'Int') {
-                if (!preg_match('/^[(]([A-Za-z0-9\,]+)[)]$/', $inVal)) {
-                  $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter correct Data (in valid format).");
+              if (!is_array($v[2])) {
+                $inVal = trim($v[2]);
+                //checking for format to avoid db errors
+                if ($type == 'Int') {
+                  if (!preg_match('/^[(]([A-Za-z0-9\,]+)[)]$/', $inVal)) {
+                    $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter correct Data (in valid format).");
+                  }
                 }
-              }
-              else {
-                if (!(substr($inVal, 0, 1) == '(' && substr($inVal, -1, 1) == ')') && !preg_match('/^[(]([A-Za-z0-9åäöÅÄÖüÜœŒæÆøØ\,\s]+)[)]$/', $inVal)) {
-                  $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter correct Data (in valid format).");
+                else {
+                  if (!(substr($inVal, 0, 1) == '(' && substr($inVal, -1, 1) == ')') && !preg_match('/^[(]([A-Za-z0-9åäöÅÄÖüÜœŒæÆøØ\,\s]+)[)]$/', $inVal)) {
+                    $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter correct Data (in valid format).");
+                  }
                 }
               }
 
               // Validate each value in parenthesis to avoid db errors
               if (empty($errorMsg)) {
                 $parenValues = array();
-                $parenValues = explode(',', trim($inVal, "(..)"));
+                $parenValues = is_array($v[2]) ? $v[2] : explode(',', trim($inVal, "(..)"));
                 foreach ($parenValues as $val) {
                   $val = trim($val);
                   if (!$val && $val != '0') {
