@@ -88,9 +88,16 @@
         <td>{include file="CRM/common/jcalendar.tpl" elementName=end_date}</td>
       </tr>
     {/if}
+    {capture assign=participantStatusURL}{crmURL p='civicrm/admin/participant_status' q="reset=1"}{/capture} 
     <tr class="crm-event-manage-eventinfo-form-block-max_participants">
-      <td class="label">{$form.max_participants.label} {help id="id-max_participants" waitlist=$waitlist}</td>
-      <td>{$form.max_participants.html|crmAddClass:four}</td>
+      <td class="label">{$form.max_participants.label}</td>
+      <td>
+        {$form.max_participants.html|crmAddClass:four}  {help id="id-max_participants" waitlist=$waitlist}
+        {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
+          {capture assign=participantStatusURL}{/capture} 
+          <a class="crm-option-edit-link crm-hover-button" title="{ts}Edit Participant Status Options{/ts}" href="{crmURL p='civicrm/admin/participant_status' q='reset=1'}"><span class="icon edit-icon"> </span></a>
+        {/if}
+      </td>
     </tr>
     <tr id="id-waitlist" class="crm-event-manage-eventinfo-form-block-has_waitlist">
       {if $waitlist}
@@ -115,7 +122,7 @@
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-is_public">
       <td>&nbsp;</td>
-      <td>{$form.is_public.html} {$form.is_public.label}{help id="id-is_public"}</td>
+      <td>{$form.is_public.html} {$form.is_public.label} {help id="id-is_public"}</td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-is_share">
       <td>&nbsp;</td>
