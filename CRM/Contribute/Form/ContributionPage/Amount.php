@@ -649,6 +649,7 @@ SELECT id
               }
               else {
                 if (empty($editedResults['is_active'])) {
+                  $fieldParams = $editedResults;
                   if (!$noContriAmount) {
                     $priceFieldValueID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldID, 'id', 'price_field_id');
                     CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldValueID, 'label', $params['amount_label']);
