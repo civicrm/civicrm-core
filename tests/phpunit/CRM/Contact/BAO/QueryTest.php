@@ -47,7 +47,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   function testSearch($fv, $count, $ids, $full) {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/queryDataset.xml'
       )
     );
