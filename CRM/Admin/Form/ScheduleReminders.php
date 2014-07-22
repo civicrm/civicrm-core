@@ -199,7 +199,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       );
     }
 
-    $limitOptions = array(1 => ts('Limit to'), 0 => ts('Addition to'));
+    $limitOptions = array(1 => ts('Limit to'), 0 => ts('Also include'));
     $this->add('select', 'limit_to', ts('Limit Options'), $limitOptions);
 
     $this->add('select', 'recipient', ts('Recipients'), $sel5[$recipient],
