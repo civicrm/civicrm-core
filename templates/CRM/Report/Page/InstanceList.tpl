@@ -26,7 +26,7 @@
 {strip}
 <div class="action-link">
   {if $templateUrl}
-    <a href="{$templateUrl}" class="button"><span><div class="icon add-icon"></div> {$newButton}</span></a>
+    <a href="{$templateUrl}" class="button"><span><div class="icon add-icon"></div>{ts}{$newButton}{/ts}</span></a>
   {/if}
   {if $reportUrl}
     <a href="{$reportUrl}" class="button"><span>{ts}View All Reports{/ts}</span></a>
@@ -38,7 +38,7 @@
 {foreach from=$list item=rows key=report}
 <div class="crm-accordion-wrapper crm-accordion_{$report}-accordion ">
  <div class="crm-accordion-header">
-    {if $title}{$title}{elseif $report EQ 'Contribute'}{ts}Contribution Reports{/ts}{else}{$report} {ts}Reports{/ts}{/if}</a>
+    {if $title}{$title}{elseif $report EQ 'Contribute'}{ts}Contribution Reports{/ts}{else}{ts}{$report}{/ts} {ts}Reports{/ts}{/if}</a>
  </div><!-- /.crm-accordion-header -->
  <div class="crm-accordion-body">
   <div id="{$report}" class="boxBlock">
@@ -61,7 +61,7 @@
 
 <div class="action-link">
   {if $templateUrl}
-    <a href="{$templateUrl}" class="button"><span><div class="icon add-icon"></div> {$newButton}</span></a>
+    <a href="{$templateUrl}" class="button"><span><div class="icon add-icon"></div> {ts}{$newButton}{/ts}</span></a>
   {/if}
   {if $reportUrl}
     <a href="{$reportUrl}" class="button"><span>{ts}View All Reports{/ts}</span></a>

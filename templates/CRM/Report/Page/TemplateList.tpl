@@ -33,7 +33,7 @@
     {foreach from=$list item=rows key=report}
 <div class="crm-accordion-wrapper crm-accordion_{$report}-accordion ">
  <div class="crm-accordion-header">
-  {if $report}{if $report EQ 'Contribute'}{ts}Contribution{/ts}{else}{$report}{/if}{else}Contact{/if} Report Templates
+  {if $report}{if $report EQ 'Contribute'}{ts}Contribution{/ts}{else}{ts}{$report}{/ts}{/if}{else}Contact{/if} Report Templates
  </div><!-- /.crm-accordion-header -->
  <div class="crm-accordion-body">
   <div id="{$report}" class="boxBlock">
@@ -41,7 +41,7 @@
     {foreach from=$rows item=row}
         <tr id="row_{counter}" class="crm-report-templateList">
       <td class="crm-report-templateList-title" style="width:35%;">
-          <a href="{$row.url}" title="{ts}Create report from this template{/ts}">&raquo; <strong>{$row.title}</strong></a>
+          <a href="{$row.url}" title="{ts}Create report from this template{/ts}">&raquo; <strong>{ts}{$row.title}{/ts}</strong></a>
           {if $row.instanceUrl}
         <div style="font-size:10px;text-align:right;margin-top:3px;">
             <a href="{$row.instanceUrl}">{ts}Existing Report(s){/ts}</a>

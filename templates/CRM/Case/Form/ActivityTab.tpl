@@ -60,7 +60,7 @@
             </td>
             <td class="crm-case-caseview-form-block-activity_type_filter_id">
               {$form.activity_type_filter_id.label}<br />
-              {$form.activity_type_filter_id.html}
+              {ts}{$form.activity_type_filter_id.html}{/ts}
             </td>
           </tr>
           {if $form.activity_deleted}

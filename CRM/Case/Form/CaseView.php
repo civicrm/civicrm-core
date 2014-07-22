@@ -272,7 +272,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
           FALSE, NULL, FALSE
         );
       }
-      $activityLinks[$url] = $label;
+      $activityLinks[$url] = ts($label);
     }
 
     $this->add('select', 'add_activity_type_id', '', $activityLinks, FALSE, array('class' => 'crm-select2 crm-action-menu action-icon-plus twenty'));

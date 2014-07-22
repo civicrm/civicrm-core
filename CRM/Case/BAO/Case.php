@@ -1239,7 +1239,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       }
 
       $values[$dao->id]['id'] = $dao->id;
-      $values[$dao->id]['type'] = $activityTypes[$dao->type]['label'];
+      $values[$dao->id]['type'] = ts($activityTypes[$dao->type]['label']);
 
       $reporterName = $dao->reporter;
       if ($hasViewContact) {
