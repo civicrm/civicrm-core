@@ -386,7 +386,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $xmlFiles = glob($fixturesDir . '/*.xml');
     foreach ($xmlFiles as $xmlFixture) {
       $op = new PHPUnit_Extensions_Database_Operation_Insert();
-      $dataset = new PHPUnit_Extensions_Database_DataSet_XMLDataSet($xmlFixture);
+      $dataset = $this->createXMLDataSet($xmlFixture);
       $this->_tablesToTruncate = array_merge($this->_tablesToTruncate, $dataset->getTableNames());
       $op->execute($this->_dbconn, $dataset);
     }
