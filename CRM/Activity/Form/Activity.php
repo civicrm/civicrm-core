@@ -321,7 +321,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
           $displayName .= ' (' . ts('default organization') . ')';
         }
-        CRM_Utils_System::setTitle($displayName . ' - ' . $activityName);
+        CRM_Utils_System::setTitle($displayName . ' - ' . ts($activityName));
       }
       else {
         CRM_Utils_System::setTitle(ts('%1 Activity', array( 1 => $activityName)));

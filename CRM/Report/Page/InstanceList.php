@@ -210,7 +210,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
       }
       $this->assign('newButton', $newButton);
       $this->assign('templateUrl', $templateUrl);
-      $this->assign('compName', $this->_compName);
+      $this->assign('compName', ts($this->_compName));
     }
     return parent::run();
   }

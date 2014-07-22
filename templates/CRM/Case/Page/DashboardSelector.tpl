@@ -78,7 +78,7 @@
     {elseif $list eq 'recent'}
        <td class="crm-case-case_recent_activity">
    {if $row.case_recent_activity_viewable}
-       <a class="crm-popup" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid="}{$row.contact_id}&aid={$row.case_recent_activity_id}" title="{ts}View this activity.{/ts}">{$row.case_recent_activity_type}</a>
+       <a class="crm-popup" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid="}{$row.contact_id}&aid={$row.case_recent_activity_id}" title="{ts}View this activity.{/ts}">{ts}{$row.case_recent_activity_type}{/ts}</a>
     {else}
        {$row.case_recent_activity_type}
     {/if}

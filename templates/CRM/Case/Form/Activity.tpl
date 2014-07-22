@@ -113,7 +113,7 @@
 
                 <tr class="crm-case-activity-form-block-activityTypeName">
                   <td class="label">{ts}Activity Type{/ts}</td>
-                  <td class="view-value bold">{$activityTypeName|escape}</td>
+                  <td class="view-value bold">{ts}{$activityTypeName|escape}{/ts}</td>
                 </tr>
                 <tr class="crm-case-activity-form-block-source_contact_id">
                   <td class="label">{$form.source_contact_id.label}</td>
