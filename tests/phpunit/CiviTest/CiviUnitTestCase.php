@@ -39,11 +39,6 @@ require_once CIVICRM_SETTINGS_PATH;
 /**
  *  Include class definitions
  */
-require_once 'PHPUnit/Extensions/Database/TestCase.php';
-require_once 'PHPUnit/Framework/TestResult.php';
-require_once 'PHPUnit/Extensions/Database/DataSet/FlatXmlDataSet.php';
-require_once 'PHPUnit/Extensions/Database/DataSet/XmlDataSet.php';
-require_once 'PHPUnit/Extensions/Database/DataSet/QueryDataSet.php';
 require_once 'tests/phpunit/Utils.php';
 require_once 'api/api.php';
 require_once 'CRM/Financial/BAO/FinancialType.php';
