@@ -24,7 +24,7 @@ class SequenceListenerTest extends \CiviCaseTestCase {
 
     $analyzer = new \Civi\CCase\Analyzer($case['id']);
     $this->assertEquals($caseStatuses['Open'], $analyzer->getCase()['status_id']);
-    $this->assertEquals('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
+    $this->assertApproxTime('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
     $this->assertEquals($actStatuses['Scheduled'], $analyzer->getSingleActivity('Medical evaluation')['status_id']);
     $this->assertFalse($analyzer->hasActivity('Mental health evaluation'));
     $this->assertFalse($analyzer->hasActivity('Secure temporary housing'));
@@ -38,7 +38,7 @@ class SequenceListenerTest extends \CiviCaseTestCase {
 
     $analyzer = new \Civi\CCase\Analyzer($case['id']);
     $this->assertEquals($caseStatuses['Open'], $analyzer->getCase()['status_id']);
-    $this->assertEquals('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
+    $this->assertApproxTime('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
     $this->assertEquals($actStatuses['Scheduled'], $analyzer->getSingleActivity('Medical evaluation')['status_id']);
     $this->assertFalse($analyzer->hasActivity('Mental health evaluation'));
     $this->assertFalse($analyzer->hasActivity('Secure temporary housing'));
@@ -51,9 +51,9 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     ));
     $analyzer->flush();
     $this->assertEquals($caseStatuses['Open'], $analyzer->getCase()['status_id']);
-    $this->assertEquals('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
+    $this->assertApproxTime('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
     $this->assertEquals($actStatuses['Completed'], $analyzer->getSingleActivity('Medical evaluation')['status_id']);
-    $this->assertEquals('2013-11-30 02:00:00', $analyzer->getSingleActivity('Mental health evaluation')['activity_date_time']);
+    $this->assertApproxTime('2013-11-30 02:00:00', $analyzer->getSingleActivity('Mental health evaluation')['activity_date_time']);
     $this->assertEquals($actStatuses['Scheduled'], $analyzer->getSingleActivity('Mental health evaluation')['status_id']);
     $this->assertFalse($analyzer->hasActivity('Secure temporary housing'));
 
@@ -65,11 +65,11 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     ));
     $analyzer->flush();
     $this->assertEquals($caseStatuses['Open'], $analyzer->getCase()['status_id']);
-    $this->assertEquals('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
+    $this->assertApproxTime('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
     $this->assertEquals($actStatuses['Completed'], $analyzer->getSingleActivity('Medical evaluation')['status_id']);
-    $this->assertEquals('2013-11-30 02:00:00', $analyzer->getSingleActivity('Mental health evaluation')['activity_date_time']);
+    $this->assertApproxTime('2013-11-30 02:00:00', $analyzer->getSingleActivity('Mental health evaluation')['activity_date_time']);
     $this->assertEquals($actStatuses['Completed'], $analyzer->getSingleActivity('Mental health evaluation')['status_id']);
-    $this->assertEquals('2013-11-30 03:00:00', $analyzer->getSingleActivity('Secure temporary housing')['activity_date_time']);
+    $this->assertApproxTime('2013-11-30 03:00:00', $analyzer->getSingleActivity('Secure temporary housing')['activity_date_time']);
     $this->assertEquals($actStatuses['Scheduled'], $analyzer->getSingleActivity('Secure temporary housing')['status_id']);
 
     // Complete third activity; close case
@@ -79,11 +79,11 @@ class SequenceListenerTest extends \CiviCaseTestCase {
       'status_id' => $actStatuses['Completed'],
     ));
     $analyzer->flush();
-    $this->assertEquals('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
+    $this->assertApproxTime('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
     $this->assertEquals($actStatuses['Completed'], $analyzer->getSingleActivity('Medical evaluation')['status_id']);
-    $this->assertEquals('2013-11-30 02:00:00', $analyzer->getSingleActivity('Mental health evaluation')['activity_date_time']);
+    $this->assertApproxTime('2013-11-30 02:00:00', $analyzer->getSingleActivity('Mental health evaluation')['activity_date_time']);
     $this->assertEquals($actStatuses['Completed'], $analyzer->getSingleActivity('Mental health evaluation')['status_id']);
-    $this->assertEquals('2013-11-30 03:00:00', $analyzer->getSingleActivity('Secure temporary housing')['activity_date_time']);
+    $this->assertApproxTime('2013-11-30 03:00:00', $analyzer->getSingleActivity('Secure temporary housing')['activity_date_time']);
     $this->assertEquals($actStatuses['Completed'], $analyzer->getSingleActivity('Secure temporary housing')['status_id']);
     $this->assertEquals($caseStatuses['Closed'], $analyzer->getCase()['status_id']);
   }
