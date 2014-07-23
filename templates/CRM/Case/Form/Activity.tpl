@@ -58,6 +58,7 @@
     {* Block for change status, case type and start date. *}
     {if $activityTypeFile EQ 'ChangeCaseStatus'
     || $activityTypeFile EQ 'ChangeCaseType'
+    || $activityTypeFile EQ 'LinkCases'
     || $activityTypeFile EQ 'ChangeCaseStartDate'}
       {include file="CRM/Case/Form/Activity/$activityTypeFile.tpl"}
       <tr class="crm-case-activity-form-block-details">

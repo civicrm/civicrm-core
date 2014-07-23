@@ -106,7 +106,7 @@ class CRM_Case_Form_Activity_LinkCases {
     $errors = array();
 
     $linkCaseId = CRM_Utils_Array::value('link_to_case_id', $values);
-    assert('is_numeric($linkeCaseId)');
+    assert('is_numeric($linkCaseId)');
     if ($linkCaseId == CRM_Utils_Array::first($form->_caseId)) {
       $errors['link_to_case'] = ts('Please select some other case to link.');
     }
