@@ -100,6 +100,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     if ($this->_caseId) {
       $this->assign('caseId', $this->_caseId);
       $this->assign('countId', count($this->_caseId));
+      $this->assign('caseID', CRM_Utils_Array::first($this->_caseId));
     }
 
     if (!$this->_caseId ||
