@@ -1177,7 +1177,7 @@ FROM   civicrm_domain
           $newObject->$dbName = $fieldsToReplace[$dbName];
         }
 
-        if ($type == 'Timestamp') {
+        if ($type == 'Timestamp' || $type == 'Date') {
           $newObject->$dbName = CRM_Utils_Date::isoToMysql($newObject->$dbName);
         }
 
