@@ -46,7 +46,6 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
    * @access public
    */
   function check($str) {
-    require_once ABSPATH . WPINC . '/pluggable.php';
     // Generic cms 'administer users' role tranlates to 'administrator' WordPress role
     $str = $this->translatePermission($str, 'WordPress', array(
       'administer users' => 'administrator',
@@ -57,6 +56,8 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
     if ($str == CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
       return TRUE;
     }
+
+    require_once ABSPATH . WPINC . '/pluggable.php';
 
     // for administrators give them all permissions
     if (!function_exists('current_user_can')) {
