@@ -5151,11 +5151,11 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         return $clause;
 
       case 'IS EMPTY':
-        $clause = " ( $field IS NULL OR $field = '' ) ";
+        $clause = " (NULLIF($field, '') IS NULL) ";
         return $clause;
 
       case 'IS NOT EMPTY':
-        $clause = " ( $field IS NOT NULL AND $field <> '' ) ";
+        $clause = " (NULLIF($field, '') IS NOT NULL) ";
         return $clause;
 
       case 'IN':
