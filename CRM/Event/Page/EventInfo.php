@@ -145,12 +145,14 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
               $labelClass = 'price_set_field-label';
             }
             // show tax rate with amount
-            $displayOpt = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
-            $displayOpt = CRM_Utils_Array::value('tax_display_settings', $displayOpt);
+            $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+            $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+            $displayOpt = CRM_Utils_Array::value('tax_display_settings', $invoiceSettings);
+            $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
             foreach ($fieldValues['options'] as $optionId => $optionVal) {
               $values['feeBlock']['isDisplayAmount'][$fieldCnt] = CRM_Utils_Array::value('is_display_amounts', $fieldValues);
-              if (CRM_Utils_Array::value('tax_amount', $optionVal)) {
-                $values['feeBlock']['value'][$fieldCnt] = CRM_Price_BAO_PriceField::getTaxLabel($optionVal,'amount',$displayOpt);
+              if ($invoicing && isset($optionVal['tax_amount'])) {
+                $values['feeBlock']['value'][$fieldCnt] = CRM_Price_BAO_PriceField::getTaxLabel($optionVal, 'amount', $displayOpt, $taxTerm);
                 $values['feeBlock']['tax_amount'][$fieldCnt] = $optionVal['tax_amount'];
               }
               else {
