@@ -119,7 +119,13 @@
 	          <tr>
 		    <td colspan = "3"></td>
 		   
-		        <td style = "padding-left:34px;text-align:right;"><font size = "1">LESS Amount Paid</font></td>
+		        <td style = "padding-left:34px;text-align:right;"><font size = "1">
+			{if $contribution_status_id == $refundedStatusId}
+			    LESS Amount Credited
+			{else}
+			    LESS Amount Paid
+			{/if}
+			</font></td>
 		
 		    <td style = "padding-left:34px;text-align:right;"><font size = "1">{$amount|crmMoney:$currency}</font></td>
 		  </tr>
@@ -158,8 +164,8 @@
       </table>
 	<table style = "margin-top:6px;padding-right:30px;font-family: Arial, Verdana, sans-serif" width = "585" border = "0"cellpadding = "-10" cellspacing="19" id = "desc">
 	  <tr>
-	    <td><b><font size = "4" align = "right">PAYMENT ADVICE</font><b/> <br/><br/> <b><font size = "1" align = "right">To:            
-              {$organization_name}</font><b/><br/><br/><b><font size="1" align="right">{$notes}</font>
+	    <td><b><font size = "4" align = "right">PAYMENT ADVICE</font></b> <br/><br/> <b><font size = "1" align = "right">To:            
+              {$organization_name}</font></b><br/><br/><font size="1" align="right">{$notes}</font>
             </td>
             <td>
 	      <table  cellpadding = "-10" cellspacing = "22"  align="center" style="margin-left:40px;">
@@ -359,9 +365,10 @@
      
         <table   style = "margin-top:6px;padding-right:30px;font-family: Arial, Verdana, sans-serif" width = "585" border = "0" cellpadding = "-10" cellspacing = "19" id = "desc">
 	  <tr>
-	    <td ><b><font size = "4" align = "right">CREDIT ADVICE<br/><br/><font size = "1" >{$notes}</font></font></b></td>
+	    <td ><font size = "4" align = "right"><b>CREDIT ADVICE</b><br/><br /><div  style="font-size:10px;max-width:300px;">Please do not pay on this advice. Deduct the amount of this Credit Note
+from your next payment to us</div><br/><font size = "1" >{$notes}</font></font></td>
 	    <td>
-              <table style = "margin-top:0px;margin-left:80px;" cellpadding = "-10" cellspacing = "22" align="center" >
+              <table style = "margin-top:0px;margin-right:20px;"  cellpadding = "-10" cellspacing = "22" align="left" >
 		<tr>
 	          <td colspan = "2"></td>
 		  <td><font size = "1" align = "right" style="font-weight:bold;">Customer: </font></td>
@@ -376,7 +383,7 @@
 		<tr>
                   <td colspan = "2"></td>
 		  <td><font size = "1" align = "right" style="font-weight:bold;">Credit Amount:</font></td> 
-		  <td><font size = "1" align = "right" style="font-weight:bold;">{$amount|crmMoney:$currency}</font></td> 
+		  <td width='50px'><font size = "1" align = "right" style="font-weight:bold;">{$amount|crmMoney:$currency}</font></td> 
 		</tr>
               </table>
             </td>
