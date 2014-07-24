@@ -105,6 +105,49 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
   }
 
+  protected function prepareTestSession() {
+    $result = parent::prepareTestSession();
+
+    // Set any cookies required by local installation
+    // Note: considered doing this in setUp(), but the Selenium session wasn't yet initialized.
+    if (property_exists($this->settings, 'cookies')) {
+      // We don't really care about this page, but it seems we need
+      // to open a page before setting a cookie.
+      $this->open($this->sboxPath);
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+      $this->setCookies($this->settings->cookies);
+    }
+    return $result;
+  }
+
+  /**
+   * @param array $cookies each item is an array with keys:
+   *  - name: string
+   *  - value: string; note that RFC's don't define particular encoding scheme, so
+   *    you must pick one yourself and pre-encode; does not allow values with
+   *    commas, semicolons, or whitespace
+   *  - path: string; default: '/'
+   *  - max_age: int; default: 1 week (7*24*60*60)
+   */
+  protected function setCookies($cookies) {
+    foreach ($cookies as $cookie) {
+      if (!isset($cookie['path'])) {
+        $cookie['path'] = '/';
+      }
+      if (!isset($cookie['max_age'])) {
+        $cookie['max_age'] = 7*24*60*60;
+      }
+      $this->deleteCookie($cookie['name'], $cookie['path']);
+      $optionExprs = array();
+      foreach ($cookie as $key => $value) {
+        if ($key != 'name' && $key != 'value') {
+          $optionExprs[] = "$key=$value";
+        }
+      }
+      $this->createCookie("{$cookie['name']}={$cookie['value']}", implode(', ', $optionExprs));
+    }
+  }
+
   protected function tearDown() {
   }
 
