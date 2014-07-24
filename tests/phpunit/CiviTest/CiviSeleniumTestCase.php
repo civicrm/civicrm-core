@@ -2095,10 +2095,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    */
   function select2($fieldName,$label, $multiple = FALSE, $xpath=FALSE) {
     if ($multiple) {
-      $this->clickAt("//*[@id='$fieldName']/../div/ul/li[1]");
-      $this->keyDown("//*[@id='$fieldName']/../div/ul/li[1]/input", " ");
-      $this->type("//*[@id='$fieldName']/../div/ul/li[1]/input", $label);
-      $this->typeKeys("//*[@id='$fieldName']/../div/ul/li[1]/input", $label);
+      $this->clickAt("//*[@id='$fieldName']/../div/ul/li");
+      $this->keyDown("//*[@id='$fieldName']/../div/ul/li//input", " ");
+      $this->type("//*[@id='$fieldName']/../div/ul/li//input", $label);
+      $this->typeKeys("//*[@id='$fieldName']/../div/ul/li//input", $label);
       $this->waitForElementPresent("//*[@class='select2-result-label']");
       $this->clickAt("//*[@class='select2-results']/li[1]/div");
     }
