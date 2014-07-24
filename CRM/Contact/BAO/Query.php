@@ -1819,7 +1819,7 @@ class CRM_Contact_BAO_Query {
             $this->_where[0][] = "contact_a.id IN ({$idList})";
           }
           else {
-            $this->_where[0][] = "contact_a.id {$this->_params[$id][1]} {$this->_params[$id][2]}";
+            $this->_where[0][] = self::buildClause("contact_a.id", "{$this->_params[$id][1]}", "{$this->_params[$id][2]}");
           }
         }
         else {
@@ -2659,7 +2659,7 @@ class CRM_Contact_BAO_Query {
       }
       else {
         $type = array_pop($clause);
-        $this->_where[$grouping][] = "contact_a.contact_type $op $type";
+        $this->_where[$grouping][] = self::buildClause("contact_a.contact_type", $op, $contactType);
       }
 
       $this->_qill[$grouping][] = ts('Contact Type') . ' - ' . implode(' ' . ts('or') . ' ', $quill);
@@ -5376,7 +5376,7 @@ AND   displayRelType.is_active = 1
     $useIDsOnly = FALSE
   ) {
 
-    if (!empty($selectValues) && !empty($selectValues[$value])) {
+    if (!empty($selectValues) &&  !is_array($value) && !empty($selectValues[$value])) {
       $qill = $selectValues[$value];
     }
     else {
@@ -5389,13 +5389,12 @@ AND   displayRelType.is_active = 1
       $qill = $selectValues[(int ) $value];
     }
     elseif ($op == 'IN' || $op == 'NOT IN') {
-      $values = self::parseSearchBuilderString($value);
-      if (is_array($values)) {
+      if (is_array($value)) {
         $intVals = array();
         $newValues = array();
-        foreach ($values as $v) {
-          $intVals[] = (int) $v;
-          $newValues[] = $selectValues[(int ) $v];
+        foreach ($value as $k => $v) {
+          $intVals[$k] = (int) $k;
+          $newValues[] = $selectValues[(int) $k];
         }
 
         $value = (in_array($name, $pseudoFields)) ? $intVals : $newValues;

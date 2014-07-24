@@ -245,6 +245,7 @@ class CRM_Contribute_BAO_Query {
   static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
+    $quoteValue = NULL;
     $fields = self::getFields();
 
     if (!empty($value) && !is_array($value)) {
@@ -348,7 +349,9 @@ class CRM_Contribute_BAO_Query {
           }
         }
         else {
-          $names[] = $types[$value];
+          if (!empty($value)) {
+            $names[] = $types[$value];
+          }
         }
 
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.financial_type_id",
@@ -411,7 +414,6 @@ class CRM_Contribute_BAO_Query {
           }
         }
         else {
-          $op = '=';
           $scTypes = $value;
           $names[] = $softCreditTypes[$value];
         }
@@ -428,13 +430,27 @@ class CRM_Contribute_BAO_Query {
 
       case 'contribution_payment_instrument_id':
       case 'contribution_payment_instrument':
-        $pi = $value;
+        $pi = array();
         $pis = CRM_Contribute_PseudoConstant::paymentInstrument();
+        if (is_array($value)) {
+          foreach ($value as $k => $v) {
+            if ($v) {
+              $op = 'IN';
+              $pi[] = $pis[$v];
+            }
+          }
+        }
+        else {
+          if (!empty($value)) {
+            $pi[] = $pis[$value];
+          }
+        }
+
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.payment_instrument_id",
           $op, $value, "Integer"
         );
 
-        $query->_qill[$grouping][] = ts('Paid By - %1', array(1 => $pis[$pi]));
+        $query->_qill[$grouping][] = ts('Paid By - %1', array(1 => $op)) . " '" . implode("' " . ts('or') . " '", $pi) . "'";
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
@@ -449,13 +465,12 @@ class CRM_Contribute_BAO_Query {
 
           $status = implode(',', $val);
 
-          if (count($val) > 1) {
+          if (count($val) > 0) {
             $op = 'IN';
             $status = "({$status})";
           }
         }
         else {
-          $op = '=';
           $status = $value;
         }
 
@@ -470,7 +485,9 @@ class CRM_Contribute_BAO_Query {
           }
         }
         else {
-          $names[] = $statusValues[$value];
+          if (!empty($value)) {
+            $names[] = $statusValues[$value];
+          }
         }
 
         $query->_qill[$grouping][] = ts('Contribution Status %1', array(1 => $op)) . ' ' . implode(' ' . ts('or') . ' ', $names);

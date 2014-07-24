@@ -215,7 +215,7 @@ class CRM_Member_BAO_Query {
         }
         else {
           $status = implode(',', array_keys($value));
-          if (count($value) > 1) {
+          if (count($value) > 0) {
             $op = 'IN';
             $status = "({$status})";
           }
@@ -298,7 +298,7 @@ class CRM_Member_BAO_Query {
         }
         else {
           $mType = implode(',', array_keys($value));
-          if (count($value) > 1) {
+          if (count($value) > 0) {
             $op = 'IN';
             $mType = "({$mType})";
           }
