@@ -1042,6 +1042,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           // CRM-14563: we store checkbox, multi-select and adv-multi select custom field using separator, hence it
           // needs special handling.
           if ($cfID = CRM_Core_BAO_CustomField::getKeyID($v[1])) {
+            $isCustomField = TRUE;
             $customFieldType = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $cfID, 'html_type');
             $specialHTMLType = array(
               'CheckBox',
@@ -1060,6 +1061,13 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
                 $params['operator'][$key][$k] = 'RLIKE';
               }
             }
+          }
+
+          // CRM-14983: verify if values are comma separated convert to array
+          if (!is_array($value) && (strpos($value,',') !== false || strstr($value, '(')) && empty($isCustomField) && $params['operator'][$key][$k] == 'IN') {
+            preg_match('#\((.*?)\)#', $value, $match);
+            $tmpArray = explode(',', $match[1]);
+            $value = array_combine(array_values($tmpArray),array_values($tmpArray));
           }
 
           if ($row) {

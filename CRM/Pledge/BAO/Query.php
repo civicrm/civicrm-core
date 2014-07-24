@@ -277,13 +277,12 @@ class CRM_Pledge_BAO_Query {
 
           $status = implode(',', $val);
 
-          if (count($val) > 1) {
+          if (count($val) > 0) {
             $op = 'IN';
             $status = "({$status})";
           }
         }
         else {
-          $op = '=';
           $status = $value;
         }
 
@@ -296,7 +295,9 @@ class CRM_Pledge_BAO_Query {
           }
         }
         else {
-          $names[] = $statusValues[$value];
+          if (!empty($value) ) {
+            $names[] = $statusValues[$value];
+          }
         }
 
         $query->_qill[$grouping][] = ts('Pledge Status %1', array(1 => $op)) . ' ' . implode(' ' . ts('or') . ' ', $names);
@@ -324,7 +325,6 @@ class CRM_Pledge_BAO_Query {
           }
         }
         else {
-          $op = '=';
           $status = $value;
         }
 
@@ -337,7 +337,9 @@ class CRM_Pledge_BAO_Query {
           }
         }
         else {
-          $names[] = $statusValues[$value];
+          if (!empty($value) ) {
+            $names[] = $statusValues[$value];
+          }
         }
 
         $query->_qill[$grouping][] = ts('Pledge Payment Status %1', array(1 => $op)) . ' ' . implode(' ' . ts('or') . ' ', $names);
