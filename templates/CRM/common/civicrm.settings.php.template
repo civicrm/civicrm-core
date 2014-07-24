@@ -50,7 +50,9 @@
  * to update the CiviCRM Resource URL field to your CiviCRM root directory
  * (Administer::System Settings::Resource URLs).
  */
-define( 'CIVICRM_UF'               , '%%cms%%'        );
+if (!defined('CIVICRM_UF')) {
+  define( 'CIVICRM_UF'               , '%%cms%%'        );
+}
 
 /**
  * Content Management System (CMS) Datasource:
@@ -59,7 +61,9 @@ define( 'CIVICRM_UF'               , '%%cms%%'        );
  * Datasource (DSN) format:
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
-define( 'CIVICRM_UF_DSN'           , 'mysql://%%CMSdbUser%%:%%CMSdbPass%%@%%CMSdbHost%%/%%CMSdbName%%?new_link=true' );
+if (!defined('CIVICRM_UF_DSN')) {
+  define( 'CIVICRM_UF_DSN'           , 'mysql://%%CMSdbUser%%:%%CMSdbPass%%@%%CMSdbHost%%/%%CMSdbName%%?new_link=true' );
+}
 
 /**
  * CiviCRM Database Settings
@@ -80,7 +84,9 @@ define( 'CIVICRM_UF_DSN'           , 'mysql://%%CMSdbUser%%:%%CMSdbPass%%@%%CMSd
  *      define( 'CIVICRM_DSN'         , 'mysql://civicrm:YOUR_PASSWORD@localhost/civicrm?new_link=true' );
  *
  */
-define( 'CIVICRM_DSN'          , 'mysql://%%dbUser%%:%%dbPass%%@%%dbHost%%/%%dbName%%?new_link=true' );
+if (!defined('CIVICRM_DSN')) {
+  define( 'CIVICRM_DSN'          , 'mysql://%%dbUser%%:%%dbPass%%@%%dbHost%%/%%dbName%%?new_link=true' );
+}
 
 /**
  * CiviCRM Logging Database
@@ -88,7 +94,9 @@ define( 'CIVICRM_DSN'          , 'mysql://%%dbUser%%:%%dbPass%%@%%dbHost%%/%%dbN
  * Used to point to a different database to use for logging (if desired). If unset defaults to equal CIVICRM_DSN.
  * The CIVICRM_DSN user needs to have the rights to modify the below database schema and be able to write to it.
  */
-define('CIVICRM_LOGGING_DSN', CIVICRM_DSN);
+if (!defined('CIVICRM_LOGGING_DSN')) {
+  define('CIVICRM_LOGGING_DSN', CIVICRM_DSN);
+}
 
 /**
  * File System Paths:
@@ -133,7 +141,9 @@ define('CIVICRM_LOGGING_DSN', CIVICRM_DSN);
 global $civicrm_root;
 
 $civicrm_root = '%%crmRoot%%';
-define( 'CIVICRM_TEMPLATE_COMPILEDIR', '%%templateCompileDir%%' );
+if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
+  define( 'CIVICRM_TEMPLATE_COMPILEDIR', '%%templateCompileDir%%' );
+}
 
 /**
  * Site URLs:
@@ -160,7 +170,9 @@ define( 'CIVICRM_TEMPLATE_COMPILEDIR', '%%templateCompileDir%%' );
  *      define( 'CIVICRM_UF_BASEURL' , 'http://www.example.com/joomla/' );
  *
  */
-define( 'CIVICRM_UF_BASEURL'      , '%%baseURL%%' );
+if (!defined('CIVICRM_UF_BASEURL')) {
+  define( 'CIVICRM_UF_BASEURL'      , '%%baseURL%%' );
+}
 
 /*
  * If you are using any CiviCRM script in the bin directory that
@@ -168,14 +180,18 @@ define( 'CIVICRM_UF_BASEURL'      , '%%baseURL%%' );
  * We recommend using a 16-32 bit alphanumeric/punctuation key.
  * More info at http://wiki.civicrm.org/confluence/display/CRMDOC/Command-line+Script+Configuration
  */
-define( 'CIVICRM_SITE_KEY', '%%siteKey%%' );
+if (!defined('CIVICRM_SITE_KEY')) {
+  define( 'CIVICRM_SITE_KEY', '%%siteKey%%' );
+}
 
 /**
  * Enable this constant, if you want to send your email through the smarty
  * templating engine(allows you to do conditional and more complex logic)
  *
  */
-define( 'CIVICRM_MAIL_SMARTY', 0 );
+if (!defined('CIVICRM_MAIL_SMARTY')) {
+  define( 'CIVICRM_MAIL_SMARTY', 0 );
+}
 
 /**
  * This setting logs all emails to a file. Useful for debugging any mail (or civimail) issues.
@@ -183,9 +199,14 @@ define( 'CIVICRM_MAIL_SMARTY', 0 );
  * The CIVICRM_MAIL_LOG is a debug option which disables MTA (mail transport agent) interaction.
  * You must disable CIVICRM_MAIL_LOG before CiviCRM will talk to your MTA.
  */
+// if (!defined('CIVICRM_MAIL_LOG')) {
 // define( 'CIVICRM_MAIL_LOG', '%%templateCompileDir%%/mail.log' );
+// }
 
-define( 'CIVICRM_DOMAIN_ID'      , 1 );
+
+if (!defined('CIVICRM_DOMAIN_ID')) {
+  define( 'CIVICRM_DOMAIN_ID'      , 1 );
+}
 
 /**
  * Settings to enable external caching using a Memcache server.  This is an
@@ -210,24 +231,32 @@ define( 'CIVICRM_DOMAIN_ID'      , 1 );
  * To not use any caching (not recommended), use a value of 'NoCache'
  *
  */
-define( 'CIVICRM_DB_CACHE_CLASS', 'ArrayCache' );
+if (!defined('CIVICRM_DB_CACHE_CLASS')) {
+  define( 'CIVICRM_DB_CACHE_CLASS', 'ArrayCache' );
+}
 
 /**
  * Change this to the IP address of your cache server if it is not on the
  * same machine (Unix).
  */
-define( 'CIVICRM_DB_CACHE_HOST', 'localhost' );
+if (!defined('CIVICRM_DB_CACHE_HOST')) {
+  define( 'CIVICRM_DB_CACHE_HOST', 'localhost' );
+}
 
 /**
  * Change this if you are not using the standard port for memcache or apccache (11211)
  */
-define( 'CIVICRM_DB_CACHE_PORT', 11211 );
+if (!defined('CIVICRM_DB_CACHE_PORT')) {
+  define( 'CIVICRM_DB_CACHE_PORT', 11211 );
+}
 
 /**
  * Items in cache will expire after the number of seconds specified here.
  * Default value is 3600 (i.e., after an hour)
  */
-define( 'CIVICRM_DB_CACHE_TIMEOUT', 3600 );
+if (!defined('CIVICRM_DB_CACHE_TIMEOUT')) {
+  define( 'CIVICRM_DB_CACHE_TIMEOUT', 3600 );
+}
 
 /**
  * If you are sharing the same memcache instance with more than one CiviCRM
@@ -237,7 +266,9 @@ define( 'CIVICRM_DB_CACHE_TIMEOUT', 3600 );
  * this if you have two servers might be 'server1_' for the first server, and
  * 'server2_' for the second server.
  */
-define( 'CIVICRM_MEMCACHE_PREFIX', '' );
+if (!defined('CIVICRM_MEMCACHE_PREFIX')) {
+  define( 'CIVICRM_MEMCACHE_PREFIX', '' );
+}
 
 /**
  * If you have multilingual site and you are using the "inherit CMS language"
@@ -263,7 +294,9 @@ define( 'CIVICRM_MEMCACHE_PREFIX', '' );
  * For more information:
  * http://wiki.civicrm.org/confluence/x/YABFBQ
  */
+// if (!defined('CIVICRM_GETTEXT_NATIVE')) {
 // define('CIVICRM_GETTEXT_NATIVE', 1);
+// }
 
 /**
  * Configure MySQL to throw more errors when encountering unusual SQL expressions.
@@ -271,7 +304,9 @@ define( 'CIVICRM_MEMCACHE_PREFIX', '' );
  * If undefined, the value is determined automatically. For CiviCRM tarballs, it defaults
  * to FALSE; for SVN checkouts, it defaults to TRUE.
  */
+// if (!defined('CIVICRM_MYSQL_STRICT')) {
 // define( 'CIVICRM_MYSQL_STRICT', TRUE );
+// }
 
 /**
  *
@@ -288,10 +323,12 @@ if ( set_include_path( $include_path ) === false ) {
    exit( );
 }
 
-if ( function_exists( 'variable_get' ) && variable_get('clean_url', '0') != '0' ) {
+if (!defined('CIVICRM_CLEANURL')) {
+  if ( function_exists( 'variable_get' ) && variable_get('clean_url', '0') != '0' ) {
     define( 'CIVICRM_CLEANURL', 1 );
-} else {
+  } else {
     define( 'CIVICRM_CLEANURL', 0 );
+  }
 }
 
 // force PHP to auto-detect Mac line endings
