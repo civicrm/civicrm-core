@@ -267,8 +267,8 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
         'event_type_id' => 4,
         'payment_processor' => $processorName,
         'fee_level' => array(
-          'Member' => "250.00",
-          'Non-Member' => "325.00",
+        'Member' => "250.00",
+        'Non-Member' => "325.00",
         ),
       );
     }
@@ -322,10 +322,10 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
     $this->click("link=Online Registration");
     $this->waitForElementPresent("_qf_Registration_upload-bottom");
 
-    $this->check("is_online_registration");
+    $this->click("is_online_registration");
     $this->assertChecked("is_online_registration");
 
-    $this->fillRichTextField("intro_text", "Fill in all the fields below and click Continue.");
+    $this->fillRichTextField("intro_text", "Fill in all the fields below and click Continue.", 'CKEditor', TRUE);
 
     // enable confirmation email
     $this->click("CIVICRM_QFID_1_is_email_confirm");
