@@ -94,6 +94,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->select("payment_instrument_id", "value=4");
     $this->waitForElementPresent("check_number");
     $this->type("check_number", "check #1041");
+    $this->click("is_email_receipt");
 
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
