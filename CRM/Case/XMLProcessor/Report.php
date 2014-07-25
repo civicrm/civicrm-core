@@ -289,7 +289,7 @@ WHERE      a.id = %1
         if ($dao->activity_type_id == CRM_Core_OptionGroup::getValue('activity_type', 'Email', 'name')) {
           $anyActivity = TRUE;
         }
-        $activityTypes = $this->allActivityTypes(FALSE, $anyActivity);
+        $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, $anyActivity);
         $activityTypeInfo = NULL;
 
         if (isset($activityTypes[$dao->activity_type_id])) {
