@@ -499,10 +499,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return void
    */
-  function fillRichTextField($fieldName, $text = 'Typing this text into editor.', $editor = 'CKEditor') {
+  function fillRichTextField($fieldName, $text = 'Typing this text into editor.', $editor = 'CKEditor', $compressed = FALSE) {
     // make sure cursor focuses on the field
     $this->fireEvent($fieldName, 'focus');
     if ($editor == 'CKEditor') {
+      if ($compressed) {
+        $this->click("{$fieldName}-plain");        
+      }
       $this->waitForElementPresent("xpath=//div[@id='cke_{$fieldName}']//iframe");
       $this->runScript("CKEDITOR.instances['{$fieldName}'].setData('<p>{$text}</p>');");
     }
