@@ -55,48 +55,47 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     );
   }
 
-  public function getAngularModules() {
-      $result = array();
-      $result['crmMailingAB'] = array(
-        'ext' => 'civicrm',
-        'js' => array('js/angular-crmMailingAB.js'),
-        'css' => array('css/angular-crmMailingAB.css'),
-      );
+	public function getAngularModules() {
+		$result = array();
+		$result['crmMailingAB'] = array(
+			'ext' => 'civicrm',
+			'js' => array('js/angular-crmMailingAB.js'),
+			'css' => array('css/angular-crmMailingAB.css'),
+		);
+
+		$civiMails = civicrm_api3('Mailing', 'get', array());
+		$campNames = civicrm_api3('Campaign', 'get', array());
+		$mailStatus = civicrm_api3('MailingJob', 'get', array());
+		$groupNames = civicrm_api3('Group', 'get', array());
+		$headerfooterList = civicrm_api3('MailingComponent', 'get', array());
+		$emailAdd = civicrm_api3('Email', 'get', array(
+			'sequential' => 1,
+			'return' => "email",
+			'contact_id' => 202,
+		));
+		$mesTemplate = civicrm_api3('MessageTemplate', 'get', array(
+			'sequential' => 1,
+			'return' => array("msg_html", "id", "msg_title"),
+			'id' => array('>' => 58),
+		));
+
+		CRM_Core_Resources::singleton()->addSetting(array(
+			'crmMailing' => array(
+				'civiMails' => array_values($civiMails['values']),
+				'campNames' => array_values($campNames['values']),
+				'mailStatus' => array_values($mailStatus['values']),
+				'groupNames' => array_values($groupNames['values']),
+				'headerfooterList' => array_values($headerfooterList['values']),
+				'mesTemplate' => array_values($mesTemplate['values']),
+				'emailAdd' => array_values($emailAdd['values']),
+			),
+		));
+
+		return $result;
+	}
 
 
-      $civiMails = civicrm_api3('Mailing', 'get', array());
-      $campNames = civicrm_api3('Campaign', 'get', array());
-      $mailStatus = civicrm_api3('MailingJob', 'get', array());
-      $groupNames = civicrm_api3('Group', 'get', array());
-      $headerfooterList = civicrm_api3('MailingComponent', 'get', array());
-      $emailAdd = civicrm_api3('Email', 'get', array(
-      'sequential' => 1,
-      'return' => "email",
-      'contact_id' => 202,
-      ));
-      $mesTemplate = civicrm_api3('MessageTemplate', 'get', array( 'sequential' => 1,
-      'return' => array("msg_html", "id", "msg_title"),
-      'id' => array('>' => 58),
-      ));
-
-      CRM_Core_Resources::singleton()->addSetting(array(
-        'crmMailing' => array(
-          'civiMails' => array_values($civiMails['values']),
-          'campNames' => array_values($campNames['values']),
-          'mailStatus' => array_values($mailStatus['values']),
-          'groupNames' => array_values($groupNames['values']),
-          'headerfooterList' => array_values($headerfooterList['values']),
-          'mesTemplate' => array_values($mesTemplate['values']),
-          'emailAdd' => array_values($emailAdd['values']),
-          ),
-        ));
-
-
-      return $result;
-    }
-
-
-  /**
+	/**
    * @return bool
    */
   static function workflowEnabled() {
