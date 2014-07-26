@@ -49,7 +49,7 @@
  *
  * @return array API Success Array
  */
-function civicrm_api3_mailingab_create($params) {
+function civicrm_api3_mailing_a_b_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -61,7 +61,7 @@ function civicrm_api3_mailingab_create($params) {
  *
  * @return array API Success Array
  */
-function civicrm_api3_mailingab_delete($params) {
+function civicrm_api3_mailing_a_b_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -71,7 +71,7 @@ function civicrm_api3_mailingab_delete($params) {
  * @param array $params
  * @return array
  */
-function civicrm_api3_mailingab_get($params) {
+function civicrm_api3_mailing_a_b_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 

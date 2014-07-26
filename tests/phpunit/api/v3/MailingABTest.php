@@ -78,7 +78,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
    * Test civicrm_mailing_create
    */
   public function testMailingABCreateSuccess() {
-    $result = $this->callAPIAndDocument('MailingAB', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertTrue(is_numeric($result['id']), "In line " . __LINE__);
     $this->assertEquals($this->_params['group_percentage'], $result['values'][$result['id']]['group_percentage']);
   }
@@ -88,7 +88,6 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
    */
   public function testMailerDeleteSuccess() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
-    $this->assertAPIDeleted($this->_entity, $result['id']);
+    $this->callAPISuccess($this->_entity, 'delete', array('id' => $result['id']));
   }
-
 }
