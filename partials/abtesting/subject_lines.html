@@ -4,7 +4,7 @@
 <table class="form-layout-compressed">
     <tbody>
     <tr>
-        <td class="label">From E-mail Address </td>
+        <td class="label">From E-mail Address A</td>
         <td>
             <select style="width: 200px" ng-model="currentMailing.from_email" ng-options="frm.email as frm.email for frm in eMailing">
                 <option value="">-none-</option>
@@ -57,111 +57,43 @@
 
 <br>
 <div class="crm-accordion-wrapper collapsed" >
-    <div class="crm-accordion-header">Compose on Screen</div>
-    <div class="crm-accordion-body"  >
 
-        <br>
-        <div class="crm-accordion-wrapper collapsed">
-            <div class="crm-accordion-header">HTML Format</div>
-            <div class="crm-accordion-body">
-                <br>
-                &nbsp &nbsp &nbsp &nbsp
-                <textarea ng-model="currentMailing.body_html" style="width: 600px; height: 300px;"></textarea>
-                <br> <br>
-            </div>
+
+    <div class="crm-accordion-wrapper collapsed">
+        <div class="crm-accordion-header">HTML Format</div>
+        <div class="crm-accordion-body">
+            <br>
+            &nbsp &nbsp &nbsp &nbsp
+            <textarea ng-model="currentMailing.body_html" style="width: 600px; height: 300px;"></textarea>
+            <br> <br>
         </div>
+    </div>
 
-        <div class="crm-accordion-wrapper collapsed">
-            <div class="crm-accordion-header">Plain Text</div>
-            <div class="crm-accordion-body" >
+    <div class="crm-accordion-wrapper collapsed">
+        <div class="crm-accordion-header">Plain Text</div>
+        <div class="crm-accordion-body" >
 
-                <br>
-                &nbsp &nbsp &nbsp &nbsp
-                <textarea ng-model="currentMailing.body_text" style="width: 600px; height: 300px;"></textarea>
-                <br> <br>
-            </div>
+            <br>
+            &nbsp &nbsp &nbsp &nbsp
+            <textarea ng-model="currentMailing.body_text" style="width: 600px; height: 300px;"></textarea>
+            <br>
         </div>
-
-        <table>
-            <tr ng-show= "false">
-                <td>
-                    <input type="checkbox">&nbsp Save Template</input>
-            </tr>
-        </table>
-
-
-
-
     </div>
+
+    <table  ng-show= "false">
+        <tr>
+            <td>
+                <input type="checkbox">&nbsp Save Template</input>
+        </tr>
+    </table>
+
 </div>
-<div class="crm-accordion-wrapper collapsed" ng-show = 'false' >
-    <div class="crm-accordion-header">Upload Content</div>
-    <div class="crm-accordion-body" >
 
-        <body>
-        <table>
-            <tr>
-                <td class="label">Upload TEXT Message</td>
-                <td>
-                    <input type="file"/>
-                </td>
-            </tr>
-            <tr>
-                <td class="label">Upload HTML Message</td>
-                <td>
-                    <input type="file"/>
-                </td>
-            </tr>
-        </table>
-
-        </body>
-    </div>
-</div>
-<div class="crm-accordion-wrapper collapsed" >
-    <div class="crm-accordion-header">Attachments</div>
-    <div class="crm-accordion-body" >
-
-        <!-- will use Controller: browse -->
-        <body>
-        <table>
-            <tr>
-                <td class="label">Attach Files</td>
-                <td>
-                    <input type="file" data-file="param.file"/>
-                </td>
-                <td>
-                    <button ng-click="upload()" >Upload</button>
-                </td>
-            </tr>
-            <tr>
-                <td class="label">Attach Files</td>
-                <td>
-                    <input type="file" data-file="param.file_2"/>
-                </td>
-                <td>
-                    <button ng-click="upload_2()" >Upload</button>
-                </td>
-            </tr>
-            <tr>
-                <td class="label">Attach Files</td>
-                <td>
-                    <input type="file" data-file="param.file_3"/>
-                </td>
-                <td>
-                    <button ng-click="upload_3()" >Upload</button>
-                </td>
-            </tr>
-
-        </table>
-
-        </body>
-    </div>
-</div>
 <div class="crm-accordion-wrapper collapsed">
     <div class="crm-accordion-header">Header and Footer</div>
     <div class="crm-accordion-body" >
 
-        <br>
+
         <body>
         <table>
             <tr>

@@ -21,7 +21,7 @@
                 &nbsp <input type="radio" ng-model="template" ng-value="templates[0]">  Subject Lines <br/><br>
                 &nbsp <input type="radio" ng-model="template" ng-value="templates[1]"> From Names <br/><br>
                 &nbsp <input type="radio" ng-model="template" ng-value="templates[2]"> Two different Emails <br/><br>
-                &nbsp <div style="position:relative; left:200px; top: 30px;" nextbutton></div> <div style="position:relative; left:300px;" cancelbutton></div>
+                &nbsp <div style="position:relative; left:220px; top: 30px;" nextbutton></div> <div style="position:relative; left:300px; top:-1px;" cancelbutton></div>
 
 
             </form>
@@ -32,9 +32,9 @@
             <form>
             <div  ng-include="template.url">
             </div>
-                <div style="position:relative; left:200px; top:60px;" prevbutton></div>
-                <div style="position:relative; left:295px; top: 30px;" nextbutton></div>
-                <div style="position:relative; left:375px;"cancelbutton></div>
+                <div style="position:relative; left:200px; top:61px;" prevbutton></div>
+                <div style="position:relative; left:300px; top: 30px;" nextbutton></div>
+                <div style="position:relative; left:375px; top:-1px;"cancelbutton></div>
 
             </form>
         </div>
@@ -46,14 +46,14 @@
 
 
                 &nbsp<br>
-                <select multiple groupselect ng-model="incGroup">
-                    <option id= "1" ng-repeat="grp in groups" value="{{grp.id}} group include" > {{grp.title}} </option>
-                    <option ng-repeat="grp in groups" value="{{grp.id}} group exclude" > {{grp.title}} </option>
-                    <option ng-repeat="ml in mailList" value="{{ml.id}} mail include" > {{ml.name}} </option>
-                    <option ng-repeat="ml in mailList" value="{{ml.id}} mail exclude" > {{ml.name}} </option>
+                <select multiple groupselect >
+                    <option id= "1" ng-repeat="grp in groups" value="{{grp.id}} group include {{grp.title}}" > {{grp.title}} </option>
+                    <option ng-repeat="grp in groups" value="{{grp.id}} group exclude {{grp.title}}" > {{grp.title}} </option>
+                    <option ng-repeat="ml in mailList" value="{{ml.id}} mail include {{ml.title}}" > {{ml.name}} </option>
+                    <option ng-repeat="ml in mailList" value="{{ml.id}} mail exclude {{ml.title}}" > {{ml.name}} </option>
                 </select>
                 <br> <br><br><br>
-
+                {{incGroup}}<br>{{excGroup}}
 
                 <h3>Select the size of your test group</h3><br>
                 &nbsp Percentage Selected - {{slide_value}}%
@@ -95,8 +95,8 @@
 
 
                 <div style="position:relative; left:200px; top:30px;" prevbutton></div>
-                <div style="position:relative; left:295px; top: 00px;" nextbutton></div>
-                <div style="position:relative; left:375px; top: -30px;" cancelbutton></div>
+                <div style="position:relative; left:300px; top: 00px;" nextbutton></div>
+                <div style="position:relative; left:375px; top: -31px;" cancelbutton></div>
 
             </form>
         </div>
@@ -110,8 +110,12 @@
                 <td>{{template.name}}</td>
             </tr>
             <tr>
-                 <td>Groups Selected</td>
-                 <td>{{groups_selected}}</td>
+                 <td>Groups Included</td>
+                 <td>{{incGroup}}</td>
+            </tr>
+            <tr>
+                    <td>Groups Excluded</td>
+                    <td>{{excGroup}}</td>
             </tr>
             <tr>
                  <td>Size of Test Group</td>
@@ -149,7 +153,7 @@
 
             <br><br>
             <div>
-4
+
                 <div style="position:relative; left:200px; top:60px;" prevbutton></div>
                 <div class="crm-submit-buttons" style="position:relative; left:295px; top: 30px;" >
                   <div class = "crm-button crm-button-type-upload crm-button_qf_Contact_upload_view"   >

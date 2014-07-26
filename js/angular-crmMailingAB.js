@@ -121,6 +121,8 @@
         $scope.scheddate={};
         $scope.scheddate.date = "6";
         $scope.scheddate.time = "";
+        $scope.incGroup =[];
+        $scope.excGroup=[];
 
 
     });
@@ -211,6 +213,39 @@
                    formatResult: format,
                    formatSelection: format,
                    escapeMarkup: function(m) { return m; }
+               });
+
+               $(element).on('select2-selecting', function(e) {
+                   var a = e.val.split(" ");
+                   var l = a.length;
+                   if(a[2]=="include")
+                   {   var str="";
+                       for(i=3; i< l; i++){
+                       str+=a[i];
+                       str+=" ";
+                       }
+                       scope.incGroup.push(str);scope.$apply();}
+
+                   else
+                   {   var str="";
+                       for(i=3; i< l; i++){
+                           str+=a[i];
+                           str+=" ";
+                       }
+
+                       scope.excGroup.push(str);scope.$apply();}
+
+               });
+               $(element).on("select2-removed", function(e) {
+                   if(e.val.split(" ")[2]=="exclude") {
+                       var index = scope.excGroup.indexOf(e.val.split(" ")[3]);
+                       scope.excGroup.splice(index, 1);
+                       scope.$apply();
+                   }
+                   else{
+                       var index = scope.incGroup.indexOf(e.val.split(" ")[3]);
+                       scope.incGroup.splice(index, 1);scope.$apply();
+                   }
                });
            }
        };

@@ -8,294 +8,20 @@
       </ul>
 
       <div id="tabs-21">
-          <table class="form-layout-compressed">
-              <tbody>
-              <tr>
-                  <td class="label">From E-mail Address</td>
-                  <td>
-                      <select style="width: 200px" ng-model="currentMailing.from_email" ng-options="frm.email as frm.email for frm in eMailing">
-                          <option value="">-none-</option>
-                      </select>
-                  </td>
-              </tr>
-              <tr>
-                  <td class="label">Reply to E-mail Address</td>
-                  <td>
-                      <select style="width: 200px" ng-model="currentMailing.replyto_email" ng-options="frm.email as frm.email for frm in eMailing">
-                          <option value="">-none-</option>
-                      </select>
-                  </td>
-              </tr>
-              <tr>
-                  <td class="label">Mailing Subject</td>
-                  <td>
-                      <input placeholder="Enter Subject"  name="subject" type="text" ng-model="currentMailing.subject"/>
-                  </td>
-              </tr>
-              <tr>
-                  <td class="label" style= "color:red" ng-show="mailing_form.subject.$invalid">
-                      Mailing subject required.
-                  </td>
-              </tr>
-              <tr>
-                  <td class="label">Use Template</td>
-                  <td>
-                      <select ng-change="tmp(tst)" ng-model="tst" ng-options= "mstemp.id as mstemp.msg_title for mstemp in tmpList">
-                          <option value="">-none-</option>
-                      </select>
-                  </td>
-              </tr>
-              <tr ng-show= "false">
-                  <td class="label">I want to</td>
-                  <td class="label">Compose on screen</td>
-                  <td><input type="radio" ng-model="composeS" value="1" /></td>
-                  <td class="label">Upload Content</td>
-                  <td><input type="radio" ng-model="composeS" value="0" /></td>
-              </tr>
-              </tbody>
-          </table>
 
-          <br>
-          <div class="crm-accordion-wrapper collapsed" >
-              <div class="crm-accordion-header">Compose on Screen</div>
-              <div class="crm-accordion-body"  >
+      <div>
 
-                  <br>
-                  <div class="crm-accordion-wrapper collapsed">
-                      <div class="crm-accordion-header">HTML Format</div>
-                      <div class="crm-accordion-body">
-                          <br>
-                          &nbsp &nbsp &nbsp &nbsp
-                          <textarea ng-model="currentMailing.body_html" style="width: 600px; height: 300px;"></textarea>
-                          <br> <br>
-                      </div>
-                  </div>
-
-                  <div class="crm-accordion-wrapper collapsed">
-                      <div class="crm-accordion-header">Plain Text</div>
-                      <div class="crm-accordion-body" >
-
-                          <br>
-                          &nbsp &nbsp &nbsp &nbsp
-                          <textarea ng-model="currentMailing.body_text" style="width: 600px; height: 300px;"></textarea>
-                          <br> <br>
-                      </div>
-                  </div>
-
-                  <table>
-                      <tr ng-show= "false">
-                          <td>
-                              <input type="checkbox">&nbsp Save Template</input>
-                      </tr>
-                  </table>
-
-
-
-
-              </div>
-          </div>
-          <div class="crm-accordion-wrapper collapsed" ng-show="false">
-              <div class="crm-accordion-header">Upload Content</div>
-              <div class="crm-accordion-body" >
-
-                  <body>
-                  <table>
-                      <tr>
-                          <td class="label">Upload TEXT Message</td>
-                          <td>
-                              <input type="file"/>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td class="label">Upload HTML Message</td>
-                          <td>
-                              <input type="file"/>
-                          </td>
-                      </tr>
-                  </table>
-
-                  </body>
-              </div>
-          </div>
-          <div class="crm-accordion-wrapper collapsed" >
-              <div class="crm-accordion-header">Attachments</div>
-              <div class="crm-accordion-body" >
-
-                  <!-- will use Controller: browse -->
-                  <body>
-                  <table>
-                      <tr>
-                          <td class="label">Attach Files</td>
-                          <td>
-                              <input type="file" data-file="param.file"/>
-                          </td>
-                          <td>
-                              <button ng-click="upload()" >Upload</button>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td class="label">Attach Files</td>
-                          <td>
-                              <input type="file" data-file="param.file_2"/>
-                          </td>
-                          <td>
-                              <button ng-click="upload_2()" >Upload</button>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td class="label">Attach Files</td>
-                          <td>
-                              <input type="file" data-file="param.file_3"/>
-                          </td>
-                          <td>
-                              <button ng-click="upload_3()" >Upload</button>
-                          </td>
-                      </tr>
-
-                  </table>
-
-                  </body>
-              </div>
-          </div>
-          <div class="crm-accordion-wrapper collapsed">
-              <div class="crm-accordion-header">Header and Footer</div>
-              <div class="crm-accordion-body" >
-
-                  <br>
-                  <body>
-                  <table>
-                      <tr>
-                          <td class="label">Mailing Header</td>
-                          <td>
-                              <select ng-model="currentMailing.header_id" ng-options="hf.id as hf.name for hf in headerfooter| filter:isHeader">
-                                  <option value="">-none-</option>
-                              </select>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td class="label">Mailing Footer</td>
-                          <td>
-                              <select ng-model="currentMailing.footer_id" ng-options="f.id as f.name for f in headerfooter| filter:isFooter">
-                                  <option value="">-none-</option>
-                              </select>
-                          </td>
-                      </tr>
-                  </table>
-                  </body>
-              </div>
-          </div>
-          <div class="crm-accordion-wrapper collapsed">
-              <div class="crm-accordion-header">Track and Respond</div>
-              <div class="crm-accordion-body" >
-
-                  <table class="form-layout-compressed">
-                      <tbody>
-                      <tr>
-                          <td>
-                              <h3 style ="text-decoration:underline"> Tracking</h3>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td>
-                              <input type="checkbox" ng-model="currentMailing.url_tracking" ng-true-value="1" ng-false-value="0">&nbsp Track Click Throughs</input>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td>
-                              <div id="help">
-                                  Track the number of times recipients click each link in this mailing. NOTE: When this feature is enabled, all links in the message body will be automaticallly re-written to route through your CiviCRM server prior to redirecting to the target page.
-                              </div>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td>
-                              <input type="checkbox" ng-model="currentMailing.open_tracking" ng-true-value="1" ng-false-value="0">&nbsp Track Opens</input>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td>
-                              <div id="help">
-                                  Track the number of times recipients open this mailing in their email software.
-                              </div>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td>
-                              <h3 style ="text-decoration:underline">Responding</h3>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td>
-                              <input type="checkbox" ng-model="trackreplies" ng-change= "reply()" ng-true-value="1" ng-false-value="0">&nbsp Track Replies</input>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td>
-                              <div id="help">
-                                  Recipients' replies are sent to a CiviMail specific address instead of the sender's address so they can be stored within CiviCRM.
-                              </div>
-                          </td>
-                      </tr>
-                      <tr ng-show= "trackr(trackreplies)">
-                          <td>
-                              <input type="checkbox" ng-model="currentMailing.forward_replies" ng-true-value="1" ng-false-value="0">&nbsp Forward Replies</input>
-                          </td>
-                      </tr>
-                      <tr ng-show= "trackr(trackreplies)">
-                          <td>
-                              <div id="help">
-                                  If a recipient replies to this mailing, forward the reply to the FROM Email address specified for the mailing.
-                              </div>
-                          </td>
-                      </tr>
-                      <tr ng-show= "trackr(trackreplies)">
-                          <td>
-                              <input type="checkbox" ng-model="currentMailing.auto_responder" ng-true-value="1" ng-false-value="0">&nbsp Auto-Respond to Replies &nbsp &nbsp</input>
-                              <select ng-model="mailAutoResponder" ng-options="au.id as au.name for au in headerfooter| filter:isAuto">
-                                  <option value="">-none-</option>
-                              </select>
-                          </td>
-                      </tr>
-                      <tr ng-show= "trackr(trackreplies)">
-                          <td>
-                              <div id="help">
-                                  If a recipient replies to this mailing, send an automated reply using the selected message.
-                              </div>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td>
-                              <h3 style ="text-decoration:underline"> Online Publication</h3>
-                          </td>
-                      </tr>
-                  </table>
-
-                  <table class="form-layout-compressed">
-                      <tr>
-                          <td class="label">Mailing Visibility</td>
-                          <td>
-                              <select ng-model="currentMailing.visibility">
-                                  <option value="Public Pages">Public Pages</option>
-                                  <option value="User and User Admin Only">User and User Admin Only</option>
-                              </select>
-                          </td>
-                          </tbody>
-                  </table>
-              </div>
-          </div>
-
-      </div>
-      <div id="tabs-22">
       <table class="form-layout-compressed">
           <tbody>
           <tr>
-              <td class="label">From E-mail Address</td>
+              <td class="label">From E-mail Address A</td>
               <td>
                   <select style="width: 200px" ng-model="currentMailing.from_email" ng-options="frm.email as frm.email for frm in eMailing">
                       <option value="">-none-</option>
                   </select>
               </td>
           </tr>
+
           <tr>
               <td class="label">Reply to E-mail Address</td>
               <td>
@@ -310,6 +36,7 @@
                   <input placeholder="Enter Subject"  name="subject" type="text" ng-model="currentMailing.subject"/>
               </td>
           </tr>
+
           <tr>
               <td class="label" style= "color:red" ng-show="mailing_form.subject.$invalid">
                   Mailing subject required.
@@ -335,111 +62,43 @@
 
       <br>
       <div class="crm-accordion-wrapper collapsed" >
-          <div class="crm-accordion-header">Compose on Screen</div>
-          <div class="crm-accordion-body"  >
 
-              <br>
-              <div class="crm-accordion-wrapper collapsed">
-                  <div class="crm-accordion-header">HTML Format</div>
-                  <div class="crm-accordion-body">
-                      <br>
-                      &nbsp &nbsp &nbsp &nbsp
-                      <textarea ng-model="currentMailing.body_html" style="width: 600px; height: 300px;"></textarea>
-                      <br> <br>
-                  </div>
+
+          <div class="crm-accordion-wrapper collapsed">
+              <div class="crm-accordion-header">HTML Format</div>
+              <div class="crm-accordion-body">
+                  <br>
+                  &nbsp &nbsp &nbsp &nbsp
+                  <textarea ng-model="currentMailing.body_html" style="width: 600px; height: 300px;"></textarea>
+                  <br> <br>
               </div>
+          </div>
 
-              <div class="crm-accordion-wrapper collapsed">
-                  <div class="crm-accordion-header">Plain Text</div>
-                  <div class="crm-accordion-body" >
+          <div class="crm-accordion-wrapper collapsed">
+              <div class="crm-accordion-header">Plain Text</div>
+              <div class="crm-accordion-body" >
 
-                      <br>
-                      &nbsp &nbsp &nbsp &nbsp
-                      <textarea ng-model="currentMailing.body_text" style="width: 600px; height: 300px;"></textarea>
-                      <br> <br>
-                  </div>
+                  <br>
+                  &nbsp &nbsp &nbsp &nbsp
+                  <textarea ng-model="currentMailing.body_text" style="width: 600px; height: 300px;"></textarea>
+                  <br>
               </div>
-
-              <table>
-                  <tr ng-show= "false">
-                      <td>
-                          <input type="checkbox">&nbsp Save Template</input>
-                  </tr>
-              </table>
-
-
-
-
           </div>
+
+          <table  ng-show= "false">
+              <tr>
+                  <td>
+                      <input type="checkbox">&nbsp Save Template</input>
+              </tr>
+          </table>
+
       </div>
-      <div class="crm-accordion-wrapper collapsed" >
-          <div class="crm-accordion-header">Upload Content</div>
-          <div class="crm-accordion-body" >
 
-              <body>
-              <table>
-                  <tr>
-                      <td class="label">Upload TEXT Message</td>
-                      <td>
-                          <input type="file"/>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td class="label">Upload HTML Message</td>
-                      <td>
-                          <input type="file"/>
-                      </td>
-                  </tr>
-              </table>
-
-              </body>
-          </div>
-      </div>
-      <div class="crm-accordion-wrapper collapsed" >
-          <div class="crm-accordion-header">Attachments</div>
-          <div class="crm-accordion-body" >
-
-              <!-- will use Controller: browse -->
-              <body>
-              <table>
-                  <tr>
-                      <td class="label">Attach Files</td>
-                      <td>
-                          <input type="file" data-file="param.file"/>
-                      </td>
-                      <td>
-                          <button ng-click="upload()" >Upload</button>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td class="label">Attach Files</td>
-                      <td>
-                          <input type="file" data-file="param.file_2"/>
-                      </td>
-                      <td>
-                          <button ng-click="upload_2()" >Upload</button>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td class="label">Attach Files</td>
-                      <td>
-                          <input type="file" data-file="param.file_3"/>
-                      </td>
-                      <td>
-                          <button ng-click="upload_3()" >Upload</button>
-                      </td>
-                  </tr>
-
-              </table>
-
-              </body>
-          </div>
-      </div>
       <div class="crm-accordion-wrapper collapsed">
           <div class="crm-accordion-header">Header and Footer</div>
           <div class="crm-accordion-body" >
 
-              <br>
+
               <body>
               <table>
                   <tr>
@@ -562,9 +221,225 @@
           </div>
       </div>
       </div>
+      </div>
+        <div id="tabs-22">
 
+        <div>
+
+        <table class="form-layout-compressed">
+            <tbody>
+            <tr>
+                <td class="label">From E-mail Address A</td>
+                <td>
+                    <select style="width: 200px" ng-model="currentMailing.from_email" ng-options="frm.email as frm.email for frm in eMailing">
+                        <option value="">-none-</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="label">Reply to E-mail Address</td>
+                <td>
+                    <select style="width: 200px" ng-model="currentMailing.replyto_email" ng-options="frm.email as frm.email for frm in eMailing">
+                        <option value="">-none-</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Mailing Subject</td>
+                <td>
+                    <input placeholder="Enter Subject"  name="subject" type="text" ng-model="currentMailing.subject"/>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="label" style= "color:red" ng-show="mailing_form.subject.$invalid">
+                    Mailing subject required.
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Use Template</td>
+                <td>
+                    <select ng-change="tmp(tst)" ng-model="tst" ng-options= "mstemp.id as mstemp.msg_title for mstemp in tmpList">
+                        <option value="">-none-</option>
+                    </select>
+                </td>
+            </tr>
+            <tr ng-show= "false">
+                <td class="label">I want to</td>
+                <td class="label">Compose on screen</td>
+                <td><input type="radio" ng-model="composeS" value="1" /></td>
+                <td class="label">Upload Content</td>
+                <td><input type="radio" ng-model="composeS" value="0" /></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <br>
+        <div class="crm-accordion-wrapper collapsed" >
+
+
+            <div class="crm-accordion-wrapper collapsed">
+                <div class="crm-accordion-header">HTML Format</div>
+                <div class="crm-accordion-body">
+                    <br>
+                    &nbsp &nbsp &nbsp &nbsp
+                    <textarea ng-model="currentMailing.body_html" style="width: 600px; height: 300px;"></textarea>
+                    <br> <br>
+                </div>
+            </div>
+
+            <div class="crm-accordion-wrapper collapsed">
+                <div class="crm-accordion-header">Plain Text</div>
+                <div class="crm-accordion-body" >
+
+                    <br>
+                    &nbsp &nbsp &nbsp &nbsp
+                    <textarea ng-model="currentMailing.body_text" style="width: 600px; height: 300px;"></textarea>
+                    <br>
+                </div>
+            </div>
+
+            <table  ng-show= "false">
+                <tr>
+                    <td>
+                        <input type="checkbox">&nbsp Save Template</input>
+                </tr>
+            </table>
+
+        </div>
+
+        <div class="crm-accordion-wrapper collapsed">
+            <div class="crm-accordion-header">Header and Footer</div>
+            <div class="crm-accordion-body" >
+
+
+                <body>
+                <table>
+                    <tr>
+                        <td class="label">Mailing Header</td>
+                        <td>
+                            <select ng-model="currentMailing.header_id" ng-options="hf.id as hf.name for hf in headerfooter| filter:isHeader">
+                                <option value="">-none-</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">Mailing Footer</td>
+                        <td>
+                            <select ng-model="currentMailing.footer_id" ng-options="f.id as f.name for f in headerfooter| filter:isFooter">
+                                <option value="">-none-</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                </body>
+            </div>
+        </div>
+        <div class="crm-accordion-wrapper collapsed">
+            <div class="crm-accordion-header">Track and Respond</div>
+            <div class="crm-accordion-body" >
+
+                <table class="form-layout-compressed">
+                    <tbody>
+                    <tr>
+                        <td>
+                            <h3 style ="text-decoration:underline"> Tracking</h3>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" ng-model="currentMailing.url_tracking" ng-true-value="1" ng-false-value="0">&nbsp Track Click Throughs</input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div id="help">
+                                Track the number of times recipients click each link in this mailing. NOTE: When this feature is enabled, all links in the message body will be automaticallly re-written to route through your CiviCRM server prior to redirecting to the target page.
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" ng-model="currentMailing.open_tracking" ng-true-value="1" ng-false-value="0">&nbsp Track Opens</input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div id="help">
+                                Track the number of times recipients open this mailing in their email software.
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h3 style ="text-decoration:underline">Responding</h3>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="checkbox" ng-model="trackreplies" ng-change= "reply()" ng-true-value="1" ng-false-value="0">&nbsp Track Replies</input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div id="help">
+                                Recipients' replies are sent to a CiviMail specific address instead of the sender's address so they can be stored within CiviCRM.
+                            </div>
+                        </td>
+                    </tr>
+                    <tr ng-show= "trackr(trackreplies)">
+                        <td>
+                            <input type="checkbox" ng-model="currentMailing.forward_replies" ng-true-value="1" ng-false-value="0">&nbsp Forward Replies</input>
+                        </td>
+                    </tr>
+                    <tr ng-show= "trackr(trackreplies)">
+                        <td>
+                            <div id="help">
+                                If a recipient replies to this mailing, forward the reply to the FROM Email address specified for the mailing.
+                            </div>
+                        </td>
+                    </tr>
+                    <tr ng-show= "trackr(trackreplies)">
+                        <td>
+                            <input type="checkbox" ng-model="currentMailing.auto_responder" ng-true-value="1" ng-false-value="0">&nbsp Auto-Respond to Replies &nbsp &nbsp</input>
+                            <select ng-model="mailAutoResponder" ng-options="au.id as au.name for au in headerfooter| filter:isAuto">
+                                <option value="">-none-</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr ng-show= "trackr(trackreplies)">
+                        <td>
+                            <div id="help">
+                                If a recipient replies to this mailing, send an automated reply using the selected message.
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h3 style ="text-decoration:underline"> Online Publication</h3>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="form-layout-compressed">
+                    <tr>
+                        <td class="label">Mailing Visibility</td>
+                        <td>
+                            <select ng-model="currentMailing.visibility">
+                                <option value="Public Pages">Public Pages</option>
+                                <option value="User and User Admin Only">User and User Admin Only</option>
+                            </select>
+                        </td>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+        </div>
+
+        </div>
   </div>
 
-
-
 </div>
+
+
