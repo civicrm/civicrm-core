@@ -20,16 +20,6 @@
 	crmMailingAB.config([
 		'$routeProvider',
 		function ($routeProvider) {
-//			$routeProvider.when('/mailing', {
-//				template: '<h1>sdfs</h1>',
-//				controller: 'mailingListCtrl',
-//				resolve: {
-//					mailingList: function ($route, crmApi) {
-//						return crmApi('Mailing', 'get', {});
-//					}
-//				}
-//			});
-
 			$routeProvider.when('/mailing/abtesting', {
 				templateUrl: partialUrl('main.html'),
 				controller: 'TabsDemoCtrl',
@@ -41,6 +31,7 @@
 			});
 		}
 	]);
+
 //-----------------------------------------
 	// Add a new record by name.
 	// Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
