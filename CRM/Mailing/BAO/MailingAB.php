@@ -67,6 +67,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
       return $mailingab;
     }
     $transaction->commit();
+    return $mailingab;
   }
 
   /**
@@ -133,5 +134,4 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
 
     CRM_Utils_Hook::post('delete', 'MailingAB', $id, $dao);
   }
-
 }

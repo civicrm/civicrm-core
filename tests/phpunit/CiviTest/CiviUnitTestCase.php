@@ -925,7 +925,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       throw new Exception('Invalid getcount result : ' . print_r($result, TRUE) . " type :" . gettype($result));
     }
     if(is_int($count)){
-      $this->assertEquals($count, $result, "incorect count returned from $entity getcount");
+      $this->assertEquals($count, $result, "incorrect count returned from $entity getcount");
     }
     return $result;
   }
