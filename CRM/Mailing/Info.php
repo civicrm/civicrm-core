@@ -77,6 +77,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 			'id' => array('>' => 58),
 			));
 		$mailGrp = civicrm_api3('MailingGroup','get', array());
+		$mailTokens = civicrm_api3('Mailing', 'get_token', array( 'usage' => 'Mailing'));
+			
 		
 				
     CRM_Core_Resources::singleton()->addSetting(array(
@@ -89,6 +91,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'mesTemplate' => array_values($mesTemplate['values']),
         'emailAdd' => array_values($emailAdd['values']),
         'mailGrp' => array_values($mailGrp['values']),
+        'mailTokens' => array_values($mailTokens),
         ),
       ));
     return $result;

@@ -7,7 +7,7 @@
   var crmMailing = angular.module('crmMailing', ['ngRoute', 'ui.utils']);
   var chck = []; //to fill the group variable $scope.incGroup
   var chck2= []; // to get id and text in the required format
-
+	var mltokens = [];
 //-------------------------------------------------------------------------------------------------------
  crmMailing.config(['$routeProvider',
     function($routeProvider) {
@@ -72,10 +72,13 @@
 		$scope.tmpList = CRM.crmMailing.mesTemplate;
 		$scope.mailingGrp = CRM.crmMailing.mailGrp;
 		$scope.currentMailing = selectedMail;
+		mltokens = CRM.crmMailing.mailTokens;
+		console.log(mltokens);
 		$scope.testGroup = "";
 		window.ct = $scope.currentMailing;
 		$scope.param = {};
 		$scope.tst="";
+		$scope.token = "";
 		chck = [];
 		chck2 = [];
 		$scope.mailid = [];
@@ -431,6 +434,7 @@
 
 			$(element).select2({
 				width:"400px",
+				placeholder: "Choose Recipients",
 				formatResult: format,
 				formatSelection: format,
 				escapeMarkup: function(m) { return m; },
@@ -463,6 +467,42 @@
 			}
 		};
 	}); 
+	
+	    crmMailing.directive('groupselect',function(){
+       return {
+           restrict : 'AE',
+           link: function(scope,element, attrs){
+               $(element).select2({width:"200px", data: mltokens, placeholder:"Insert Token"});
+
+               
+               $(element).on('select2-selecting', function(e) { 
+								scope.$evalAsync('_resetSelection()');console.log(mltokens);
+						   /* if(scope.currentMailing.body_html == null){
+									scope.currentMailing.body_html = e.val;
+								}
+								else 
+								scope.currentMailing.body_html = scope.currentMailing.body_html + e.val;
+*/
+								var msg = document.getElementById("body_html").value;
+								var cursorlen = document.getElementById("body_html").selectionStart;
+								console.log(cursorlen);
+								var textlen   = msg.length;
+								document.getElementById("body_html").value = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
+								scope.currentMailing.body_html = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
+								console.log(document.getElementById("body_html").value);
+								console.log(scope.currentMailing.body_html);
+								var cursorPos = (cursorlen + e.val.length);
+								document.getElementById("body_html").selectionStart = cursorPos;
+								document.getElementById("body_html").selectionEnd   = cursorPos;
+								document.getElementById("body_html").focus();  
+								scope.$apply();
+								e.preventDefault();
+								})
+
+           }
+       };
+
+    });
 	
 	// Used for the select date option. This is used for giving scheduled_date its date value
 	crmMailing.directive('chsdate',function(){
