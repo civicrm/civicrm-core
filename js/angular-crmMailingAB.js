@@ -39,6 +39,7 @@
               return crmApi('MailingAB', 'getsingle', {id: $route.current.params.id});
             }
             else {
+              console.log("created");
               //created_id has been set to my id. Does not save without created_id. Needs to made generic based on the user
               return { just_created:"1"
               };
@@ -108,15 +109,16 @@
         { name: 'From Name', url: partialUrl('from_name.html'),val:2},
         {name: 'Two different Emails', url: partialUrl('two_emails.html'),val:3}
       ];
-    if(typeof $scope.template == 'undefined'){
-    console.log("adi");
-      $scope.template = $scope.templates[0];
-  }
-    else{
+    if($scope.currentABTest.just_created != 1){
+
       console.log("adit "+$scope.currentABTest.testing_criteria_id);
 
       $scope.template=$scope.templates[$scope.currentABTest.testing_criteria_id-1];
       console.log($scope.template.val);
+  }
+    else{
+      console.log("adi");
+      $scope.template = $scope.templates[0];
     }
 
     mltokens = CRM.crmMailing.mailTokens;
@@ -781,9 +783,9 @@
           dateFormat: "yy-mm-dd",
           onSelect: function(date) {
             $(".ui-datepicker a").removeAttr("href");
-            scope.scheddate.date=date.toString();
+            scope.currentABTest.date=date.toString();
             scope.$apply();
-            console.log(scope.scheddate.date);
+            console.log(scope.currentABTest.date);
           }
         });
       }
