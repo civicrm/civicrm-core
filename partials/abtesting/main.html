@@ -1,5 +1,6 @@
 <div>
-  {{tab_val}}
+  {{tab_val}}<br>
+  
   <div ui-jq="tabs" id="alltabs">
     <ul>
 
@@ -15,9 +16,9 @@
 
         <h3> What would you like to test ?</h3><br><br>
 
-        &nbsp <input type="radio" ng-model="template" ng-value="templates[0]" ng-click="init(2)"> Subject Lines <br/><br>
-        &nbsp <input type="radio" ng-model="template" ng-value="templates[1]" ng-click="init(3)"> From Names <br/><br>
-        &nbsp <input type="radio" ng-model="template" ng-value="templates[2]" ng-click="init(1)"> Two different Emails <br/><br>
+        &nbsp <input type="radio" ng-model="template" ng-value="templates[0]" ng-click="init(2)" ng-checked="template.val==1"> Subject Lines <br/><br>
+        &nbsp <input type="radio" ng-model="template" ng-value="templates[1]" ng-click="init(3)" ng-checked="template.val==2"> From Names <br/><br>
+        &nbsp <input type="radio" ng-model="template" ng-value="templates[2]" ng-click="init(1)" ng-checked="template.val==3"> Two different Emails <br/><br>
         &nbsp
         <div style="position:relative; left:220px; top: 30px;"  nextbutton></div>
         <div style="position:relative; left:300px; top:-1px;" cancelbutton></div>

@@ -53,7 +53,9 @@
   // Add a new record by name.
   // Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
   crmMailingAB.controller('ListingCtrl', function ($scope, crmApi) {
-    $scope.mailList = CRM.crmMailing.civiMails;
+    $scope.abmailList = CRM.crmMailing.mailingabNames;
+    console.log($scope.abmailList);
+
 
   })
   crmMailingAB.controller('TabsDemoCtrl', function ($scope, crmApi,selectedABTest) {
@@ -100,6 +102,22 @@
         $scope.mailB = {};
       }
 
+    $scope.templates =
+      [
+        { name: 'Subject Lines', url: partialUrl('subject_lines.html'),val: 1},
+        { name: 'From Name', url: partialUrl('from_name.html'),val:2},
+        {name: 'Two different Emails', url: partialUrl('two_emails.html'),val:3}
+      ];
+    if(typeof $scope.template == 'undefined'){
+    console.log("adi");
+      $scope.template = $scope.templates[0];
+  }
+    else{
+      console.log("adit "+$scope.currentABTest.testing_criteria_id);
+
+      $scope.template=$scope.templates[$scope.currentABTest.testing_criteria_id-1];
+      console.log($scope.template.val);
+    }
 
     mltokens = CRM.crmMailing.mailTokens;
 
@@ -127,13 +145,6 @@
         $scope.tab_val = 3;
       }
     };
-    $scope.templates =
-      [
-        { name: 'Subject Lines', url: partialUrl('subject_lines.html'),val: 1},
-        { name: 'From Name', url: partialUrl('from_name.html'),val:2},
-        {name: 'Two different Emails', url: partialUrl('two_emails.html'),val:3}
-      ];
-    $scope.template = $scope.templates[0];
 
     $scope.slide_value = 0;
 
@@ -537,7 +548,7 @@
     return{
       restrict: 'AE',
       link: function (scope, element, attrs) {
-        if(typeof scope.currentABTest.group_percentage != undefined){
+        if(typeof scope.currentABTest.group_percentage != 'undefined'){
           console.log("Yay");
           $(element).slider({value:scope.currentABTest.group_percentage});
         }

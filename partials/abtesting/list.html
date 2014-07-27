@@ -1,26 +1,31 @@
+<!--
+Controller: CaseTypeListsCtrl
+Required vars: caseTypes
+-->
 <div id="help">
-  All partially completed and completed mail are listed here
+  A Case Type describes a group of related tasks, interactions, or processes.
 </div>
 
-<table class="form-layout">
+<table class="display">
   <thead>
   <tr>
-    <th>Mailing Name</th>
-    <!--    <th>Status</th>  -->
-    <th>Created By</th>
-    <th>Created Date</th>
-    <th>Sent By</th>
+    <th>Title</th>
+    <th>Id</th>
+    <th>Progress</th>
+
     <th></th>
   </tr>
   </thead>
-  <tr ng-repeat="mailab in mailingabNames">
-    <td>{{mailab.id}}</td>
-    <!--    <td>{{mailStatus[{{$index}}]}}</td>  -->
-
-    <td><a ng-href="#/mailing/abtesting/{{mailab.id}}">Edit</a</td>
+  <tbody>
+  <tr ng-repeat="ab in abmailList">
+    <td>{{ab.id}}</td>
+    <td>{{ab.id}}</td>
+    <td>{{ab.id}}</td>
+    <td><a class="action-item crm-hover-button" ng-href="#/mailing/abtesting/{{ab.id}}">Edit</a></td>
   </tr>
+  </tbody>
 </table>
 
-<div class="action-link">
-  <a ng-href="#/mailing/abtesting/new" class="button"><span>New Mailing</span></a>
+<div class="crm-submit-buttons">
+  <a ng-href="#/mailing/abtesting/new" class="button"><span><div class="icon add-icon"></div>New A/B Test</span></a>
 </div>
