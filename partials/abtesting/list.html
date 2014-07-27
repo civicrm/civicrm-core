@@ -1,14 +1,26 @@
-<div>
-Current Running AB Tests are
-  <table>
-    <tr>
-      <td><h3>Name</h3></td>
-      <td><h3>Subject</h3></td>
-    </tr>
-    <tr ng-repeat="ml in mailList">
-      <td>{{ml.name}}</td>
-      <td>{{ml.subject}}</td>
-    </tr>
-  </table>
+<div id="help">
+  All partially completed and completed mail are listed here
+</div>
 
+<table class="form-layout">
+  <thead>
+  <tr>
+    <th>Mailing Name</th>
+    <!--    <th>Status</th>  -->
+    <th>Created By</th>
+    <th>Created Date</th>
+    <th>Sent By</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tr ng-repeat="mailab in mailingabNames">
+    <td>{{mailab.id}}</td>
+    <!--    <td>{{mailStatus[{{$index}}]}}</td>  -->
+
+    <td><a ng-href="#/mailing/abtesting/{{mailab.id}}">Edit</a</td>
+  </tr>
+</table>
+
+<div class="action-link">
+  <a ng-href="#/mailing/abtesting/new" class="button"><span>New Mailing</span></a>
 </div>

@@ -6,7 +6,7 @@
     <tr>
         <td class="label">From E-mail Address A</td>
         <td>
-            <select style="width: 200px" ng-model="currentMailing.from_email" ng-options="frm.email as frm.email for frm in eMailing">
+            <select style="width: 200px" ng-model="mailA.from_email" ng-options="frm.email as frm.email for frm in eMailing">
                 <option value="">-none-</option>
             </select>
         </td>
@@ -14,7 +14,7 @@
     <tr>
         <td class="label">From E-mail Address B</td>
         <td>
-            <select style="width: 200px" ng-model="currentMailing.from_email" ng-options="frm.email as frm.email for frm in eMailing">
+            <select style="width: 200px" ng-model="mailB.from_email" ng-options="frm.email as frm.email for frm in eMailing">
                 <option value="">-none-</option>
             </select>
         </td>
@@ -22,7 +22,7 @@
     <tr>
         <td class="label">Reply to E-mail Address</td>
         <td>
-            <select style="width: 200px" ng-model="currentMailing.replyto_email" ng-options="frm.email as frm.email for frm in eMailing">
+            <select style="width: 200px" ng-model="mailA.replyto_email" ng-options="frm.email as frm.email for frm in eMailing">
                 <option value="">-none-</option>
             </select>
         </td>
@@ -30,7 +30,7 @@
     <tr>
         <td class="label">Mailing Subject</td>
         <td>
-            <input placeholder="Enter Subject"  name="subject" type="text" ng-model="currentMailing.subject"/>
+            <input placeholder="Enter Subject"  name="subject" type="text" ng-model="mailA.subject"/>
         </td>
     </tr>
     <tr>
@@ -65,7 +65,7 @@
             <div class="crm-accordion-body">
                 <br>
                 &nbsp &nbsp &nbsp &nbsp
-                <textarea ng-model="currentMailing.body_html" style="width: 600px; height: 300px;"></textarea>
+                <textarea ng-model="mailA.body_html" style="width: 600px; height: 300px;"></textarea>
                 <br> <br>
             </div>
         </div>
@@ -76,7 +76,7 @@
 
                 <br>
                 &nbsp &nbsp &nbsp &nbsp
-                <textarea ng-model="currentMailing.body_text" style="width: 600px; height: 300px;"></textarea>
+                <textarea ng-model="mailA.body_text" style="width: 600px; height: 300px;"></textarea>
                 <br>
             </div>
         </div>
@@ -100,7 +100,7 @@
             <tr>
                 <td class="label">Mailing Header</td>
                 <td>
-                    <select ng-model="currentMailing.header_id" ng-options="hf.id as hf.name for hf in headerfooter| filter:isHeader">
+                    <select ng-model="mailA.header_id" ng-options="hf.id as hf.name for hf in headerfooter| filter:isHeader">
                         <option value="">-none-</option>
                     </select>
                 </td>
@@ -108,7 +108,7 @@
             <tr>
                 <td class="label">Mailing Footer</td>
                 <td>
-                    <select ng-model="currentMailing.footer_id" ng-options="f.id as f.name for f in headerfooter| filter:isFooter">
+                    <select ng-model="mailA.footer_id" ng-options="f.id as f.name for f in headerfooter| filter:isFooter">
                         <option value="">-none-</option>
                     </select>
                 </td>
@@ -130,7 +130,7 @@
             </tr>
             <tr>
                 <td>
-                    <input type="checkbox" ng-model="currentMailing.url_tracking" ng-true-value="1" ng-false-value="0">&nbsp Track Click Throughs</input>
+                    <input type="checkbox" ng-model="mailA.url_tracking" ng-true-value="1" ng-false-value="0">&nbsp Track Click Throughs</input>
                 </td>
             </tr>
             <tr>
@@ -142,7 +142,7 @@
             </tr>
             <tr>
                 <td>
-                    <input type="checkbox" ng-model="currentMailing.open_tracking" ng-true-value="1" ng-false-value="0">&nbsp Track Opens</input>
+                    <input type="checkbox" ng-model="mailA.open_tracking" ng-true-value="1" ng-false-value="0">&nbsp Track Opens</input>
                 </td>
             </tr>
             <tr>
@@ -171,7 +171,7 @@
             </tr>
             <tr ng-show= "trackr(trackreplies)">
                 <td>
-                    <input type="checkbox" ng-model="currentMailing.forward_replies" ng-true-value="1" ng-false-value="0">&nbsp Forward Replies</input>
+                    <input type="checkbox" ng-model="mailA.forward_replies" ng-true-value="1" ng-false-value="0">&nbsp Forward Replies</input>
                 </td>
             </tr>
             <tr ng-show= "trackr(trackreplies)">
@@ -183,7 +183,7 @@
             </tr>
             <tr ng-show= "trackr(trackreplies)">
                 <td>
-                    <input type="checkbox" ng-model="currentMailing.auto_responder" ng-true-value="1" ng-false-value="0">&nbsp Auto-Respond to Replies &nbsp &nbsp</input>
+                    <input type="checkbox" ng-model="mailA.auto_responder" ng-true-value="1" ng-false-value="0">&nbsp Auto-Respond to Replies &nbsp &nbsp</input>
                     <select ng-model="mailAutoResponder" ng-options="au.id as au.name for au in headerfooter| filter:isAuto">
                         <option value="">-none-</option>
                     </select>
@@ -207,7 +207,7 @@
             <tr>
                 <td class="label">Mailing Visibility</td>
                 <td>
-                    <select ng-model="currentMailing.visibility">
+                    <select ng-model="mailA.visibility">
                         <option value="Public Pages">Public Pages</option>
                         <option value="User and User Admin Only">User and User Admin Only</option>
                     </select>
