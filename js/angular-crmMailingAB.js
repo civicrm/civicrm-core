@@ -10,7 +10,7 @@
   };
 
   var crmMailingAB = angular.module('crmMailingAB', ['ngRoute', 'ui.utils']);
-
+  var mltokens = [];
   crmMailingAB.run(function ($rootScope, $templateCache) {
     $rootScope.$on('$viewContentLoaded', function () {
       $templateCache.removeAll();
@@ -33,8 +33,16 @@
         templateUrl: partialUrl('main.html'),
         controller: 'TabsDemoCtrl',
         resolve: {
-          mailingList: function ($route, crmApi) {
-            return crmApi('Mailing', 'get', {});
+          selectedABTest: function($route, crmApi) {
+            if ( $route.current.params.id !== 'new') {
+
+              return crmApi('MailingAB', 'getsingle', {id: $route.current.params.id});
+            }
+            else {
+              //created_id has been set to my id. Does not save without created_id. Needs to made generic based on the user
+              return {visibility: "Public Pages", url_tracking:"1", forward_replies:"0", created_id: "202", auto_responder:"0", open_tracking:"1",just_created:"1"
+              };
+            }
           }
         }
       });
@@ -48,10 +56,34 @@
     $scope.mailList = CRM.crmMailing.civiMails;
 
   })
-  crmMailingAB.controller('TabsDemoCtrl', function ($scope, crmApi) {
-
+  crmMailingAB.controller('TabsDemoCtrl', function ($scope, crmApi,selectedABTest) {
+    $scope.abId="";
+    $scope.currentABTest=selectedABTest
     $scope.groups = CRM.crmMailing.groupNames;
     $scope.mailList = CRM.crmMailing.civiMails;
+    $scope.eMailing = CRM.crmMailing.emailAdd;
+    $scope.tmpList = CRM.crmMailing.mesTemplate;
+    $scope.headerfooter = CRM.crmMailing.headerfooterList;
+
+
+      if($scope.currentABTest.just_created != 1){
+        console.log("Prithvi");
+        console.log($scope.currentABTest);
+        console.log($scope.currentABTest.mailing_id_a);
+
+        $scope.abId = $scope.currentABTest.id;
+      $scope.mailA = crmApi('Mailing','getsingle',{id:$scope.currentABTest.mailing_id_a});
+      $scope.mailB= crmApi('Mailing','getsingle',{id:$scope.currentABTest.mailing_id_b});
+      console.log($scope.mailA);
+      }
+      else{
+        console.log("Prithvila");
+        $scope.mailA = {};
+        $scope.mailB = {};
+      }
+
+
+    mltokens = CRM.crmMailing.mailTokens;
 
     $scope.tab_val = 0;
     $scope.max_tab = 0;
@@ -77,9 +109,9 @@
     };
     $scope.templates =
       [
-        { name: 'Subject Lines', url: partialUrl('subject_lines.html')},
-        { name: 'From Name', url: partialUrl('from_name.html')},
-        {name: 'Two different Emails', url: partialUrl('two_emails.html')}
+        { name: 'Subject Lines', url: partialUrl('subject_lines.html'),val: 1},
+        { name: 'From Name', url: partialUrl('from_name.html'),val:2},
+        {name: 'Two different Emails', url: partialUrl('two_emails.html'),val:3}
       ];
     $scope.template = $scope.templates[0];
 
@@ -94,17 +126,74 @@
       }
     };
 
+    $scope.reply = function(){
+      if($scope.trackreplies==0){
+        $scope.trackreplies=1;
+      }
+      else{
+        $scope.trackreplies=0;
+        $scope.currentMailing.forward_replies=0;
+        $scope.currentMailing.auto_responder=0;
+      }
+    }
+
+    $scope.isAuto= function(au){
+      return au.component_type == "Reply";
+    };
+
+    $scope.trackr= function(trackreplies){
+      if(trackreplies=="1"){
+        return true;
+      }
+      else
+        return false;
+    }
+
+
+
+    $scope.isHeader= function(hf){
+      return hf.component_type == "Header";
+    };
+    //filter so we only get footers from mailing component
+    $scope.isFooter= function(f){
+      return f.component_type == "Footer";
+    };
+
     $scope.send_date = "01/01/2000";
 
     $scope.dt = "";
 
-    $scope.mailA = {};
 
-    $scope.mailB = {};
-    $scope.save = function (dat) {
+    $scope.savea = function (dat) {
 
       var result = crmApi('Mailing', 'create', dat, true);
-      console.log("Ac " + result);
+      console.log(result);
+      result.success(function(data) {
+        if (data.is_error == 0) {
+          $scope.mailA.id = data.id;
+          console.log("Mail a Id "+ $scope.mailA.id);
+        }
+      });
+    };
+
+    $scope.append_mails = function(){
+      crmApi('MailingAB','create',{id:$scope.abId,mailing_id_a:$scope.mailA.id,mailing_id_b:$scope.mailB.id});
+    };
+
+    $scope.saveb = function (dat) {
+     var flag =0;
+      var result = crmApi('Mailing', 'create', dat, true);
+      console.log(result);
+      result.success(function(data) {
+        if (data.is_error == 0) {
+          $scope.mailB.id = data.id;
+          console.log("Mail b Id "+ $scope.mailB.id);
+          $scope.append_mails();
+
+
+        }
+      });
+
     };
 
     $scope.init = function (par) {
@@ -126,6 +215,47 @@
     $scope.incGroup = [];
     $scope.excGroup = [];
 
+    $scope.create_abtest = function(){
+      var result;
+      if($scope.abId =="" )
+      result= crmApi('MailingAB','create',{testing_criteria_id: $scope.template.val});
+      else{
+        if (typeof $scope.currentABTest.mailing_id_a == 'undefined')
+      result= crmApi('MailingAB','create',{id:$scope.abId,testing_criteria_id: $scope.template.val});
+        else{
+          result= crmApi('MailingAB','create',{id:$scope.abId,testing_criteria_id: $scope.template.val,mailing_id_a:$scope.currentABTest.mailing_id_a,mailing_id_b:$scope.currentABTest.mailing_id_b} );
+
+        }
+
+      }
+
+
+      result.success(function(data) {
+        if (data.is_error == 0) {
+          $scope.abId = data.id;
+          console.log("ID "+$scope.abId);
+        }
+      });
+    };
+
+
+
+    $scope.tmp = function (tst){
+      $scope.currentMailing.msg_template_id=tst;
+      console.log($scope.currentMailing.msg_template_id+ "sasas");
+      if($scope.currentMailing.msg_template_id == null){
+        $scope.currentMailing.body_html="";
+      }
+      else{
+        for(var a in $scope.tmpList){
+
+          if($scope.tmpList[a].id==$scope.currentMailing.msg_template_id){
+            $scope.currentMailing.body_html=$scope.tmpList[a].msg_html;
+          }
+        }
+      }
+    };
+
 
   });
 
@@ -143,6 +273,10 @@
         $(element).parent().parent().parent().parent().tabs({disabled: myarr});
 
         $(element).on("click", function () {
+          if(scope.tab_val==0){
+
+            scope.create_abtest();
+          }
           scope.tab_val = scope.tab_val + 1;
 
           scope.max_tab = Math.max(scope.tab_val, scope.max_tab);
@@ -187,7 +321,7 @@
     };
   });
 
-  crmMailingAB.directive('groupselect', function () {
+  crmMailingAB.directive('chsgroup', function () {
     return {
       restrict: 'AE',
       link: function (scope, element, attrs) {
@@ -259,6 +393,42 @@
             scope.$apply();
           }
         });
+      }
+    };
+
+  });
+
+  crmMailingAB.directive('groupselect',function(){
+    return {
+      restrict : 'AE',
+      link: function(scope,element, attrs){
+        $(element).select2({width:"200px", data: mltokens, placeholder:"Insert Token"});
+
+
+        $(element).on('select2-selecting', function(e) {
+          scope.$evalAsync('_resetSelection()');console.log(mltokens);
+          /* if(scope.currentMailing.body_html == null){
+           scope.currentMailing.body_html = e.val;
+           }
+           else
+           scope.currentMailing.body_html = scope.currentMailing.body_html + e.val;
+           */
+          var msg = document.getElementById("body_html").value;
+          var cursorlen = document.getElementById("body_html").selectionStart;
+          console.log(cursorlen);
+          var textlen   = msg.length;
+          document.getElementById("body_html").value = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
+          scope.currentMailing.body_html = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
+          console.log(document.getElementById("body_html").value);
+          console.log(scope.currentMailing.body_html);
+          var cursorPos = (cursorlen + e.val.length);
+          document.getElementById("body_html").selectionStart = cursorPos;
+          document.getElementById("body_html").selectionEnd   = cursorPos;
+          document.getElementById("body_html").focus();
+          scope.$apply();
+          e.preventDefault();
+        })
+
       }
     };
 
@@ -343,47 +513,127 @@
         $(element).on("click", function () {
 
           console.log("clicked");
-          scope.save({
-            "sequential": 1,
-            "name": "Aditya Nambiar",
-            "subject": scope.mailA.subj,
-            "created_id": "2",
-            "from_email": scope.mailA.fromEmail,
-            "body_text": scope.mailA.body
+          scope.savea({
+            id: scope.mailA.id,
+            name: "Aditya Nambiar",
+            visibility:  scope.mailA.visibility,
+            created_id: 1,
+            subject: scope.mailA.subject,
+            msg_template_id: scope.mailA.msg_template_id==null ? "" : scope.mailA.msg_template_id,
+            open_tracking: scope.mailA.open_tracking,
+            url_tracking: scope.mailA.url_tracking,
+            forward_replies: scope.mailA.forward_replies,
+            auto_responder: scope.mailA.auto_responder,
+            from_name: scope.mailA.from_name,
+            from_email: scope.mailA.from_email,
+            replyto_email: scope.mailA.replyto_email,
+            unsubscribe_id: scope.mailA.unsubscribe_id,
+            resubscribe_id: scope.mailA.resubscribe_id,
+            body_html: scope.mailA.body_html,
+            body_text: scope.mailA.body_text,
+            scheduled_date: scope.mailA.scheduled_date,
+            scheduled_id: scope.mailA.scheduled_id,
+            campaign_id:	scope.mailA.campaign_id==null ? "" : scope.mailA.campaign_id,
+            header_id:	scope.mailA.header_id,
+            footer_id: scope.mailA.footer_id,
 
+            is_completed: scope.mailA.is_completed
           });
           console.log("Truth " + scope.whatnext)
 
           if (scope.whatnext == "3") {
             console.log("sdf");
-            scope.mailB.subj = scope.mailA.subj;
-            scope.mailB.body = scope.mailA.body;
+
+              scope.mailB.name= scope.mailA.name;
+              scope.mailB.visibility=  scope.mailA.visibility;
+              scope.mailB.created_id= scope.mailA.created_id;
+              scope.mailB.subject= scope.mailA.subject;
+              scope.mailB.msg_template_id= scope.mailA.msg_template_id==null ? "" : scope.mailA.msg_template_id;
+              scope.mailB.open_tracking= scope.mailA.open_tracking;
+              scope.mailB.url_tracking= scope.mailA.url_tracking;
+              scope.mailB.forward_replies= scope.mailA.forward_replies;
+              scope.mailB.auto_responder= scope.mailA.auto_responder;
+              scope.mailB.from_name= scope.mailA.from_name;
+              scope.mailB.replyto_email= scope.mailA.replyto_email;
+              scope.mailB.unsubscribe_id= scope.mailA.unsubscribe_id;
+              scope.mailB.resubscribe_id= scope.mailA.resubscribe_id;
+              scope.mailB.body_html= scope.mailA.body_html;
+              scope.mailB.body_text= scope.mailA.body_text;
+              scope.mailB.scheduled_date= scope.mailA.scheduled_date;
+              scope.mailB.scheduled_id= scope.mailA.scheduled_id;
+              scope.mailB.campaign_id=	scope.mailA.campaign_id==null ? "" : scope.mailA.campaign_id;
+              scope.mailB.header_id=	scope.mailA.header_id;
+              scope.mailB.footer_id=	scope.mailA.footer_id;
+
+              scope.mailB.is_completed= scope.mailA.is_completed;
 
           }
           else {
             if (scope.whatnext == "2") {
               scope.mailB.fromEmail = scope.mailA.fromEmail;
-              scope.mailB.body = scope.mailA.body;
+              scope.mailB.name= scope.mailA.name;
+              scope.mailB.visibility=  scope.mailA.visibility;
+              scope.mailB.created_id= scope.mailA.created_id;
+              scope.mailB.msg_template_id= scope.mailA.msg_template_id==null ? "" : scope.mailA.msg_template_id;
+              scope.mailB.open_tracking= scope.mailA.open_tracking;
+              scope.mailB.url_tracking= scope.mailA.url_tracking;
+              scope.mailB.forward_replies= scope.mailA.forward_replies;
+              scope.mailB.auto_responder= scope.mailA.auto_responder;
+              scope.mailB.from_name= scope.mailA.from_name;
+              scope.mailB.replyto_email= scope.mailA.replyto_email;
+              scope.mailB.unsubscribe_id= scope.mailA.unsubscribe_id;
+              scope.mailB.resubscribe_id= scope.mailA.resubscribe_id;
+              scope.mailB.body_html= scope.mailA.body_html;
+              scope.mailB.body_text= scope.mailA.body_text;
+              scope.mailB.scheduled_date= scope.mailA.scheduled_date;
+              scope.mailB.scheduled_id= scope.mailA.scheduled_id;
+              scope.mailB.campaign_id=	scope.mailA.campaign_id==null ? "" : scope.mailA.campaign_id;
+              scope.mailB.header_id=	scope.mailA.header_id;
+              scope.mailB.footer_id=	scope.mailA.footer_id;
+
+              scope.mailB.is_completed= scope.mailA.is_completed;
 
             }
           }
 
 
-          scope.save({
-            "sequential": 1,
-            "name": "Aditya Nambiar",
-            "subject": scope.mailB.subj,
-            "created_id": "2",
-            "from_email": scope.mailB.fromEmail,
-            "body_text": scope.mailB.body
+          scope.saveb({
+
+            id: scope.mailB.id,
+            name: "Aditya Nambiar",
+            visibility:  scope.mailB.visibility,
+            created_id: 1,
+            subject: scope.mailB.subject,
+            msg_template_id: scope.mailB.msg_template_id==null ? "" : scope.mailB.msg_template_id,
+            open_tracking: scope.mailB.open_tracking,
+            url_tracking: scope.mailB.url_tracking,
+            forward_replies: scope.mailB.forward_replies,
+            auto_responder: scope.mailB.auto_responder,
+            from_name: scope.mailB.from_name,
+            from_email: scope.mailB.from_email,
+            replyto_email: scope.mailB.replyto_email,
+            unsubscribe_id: scope.mailB.unsubscribe_id,
+            resubscribe_id: scope.mailB.resubscribe_id,
+            body_html: scope.mailB.body_html,
+            body_text: scope.mailB.body_text,
+            scheduled_date: scope.mailB.scheduled_date,
+            scheduled_id: scope.mailB.scheduled_id,
+            campaign_id:	scope.mailB.campaign_id==null ? "" : scope.mailB.campaign_id,
+            header_id:	scope.mailB.header_id,
+            footer_id:	scope.mailB.footer_id,
+
+            is_completed: scope.mailA.is_completed
 
           });
+
 
         });
       }
     };
 
   });
+
+
 
   crmMailingAB.directive('nextbutton', function () {
     return {
