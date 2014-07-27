@@ -15,9 +15,9 @@
 
         <h3> What would you like to test ?</h3><br><br>
 
-        &nbsp <input type="radio" ng-model="template" ng-value="templates[0]" ng-init="whatnext=2"> Subject Lines <br/><br>
-        &nbsp <input type="radio" ng-model="template" ng-value="templates[1]" ng-init="whatnext=3"> From Names <br/><br>
-        &nbsp <input type="radio" ng-model="template" ng-value="templates[2]" ng-init="whatnext=1"> Two different Emails <br/><br>
+        &nbsp <input type="radio" ng-model="template" ng-value="templates[0]" ng-click="init(2)"> Subject Lines <br/><br>
+        &nbsp <input type="radio" ng-model="template" ng-value="templates[1]" ng-click="init(3)"> From Names <br/><br>
+        &nbsp <input type="radio" ng-model="template" ng-value="templates[2]" ng-click="init(1)"> Two different Emails <br/><br>
         &nbsp
         <div style="position:relative; left:220px; top: 30px;"  nextbutton></div>
         <div style="position:relative; left:300px; top:-1px;" cancelbutton></div>
@@ -29,7 +29,8 @@
     <div id="tabs-2">
 
       <form>
-        <div  ng-include="template.url"> -->
+        <div  ng-include="template.url">
+
         </div>
         <div style="position:relative; left:200px; top:61px;" prevbutton></div>
         <div style="position:relative; left:300px; top: 30px;" submitform nextbutton></div>

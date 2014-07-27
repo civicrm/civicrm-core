@@ -58,6 +58,7 @@
   })
   crmMailingAB.controller('TabsDemoCtrl', function ($scope, crmApi,selectedABTest) {
     $scope.abId="";
+    $scope.whatnext=2;
     $scope.currentABTest=selectedABTest
     $scope.groups = CRM.crmMailing.groupNames;
     $scope.mailList = CRM.crmMailing.civiMails;
@@ -72,9 +73,20 @@
         console.log($scope.currentABTest.mailing_id_a);
 
         $scope.abId = $scope.currentABTest.id;
-      $scope.mailA = crmApi('Mailing','getsingle',{id:$scope.currentABTest.mailing_id_a});
-      $scope.mailB= crmApi('Mailing','getsingle',{id:$scope.currentABTest.mailing_id_b});
-      console.log($scope.mailA);
+        var abmailA = crmApi('Mailing','getsingle',{id:$scope.currentABTest.mailing_id_a});
+        var abmailB= crmApi('Mailing','getsingle',{id:$scope.currentABTest.mailing_id_b});
+        abmailA.success(function (data) {
+          if (data.is_error == 0) {
+            $scope.mailA = data;
+
+          };
+        });
+        abmailB.success(function(data) {
+          if (data.is_error == 0) {
+            $scope.mailB = data;
+
+          };
+        });
       }
       else{
         console.log("Prithvila");
