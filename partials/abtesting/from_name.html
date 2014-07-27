@@ -41,7 +41,7 @@
     <tr>
         <td class="label">Use Template</td>
         <td>
-            <select ng-change="tmp(tst)" ng-model="tst" ng-options= "mstemp.id as mstemp.msg_title for mstemp in tmpList">
+            <select ng-change="tmp(mailA.msg_template_id,3)" ng-model="mailA.msg_template_id" ng-options= "mstemp.id as mstemp.msg_title for mstemp in tmpList">
                 <option value="">-none-</option>
             </select>
         </td>

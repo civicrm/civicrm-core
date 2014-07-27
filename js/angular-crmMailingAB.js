@@ -40,7 +40,7 @@
             }
             else {
               //created_id has been set to my id. Does not save without created_id. Needs to made generic based on the user
-              return {visibility: "Public Pages", url_tracking:"1", forward_replies:"0", created_id: "202", auto_responder:"0", open_tracking:"1",just_created:"1"
+              return { just_created:"1"
               };
             }
           }
@@ -65,7 +65,12 @@
     $scope.eMailing = CRM.crmMailing.emailAdd;
     $scope.tmpList = CRM.crmMailing.mesTemplate;
     $scope.headerfooter = CRM.crmMailing.headerfooterList;
+    if($scope.currentABTest.declare_winning_time != null){
+      $scope.ans= $scope.currentABTest.declare_winning_time.split(" ");
+      $scope.currentABTest.date=$scope.ans[0];
+      $scope.currentABTest.time=$scope.ans[1];
 
+    }
 
       if($scope.currentABTest.just_created != 1){
         console.log("Prithvi");
@@ -90,6 +95,7 @@
       }
       else{
         console.log("Prithvila");
+        console.log($scope.currentABTest);
         $scope.mailA = {};
         $scope.mailB = {};
       }
@@ -104,6 +110,8 @@
         $scope.tab_val = 0;
       }
     };
+
+    $scope.winner_criteria="";
     $scope.compose_clicked = function () {
       if ($scope.max_tab >= 1) {
         $scope.tab_val = 1;
@@ -221,14 +229,14 @@
       $scope.apply();
     };
 
-    $scope.scheddate = {};
-    $scope.scheddate.date = "6";
-    $scope.scheddate.time = "";
+
     $scope.incGroup = [];
     $scope.excGroup = [];
 
     $scope.create_abtest = function(){
       var result;
+      $scope.currentABTest.testing_criteria_id=$scope.template.val;
+
       if($scope.abId =="" )
       result= crmApi('MailingAB','create',{testing_criteria_id: $scope.template.val});
       else{
@@ -250,21 +258,88 @@
       });
     };
 
+    $scope.update_abtest = function(){
+
+      $scope.currentABTest.declare_winning_time= $scope.currentABTest.date + " " + $scope.currentABTest.time ;
+
+      result= crmApi('MailingAB','create',{id:$scope.abId,
+                      testing_criteria_id: $scope.template.val,
+                      mailing_id_a:$scope.currentABTest.mailing_id_a,
+                      mailing_id_b:$scope.currentABTest.mailing_id_b,
+                      winner_criteria_id : $scope.currentABTest.winner_criteria_id,
+                      group_percentage: $scope.currentABTest.group_percentage,
+                      declare_winning_time: $scope.currentABTest.declare_winning_time
+                      } );
+
+    };
 
 
-    $scope.tmp = function (tst){
-      $scope.currentMailing.msg_template_id=tst;
-      console.log($scope.currentMailing.msg_template_id+ "sasas");
-      if($scope.currentMailing.msg_template_id == null){
-        $scope.currentMailing.body_html="";
-      }
-      else{
-        for(var a in $scope.tmpList){
 
-          if($scope.tmpList[a].id==$scope.currentMailing.msg_template_id){
-            $scope.currentMailing.body_html=$scope.tmpList[a].msg_html;
+
+    $scope.tmp = function (tst,aorb){
+      if(aorb==1){
+        $scope.mailA.msg_template_id=tst;
+        console.log($scope.mailA.msg_template_id+ "sasas");
+        if($scope.mailA.msg_template_id == null){
+          $scope.mailA.body_html="";
+        }
+        else{
+          for(var a in $scope.tmpList){
+
+            if($scope.tmpList[a].id==$scope.mailA.msg_template_id){
+              $scope.mailA.body_html=$scope.tmpList[a].msg_html;
+            }
           }
         }
+      }
+      else if(aorb==2){
+
+        $scope.mailB.msg_template_id=tst;
+        console.log($scope.mailB.msg_template_id+ "sasas");
+        if($scope.mailB.msg_template_id == null){
+          $scope.mailB.body_html="";
+        }
+        else{
+          for(var a in $scope.tmpList){
+
+            if($scope.tmpList[a].id==$scope.mailB.msg_template_id){
+              $scope.mailB.body_html=$scope.tmpList[a].msg_html;
+            }
+          }
+        }
+
+      }
+      else {
+
+        $scope.mailA.msg_template_id=tst;
+        console.log($scope.mailA.msg_template_id+ "sasas");
+        if($scope.mailA.msg_template_id == null){
+          $scope.mailA.body_html="";
+        }
+        else{
+          for(var a in $scope.tmpList){
+
+            if($scope.tmpList[a].id==$scope.mailA.msg_template_id){
+              $scope.mailA.body_html=$scope.tmpList[a].msg_html;
+            }
+          }
+        }
+
+        $scope.mailB.msg_template_id=tst;
+        console.log($scope.mailB.msg_template_id+ "sasas");
+        if($scope.mailB.msg_template_id == null){
+          $scope.mailB.body_html="";
+        }
+        else{
+          for(var a in $scope.tmpList){
+
+            if($scope.tmpList[a].id==$scope.mailB.msg_template_id){
+              $scope.mailB.body_html=$scope.tmpList[a].msg_html;
+            }
+          }
+        }
+
+
       }
     };
 
@@ -286,9 +361,21 @@
 
         $(element).on("click", function () {
           if(scope.tab_val==0){
-
             scope.create_abtest();
           }
+          else if(scope.tab_val == 2){
+            scope.update_abtest();
+            if(scope.currentABTest.winner_criteria_id==1){
+              scope.winner_criteria="Open";
+            }
+            else if(scope.currentABTest.winner_criteria_id==2){
+              scope.winner_criteria=" Total Unique Clicks";
+            }
+            else if(scope.currentABTest.winner_criteria_id==3){
+                scope.winner_criteria="Total Clicks on a particular link";
+              }
+          }
+
           scope.tab_val = scope.tab_val + 1;
 
           scope.max_tab = Math.max(scope.tab_val, scope.max_tab);
@@ -450,10 +537,14 @@
     return{
       restrict: 'AE',
       link: function (scope, element, attrs) {
+        if(typeof scope.currentABTest.group_percentage != undefined){
+          console.log("Yay");
+          $(element).slider({value:scope.currentABTest.group_percentage});
+        }
         $(element).slider({min: 1});
         $(element).slider({
           slide: function (event, ui) {
-            scope.slide_value = ui.value;
+            scope.currentABTest.group_percentage = ui.value;
             scope.$apply();
           }
         });
@@ -668,6 +759,23 @@
         '<input type="submit" value="Cancel"  id="campaignbutton _qf_Contact_upload_view-top" class="btn btn-primary" >' +
         '</div></div>'
 
+    };
+  });
+
+  crmMailingAB.directive('chsdate',function(){
+    return {
+      restrict: 'AE',
+      link: function(scope,element,attrs){
+        $(element).datepicker({
+          dateFormat: "yy-mm-dd",
+          onSelect: function(date) {
+            $(".ui-datepicker a").removeAttr("href");
+            scope.scheddate.date=date.toString();
+            scope.$apply();
+            console.log(scope.scheddate.date);
+          }
+        });
+      }
     };
   });
 
