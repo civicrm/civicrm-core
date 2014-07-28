@@ -59,7 +59,7 @@
 {foreach from=$lineItem item=value key=priceset}
 {capture assign=ts_item}{ts}Item{/ts}{/capture}
 {capture assign=ts_total}{ts}Fee{/ts}{/capture}
-{if $totalTaxAmount}
+{if $dataArray}
 {capture assign=ts_subtotal}{ts}Subtotal{/ts}{/capture}
 {capture assign=ts_taxRate}{ts}Tax Rate{/ts}{/capture}
 {capture assign=ts_taxAmount}{ts}Tax Amount{/ts}{/capture}
@@ -67,21 +67,21 @@
 {/if}
 {capture assign=ts_start_date}{ts}Membership Start Date{/ts}{/capture}
 {capture assign=ts_end_date}{ts}Membership End Date{/ts}{/capture}
-{$ts_item|string_format:"%-30s"} {$ts_total|string_format:"%10s"} {if $totalTaxAmount} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate|string_format:"%10s"} {$ts_taxAmount|string_format:"%10s"} {$ts_total|string_format:"%10s"} {/if} {$ts_start_date|string_format:"%20s"} {$ts_end_date|string_format:"%20s"}
+{$ts_item|string_format:"%-30s"} {$ts_total|string_format:"%10s"} {if $dataArray} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate|string_format:"%10s"} {$ts_taxAmount|string_format:"%10s"} {$ts_total|string_format:"%10s"} {/if} {$ts_start_date|string_format:"%20s"} {$ts_end_date|string_format:"%20s"}
 --------------------------------------------------------------------------------------------------
 
 {foreach from=$value item=line}
-{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.line_total|crmMoney|string_format:"%10s"}  {if $totalTaxAmount} {$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {$line.tax_rate|crmMoney:$currency|string_format:"%10s"} {$line.tax_amount|crmMoney:$currency|string_format:"%10s"} {$line.line_total|crmMoney|string_format:"%10s"} {/if} {$line.start_date|string_format:"%20s"} {$line.end_date|string_format:"%20s"}
+{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.line_total|crmMoney|string_format:"%10s"}  {if $dataArray} {$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {if $line.tax_rate != "" || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:$currency|string_format:"%10s"} {else}                  {/if}   {$line.line_total+$line.tax_amount|crmMoney|string_format:"%10s"} {/if} {$line.start_date|string_format:"%20s"} {$line.end_date|string_format:"%20s"}
 {/foreach}
 {/foreach}
 
-{if $dataArray && $totalTaxAmount}
+{if $dataArray}
 {ts}Amount before Tax{/ts}: {$amount-$totalTaxAmount|crmMoney:$currency}
 
 {foreach from=$dataArray item=value key=priceset}
-{if $priceset}
+{if $priceset || $priceset == 0}
 {$taxTerm} {$priceset|string_format:"%.2f"}%: {$value|crmMoney:$currency}
-{elseif  $priceset == 0}
+{else}
 {ts}No{/ts} {$taxTerm}: {$value|crmMoney:$currency}
 {/if}
 {/foreach}

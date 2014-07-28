@@ -238,15 +238,20 @@ registration process.{/ts}</p>
                <td>
                 {$line.unit_price*$line.qty|crmMoney}
                </td>
-               <td>
-                {$line.tax_rate|crmMoney}
-               </td>
-               <td>
-                {$line.tax_amount|crmMoney}
-               </td>
+               {if $line.tax_rate != "" || $line.tax_amount != ""}
+                <td>
+                 {$line.tax_rate|string_format:"%.2f"}%
+                </td>
+                <td>
+                 {$line.tax_amount|crmMoney}
+                </td>
+               {else}
+                <td></td>
+                <td></td>
+               {/if}
               {/if}
               <td>
-               {$line.line_total|crmMoney:$currency}
+               {$line.line_total+$line.tax_amount|crmMoney:$currency}
               </td>
         {if $pricesetFieldsCount }<td>{$line.participant_count}</td> {/if}
              </tr>
@@ -267,14 +272,14 @@ registration process.{/ts}</p>
         </tr>
         {foreach from=$dataArray item=value key=priceset}
          <tr>
-          {if $priceset}
-            <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>    
-            <td>&nbsp;{$value|crmMoney:$currency}</td>
-          {elseif  $priceset == 0}
-            <td>&nbsp;{ts}No{/ts} {$taxTerm}</td>
-            <td>&nbsp;{$value|crmMoney:$currency}</td>
+          {if $priceset || $priceset == 0}
+           <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>    
+           <td>&nbsp;{$value|crmMoney:$currency}</td>
+          {else}
+           <td>&nbsp;{ts}No{/ts} {$taxTerm}</td>
+           <td>&nbsp;{$value|crmMoney:$currency}</td>
           {/if}
-        </tr>
+         </tr>
         {/foreach}
        {/if}
       {/if}
