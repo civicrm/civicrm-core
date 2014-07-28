@@ -77,10 +77,10 @@
 			    {$amount|crmMoney}
 			  {elseif $displayOpt == 'Inclusive'}
 			    {$amount|crmMoney}
-			    <span class='crm-price-amount-label'> (includes {$option.tax_rate|round:2}% {$taxTerm} - {$option.tax_amount|crmMoney})</span>
+			    <span class='crm-price-amount-label'> (includes {$taxTerm} of {$option.tax_amount|crmMoney})</span>
 			  {else}
 			    {$option.amount|crmMoney}
-			    <span class='crm-price-amount-label'> + {$option.tax_amount|crmMoney} - {$option.tax_rate|round:2}% {$taxTerm}</span>
+			    <span class='crm-price-amount-label'> + {$option.tax_amount|crmMoney} {$taxTerm}</span>
 			  {/if}
 			{else}
 			  {$option.amount|crmMoney}

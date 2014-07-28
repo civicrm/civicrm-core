@@ -363,11 +363,11 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
               }
               else if ($displayOpt == 'Inclusive') {
                 $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName] + $taxAmount) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
-                $opt['label'] .= '<span class="crm-price-amount-label"> (includes '.round($opt['tax_rate'],2).'% ' . $taxTerm . ' - ' . CRM_Utils_Money::format($taxAmount) . ')</span>';
+                $opt['label'] .= '<span class="crm-price-amount-label"> (includes ' . $taxTerm . ' of ' . CRM_Utils_Money::format($opt['tax_amount']) . ')</span>';
               }
               else {
                 $opt['label'] = '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span> <span class="crm-price-amount-label">' . $opt['label'] . '</span>';
-                $opt['label'] .= '<span class="crm-price-amount-label"> + '. CRM_Utils_Money::format($opt['tax_amount']) . ' - ' . round($opt['tax_rate'],2).'% ' . $taxTerm . '</span>';
+                $opt['label'] .= '<span class="crm-price-amount-label"> + '. CRM_Utils_Money::format($opt['tax_amount']) . ' ' . $taxTerm . '</span>';
               }
             }
             else {
@@ -746,11 +746,11 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
     }
     else if ($displayOpt == 'Inclusive') {
       $label = CRM_Utils_Money::format($opt[$valueFieldName] + $opt['tax_amount']);
-      $label .= '<span class="crm-price-amount-label"> (includes '.round($opt['tax_rate'],2).'% ' . $taxTerm . ' - ' . CRM_Utils_Money::format($opt['tax_amount']) . ')</span>';
+      $label .= '<span class="crm-price-amount-label"> (includes ' . $taxTerm . ' of ' . CRM_Utils_Money::format($opt['tax_amount']) . ')</span>';
     }
     else {
       $label = CRM_Utils_Money::format($opt[$valueFieldName]);
-      $label .= '<span class="crm-price-amount-label"> + '. CRM_Utils_Money::format($opt['tax_amount']) . ' - ' . round($opt['tax_rate'],2).'% ' . $taxTerm . '</span>';
+      $label .= '<span class="crm-price-amount-label"> + '. CRM_Utils_Money::format($opt['tax_amount']) . ' ' . $taxTerm . '</span>';
     }
 
     return $label;
