@@ -450,10 +450,10 @@ AND li.entity_id = {$entityId}
    */
   public static function calculateTaxRate($lineItemId) {
     if ($lineItemId['html_type'] == 'Text') {
-      $tax = (($lineItemId['line_total'] - ($lineItemId['unit_price'] * $lineItemId['qty'])))/($lineItemId['unit_price'] * $lineItemId['qty'])*100;
+      $tax = $lineItemId['tax_amount']/($lineItemId['unit_price'] * $lineItemId['qty'])*100;
     }
     else {
-      $tax = (($lineItemId['line_total'] - $lineItemId['unit_price'])/$lineItemId['unit_price']) * 100;
+      $tax = ($lineItemId['tax_amount']/$lineItemId['unit_price']) * 100;
     }
     return $tax;
   }
