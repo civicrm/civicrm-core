@@ -278,9 +278,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
       $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-      $this->assign('taxTerm', $taxTerm);
       if ($invoicing) {
         $this->assign('totalTaxAmount', $taxAmount);
+        $this->assign('taxTerm', $taxTerm);
       }
       $this->assign('part', $this->_part);
       $this->set('part', $this->_part);
@@ -299,9 +299,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if ($invoicing) {
           foreach ($value as $v) {
             if (isset($v['tax_rate'])) {
-              if ($v['tax_rate'] != '') {
-                $getTaxDetails = TRUE;
-              }
+              $getTaxDetails = TRUE;
             }
           }
         }
@@ -309,9 +307,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       if (!empty($lineItemForTemplate)) {
         $this->assign('lineItem', $lineItemForTemplate);
       }
+      $this->assign('getTaxDetails', $getTaxDetails);
     }
 
-    $this->assign('getTaxDetails', $getTaxDetails);
     //display additional participants profile.
     self::assignProfiles($this);
 

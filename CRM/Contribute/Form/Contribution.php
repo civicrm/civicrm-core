@@ -1033,11 +1033,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $dataArray = array();
     foreach ($this->_lineItems as $key => $value) {
       foreach ($value as $v) {
-        if (isset($dataArray[$v['tax_rate']])) {
-          $dataArray[$v['tax_rate']] = $dataArray[$v['tax_rate']] + CRM_Utils_Array::value('tax_amount', $v);
+        if (isset($dataArray[(string)$v['tax_rate']])) {
+          $dataArray[(string)$v['tax_rate']] = $dataArray[(string)$v['tax_rate']] + CRM_Utils_Array::value('tax_amount', $v);
         }
         else {
-          $dataArray[$v['tax_rate']] = CRM_Utils_Array::value('tax_amount', $v);
+          $dataArray[(string)$v['tax_rate']] = CRM_Utils_Array::value('tax_amount', $v);
         }
       }
     }
