@@ -132,45 +132,39 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
-    $config  = CRM_Core_Config::singleton();
-    $options = array();
-    $session->getVars($options,
-                      "CRM_Mailing_Controller_Send_{$this->controller->_key}"
-                      );
     if (CRM_Core_Permission::check('administer CiviCRM')) {
       $this->assign('isAdmin', 1);
     }
-    $fromEmailAddress = CRM_Core_OptionGroup::values('from_email_address');
-    if (empty($fromEmailAddress)) {
-      //redirect user to enter from email address.
-      $url = CRM_Utils_System::url('civicrm/admin/options/from_email_address', 'action=add&reset=1');
-      $status = ts("There is no valid from email address present. You can add here <a href='%1'>Add From Email Address.</a>", array(1 => $url));
-      $session->setStatus($status, ts('Notice'));
-    }
-    else {
-      foreach ($fromEmailAddress as $key => $email) {
-        $fromEmailAddress[$key] = htmlspecialchars($fromEmailAddress[$key]);
+    $contactID = $session->get('userID');
+    $contactEmails = CRM_Core_BAO_Email::allEmails($contactID);
+    $emails = array();
+    $fromDisplayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+                                                   $contactID, 'display_name'
+                                                   );
+    foreach ($contactEmails as $emailId => $item) {
+      $email = $item['email'];
+      if ($email) {
+        $emails[$emailId] = '"' . $fromDisplayName . '" <' . $email . '> ';
+      }
+      if (isset($emails[$emailId])) {
+        $emails[$emailId] .= $item['locationType'];
+        if ($item['is_primary']) {
+          $emails[$emailId] .= ' ' . ts('(preferred)');
+        }
+        $emails[$emailId] = htmlspecialchars($emails[$emailId]);
       }
     }
+    $fromEmailAddress = CRM_Core_OptionGroup::values('from_email_address');
+    foreach ($fromEmailAddress as $key => $email) {
+      $fromEmailAddress[$key] = htmlspecialchars($fromEmailAddress[$key]);
+    }
+    $fromEmail = CRM_Utils_Array::crmArrayMerge($emails, $fromEmailAddress);
+
     $this->addElement('radio', 'output', NULL, ts('Email Invoice'), 'email_invoice');
     $this->addElement('radio', 'output', NULL, ts('PDF Invoice'), 'pdf_invoice');
-    $this->add('select', 'from_email_address',
-      ts('From Email Address'), array(
-        '' => '- select -') + $fromEmailAddress
-    );
-    
-    // Validation of From Email Address
-    if (in_array("email", $this->urlPath)) {
-      $this->addRule('from_email_address', ts('From Email Address is required'), 'required');
-    }
-    else {
-      $this->addRule('output', ts('Selection required'), 'required');
-      if (!empty($this->_submitValues['output']) && $this->_submitValues['output'] == 'email_invoice') { 
-        $this->addRule('from_email_address', ts('From Email Address is required'), 'required');
-      }
-    }
-
-    $this->addWysiwyg('email_comment', ts('If you would like to add personal message to email please add it here. (The same messages will sent to all receipients.)'), array('rows' => 2, 'cols' => 40));
+    $this->add('select', 'from_email_address', ts('From Email Address'), array('' => '- select -') + $fromEmail);
+    $this->addFormRule(array('CRM_Contribute_Form_Task_Invoice', 'formRule'));
+    $this->addWysiwyg('email_comment', ts('If you would like to add personal message to email please add it here. (If sending to more then one receipient the same message will be sent to each contact.)'), array('rows' => 2, 'cols' => 40));
 
     if (in_array("email", $this->urlPath)) {
       $this->addButtons(array(
@@ -199,6 +193,35 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         )
       );
     }
+  }
+
+  /**
+   * global validation rules for the form
+   *
+   * @param $values
+   *
+   * @internal param array $fields posted values of the form
+   *
+   * @return array list of errors to be posted back to the form
+   * @static
+   * @access public
+   */
+  static function formRule($values) {
+    $errors = array();
+    if (!$values['from_email_address']) {
+      if (in_array("Email Invoice", $values)) {
+        $errors['from_email_address'] = ts("From Email Address is required");
+      }
+      else {
+        if (in_array("email_invoice", $values)) {
+          $errors['from_email_address'] = ts("From Email Address is required");
+        }
+        else {
+          $errors['output'] = ts("Selection required");
+        }
+      }
+    }
+    return $errors;
   }
   
    /**
@@ -321,11 +344,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $dataArray = array();
       $subTotal = 0;
       foreach ($lineItem as $entity_id => $taxRate) {
-        if (isset($dataArray[$taxRate['tax_rate']])) {
-          $dataArray[$taxRate['tax_rate']] = $dataArray[$taxRate['tax_rate']] + CRM_Utils_Array::value('tax_amount', $taxRate);
+        if (isset($dataArray[(string)$taxRate['tax_rate']])) {
+          $dataArray[(string)$taxRate['tax_rate']] = $dataArray[(string)$taxRate['tax_rate']] + CRM_Utils_Array::value('tax_amount', $taxRate);
         }
         else {
-          $dataArray[$taxRate['tax_rate']] = CRM_Utils_Array::value('tax_amount', $taxRate);
+          $dataArray[(string)$taxRate['tax_rate']] = CRM_Utils_Array::value('tax_amount', $taxRate);
         }
         $subTotal += CRM_Utils_Array::value('subTotal', $taxRate);
       }
@@ -412,13 +435,25 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
                                   'tplParams' => $tplParams,
                                   'PDFFilename' => 'Invoice.pdf',
                                   );
-      
+      $session = CRM_Core_Session::singleton();
+      $contactID = $session->get('userID');
+      $contactEmails = CRM_Core_BAO_Email::allEmails($contactID);
+      $emails = array();
+      $fromDisplayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+                                                     $contactID, 'display_name'
+                                                     );
+
+      foreach ($contactEmails as $emailId => $item) {
+        $email = $item['email'];
+        if ($email) {
+          $emails[$emailId] = '"' . $fromDisplayName . '" <' . $email . '> ';
+        }
+      }
+      $fromEmail = CRM_Utils_Array::crmArrayMerge($emails, CRM_Core_OptionGroup::values('from_email_address'));
       
       // from email address
       if (isset($params['from_email_address'])) {
-        $fromEmailAddress = CRM_Utils_Array::value($params['from_email_address'],
-                                                   CRM_Core_OptionGroup::values('from_email_address')
-                                                   );
+        $fromEmailAddress = CRM_Utils_Array::value($params['from_email_address'], $fromEmail);
       }
       // condition to check for download PDF Invoice or email Invoice
       if ($invoiceElements['createPdf']) {
