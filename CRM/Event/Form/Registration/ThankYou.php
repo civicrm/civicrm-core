@@ -98,13 +98,13 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     }
     $this->assignToTemplate();
 
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $getTaxDetails = FALSE;
     $taxAmount = 0;
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $lineItemForTemplate = array();
-      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
-      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-      $getTaxDetails = FALSE;
       foreach ($this->_lineItem as $key => $value) {
         if (!empty($value)) {
           $lineItemForTemplate[$key] = $value;
@@ -112,9 +112,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
             foreach ($value as $v) {
               if (isset($v['tax_amount']) || isset($v['tax_rate'])) {
                 $taxAmount += $v['tax_amount'];
-                if ($v['tax_rate'] != '') {
-                  $getTaxDetails = TRUE;
-                }              
+                $getTaxDetails = TRUE;
               }
             }
           }
@@ -130,9 +128,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
           foreach ($lineItemValue as $v) {
             if (isset($v['tax_amount']) || isset($v['tax_rate'])) {
               $taxAmount += $v['tax_amount'];
-              if ($v['tax_rate'] != '') {
-                $getTaxDetails = TRUE;
-              }              
+              $getTaxDetails = TRUE;
             }
           }
         }
@@ -142,6 +138,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     if ($invoicing) {
       $this->assign('getTaxDetails', $getTaxDetails);
       $this->assign('totalTaxAmount', $taxAmount);
+      $this->assign('taxTerm', $taxTerm);
     }
     $this->assign('totalAmount', $this->_totalAmount);
     
@@ -234,7 +231,6 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
       $this->assign('pcpLinkText', $dao->link_text);
     }
 
-    $this->assign('taxTerm', $taxTerm);
     // Assign Participant Count to Lineitem Table
     $this->assign('pricesetFieldsCount', CRM_Price_BAO_PriceSet::getPricesetCount($this->_priceSetId));
 
