@@ -69,6 +69,19 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     foreach ($texts as $text) {
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
     }
+
+    // Disable and re-enable Other Amounts (verify fix for CRM-15021)
+    $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id=$pageId", '_qf_Amount_next-bottom');
+    $this->click("is_allow_other_amount");
+    $this->clickLink("_qf_Amount_upload_done-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId", '_qf_Main_upload-bottom');
+    $this->assertFalse($this->isTextPresent('Other Amount'), 'Other Amount present but not expected.');
+    $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id=$pageId", '_qf_Amount_next-bottom');
+    $this->click("is_allow_other_amount");
+    $this->clickLink("_qf_Amount_upload_done-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId", '_qf_Main_upload-bottom');
+    $this->assertTrue($this->isTextPresent('Other Amount'), 'Other Amount not present but expected.');
+    $this->isElementPresent("xpath=//div[@class='content other_amount-content']/input");
   }
 
   // CRM-12510 Test copy contribution page
