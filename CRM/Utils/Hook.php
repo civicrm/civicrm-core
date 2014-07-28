@@ -253,7 +253,7 @@ abstract class CRM_Utils_Hook {
    *
    * @param string $op         the type of operation being performed
    * @param string $objectName the name of the object
-   * @param object $id         the object id if available
+   * @param int $id         the object id if available
    * @param array  $params     the parameters used for object creation / editing
    *
    * @return null the return value is ignored
