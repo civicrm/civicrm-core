@@ -53,18 +53,6 @@ class CRM_Admin_Page_ConfigTaskList extends CRM_Core_Page {
     $destination = urlencode($destination);
     $this->assign('destination', $destination);
 
-    CRM_Core_OptionValue::getValues(array('name' => 'from_email_address'), $optionValue);
-    if (!empty($optionValue)) {
-      list($id) = array_keys($optionValue);
-      $this->assign('fromEmailId', $id);
-    }
-
-    $payPalProId = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_PaymentProcessorType',
-      'PayPal', 'id', 'name'
-    );
-    if ($payPalProId) {
-      $this->assign('payPalProId', $payPalProId);
-    }
     return parent::run();
   }
 }
