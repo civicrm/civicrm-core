@@ -498,11 +498,7 @@
       }
     }
 
-    CRM.$('#pricevalue').each(toggleBillingBlockIfFree);
-
-    $('#priceset input').on('change', function() {
-      CRM.$('#pricevalue').each(toggleBillingBlockIfFree);
-    });
+    $('#pricevalue').each(toggleBillingBlockIfFree).on('change', toggleBillingBlockIfFree);
   });
   {/literal}
 </script>
