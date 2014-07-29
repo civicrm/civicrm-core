@@ -99,7 +99,7 @@
   									<table align="right" border="0" cellpadding="0" cellspacing="0" class="emhide" width="310">
   										<tbody>
   											<tr>
-  												<td align="right" style="font-family: Helvetica, arial, sans-serif; font-size: 16px;color: #f8f8f8;padding-right:15px;" valign="middle">Month and Year</td>
+                          <td align="right" style="font-family: Helvetica, arial, sans-serif; font-size: 16px;color: #f8f8f8;padding-right:15px; text-align:right;" valign="middle">Month and Year</td>
   											</tr>
   										</tbody>
   									</table>
@@ -137,7 +137,7 @@
   									<table align="center" border="0" cellpadding="2" cellspacing="0" width="93%">
   										<tbody>
   											<tr>
-  												<td rowspan="2" style="padding-top:10px; padding-bottom:10px;" width="38%"><img src="https://civicrm.org/sites/default/files/civicrm/custom/images/top-logo_2.png" alt="Replace with Your Logo" /></td>
+                          <td rowspan="2" style="padding-top:10px; padding-bottom:10px;" width="38%"><img src="https://civicrm.org/sites/default/files/civicrm/custom/images/civicrm-logo-transparent.png" alt="Replace with your own logo" width="220" border="0" /></td>
   												<td align="right" width="62%">
   												<h6 class="collapse">&nbsp;</h6>
   												</td>
@@ -338,9 +338,6 @@
   																		</td>
   																	</tr>
   																	<!-- /button --><!-- white button -->
-  																	<tr>
-  																		<td class="padding-right15" style="font-family: Helvetica, arial, sans-serif; font-size: 16px; font-weight:bold; color: #333333; text-align:left;line-height: 24px; padding-top:10px; padding-bottom:10px; padding-left:15px;"><a href="#" style="color:#ffffff;text-decoration:none;font-weight:bold;" target="_blank" title="read more">Read More</a></td>
-  																	</tr>
   																	<!-- /button --><!-- Spacing --><!-- end of content -->
   																</tbody>
   															</table>
