@@ -1376,7 +1376,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $contactID,
       'membership_type_id' => $this->_ids['membership_type'],
       'start_date' => 'yesterday - 1 year',
-      'end_date' => 'yesterday',
+      'end_date' => 'yesterday +1 year',
     ));
     $contribution = $this->callAPISuccess('contribution', 'create', array(
       'domain_id' => 1,
