@@ -610,6 +610,8 @@ class CRM_Core_Resources {
 
       "packages/jquery/plugins/jquery.timeentry$min.js",
 
+      "packages/jquery/plugins/jquery.blockUI$min.js",
+
       "packages/jquery/plugins/DataTables/media/js/jquery.dataTables$min.js",
       "packages/jquery/plugins/DataTables/media/css/jquery.dataTables$min.css",
 
@@ -625,7 +627,6 @@ class CRM_Core_Resources {
       $items[] = "packages/jquery/plugins/jquery.menu$min.js";
       $items[] = "packages/jquery/css/menu.css";
       $items[] = "packages/jquery/plugins/jquery.jeditable$min.js";
-      $items[] = "packages/jquery/plugins/jquery.blockUI$min.js";
       $items[] = "packages/jquery/plugins/jquery.notify$min.js";
       $items[] = "js/jquery/jquery.crmeditable.js";
     }
