@@ -168,6 +168,9 @@ class CRM_Contact_Form_Search_Custom_Group
 
       $defaults['includeGroups'] = CRM_Utils_Array::value('includeGroups', $this->_formValues);
       $defaults['excludeGroups'] = CRM_Utils_Array::value('excludeGroups', $this->_formValues);
+
+      $defaults['includeTags'] = CRM_Utils_Array::value('includeTags', $this->_formValues);
+      $defaults['excludeTags'] = CRM_Utils_Array::value('excludeTags', $this->_formValues);
     }
 
     return $defaults;
