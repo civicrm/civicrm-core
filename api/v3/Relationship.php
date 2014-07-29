@@ -55,9 +55,11 @@ function civicrm_api3_relationship_create($params) {
   $values = array();
   _civicrm_api3_relationship_format_params($params, $values);
   $ids = array();
+  $action = CRM_Core_Action::ADD;
 
   if (CRM_Utils_Array::value('id', $params)) {
     $ids['contactTarget'] = $values['contact_id_b'];
+    $action = CRM_Core_Action::UPDATE;
   }
 
   $values['relationship_type_id'] = $values['relationship_type_id'] . '_a_b';
@@ -74,6 +76,10 @@ function civicrm_api3_relationship_create($params) {
   }
   elseif ($relationshipBAO[2]) {
     throw new API_Exception('Relationship already exists');
+  }
+  // Handle related memberships CRM-13652
+  if (!empty($params['contact_id_a'])) {
+    CRM_Contact_BAO_Relationship::relatedMemberships($params['contact_id_a'], $values, $ids, $action);
   }
   $id = $relationshipBAO[4][0];
   $values = array();
