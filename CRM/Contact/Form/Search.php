@@ -381,10 +381,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $url = CRM_Utils_System::makeURL('qfKey') . $formQFKey;
         CRM_Utils_System::redirect($url);
       }
+      $permissionForGroup = FALSE;
 
       if (!empty($this->_groupID)) {
-        $permissionForGroup = FALSE;
-
         // check if user has permission to edit members of this group
         $permission = CRM_Contact_BAO_Group::checkPermission($this->_groupID);
         if ($permission && in_array(CRM_Core_Permission::EDIT, $permission)) {
@@ -394,12 +393,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         // check if _groupID exists, it might not if
         // we are displaying a hidden group
         if (!isset($this->_group[$this->_groupID])) {
-          $permissionForGroup = FALSE;
           $this->_group[$this->_groupID] =
             CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $this->_groupID, 'title');
         }
-
-        $this->assign('permissionedForGroup', $permissionForGroup);
 
         // set the group title
         $groupValues = array('id' => $this->_groupID, 'title' => $this->_group[$this->_groupID]);
@@ -430,7 +426,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'group_contact_status', ts('Group Status')
       );
 
-      $this->assign('permissionedForGroup', FALSE);
+      $this->assign('permissionedForGroup', $permissionForGroup);
     }
 
     // add the go button for the action form, note it is of type 'next' rather than of type 'submit'
