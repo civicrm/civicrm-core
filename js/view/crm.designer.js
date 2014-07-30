@@ -49,6 +49,7 @@
 
     initialize: function(options) {
       CRM.designerApp.vent.on('ufUnsaved', this.onUfChanged, this);
+      CRM.designerApp.vent.on('ufSaved', this.onUfSaved, this);
     },
     onClose: function() {
       this.undoAlert && this.undoAlert.close && this.undoAlert.close();
@@ -56,6 +57,10 @@
     },
     onUfChanged: function(isUfUnsaved) {
       this.isUfUnsaved = isUfUnsaved;
+    },
+    onUfSaved: function() {
+      CRM.designerApp.vent.off('ufUnsaved', this.onUfChanged, this);
+      this.isUfUnsaved = false;
     },
     onRender: function() {
       var designerDialog = this;
