@@ -363,47 +363,82 @@ SELECT label, value
             // for checkboxes the value is already in the right format and is NOT an array
             if (is_array($value)) {
 
-              //ignoring $op value for checkbox and multi select
               $sqlValue   = array();
-              $sqlOP      = ' AND ';
-              $sqlOPlabel = ts('match ALL');
-              if ($field['html_type'] == 'CheckBox') {
-                foreach ($value as $k => $v) {
-                  if ($v) {
-                    if ($k == 'CiviCRM_OP_OR') {
+              switch($field['html_type']) {
+                // search select value with multi-select widget
+                case 'Select':
+                  $sqlOPlabel = ts('match ANY');
+                  foreach ($value as $k => $v) {
+                    $v = CRM_Core_DAO::escapeString($v);
+                    $sqlValue[] = "'$v'";
+                  }
+                  if (!empty($sqlValue)) {
+                    $this->_where[$grouping][] = " ( $sql IN ( " . implode(',', $sqlValue) . ' )) ';
+                    $this->_qill[$grouping][] = "{$field['label']} $op $qillValue ( $sqlOPlabel )";
+                  }
+                  break;
+
+                // search radio value with checkboxes widget
+                case 'Radio':
+                  $sqlOPlabel = ts('match ANY');
+                  foreach ($value as $k => $v) {
+                    if ($v) {
+                      $sqlValue[] = "'$k'";
+                    }
+                  }
+                  if (!empty($sqlValue)) {
+                    $this->_where[$grouping][] = " ( $sql IN ( " . implode(',', $sqlValue) . ' )) ';
+                    $this->_qill[$grouping][] = "{$field['label']} $op $qillValue ( $sqlOPlabel )";
+                  }
+                  break;
+
+                case 'CheckBox':
+                  $sqlOP      = ' AND ';
+                  $sqlOPlabel = ts('match ALL');
+                  
+                  foreach ($value as $k => $v) {
+                    if ($v) {
+                      if ($k == 'CiviCRM_OP_OR') {
+                        $sqlOP = ' OR ';
+                        $sqlOPlabel = ts('match ANY');
+                        continue;
+                      }
+
+                      $sqlValue[] = "( $sql like '%" . CRM_Core_DAO::VALUE_SEPARATOR . $k . CRM_Core_DAO::VALUE_SEPARATOR . "%' ) ";
+                    }
+                  }
+                  //if user check only 'CiviCRM_OP_OR' check box
+                  //of custom checkbox field, then ignore this field.
+                  if (!empty($sqlValue)) {
+                    $this->_where[$grouping][] = ' ( ' . implode($sqlOP, $sqlValue) . ' ) ';
+                    $this->_qill[$grouping][] = "{$field['label']} $op $qillValue ( $sqlOPlabel )";
+                  }
+                  break;
+
+                // should be multi-select only
+                default:
+                  $sqlOP      = ' AND ';
+                  $sqlOPlabel = ts('match ALL');
+
+                  foreach ($value as $k => $v) {
+                    if ($v == 'CiviCRM_OP_OR') {
                       $sqlOP = ' OR ';
                       $sqlOPlabel = ts('match ANY');
                       continue;
                     }
-
-                    $sqlValue[] = "( $sql like '%" . CRM_Core_DAO::VALUE_SEPARATOR . $k . CRM_Core_DAO::VALUE_SEPARATOR . "%' ) ";
+                    $v = CRM_Core_DAO::escapeString($v);
+                    $sqlValue[] = "( $sql like '%" . CRM_Core_DAO::VALUE_SEPARATOR . $v . CRM_Core_DAO::VALUE_SEPARATOR . "%' ) ";
                   }
-                }
-                //if user check only 'CiviCRM_OP_OR' check box
-                //of custom checkbox field, then ignore this field.
-                if (!empty($sqlValue)) {
-                  $this->_where[$grouping][] = ' ( ' . implode($sqlOP, $sqlValue) . ' ) ';
-                  $this->_qill[$grouping][] = "{$field['label']} $op $qillValue ( $sqlOPlabel )";
-                }
-                // for multi select
-              }
-              else {
-                foreach ($value as $k => $v) {
-                  if ($v == 'CiviCRM_OP_OR') {
-                    $sqlOP = ' OR ';
-                    $sqlOPlabel = ts('match ANY');
-                    continue;
+                  //if user select only 'CiviCRM_OP_OR' value
+                  //of custom multi select field, then ignore this field.
+                  if (!empty($sqlValue)) {
+                    $this->_where[$grouping][] = ' ( ' . implode($sqlOP, $sqlValue) . ' ) ';
+                    $this->_qill[$grouping][] = "$field[label] $op $qillValue ( $sqlOPlabel )";
                   }
-                  $v = CRM_Core_DAO::escapeString($v);
-                  $sqlValue[] = "( $sql like '%" . CRM_Core_DAO::VALUE_SEPARATOR . $v . CRM_Core_DAO::VALUE_SEPARATOR . "%' ) ";
-                }
-                //if user select only 'CiviCRM_OP_OR' value
-                //of custom multi select field, then ignore this field.
-                if (!empty($sqlValue)) {
-                  $this->_where[$grouping][] = ' ( ' . implode($sqlOP, $sqlValue) . ' ) ';
-                  $this->_qill[$grouping][] = "$field[label] $op $qillValue ( $sqlOPlabel )";
-                }
+                  break;
+  
               }
+                
             }
             else {
               if ($field['is_search_range'] && is_array($value)) {

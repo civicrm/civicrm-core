@@ -755,6 +755,18 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $field->html_type = 'Text';
     }
 
+    // allow multiple choices in search for single value text
+    $edit_html_type = $field->html_type;
+    if ($search && $field->data_type == 'String') {
+      $search_type = array(
+        'Radio' => 'CheckBox',
+        'Select' => 'Multi-Select',
+      );
+      if (array_key_exists($field->html_type, $search_type)) {
+        $field->html_type = $search_type[$field->html_type];
+      }
+    }
+
     $placeholder = $search ? ts('- any -') : ($useRequired ? ts('- select -') : ts('- none -'));
 
     // FIXME: Why are select state/country separate widget types?
@@ -931,7 +943,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $field->option_group_id
         );
         if ($search &&
-          count($selectOption) > 1
+          count($selectOption) > 1 && !$edit_html_type == 'Select'
         ) {
           $selectOption['CiviCRM_OP_OR'] = ts('Select to match ANY; unselect to match ALL');
         }
@@ -951,7 +963,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $check[] = &$qf->addElement('advcheckbox', $v, NULL, $l, array('data-crm-custom' => $dataCrmCustomVal));
         }
         if ($search &&
-          count($check) > 1
+          count($check) > 1 && !$edit_html_type == 'Radio'
         ) {
           $check[] = &$qf->addElement('advcheckbox', 'CiviCRM_OP_OR', NULL, ts('Check to match ANY; uncheck to match ALL'), array('data-crm-custom' => $dataCrmCustomVal));
         }
@@ -1228,7 +1240,18 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           }
         }
         else {
-          $display = CRM_Utils_Array::value($value, $option);
+          // in search context, we use a checkboxes widget so result is an array
+          if (is_array($value)) {
+            $v = array();
+            foreach ($value as $key => $val) {
+              if ($val) {
+                $v[] = CRM_Utils_Array::value($key, $option);
+              }
+            }
+            $display = implode(', ', $v);
+          } else {
+            $display = CRM_Utils_Array::value($value, $option);
+          }
         }
         break;
 
@@ -1244,7 +1267,16 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'Select':
-        $display = CRM_Utils_Array::value($value, $option);
+        // in search context, we use a multi-select widget so result is an array
+        if (is_array($value)) {
+          $v = array();
+          foreach ($value as $key => $val) {
+            $v[] = CRM_Utils_Array::value($val, $option);
+          }
+          $display = implode(', ', $v);
+        } else {
+          $display = CRM_Utils_Array::value($value, $option);
+        }
         break;
 
       case 'CheckBox':
