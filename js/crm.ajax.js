@@ -344,9 +344,7 @@
     // CRM-14353 - Warn of unsaved changes for all forms except those which have opted out
     function cancelAction() {
       var dirty = CRM.utils.initialValueChanged($('form:not([data-warn-changes=false])', widget));
-      widget
-        .attr('data-unsaved-changes', dirty ? 'true' : 'false')
-        .dialog('close');
+      widget.attr('data-unsaved-changes', dirty ? 'true' : 'false');
       if (dirty) {
         var id = widget.attr('id') + '-unsaved-alert',
           title = widget.dialog('option', 'title'),
@@ -357,10 +355,13 @@
         });
       }
     }
-    if (widget.data('uiDialog')) {
-      // CRM-14353 - This is a bit harsh but we are removing jQuery UI's event handler from the close button and adding our own
-      widget.parent().find('.ui-dialog-titlebar-close').first().off().click(cancelAction);
-    }
+
+    widget.data('uiDialog') && widget.on('dialogbeforeclose', function(e) {
+      // CRM-14353 - Warn unsaved changes if user clicks close button or presses "esc"
+      if (e.originalEvent) {
+        cancelAction();
+      }
+    });
 
     widget.on('crmFormLoad.crmForm', function(event, data) {
       var $el = $(this)
@@ -373,6 +374,7 @@
           $el.trigger('crmFormCancel', e);
           if ($el.data('uiDialog') && settings.autoClose) {
             cancelAction();
+            $el.dialog('close');
           }
           else if (!settings.autoClose) {
             $el.crmSnippet('resetUrl').crmSnippet('refresh');
