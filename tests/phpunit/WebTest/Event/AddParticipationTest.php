@@ -87,7 +87,10 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
 
     // go for the chicken combo (obviously)
     //      $this->click('CIVICRM_QFID_chicken_Chicken');
-
+    
+    $this->waitForElementPresent('send_receipt');
+    $this->assertTrue($this->isChecked("send_receipt"), 'Send Confirmation and Receipt checkbox should be checked by default but is not checked.');
+    
     // Clicking save.
     $this->click('_qf_Participant_upload-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
