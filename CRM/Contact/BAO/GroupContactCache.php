@@ -309,7 +309,7 @@ SET    cache_date = null,
 ";
       }
       else {
-        $query = "
+/*        $query = "
 DELETE     gc
 FROM       civicrm_group_contact_cache gc
 INNER JOIN civicrm_group g ON g.id = gc.group_id
@@ -326,6 +326,14 @@ UPDATE civicrm_group g
 SET    refresh_date = $refreshTime
 WHERE  TIMESTAMPDIFF(MINUTE, cache_date, $now) < $smartGroupCacheTimeout
 AND    refresh_date IS NULL
+";*/
+        $query = "
+TRUNCATE civicrm_group_contact_cache
+";
+        $update = "
+UPDATE civicrm_group g
+SET    cache_date = null,
+       refresh_date = null
 ";
       }
     }
