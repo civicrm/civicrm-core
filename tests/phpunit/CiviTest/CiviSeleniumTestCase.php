@@ -2083,7 +2083,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
       $fieldLabel = "custom_field_for_{$customSet['entity']}_{$customSet['subEntity']}" . substr(sha1(rand()), 0, 4);
       $this->type('label', $fieldLabel);
-      $this->click('_qf_Field_next-bottom');
+      $this->click('_qf_Field_next_new-bottom');
       $this->waitForPageToLoad($this->getTimeoutMsec());
       $customGroupTitle = preg_replace('/\s/', '_', trim($customGroupTitle));
 
