@@ -17,11 +17,13 @@ Required vars: caseTypes
   </tr>
   </thead>
   <tbody>
-  <tr ng-repeat="ab in abmailList">
+  <tr ng-repeat="ab in graph_data">
     <td>{{ab.id}}</td>
     <td>{{ab.id}}</td>
     <td>{{ab.id}}</td>
     <td><a class="action-item crm-hover-button" ng-href="#/mailing/abtesting/{{ab.id}}">Edit</a></td>
+    <td><a class="action-item crm-hover-button" ng-href="#/mailing/abtesting/report/{{ab.id}}">Edit</a></td>
+
   </tr>
   </tbody>
 </table>

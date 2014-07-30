@@ -1,10 +1,50 @@
 <div>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <style>
+    .series {
+      fill: none;
+    }
+    .axis path, .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+  </style>
+  <div id="grph" ></div>
+  <div linegraph></div>
+  <table  style ="position: relative;  right :-425px; top:-250px; width :250px;">
+    <tr  >
+      <th>Details</th>
+      <th style="width :90px;">Version A</th>
+      <th style="width :90px;">Version B</th>
+    </tr>
+    <tr ng-repeat="d in data">
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
 
-    <hr>
-    &nbsp <input type="radio" >  Stop Test and Send Version A <br/><br>
-    &nbsp <input type="radio" >  Stop Test and Send Version B <br/><br>
 
+  </table>
+  <br><br>
+   <hr>
+
+  <table style="position: relative; left :40px;">
+    <tbody>
+
+    <tr >
+
+      <td>
+        <input type="radio" name="stop">  Stop Test and Send Version A
+      </td>
+
+      <td>
+        <input type="radio" name="stop">  Stop Test and Send Version B
+      </td>
+    </tr>
+
+    </tbody>
+  </table>
 
 
 </div>
