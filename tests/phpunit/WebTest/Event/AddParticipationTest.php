@@ -195,7 +195,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
 
     //clicking save
-    $this->click('_qf_Field_next');
+    $this->click('_qf_Field_done-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
@@ -236,7 +236,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
 
     //clicking save
-    $this->click('_qf_Field_next');
+    $this->click('_qf_Field_done-bottom');
 
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
 
@@ -376,7 +376,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $customSets = array(
       array('entity' => 'ParticipantEventName', 'subEntity' => 'Fall Fundraiser Dinner',
         'triggerElement' => array('name' => "event_id", 'type' => "select2")),
-      array('entity' => 'ParticipantRole', 'subEntity' => 'Attendee','triggerElement' => array('type' => "checkbox"))
+      array('entity' => 'ParticipantRole', 'subEntity' => 'Attendee','triggerElement' => array('name' => 'role_id', 'type' => "select"))
     );
     $pageUrl = array('url' => "participant/add", 'args' => "reset=1&action=add&context=standalone");
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);

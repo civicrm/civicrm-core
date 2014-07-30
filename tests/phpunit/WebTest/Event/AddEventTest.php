@@ -216,12 +216,12 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   function _deleteDiscount($id, $eventTitle, $discount) {
     $this->openCiviPage("event/manage/fee", "reset=1&action=update&id=$id", "_qf_Fee_upload-bottom");
     $this->type("discount_name_2", "");
-    $this->click("xpath=//tr[@id='discount_2']/td[3]/span/a");
-    $this->click("xpath=//tr[@id='discount_2']/td[4]/span/a");
+    $this->click("xpath=//tr[@id='discount_2']/td[3]/a");
+    $this->click("xpath=//tr[@id='discount_2']/td[4]/a");
     $this->type("discounted_value_1_2", "");
     $this->type("discounted_value_2_2", "");
     $this->click("_qf_Fee_upload-bottom");
-    $this->waitForPageToLoad();
+    $this->waitForText('crm-notification-container', "'Fees' information has been saved.");
     //Assertions
     $this->openCiviPage("admin/price", "reset=1");
     $this->assertStringsPresent($discount[1]);
@@ -316,8 +316,9 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("_qf_Fee_upload-bottom");
     $this->assertChecked('is_pay_later');
     $this->click("CIVICRM_QFID_0_is_monetary");
-    $this->clickLink("_qf_Fee_upload-bottom", "_qf_Fee_upload-bottom");
 
+    $this->clickLink("_qf_Fee_upload-bottom", "_qf_Fee_upload-bottom", FALSE);
+    $this->waitForElementPresent("xpath=//div[@id='event-fees'][@style='display: none;']");
     //check if pay later option is disabled
     $this->click('CIVICRM_QFID_1_is_monetary');
     $this->waitForElementPresent('is_pay_later');
@@ -380,7 +381,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->select("template_id", "value={$templateID}");
 
     // Wait for event type to be filled in (since page reloads)
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("event_type_id");
     $this->verifySelectedValue("event_type_id", $eventTypeID);
 
     // Attendee role s/b selected now.
@@ -509,10 +510,16 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->click("link=Online Registration");
     $this->waitForElementPresent("_qf_Registration_upload-bottom");
 
-    $this->click("is_online_registration");
+    $isChecked = $this->isChecked('is_online_registration');
+    if (!$isChecked) {
+      $this->click("is_online_registration");
+    }
     $this->assertChecked("is_online_registration");
     if ($multipleRegistrations) {
-      $this->click("is_multiple_registrations");
+      $isChecked = $this->isChecked('is_multiple_registrations');
+      if (!$isChecked) {
+        $this->click("is_multiple_registrations");
+      }
       $this->assertChecked("is_multiple_registrations");
     }
 
@@ -707,13 +714,13 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
       3 => '1 hour after Event Start Date',
       4 => 'Registered',
       5 => 'Yes',
-// Not sure why it's not finding the 6th cell? dgg.
-//      6 => 'Yes',
+      6 => 'Yes',
     );
 
+    $this->waitForElementPresent("xpath=//form[@id='ScheduleReminders']//div[@id='option11_wrapper']");
     //verify the fields for Event Reminder selector
     foreach ($verifyText as $key => $value) {
-      $this->verifyText("xpath=//div['option11_wrapper']/table/tbody/tr/td[$key]", $value);
+      $this->verifyText("xpath=//form[@id='ScheduleReminders']//div['option11_wrapper']/table/tbody/tr/td[$key]", $value);
     }
   }
 
@@ -764,10 +771,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $primaryDisplayName = "{$primaryParticipantInfo['first_name']} {$primaryParticipantInfo['last_name']}";
     $this->webtestLogin();
     $this->openCiviPage("event/search?reset=1", "reset=1");
-    $this->type('event_name', $eventTitle);
-    $this->click("event_name");
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2("event_id", $eventTitle, FALSE);
     $this->clickLink('_qf_Search_refresh');
     $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),
      '{$secParticipant['last_name']}, {$secParticipant['first_name']}')]/../../td[6]", preg_quote('225.00'));
@@ -778,7 +782,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     foreach ($addtlPart as $value) {
       $this->clickLink("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),
        '{$value['last_name']}, {$value['first_name']}')]/../../td[11]/span/a[2][contains(text(), 'Edit')]",
-        '_qf_Participant_upload-bottom');
+        '_qf_Participant_upload-bottom', FALSE);
       $this->assertTrue(
         $this->isElementPresent("xpath=//tr[@class='crm-participant-form-block-registered-by']/td[2]/a[contains(text(),
          '$primaryDisplayName')]"), 'Registered By info is wrong on additional participant edit form');
@@ -797,29 +801,33 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     //unselect the payment processor configured
     $this->openCiviPage("event/manage/fee", "reset=1&action=update&id={$eventId}", '_qf_Fee_upload-bottom');
     $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='Test Processor']");
-    $this->clickLink("_qf_Fee_upload-bottom");
+    $this->click("_qf_Fee_upload-bottom");
+    $this->waitForText('crm-notification-container', "'Fees' information has been saved.");
 
     // add participant and 3 additional participant and change status of participant from edit participant
     $this->_testOnlineRegistration($registerUrl, $numberRegistrations, $anonymous, TRUE);
     $this->webtestLogin();
 
     $this->openCiviPage("event/search?reset=1", "reset=1");
-    $this->type('event_name', $eventTitle);
-    $this->click("event_name");
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2("event_id", $eventTitle, FALSE);
     $this->click("xpath=//td[@class='crm-event-form-block-participant_status']/div[@class='listing-box']//div/label[text()='Pending from pay later']");
     $this->click('_qf_Search_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    $uRL = $this->getAttribute("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='Edit']@href");
+    $participantName = $this->getText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a");
     $this->click("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='Edit']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("status_id");
     $this->select('status_id', 'label=Registered');
+    $this->waitForElementPresent("record_contribution");
     $this->click('record_contribution');
+    $this->waitForElementPresent("contribution_status_id");
     $this->select('contribution_status_id', 'label=Completed');
-    $pID = $this->urlArg('id');
+    $pID = $this->urlArg('id', $uRL);
     $contributionID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $pID, 'contribution_id', 'participant_id');
     $this->click('_qf_Participant_upload-top');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='Edit']");
+    $this->click("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='View']");
+    $this->waitForElementPresent("_qf_ParticipantView_cancel-top");
     $this->verifyFinancialRecords($contributionID);
 
     // add participant and 3 additional participant and change status of participant from edit contribution
@@ -827,22 +835,19 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     $this->openCiviPage("event/search?reset=1", "reset=1");
-    $this->type('event_name', $eventTitle);
-    $this->click("event_name");
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2("event_id", $eventTitle, FALSE);
     $this->click("xpath=//td[@class='crm-event-form-block-participant_status']/div[@class='listing-box']//div/label[text()='Pending from pay later']");
     $this->click('_qf_Search_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    $uRL = $this->getAttribute("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='View']@href");
     $this->click("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='View']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $pID = $this->urlArg('id');
+    $pID = $this->urlArg('id', $uRL);
     $contributionID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $pID, 'contribution_id', 'participant_id');
+    $this->waitForElementPresent("xpath=//tr[@id='rowid$contributionID']/td[8]/span//a[text()='Edit']");
     $this->click("xpath=//tr[@id='rowid$contributionID']/td[8]/span//a[text()='Edit']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("_qf_Contribution_upload-bottom");
     $this->select('contribution_status_id', 'label=Completed');
-    $this->click('_qf_Contribution_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Contribution_upload-bottom', '_qf_ParticipantView_cancel-bottom', FALSE);
     $this->verifyFinancialRecords($contributionID);
   }
 
@@ -917,7 +922,7 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->type("value[2]",'1000.00');
     $this->check('default');
     $this->click('_qf_Fee_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText('crm-notification-container', "'Fees' information has been saved.");
 
     // intro text for registration page
     $registerIntro = 'Fill in all the fields below and click Continue.';
@@ -965,10 +970,9 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
    */
   function _testEnableParticipantStatuses($status) {
    // enable participant status
-   if ($this->isElementPresent("xpath=//td[@class='crm-particpant-label'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']")){
-     $this->click("xpath=//td[@class='crm-particpant-label'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']");
-     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']");
-     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[2]");
+   if ($this->isElementPresent("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']")) {
+     $this->click("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']");
+     $this->waitForElementPresent("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Disable']");
    }
  }
 }

@@ -275,6 +275,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->check('is_online_registration');
     $this->assertChecked('is_online_registration');
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField('intro_text', $registerIntro);
 
     // enable confirmation email
@@ -435,6 +436,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->check('is_online_registration');
     $this->assertChecked('is_online_registration');
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField('intro_text', $registerIntro);
 
     // enable confirmation email
@@ -666,10 +668,10 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         'Contribution Status' => 'Completed',
         'Paid By' => 'Check',
         'Check Number' => '1044',
-        'Total Amount' => '$ 2,705.00',
         'Received Into' => 'Deposit Bank Account',
       )
     );
+    $this->verifyText("xpath=//td[text()='Contribution Amount']/following-sibling::td//div/div", preg_quote('Contribution Total: $ 2,705.00'));
   }
 
 

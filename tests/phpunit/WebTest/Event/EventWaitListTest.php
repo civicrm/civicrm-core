@@ -123,6 +123,7 @@ class WebTest_Event_EventWaitListTest extends CiviSeleniumTestCase {
       $this->assertChecked("is_multiple_registrations");
     }
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField("intro_text", $registerIntro);
 
     // enable confirmation email
