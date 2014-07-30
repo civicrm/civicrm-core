@@ -54,13 +54,8 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
     // Search the participants
     $this->openCiviPage("event/search", "reset=1", '_qf_Search_refresh');
 
-    $eventName = 'Rain';
-    $this->click("event_name");
-    $this->type("event_name", $eventName);
-    $this->typeKeys("event_name", $eventName);
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
-    $this->assertContains($eventName, $this->getValue("event_name"), "autocomplete expected $eventName but didn’t find it in " . $this->getValue("event_name"));
+    $eventName = 'Rain-forest Cup Youth Soccer Tournament';
+    $this->select2("event_id", $eventName);
     $this->click('_qf_Search_refresh');
 
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[text()='$sortName1']");
@@ -74,12 +69,10 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
 
     // Change participant status for selected participants
     $this->select('task', "label=Change Participant Status");
-    $this->click('Go');
     $this->waitForElementPresent('_qf_ParticipantStatus_next');
 
     $this->select('status_change', "label=Attended");
-    $this->click('_qf_ParticipantStatus_next');
-    $this->waitForElementPresent('Go');
+    $this->clickLink('_qf_ParticipantStatus_next');
     $this->assertTrue($this->isTextPresent('The updates have been saved.'),
       "Status message didn't show up after saving!"
     );
@@ -112,10 +105,10 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
     $this->webtestFillAutocomplete($firstName);
 
     // Select event. Based on label for now.
-    $this->select('event_id', "label=regexp:Rain-forest Cup Youth Soccer Tournament.");
+    $this->select2('event_id', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select role
-    $this->click('role_id[2]');
+    $this->multiselect2('role_id', array('Volunteer'));
 
     // Choose Registration Date.
     // Using helper webtestFillDate function.
@@ -134,7 +127,7 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
     // Select an event fee
     $this->waitForElementPresent('priceset');
 
-    $this->click("xpath=//input[@class='form-radio']");
+    $this->click("xpath=//input[@class='crm-form-radio']");
     // Select 'Record Payment'
     $this->click('record_contribution');
 
@@ -155,9 +148,9 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
       "Status message didn't show up after saving!"
     );
 
-    $this->waitForElementPresent("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->click("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -166,9 +159,9 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
         'Participant Role' => 'Attendee',
         'Status' => 'Registered',
         'Event Source' => 'Event StandaloneAddTest Webtest',
-        'Event Fees' => '$ 800.00',
       )
     );
+    $this->verifyText("xpath=//td[text()='Selections']/following-sibling::td//div/div", preg_quote('Event Total: $ 800.00'));
   }
 }
 

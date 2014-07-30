@@ -141,14 +141,13 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/search", "reset=1", '_qf_Basic_refresh');
     $this->type('sort_name', $firstName);
     $this->click('_qf_Basic_refresh ');
-    $this->waitForElementPresent('Go');
-    $this->assertTrue($this->isTextPresent('1 Contact'));
+    $this->waitForTextPresent('1 Contact');
 
     // Verify Activity created
     $this->openCiviPage("activity/search", "reset=1", '_qf_Search_refresh');
     $this->type('sort_name', $firstName1);
     $this->click('_qf_Search_refresh');
-    $this->waitForElementPresent("Go");
+    $this->waitForElementPresent("xpath=//div[@class='crm-search-results']//table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[text()='View']");
     $this->click("xpath=//div[@class='crm-search-results']//table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
     $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[1]/td[2]/span/a[1]",
@@ -238,6 +237,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
       $this->assertChecked("is_multiple_registrations");
     }
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField("intro_text", $registerIntro);
 
     // enable confirmation email
