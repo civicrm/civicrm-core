@@ -793,7 +793,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
         $voterLinks['reserve'] = array(
           'name' => 'reserve',
           'url' => 'civicrm/survey/search',
-          'qs' => 'sid=%%id%%&reset=1&op=reserve&force=1',
+          'qs' => 'sid=%%id%%&reset=1&op=reserve',
           'title' => ts('Reserve Respondents'),
         );
       }
