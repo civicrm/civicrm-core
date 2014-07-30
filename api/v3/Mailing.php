@@ -68,6 +68,39 @@ function _civicrm_api3_mailing_create_spec(&$params) {
   $params['api.mailing_job.create']['api.default'] = 1;
 }
 
+
+
+
+function civicrm_api3_mailing_stats($params) {
+  civicrm_api3_verify_mandatory($params,
+    'CRM_Mailing_DAO_MailingJob',
+    array('mailing_id'),
+    FALSE
+  );
+  $stats[$params['mailing_id']] = array();
+  foreach (array('Delivered', 'Bounces', 'Unsubscribers', 'Unique Clicks', 'Opened') as $detail) {
+    switch ($detail) {
+      case 'Delivered':
+        $stats[$params['mailing_id']] += array($detail => CRM_Mailing_Event_BAO_Delivered::getTotalCount($params['mailing_id']));
+        break;
+      case 'Bounces':
+        $stats[$params['mailing_id']] += array($detail => CRM_Mailing_Event_BAO_Bounce::getTotalCount($params['mailing_id']));
+        break;
+      case 'Unsubscribers':
+        $stats[$params['mailing_id']] += array($detail => CRM_Mailing_Event_BAO_Unsubscribe::getTotalCount($params['mailing_id']));
+        break;
+      case 'Unique Clicks':
+        $stats[$params['mailing_id']] += array($detail => CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id']));
+        break;
+      case 'Opened':
+        $stats[$params['mailing_id']] += array($detail => CRM_Mailing_Event_BAO_Opened::getTotalCount($params['mailing_id']));
+        break;
+    }
+  }
+  return civicrm_api3_create_success($stats);
+}
+
+
 /**
  * Handle a delete event.
  *

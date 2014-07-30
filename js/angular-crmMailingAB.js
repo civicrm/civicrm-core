@@ -16,7 +16,6 @@
       $templateCache.removeAll();
     });
   });
-
   crmMailingAB.config([
     '$routeProvider',
     function ($routeProvider) {
@@ -28,6 +27,17 @@
             return crmApi('Mailing', 'get', {});
           }
         }
+      });
+      $routeProvider.when('/mailing/abtesting/report/:id', {
+        templateUrl: partialUrl('report.html'),
+        controller: 'ReportCtrl',
+        resolve: {
+          selectedABTest: function($route, crmApi) {
+              return crmApi('MailingAB', 'getsingle', {id: $route.current.params.id});
+
+          }
+        }
+
       });
       $routeProvider.when('/mailing/abtesting/:id', {
         templateUrl: partialUrl('main.html'),
@@ -56,6 +66,41 @@
   crmMailingAB.controller('ListingCtrl', function ($scope, crmApi) {
     $scope.abmailList = CRM.crmMailing.mailingabNames;
     console.log($scope.abmailList);
+
+
+  })
+  crmMailingAB.controller('ReportCtrl', function ($scope, crmApi,selectedABTest) {
+
+
+    $scope.graph_data =  [{
+      time: 1,
+      x: 3,
+      y: 4
+    }, {
+      time: 2,
+      x: 6,
+      y: 8,
+    }, {
+      time: 3,
+      x: 10,
+      y: 9,
+    }, {
+      time: 4,
+      x: 13,
+      y: 11,
+    }]
+    console.log(selectedABTest);
+    if(selectedABTest.winner_criteria_id==1){
+      $scope.winner_criteria = "Open";
+    }
+    else if(selectedABTest.winner_criteria_id ==2){
+      $scope.winner_criteria ="Total Unique Clicks";
+    }
+    else if(selectedABTest.winner_criteria_id ==3){
+        $scope.winner_criteria ="Total Clicks on a particular link";
+
+      }
+
 
 
   })
@@ -102,6 +147,9 @@
         $scope.mailA = {};
         $scope.mailB = {};
       }
+
+    if(typeof $scope.mailA == 'undefined')$scope.mailA={};
+    if(typeof $scope.mailB == 'undefined')$scope.mailB={};
 
     $scope.templates =
       [
@@ -284,7 +332,12 @@
                       declare_winning_time: $scope.currentABTest.declare_winning_time
                       } );
 
+
+
     };
+
+
+
 
 
 
@@ -655,6 +708,7 @@
 
             is_completed: scope.mailA.is_completed
           });
+
           console.log("Truth " + scope.whatnext)
 
           if (scope.whatnext == "3") {
@@ -712,7 +766,6 @@
             }
           }
 
-
           scope.saveb({
 
             id: scope.mailB.id,
@@ -741,6 +794,7 @@
             is_completed: scope.mailA.is_completed
 
           });
+
 
 
         });
@@ -804,6 +858,161 @@
     };
   });
 
+  crmMailingAB.directive('linegraph',function(){
+    return {
+      restrict: 'AE',
+      link: function(scope,element,attrs){
+          console.log("try");
+        var data= scope.graph_data;
+
+        // see wht it looks like in the console
+        console.log("Data");
+        console.log(data);
+
+        // set up a colour variable
+        var color = d3.scale.category10();
+
+        // map one colour each to x, y and z
+        // keys grabs the key value or heading of each key value pair in the json
+        // but not time
+        console.log("Key");
+
+        console.log(d3.keys(data[0]));
+        color.domain(d3.keys(data[0]).filter(function(key) {
+          return key !== "time";
+        }));
+
+        // create a nested series for passing to the line generator
+        // it's best understood by console logging the data
+        var series = color.domain().map(function(name) {
+          console.log(name);
+
+          return {
+            name: name,
+            values: data.map(function(d) {
+              console.log("------");
+              console.log(d);
+              return {
+                time: d.time,
+                score: +d[name]
+
+              };
+            })
+          };
+        });
+        console.log("Series");
+
+        console.log(series);
+
+        // Set the dimensions of the canvas / graph
+        var margin = {
+            top: 30,
+            right: 20,
+            bottom: 40,
+            left: 75
+          },
+          width = 375 - margin.left - margin.right,
+          height = 250 - margin.top - margin.bottom;
+
+        // Set the ranges
+        //var x = d3.time.scale().range([0, width]).domain([0,10]);
+        var x = d3.scale.linear().range([0,width]);
+        var y = d3.scale.linear().range([height, 0]);
+
+        // Define the axes
+        var xAxis = d3.svg.axis().scale(x)
+          .orient("bottom").ticks(10);
+
+        var yAxis = d3.svg.axis().scale(y)
+          .orient("left").ticks(5);
+
+        // Define the line
+        // Note you plot the time / score pair from each key you created ealier
+        var valueline = d3.svg.line()
+          .x(function(d) {
+            return x(d.time);
+          })
+          .y(function(d) {
+            return y(d.score);
+          });
+
+
+        // Adds the svg canvas
+        var svg = d3.select(element[0])
+          .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Scale the range of the data
+        x.domain(d3.extent(data, function(d) {
+          return d.time;
+        }));
+
+        // note the nested nature of this you need to dig an additional level
+        y.domain([
+          d3.min(series, function(c) {
+            return d3.min(c.values, function(v) {
+              return v.score;
+            });
+          }),
+          d3.max(series, function(c) {
+            return d3.max(c.values, function(v) {
+              return v.score;
+            });
+          })
+        ]);
+        svg.append("text")      // text label for the x axis
+          .attr("x", width / 2  )
+          .attr("y", height + margin.bottom )
+          .style("text-anchor", "middle")
+          .text("Time");
+
+        svg.append("text")      // text label for the x axis
+
+          .style("text-anchor", "middle")
+          .text(scope.winner_criteria).attr("transform", function(d) {
+            return "rotate(-90)"
+          }).attr("x", -height/2 )
+          .attr("y", -30 );
+        ;
+        // create a variable called series and bind the date
+        // for each series append a g element and class it as series for css styling
+        var series = svg.selectAll(".series")
+          .data(series)
+          .enter().append("g")
+          .attr("class", "series");
+
+        // create the path for each series in the variable series i.e. x, y and z
+        // pass each object called x, y nad z to the lne generator
+        series.append("path")
+          .attr("class", "line")
+          .attr("d", function(d) {
+            console.log(d); // to see how d3 iterates through series
+            return valueline(d.values);
+          })
+          .style("stroke", function(d) {
+            return color(d.name);
+          });
+
+        // Add the X Axis
+        svg.append("g") // Add the X Axis
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(xAxis);
+
+        // Add the Y Axis
+        svg.append("g") // Add the Y Axis
+          .attr("class", "y axis")
+          .call(yAxis);
+
+
+      }
+
+    }
+
+  });
 
 })(angular, CRM.$, CRM._);
 
