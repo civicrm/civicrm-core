@@ -27,7 +27,7 @@
 
 <div class="crm-accordion-wrapper crm-plaint_text_sms-accordion ">
 <div class="crm-accordion-header">
-  {ts}Plain-Text Format{/ts}
+  {ts}SMS Message{/ts}
   </div><!-- /.crm-accordion-header -->
  <div class="crm-accordion-body">
  <div id='char-count-message'></div>
