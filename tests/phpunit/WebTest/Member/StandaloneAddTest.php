@@ -72,6 +72,7 @@ class WebTest_Member_StandaloneAddTest extends CiviSeleniumTestCase {
     // fill in Status Override?
     // fill in Record Membership Payment?
     $this->click("send_receipt");
+    $this->assertTrue($this->isChecked("send_receipt"), 'Send Confirmation and Receipt checkbox should be checked.');
     $this->click("_qf_Membership_upload");
 
     //View Membership

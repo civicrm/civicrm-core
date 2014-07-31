@@ -95,7 +95,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("check_number");
     $this->type("check_number", "check #1041");
     $this->click("is_email_receipt");
-
+    $this->assertTrue($this->isChecked("is_email_receipt"), 'Send Receipt checkbox should be checked.');
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // soft credit
