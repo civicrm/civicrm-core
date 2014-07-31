@@ -2900,6 +2900,7 @@ div.grippie {
 #civicrm-menu #crm-qsearch {
   padding: 1px 3px 1px 2px;
   height: 20px;
+  background-color: #000 !important;
 }
 
 #civicrm-menu #crm-qsearch input {
@@ -2909,7 +2910,9 @@ div.grippie {
   padding: 2px 16px 3px 2px;
   height: 17px;
 }
-#civicrm-menu #crm-qsearch input:focus {
+#civicrm-menu #crm-qsearch input:hover,
+#civicrm-menu #crm-qsearch input:focus,
+#civicrm-menu #crm-qsearch.activetarget input {
   background-color: #ffffff;
 }
 
