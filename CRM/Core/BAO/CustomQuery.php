@@ -588,22 +588,37 @@ SELECT label, value
               $this->_qill[$grouping][] = $field['label'] . " {$op} {$qillValue}";
             }
             else {
-              $sqlOP = ' AND ';
-              $sqlOPlabel = ts('match ALL');
-              foreach ($value as $k => $v) {
-                if ($v == 'CiviCRM_OP_OR') {
-                  $sqlOP = ' OR ';
-                  $sqlOPlabel = ts('match ANY');
-                  continue;
+              // single value field
+              if ($field['html_type'] == 'Select State/Province' || 
+                $field['html_type'] == 'Select Country') {
+                $sqlOPlabel = ts('match ANY');
+                foreach ($value as $k => $v) {
+                  $sqlValue[] =  CRM_Utils_Type::escape($v, 'Int');
                 }
-                $sqlValue[] = "( $fieldName like '%" . CRM_Core_DAO::VALUE_SEPARATOR . $v . CRM_Core_DAO::VALUE_SEPARATOR . "%' ) ";
+                if (!empty($sqlValue)) {
+                  $this->_where[$grouping][] = " ( $fieldName IN ( " . implode(',', $sqlValue) . ' )) ';
+                  $this->_qill[$grouping][] = "{$field['label']} $op $qillValue ( $sqlOPlabel )";
+                }
               }
+              // multiple value field
+              else {
+                $sqlOP = ' AND ';
+                $sqlOPlabel = ts('match ALL');
+                foreach ($value as $k => $v) {
+                  if ($v == 'CiviCRM_OP_OR') {
+                    $sqlOP = ' OR ';
+                    $sqlOPlabel = ts('match ANY');
+                    continue;
+                  }
+                  $sqlValue[] = "( $fieldName like '%" . CRM_Core_DAO::VALUE_SEPARATOR . $v . CRM_Core_DAO::VALUE_SEPARATOR . "%' ) ";
+                }
 
-              //if user select only 'CiviCRM_OP_OR' value
-              //of custom multi select field, then ignore this field.
-              if (!empty($sqlValue)) {
-                $this->_where[$grouping][] = " ( " . implode($sqlOP, $sqlValue) . " ) ";
-                $this->_qill[$grouping][] = "$field[label] $op $qillValue ( $sqlOPlabel )";
+                //if user select only 'CiviCRM_OP_OR' value
+                //of custom multi select field, then ignore this field.
+                if (!empty($sqlValue)) {
+                  $this->_where[$grouping][] = " ( " . implode($sqlOP, $sqlValue) . " ) ";
+                  $this->_qill[$grouping][] = "$field[label] $op $qillValue ( $sqlOPlabel )";
+                }
               }
             }
             continue;

@@ -757,14 +757,22 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     // allow multiple choices in search for single value text
     $edit_html_type = $field->html_type;
-    if ($search && $field->data_type == 'String') {
-      $search_type = array(
+    if ($search) {
+      $search_type_string_only = array(
         'Radio' => 'CheckBox',
         'Select' => 'Multi-Select',
       );
-      if (array_key_exists($field->html_type, $search_type)) {
-        $field->html_type = $search_type[$field->html_type];
+      $search_type_other = array(
+        'Select State/Province' => 'Multi-Select State/Province',
+        'Select Country' => 'Multi-Select Country',
+      );
+      if ($field->data_type == 'String' && array_key_exists($field->html_type, $search_type_string_only)) {
+        $field->html_type = $search_type_string_only[$field->html_type];
       }
+      elseif (array_key_exists($field->html_type, $search_type_other)) {
+        $field->html_type = $search_type_other[$field->html_type];
+      }
+
     }
 
     $placeholder = $search ? ts('- any -') : ($useRequired ? ts('- select -') : ts('- none -'));
@@ -1341,7 +1349,17 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $display = '';
         }
         else {
-          $display = CRM_Core_PseudoConstant::stateProvince($value);
+          // in search context, we use a multi-select widget so result is an array
+          if (is_array($value)) {
+            $v = array();
+            foreach ($value as $key => $val) {
+              $v[] = CRM_Core_PseudoConstant::stateProvince($val);
+            }
+            $display = implode(', ', $v);
+          }
+          else {
+            $display = CRM_Core_PseudoConstant::stateProvince($value);
+          }
         }
         break;
 
@@ -1370,7 +1388,17 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $display = '';
         }
         else {
-          $display = CRM_Core_PseudoConstant::country($value);
+          // in search context, we use a multi-select widget so result is an array
+          if (is_array($value)) {
+            $v = array();
+            foreach ($value as $key => $val) {
+              $v[] = CRM_Core_PseudoConstant::country($val);
+            }
+            $display = implode(', ', $v);
+          }
+          else {
+            $display = CRM_Core_PseudoConstant::country($value);
+          }
         }
         break;
 
