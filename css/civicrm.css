@@ -2903,10 +2903,14 @@ div.grippie {
 }
 
 #civicrm-menu #crm-qsearch input {
-  background-color: #ffffff;
+  background-color: #eaeaea;
   border: 1px solid black;
   margin: 0px;
   padding: 2px 16px 3px 2px;
+  height: 17px;
+}
+#civicrm-menu #crm-qsearch input:focus {
+  background-color: #ffffff;
 }
 
 /* Status message box */
