@@ -2887,14 +2887,10 @@ div.grippie {
 
 /* civicrm admin menu */
 #civicrm-menu .ui-autocomplete-input,
-.crm-container .ui-autocomplete-input,
-.crm-container .ac_input {
+.crm-container .ui-autocomplete-input {
   background: white url("../packages/jquery/plugins/select2/select2.png") no-repeat scroll right -23px;
   padding-right: 16px;
   /* so that text doesn't flow on top of icon */
-}
-#crm-container .ac_input {
-  width: 20em;
 }
 
 #civicrm-menu #crm-qsearch {
@@ -3815,7 +3811,7 @@ div.m ul#civicrm-menu,
   border-radius: 4px;
 }
 
-/* autocomplete */
+/* deprecated autocomplete styles */
 
 .ac_results {
   background: transparent url(../i/dropdown-pointer.gif) no-repeat 25px 1px;
@@ -3837,20 +3833,10 @@ div.m ul#civicrm-menu,
   width: 160px!important;
 }
 
-.ac_even {
-  background-color: transparent;
-}
-.ac_odd {
-  background-color: #4F4F4F;
-}
-
 .ac_results li a {
   display: block;
 }
 
-.ac_results li,
-.ac_results li a,
-.ac_results li a:visited,
 .crm-container .ac_results li,
 .crm-container .ac_results li a,
 .crm-container .ac_results li a:visited {
@@ -3863,41 +3849,30 @@ div.m ul#civicrm-menu,
   font-weight: normal;
 }
 
-.ac_results li .icon,
-.ac_results li a .icon,
-.ac_results li a:visited .icon,
 .crm-container .ac_results li .icon,
 .crm-container .ac_results li a .icon,
 .crm-container .ac_results li a:visited .icon {
   background-image: url(../i/icons/jquery-ui-FFFFFF.png);
 }
 
-.ac_results li a:hover .icon,
-.ac_results li.ac_over a .icon,
 .crm-container .ac_results li a:hover .icon {
   background-image: url(../i/icons/jquery-ui-3E3E3E.png);
 }
 
-.ac_results li.ac_over,
 .ac_results li:hover,
 .ac_results li:hover a,
-.ac_results li.ac_over a,
-.ac_results li a:hover,
-.ac_results li.ac_over a:visited {
+.ac_results li a:hover {
   background-color: #F5F6F1;
   color: #666;
 }
-.ac_results li.ac_over strong,
-.ac_results li:hover strong,
-.crm-container .ac_results li.ac_over strong {
+.crm-container .ac_results li:hover strong {
   color: #000;
 }
 
 /* loader autocomplete */
 
 #civicrm-menu .ui-autocomplete-loading,
-.crm-container .ui-autocomplete-loading,
-.crm-container .ac_loading {
+.crm-container .ui-autocomplete-loading {
   background: white url('../i/loading.gif') no-repeat right center;
 }
 
