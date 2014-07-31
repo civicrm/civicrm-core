@@ -118,7 +118,7 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
     if (field_type == 'radio') {
       var target = target_element_id.split("|");
       for (var j = 0; j < target.length; j++) {
-        if (cj('[name="' + trigger_field_id + '"]').is(':checked')) {
+        if (cj('[name="' + trigger_field_id + '"]:first').is(':checked')) {
           if (invert) {
             cj('#' + target[j]).hide();
           }
