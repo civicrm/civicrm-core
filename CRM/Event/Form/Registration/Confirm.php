@@ -447,7 +447,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields, $this);
       //unset the billing parameters if it is pay later mode
       //to avoid creation of billing location
-      if ($this->_allowWaitlist || $this->_requireApproval || !empty($value['is_pay_later']) || empty($value['is_primary'])) {
+      if ($this->_allowWaitlist
+        || $this->_requireApproval
+        || (!empty($value['is_pay_later']) && !$this->_isBillingAddressRequiredForPayLater)
+        || empty($value['is_primary'])
+      ) {
         $billingFields = array(
           "email-{$this->_bltID}",
           'billing_first_name',
