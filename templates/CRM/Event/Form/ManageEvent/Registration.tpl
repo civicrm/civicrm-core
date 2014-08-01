@@ -26,7 +26,7 @@
 {if $addProfileBottomAdd OR $addProfileBottom}
   <td scope="row" class="label"
       width="20%">{if $addProfileBottomAdd }{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].label}
-    {else}{$form.custom_post_id[$profileBottomNum].label}{/if}</td>
+    {else}{$form.custom_post_id_multiple[$profileBottomNum].label}{/if}</td>
   <td>{if $addProfileBottomAdd }{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].html}{else}{$form.custom_post_id_multiple[$profileBottomNum].html}{/if}
     &nbsp;<span class='profile_bottom_link_remove'><a href="#" class="crm-hover-button crm-button-rem-profile"
                                                       data-addtlPartc="{$addProfileBottomAdd}"><span
@@ -420,7 +420,7 @@ invert              = 0
 
         var addtlPartc = $(this).data('addtlPartc');
 
-        if ($(this).closest("tr").attr("class").indexOf("additional_custom_post") > -1 || addtlPartc) {
+        if ($(this).closest("td").children("input").attr("name").indexOf("additional_custom_post") > -1 || addtlPartc) {
             profileBottomCountAdd++
             urlPath = CRM.url('civicrm/event/manage/registration', { addProfileBottomAdd: 1, addProfileNumAdd: profileBottomCountAdd, snippet: 4 } ) ;
         } else {
