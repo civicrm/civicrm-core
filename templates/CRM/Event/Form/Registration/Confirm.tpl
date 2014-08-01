@@ -149,7 +149,7 @@
 
     {include file="CRM/Event/Form/Registration/DisplayProfile.tpl"}
 
-    {if $contributeMode ne 'notify' and !$is_pay_later and $paidEvent and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
+    {if $contributeMode ne 'notify' and $isBillingAddressRequiredForPayLater and $paidEvent and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
       <div class="crm-group billing_name_address-group">
             <div class="header-dark">
                 {ts}Billing Name and Address{/ts}

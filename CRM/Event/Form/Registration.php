@@ -187,6 +187,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   public $_forcePayement;
 
+  public $_isBillingAddressRequiredForPayLater;
+
   /**
    * Function to set variables up before form is built
    *
@@ -466,6 +468,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if ($campID && CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Campaign', $campID)) {
       $this->_values['event']['campaign_id'] = $campID;
     }
+
+    // check if billing block is required for pay later
+    //$this->_isBillingAddressRequiredForPayLater = CRM_Utils_Array::value('is_billing_address_required ', $this->_values['event']);
+    $this->_isBillingAddressRequiredForPayLater = 1;
+    $this->assign('isBillingAddressRequiredForPayLater', $this->_isBillingAddressRequiredForPayLater);
   }
 
   /**
