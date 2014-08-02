@@ -44,6 +44,10 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+
+    $this->loadAllFixtures();
+
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
   }
 
   /**
@@ -159,7 +163,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         array(
           'fieldName' => 'activity_type_id',
           'sample' => 'Email',
-          'max' => 50,
+          'max' => 100,
         ),
         array(
           'fieldName' => 'status_id',
@@ -189,7 +193,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         array(
           'fieldName' => 'activity_type_id',
           'sample' => 'Phone Call',
-          'max' => 50,
+          'max' => 100,
         ),
       ),
       'CRM_Event_DAO_ParticipantStatusType' => array(
@@ -550,6 +554,10 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         array(
           'fieldName' => 'status_id',
           'sample' => 'Ongoing',
+        ),
+        array(
+          'fieldName' => 'case_type_id',
+          'sample' => 'Housing Support',
         ),
       ),
     );
