@@ -44,6 +44,11 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
+
+    $this->loadAllFixtures();
+
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
   }
 
   /**
@@ -55,17 +60,14 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     // Create a custom field group for testing.
     $custom_group_name = md5(microtime());
     $api_params = array(
-      'version' => 3,
       'title' => $custom_group_name,
       'extends' => 'Individual',
       'is_active' => TRUE,
     );
-    $result = civicrm_api('customGroup', 'create', $api_params);
-    $this->assertAPISuccess($result);
+    $result = civicrm_api3('customGroup', 'create', $api_params);
 
     // Add a custom field to the above field group.
     $api_params = array(
-      'version' => 3,
       'debug' => 1,
       'custom_group_id' => $result['id'],
       'label' => $custom_group_name,
@@ -79,24 +81,20 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         'weight' => 0,
       )),
     );
-    $result = civicrm_api('custom_field', 'create', $api_params);
-    $this->assertAPISuccess($result);
+    $result = civicrm_api3('custom_field', 'create', $api_params);
     $customFieldId = $result['id'];
 
     // Create a Contact Group for testing.
     $group_name = md5(microtime());
     $api_params = array(
-      'version' => 3,
       'title' => $group_name,
       'is_active' => TRUE,
     );
-    $result = civicrm_api('group', 'create', $api_params);
-    $this->assertAPISuccess($result);
+    $result = civicrm_api3('group', 'create', $api_params);
 
     // Create a PaymentProcessor for testing.
     $pp_name = md5(microtime());
     $api_params = array(
-      'version' => 3,
       'domain_id' => 1,
       'payment_processor_type_id' => 10,
       'name' => $pp_name,
@@ -106,8 +104,38 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'url_recur' => 'https://test.com/',
       'is_active' => 1,
     );
-    $result = civicrm_api('payment_processor', 'create', $api_params);
-    $this->assertAPISuccess($result);
+    $result = civicrm_api3('payment_processor', 'create', $api_params);
+
+    // Create a Campaign for testing.
+    $campaign_name = md5(microtime());
+    $api_params = array(
+      'title' => $campaign_name,
+      'is_active' => TRUE,
+      'status_id' => 2,
+    );
+    $result = civicrm_api3('campaign', 'create', $api_params);
+
+    // Create a membership type for testing.
+    $membership_type = md5(microtime());
+    $api_params = array(
+      'name' => $membership_type,
+      'is_active' => TRUE,
+      'financial_type_id' => 1,
+      'domain_id' => 1,
+      'member_of_contact_id' => 1,
+      'duration_unit' => 'day',
+      'duration_interval' => 1,
+    );
+    $result = civicrm_api3('membership_type', 'create', $api_params);
+    
+    // Create a contribution page for testing.
+    $contribution_page = md5(microtime());
+    $api_params = array(
+      'title' => $contribution_page,
+      'is_active' => TRUE,
+      'financial_type_id' => 1,
+    );
+    $result = civicrm_api3('contribution_page', 'create', $api_params);
 
     /**
      * daoName/field combinations to test
@@ -116,13 +144,29 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
      * - fieldName: the SQL column name within the DAO table.
      * - sample: Any one value which is expected in the list of option values.
      * - exclude: Any one value which should not be in the list.
-     * - max: integer (default = 10) maximum number of option values expected.
+     * - max: integer (default = 20) maximum number of option values expected.
      */
     $fields = array(
+      'CRM_ACL_DAO_ACL' => array(
+        array(
+          'fieldName' => 'operation',
+          'sample' => 'View',
+        ),
+      ),
+      'CRM_Contact_DAO_Group' => array(
+        array(
+          'fieldName' => 'visibility',
+          'sample' => 'Public Pages',
+        ),
+      ),
       'CRM_Contact_DAO_GroupContact' => array(
         array(
           'fieldName' => 'group_id',
           'sample' => $group_name,
+        ),
+        array(
+          'fieldName' => 'status',
+          'sample' => 'Added',
         ),
       ),
       'CRM_Contact_DAO_GroupContactCache' => array(
@@ -142,11 +186,63 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'group_id',
           'sample' => $group_name,
         ),
+        array(
+          'fieldName' => 'method',
+          'sample' => 'Web',
+        ),
+        array(
+          'fieldName' => 'status',
+          'sample' => 'Added',
+        ),
+      ),
+      'CRM_Core_DAO_Cache' => array(
+        array(
+          'fieldName' => 'component_id',
+          'sample' => 'CiviMail',
+        ),
+      ),
+      'CRM_Contact_DAO_ACLContactCache' => array(
+        array(
+          'fieldName' => 'operation',
+          'sample' => 'All',
+        ),
+      ),
+      'CRM_Core_DAO_Setting' => array(
+        array(
+          'fieldName' => 'component_id',
+          'sample' => 'CiviMail',
+        ),
       ),
       'CRM_Core_DAO_ActionSchedule' => array(
         array(
           'fieldName' => 'group_id',
           'sample' => $group_name,
+        ),
+        array(
+          'fieldName' => 'start_action_unit',
+          'sample' => 'hour',
+        ),
+        array(
+          'fieldName' => 'repetition_frequency_unit',
+          'sample' => 'hour',
+        ),
+        array(
+          'fieldName' => 'end_frequency_unit',
+          'sample' => 'hour',
+        ),
+        array(
+          'fieldName' => 'mode',
+          'sample' => 'Email',
+        ),
+      ),
+      'CRM_Dedupe_DAO_RuleGroup' => array(
+        array(
+          'fieldName' => 'contact_type',
+          'sample' => 'Individual',
+        ),
+        array(
+          'fieldName' => 'used',
+          'sample' => 'Unsupervised',
         ),
       ),
       'CRM_Mailing_Event_DAO_Subscribe' => array(
@@ -159,7 +255,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         array(
           'fieldName' => 'activity_type_id',
           'sample' => 'Email',
-          'max' => 50,
+          'max' => 100,
         ),
         array(
           'fieldName' => 'status_id',
@@ -177,8 +273,17 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'medium_id',
           'sample' => 'Phone',
         ),
+        array(
+          'fieldName' => 'campaign_id',
+          'sample' => $campaign_name,
+        ),
       ),
       'CRM_Campaign_DAO_Campaign' => array(
+        array(
+          'fieldName' => 'campaign_type_id',
+          'sample' => 'Constituent Engagement',
+          'max' => 50,
+        ),
         array(
           'fieldName' => 'status_id',
           'sample' => 'Completed',
@@ -187,34 +292,85 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       ),
       'CRM_Campaign_DAO_Survey' => array(
         array(
+          'fieldName' => 'campaign_id',
+          'sample' => $campaign_name,
+        ),
+        array(
           'fieldName' => 'activity_type_id',
           'sample' => 'Phone Call',
-          'max' => 50,
+          'max' => 100,
+        ),
+      ),
+      'CRM_Campaign_DAO_CampaignGroup' => array(
+        array(
+          'fieldName' => 'campaign_id',
+          'sample' => $campaign_name,
+        ),
+        array(
+          'fieldName' => 'group_type',
+          'sample' => 'Include',
+        ),
+      ),
+      'CRM_Contact_DAO_RelationshipType' => array(
+        array(
+          'fieldName' => 'contact_type_a',
+          'sample' => 'Individual',
+        ),
+        array(
+          'fieldName' => 'contact_type_b',
+          'sample' => 'Organization',
         ),
       ),
       'CRM_Event_DAO_ParticipantStatusType' => array(
         array(
+          'fieldName' => 'class',
+          'sample' => 'Waiting',
+        ),
+        array(
           'fieldName' => 'visibility_id',
           'sample' => 'Public',
         ),
       ),
-      'CRM_Member_DAO_MembershipType' => array(
+      'CRM_Price_DAO_LineItem' => array(
         array(
-          'fieldName' => 'visibility',
-          'sample' => 'Public',
+          'fieldName' => 'financial_type_id',
+          'sample' => 'Donation',
         ),
       ),
       'CRM_Price_DAO_PriceField' => array(
         array(
+          'fieldName' => 'html_type',
+          'sample' => 'Select',
+        ),
+        array(
           'fieldName' => 'visibility_id',
           'sample' => 'Public',
+        ),
+      ),
+      'CRM_Price_DAO_PriceFieldValue' => array(
+        array(
+          'fieldName' => 'financial_type_id',
+          'sample' => 'Donation',
+        ),
+      ),
+      'CRM_Price_DAO_PriceSet' => array(
+        array(
+          'fieldName' => 'domain_id',
+          'sample' => 'Default Domain Name',
+        ),
+        array(
+          'fieldName' => 'extends',
+          'sample' => 'CiviEvent',
+        ),
+        array(
+          'fieldName' => 'financial_type_id',
+          'sample' => 'Donation',
         ),
       ),
       'CRM_Financial_DAO_EntityFinancialAccount' => array(
         array(
           'fieldName' => 'financial_account_id',
           'sample' => 'Member Dues',
-          'max' => 15,
         ),
         array(
           'fieldName' => 'account_relationship',
@@ -229,7 +385,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         array(
           'fieldName' => 'financial_account_id',
           'sample' => 'Accounts Receivable',
-          'max' => 15,
         ),
         array(
           'fieldName' => 'currency',
@@ -241,17 +396,19 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         array(
           'fieldName' => 'from_financial_account_id',
           'sample' => 'Accounts Receivable',
-          'max' => 15,
         ),
         array(
           'fieldName' => 'to_financial_account_id',
           'sample' => 'Accounts Receivable',
-          'max' => 15,
         ),
         array(
           'fieldName' => 'currency',
           'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
+        ),
+        array(
+          'fieldName' => 'payment_instrument_id',
+          'sample' => 'Check',
         ),
       ),
       'CRM_Financial_DAO_FinancialAccount' => array(
@@ -260,18 +417,54 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Cost of Sales',
         ),
       ),
+      'CRM_Financial_DAO_PaymentProcessor' => array(
+        array(
+          'fieldName' => 'domain_id',
+          'sample' => 'Default Domain Name',
+        ),
+      ),
+      'CRM_Financial_BAO_PaymentProcessorType' => array(
+        array(
+          'fieldName' => 'billing_mode',
+          'sample' => 'form',
+        ),
+      ),
       'CRM_Core_DAO_UFField' => array(
         array(
           'fieldName' => 'uf_group_id',
           'sample' => 'Name and Address',
-          'max' => 15,
+        ),
+        array(
+          'fieldName' => 'visibility',
+          'sample' => 'Public Pages',
         ),
       ),
       'CRM_Core_DAO_UFJoin' => array(
         array(
           'fieldName' => 'uf_group_id',
           'sample' => 'Name and Address',
-          'max' => 15,
+        ),
+      ),
+      'CRM_Core_DAO_UFMatch' => array(
+        array(
+          'fieldName' => 'domain_id',
+          'sample' => 'Default Domain Name',
+        ),
+      ),
+      'CRM_Core_DAO_Job' => array(
+        array(
+          'fieldName' => 'domain_id',
+          'sample' => 'Default Domain Name',
+        ),
+        array(
+          'fieldName' => 'run_frequency',
+          'sample' => 'Daily',
+        ),
+      ),
+      'CRM_Core_DAO_JobLog' => array(
+        array(
+          'fieldName' => 'domain_id',
+          'sample' => 'Default Domain Name',
         ),
       ),
       'CRM_Contribute_DAO_ContributionSoft' => array(
@@ -291,12 +484,54 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
+        array(
+          'fieldName' => 'financial_type_id',
+          'sample' => 'Donation',
+        ),
+        array(
+          'fieldName' => 'period_type',
+          'sample' => 'Rolling',
+        ),
+        array(
+          'fieldName' => 'duration_unit',
+          'sample' => 'Day',
+        ),
+        array(
+          'fieldName' => 'frequency_unit',
+          'sample' => 'Day',
+        ),
+      ),
+      'CRM_Contribute_DAO_ContributionProduct' => array(
+        array(
+          'fieldName' => 'financial_type_id',
+          'sample' => 'Donation',
+        ),
       ),
       'CRM_Contribute_DAO_ContributionRecur' => array(
         array(
           'fieldName' => 'currency',
           'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
+        ),
+        array(
+          'fieldName' => 'frequency_unit',
+          'sample' => 'month',
+        ),
+        array(
+          'fieldName' => 'contribution_status_id',
+          'sample' => 'Completed',
+        ),
+        array(
+          'fieldName' => 'financial_type_id',
+          'sample' => 'Donation',
+        ),
+        array(
+          'fieldName' => 'payment_instrument_id',
+          'sample' => 'Check',
+        ),
+        array(
+          'fieldName' => 'campaign_id',
+          'sample' => $campaign_name,
         ),
       ),
      'CRM_Pledge_DAO_PledgePayment' => array(
@@ -311,6 +546,18 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'currency',
           'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
+        ),
+        array(
+          'fieldName' => 'financial_type_id',
+          'sample' => 'Donation',
+        ),
+        array(
+          'fieldName' => 'frequency_unit',
+          'sample' => 'month',
+        ),
+        array(
+          'fieldName' => 'campaign_id',
+          'sample' => $campaign_name,
         ),
       ),
       'CRM_PCP_DAO_PCP' => array(
@@ -329,6 +576,32 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'custom_group_id',
           'sample' => $custom_group_name,
         ),
+        array(
+          'fieldName' => 'data_type',
+          'sample' => 'Alphanumeric',
+        ),
+        array(
+          'fieldName' => 'html_type',
+          'sample' => 'Select Date',
+        ),
+      ),
+      'CRM_Core_DAO_CustomGroup' => array(
+        array(
+          'fieldName' => 'style',
+          'sample' => 'Inline',
+        ),
+      ),
+      'CRM_Core_DAO_Dashboard' => array(
+        array(
+          'fieldName' => 'domain_id',
+          'sample' => 'Default Domain Name',
+        ),
+      ),
+      'CRM_Core_DAO_Tag' => array(
+        array(
+          'fieldName' => 'used_for',
+          'sample' => 'Contacts',
+        ),
       ),
       'CRM_Core_DAO_EntityTag' => array(
         array(
@@ -336,23 +609,53 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Government Entity',
         ),
       ),
+      'CRM_Core_DAO_Extension' => array(
+        array(
+          'fieldName' => 'type',
+          'sample' => 'Module',
+        ),
+      ),
       'CRM_Core_DAO_OptionValue' => array(
+        array(
+          'fieldName' => 'option_group_id',
+          'sample' => 'gender',
+          'max' => 200,
+        ),
         array(
           'fieldName' => 'component_id',
           'sample' => 'CiviContribute',
         ),
+        array(
+          'fieldName' => 'domain_id',
+          'sample' => 'Default Domain Name',
+        ),
       ),
       'CRM_Core_DAO_MailSettings' => array(
         array(
+          'fieldName' => 'domain_id',
+          'sample' => 'Default Domain Name',
+        ),
+        array(
           'fieldName' => 'protocol',
           'sample' => 'Localdir',
+        ),
+      ),
+      'CRM_Core_DAO_Managed' => array(
+        array(
+          'fieldName' => 'cleanup',
+          'sample' => 'Always',
         ),
       ),
       'CRM_Core_DAO_Mapping' => array(
         array(
           'fieldName' => 'mapping_type_id',
           'sample' => 'Search Builder',
-          'max' => 15,
+        ),
+      ),
+      'CRM_Core_DAO_Navigation' => array(
+        array(
+          'fieldName' => 'domain_id',
+          'sample' => 'Default Domain Name',
         ),
       ),
       'CRM_Core_DAO_Phone' => array(
@@ -363,6 +666,16 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         array(
           'fieldName' => 'location_type_id',
           'sample' => 'Home',
+        ),
+      ),
+      'CRM_Core_DAO_PrintLabel' => array(
+        array(
+          'fieldName' => 'label_format_name',
+          'sample' => 'Avery 5395',
+        ),
+        array(
+          'fieldName' => 'label_type_id',
+          'sample' => 'Event Badge',
         ),
       ),
       'CRM_Core_DAO_Email' => array(
@@ -383,7 +696,21 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Facebook',
         ),
       ),
+      'CRM_Core_DAO_WordReplacement' => array(
+        array(
+          'fieldName' => 'match_type',
+          'sample' => 'Exact Match',
+        ),
+        array(
+          'fieldName' => 'domain_id',
+          'sample' => 'Default Domain Name',
+        ),
+      ),
       'CRM_Core_DAO_MappingField' => array(
+        array(
+          'fieldName' => 'contact_type',
+          'sample' => 'Individual',
+        ),
         array(
           'fieldName' => 'website_type_id',
           'sample' => 'Facebook',
@@ -391,6 +718,10 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         array(
           'fieldName' => 'im_provider_id',
           'sample' => 'Yahoo',
+        ),
+        array(
+          'fieldName' => 'operator',
+          'sample' => '=',
         ),
       ),
       'CRM_Contact_DAO_Contact' => array(
@@ -426,6 +757,14 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'max' => 250,
         ),
         array(
+          'fieldName' => 'preferred_mail_format',
+          'sample' => 'Text',
+        ),
+        array(
+          'fieldName' => 'communication_style_id',
+          'sample' => 'Formal',
+        ),
+        array(
           'fieldName' => "custom_$customFieldId",
           'sample' => array('foo' => 'Foo'),
           'max' => 1,
@@ -444,11 +783,19 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'mode_id',
           'sample' => 'Automatic Batch',
         ),
+        array(
+          'fieldName' => 'payment_instrument_id',
+          'sample' => 'Check',
+        ),
       ),
       'CRM_Core_DAO_IM' => array(
         array(
           'fieldName' => 'provider_id',
           'sample' => 'Yahoo',
+        ),
+        array(
+          'fieldName' => 'location_type_id',
+          'sample' => 'Home',
         ),
       ),
       'CRM_Event_DAO_Participant' => array(
@@ -465,11 +812,19 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
+        array(
+          'fieldName' => 'campaign_id',
+          'sample' => $campaign_name,
+        ),
       ),
       'CRM_Event_DAO_Event' => array(
         array(
           'fieldName' => 'event_type_id',
           'sample' => 'Fundraiser',
+        ),
+        array(
+          'fieldName' => 'participant_listing_id',
+          'sample' => 'Name and Email',
         ),
         array(
           'fieldName' => 'payment_processor',
@@ -480,21 +835,129 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Donation',
         ),
         array(
+          'fieldName' => 'default_role_id',
+          'sample' => 'Attendee',
+        ),
+        array(
           'fieldName' => 'currency',
           'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
+        array(
+          'fieldName' => 'campaign_id',
+          'sample' => $campaign_name,
+        ),
+      ),
+      'CRM_Core_DAO_Menu' => array(
+        array(
+          'fieldName' => 'domain_id',
+          'sample' => 'Default Domain Name',
+        ),
+        array(
+          'fieldName' => 'component_id',
+          'sample' => 'CiviMember',
+        ),
       ),
       'CRM_Member_DAO_Membership' => array(
         array(
+          'fieldName' => 'membership_type_id',
+          'sample' => $membership_type,
+        ),
+        array(
           'fieldName' => 'status_id',
           'sample' => 'New',
+        ),
+        array(
+          'fieldName' => 'campaign_id',
+          'sample' => $campaign_name,
+        ),
+      ),
+      'CRM_Member_DAO_MembershipStatus' => array(
+        array(
+          'fieldName' => 'start_event',
+          'sample' => 'start date',
+        ),
+        array(
+          'fieldName' => 'end_event',
+          'sample' => 'member since',
+        ),
+        array(
+          'fieldName' => 'start_event_adjust_unit',
+          'sample' => 'month',
+        ),
+        array(
+          'fieldName' => 'end_event_adjust_unit',
+          'sample' => 'year',
+        ),
+      ),
+      'CRM_Member_DAO_MembershipType' => array(
+        array(
+          'fieldName' => 'visibility',
+          'sample' => 'Public',
+        ),
+        array(
+          'fieldName' => 'domain_id',
+          'sample' => 'Default Domain Name',
+        ),
+        array(
+          'fieldName' => 'financial_type_id',
+          'sample' => 'Donation',
+        ),
+        array(
+          'fieldName' => 'duration_unit',
+          'sample' => 'lifetime',
+        ),
+        array(
+          'fieldName' => 'period_type',
+          'sample' => 'Rolling',
         ),
       ),
       'CRM_Mailing_DAO_Mailing' => array(
         array(
           'fieldName' => 'approval_status_id',
           'sample' => 'Approved',
+        ),
+        array(
+          'fieldName' => 'domain_id',
+          'sample' => 'Default Domain Name',
+        ),
+        array(
+          'fieldName' => 'visibility',
+          'sample' => 'Public Pages',
+        ),
+        array(
+          'fieldName' => 'campaign_id',
+          'sample' => $campaign_name,
+        ),
+      ),
+      'CRM_Mailing_DAO_Component' => array(
+        array(
+          'fieldName' => 'component_type',
+          'sample' => 'Header',
+        ),
+      ),
+      'CRM_Mailing_DAO_MailingGroup' => array(
+        array(
+          'fieldName' => 'group_type',
+          'sample' => 'Include',
+        ),
+      ),
+      'CRM_Mailing_DAO_MailingJob' => array(
+        array(
+          'fieldName' => 'status',
+          'sample' => 'Scheduled',
+        ),
+      ),
+      'CRM_Mailing_Event_DAO_Bounce' => array(
+        array(
+          'fieldName' => 'bounce_type_id',
+          'sample' => 'Invalid',
+        ),
+      ),
+      'CRM_Mailing_Event_DAO_Subscribe' => array(
+        array(
+          'fieldName' => 'group_id',
+          'sample' => $group_name,
         ),
       ),
       'CRM_Grant_DAO_Grant' => array(
@@ -510,6 +973,10 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'currency',
           'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
+        ),
+        array(
+          'fieldName' => 'financial_type_id',
+          'sample' => 'Donation',
         ),
       ),
       'CRM_Contribute_DAO_Contribution' => array(
@@ -530,6 +997,20 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'contribution_status_id',
           'sample' => 'Completed',
         ),
+        array(
+          'fieldName' => 'contribution_page_id',
+          'sample' => $contribution_page,
+        ),
+        array(
+          'fieldName' => 'campaign_id',
+          'sample' => $campaign_name,
+        ),
+      ),
+      'CRM_Contribute_DAO_PremiumsProduct' => array(
+        array(
+          'fieldName' => 'financial_type_id',
+          'sample' => 'Donation',
+        ),
       ),
       'CRM_Contribute_DAO_ContributionPage' => array(
         array(
@@ -545,11 +1026,25 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
+        array(
+          'fieldName' => 'campaign_id',
+          'sample' => $campaign_name,
+        ),
       ),
       'CRM_Case_DAO_Case' => array(
         array(
           'fieldName' => 'status_id',
           'sample' => 'Ongoing',
+        ),
+        array(
+          'fieldName' => 'case_type_id',
+          'sample' => 'Housing Support',
+        ),
+      ),
+      'CRM_Report_DAO_ReportInstance' => array(
+        array(
+          'fieldName' => 'domain_id',
+          'sample' => 'Default Domain Name',
         ),
       ),
     );
@@ -579,7 +1074,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         }
 
         // Ensure count of optionValues is not extraordinarily high.
-        $max = CRM_Utils_Array::value('max', $field, 12);
+        $max = CRM_Utils_Array::value('max', $field, 20);
         $this->assertLessThanOrEqual($max, count($optionValues), $message);
       }
     }

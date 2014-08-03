@@ -110,12 +110,6 @@
   <index>
     <name>index_grant_type_id</name>
     <fieldName>grant_type_id</fieldName>
-    <pseudoconstant>
-      <optionGroupName>grant_type</optionGroupName>
-    </pseudoconstant>
-    <html>
-      <type>Select</type>
-    </html>
     <add>1.8</add>
   </index>
   <field>
