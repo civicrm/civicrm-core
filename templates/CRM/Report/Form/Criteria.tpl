@@ -29,7 +29,7 @@
         {if $componentName eq 'Grant'}
             <h3>{ts}Include these Statistics{/ts}</h3>
         {else}
-            <h3>Display Columns</h3>
+            <h3>{ts}Display Columns{/ts}</h3>
         {/if}
         {foreach from=$colGroups item=grpFields key=dnc}
             {assign  var="count" value="0"}
@@ -65,7 +65,7 @@
 
     {if $groupByElements}
         <div id="group-by-elements" class="civireport-criteria" >
-        <h3>Group by Columns</h3>
+        <h3>{ts}Group by Columns{/ts}</h3>
         {assign  var="count" value="0"}
         <table class="report-layout">
             <tr class="crm-report crm-report-criteria-groupby">
@@ -91,15 +91,15 @@
 
     {if $orderByOptions}
       <div id="order-by-elements" class="civireport-criteria" >
-        <h3>Order by Columns</h3>
+        <h3>{ts}Order by Columns{/ts}</h3>
 
   <table id="optionField">
         <tr>
         <th>&nbsp;</th>
-        <th> Column</th>
-        <th> Order</th>
-        <th> Section Header / Group By</th>
-        <th> Page Break</th>
+        <th> {ts}Column{/ts}</th>
+        <th> {ts}Order{/ts}</th>
+        <th> {ts}Section Header / Group By{/ts}</th>
+        <th> {ts}Page Break{/ts}</th>
         </tr>
 
   {section name=rowLoop start=1 loop=6}
@@ -162,7 +162,7 @@
 
     {if $otherOptions}
         <div id="other-options" class="civireport-criteria" >
-        <h3>Other Options</h3>
+        <h3>{ts}Other Options{/ts}</h3>
         <table class="report-layout">
           {assign var="optionCount" value=0}
           <tr class="crm-report crm-report-criteria-field">
@@ -183,7 +183,7 @@
 
     {if $filters}
   <div id="set-filters" class="civireport-criteria" >
-        <h3>Set Filters</h3>
+        <h3>{ts}Set Filters{/ts}</h3>
         <table class="report-layout">
       {assign var="counter" value=1}
             {foreach from=$filters     item=table key=tableName}
