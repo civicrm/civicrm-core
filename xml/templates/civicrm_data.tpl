@@ -130,83 +130,84 @@ VALUES
 -- option groups and values for 'preferred communication methods' , 'activity types', 'gender', etc.
 
 INSERT INTO
-   `civicrm_option_group` (`name`, `title`, `is_reserved`, `is_active`)
+   `civicrm_option_group` (`name`, `title`, `is_reserved`, `is_active`, `is_locked`)
 VALUES
-   ('preferred_communication_method', '{ts escape="sql"}Preferred Communication Method{/ts}'     , 1, 1),
-   ('activity_type'                 , '{ts escape="sql"}Activity Type{/ts}'                      , 1, 1),
-   ('gender'                        , '{ts escape="sql"}Gender{/ts}'                             , 1, 1),
-   ('instant_messenger_service'     , '{ts escape="sql"}Instant Messenger (IM) screen-names{/ts}', 1, 1),
-   ('mobile_provider'               , '{ts escape="sql"}Mobile Phone Providers{/ts}'             , 1, 1),
-   ('individual_prefix'             , '{ts escape="sql"}Individual contact prefixes{/ts}'        , 1, 1),
-   ('individual_suffix'             , '{ts escape="sql"}Individual contact suffixes{/ts}'        , 1, 1),
-   ('acl_role'                      , '{ts escape="sql"}ACL Role{/ts}'                           , 1, 1),
-   ('accept_creditcard'             , '{ts escape="sql"}Accepted Credit Cards{/ts}'              , 1, 1),
-   ('payment_instrument'            , '{ts escape="sql"}Payment Instruments{/ts}'                , 1, 1),
-   ('contribution_status'           , '{ts escape="sql"}Contribution Status{/ts}'                , 1, 1),
-   ('pcp_status'                    , '{ts escape="sql"}PCP Status{/ts}'                         , 1, 1),
-   ('participant_role'              , '{ts escape="sql"}Participant Role{/ts}'                   , 1, 1),
-   ('event_type'                    , '{ts escape="sql"}Event Type{/ts}'                         , 1, 1),
-   ('contact_view_options'          , '{ts escape="sql"}Contact View Options{/ts}'               , 1, 1),
-   ('contact_smart_group_display'   , '{ts escape="sql"}Contact Smart Group View Options{/ts}'   , 1, 1),
-   ('contact_edit_options'          , '{ts escape="sql"}Contact Edit Options{/ts}'               , 1, 1),
-   ('advanced_search_options'       , '{ts escape="sql"}Advanced Search Options{/ts}'            , 1, 1),
-   ('user_dashboard_options'        , '{ts escape="sql"}User Dashboard Options{/ts}'             , 1, 1),
-   ('address_options'               , '{ts escape="sql"}Addressing Options{/ts}'                 , 1, 1),
-   ('group_type'                    , '{ts escape="sql"}Group Type{/ts}'                         , 1, 1),
-   ('grant_status'                  , '{ts escape="sql"}Grant status{/ts}'                       , 1, 1),
-   ('grant_type'                    , '{ts escape="sql"}Grant Type{/ts}'                         , 1, 1),
-   ('custom_search'                 , '{ts escape="sql"}Custom Search{/ts}'                      , 1, 1),
-   ('activity_status'               , '{ts escape="sql"}Activity Status{/ts}'                    , 1, 1),
-   ('case_type'                     , '{ts escape="sql"}Case Type{/ts}'                          , 1, 1),
-   ('case_status'                   , '{ts escape="sql"}Case Status{/ts}'                        , 1, 1),
-   ('participant_listing'           , '{ts escape="sql"}Participant Listing{/ts}'                , 1, 1),
-   ('safe_file_extension'           , '{ts escape="sql"}Safe File Extension{/ts}'                , 1, 1),
-   ('from_email_address'            , '{ts escape="sql"}From Email Address{/ts}'                 , 1, 1),
-   ('mapping_type'                  , '{ts escape="sql"}Mapping Type{/ts}'                       , 1, 1),
-   ('wysiwyg_editor'                , '{ts escape="sql"}WYSIWYG Editor{/ts}'                     , 1, 1),
-   ('recur_frequency_units'         , '{ts escape="sql"}Recurring Frequency Units{/ts}'          , 1, 1),
-   ('phone_type'                    , '{ts escape="sql"}Phone Type{/ts}'                         , 1, 1),
-   ('custom_data_type'              , '{ts escape="sql"}Custom Data Type{/ts}'                   , 1, 1),
-   ('visibility'                    , '{ts escape="sql"}Visibility{/ts}'                         , 1, 1),
-   ('mail_protocol'                 , '{ts escape="sql"}Mail Protocol{/ts}'                      , 1, 1),
-   ('priority'                      , '{ts escape="sql"}Priority{/ts}'                           , 1, 1),
-   ('redaction_rule'                , '{ts escape="sql"}Redaction Rule{/ts}'                     , 1, 1),
-   ('report_template'               , '{ts escape="sql"}Report Template{/ts}'                    , 1, 1),
-   ('email_greeting'                , '{ts escape="sql"}Email Greeting Type{/ts}'                , 1, 1),
-   ('postal_greeting'               , '{ts escape="sql"}Postal Greeting Type{/ts}'               , 1, 1),
-   ('addressee'                     , '{ts escape="sql"}Addressee Type{/ts}'                     , 1, 1),
-   ('contact_autocomplete_options'  , '{ts escape="sql"}Autocomplete Contact Search{/ts}'        , 1, 1),
-   ('contact_reference_options'     , '{ts escape="sql"}Contact Reference Autocomplete Options{/ts}', 1, 1),
-   ('website_type'                  , '{ts escape="sql"}Website Type{/ts}'                       , 1, 1),
-   ('tag_used_for'                  , '{ts escape="sql"}Tag Used For{/ts}'                       , 1, 1),
-   ('currencies_enabled'            , '{ts escape="sql"}Currencies Enabled{/ts}'                 , 1, 1),
-   ('event_badge'                   , '{ts escape="sql"}Event Name Badge{/ts}'                   , 1, 1),
-   ('note_privacy'                  , '{ts escape="sql"}Privacy levels for notes{/ts}'           , 1, 1),
-   ('campaign_type'                 , '{ts escape="sql"}Campaign Type{/ts}'                      , 1, 1),
-   ('campaign_status'               , '{ts escape="sql"}Campaign Status{/ts}'                    , 1, 1),
-   ('system_extensions'             , '{ts escape="sql"}CiviCRM Extensions{/ts}'                 , 1, 1),
-   ('mail_approval_status'          , '{ts escape="sql"}CiviMail Approval Status{/ts}'           , 1, 1),
-   ('engagement_index'              , '{ts escape="sql"}Engagement Index{/ts}'                   , 1, 1),
-   ('cg_extend_objects'             , '{ts escape="sql"}Objects a custom group extends to{/ts}'  , 1, 1),
-   ('paper_size'                    , '{ts escape="sql"}Paper Size{/ts}'                         , 1, 1),
-   ('pdf_format'                    , '{ts escape="sql"}PDF Page Format{/ts}'                    , 1, 1),
-   ('label_format'                  , '{ts escape="sql"}Mailing Label Format{/ts}'               , 1, 1),
-   ('activity_contacts'             , '{ts escape="sql"}Activity Contacts{/ts}'                  , 1, 1),
-   ('account_relationship'          , '{ts escape="sql"}Account Relationship{/ts}'               , 1, 1),
-   ('event_contacts'                , '{ts escape="sql"}Event Recipients{/ts}'                   , 1, 1),
-   ('conference_slot'               , '{ts escape="sql"}Conference Slot{/ts}'                    , 1, 1),
-   ('batch_type'                    , '{ts escape="sql"}Batch Type{/ts}'                         , 1, 1),
-   ('batch_mode'                    , '{ts escape="sql"}Batch Mode{/ts}'                         , 1, 1),
-   ('batch_status'                  , '{ts escape="sql"}Batch Status{/ts}'                       , 1, 1),
-   ('sms_api_type'                  , '{ts escape="sql"}Api Type{/ts}'                           , 1, 1),
-   ('sms_provider_name'             , '{ts escape="sql"}Sms Provider Internal Name{/ts}'         , 1, 1),
-   ('auto_renew_options'            , '{ts escape="sql"}Auto Renew Options{/ts}'                 , 1, 1),
-   ('financial_account_type'        , '{ts escape="sql"}Financial Account Type{/ts}'             , 1, 1),
-   ('financial_item_status'         , '{ts escape="sql"}Financial Item Status{/ts}'              , 1, 1),
-   ('label_type'                    , '{ts escape="sql"}Label Type{/ts}'                         , 1, 1),
-   ('name_badge'                    , '{ts escape="sql"}Name Badge Format{/ts}'                  , 1, 1),
-   ('communication_style'           , '{ts escape="sql"}Communication Style{/ts}'                , 1, 1),
-   ('msg_mode'                      , '{ts escape="sql"}Message Mode{/ts}'                       , 1, 1);
+   ('preferred_communication_method', '{ts escape="sql"}Preferred Communication Method{/ts}'     , 1, 1, 0),
+   ('activity_type'                 , '{ts escape="sql"}Activity Type{/ts}'                      , 1, 1, 0),
+   ('gender'                        , '{ts escape="sql"}Gender{/ts}'                             , 1, 1, 0),
+   ('instant_messenger_service'     , '{ts escape="sql"}Instant Messenger (IM) screen-names{/ts}', 1, 1, 0),
+   ('mobile_provider'               , '{ts escape="sql"}Mobile Phone Providers{/ts}'             , 1, 1, 0),
+   ('individual_prefix'             , '{ts escape="sql"}Individual contact prefixes{/ts}'        , 1, 1, 0),
+   ('individual_suffix'             , '{ts escape="sql"}Individual contact suffixes{/ts}'        , 1, 1, 0),
+   ('acl_role'                      , '{ts escape="sql"}ACL Role{/ts}'                           , 1, 1, 0),
+   ('accept_creditcard'             , '{ts escape="sql"}Accepted Credit Cards{/ts}'              , 1, 1, 0),
+   ('payment_instrument'            , '{ts escape="sql"}Payment Instruments{/ts}'                , 1, 1, 0),
+   ('contribution_status'           , '{ts escape="sql"}Contribution Status{/ts}'                , 1, 1, 1),
+   ('pcp_status'                    , '{ts escape="sql"}PCP Status{/ts}'                         , 1, 1, 1),
+   ('participant_role'              , '{ts escape="sql"}Participant Role{/ts}'                   , 1, 1, 0),
+   ('event_type'                    , '{ts escape="sql"}Event Type{/ts}'                         , 1, 1, 0),
+   ('contact_view_options'          , '{ts escape="sql"}Contact View Options{/ts}'               , 1, 1, 1),
+   ('contact_smart_group_display'   , '{ts escape="sql"}Contact Smart Group View Options{/ts}'   , 1, 1, 1),
+   ('contact_edit_options'          , '{ts escape="sql"}Contact Edit Options{/ts}'               , 1, 1, 1),
+   ('advanced_search_options'       , '{ts escape="sql"}Advanced Search Options{/ts}'            , 1, 1, 1),
+   ('user_dashboard_options'        , '{ts escape="sql"}User Dashboard Options{/ts}'             , 1, 1, 1),
+   ('address_options'               , '{ts escape="sql"}Addressing Options{/ts}'                 , 1, 1, 0),
+   ('group_type'                    , '{ts escape="sql"}Group Type{/ts}'                         , 1, 1, 0),
+   ('grant_status'                  , '{ts escape="sql"}Grant status{/ts}'                       , 1, 1, 0),
+   ('grant_type'                    , '{ts escape="sql"}Grant Type{/ts}'                         , 1, 1, 0),
+   ('custom_search'                 , '{ts escape="sql"}Custom Search{/ts}'                      , 1, 1, 0),
+   ('activity_status'               , '{ts escape="sql"}Activity Status{/ts}'                    , 1, 1, 0),
+   ('case_type'                     , '{ts escape="sql"}Case Type{/ts}'                          , 1, 1, 0),
+   ('case_status'                   , '{ts escape="sql"}Case Status{/ts}'                        , 1, 1, 0),
+   ('participant_listing'           , '{ts escape="sql"}Participant Listing{/ts}'                , 1, 1, 0),
+   ('safe_file_extension'           , '{ts escape="sql"}Safe File Extension{/ts}'                , 1, 1, 0),
+   ('from_email_address'            , '{ts escape="sql"}From Email Address{/ts}'                 , 1, 1, 0),
+   ('mapping_type'                  , '{ts escape="sql"}Mapping Type{/ts}'                       , 1, 1, 1),
+   ('wysiwyg_editor'                , '{ts escape="sql"}WYSIWYG Editor{/ts}'                     , 1, 1, 0),
+   ('recur_frequency_units'         , '{ts escape="sql"}Recurring Frequency Units{/ts}'          , 1, 1, 0),
+   ('phone_type'                    , '{ts escape="sql"}Phone Type{/ts}'                         , 1, 1, 0),
+   ('custom_data_type'              , '{ts escape="sql"}Custom Data Type{/ts}'                   , 1, 1, 0),
+   ('visibility'                    , '{ts escape="sql"}Visibility{/ts}'                         , 1, 1, 0),
+   ('mail_protocol'                 , '{ts escape="sql"}Mail Protocol{/ts}'                      , 1, 1, 0),
+   ('priority'                      , '{ts escape="sql"}Priority{/ts}'                           , 1, 1, 0),
+   ('redaction_rule'                , '{ts escape="sql"}Redaction Rule{/ts}'                     , 1, 1, 0),
+   ('report_template'               , '{ts escape="sql"}Report Template{/ts}'                    , 1, 1, 0),
+   ('email_greeting'                , '{ts escape="sql"}Email Greeting Type{/ts}'                , 1, 1, 0),
+   ('postal_greeting'               , '{ts escape="sql"}Postal Greeting Type{/ts}'               , 1, 1, 0),
+   ('addressee'                     , '{ts escape="sql"}Addressee Type{/ts}'                     , 1, 1, 0),
+   ('contact_autocomplete_options'  , '{ts escape="sql"}Autocomplete Contact Search{/ts}'        , 1, 1, 1),
+   ('contact_reference_options'     , '{ts escape="sql"}Contact Reference Autocomplete Options{/ts}', 1, 1, 1),
+   ('website_type'                  , '{ts escape="sql"}Website Type{/ts}'                       , 1, 1, 0),
+   ('tag_used_for'                  , '{ts escape="sql"}Tag Used For{/ts}'                       , 1, 1, 1),
+   ('currencies_enabled'            , '{ts escape="sql"}Currencies Enabled{/ts}'                 , 1, 1, 0),
+   ('event_badge'                   , '{ts escape="sql"}Event Name Badge{/ts}'                   , 1, 1, 0),
+   ('note_privacy'                  , '{ts escape="sql"}Privacy levels for notes{/ts}'           , 1, 1, 0),
+   ('campaign_type'                 , '{ts escape="sql"}Campaign Type{/ts}'                      , 1, 1, 0),
+   ('campaign_status'               , '{ts escape="sql"}Campaign Status{/ts}'                    , 1, 1, 0),
+   ('system_extensions'             , '{ts escape="sql"}CiviCRM Extensions{/ts}'                 , 1, 1, 0),
+   ('mail_approval_status'          , '{ts escape="sql"}CiviMail Approval Status{/ts}'           , 1, 1, 0),
+   ('engagement_index'              , '{ts escape="sql"}Engagement Index{/ts}'                   , 1, 1, 0),
+   ('cg_extend_objects'             , '{ts escape="sql"}Objects a custom group extends to{/ts}'  , 1, 1, 0),
+   ('paper_size'                    , '{ts escape="sql"}Paper Size{/ts}'                         , 1, 1, 0),
+   ('pdf_format'                    , '{ts escape="sql"}PDF Page Format{/ts}'                    , 1, 1, 0),
+   ('label_format'                  , '{ts escape="sql"}Mailing Label Format{/ts}'               , 1, 1, 0),
+   ('activity_contacts'             , '{ts escape="sql"}Activity Contacts{/ts}'                  , 1, 1, 1),
+   ('account_relationship'          , '{ts escape="sql"}Account Relationship{/ts}'               , 1, 1, 0),
+   ('event_contacts'                , '{ts escape="sql"}Event Recipients{/ts}'                   , 1, 1, 0),
+   ('conference_slot'               , '{ts escape="sql"}Conference Slot{/ts}'                    , 1, 1, 0),
+   ('batch_type'                    , '{ts escape="sql"}Batch Type{/ts}'                         , 1, 1, 1),
+   ('batch_mode'                    , '{ts escape="sql"}Batch Mode{/ts}'                         , 1, 1, 1),
+   ('batch_status'                  , '{ts escape="sql"}Batch Status{/ts}'                       , 1, 1, 1),
+   ('sms_api_type'                  , '{ts escape="sql"}Api Type{/ts}'                           , 1, 1, 0),
+   ('sms_provider_name'             , '{ts escape="sql"}Sms Provider Internal Name{/ts}'         , 1, 1, 0),
+   ('auto_renew_options'            , '{ts escape="sql"}Auto Renew Options{/ts}'                 , 1, 1, 1),
+   ('financial_account_type'        , '{ts escape="sql"}Financial Account Type{/ts}'             , 1, 1, 0),
+   ('financial_item_status'         , '{ts escape="sql"}Financial Item Status{/ts}'              , 1, 1, 1),
+   ('label_type'                    , '{ts escape="sql"}Label Type{/ts}'                         , 1, 1, 0),
+   ('name_badge'                    , '{ts escape="sql"}Name Badge Format{/ts}'                  , 1, 1, 0),
+   ('communication_style'           , '{ts escape="sql"}Communication Style{/ts}'                , 1, 1, 0),
+   ('msg_mode'                      , '{ts escape="sql"}Message Mode{/ts}'                       , 1, 1, 0),
+   ('contact_date_reminder_options' , '{ts escape="sql"}Contact Date Reminder Options{/ts}'      , 1, 1, 1);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
@@ -282,6 +283,7 @@ SELECT @option_group_id_label_type := max(id) from civicrm_option_group where na
 SELECT @option_group_id_name_badge := max(id) from civicrm_option_group where name = 'name_badge';
 SELECT @option_group_id_communication_style := max(id) from civicrm_option_group where name = 'communication_style';
 SELECT @option_group_id_msg_mode := max(id) from civicrm_option_group where name = 'msg_mode';
+SELECT @option_group_id_contactDateMode := max(id) from civicrm_option_group where name = 'contact_date_reminder_options';
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 SELECT @eventCompId      := max(id) FROM civicrm_component where name = 'CiviEvent';
@@ -539,12 +541,13 @@ VALUES
   (@option_group_id_gType, 'Access Control'  , 1, NULL, NULL, 0, NULL, 1, NULL, 0, 1, 1, NULL, NULL),
   (@option_group_id_gType, 'Mailing List'    , 2, NULL, NULL, 0, NULL, 2, NULL, 0, 1, 1, NULL, NULL),
 
-  (@option_group_id_grantSt, '{ts escape="sql"}Submitted{/ts}',             1, 'Submitted',  NULL, 0, 1,    1, NULL, 0, 0, 1, NULL, NULL),
-  (@option_group_id_grantSt, '{ts escape="sql"}Approved{/ts}',              2, 'Approved',  NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
-  (@option_group_id_grantSt, '{ts escape="sql"}Rejected{/ts}', 3, 'Rejected', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL),
-  (@option_group_id_grantSt, '{ts escape="sql"}Paid{/ts}',                  4, 'Paid',     NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL),
-  (@option_group_id_grantSt, '{ts escape="sql"}Awaiting Information'{/ts}', 5, 'Awaiting Information', NULL, 0, NULL, 5, NULL, 0, 0, 1, NULL, NULL),
-  (@option_group_id_grantSt, '{ts escape="sql"}Withdrawn{/ts}',             6, 'Withdrawn',     NULL, 0, NULL, 6, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_grantSt, '{ts escape="sql"}Submitted{/ts}', 1, 'Submitted',  NULL, 0, 1,    1, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_grantSt, '{ts escape="sql"}Eligible{/ts}', 2, 'Eligible',  NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_grantSt, '{ts escape="sql"}Ineligible{/ts}', 3, 'Ineligible', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_grantSt, '{ts escape="sql"}Paid{/ts}', 4, 'Paid', NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_grantSt, '{ts escape="sql"}Awaiting Information{/ts}', 5, 'Awaiting Information', NULL, 0, NULL, 5, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_grantSt, '{ts escape="sql"}Withdrawn{/ts}', 6, 'Withdrawn', NULL, 0, NULL, 6, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_grantSt, '{ts escape="sql"}Approved for Payment{/ts}',  7, 'Approved for Payment', NULL, 0, NULL, 7, NULL, 0, 0, 1, NULL, NULL),
 
   (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_Sample'               , 1, 'CRM_Contact_Form_Search_Custom_Sample'      , NULL, 0, NULL, 1, '{ts escape="sql"}Household Name and State{/ts}', 0, 0, 1, NULL, NULL),
   (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_ContributionAggregate', 2, 'CRM_Contact_Form_Search_Custom_ContributionAggregate', NULL, 0, NULL, 2, '{ts escape="sql"}Contribution Aggregate{/ts}', 0, 0, 1, NULL, NULL),
@@ -720,12 +723,18 @@ VALUES
   (@option_group_id_addressee, '{literal}Customized{/literal}',                  '4', '{literal}Customized{/literal}',                  NULL ,    0 , '0', '4', NULL , '0', '1', '1', NULL , NULL),
 
 -- website type
-   (@option_group_id_website, 'Home',     1, 'Home',     NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_website, 'Work',     2, 'Work',     NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_website, 'Work',     1, 'Work',     NULL, 0, 1, 1, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_website, 'Main',     2, 'Main',     NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_website, 'Facebook', 3, 'Facebook', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_website, 'Twitter',  4, 'Twitter',  NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_website, 'MySpace',  5, 'MySpace',  NULL, 0, NULL, 5, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_website, 'Main',     6, 'Main',     NULL, 0, NULL, 6, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_website, 'Google+',  4, 'Google_',  NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_website, 'Instagram',  5, 'Instagram',  NULL, 0, NULL, 5, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_website, 'LinkedIn',  6, 'LinkedIn',  NULL, 0, NULL, 6, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_website, 'MySpace',  7, 'MySpace',  NULL, 0, NULL, 7, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_website, 'Pinterest',  8, 'Pinterest',  NULL, 0, NULL, 8, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_website, 'SnapChat',  9, 'SnapChat',  NULL, 0, NULL, 9, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_website, 'Tumblr',  10, 'Tumblr',  NULL, 0, NULL, 10, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_website, 'Twitter',  11, 'Twitter',  NULL, 0, NULL, 11, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_website, 'Vine',  12, 'Vine ',  NULL, 0, NULL, 12, NULL, 0, 0, 1, NULL, NULL),
 
 -- Tag used for
    (@option_group_id_tuf, 'Contacts',   'civicrm_contact',  'Contacts',     NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
@@ -917,7 +926,11 @@ VALUES
 -- Message Mode
 (@option_group_id_msg_mode, '{ts escape="sql"}Email{/ts}', 'Email', 'Email', NULL, 0, 1, 1, NULL, 0, 1, 1, NULL, NULL),
 (@option_group_id_msg_mode, '{ts escape="sql"}SMS{/ts}', 'SMS', 'SMS', NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL),
-(@option_group_id_msg_mode, '{ts escape="sql"}User Preference{/ts}', 'User_Preference', 'User Preference', NULL, 0, 0, 3, NULL, 0, 1, 1, NULL, NULL);
+(@option_group_id_msg_mode, '{ts escape="sql"}User Preference{/ts}', 'User_Preference', 'User Preference', NULL, 0, 0, 3, NULL, 0, 1, 1, NULL, NULL),
+
+-- Reminder Options for Contact Date Fields
+(@option_group_id_contactDateMode, '{ts escape="sql"}Actual date only{/ts}', '1', 'Actual date only', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
+(@option_group_id_contactDateMode, '{ts escape="sql"}Each anniversary{/ts}', '2', 'Each anniversary', NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL);
 
 -- financial accounts
 SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;
@@ -1364,16 +1377,7 @@ VALUES
    (1, 'User Account', NULL, NULL, 1, 1),
    (1, 'Profile', NULL, NULL, 1, 1),
    (1, 'Profile', NULL, NULL, 2, 2),
-   (1, 'Profile', NULL, NULL, 3, 4),
-   (1, 'Profile', NULL, NULL, 4, 5),
-   (1, 'Profile', NULL, NULL, 5, 6),
-   (1, 'Profile', NULL, NULL, 6, 7),
-   (1, 'Profile', NULL, NULL, 7, 8),
-   (1, 'Profile', NULL, NULL, 8, 9),
-   (1, 'Profile', NULL, NULL, 9, 10),
-   (1, 'Profile', NULL, NULL, 10, 11),
-   (1, 'Profile', NULL, NULL, 11, 12),
-   (1, 'Profile', NULL, NULL, 12, 13);
+   (1, 'Profile', NULL, NULL, 11, 12);
 
 INSERT INTO civicrm_uf_field
        ( uf_group_id, field_name,              is_required, is_reserved, weight, visibility,                  in_selector, is_searchable, location_type_id, label,                                          field_type,    help_post, phone_type_id ) VALUES
@@ -1480,7 +1484,8 @@ VALUES
 ( 'civicrm_participant', 'event_type', 'Event Type', 'civicrm_participant_status_type', 'Participant Status', 'event_start_date', 'event_end_date', 'event_contacts'),
 ( 'civicrm_participant', 'civicrm_event', 'Event Name', 'civicrm_participant_status_type', 'Participant Status', 'event_start_date', 'event_end_date', 'event_contacts'),
 ( 'civicrm_membership', 'civicrm_membership_type', 'Membership Type', 'auto_renew_options', 'Auto Renew Options', 'membership_join_date', 'membership_end_date', NULL),
-( 'civicrm_participant', 'event_template', 'Event Template', 'civicrm_participant_status_type', 'Participant Status', 'event_start_date', 'event_end_date', 'event_contacts');
+( 'civicrm_participant', 'event_template', 'Event Template', 'civicrm_participant_status_type', 'Participant Status', 'event_start_date', 'event_end_date', 'event_contacts'),
+( 'civicrm_contact', 'civicrm_contact', 'Date Field', 'contact_date_reminder_options', 'Annual Options', 'date_field', NULL, NULL);
 
 INSERT INTO `civicrm_contact_type`
   (`id`, `name`, `label`,`image_URL`, `parent_id`, `is_active`,`is_reserved`)
@@ -1507,7 +1512,8 @@ end=[contact ID] optional-process contacts with IDs less than this
 throttle=[1 or 0] optional-1 adds five second sleep{/ts}', 0),
     ( @domainID, 'Daily' ,  NULL, '{ts escape="sql" skip="true"}Update Greetings and Addressees{/ts}','{ts escape="sql" skip="true"}Goes through contact records and updates email and postal greetings, or addressee value{/ts}', 'job', 'update_greeting','{ts escape="sql" skip="true"}ct=[Individual or Household or Organization] required
 gt=[email_greeting or postal_greeting or addressee] required
-force=[0 or 1] optional-0 update contacts with null value, 1 update all{/ts}', 0),
+force=[0 or 1] optional-0 update contacts with null value, 1 update all
+limit=Number optional-Limit the number of contacts to update{/ts}', 0),
     ( @domainID, 'Daily' ,  NULL, '{ts escape="sql" skip="true"}Mail Reports{/ts}', '{ts escape="sql" skip="true"}Generates and sends out reports via email{/ts}', 'job', 'mail_report','{ts escape="sql" skip="true"}instanceId=[ID of report instance] required
 format=[csv or print] optional-output CSV or print-friendly HTML, else PDF{/ts}', 0),
     ( @domainID, 'Daily' ,  NULL, '{ts escape="sql" skip="true"}Send Scheduled Reminders{/ts}', '{ts escape="sql" skip="true"}Sends out scheduled reminders via email{/ts}', 'job', 'send_reminder', NULL, 0),

@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Profile_ProfileGroupSubscriptionTest
+ */
 class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -126,6 +130,9 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->_testdeleteProfile($profileTitle);
   }
 
+  /**
+   * @param $profileTitle
+   */
   function _testdeleteProfile($profileTitle) {
     $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
     $this->click("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");

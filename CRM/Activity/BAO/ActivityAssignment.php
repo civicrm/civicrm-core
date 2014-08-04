@@ -49,12 +49,12 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
   /**
    * Add activity assignment.
    *
-   * @param array  $params       (reference ) an assoc array of name/value pairs
-   * @param array  $ids          (reference ) the array that holds all the db ids
+   * @param array $params (reference ) an assoc array of name/value pairs
+   *
+   * @internal param array $ids (reference ) the array that holds all the db ids
    *
    * @return object activity type of object that is added
    * @access public
-   *
    */
   public static function create(&$params) {
     $assignment = new CRM_Activity_BAO_ActivityContact();
@@ -70,12 +70,13 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
   /**
    * Retrieve assignee_id by activity_id
    *
-   * @param int    $id  ID of the activity
+   * @param $activity_id
    *
-   * @return void
+   * @internal param int $id ID of the activity
+   *
+   * @return array
    *
    * @access public
-   *
    */
   static function retrieveAssigneeIdsByActivityId($activity_id) {
     $assigneeArray = array();

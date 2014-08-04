@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_ContactCustomDataTest
+ */
 class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
@@ -45,13 +49,13 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     $this->click("xpath=//div[@id='browseValues_Individual']/div[2]/a/span");
     $this->waitForElementPresent('_qf_DedupeRules_next-bottom');
     $this->type('title', $newRuleTitle);
-    $this->click("CIVICRM_QFID_1_used");
+    $this->click("CIVICRM_QFID_Supervised_used");
     $this->select("where_0", "label=$customDataParams[1]");
     $this->type('weight_0', '10');
     $this->type('threshold', '10');
     $this->click('_qf_DedupeRules_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("The rule '{$newRuleTitle}' has been saved."));
+    $this->waitForText("crm-notification-container", "The rule '{$newRuleTitle}' has been saved.");
 
     $rgId = explode('&rgid=', $this->getAttribute("xpath=//div[@id='browseValues_Individual']//table/tbody//tr/td[text()='{$newRuleTitle}']/../td[3]/span/a[text()='Use Rule']@href"));
     $rgId = explode('&', $rgId[1]);
@@ -94,10 +98,10 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     $this->typeKeys('css=input#sort_name_navigation', $firstName1);
 
     // Wait for result list.
-    $this->waitForElementPresent("css=div.ac_results-inner li");
+    $this->waitForElementPresent("css=ul.ui-autocomplete li");
 
     // Visit contact summary page.
-    $this->click("css=div.ac_results-inner li");
+    $this->click("css=ul.ui-autocomplete li");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent('This is a test field'));
   }
@@ -105,6 +109,12 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide data for custom data import.
      */
+  /**
+   * @param $customDataParams
+   * @param $firstName1
+   *
+   * @return array
+   */
   function _individualCustomCSVData($customDataParams, $firstName1) {
     $headers = array(
       'first_name' => 'First Name',
@@ -122,10 +132,18 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
+  /**
+   * @param $originalHeaders
+   * @param $originalRows
+   * @param $checkSummary
+   */
   function checkDuplicateContacts($originalHeaders, $originalRows, $checkSummary) {
     $this->assertTrue($this->isTextPresent('CiviCRM has detected one record which is a duplicate of existing CiviCRM contact record. These records have not been imported.'));
   }
 
+  /**
+   * @return array
+   */
   function _addCustomData() {
 
     $this->openCiviPage("admin/custom/group", "reset=1");
@@ -167,7 +185,7 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     $this->click('_qf_Field_next-bottom');
     $this->waitForElementPresent('newCustomField');
 
-    $this->assertTrue($this->isTextPresent("Your custom field '{$customField}' has been saved."));
+    $this->assertTrue($this->isTextPresent("Custom field '{$customField}' has been saved."));
     $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField']/../../td[8]/span/a@href"));
     $customFieldId = $customFieldId[1];
 

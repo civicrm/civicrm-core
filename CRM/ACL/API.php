@@ -138,7 +138,11 @@ class CRM_ACL_API {
    * get all the groups the user has access to for the given operation
    *
    * @param int $type the type of permission needed
-   * @param int    $contactID the contactID for whom the check is made
+   * @param int $contactID the contactID for whom the check is made
+   *
+   * @param string $tableName
+   * @param null $allGroups
+   * @param null $includedGroups
    *
    * @return array the ids of the groups for which the user has permissions
    * @access public
@@ -167,7 +171,13 @@ class CRM_ACL_API {
    * check if the user has access to this group for operation $type
    *
    * @param int $type the type of permission needed
-   * @param int    $contactID the contactID for whom the check is made
+   * @param $groupID
+   * @param int $contactID the contactID for whom the check is made
+   *
+   * @param string $tableName
+   * @param null $allGroups
+   * @param null $includedGroups
+   * @param bool $flush
    *
    * @return array the ids of the groups for which the user has permissions
    * @access public
@@ -178,10 +188,17 @@ class CRM_ACL_API {
     $contactID      = NULL,
     $tableName      = 'civicrm_saved_search',
     $allGroups      = NULL,
-    $includedGroups = NULL
+    $includedGroups = NULL,
+    $flush = FALSE
   ) {
-    static $cache = array();
 
+    static $cache = array();
+    //@todo this is pretty hacky!!!
+    //adding a way for unit tests to flush the cache
+    if ($flush) {
+      $cache = array();
+      return;
+    }
     if (!$contactID) {
       $session = CRM_Core_Session::singleton();
       $contactID = NULL;

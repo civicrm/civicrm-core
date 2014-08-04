@@ -34,6 +34,10 @@
  */
 
 require_once 'Mail/mime.php';
+
+/**
+ * Class CRM_Mailing_Event_BAO_Unsubscribe
+ */
 class CRM_Mailing_Event_BAO_Unsubscribe extends CRM_Mailing_Event_DAO_Unsubscribe {
 
   /**
@@ -403,9 +407,11 @@ WHERE  email = %2
   /**
    * Get row count for the event selector
    *
-   * @param int $mailing_id       ID of the mailing
-   * @param int $job_id           Optional ID of a job to filter on
-   * @param boolean $is_distinct  Group by queue ID?
+   * @param int $mailing_id ID of the mailing
+   * @param int $job_id Optional ID of a job to filter on
+   * @param boolean $is_distinct Group by queue ID?
+   *
+   * @param null $org_unsubscribe
    *
    * @return int                  Number of rows in result set
    * @access public
@@ -461,13 +467,14 @@ WHERE  email = %2
   /**
    * Get rows for the event browser
    *
-   * @param int $mailing_id       ID of the mailing
-   * @param int $job_id           optional ID of the job
-   * @param boolean $is_distinct  Group by queue id?
-   * @param int $offset           Offset
-   * @param int $rowCount         Number of rows
-   * @param array $sort           sort array
+   * @param int $mailing_id ID of the mailing
+   * @param int $job_id optional ID of the job
+   * @param boolean $is_distinct Group by queue id?
+   * @param int $offset Offset
+   * @param int $rowCount Number of rows
+   * @param array $sort sort array
    *
+   * @param null $org_unsubscribe
    * @return array                Result set
    * @access public
    * @static
@@ -559,6 +566,11 @@ WHERE  email = %2
     return $results;
   }
 
+  /**
+   * @param $queueID
+   *
+   * @return array
+   */
   public static function getContactInfo($queueID) {
     $query = "
 SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,

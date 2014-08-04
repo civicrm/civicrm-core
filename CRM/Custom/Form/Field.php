@@ -527,7 +527,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     // add buttons
     $this->addButtons(array(
         array(
-          'type' => 'next',
+          'type' => 'done',
           'name' => ts('Save'),
           'isDefault' => TRUE,
         ),
@@ -561,7 +561,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   /**
    * global validation rules for the form
    *
-   * @param array  $fields   (referance) posted values of the form
+   * @param array $fields (referance) posted values of the form
+   *
+   * @param $files
+   * @param $self
    *
    * @return array    if errors then list of errors to be posted back to the form,
    *                  true otherwise
@@ -674,13 +677,8 @@ SELECT count(*)
             if (strpos($fields['filter'], 'entity=') !== FALSE) {
               $errors['filter'] = ts("Please do not include entity parameter (entity is always 'contact')");
             }
-            elseif (strpos($fields['filter'], 'action=') === FALSE) {
-              $errors['filter'] = ts("Please specify 'action' parameter, it should be 'lookup' or 'get'");
-            }
-            elseif (strpos($fields['filter'], 'action=get') === FALSE &&
-              strpos($fields['filter'], 'action=lookup') === FALSE
-            ) {
-              $errors['filter'] = ts("Only 'get' and 'lookup' actions are supported.");
+            elseif (strpos($fields['filter'], 'action=get') === FALSE) {
+              $errors['filter'] = ts("Only 'get' action is supported.");
             }
           }
           $self->setDefaults(array('filter_selected', $fields['filter_selected']));
@@ -1002,7 +1000,7 @@ SELECT id
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
-      $msg += '<p>' . ts("Ready to add another.") . '</p>';
+      $msg .= '<p>' . ts("Ready to add another.") . '</p>';
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field/add',
           'reset=1&action=add&gid=' . $this->_gid
         ));

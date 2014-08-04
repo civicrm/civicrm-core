@@ -66,7 +66,7 @@
   <p></p>
   <div class="form-item">
   {strip}
-    <table id="crm-transaction-selector-assign" cellpadding="0" cellspacing="0" border="0">
+    <table id="crm-transaction-selector-assign-{$entityID}" cellpadding="0" cellspacing="0" border="0">
       <thead>
       <tr>
         <th class="crm-transaction-checkbox">{if $statusID eq 1}{$form.toggleSelect.html}{/if}</th>
@@ -90,8 +90,8 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
-  cj('#_qf_BatchTransaction_submit-top, #_qf_BatchTransaction_submit-botttom').click(function() {
-    cj('.crm-batch_transaction_search-accordion:not(.collapsed)').crmAccordionToggle();
+  CRM.$('#_qf_BatchTransaction_submit-top, #_qf_BatchTransaction_submit-botttom').click(function() {
+    CRM.$('.crm-batch_transaction_search-accordion:not(.collapsed)').crmAccordionToggle();
   });
   var batchStatus = {/literal}{$statusID}{literal};
   // build transaction listing only for open batches
@@ -104,58 +104,58 @@ CRM.$(function($) {
       buildTransactionSelectorAssign( false );
     }
     buildTransactionSelectorRemove();
-    cj('#_qf_BatchTransaction_submit-botttom, #_qf_BatchTransaction_submit-top').click( function() {
+    CRM.$('#_qf_BatchTransaction_submit-botttom, #_qf_BatchTransaction_submit-top').click( function() {
       buildTransactionSelectorAssign( true );
       return false;
     });
 
-    cj("#trans_assign").prop('disabled',true);
-    cj("#trans_remove").prop('disabled',true);
-    cj('#crm-transaction-selector-assign #toggleSelect').click( function() {
+    CRM.$("#trans_assign").prop('disabled',true);
+    CRM.$("#trans_remove").prop('disabled',true);
+    CRM.$('#crm-transaction-selector-assign-{/literal}{$entityID}{literal} #toggleSelect').click( function() {
       enableActions('x');
     });
-    cj('#crm-transaction-selector-remove #toggleSelects').click( function() {
+    CRM.$('#crm-transaction-selector-remove-{/literal}{$entityID}{literal} #toggleSelects').click( function() {
       enableActions('y');
     });
-    cj('#Go').click( function() {
-      return selectAction("trans_assign","toggleSelect", "crm-transaction-selector-assign input[id^='mark_x_']");
+    CRM.$('#Go').click( function() {
+      return selectAction("trans_assign","toggleSelect", "crm-transaction-selector-assign-{/literal}{$entityID}{literal} input[id^='mark_x_']");
     });
-    cj('#GoRemove').click( function() {
-      return selectAction("trans_remove","toggleSelects", "crm-transaction-selector-remove input[id^='mark_y_']");
+    CRM.$('#GoRemove').click( function() {
+      return selectAction("trans_remove","toggleSelects", "crm-transaction-selector-remove-{/literal}{$entityID}{literal} input[id^='mark_y_']");
     });
-    cj('#Go').click( function() {
-      if (cj("#trans_assign" ).val() != "" && cj("input[id^='mark_x_']").is(':checked')) {
+    CRM.$('#Go').click( function() {
+      if (CRM.$("#trans_assign" ).val() != "" && CRM.$("input[id^='mark_x_']").is(':checked')) {
         bulkAssignRemove('Assign');
       }
       return false;
     });
-    cj('#GoRemove').click( function() {
-      if (cj("#trans_remove" ).val() != "" && cj("input[id^='mark_y_']").is(':checked')) {
+    CRM.$('#GoRemove').click( function() {
+      if (CRM.$("#trans_remove" ).val() != "" && CRM.$("input[id^='mark_y_']").is(':checked')) {
         bulkAssignRemove('Remove');
       }
       return false;
     });
-    cj("#crm-transaction-selector-assign input[id^='mark_x_']").click( function() {
+    CRM.$("#crm-transaction-selector-assign-{/literal}{$entityID}{literal} input[id^='mark_x_']").click( function() {
       enableActions('x');
     });
-    cj("#crm-transaction-selector-remove input[id^='mark_y_']").click( function() {
+    CRM.$("#crm-transaction-selector-remove-{/literal}{$entityID}{literal} input[id^='mark_y_']").click( function() {
       enableActions('y');
     });
 
-    cj("#crm-transaction-selector-assign #toggleSelect").click( function() {
-      if (cj("#crm-transaction-selector-assign #toggleSelect").is(':checked')) {
-        cj("#crm-transaction-selector-assign input[id^='mark_x_']").prop('checked',true);
+    CRM.$("#crm-transaction-selector-assign-{/literal}{$entityID}{literal} #toggleSelect").click( function() {
+      if (CRM.$("#crm-transaction-selector-assign-{/literal}{$entityID}{literal} #toggleSelect").is(':checked')) {
+        CRM.$("#crm-transaction-selector-assign-{/literal}{$entityID}{literal} input[id^='mark_x_']").prop('checked',true);
       }
       else {
-        cj("#crm-transaction-selector-assign input[id^='mark_x_']").prop('checked',false);
+        CRM.$("#crm-transaction-selector-assign-{/literal}{$entityID}{literal} input[id^='mark_x_']").prop('checked',false);
       }
     });
-    cj("#crm-transaction-selector-remove #toggleSelects").click( function() {
-      if (cj("#crm-transaction-selector-remove #toggleSelects").is(':checked')) {
-        cj("#crm-transaction-selector-remove input[id^='mark_y_']").prop('checked',true);
+    CRM.$("#crm-transaction-selector-remove-{/literal}{$entityID}{literal} #toggleSelects").click( function() {
+      if (CRM.$("#crm-transaction-selector-remove-{/literal}{$entityID}{literal} #toggleSelects").is(':checked')) {
+        CRM.$("#crm-transaction-selector-remove-{/literal}{$entityID}{literal} input[id^='mark_y_']").prop('checked',true);
       }
       else {
-        cj("#crm-transaction-selector-remove input[id^='mark_y_']").prop('checked',false);
+        CRM.$("#crm-transaction-selector-remove-{/literal}{$entityID}{literal} input[id^='mark_y_']").prop('checked',false);
       }
     });
   }
@@ -166,10 +166,10 @@ CRM.$(function($) {
 
 function enableActions( type ) {
   if (type == 'x') {
-    cj("#trans_assign").prop('disabled',false);
+    CRM.$("#trans_assign").prop('disabled',false);
   }
   else {
-    cj("#trans_remove").prop('disabled',false);
+    CRM.$("#trans_remove").prop('disabled',false);
   }
 }
 
@@ -181,7 +181,7 @@ function buildTransactionSelectorAssign(filterSearch) {
     var ZeroRecordText = '<div class="status messages">{/literal}{ts escape="js"}No Contributions found for your search criteria.{/ts}{literal}</li></ul></div>';
   }
 
-  crmBatchSelector1 = cj('#crm-transaction-selector-assign').dataTable({
+  crmBatchSelector1 = CRM.$('#crm-transaction-selector-assign-{/literal}{$entityID}{literal}').dataTable({
   "bDestroy"   : true,
   "bFilter"    : false,
   "bAutoWidth" : false,
@@ -223,20 +223,20 @@ function buildTransactionSelectorAssign(filterSearch) {
   },
   "fnServerData": function ( sSource, aoData, fnCallback ) {
     if ( filterSearch ) {
-      cj('#searchForm :input').each(function() {
-        if (cj(this).val()) {
+      CRM.$('#searchForm :input').each(function() {
+        if (CRM.$(this).val()) {
           aoData.push(
-            {name:cj(this).attr('id'), value: cj(this).val()}
+            {name:CRM.$(this).attr('id'), value: CRM.$(this).val()}
           );
-          cj(':radio, :checkbox').each(function() {
-            if (cj(this).is(':checked')) {
-              aoData.push( { name: cj(this).attr('name'), value: cj(this).val() } );
+          CRM.$(':radio, :checkbox').each(function() {
+            if (CRM.$(this).is(':checked')) {
+              aoData.push( { name: CRM.$(this).attr('name'), value: CRM.$(this).val() } );
             }
           });
         }
       });
     }
-    cj.ajax({
+    CRM.$.ajax({
       "dataType": 'json',
       "type": "POST",
       "url": sSource,
@@ -251,7 +251,7 @@ function buildTransactionSelectorRemove( ) {
   var columns = '';
   var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Financial_Page_AJAX&fnName=getFinancialTransactionsList&snippet=4&context=financialBatch&entityID=$entityID&statusID=$statusID"}'{literal};
 
-  crmBatchSelector = cj('#crm-transaction-selector-remove').dataTable({
+  crmBatchSelector = CRM.$('#crm-transaction-selector-remove-{/literal}{$entityID}{literal}').dataTable({
   "bDestroy"   : true,
   "bFilter"    : false,
   "bAutoWidth" : false,
@@ -291,7 +291,7 @@ function buildTransactionSelectorRemove( ) {
     }
   },
   "fnServerData": function (sSource, aoData, fnCallback) {
-    cj.ajax({
+    CRM.$.ajax({
       "dataType": 'json',
       "type": "POST",
       "url": sSource,
@@ -303,14 +303,14 @@ function buildTransactionSelectorRemove( ) {
 }
 
 function selectAction( id, toggleSelectId, checkId ) {
-  if (cj("#"+ id ).is(':disabled')) {
+  if (CRM.$("#"+ id ).is(':disabled')) {
     return false;
   }
-  else if (!cj("#" + toggleSelectId).is(':checked') && !cj("#" + checkId).is(':checked') && cj("#" + id).val() != "") {
+  else if (!CRM.$("#" + toggleSelectId).is(':checked') && !CRM.$("#" + checkId).is(':checked') && CRM.$("#" + id).val() != "") {
     CRM.alert ({/literal}'{ts escape="js"}Please select one or more contributions for this action.{/ts}'{literal});
     return false;
   }
-  else if (cj("#" + id).val() == "") {
+  else if (CRM.$("#" + id).val() == "") {
     CRM.alert ({/literal}'{ts escape="js"}Please select an action from the drop-down menu.{/ts}'{literal});
     return false;
   }
@@ -320,18 +320,18 @@ function bulkAssignRemove( action ) {
   var postUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q="className=CRM_Financial_Page_AJAX&fnName=bulkAssignRemove&entityID=$entityID" }"{literal};
   var fids = [];
   if (action == 'Assign') {
-    cj("input[id^='mark_x_']:checked").each( function () {
-      var a = cj(this).attr('id');
+    CRM.$("input[id^='mark_x_']:checked").each( function () {
+      var a = CRM.$(this).attr('id');
       fids.push(a);
     });
   }
   if (action == 'Remove') {
-    cj("input[id^='mark_y_']:checked").each( function () {
-      var a = cj(this).attr('id');
+    CRM.$("input[id^='mark_y_']:checked").each( function () {
+      var a = CRM.$(this).attr('id');
       fids.push(a);
     });
   }
-  cj.post(postUrl, { ID: fids, action:action }, function(data) {
+  CRM.$.post(postUrl, { ID: fids, action:action }, function(data) {
     //this is custom status set when record update success.
     if (data.status == 'record-updated-success') {
       buildTransactionSelectorAssign( true );

@@ -38,6 +38,8 @@
  *
  * @param string $str
  *
+ * @param bool $gdata
+ *
  * @return string  formatted text
  * @access public
  */

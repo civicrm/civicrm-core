@@ -65,6 +65,9 @@ function civicrm_api3_message_template_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * @param $params
+ */
 function _civicrm_api3_message_template_get_spec(&$params) {
 }
 

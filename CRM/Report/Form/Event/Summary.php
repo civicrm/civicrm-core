@@ -49,6 +49,12 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
     'Event');
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
     $this->_columns = array(
@@ -163,7 +169,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
         }
       }
     }
-    $clauses[] = "({$this->_aliases['civicrm_event']}.is_template IS NULL OR {$this->_aliases['civicrm_event']}.is_template = 0)";
+    $clauses[] = "{$this->_aliases['civicrm_event']}.is_template = 0";
     $this->_where = 'WHERE  ' . implode(' AND ', $clauses);
   }
 
@@ -173,6 +179,9 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
   }
 
   //get participants information for events
+  /**
+   * @return array
+   */
   function participantInfo() {
 
     $statusType1 = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
@@ -319,6 +328,9 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function buildChart(&$rows) {
     $this->_interval = 'events';
     $countEvent = NULL;
@@ -354,6 +366,9 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
     }
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
 
     if (is_array($rows)) {

@@ -231,7 +231,9 @@ class CRM_Friend_Form extends CRM_Core_Form {
   /**
    * Function for validation
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param $fields
+   *
+   * @internal param array $params (ref.) an assoc array of name/value pairs
    *
    * @return mixed true or array of errors
    * @access public

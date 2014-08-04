@@ -1,7 +1,14 @@
 <?php
 
 require_once 'CRM/Contact/Form/Search/Custom/Base.php';
+
+/**
+ * Class test_extension_manager_searchtest
+ */
 class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     parent::__construct($formValues);
   }
@@ -71,6 +78,11 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   /**
    * Construct a full SQL query which returns one page worth of results
    *
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   *
    * @return string, sql
    */
   function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE) {
@@ -110,6 +122,8 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
 
   /**
    * Construct a SQL WHERE clause
+   *
+   * @param bool $includeContactIDs
    *
    * @return string, sql fragment with conditional expressions
    */

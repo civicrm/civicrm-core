@@ -40,24 +40,26 @@
 /**
  * Add or update a relationship
  *
- * @param  array   $params  input parameters
+ * @param  array $params input parameters
  *
+ * @throws API_Exception
  * @example RelationshipCreate.php Std Create example
  *
  * @return array API Result Array
  * {@getfields relationship_create}
  * @static void
  * @access public
- *
  */
 function civicrm_api3_relationship_create($params) {
 
   $values = array();
   _civicrm_api3_relationship_format_params($params, $values);
   $ids = array();
+  $action = CRM_Core_Action::ADD;
 
   if (!empty($params['id'])) {
     $ids['contactTarget'] = $values['contact_id_b'];
+    $action = CRM_Core_Action::UPDATE;
   }
 
   $values['relationship_type_id'] = $values['relationship_type_id'] . '_a_b';
@@ -74,6 +76,10 @@ function civicrm_api3_relationship_create($params) {
   }
   elseif ($relationshipBAO[2]) {
     throw new API_Exception('Relationship already exists');
+  }
+  // Handle related memberships CRM-13652
+  if (!empty($params['contact_id_a'])) {
+    CRM_Contact_BAO_Relationship::relatedMemberships($params['contact_id_a'], $values, $ids, $action);
   }
   $id = $relationshipBAO[4][0];
   $values = array();
@@ -171,11 +177,12 @@ function civicrm_api3_relationship_get($params) {
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params Associative array of property name/value
  *                             pairs to insert in new contact.
- * @param array  $values       The reformatted properties that we can use internally
+ * @param array $values The reformatted properties that we can use internally
  *                            '
  *
+ * @throws Exception
  * @return array|CRM_Error
  * @access public
  */

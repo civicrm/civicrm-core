@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_AddContactsToEventAdvancedSearchTest
+ */
 class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -47,10 +51,10 @@ class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumT
 
     // Select event. Based on label for now.
     $this->waitForElementPresent('event_id');
-    $this->select('event_id', "label=regexp:Rain-forest Cup Youth Soccer Tournament.");
+    $this->select2('event_id', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select role
-    $this->click('role_id[2]');
+    $this->multiselect2('role_id', array('Volunteer'));
 
     // Select participant status
     $this->select('status_id', 'value=1');

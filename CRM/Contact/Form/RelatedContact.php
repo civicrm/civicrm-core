@@ -140,8 +140,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
       $this->_contactType,
       $countryID,
       $stateID,
-      'Contact Information',
-      TRUE
+      ts('Contact Information')
     );
 
     $this->addButtons(array(
@@ -182,6 +181,10 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
     }
 
     $params['contact_type'] = $this->_contactType;
+    //CRM-14904
+    if ( isset($this->_defaults['contact_sub_type']) ) {
+      $params['contact_sub_type'] = $this->_defaults['contact_sub_type'];
+    }
     $params['contact_id'] = $this->_contactId;
 
     $contact = CRM_Contact_BAO_Contact::create($params, TRUE);

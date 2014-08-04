@@ -124,8 +124,10 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   /**
    * Get the container which defines a particular key
    *
+   * @param $key
+   *
+   * @throws CRM_Extension_Exception_MissingException
    * @return CRM_Extension_Container_Interface
-   * @throws CRM_Extension_Exception
    */
   public function getContainer($key) {
     $k2c = $this->getKeysToContainer();

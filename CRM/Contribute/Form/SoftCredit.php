@@ -41,6 +41,8 @@ class CRM_Contribute_Form_SoftCredit {
   /**
    * Function to set variables up before form is built
    *
+   * @param $form
+   *
    * @return void
    * @access static
    */
@@ -74,7 +76,7 @@ class CRM_Contribute_Form_SoftCredit {
    * @return void
    */
   static function buildQuickForm(&$form) {
-    if ($form->_mode == 'live' && $form->_honor_block_is_active) {
+    if ($form->_mode == 'live' && !empty($form->_honor_block_is_active)) {
       $ufJoinDAO = new CRM_Core_DAO_UFJoin();
       $ufJoinDAO->module = 'soft_credit';
       $ufJoinDAO->entity_id = $form->_id;
@@ -86,13 +88,12 @@ class CRM_Contribute_Form_SoftCredit {
           }
 
           $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
-          $extraOption = array('onclick' => "enableHonorType();");
 
           // radio button for Honor Type
           foreach ($jsonData['soft_credit_types'] as $value) {
-            $honorTypes[$value] = $form->createElement('radio', NULL, NULL, $softCreditTypes[$value], $value, $extraOption);
+            $honorTypes[$value] = $form->createElement('radio', NULL, NULL, $softCreditTypes[$value], $value);
           }
-          $form->addGroup($honorTypes, 'soft_credit_type_id', NULL);
+          $form->addGroup($honorTypes, 'soft_credit_type_id', NULL)->setAttribute('allowClear', TRUE);
         }
       }
         return $form;
@@ -105,7 +106,7 @@ class CRM_Contribute_Form_SoftCredit {
     if ($form->getAction() & CRM_Core_Action::UPDATE) {
       $form->_softCreditInfo = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($form->_id, TRUE);
     }
-    elseif ($form->_pledgeID) {
+    elseif (!empty($form->_pledgeID)) {
       //Check and select most recent completed contrubtion and use it to retrieve
       //soft-credit information to use as default for current pledge payment, CRM-13981
       $pledgePayments = CRM_Pledge_BAO_PledgePayment::getPledgePayments($form->_pledgeID);
@@ -190,9 +191,12 @@ class CRM_Contribute_Form_SoftCredit {
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
+   * @param array $fields the input form values
    *
-   * @return true if no errors, else array of errors
+   * @param $errors
+   * @param $self
+   *
+   * @return array of errors
    * @access public
    * @static
    */

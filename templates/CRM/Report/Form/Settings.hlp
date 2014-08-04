@@ -67,6 +67,13 @@
 </p>
 {/htxt}
 
+{htxt id="id-dash_limit-title"}
+  {ts}Limit Rows per Page in Dashboard{/ts}
+{/htxt}
+{htxt id="id-dash_limit"}
+  {ts}The default number of rows per page for most reports is 50. However, this may be too many for a report which is included in the 'Home Dashboard'. You can reduce the number of rows included in each page when the report is part of the Dashboard by entering the desired row count here. Users will still be able to navigate through the full report using a pager.{/ts}
+{/htxt}
+
 {htxt id="id-is_reserved-title"}
   {ts}Reserved{/ts}
 {/htxt}

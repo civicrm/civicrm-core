@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_GroupTest
+ */
 class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
@@ -92,6 +96,9 @@ class WebTest_Import_GroupTest extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide data for contact import for Individuals.
      */
+  /**
+   * @return array
+   */
   function _individualGroupCSVData() {
     $headers = array(
       'first_name' => 'First Name',

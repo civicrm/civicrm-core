@@ -82,8 +82,11 @@ class CRM_Contact_Form_Edit_Household {
    *
    * @params array $fields array of form values
    *
-   * @return $error
-   * @static
+   * @param $fields
+   * @param $files
+   * @param null $contactID
+   *
+   * @return array|bool $error@static
    * @public
    */
   static function formRule($fields, $files, $contactID = NULL) {

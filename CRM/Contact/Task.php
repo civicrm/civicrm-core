@@ -369,6 +369,11 @@ class CRM_Contact_Task {
     return $tasks;
   }
 
+  /**
+   * @param $value
+   *
+   * @return array
+   */
   static function getTask($value) {
     self::initTasks();
 

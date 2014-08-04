@@ -84,6 +84,13 @@ class CRM_Extension_Mapper {
 
   protected $civicrmUrl;
 
+  /**
+   * @param CRM_Extension_Container_Interface $container
+   * @param CRM_Utils_Cache_Interface $cache
+   * @param null $cacheKey
+   * @param null $civicrmPath
+   * @param null $civicrmUrl
+   */
   public function __construct(CRM_Extension_Container_Interface $container, CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $civicrmPath = NULL, $civicrmUrl = NULL) {
     $this->container = $container;
     $this->cache = $cache;
@@ -120,7 +127,9 @@ class CRM_Extension_Mapper {
    *
    * @access public
    *
-   * @param string $key extension key
+   * @param $clazz
+   *
+   * @internal param string $key extension key
    *
    * @return string full path the extension .php file
    */
@@ -163,6 +172,10 @@ class CRM_Extension_Mapper {
 
   /**
    * @param string $key extension fully-qualified-name
+   * @param bool $fresh
+   *
+   * @throws CRM_Extension_Exception
+   * @throws Exception
    * @return object CRM_Extension_Info
    */
   public function keyToInfo($key, $fresh = FALSE) {
@@ -299,6 +312,29 @@ class CRM_Extension_Mapper {
     return $moduleExtensions;
   }
 
+  /**
+   * Get a list of base URLs for all active modules
+   *
+   * @return array (string $extKey => string $baseUrl)
+   */
+  public function getActiveModuleUrls() {
+    // TODO optimization/caching
+    $urls = array();
+    $urls['civicrm'] = $this->keyToUrl('civicrm');
+    foreach ($this->getModules() as $module) {
+      /** @var $module CRM_Core_Module */
+      if ($module->is_active) {
+        $urls[$module->name] = $this->keyToUrl($module->name);
+      }
+    }
+    return $urls;
+  }
+
+  /**
+   * @param $name
+   *
+   * @return bool
+   */
   public function isActiveModule($name) {
     $activeModules = $this->getActiveModuleFiles();
     foreach ($activeModules as $activeModule) {

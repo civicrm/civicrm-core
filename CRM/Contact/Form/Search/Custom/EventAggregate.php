@@ -37,6 +37,9 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
   protected $_formValues;
   public $_permissionedComponent;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     $this->_formValues = $formValues;
     $this->_permissionedComponent = array('CiviContribute', 'CiviEvent');
@@ -55,6 +58,9 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
     );
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
 
     /**
@@ -171,6 +177,9 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
     return $sql;
   }
 
+  /**
+   * @return string
+   */
   function from() {
     return "
         civicrm_participant_payment
@@ -191,6 +200,11 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
      * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
      *
      */
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     $clauses = array();
 
@@ -242,6 +256,9 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
 
 
   /* This function does a query to get totals for some of the search result columns and returns a totals array. */
+  /**
+   * @return array
+   */
   function summary() {
     $totalSelect = "
         SUM(civicrm_contribution.total_amount) as payment_amount,COUNT(civicrm_participant.id) as participant_count,
@@ -294,14 +311,27 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
     return $dao->N;
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   *
+   * @return string
+   */
   function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
     return $this->all($offset, $rowcount, $sort);
   }
 
+  /**
+   * @return array
+   */
   function &columns() {
     return $this->_columns;
   }
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);

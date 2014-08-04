@@ -47,7 +47,7 @@ use JMS\Serializer\Annotation as JMS;
  *
  * @CiviAPI\Entity("UFField")
  * @CiviAPI\Permission()
- * @ORM\Table(name="civicrm_uf_field", indexes={@ORM\Index(name="FK_civicrm_uf_field_uf_group_id", columns={"uf_group_id"}),@ORM\Index(name="FK_civicrm_uf_field_location_type_id", columns={"location_type_id"})})
+ * @ORM\Table(name="civicrm_uf_field", indexes={@ORM\Index(name="IX_website_type_id", columns={"website_type_id"}),@ORM\Index(name="FK_civicrm_uf_field_uf_group_id", columns={"uf_group_id"}),@ORM\Index(name="FK_civicrm_uf_field_location_type_id", columns={"location_type_id"})})
  * @ORM\Entity
  *
  */
@@ -179,6 +179,15 @@ class UFField extends \Civi\Core\Entity {
    * 
    */
   private $phoneTypeId;
+  
+  /**
+   * @var integer
+   *
+   * @JMS\Type("integer")
+   * @ORM\Column(name="website_type_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
+   */
+  private $websiteTypeId;
   
   /**
    * @var string
@@ -486,6 +495,26 @@ class UFField extends \Civi\Core\Entity {
   }
   
   /**
+   * Set websiteTypeId
+   *
+   * @param integer $websiteTypeId
+   * @return UFField
+   */
+  public function setWebsiteTypeId($websiteTypeId) {
+    $this->websiteTypeId = $websiteTypeId;
+    return $this;
+  }
+
+  /**
+   * Get websiteTypeId
+   *
+   * @return integer
+   */
+  public function getWebsiteTypeId() {
+    return $this->websiteTypeId;
+  }
+  
+  /**
    * Set label
    *
    * @param string $label
@@ -727,6 +756,15 @@ class UFField extends \Civi\Core\Entity {
       
         'name' => 'phone_type_id',
         'propertyName' => 'phoneTypeId',
+        'type' => \CRM_Utils_Type::T_INT,
+                                                             
+                                    
+                          ),
+      
+              'website_type_id' => array(
+      
+        'name' => 'website_type_id',
+        'propertyName' => 'websiteTypeId',
         'type' => \CRM_Utils_Type::T_INT,
                                                              
                                     

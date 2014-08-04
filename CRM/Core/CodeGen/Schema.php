@@ -4,6 +4,9 @@
  * Create SQL files to create and populate a new schema.
  */
 class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
     $this->locales = $this->findLocales();
@@ -25,6 +28,9 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
     $this->generateSample();
   }
 
+  /**
+   * @param string $fileName
+   */
   function generateCreateSql($fileName = 'civicrm.mysql') {
     $schema_tool = new \Doctrine\ORM\Tools\SchemaTool($this->config->doctrine->entity_manager);
     $sql = $schema_tool->getCreateSchemaSql($this->config->doctrine->metadata);
@@ -36,6 +42,9 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
     fclose($sql_file);
   }
 
+  /**
+   * @param string $fileName
+   */
   function generateDropSql($fileName = 'civicrm_drop.mysql') {
     $table_names = array();
     foreach ($this->config->doctrine->metadata as $class_metadata) {
@@ -88,8 +97,13 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
       'civicrm_acl.tpl',
     );
     $template->runConcat($sections, CRM_Utils_Path::join($this->config->sqlCodePath, 'civicrm_sample.mysql'));
+
+    $template->run('case_sample.tpl', $this->config->sqlCodePath . 'case_sample.mysql');
   }
 
+  /**
+   * @return array
+   */
   function findLocales() {
     require_once 'CRM/Core/Config.php';
     $config = CRM_Core_Config::singleton(FALSE);

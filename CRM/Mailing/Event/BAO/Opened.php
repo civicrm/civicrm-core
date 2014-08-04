@@ -124,7 +124,9 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    * CRM-12814
    * Get opened count for each mailing for a given set of mailing IDs
    *
-   * @param int $contactID  ID of the mailing
+   * @param $mailingIDs
+   *
+   * @internal param int $contactID ID of the mailing
    *
    * @return array          Opened count per mailing ID
    * @access public
@@ -203,12 +205,14 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
   /**
    * Get rows for the event browser
    *
-   * @param int $mailing_id       ID of the mailing
-   * @param int $job_id           optional ID of the job
-   * @param boolean $is_distinct  Group by queue id?
-   * @param int $offset           Offset
-   * @param int $rowCount         Number of rows
-   * @param array $sort           sort array
+   * @param int $mailing_id ID of the mailing
+   * @param int $job_id optional ID of the job
+   * @param boolean $is_distinct Group by queue id?
+   * @param int $offset Offset
+   * @param int $rowCount Number of rows
+   * @param array $sort sort array
+   *
+   * @param null $contact_id
    *
    * @return array                Result set
    * @access public

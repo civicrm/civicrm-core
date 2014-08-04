@@ -148,6 +148,8 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
+   * @param bool $check
+   *
    * @return void
    * @access public
    */
@@ -176,6 +178,9 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
     $this->add('checkbox', 'is_recur', ts('Does this Payment Processor Type support recurring donations?'));
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array();
 

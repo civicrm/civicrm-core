@@ -40,12 +40,13 @@
 /**
  * Create or update a contact (note you should always call this via civicrm_api() & never directly)
  *
- * @param  array   $params   input parameters
+ * @param  array $params input parameters
  *
  * Allowed @params array keys are:
  * {@getfields contact_create}
  *
  *
+ * @throws API_Exception
  * @example ContactCreate.php Example of Create Call
  *
  * @return array  API Result Array
@@ -153,6 +154,11 @@ function civicrm_api3_contact_get($params) {
   return civicrm_api3_create_success($contacts, $params, 'contact');
 }
 
+/**
+ * @param $params
+ *
+ * @return int
+ */
 function civicrm_api3_contact_getcount($params) {
   $options = array();
   _civicrm_api3_contact_get_supportanomalies($params, $options);
@@ -201,6 +207,10 @@ function _civicrm_api3_contact_get_spec(&$params) {
   $params['group_id']['title'] = 'Group Memberships (filter)';
   $params['group']['title'] = 'Group Memberships (filter, array)';
   $params['tag']['title'] = 'Assigned tags (filter, array)';
+  $params['birth_date_low'] = array('name' => 'birth_date_low', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birthdate is equal to or greater than'));
+  $params['birth_date_high'] = array('name' => 'birth_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birthdate is equal to or less than'));
+  $params['deceased_date_low'] = array('name' => 'deceased_date_low','type' => CRM_Utils_Type::T_DATE, 'title' => ts('Deceased Date is equal to or greater than'));
+  $params['deceased_date_high'] = array('name' => 'deceased_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Deceased Date is equal to or less than'));
 }
 
 /**
@@ -281,6 +291,17 @@ function civicrm_api3_contact_delete($params) {
 }
 
 
+/**
+ * @param $params
+ * @param bool $dupeCheck
+ * @param bool $dupeErrorArray
+ * @param bool $obsoletevalue
+ * @param null $dedupeRuleGroupID
+ *
+ * @return null
+ * @throws API_Exception
+ * @throws CiviCRM_API3_Exception
+ */
 function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeErrorArray = false, $obsoletevalue = true, $dedupeRuleGroupID = null )
 {
 
@@ -325,7 +346,7 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
       $dedupeParams['check_permission'] = $params['check_permission'];
     }
 
-    $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['contact_type'], 'Strict', array());
+    $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['contact_type'], 'Unsupervised', array());
 
     if (count($ids) >0) {
       throw new API_Exception("Found matching contacts: ". implode(',',$ids),"duplicate",array("ids"=>$ids));
@@ -391,10 +412,10 @@ function _civicrm_api3_contact_update($params, $contactID = NULL) {
 /**
  * Validate the addressee or email or postal greetings
  *
- * @param  $params                   Associative array of property name/value
+ * @param  array $params  Associative array of property name/value
  *                                   pairs to insert in new contact.
  *
- * @return array (reference )        null on success, error message otherwise
+ * @throws API_Exception
  *
  * @access public
  */
@@ -851,12 +872,21 @@ function civicrm_api3_contact_merge($params) {
   }
 }
 
+/**
+ * @param $params
+ */
 function _civicrm_api3_contact_proximity_spec(&$params) {
   $params['latitude']['api.required'] = 1;
   $params['longitude']['api.required'] = 1;
   $params['unit']['api.default'] = 'meter';
 }
 
+/**
+ * @param $params
+ *
+ * @return array
+ * @throws Exception
+ */
 function civicrm_api3_contact_proximity($params) {
   $latitude  = CRM_Utils_Array::value('latitude', $params);
   $longitude = CRM_Utils_Array::value('longitude', $params);

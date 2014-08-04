@@ -54,6 +54,10 @@
  */
 
 require_once 'api/Wrapper.php';
+
+/**
+ * Class CRM_Utils_API_MatchOption
+ */
 class CRM_Utils_API_MatchOption implements API_Wrapper {
 
   /**
@@ -165,8 +169,10 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
   /**
    * Create APIv3 "get" parameters to lookup an existing record using $keys
    *
-   * @param array $apiRequest
+   * @param $origParams
    * @param array $keys list of keys to match against
+   *
+   * @internal param array $apiRequest
    * @return array APIv3 $params
    */
   function createGetParams($origParams, $keys) {

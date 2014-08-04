@@ -42,6 +42,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   /**
    * build all the data structures needed to build the form
    *
+   * @param $form
+   *
    * @return void
    * @access public
    */
@@ -61,6 +63,10 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     CRM_Utils_System::setTitle('Create Printable Letters (PDF)');
   }
 
+  /**
+   * @param $form
+   * @param $cid
+   */
   static function preProcessSingle(&$form, $cid) {
     $form->_contactIds = array($cid);
     // put contact display name in title for single contact mode
@@ -149,6 +155,17 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       array('size' => 8, 'maxlength' => 8, 'onkeyup' => "showUpdateFormatChkBox();"),
       TRUE
     );
+
+    $config = CRM_Core_Config::singleton();
+    if ($config->wkhtmltopdfPath == false) {
+      $form->add(
+        'text',
+        'stationery',
+        ts('Stationery (relative path to PDF you wish to use as the background)'),
+        array('size' => 25, 'maxlength' => 900, 'onkeyup' => "showUpdateFormatChkBox();"),
+        FALSE
+      );
+    }
     $form->add('checkbox', 'bind_format', ts('Always use this Page Format with the selected Template'));
     $form->add('checkbox', 'update_format', ts('Update Page Format (this will affect all templates that use this format)'));
 
@@ -166,6 +183,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
         NULL,
         FALSE
       );
+
       if ($form->get('action') == CRM_Core_Action::VIEW) {
         $form->addButtons(array(
             array(
@@ -257,6 +275,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    *
    * @access protected
    *
+   * @param $form
+   *
    * @return array( $categories, $html_message, $messageToken, $returnProperties )
    */
   static protected function processMessageTemplate(&$form) {
@@ -330,6 +350,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function postProcess(&$form) {
@@ -376,6 +398,13 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     CRM_Utils_System::civiExit(1);
   }
 
+  /**
+   * @param $form
+   * @param $html_message
+   * @param $contactIds
+   *
+   * @throws CRM_Core_Exception
+   */
   static function createActivities($form, $html_message, $contactIds) {
     //Added for CRM-12682: Add activity subject and campaign fields
     $formValues     = $form->controller->exportValues($form->getName());
@@ -413,6 +442,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
+    //@todo why are we using $form->_contactIds here & contactIds above - need comment
     foreach ($form->_contactIds as $contactId) {
       $activityTargetParams = array(
         'activity_id' => empty($activity->id) ? $activityIds[$contactId] : $activity->id,
@@ -423,6 +453,9 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     }
   }
 
+  /**
+   * @param $message
+   */
   static function formatMessage(&$message) {
     $newLineOperators = array(
       'p' => array(

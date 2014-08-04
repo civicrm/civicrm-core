@@ -43,7 +43,11 @@
       'change .crm-profile-selector-select select': 'onChangeUfGroupId',
       'click .crm-profile-selector-edit': 'doEdit',
       'click .crm-profile-selector-copy': 'doCopy',
-      'click .crm-profile-selector-create': 'doCreate'
+      'click .crm-profile-selector-create': 'doCreate',
+      'click .crm-profile-selector-preview': 'doShowPreview',
+      // prevent interaction with preview form
+      'click .crm-profile-selector-preview-pane': false,
+      'crmLoad .crm-profile-selector-preview-pane': 'disableForm'
     },
     /** @var Marionette.View which specifically builds on jQuery-UI's dialog */
     activeDialog: null,
@@ -54,6 +58,8 @@
       this.selectRegion.show(view);
       this.setUfGroupId(this.options.ufGroupId, {silent: true});
       this.toggleButtons();
+      this.$('.crm-profile-selector-select select').css('width', '25em').crmSelect2();
+      this.doShowPreview();
     },
     onChangeUfGroupId: function(event) {
       this.options.ufGroupId = $(event.target).val();
@@ -70,41 +76,35 @@
     setUfGroupId: function(value, options) {
       this.options.ufGroupId = value;
       this.$('.crm-profile-selector-select select').val(value);
-      if (!options || !options.silent) {
-        this.$('.crm-profile-selector-select select').change();
-      }
+      this.$('.crm-profile-selector-select select').select2('val', value, (!options || !options.silent));
     },
     getUfGroupId: function() {
       return this.options.ufGroupId;
     },
     doPreview: function() {
       var $pane = this.$('.crm-profile-selector-preview-pane');
-
       if (!this.hasUfGroupId()) {
         $pane.html($('#profile_selector_empty_preview_template').html());
-        return;
+      } else {
+        CRM.loadPage(CRM.url("civicrm/ajax/inline", {class_name: 'CRM_UF_Form_Inline_PreviewById', id: this.getUfGroupId()}), {target: $pane});
       }
-
-      $pane.block({message: ts('Loading...'), theme: true});
-      $.ajax({
-        url: CRM.url("civicrm/ajax/inline"),
-        type: 'GET',
-        data: {
-          class_name: 'CRM_UF_Form_Inline_PreviewById',
-          id: this.getUfGroupId(),
-          snippet: 4
-        }
-      }).done(function(data) {
-        $pane
-          .unblock()
-          .html(data)
-          .click(function() {
-            return false; // disable buttons
-          });
-      });
-      return false;
     },
-    doEdit: function() {
+    doShowPreview: function() {
+      var $preview = this.$('.crm-profile-selector-preview');
+      var $pane = this.$('.crm-profile-selector-preview-pane');
+      if ($preview.hasClass('crm-profile-selector-preview-show')) {
+        $preview.removeClass('crm-profile-selector-preview-show');
+        $pane.show();
+      } else {
+        $preview.addClass('crm-profile-selector-preview-show');
+        $pane.hide();
+      }
+    },
+    disableForm: function() {
+      this.$(':input', '.crm-profile-selector-preview-pane').prop('readOnly', true);
+    },
+    doEdit: function(e) {
+      e.preventDefault();
       var profileSelectorView = this;
       var designerDialog = new CRM.Designer.DesignerDialog({
         findCreateUfGroupModel: function(options) {
@@ -123,9 +123,9 @@
       });
       CRM.designerApp.vent.on('ufSaved', this.onSave, this);
       this.setDialog(designerDialog);
-      return false;
     },
-    doCopy: function() {
+    doCopy: function(e) {
+      e.preventDefault();
       // This is largely the same as doEdit, but we ultimately pass in a deepCopy of the ufGroupModel.
       var profileSelectorView = this;
       var designerDialog = new CRM.Designer.DesignerDialog({
@@ -145,9 +145,9 @@
       });
       CRM.designerApp.vent.on('ufSaved', this.onSave, this);
       this.setDialog(designerDialog);
-      return false;
     },
-    doCreate: function() {
+    doCreate: function(e) {
+      e.preventDefault();
       var profileSelectorView = this;
       var designerDialog = new CRM.Designer.DesignerDialog({
         findCreateUfGroupModel: function(options) {
@@ -159,7 +159,6 @@
       });
       CRM.designerApp.vent.on('ufSaved', this.onSave, this);
       this.setDialog(designerDialog);
-      return false;
     },
     onSave: function() {
       CRM.designerApp.vent.off('ufSaved', this.onSave, this);

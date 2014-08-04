@@ -16,7 +16,7 @@
      * @see CRM-12188
      */
     CRM.designerApp.clearPreviewArea = function () {
-      $('.crm-profile-selector-preview-pane > .crm-form-block').each(function () {
+      $('.crm-profile-selector-preview-pane > *').each(function () {
         var parent = $(this).parent();
         CRM.designerApp.DetachedProfiles.push({
           parent: parent,

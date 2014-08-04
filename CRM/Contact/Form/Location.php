@@ -37,6 +37,8 @@ class CRM_Contact_Form_Location {
   /**
    * Function to set variables up before form is built
    *
+   * @param $form
+   *
    * @return void
    */
   static function preProcess(&$form) {
@@ -73,6 +75,8 @@ class CRM_Contact_Form_Location {
 
   /**
    * Function to build the form
+   *
+   * @param $form
    *
    * @return void
    * @access public

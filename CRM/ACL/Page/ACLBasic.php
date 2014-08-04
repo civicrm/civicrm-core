@@ -208,6 +208,8 @@ ORDER BY entity_id
   /**
    * Get user context.
    *
+   * @param null $mode
+   *
    * @return string user context.
    */
   function userContext($mode = NULL) {

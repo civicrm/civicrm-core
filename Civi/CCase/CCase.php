@@ -47,7 +47,7 @@ use JMS\Serializer\Annotation as JMS;
  *
  * @CiviAPI\Entity("CCase")
  * @CiviAPI\Permission()
- * @ORM\Table(name="civicrm_case", indexes={@ORM\Index(name="index_case_type_id", columns={"case_type_id"}),@ORM\Index(name="index_is_deleted", columns={"is_deleted"})})
+ * @ORM\Table(name="civicrm_case", indexes={@ORM\Index(name="index_case_type_id", columns={"case_type_id"}),@ORM\Index(name="index_is_deleted", columns={"is_deleted"}),@ORM\Index(name="FK_civicrm_case_case_type_id", columns={"case_type_id"})})
  * @ORM\Entity
  *
  */
@@ -64,13 +64,13 @@ class CCase extends \Civi\Core\Entity {
   private $id;
     
   /**
-   * @var string
+   * @var \Civi\CCase\CaseType
    *
-   * @JMS\Type("string")
-   * @ORM\Column(name="case_type_id", type="string", length=128, nullable=false)
    * 
+   * @ORM\ManyToOne(targetEntity="Civi\CCase\CaseType")
+   * @ORM\JoinColumns({@ORM\JoinColumn(name="case_type_id", referencedColumnName="id", onDelete="SET NULL")})
    */
-  private $caseTypeId;
+  private $caseType;
   
   /**
    * @var string
@@ -136,23 +136,23 @@ class CCase extends \Civi\Core\Entity {
   }
     
   /**
-   * Set caseTypeId
+   * Set caseType
    *
-   * @param string $caseTypeId
+   * @param \Civi\CCase\CaseType $caseType
    * @return CCase
    */
-  public function setCaseTypeId($caseTypeId) {
-    $this->caseTypeId = $caseTypeId;
+  public function setCaseType(\Civi\CCase\CaseType $caseType = null) {
+    $this->caseType = $caseType;
     return $this;
   }
 
   /**
-   * Get caseTypeId
+   * Get caseType
    *
-   * @return string
+   * @return \Civi\CCase\CaseType
    */
-  public function getCaseTypeId() {
-    return $this->caseTypeId;
+  public function getCaseType() {
+    return $this->caseType;
   }
   
   /**
@@ -306,21 +306,21 @@ class CCase extends \Civi\Core\Entity {
               'case_type_id' => array(
       
         'name' => 'case_type_id',
-        'propertyName' => 'caseTypeId',
-        'type' => \CRM_Utils_Type::T_STRING,
+        'propertyName' => 'caseType',
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Case Type'),
-                        'required' => true,
-                         'maxlength' => 128,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
+                                                             
                 'import' => true,
         'where' => 'civicrm_case.case_type_id',
         'headerPattern' => '',
         'dataPattern' => '',
                          'export' => false,
                                    
+                'FKClassName' => 'CRM_Case_DAO_CaseType',
                                      'pseudoconstant' => array(
-                                'optionGroupName' => 'case_type',
+                                'table' => 'civicrm_case_type',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'title',
                     )
                  ),
       

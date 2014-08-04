@@ -137,13 +137,16 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
 
-    $ids = array();
-
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $ids['id'] = $this->_id;
+      $params['id'] = $this->_id;
     }
 
-    CRM_Mailing_BAO_Component::add($params, $ids);
+    $component = CRM_Mailing_BAO_Component::add($params);
+    CRM_Core_Session::setStatus(ts('The mailing component \'%1\' has been saved.', array(
+        1 => $component->name
+      )
+    ), ts('Saved'), 'success');
+
   }
   //end of function
 
@@ -151,6 +154,9 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    * Function for validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
+   *
+   * @param $files
+   * @param $options
    *
    * @return mixed true or array of errors
    * @access public

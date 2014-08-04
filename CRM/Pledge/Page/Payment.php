@@ -49,7 +49,7 @@ class CRM_Pledge_Page_Payment extends CRM_Core_Page {
 
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
-    CRM_Pledge_Page_Tab::setContext();
+    CRM_Pledge_Page_Tab::setContext($this);
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $this->edit();
@@ -66,7 +66,7 @@ class CRM_Pledge_Page_Payment extends CRM_Core_Page {
       $this->assign('contactId', $this->_contactId);
 
       // check if we can process credit card contribs
-      CRM_Core_Payment::allowBackofficeCreditCard($this);
+      $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
 
       // check is the user has view/edit signer permission
       $permission = 'view';

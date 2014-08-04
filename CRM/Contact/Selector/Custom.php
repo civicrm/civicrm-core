@@ -109,12 +109,19 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   /**
    * Class constructor
    *
+   * @param $customSearchClass
    * @param array $formValues array of form values imported
-   * @param array $params     array of parameters for query
-   * @param int   $action - action of search basic or advanced.
+   * @param array $params array of parameters for query
+   * @param null $returnProperties
+   * @param \const|int $action - action of search basic or advanced.
    *
-   * @return CRM_Contact_Selector
-   * @access public
+   * @param bool $includeContactIds
+   * @param bool $searchChildGroups
+   * @param string $searchContext
+   * @param null $contextMenu
+   *
+   * @return \CRM_Contact_Selector_Custom
+  @access public
    */
   function __construct(
     $customSearchClass,
@@ -164,18 +171,24 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *
    */
   static function &links() {
+    list($key) = func_get_args();
+    $searchContext = "&context=custom";
+    $extraParams = ($key) ? "&key={$key}" : NULL;
+
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::VIEW => array(
           'name' => ts('View'),
           'url' => 'civicrm/contact/view',
-          'qs' => 'reset=1&cid=%%id%%',
+          'qs' => "reset=1&cid=%%id%%{$extraParams}{$searchContext}",
+          'class' => 'no-popup',
           'title' => ts('View Contact Details'),
         ),
         CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit'),
           'url' => 'civicrm/contact/add',
           'qs' => 'reset=1&action=update&cid=%%id%%',
+          'class' => 'no-popup',
           'title' => ts('Edit Contact Details'),
         ),
       );
@@ -186,6 +199,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
           'name' => ts('Map'),
           'url' => 'civicrm/contact/map',
           'qs' => 'reset=1&cid=%%id%%&searchType=custom',
+          'class' => 'no-popup',
           'title' => ts('Map Contact'),
         );
       }
@@ -197,7 +211,10 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -289,7 +306,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
 
     $columns     = $this->_search->columns();
     $columnNames = array_values($columns);
-    $links       = self::links();
+    $links       = self::links($this->_key);
 
     $permissions = array(CRM_Core_Permission::getPermission());
     if (CRM_Core_Permission::check('delete contacts')) {
@@ -373,6 +390,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     return NULL;
   }
 
+  /**
+   * @return mixed
+   */
   public function getSummary() {
     return $this->_search->summary();
   }
@@ -388,10 +408,22 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     return ts('CiviCRM Custom Search');
   }
 
+  /**
+   * @return null
+   */
   function alphabetQuery() {
     return NULL;
   }
 
+  /**
+   * @param $params
+   * @param $action
+   * @param $sortID
+   * @param null $displayRelationshipType
+   * @param string $queryOperator
+   *
+   * @return Object
+   */
   function &contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
     $params = array();
     $sql = $this->_search->contactIDs($params);
@@ -399,8 +431,11 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     return CRM_Core_DAO::executeQuery($sql, $params);
   }
 
+  /**
+   * @param $rows
+   */
   function addActions(&$rows) {
-    $links = self::links();
+    $links = self::links($this->_key);
 
     $permissions = array(CRM_Core_Permission::getPermission());
     if (CRM_Core_Permission::check('delete contacts')) {
@@ -421,6 +456,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     }
   }
 
+  /**
+   * @param $rows
+   */
   function removeActions(&$rows) {
     foreach ($rows as $rid => & $rValue) {
       unset($rValue['action']);

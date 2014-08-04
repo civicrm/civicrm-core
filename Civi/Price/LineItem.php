@@ -47,7 +47,7 @@ use JMS\Serializer\Annotation as JMS;
  *
  * @CiviAPI\Entity("LineItem")
  * @CiviAPI\Permission()
- * @ORM\Table(name="civicrm_line_item", uniqueConstraints={@ORM\UniqueConstraint(name="UI_line_item_value", columns={"entity_table","entity_id","price_field_value_id","price_field_id"})}, indexes={@ORM\Index(name="index_entity", columns={"entity_table","entity_id"}),@ORM\Index(name="FK_civicrm_line_item_price_field_id", columns={"price_field_id"}),@ORM\Index(name="FK_civicrm_line_item_price_field_value_id", columns={"price_field_value_id"}),@ORM\Index(name="FK_civicrm_line_item_financial_type_id", columns={"financial_type_id"})})
+ * @ORM\Table(name="civicrm_line_item", uniqueConstraints={@ORM\UniqueConstraint(name="UI_line_item_value", columns={"entity_table","entity_id","contribution_id","price_field_value_id","price_field_id"})}, indexes={@ORM\Index(name="index_entity", columns={"entity_table","entity_id"}),@ORM\Index(name="FK_civicrm_line_item_contribution_id", columns={"contribution_id"}),@ORM\Index(name="FK_civicrm_line_item_price_field_id", columns={"price_field_id"}),@ORM\Index(name="FK_civicrm_line_item_price_field_value_id", columns={"price_field_value_id"}),@ORM\Index(name="FK_civicrm_line_item_financial_type_id", columns={"financial_type_id"})})
  * @ORM\Entity
  *
  */
@@ -80,6 +80,15 @@ class LineItem extends \Civi\Core\Entity {
    * 
    */
   private $entityId;
+  
+  /**
+   * @var \Civi\Contribute\Contribution
+   *
+   * 
+   * @ORM\ManyToOne(targetEntity="Civi\Contribute\Contribution")
+   * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_id", referencedColumnName="id", onDelete="SET NULL")})
+   */
+  private $contribution;
   
   /**
    * @var \Civi\Price\PriceField
@@ -209,6 +218,26 @@ class LineItem extends \Civi\Core\Entity {
    */
   public function getEntityId() {
     return $this->entityId;
+  }
+  
+  /**
+   * Set contribution
+   *
+   * @param \Civi\Contribute\Contribution $contribution
+   * @return LineItem
+   */
+  public function setContribution(\Civi\Contribute\Contribution $contribution = null) {
+    $this->contribution = $contribution;
+    return $this;
+  }
+
+  /**
+   * Get contribution
+   *
+   * @return \Civi\Contribute\Contribution
+   */
+  public function getContribution() {
+    return $this->contribution;
   }
   
   /**
@@ -436,6 +465,16 @@ class LineItem extends \Civi\Core\Entity {
                                     
                           ),
       
+              'contribution_id' => array(
+      
+        'name' => 'contribution_id',
+        'propertyName' => 'contribution',
+        'type' => \CRM_Utils_Type::T_INT,
+                                                             
+                                    
+                'FKClassName' => 'CRM_Contribute_DAO_Contribution',
+                          ),
+      
               'price_field_id' => array(
       
         'name' => 'price_field_id',
@@ -526,7 +565,12 @@ class LineItem extends \Civi\Core\Entity {
                                            'default' => 'NULL',
          
                 'FKClassName' => 'CRM_Financial_DAO_FinancialType',
-                          ),
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_financial_type',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
       
               'deductible_amount' => array(
       

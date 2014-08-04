@@ -67,6 +67,8 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
    *
    * @param string $str the permission to check
    *
+   * @param null $contactID
+   *
    * @return boolean true if yes, else false
    * @access public
    */

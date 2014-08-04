@@ -52,7 +52,7 @@
 
   <field>
     <name>activity_type_id</name>
-    <title>Activity Type ID</title>
+    <title>Activity Type</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Implicit FK to civicrm_option_value where option_group = activity_type</comment>

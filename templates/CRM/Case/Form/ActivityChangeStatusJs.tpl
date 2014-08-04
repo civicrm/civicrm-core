@@ -37,7 +37,7 @@
           caseId = $(this).attr('case_id'),
           data = 'snippet=1&reset=1',
           $el = $('<div class="crm-activity_change_status"></div>');
-        $el.block({theme:true});
+        $el.block();
 
         $el.load(CRM.url('civicrm/case/changeactivitystatus'), data, function() {
           $el.unblock().trigger('crmLoad');
@@ -69,16 +69,7 @@
                   return false;
                 }
                 else {
-                  // reload the table on success
-                  if (window.buildCaseActivities) {
-                    // If we are using a datatable
-                    buildCaseActivities(true);
-                  }
-                  else {
-                    // Legacy refresh for non-datatable screens
-                    var table = link.closest('table.nestedActivitySelector');
-                    table.parent().crmSnippet({url: CRM.url('civicrm/case/details', table.data('params'))}).crmSnippet('refresh');
-                  }
+                  CRM.refreshParent(link);
                 }
               },
               error : function(jqXHR) {

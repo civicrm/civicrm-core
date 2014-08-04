@@ -201,9 +201,10 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   /**
    * edit price set
    *
-   * @param int    $id       price set id
-   * @param string $action   the action to be invoked
+   * @param $sid
+   * @param string $action the action to be invoked
    *
+   * @internal param int $id price set id
    * @return void
    * @access public
    */
@@ -223,7 +224,9 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   /**
    * Preview price set
    *
-   * @param int $id price set id
+   * @param $sid
+   *
+   * @internal param int $id price set id
    *
    * @return void
    * @access public

@@ -40,7 +40,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
-    $this->_sethtmlGlobals();
   }
 
   function tearDown() {}

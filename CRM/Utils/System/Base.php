@@ -4,9 +4,36 @@
  * Base class for UF system integrations
  */
 abstract class CRM_Utils_System_Base {
+  /**
+   * deprecated property to check if this is a drupal install. The correct method is to have functions on the UF classes for all UF specific
+   * functions and leave the codebase oblivious to the type of CMS
+   * @deprecated
+   * @var bool
+   */
   var $is_drupal = FALSE;
+
+  /**
+   * deprecated property to check if this is a joomla install. The correct method is to have functions on the UF classes for all UF specific
+   * functions and leave the codebase oblivious to the type of CMS
+   * @deprecated
+   * @var bool
+   */
   var $is_joomla = FALSE;
+
+    /**
+     * deprecated property to check if this is a wordpress install. The correct method is to have functions on the UF classes for all UF specific
+     * functions and leave the codebase oblivious to the type of CMS
+     * @deprecated
+     * @var bool
+     */
   var $is_wordpress = FALSE;
+
+  /**
+   * Does this CMS / UF support a CMS specific logging mechanism?
+   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
+   * @var bool
+   */
+  var $supports_UF_Logging = FALSE;
 
   /*
    * Does the CMS allow CMS forms to be extended by hooks
@@ -69,10 +96,16 @@ abstract class CRM_Utils_System_Base {
     }
   }
 
+  /**
+   * @return string
+   */
   function getDefaultBlockLocation() {
     return 'left';
   }
 
+  /**
+   * @return string
+   */
   function getVersion() {
     return 'Unknown';
   }
@@ -81,6 +114,9 @@ abstract class CRM_Utils_System_Base {
    * Format the url as per language Negotiation.
    *
    * @param string $url
+   *
+   * @param bool $addLanguagePart
+   * @param bool $removeLanguagePart
    *
    * @return string $url, formatted url.
    * @static
@@ -116,6 +152,8 @@ abstract class CRM_Utils_System_Base {
    * Determine the native ID of the CMS user
    *
    * @param $username
+   *
+   * @throws CRM_Core_Exception
    * @return int|NULL
    */
   function getUfId($username) {
@@ -147,6 +185,9 @@ abstract class CRM_Utils_System_Base {
 
   /**
    * Return default Site Settings
+   *
+   * @param $dir
+   *
    * @return array array
    * - $url, (Joomla - non admin url)
    * - $siteName,
@@ -215,7 +256,7 @@ abstract class CRM_Utils_System_Base {
    * @return string Timezone e.g. 'America/Los_Angeles'
    */
   function getTimeZoneString() {
-    return NULL;
+    return date_default_timezone_get();
   }
 
   /**
@@ -280,6 +321,38 @@ abstract class CRM_Utils_System_Base {
       return $this->getUniqueIdentifierFromUserObject($user);
     }
     return $this->getLoggedInUniqueIdentifier();
+  }
+
+  /**
+   * Get Url to view user record
+   * @param integer $contactID Contact ID
+   *
+   * @return string
+   */
+  function getUserRecordUrl($contactID) {
+    return NULL;
+  }
+  /**
+   * Is the current user permitted to add a user
+   * @return bool
+   */
+  function checkPermissionAddUser() {
+    return FALSE;
+  }
+
+  /**
+   * output code from error function
+   * @param string $content
+   */
+  function outputError($content) {
+    echo CRM_Utils_System::theme($content);
+  }
+
+  /**
+   * Log error to CMS
+   */
+  function logger($message) {
+
   }
 }
 

@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_FixedMembershipTypeTest
+ */
 class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -161,11 +165,11 @@ SELECT end_event_adjust_interval
 
     // Clicking save.
     $this->click('_qf_Membership_upload');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
 
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
     // Is status message correct?
     $this->assertTrue($this->isTextPresent("Membership Type $title membership for $firstName $lastName has been added."),
       "Status message didn't show up after saving!"
@@ -317,7 +321,7 @@ SELECT end_event_adjust_interval
 
     // Clicking save.
     $this->click('_qf_Membership_upload');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -466,7 +470,7 @@ SELECT end_event_adjust_interval
 
     // Clicking save.
     $this->click('_qf_Membership_upload');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -617,7 +621,7 @@ SELECT end_event_adjust_interval
 
     // Clicking save.
     $this->click('_qf_Membership_upload');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
 
     // page was loaded
     $this->waitForTextPresent($sourceText);

@@ -49,9 +49,10 @@ class CRM_Utils_Money {
    * %C - the currency ISO code (e.g., 'USD') if provided
    * %c - the currency symbol (e.g., '$') if available
    *
-   * @param float  $amount      the monetary amount to display (1234.56)
-   * @param string $currency    the three-letter ISO currency code ('USD')
-   * @param string $format      the desired currency format
+   * @param float $amount the monetary amount to display (1234.56)
+   * @param string $currency the three-letter ISO currency code ('USD')
+   * @param string $format the desired currency format
+   * @param bool $onlyNumber
    * @param string $valueFormat the desired monetary value display format (e.g. '%!i')
    *
    * @return string  formatted monetary string
@@ -69,11 +70,11 @@ class CRM_Utils_Money {
     if (!$format) {
       $format = $config->moneyformat;
     }
-    
+
     if (!$valueFormat) {
       $valueFormat = $config->moneyvalueformat;
     }
-     
+
     if ($onlyNumber) {
       // money_format() exists only in certain PHP install (CRM-650)
       if (is_numeric($amount) and function_exists('money_format')) {

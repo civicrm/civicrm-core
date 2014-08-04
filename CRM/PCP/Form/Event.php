@@ -135,6 +135,9 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
+   * @param $files
+   * @param $self
+   *
    * @return mixed true or array of errors
    * @access public
    * @static

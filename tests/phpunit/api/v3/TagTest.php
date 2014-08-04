@@ -130,7 +130,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
       'description' => 'Outside undie-wearers',
     );
     $result = $this->callAPIAndDocument('tag', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertNotNull($result['id'], 'In line ' . __LINE__);
+    $this->assertNotNull($result['id']);
     $params['used_for'] = 'civicrm_contact';
     $this->getAndCheck($params, $result['id'], 'tag');
   }

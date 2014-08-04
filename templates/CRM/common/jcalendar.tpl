@@ -43,7 +43,9 @@
       &nbsp;&nbsp;{$form.$blockSection.$blockId.$tElement.html|crmAddClass:six}
     {/if}
 {else}
-    {assign var='elementId'   value=$form.$elementName.id}
+    {if !$elementId}
+      {assign var='elementId'   value=$form.$elementName.id}
+    {/if}
     {assign var="timeElement" value=$elementName|cat:'_time'}
     {$form.$elementName.html}
 {/if}
@@ -131,6 +133,8 @@
       // format date according to display field
       displayDateValue = cj.datepicker.formatDate( date_format, displayDateValue );
       cj( element_date).val( displayDateValue );
+      //support unsaved-changes warning: CRM-14353
+      cj( element_date).data('crm-initial-value', displayDateValue);
 
       cj(element_date).click( function( ) {
           hideYear( this );

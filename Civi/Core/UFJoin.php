@@ -118,10 +118,10 @@ class UFJoin extends \Civi\Core\Entity {
   private $ufGroup;
   
   /**
-   * @var string
+   * @var text
    *
-   * @JMS\Type("string")
-   * @ORM\Column(name="module_data", type="string", length=255, nullable=true)
+   * @JMS\Type("text")
+   * @ORM\Column(name="module_data", type="text", nullable=true)
    * 
    */
   private $moduleData;
@@ -258,7 +258,7 @@ class UFJoin extends \Civi\Core\Entity {
   /**
    * Set moduleData
    *
-   * @param string $moduleData
+   * @param text $moduleData
    * @return UFJoin
    */
   public function setModuleData($moduleData) {
@@ -269,7 +269,7 @@ class UFJoin extends \Civi\Core\Entity {
   /**
    * Get moduleData
    *
-   * @return string
+   * @return text
    */
   public function getModuleData() {
     return $this->moduleData;
@@ -373,11 +373,9 @@ class UFJoin extends \Civi\Core\Entity {
       
         'name' => 'module_data',
         'propertyName' => 'moduleData',
-        'type' => \CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Module Data'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
+                                                             
                                     
                           ),
              );

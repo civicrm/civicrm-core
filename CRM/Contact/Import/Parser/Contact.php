@@ -442,6 +442,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param int $onDuplicate the code for what action to take on duplicates
    * @param array $values the array of values belonging to this line
    *
+   * @param bool $doGeocodeAddress
+   *
    * @return boolean      the result of this processing
    * @access public
    */
@@ -663,7 +665,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     //fixed CRM-4148
     //now we create new contact in update/fill mode also.
     $contactID = NULL;
-    if ($createNewContact || $this->_updateWithId) {
+    if ($createNewContact || ($this->_retCode != CRM_Import_Parser::NO_MATCH && $this->_updateWithId)) {
 
       //CRM-4430, don't carry if not submitted.
       foreach (array('prefix_id', 'suffix_id', 'gender_id') as $name) {
@@ -1120,7 +1122,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * function to check if an error in custom data
    *
-   * @param String   $errorMessage   A string containing all the error-fields.
+   * @param $params
+   * @param String $errorMessage A string containing all the error-fields.
+   *
+   * @param null $csType
+   * @param null $relationships
    *
    * @access public
    */
@@ -1146,6 +1152,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         if (!array_key_exists($customFieldID, $customFields)) {
           self::addToErrorMsg(ts('field ID'), $errorMessage);
         }
+        // validate null values for required custom fields of type boolean
+        if (!empty($customFields[$customFieldID]['is_required']) && (empty($params['custom_'.$customFieldID]) && !is_numeric($params['custom_'.$customFieldID])) && $customFields[$customFieldID]['data_type'] == 'Boolean') {
+          self::addToErrorMsg($customFields[$customFieldID]['label'].'::'.$customFields[$customFieldID]['groupTitle'], $errorMessage);
+        }
+
         //For address custom fields, we do get actual custom field value as an inner array of
         //values so need to modify
         if (array_key_exists($customFieldID, $addressCustomFields)) {
@@ -1167,7 +1178,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           }
           elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
             if (CRM_Utils_String::strtoboolstr($value) === FALSE) {
-              self::addToErrorMsg($customFields[$customFieldID]['label'], $errorMessage);
+              self::addToErrorMsg($customFields[$customFieldID]['label'].'::'.$customFields[$customFieldID]['groupTitle'], $errorMessage);
             }
           }
           // need not check for label filed import
@@ -1303,6 +1314,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param string $gender check this value across gender values.
    *
    * retunr gender value / false
+   *
+   * @return bool
    * @access public
    */
   public function checkGender($gender) {
@@ -1330,7 +1343,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * function to check if an error in Core( non-custom fields ) field
    *
-   * @param String   $errorMessage   A string containing all the error-fields.
+   * @param $params
+   * @param String $errorMessage A string containing all the error-fields.
    *
    * @access public
    */
@@ -1600,6 +1614,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * function to ckeck a value present or not in a array
    *
+   * @param $value
+   * @param $valueArray
+   *
    * @return ture if value present in array or retun false
    *
    * @access public
@@ -1787,7 +1804,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
                   }
                 }
                 else {
-                  if ($getValue[$cnt]['location_type_id'] == $params[$locKeys][$key]['location_type_id']) {
+                  if ((!empty($getValue[$cnt]['location_type_id']) && !empty($params[$locKeys][$key]['location_type_id'])) && $getValue[$cnt]['location_type_id'] == $params[$locKeys][$key]['location_type_id']) {
                     unset($params[$locKeys][$key]);
                   }
                 }
@@ -1870,7 +1887,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           self::formatCustomDate($params, $formatted, $dateType, $key);
         }
         elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
-          $params[$key] = CRM_Utils_String::strtoboolstr($val);
+          if (empty($val) && !is_numeric($val) && $this->_onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
+            //retain earlier value when Import mode is `Fill`
+            unset($params[$key]);
+          }
+          else {
+            $params[$key] = CRM_Utils_String::strtoboolstr($val);
           }
         }
 
@@ -1888,14 +1910,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         $params[$key] = $this->checkGender($val);
       }
     }
+   }
 
     //now format custom data.
     foreach ($params as $key => $field) {
-      if (!isset($field) || empty($field)){
-        unset($params[$key]);
-        continue;
-      }
-
       if (is_array($field)) {
         $isAddressCustomField = FALSE;
         foreach ($field as $value) {
@@ -1953,6 +1971,22 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         $extends = CRM_Utils_Array::value('extends', $customFields[$customFieldID]);
         $htmlType = CRM_Utils_Array::value( 'html_type', $customFields[$customFieldID] );
         switch ( $htmlType ) {
+        case 'Select':
+        case 'Radio':
+        case 'Autocomplete-Select':
+          if ($customFields[$customFieldID]['data_type'] == 'String') {
+            $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
+            foreach ($customOption as $customFldID => $customValue) {
+              $val = CRM_Utils_Array::value('value', $customValue);
+              $label = CRM_Utils_Array::value('label', $customValue);
+              $label = strtolower($label);
+              $value = strtolower(trim($formatted[$key]));
+              if (($value == $label) || ($value == strtolower($val))) {
+                $params[$key] = $formatted[$key] = $val;
+              }
+            }
+          }
+          break;
         case 'CheckBox':
         case 'AdvMulti-Select':
         case 'Multi-Select':
@@ -1989,6 +2023,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     // to check if not update mode and unset the fields with empty value.
     if (!$this->_updateWithId && array_key_exists('custom', $formatted)) {
       foreach ($formatted['custom'] as $customKey => $customvalue) {
+        if (empty($formatted['custom'][$customKey][- 1]['is_required'])) {
+          $formatted['custom'][$customKey][-1]['is_required'] = $customFields[$customKey]['is_required'];
+        }
         $emptyValue = CRM_Utils_Array::value('value', $customvalue[ - 1]);
         if (!isset($emptyValue)) {
           unset($formatted['custom'][$customKey]);
@@ -2023,9 +2060,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Function to generate status and error message for unparsed street address records.
    *
-   * @param array  $values           the array of values belonging to each row
-   * @param array  $statusFieldName  store formatted date in this array
-
+   * @param array $values the array of values belonging to each row
+   * @param array $statusFieldName store formatted date in this array
+   * @param $returnCode
+   *
+   * @return int
    * @access public
    */
   function processMessage(&$values, $statusFieldName, $returnCode) {
@@ -2051,6 +2090,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     return $returnCode;
   }
 
+  /**
+   * @param $relKey
+   * @param $params
+   *
+   * @return bool
+   */
   function checkRelatedContactFields($relKey, $params) {
     //avoid blank contact creation.
     $allowToCreate = FALSE;

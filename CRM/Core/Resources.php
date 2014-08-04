@@ -128,6 +128,8 @@ class CRM_Core_Resources {
    * Construct a resource manager
    *
    * @param CRM_Extension_Mapper $extMapper Map extension names to their base path or URLs.
+   * @param CRM_Utils_Cache_Interface $cache JS-localization cache
+   * @param string|null $cacheCodeKey Random code to append to resource URLs; changing the code forces clients to reload resources
    */
   public function __construct($extMapper, $cache, $cacheCodeKey = NULL) {
     $this->extMapper = $extMapper;
@@ -158,6 +160,13 @@ class CRM_Core_Resources {
   public function addScriptFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION, $translate = TRUE) {
     if ($translate) {
       $this->translateScript($ext, $file);
+    }
+    // Look for non-minified version if we are in debug mode
+    if (CRM_Core_Config::singleton()->debug && strpos($file, '.min.js') !== FALSE) {
+      $nonMiniFile = str_replace('.min.js', '.js', $file);
+      if ($this->getPath($ext, $nonMiniFile)) {
+        $file = $nonMiniFile;
+      }
     }
     return $this->addScriptUrl($this->getUrl($ext, $file, TRUE), $weight, $region);
   }
@@ -232,7 +241,7 @@ class CRM_Core_Resources {
   /**
    * Add JavaScript variables to the global CRM object via a callback function.
    *
-   * @param $callable function
+   * @param callable $callable
    * @return CRM_Core_Resources
    */
   public function addSettingsFactory($callable) {
@@ -377,7 +386,7 @@ class CRM_Core_Resources {
    * @param $ext string, extension name; use 'civicrm' for core
    * @param $file string, file path -- relative to the extension base dir
    *
-   * @return (string|bool), full file path or FALSE if not found
+   * @return bool|string (string|bool), full file path or FALSE if not found
    */
   public function getPath($ext, $file) {
     // TODO consider caching results
@@ -393,6 +402,8 @@ class CRM_Core_Resources {
    *
    * @param $ext string, extension name; use 'civicrm' for core
    * @param $file string, file path -- relative to the extension base dir
+   * @param bool $addCacheCode
+   *
    * @return string, URL
    */
   public function getUrl($ext, $file = NULL, $addCacheCode = FALSE) {
@@ -406,10 +417,16 @@ class CRM_Core_Resources {
     return $this->extMapper->keyToUrl($ext) . '/' . $file;
   }
 
+  /**
+   * @return string
+   */
   public function getCacheCode() {
     return $this->cacheCode;
   }
 
+  /**
+   * @param $value
+   */
   public function setCacheCode($value) {
     $this->cacheCode = $value;
     if ($this->cacheCodeKey) {
@@ -428,6 +445,7 @@ class CRM_Core_Resources {
    * TODO: Separate the functional code (like addStyle/addScript) from the policy code
    * (like addCoreResources/addCoreStyles).
    *
+   * @param string $region
    * @return CRM_Core_Resources
    * @access public
    */
@@ -449,24 +467,20 @@ class CRM_Core_Resources {
         }
       }
 
-      // Initialize CRM.url and CRM.formatMoney
-      $url = CRM_Utils_System::url('civicrm/example', 'placeholder', FALSE, NULL, FALSE);
-      $js = "CRM.url('init', '$url');\n";
-      $js .= "CRM.formatMoney('init', " . json_encode(CRM_Utils_Money::format(1234.56)) . ");";
-
-      $this->addLocalization($js);
-      $this->addScript($js, $jsWeight++, $region);
+      // Dynamic localization script
+      $this->addScriptUrl($this->addLocalizationJs(), $jsWeight++, $region);
 
       // Add global settings
-      $settings = array(
-        'userFramework' => $config->userFramework,
-        'resourceBase' => $config->resourceBase,
-        'lcMessages' => $config->lcMessages,
+      $settings = array('config' => array(
         'ajaxPopupsEnabled' => $this->ajaxPopupsEnabled,
-      );
-      $this->addSetting(array('config' => $settings));
+      ));
+      // Disable profile creation if user lacks permission
+      if (!CRM_Core_Permission::check('edit all contacts') && !CRM_Core_Permission::check('add contacts')) {
+        $settings['profileCreate'] = FALSE;
+      }
+      $this->addSetting($settings);
 
-      // Give control of jQuery back to the CMS - this loads last
+      // Give control of jQuery and _ back to the CMS - this loads last
       $this->addScriptFile('civicrm', 'js/noconflict.js', 9999, $region, FALSE);
 
       $this->addCoreStyles($region);
@@ -533,26 +547,34 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Add inline scripts needed to localize js widgets
-   * @param string $js
+   * Add dynamic l10n js
+   *
+   * @return string URL of JS file
    */
-  function addLocalization(&$js) {
+  private function addLocalizationJs() {
     $config = CRM_Core_Config::singleton();
-    
-    // Localize select2 strings
-    $contactSearch = json_encode($config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...'));
-    $otherSearch = json_encode(ts('Enter search term...'));
-    $js .= "
-      $.fn.select2.defaults.formatNoMatches = " . json_encode(ts("None found.")) . ";
-      $.fn.select2.defaults.formatLoadMore = " . json_encode(ts("Loading...")) . ";
-      $.fn.select2.defaults.formatSearching = " . json_encode(ts("Searching...")) . ";
-      $.fn.select2.defaults.formatInputTooShort = function(){return CRM.$(this).data('api-entity') == 'contact' ? $contactSearch : $otherSearch};
-    ";
-
-    // Contact create profiles with localized names
-    if (CRM_Core_Permission::check('edit all contacts') || CRM_Core_Permission::check('add contacts')) {
-      $this->addSetting(array('profile' => array('contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks())));
+    $fileName = 'l10n-' . $config->lcMessages . '.js';
+    if (!is_file(CRM_Utils_File::dynamicResourcePath($fileName))) {
+      CRM_Utils_File::addDynamicResource($fileName, $this->createLocalizationJs());
     }
+    // Dynamic localization script
+    return CRM_Utils_File::dynamicResourceUrl($fileName);
+  }
+
+  /**
+   * Create dynamic script for localizing js widgets
+   *
+   * @return string javascript content
+   */
+  private function createLocalizationJs() {
+    $config = CRM_Core_Config::singleton();
+    $vars = array(
+      'moneyFormat' => json_encode(CRM_Utils_Money::format(1234.56)),
+      'contactSearch' => json_encode($config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...')),
+      'otherSearch' => json_encode(ts('Enter search term...')),
+      'contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks(),
+    );
+    return CRM_Core_Smarty::singleton()->fetchWith('CRM/common/localization.js.tpl', $vars);
   }
 
   /**
@@ -563,26 +585,22 @@ class CRM_Core_Resources {
   public function coreResourceList() {
     $config = CRM_Core_Config::singleton();
     // Use minified files for production, uncompressed in debug mode
+    // Note, $this->addScriptFile would automatically search for the non-minified file in debug mode but this is probably faster
     $min = $config->debug ? '' : '.min';
 
     // Scripts needed by everyone, everywhere
     // FIXME: This is too long; list needs finer-grained segmentation
     $items = array(
-      "packages/jquery/jquery-1.11.0$min.js",
-      "packages/jquery/jquery-migrate-1.2.1.js", // TODO: Remove before 4.5 release
-      "packages/jquery/jquery-ui/js/jquery-ui-1.10.4.custom$min.js",
-      "packages/jquery/jquery-ui/css/theme/jquery-ui-1.10.4.custom$min.css",
+      "packages/jquery/jquery-1.11.1$min.js",
+      "packages/jquery/jquery-ui/jquery-ui$min.js",
+      "packages/jquery/jquery-ui/jquery-ui$min.css",
 
       "packages/backbone/lodash.compat$min.js",
 
       "packages/jquery/plugins/jquery.mousewheel$min.js",
 
-      "packages/jquery/plugins/select2/select2.js", // No mini until release of select2 3.4.6
+      "packages/jquery/plugins/select2/select2$min.js",
       "packages/jquery/plugins/select2/select2.css",
-
-      // TODO: Remove before 4.5 release
-      "packages/jquery/plugins/jquery.autocomplete.js",
-      "packages/jquery/css/jquery.autocomplete.css",
 
       "packages/jquery/plugins/jquery.tableHeader.js",
 
@@ -592,9 +610,10 @@ class CRM_Core_Resources {
 
       "packages/jquery/plugins/jquery.timeentry$min.js",
 
-      "packages/jquery/plugins/DataTables/media/js/jquery.dataTables$min.js",
+      "packages/jquery/plugins/jquery.blockUI$min.js",
 
-      "packages/jquery/plugins/jquery.FormNavigate$min.js",
+      "packages/jquery/plugins/DataTables/media/js/jquery.dataTables$min.js",
+      "packages/jquery/plugins/DataTables/media/css/jquery.dataTables$min.css",
 
       "packages/jquery/plugins/jquery.validate$min.js",
       "packages/jquery/plugins/jquery.ui.datepicker.validation.pack.js",
@@ -608,13 +627,8 @@ class CRM_Core_Resources {
       $items[] = "packages/jquery/plugins/jquery.menu$min.js";
       $items[] = "packages/jquery/css/menu.css";
       $items[] = "packages/jquery/plugins/jquery.jeditable$min.js";
-      $items[] = "packages/jquery/plugins/jquery.blockUI$min.js";
       $items[] = "packages/jquery/plugins/jquery.notify$min.js";
       $items[] = "js/jquery/jquery.crmeditable.js";
-
-      // TODO: tokeninput is deprecated in favor of select2 and will be removed soon
-      $items[] = "packages/jquery/plugins/jquery.tokeninput$min.js";
-      $items[] = "packages/jquery/css/token-input-facebook.css";
     }
 
     // Enable administrators to edit option lists in a dialog
@@ -626,9 +640,9 @@ class CRM_Core_Resources {
     if ($config->lcMessages && $config->lcMessages != 'en_US') {
       // Search for i18n file in order of specificity (try fr-CA, then fr)
       list($lang) = explode('_', $config->lcMessages);
-      $path = "packages/jquery/jquery-ui/development-bundle/ui/" . ($min ? 'minified/' : '') . "i18n";
+      $path = "packages/jquery/jquery-ui/i18n";
       foreach (array(str_replace('_', '-', $config->lcMessages), $lang) as $language) {
-        $localizationFile = "$path/jquery.ui.datepicker-{$language}{$min}.js";
+        $localizationFile = "$path/datepicker-{$language}.js";
         if ($this->getPath('civicrm', $localizationFile)) {
           $items[] = $localizationFile;
           break;

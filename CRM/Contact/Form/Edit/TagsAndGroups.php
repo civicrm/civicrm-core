@@ -45,13 +45,16 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    * This function is to build form elements
    * params object $form object of the form
    *
-   * @param Object  $form        the form object that we are operating on
-   * @param int     $contactId   contact id
-   * @param int     $type        what components are we interested in
-   * @param boolean $visibility  visibility of the field
-   * @param string  $groupName   if used for building group block
-   * @param string  $tagName     if used for building tag block
-   * @param string  $fieldName   this is used in batch profile(i.e to build multiple blocks)
+   * @param Object $form the form object that we are operating on
+   * @param int $contactId contact id
+   * @param int $type what components are we interested in
+   * @param boolean $visibility visibility of the field
+   * @param null $isRequired
+   * @param string $groupName if used for building group block
+   * @param string $tagName if used for building tag block
+   * @param string $fieldName this is used in batch profile(i.e to build multiple blocks)
+   *
+   * @param string $groupElementType
    *
    * @static
    * @access public
@@ -110,7 +113,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
           ) {
             continue;
           }
-          
+
           if ($groupElementType == 'select') {
             $groupsOptions[$id] = $group['title'];
           }
@@ -170,10 +173,12 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
   /**
    * set defaults for relevant form elements
    *
-   * @param int    $id        the contact id
-   * @param array  $defaults  the defaults array to store the values in
-   * @param int    $type      what components are we interested in
+   * @param int $id the contact id
+   * @param array $defaults the defaults array to store the values in
+   * @param int $type what components are we interested in
    * @param string $fieldName this is used in batch profile(i.e to build multiple blocks)
+   *
+   * @param string $groupElementType
    *
    * @return void
    * @access public
@@ -220,6 +225,9 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    * the default values are retrieved from the database
    *
    * @access public
+   *
+   * @param $form
+   * @param $defaults
    *
    * @return void
    */

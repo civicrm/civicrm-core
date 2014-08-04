@@ -91,8 +91,9 @@ class KernelTest extends \CiviUnitTestCase {
    * Add listeners to $this->dispatcher which record each invocation of $monitoredEvents
    * in $this->actualEventSequence.
    *
-   * @param EventDispatcher $this->dispatcher
    * @param array $monitoredEvents list of event names
+   *
+   * @internal param \Symfony\Component\EventDispatcher\EventDispatcher $this ->dispatcher
    */
   public function monitorEvents($monitoredEvents) {
     foreach ($monitoredEvents as $monitoredEvent) {

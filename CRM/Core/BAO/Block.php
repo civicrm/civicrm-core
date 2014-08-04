@@ -51,10 +51,11 @@ class CRM_Core_BAO_Block {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param Object $block         typically a Phone|Email|IM|OpenID object
-   * @param string $blockName     name of the above object
-   * @param array  $params        input parameters to find object
-   * @param array  $values        output values of the object
+   * @param string $blockName name of the above object
+   * @param array $params input parameters to find object
+   *
+   * @internal param Object $block typically a Phone|Email|IM|OpenID object
+   * @internal param array $values output values of the object
    *
    * @return array of $block objects.
    * @access public
@@ -98,9 +99,10 @@ class CRM_Core_BAO_Block {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param Object $block         typically a Phone|Email|IM|OpenID object
-   * @param string $blockName     name of the above object
-   * @param array  $values        output values of the object
+   * @param Object $block typically a Phone|Email|IM|OpenID object
+   * @param string $blockName name of the above object
+   *
+   * @internal param array $values output values of the object
    *
    * @return array of $block objects.
    * @access public
@@ -168,7 +170,10 @@ class CRM_Core_BAO_Block {
    * Function to get all block ids for a contact
    *
    * @param string $blockName block name
-   * @param int    $contactId contact id
+   * @param int $contactId contact id
+   *
+   * @param null $entityElements
+   * @param bool $updateBlankLocInfo
    *
    * @return array $contactBlockIds formatted array of block ids
    *
@@ -207,9 +212,12 @@ class CRM_Core_BAO_Block {
   /**
    * takes an associative array and creates a block
    *
-   * @param string $blockName      block name
-   * @param array  $params         (reference ) an assoc array of name/value pairs
-   * @param array  $requiredFields fields that's are required in a block
+   * @param string $blockName block name
+   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param null $entity
+   * @param null $contactId
+   *
+   * @internal param array $requiredFields fields that's are required in a block
    *
    * @return object       CRM_Core_BAO_Block object on success, null otherwise
    * @access public
@@ -422,13 +430,16 @@ class CRM_Core_BAO_Block {
    *            - if no other entry is 1 change to 1
    *            - if one other entry exists change that to 1
    *            - if more than one other entry exists change first one to 1
-   *              @fixme - perhaps should choose by location_type
+   * @fixme - perhaps should choose by location_type
    *  #  empty - same as 0 as once we have checked first step
    *             we know if it should be 1 or 0
    *
    *  if $params['id'] is set $params['contact_id'] may need to be retrieved
    *
-   *  @param array $params
+   * @param array $params
+   * @param $class
+   *
+   * @throws API_Exception
    * @static
    */
   public static function handlePrimary(&$params, $class) {
@@ -497,7 +508,10 @@ class CRM_Core_BAO_Block {
 
   /**
    * Sort location array so primary element is first
-   * @param Array $location
+   *
+   * @param $locations
+   *
+   * @internal param Array $location
    */
   static function sortPrimaryFirst(&$locations){
     uasort($locations, 'self::primaryComparison');

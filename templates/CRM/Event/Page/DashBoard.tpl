@@ -35,7 +35,7 @@
     <div class="float-right">
   <table class="form-layout-compressed">
      <tr>
-    <td><a href="{$configPagesURL}" class="button"><span>{ts}Manage Events{/ts}</span></a></td>
+    <td><a href="{$configPagesURL}" class="button no-popup"><span>{ts}Manage Events{/ts}</span></a></td>
     <td><a href="{$newEventURL}" class="button"><span><div class="icon add-icon"></div>{ts}New Event{/ts}</span></a></td>
      </tr>
   </table>
@@ -90,7 +90,7 @@
             {foreach from=$values.statuses item=class}
                 {if $class}
                     {foreach from=$class item=status}
-                        <a href="{$status.url}" title="{ts 1=$status.name}List %1 participants{/ts}">{$status.name}: {$status.count}</a>
+                        <a href="{$status.url}" title="{ts 1=$status.label}List %1 participants{/ts}">{$status.label}: {$status.count}</a>
                     {/foreach}
                     <hr />
                 {/if}

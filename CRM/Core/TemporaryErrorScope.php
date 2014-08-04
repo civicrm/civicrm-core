@@ -40,6 +40,8 @@ class CRM_Core_TemporaryErrorScope {
 
   /**
    * @param mixed $callback
+   * @param null $modeException
+   *
    * @return CRM_Core_TemporaryErrorScope
    */
   public static function create($callback, $modeException = NULL) {
@@ -51,6 +53,9 @@ class CRM_Core_TemporaryErrorScope {
     return new CRM_Core_TemporaryErrorScope($newFrame);
   }
 
+  /**
+   * @param $newFrame
+   */
   public function __construct($newFrame) {
     self::$oldFrames[] = self::getActive();
     self::setActive($newFrame);

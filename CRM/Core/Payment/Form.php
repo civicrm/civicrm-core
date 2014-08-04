@@ -52,6 +52,8 @@ class CRM_Core_Payment_Form {
   /**
    * create all common fields needed for a credit card or direct debit transaction
    *
+   * @param $form
+   *
    * @return void
    * @access protected
    */
@@ -138,6 +140,8 @@ class CRM_Core_Payment_Form {
   /**
    * create all fields needed for a credit card transaction
    *
+   * @param $form
+   *
    * @return void
    * @access public
    */
@@ -189,6 +193,8 @@ class CRM_Core_Payment_Form {
   /**
    * create all fields needed for direct debit transaction
    *
+   * @param $form
+   *
    * @return void
    * @access public
    */
@@ -236,6 +242,9 @@ class CRM_Core_Payment_Form {
 
   /**
    * Function to add all the credit card fields
+   *
+   * @param $form
+   * @param bool $useRequired
    *
    * @return void
    * @access public
@@ -306,10 +315,12 @@ class CRM_Core_Payment_Form {
   /**
    * Function to add all the direct debit fields
    *
+   * @param $form
+   * @param bool $useRequired
    * @return void
    * @access public
    */
-  function buildDirectDebit(&$form, $useRequired = FALSE) {
+  static function buildDirectDebit(&$form, $useRequired = FALSE) {
     if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM) {
       self::setDirectDebitFields($form);
       foreach ($form->_paymentFields as $name => $field) {
@@ -371,6 +382,11 @@ class CRM_Core_Payment_Form {
   /**
    * function to map address fields
    *
+   * @param $id
+   * @param $src
+   * @param $dst
+   * @param bool $reverse
+   *
    * @return void
    * @static
    */
@@ -410,6 +426,8 @@ class CRM_Core_Payment_Form {
    * The date format for this field should typically be "M Y" (ex: Feb 2011) or "m Y" (02 2011)
    * See CRM-9017
    *
+   * @param $src
+   *
    * @return int
    * @static
    */
@@ -425,6 +443,8 @@ class CRM_Core_Payment_Form {
    * function to get the credit card expiration year
    * The date format for this field should typically be "M Y" (ex: Feb 2011) or "m Y" (02 2011)
    * This function exists only to make it consistant with getCreditCardExpirationMonth
+   *
+   * @param $src
    *
    * @return int
    * @static

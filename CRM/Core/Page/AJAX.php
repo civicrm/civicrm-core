@@ -137,6 +137,8 @@ class CRM_Core_Page_AJAX {
    * @param string $type 'method'|'class'|''
    * @param string $className 'Class_Name'
    * @param string $fnName method name
+   *
+   * @return bool
    */
   static function checkAuthz($type, $className, $fnName = null) {
     switch ($type) {
@@ -184,16 +186,16 @@ class CRM_Core_Page_AJAX {
     if ($session->getStatus(FALSE)) {
       $response['crmMessages'] = $session->getStatus(TRUE);
     }
+    $output = json_encode($response);
 
     // CRM-11831 @see http://www.malsup.com/jquery/form/#file-upload
-    $xhr = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
-    if (!$xhr) {
-      echo '<textarea>';
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+      header('Content-Type: application/json');
     }
-    echo json_encode($response);
-    if (!$xhr) {
-      echo '</textarea>';
+    else {
+      $output = "<textarea>$output</textarea>";
     }
+    echo $output;
     CRM_Utils_System::civiExit();
   }
 
@@ -202,6 +204,7 @@ class CRM_Core_Page_AJAX {
    * @param array $results - If nested array, also provide:
    * @param string $val - array key to use as the value
    * @param string $key - array key to use as the key
+   * @deprecated
    */
   static function autocompleteResults($results, $val='label', $key='id') {
     $output = array();

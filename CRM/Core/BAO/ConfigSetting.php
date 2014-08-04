@@ -46,6 +46,8 @@ class CRM_Core_BAO_ConfigSetting {
    *
    * @params array $params associated array of civicrm variables
    *
+   * @param $params
+   *
    * @return null
    * @static
    */
@@ -61,6 +63,8 @@ class CRM_Core_BAO_ConfigSetting {
    * Function to add civicrm settings
    *
    * @params array $params associated array of civicrm variables
+   *
+   * @param $params
    *
    * @return null
    * @static
@@ -143,6 +147,8 @@ class CRM_Core_BAO_ConfigSetting {
    *
    * @params array $params associated array of civicrm variables
    *
+   * @param $params
+   *
    * @return null
    * @static
    */
@@ -197,6 +203,8 @@ class CRM_Core_BAO_ConfigSetting {
 
   /**
    * Function to retrieve the settings values from db
+   *
+   * @param $defaults
    *
    * @return array $defaults
    * @static
@@ -358,6 +366,9 @@ class CRM_Core_BAO_ConfigSetting {
     }
   }
 
+  /**
+   * @return array
+   */
   static function getConfigSettings() {
     $config = CRM_Core_Config::singleton();
 
@@ -461,6 +472,12 @@ class CRM_Core_BAO_ConfigSetting {
     return array($url, $dir, $siteName, $siteRoot);
   }
 
+  /**
+   * @param array $defaultValues
+   *
+   * @return string
+   * @throws Exception
+   */
   static function doSiteMove($defaultValues = array() ) {
     $moveStatus = ts('Beginning site move process...') . '<br />';
     // get the current and guessed values
@@ -640,6 +657,9 @@ WHERE  option_group_id = (
     return TRUE;
   }
 
+  /**
+   * @return array
+   */
   static function skipVars() {
     return array(
       'dsn', 'templateCompileDir',

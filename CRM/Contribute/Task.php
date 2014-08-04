@@ -151,6 +151,8 @@ class CRM_Contribute_Task {
    *
    * @param int $permission
    *
+   * @param bool $softCreditFiltering
+   *
    * @return array set of tasks that are valid for the user
    * @access public
    */

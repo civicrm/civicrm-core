@@ -138,6 +138,9 @@ function civicrm_api3_profile_get($params) {
   }
 }
 
+/**
+ * @param $params
+ */
 function _civicrm_api3_profile_get_spec(&$params) {
   $params['profile_id']['api.required'] = TRUE;
   $params['contact_id']['description'] = 'If no contact is specified an array of defaults will be returned';
@@ -599,6 +602,12 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
   return $profileFields[$profileID];
 }
 
+/**
+ * @param $a
+ * @param $b
+ *
+ * @return bool
+ */
 function _civicrm_api3_order_by_weight($a, $b) {
   return CRM_Utils_Array::value('weight', $b) < CRM_Utils_Array::value('weight', $a) ? TRUE : FALSE;
 }
@@ -677,7 +686,12 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
 
 /**
  * @todo this should be handled by the api wrapper using getfields info - need to check
- * how we add a a pseudoconstant to this pseudoapi to make that work
+ * how we add a a pseudoconstant to this pseudo api to make that work
+ *
+ * @param $profileID
+ *
+ * @return array
+ * @throws CiviCRM_API3_Exception
  */
 function _civicrm_api3_profile_getProfileID($profileID) {
   if(!empty($profileID) && strtolower($profileID) != 'billing' && !is_numeric($profileID)) {

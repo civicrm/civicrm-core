@@ -46,11 +46,18 @@ class CRM_Core_I18n {
   private $_nativegettext = FALSE;
 
   /**
+   * Gettext cache for extension domains/streamers, depending on if native or phpgettext.
+   * - native gettext: we cache the value for textdomain()
+   * - phpgettext: we cache the file streamer.
+   */
+  private $_extensioncache = array();
+
+  /**
    * A locale-based constructor that shouldn't be called from outside of this class (use singleton() instead).
    *
    * @param  $locale string  the base of this certain object's existence
    *
-   * @return         void
+   * @return \CRM_Core_I18n
    */
   function __construct($locale) {
     if ($locale != '' and $locale != 'en_US') {
@@ -74,15 +81,27 @@ class CRM_Core_I18n {
         textdomain('civicrm');
 
         $this->_phpgettext = new CRM_Core_I18n_NativeGettext();
+        $this->_extensioncache['civicrm'] = 'civicrm';
         return;
       }
 
       // Otherwise, use PHP-gettext
+      // we support both the old file hierarchy format and the new:
+      // pre-4.5:  civicrm/l10n/xx_XX/civicrm.mo
+      // post-4.5: civicrm/l10n/xx_XX/LC_MESSAGES/civicrm.mo
       require_once 'PHPgettext/streams.php';
       require_once 'PHPgettext/gettext.php';
 
-      $streamer = new FileReader($config->gettextResourceDir . $locale . DIRECTORY_SEPARATOR . 'civicrm.mo');
+      $mo_file = $config->gettextResourceDir . $locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
+
+      if (! file_exists($mo_file)) {
+        // fallback to pre-4.5 mode
+        $mo_file = $config->gettextResourceDir . $locale . DIRECTORY_SEPARATOR . 'civicrm.mo';
+      }
+
+      $streamer = new FileReader($mo_file);
       $this->_phpgettext = new gettext_reader($streamer);
+      $this->_extensioncache['civicrm'] = $this->_phpgettext;
     }
   }
 
@@ -232,7 +251,7 @@ class CRM_Core_I18n {
 
     // gettext domain for extensions
     $domain_changed = FALSE;
-    if (isset($params['domain'])) {
+    if (! empty($params['domain']) && $this->_phpgettext) {
       if ($this->setGettextDomain($params['domain'])) {
         $domain_changed = TRUE;
       }
@@ -378,13 +397,16 @@ class CRM_Core_I18n {
    *
    * @param  $key Key of the extension (can be 'civicrm', or 'org.example.foo').
    *
-   * @return void
+   * @return Boolean True if the domain was changed for an extension.
    */
   function setGettextDomain($key) {
-    static $cache = array();
+    /* No domain changes for en_US */
+    if (! $this->_phpgettext) {
+      return FALSE;
+    }
 
-    // It's only necessary to find once
-    if (! isset($cache[$key])) {
+    // It's only necessary to find/bind once
+    if (! isset($this->_extensioncache[$key])) {
       $config = CRM_Core_Config::singleton();
 
       try {
@@ -393,19 +415,38 @@ class CRM_Core_I18n {
         $info = $mapper->keyToInfo($key);
         $domain = $info->file;
 
-        bindtextdomain($domain, $path . DIRECTORY_SEPARATOR . 'l10n');
-        bind_textdomain_codeset($domain, 'UTF-8');
-        $cache[$key] = $domain;
+        if ($this->_nativegettext) {
+          bindtextdomain($domain, $path . DIRECTORY_SEPARATOR . 'l10n');
+          bind_textdomain_codeset($domain, 'UTF-8');
+          $this->_extensioncache[$key] = $domain;
+        }
+        else {
+          // phpgettext
+          $mo_file = $path . DIRECTORY_SEPARATOR . 'l10n' . DIRECTORY_SEPARATOR . $config->lcMessages . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . $domain . '.mo';
+          $streamer = new FileReader($mo_file);
+          $this->_extensioncache[$key] = new gettext_reader($streamer);
+        }
       }
       catch (CRM_Extension_Exception $e) {
-        // There's not much we can do at this point
-        $cache[$key] = FALSE;
+        // Intentionally not translating this string to avoid possible infinit loops
+        // Only developers should see this string, if they made a mistake in their ts() usage.
+        CRM_Core_Session::setStatus('Unknown extension key in a translation string: ' . $key, '', 'error');
+        $this->_extensioncache[$key] = FALSE;
       }
     }
 
-    if (isset($cache[$key]) && $cache[$key]) {
-      textdomain($cache[$key]);
+    if (isset($this->_extensioncache[$key]) && $this->_extensioncache[$key]) {
+      if ($this->_nativegettext) {
+        textdomain($this->_extensioncache[$key]);
+      }
+      else {
+        $this->_phpgettext = $this->_extensioncache[$key];
+      }
+
+      return TRUE;
     }
+
+    return FALSE;
   }
 
   /**

@@ -86,8 +86,10 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   /**
    * Takes an associative array and creates a membership Status object
    * See http://wiki.civicrm.org/confluence/display/CRM/Database+layer
-   * @param array    $params      (reference ) an assoc array of name/value pairs
    *
+   * @param array $params (reference ) an assoc array of name/value pairs
+   *
+   * @throws Exception
    * @return object CRM_Member_BAO_MembershipStatus object
    * @access public
    * @static
@@ -158,6 +160,8 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * Function to get  membership status
    *
    * @param int $membershipStatusId
+   *
+   * @return array
    * @static
    */
   public static function getMembershipStatus($membershipStatusId) {
@@ -174,7 +178,9 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * Function to delete membership Types
    *
    * @param int $membershipStatusId
-   * @param
+   *
+   * @throws CRM_Core_Exception
+   * @internal param $
    * @static
    */
   static function del($membershipStatusId) {
@@ -202,16 +208,17 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   /**
    * Function to find the membership status based on start date, end date, join date & status date.
    *
-   * @param  date    $startDate      start date of the member whose membership status is to be calculated.
-   * @param  date    $endDate        end date of the member whose membership status is to be calculated.
-   * @param  date    $joinDate       join date of the member whose membership status is to be calculated.
-   * @param  date    $statusDate     status date of the member whose membership status is to be calculated.
+   * @param  string $startDate start date of the member whose membership status is to be calculated.
+   * @param  string $endDate end date of the member whose membership status is to be calculated.
+   * @param  string $joinDate join date of the member whose membership status is to be calculated.
+   * @param \date|string $statusDate status date of the member whose membership status is to be calculated.
    * @param  boolean $excludeIsAdmin exclude the statuses those having is_admin = 1
-   * @param integer $membershipType membership type id - passed to the hook
+   * @param $membershipTypeID
    * @param array $membership membership params as available to calling function - passed to the hook
    *
-   * @return
-   * @static
+   * @internal param int $membershipType membership type id - passed to the hook
+   * @return array
+  @static
    */
   static function getMembershipStatusByDate($startDate, $endDate, $joinDate,
     $statusDate = 'today', $excludeIsAdmin = FALSE, $membershipTypeID, $membership = array()
@@ -361,8 +368,8 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   /**
    * Function that return the status ids whose is_current_member is set
    *
-   * @return
-   * @static
+   * @return array
+  @static
    */
   public static function getMembershipStatusCurrent() {
     $statusIds = array();

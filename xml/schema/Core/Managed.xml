@@ -56,6 +56,19 @@
     <comment>Foreign key to the referenced item.</comment>
     <add>4.2</add>
   </field>
+  <field>
+    <name>cleanup</name>
+    <type>varchar</type>
+    <length>32</length>
+    <comment>Policy on when to cleanup entity (always, never, unused)</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_ManagedEntities::getCleanupOptions</callback>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>4.5</add>
+  </field>
   <index>
     <name>UI_managed_entity</name>
     <fieldName>entity_type</fieldName>

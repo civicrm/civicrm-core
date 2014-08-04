@@ -43,6 +43,8 @@
  * {@getfields phone_create}
  * @example PhoneCreate.php
  *
+ * @param $params
+ *
  * @return array of newly created phone property values.
  * @access public
  */

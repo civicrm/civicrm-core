@@ -79,7 +79,7 @@ class JobLog extends \Civi\Core\Entity {
    * @ORM\Column(name="run_time", type="datetime", nullable=true, columnDefinition="TIMESTAMP NULL DEFAULT NULL")
    * 
    */
-  private $runTime;
+  private $runTime = 'NULL';
   
   /**
    * @var integer
@@ -306,7 +306,12 @@ class JobLog extends \Civi\Core\Entity {
                                                      
                                     
                 'FKClassName' => 'CRM_Core_DAO_Domain',
-                          ),
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_domain',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
       
               'run_time' => array(
       
@@ -315,7 +320,8 @@ class JobLog extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Run Time'),
                                                              
-                                    
+                                           'default' => 'NULL',
+         
                           ),
       
               'job_id' => array(

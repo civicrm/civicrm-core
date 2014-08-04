@@ -43,8 +43,8 @@ class CRM_Core_QuickForm_Action_Reload extends CRM_Core_QuickForm_Action {
    *
    * @param object $stateMachine reference to state machine object
    *
-   * @return object
-   * @access public
+   * @return \CRM_Core_QuickForm_Action_Reload
+  @access public
    */
   function __construct(&$stateMachine) {
     parent::__construct($stateMachine);

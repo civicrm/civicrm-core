@@ -27,6 +27,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CiviReportTestCase
+ */
 class CiviReportTestCase extends CiviUnitTestCase {
   function setUp() {
     parent::setUp();
@@ -38,9 +41,18 @@ class CiviReportTestCase extends CiviUnitTestCase {
     // Note that MySQL doesn't provide a way to list them, so we would need
     // to keep track ourselves (eg CRM_Core_TemporaryTableManager) or reset
     // the MySQL connection between test runs.
+
+    $this->quickCleanup($this->_tablesToTruncate);
     parent::tearDown();
   }
 
+  /**
+   * @param $reportClass
+   * @param $inputParams
+   *
+   * @return string
+   * @throws Exception
+   */
   function getReportOutputAsCsv($reportClass, $inputParams) {
     $config = CRM_Core_Config::singleton();
     $config->keyDisable = TRUE;
@@ -88,6 +100,11 @@ class CiviReportTestCase extends CiviUnitTestCase {
     return $tmpFile;
   }
 
+  /**
+   * @param $csvFile
+   *
+   * @return array
+   */
   function getArrayFromCsv($csvFile) {
     $arrFile = array();
     if (($handle = fopen($csvFile, "r")) !== FALSE) {
@@ -132,6 +149,11 @@ class CiviReportTestCase extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return string
+   */
   public function flattenCsvArray($rows) {
     $result = '';
     foreach ($rows as $row) {

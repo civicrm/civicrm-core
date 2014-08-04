@@ -5,7 +5,9 @@
  *
  * FIXME This is a bare-minimum placeholder
  *
- * @param  array  $ params input parameters
+ * @param $params
+ *
+ * @internal param $array $ params input parameters
  *
  * {@example OptionValueGet.php 0}
  * @example OptionValueGet.php
@@ -28,6 +30,8 @@ function civicrm_api3_report_template_get($params) {
  * Allowed @params array keys are:
  *
  * {@example OptionValueCreate.php}
+ *
+ * @param $params
  *
  * @return array of newly created option_value property values.
  * {@getfields OptionValue_create}
@@ -92,6 +96,13 @@ function civicrm_api3_report_template_getrows($params) {
   return civicrm_api3_create_success($rows, $params, 'report_template', 'getrows', CRM_Core_DAO::$_nullObject, $metadata);
 }
 
+/**
+ * @param $params
+ *
+ * @return array
+ * @throws API_Exception
+ * @throws CiviCRM_API3_Exception
+ */
 function _civicrm_api3_report_template_getrows($params) {
   if(empty($params['report_id'])) {
     $params['report_id'] = civicrm_api3('report_instance', 'getvalue', array('id' => $params['instance_id'], 'return' => 'report_id'));
@@ -137,6 +148,11 @@ function _civicrm_api3_report_template_getrows($params) {
   return array($rows, $reportInstance, $metadata);
 }
 
+/**
+ * @param $params
+ *
+ * @return array
+ */
 function civicrm_api3_report_template_getstatistics($params) {
   list($rows, $reportInstance, $metadata) = _civicrm_api3_report_template_getrows($params);
   $stats = $reportInstance->statistics($rows);

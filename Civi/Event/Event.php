@@ -47,7 +47,7 @@ use JMS\Serializer\Annotation as JMS;
  *
  * @CiviAPI\Entity("Event")
  * @CiviAPI\Permission()
- * @ORM\Table(name="civicrm_event", indexes={@ORM\Index(name="index_event_type_id", columns={"event_type_id"}),@ORM\Index(name="index_participant_listing_id", columns={"participant_listing_id"}),@ORM\Index(name="index_parent_event_id", columns={"parent_event_id"}),@ORM\Index(name="FK_civicrm_event_loc_block_id", columns={"loc_block_id"}),@ORM\Index(name="FK_civicrm_event_created_id", columns={"created_id"}),@ORM\Index(name="FK_civicrm_event_campaign_id", columns={"campaign_id"})})
+ * @ORM\Table(name="civicrm_event", indexes={@ORM\Index(name="index_event_type_id", columns={"event_type_id"}),@ORM\Index(name="index_participant_listing_id", columns={"participant_listing_id"}),@ORM\Index(name="index_parent_event_id", columns={"parent_event_id"}),@ORM\Index(name="FK_civicrm_event_loc_block_id", columns={"loc_block_id"}),@ORM\Index(name="FK_civicrm_event_created_id", columns={"created_id"}),@ORM\Index(name="FK_civicrm_event_campaign_id", columns={"campaign_id"}),@ORM\Index(name="FK_civicrm_event_dedupe_rule_group_id", columns={"dedupe_rule_group_id"})})
  * @ORM\Entity
  *
  */
@@ -544,7 +544,7 @@ class Event extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_template", type="boolean", nullable=true, options={"default": 0})
+   * @ORM\Column(name="is_template", type="boolean", nullable=false, options={"default": 0})
    * 
    */
   private $isTemplate = '0';
@@ -604,6 +604,15 @@ class Event extends \Civi\Core\Entity {
   private $isShare = '1';
   
   /**
+   * @var boolean
+   *
+   * @JMS\Type("boolean")
+   * @ORM\Column(name="is_confirm_enabled", type="boolean", nullable=true, options={"default": 1})
+   * 
+   */
+  private $isConfirmEnabled = '1';
+  
+  /**
    * @var integer
    *
    * @JMS\Type("integer")
@@ -620,6 +629,15 @@ class Event extends \Civi\Core\Entity {
    * 
    */
   private $slotLabelId = 'NULL';
+  
+  /**
+   * @var \Civi\Dedupe\RuleGroup
+   *
+   * 
+   * @ORM\ManyToOne(targetEntity="Civi\Dedupe\RuleGroup")
+   * @ORM\JoinColumns({@ORM\JoinColumn(name="dedupe_rule_group_id", referencedColumnName="id")})
+   */
+  private $dedupeRuleGroup = 'NULL';
 
   /**
    * Get id
@@ -1831,6 +1849,26 @@ class Event extends \Civi\Core\Entity {
   }
   
   /**
+   * Set isConfirmEnabled
+   *
+   * @param boolean $isConfirmEnabled
+   * @return Event
+   */
+  public function setIsConfirmEnabled($isConfirmEnabled) {
+    $this->isConfirmEnabled = $isConfirmEnabled;
+    return $this;
+  }
+
+  /**
+   * Get isConfirmEnabled
+   *
+   * @return boolean
+   */
+  public function getIsConfirmEnabled() {
+    return $this->isConfirmEnabled;
+  }
+  
+  /**
    * Set parentEventId
    *
    * @param integer $parentEventId
@@ -1868,6 +1906,26 @@ class Event extends \Civi\Core\Entity {
    */
   public function getSlotLabelId() {
     return $this->slotLabelId;
+  }
+  
+  /**
+   * Set dedupeRuleGroup
+   *
+   * @param \Civi\Dedupe\RuleGroup $dedupeRuleGroup
+   * @return Event
+   */
+  public function setDedupeRuleGroup(\Civi\Dedupe\RuleGroup $dedupeRuleGroup = null) {
+    $this->dedupeRuleGroup = $dedupeRuleGroup;
+    return $this;
+  }
+
+  /**
+   * Get dedupeRuleGroup
+   *
+   * @return \Civi\Dedupe\RuleGroup
+   */
+  public function getDedupeRuleGroup() {
+    return $this->dedupeRuleGroup;
   }
 
   /**
@@ -2543,7 +2601,8 @@ class Event extends \Civi\Core\Entity {
         'propertyName' => 'isTemplate',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is an Event Template'),
-                                                             
+                        'required' => true,
+                                                     
                                     
                           ),
       
@@ -2635,6 +2694,17 @@ class Event extends \Civi\Core\Entity {
          
                           ),
       
+              'is_confirm_enabled' => array(
+      
+        'name' => 'is_confirm_enabled',
+        'propertyName' => 'isConfirmEnabled',
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Is the booking confirmation screen enabled?'),
+                                                             
+                                           'default' => '1',
+         
+                          ),
+      
               'parent_event_id' => array(
       
         'name' => 'parent_event_id',
@@ -2656,6 +2726,24 @@ class Event extends \Civi\Core\Entity {
                                            'default' => 'NULL',
          
                           ),
+      
+              'dedupe_rule_group_id' => array(
+      
+        'name' => 'dedupe_rule_group_id',
+        'propertyName' => 'dedupeRuleGroup',
+        'type' => \CRM_Utils_Type::T_INT,
+                'title' => ts('Dedupe Rule'),
+                                                             
+                                           'default' => 'NULL',
+         
+                'FKClassName' => 'CRM_Dedupe_DAO_RuleGroup',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_dedupe_rule_group',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'title',
+                      'nameColumn' => 'name',
+                    )
+                 ),
              );
     }
     return self::$_fields;

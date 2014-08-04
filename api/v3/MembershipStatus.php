@@ -81,7 +81,7 @@ function civicrm_api3_membership_status_get($params) {
  * Update an existing membership status
  *
  * This api is used for updating an existing membership status.
- * Required parrmeters : id of a membership status
+ * Required parameters : id of a membership status
  *
  * @param  Array   $params  an associative array of name/value property values of civicrm_membership_status
  * @deprecated - should just use create
@@ -142,8 +142,11 @@ function civicrm_api3_membership_status_delete($params) {
  * This API is used for deriving Membership Status of a given Membership
  * record using the rules encoded in the membership_status table.
  *
- * @param  Int     $membershipID  Id of a membership
- * @param  String  $statusDate
+ * @param $membershipParams
+ *
+ * @throws API_Exception
+ * @internal param Int $membershipID Id of a membership
+ * @internal param String $statusDate
  *
  * @return Array  Array of status id and status name
  * @public

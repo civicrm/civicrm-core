@@ -38,6 +38,9 @@
  *
  */
 class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
@@ -287,6 +290,9 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    *
    * @params int     $contactId      contact id
    * @params array   $values         associative array of name/value pair
+   *
+   * @param $contactID
+   * @param $values
    *
    * @return void
    * @access public

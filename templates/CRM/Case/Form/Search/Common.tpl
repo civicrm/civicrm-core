@@ -77,7 +77,7 @@
   {/if}
 </tr>
 
-<tr><td colspan="3">{include file="CRM/common/Tag.tpl" tagsetType='case'}</td></tr>
+<tr><td colspan="3">{include file="CRM/common/Tagset.tpl" tagsetType='case'}</td></tr>
 
   {if $caseGroupTree}
   <tr>

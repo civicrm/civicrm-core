@@ -175,6 +175,10 @@
     <page_callback>\Civi\API\Page\REST</page_callback>
     <page_type>4</page_type>
     <title>REST</title>
+  </item>
+  <item>
+    <path>civicrm/a</path>
+    <page_callback>CRM_Core_Page_Angular</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
 </menu>

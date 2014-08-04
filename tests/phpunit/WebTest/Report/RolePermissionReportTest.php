@@ -25,6 +25,10 @@
   */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Report_RolePermissionReportTest
+ */
 class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -129,7 +133,7 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->openCiviPage('report/instance/1', 'reset=1');
 
     //check if the reserved report field is frozen
-    $this->assertTrue($this->isElementPresent("xpath=//div[@id='instanceForm']//table[3]/tbody//tr/td[2]/tt[text()='[ ]']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@id='instanceForm']//table[3]/tbody//tr/td[2]/span/tt[text()='[ ]']"));
 
     // let's give full CiviReport permissions.
     $permissions = array(
@@ -200,6 +204,9 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->_roleDelete($role);
   }
 
+  /**
+   * @param $role
+   */
   function _roleDelete($role) {
     $this->waitForElementPresent("xpath=//table[@id='user-roles']/tbody//tr/td[text()='{$role}']/..//td/a[text()='edit role']");
     $this->click("xpath=//table[@id='user-roles']/tbody//tr/td[text()='{$role}']/..//td/a[text()='edit role']");
@@ -210,6 +217,11 @@ class WebTest_Report_RolePermissionReportTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("The role has been deleted.");
   }
 
+  /**
+   * @param $roleid
+   *
+   * @return string
+   */
   function _testCreateUser($roleid) {
 
     $this->open($this->sboxPath . "admin/people/create");

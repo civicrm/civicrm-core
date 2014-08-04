@@ -275,7 +275,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     // build tag widget
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_case');
-    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_case', NULL, TRUE, TRUE);
+    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_case', NULL, FALSE, TRUE);
 
     $this->addButtons(array(
         array(
@@ -315,6 +315,9 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    * global validation rules for the form
    *
    * @param array $values posted values of the form
+   *
+   * @param $files
+   * @param $form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -384,10 +387,8 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     // 2. create/edit case
     if (!empty($params['case_type_id'])) {
-      $caseType = CRM_Case_PseudoConstant::caseType('name');
-      $params['case_type'] = $caseType[$params['case_type_id']];
+      $params['case_type'] = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $params['case_type_id'], 'name', 'id');
       $params['subject'] = $params['activity_subject'];
-      $params['case_type_id'] = CRM_Core_DAO::VALUE_SEPARATOR . $params['case_type_id'] . CRM_Core_DAO::VALUE_SEPARATOR;
     }
     $caseObj = CRM_Case_BAO_Case::create($params);
     $params['case_id'] = $caseObj->id;

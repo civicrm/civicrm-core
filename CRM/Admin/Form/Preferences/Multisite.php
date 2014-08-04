@@ -48,26 +48,31 @@ class CRM_Admin_Form_Preferences_Multisite extends CRM_Admin_Form_Preferences {
           'html_type' => 'checkbox',
           'title' => ts('Enable Multi Site Configuration'),
           'weight' => 1,
-          'description' => ts('Multi Site provides support for sharing a single CiviCRM database among multiple sites.') . ' ' . $msDoc,
+          'description' => ts('Make CiviCRM aware of multiple domains. You should configure a domain group if enabled') . ' ' . $msDoc,
         ),
-        'uniq_email_per_site' => array(
+        /** Remove this checkbox until some one knows what this setting does
+          'uniq_email_per_site' => array(
           'html_type' => 'checkbox',
           'title' => ts('Ensure multi sites have a unique email per site'),
           'weight' => 2,
           'description' => NULL,
         ),
+         */
         'domain_group_id' => array(
-          'html_type' => 'text',
-          'title' => ts('Parent group for this domain'),
+          'html_type' => 'entity_reference',
+          'title' => ts('Domain Group'),
           'weight' => 3,
-          'description' => ts('Enter the group ID (civicrm_group.id).'),
+          'options' => array('entity' => 'group', 'select' => array('minimumInputLength' => 0)),
+          'description' => ts('Contacts created on this site are added to this group'),
         ),
+        /** Remove this checkbox until some one knows what this setting does
         'event_price_set_domain_id' => array(
           'html_type' => 'text',
           'title' => ts('Domain for event price sets'),
           'weight' => 4,
           'description' => NULL,
         ),
+        */
       ),
     );
 

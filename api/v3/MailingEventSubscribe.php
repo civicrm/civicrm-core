@@ -40,9 +40,10 @@
 /**
  * Subscribe from mailing group
  *
- * @param array $params  Associative array of property
+ * @param array $params Associative array of property
  *                       name/value pairs to insert in new 'survey'
  *
+ * @throws API_Exception
  * @return array api result array
  * {@getfields mailing_event_subscribe_create}
  * @access public

@@ -56,16 +56,18 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
 
   /**
    *
-   *@see CRM_Utils_Hook::invoke()
-   *@param integer $numParams Number of parameters to pass to the hook
-   *@param unknown $arg1 parameter to be passed to the hook
-   *@param unknown $arg2 parameter to be passed to the hook
-   *@param unknown $arg3 parameter to be passed to the hook
-   *@param unknown $arg4 parameter to be passed to the hook
-   *@param unknown $arg5 parameter to be passed to the hook
-   *@param string $fnSuffix function suffix, this is effectively the hook name
-   *@return Ambigous <boolean, multitype:>
+   * @see CRM_Utils_Hook::invoke()
    *
+   * @param integer $numParams Number of parameters to pass to the hook
+   * @param unknown $arg1 parameter to be passed to the hook
+   * @param unknown $arg2 parameter to be passed to the hook
+   * @param unknown $arg3 parameter to be passed to the hook
+   * @param unknown $arg4 parameter to be passed to the hook
+   * @param unknown $arg5 parameter to be passed to the hook
+   * @param mixed $arg6
+   * @param string $fnSuffix function suffix, this is effectively the hook name
+   *
+   * @return Ambigous <boolean, multitype:>
    */
   function invoke($numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,

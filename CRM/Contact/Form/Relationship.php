@@ -367,8 +367,9 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     $this->add('advcheckbox', 'is_active', ts('Enabled?'));
 
-    $this->add('advcheckbox', 'is_permission_a_b');
-    $this->add('advcheckbox', 'is_permission_b_a');
+    // CRM-14612 - Don't use adv-checkbox as it interferes with the form js
+    $this->add('checkbox', 'is_permission_a_b');
+    $this->add('checkbox', 'is_permission_b_a');
 
     $this->add('text', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Relationship', 'description'));
 
@@ -418,6 +419,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $ids = array('contact' => $this->_contactId);
 
     $relationshipTypeId = str_replace(array('_', 'a', 'b'), '', $params['relationship_type_id']);
+
+    // CRM-14612 - Don't use adv-checkbox as it interferes with the form js
+    $params['is_permission_a_b'] = CRM_Utils_Array::value('is_permission_a_b', $params, 0);
+    $params['is_permission_b_a'] = CRM_Utils_Array::value('is_permission_b_a', $params, 0);
 
     // Update mode (always single)
     if ($this->_action & CRM_Core_Action::UPDATE) {

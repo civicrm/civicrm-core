@@ -97,8 +97,6 @@
    <div class="clear"></div>
   </div>
     </div>
-    {* include jscript to warn if unsaved form field changes *}
-    {include file="CRM/common/formNavigate.tpl"}
 {/if}
 {if ($action eq 8)}
 <fieldset><legend>{ts}Delete Note{/ts}</legend>
@@ -178,7 +176,8 @@
                         + response['values'][i].modified_date
                         + '</td><td>'
                         + '<a href="'+ urlTemplate + response['values'][i].createdById +'">'+ response['values'][i].createdBy +'</a>'
-                        + '</td><td>' // FIXME: attachments
+                        + '</td><td>'
+                        + response['values'][i].attachment
                         + '</td><td>'+ commentAction.replace(/{cid}/g, response['values'][i].createdById).replace(/{id}/g, response['values'][i].id) +'</td></tr>'
 
                     commentRows['cnote_'+ noteId][response['values'][i].id] = str;
@@ -195,11 +194,13 @@
     }
 
     function drawCommentRows(rowId) {
+      if (rowId) {
         row = cj('tr#'+ rowId)
         for (i in commentRows[rowId]) {
             row.after(commentRows[rowId][i]);
             row = cj('tr#cnote_'+ i);
         }
+      }
     }
 
     {/literal}

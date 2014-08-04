@@ -694,7 +694,12 @@ class OptionValue extends \Civi\Core\Entity {
                                                              
                                     
                 'FKClassName' => 'CRM_Core_DAO_Domain',
-                          ),
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_domain',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
       
               'visibility_id' => array(
       

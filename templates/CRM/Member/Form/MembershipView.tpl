@@ -65,7 +65,17 @@
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
 
     {if $accessContribution and $rows.0.contribution_id}
-        {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
+        <div class="crm-accordion-wrapper">
+              <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
+              <div class="crm-accordion-body">{include file="CRM/Contribute/Form/Selector.tpl" context="Search"}</div>
+        </div>
+    {/if}
+
+    {if $softCredit}
+        <div class="crm-accordion-wrapper">
+            <div class="crm-accordion-header">{ts}Related Soft Contributions{/ts}</div>
+            <div class="crm-accordion-body">{include file="CRM/Contribute/Page/ContributionSoft.tpl" context="membership"}</div>
+        </div>
     {/if}
 
     {if $has_related}

@@ -259,6 +259,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
   /**
    * Get user context.
    *
+   * @param null $mode
+   *
    * @return string user context.
    */
   function userContext($mode = NULL) {
@@ -282,6 +284,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    * extension's status on the local system.
    *
    * The result format resembles the old CRM_Core_Extensions_Extension.
+   *
+   * @param CRM_Extension_Info $obj
    *
    * @return array
    */

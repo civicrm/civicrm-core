@@ -51,6 +51,10 @@ class Kernel {
    */
   protected $apiProviders;
 
+  /**
+   * @param $dispatcher
+   * @param array $apiProviders
+   */
   function __construct($dispatcher, $apiProviders = array()) {
     $this->apiProviders = $apiProviders;
     $this->dispatcher = $dispatcher;

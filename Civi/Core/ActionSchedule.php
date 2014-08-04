@@ -319,6 +319,24 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
+   * @ORM\Column(name="from_name", type="string", length=255, nullable=true)
+   * 
+   */
+  private $fromName;
+  
+  /**
+   * @var string
+   *
+   * @JMS\Type("string")
+   * @ORM\Column(name="from_email", type="string", length=255, nullable=true)
+   * 
+   */
+  private $fromEmail;
+  
+  /**
+   * @var string
+   *
+   * @JMS\Type("string")
    * @ORM\Column(name="mode", type="string", length=128, nullable=true, options={"default": "Email"})
    * 
    */
@@ -903,6 +921,46 @@ class ActionSchedule extends \Civi\Core\Entity {
   }
   
   /**
+   * Set fromName
+   *
+   * @param string $fromName
+   * @return ActionSchedule
+   */
+  public function setFromName($fromName) {
+    $this->fromName = $fromName;
+    return $this;
+  }
+
+  /**
+   * Get fromName
+   *
+   * @return string
+   */
+  public function getFromName() {
+    return $this->fromName;
+  }
+  
+  /**
+   * Set fromEmail
+   *
+   * @param string $fromEmail
+   * @return ActionSchedule
+   */
+  public function setFromEmail($fromEmail) {
+    $this->fromEmail = $fromEmail;
+    return $this;
+  }
+
+  /**
+   * Get fromEmail
+   *
+   * @return string
+   */
+  public function getFromEmail() {
+    return $this->fromEmail;
+  }
+  
+  /**
    * Set mode
    *
    * @param string $mode
@@ -1287,6 +1345,30 @@ class ActionSchedule extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Absolute Date'),
                                                              
+                                    
+                          ),
+      
+              'from_name' => array(
+      
+        'name' => 'from_name',
+        'propertyName' => 'fromName',
+        'type' => \CRM_Utils_Type::T_STRING,
+                'title' => ts('From Name'),
+                                 'maxlength' => 255,
+                                 'size' => \CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'from_email' => array(
+      
+        'name' => 'from_email',
+        'propertyName' => 'fromEmail',
+        'type' => \CRM_Utils_Type::T_STRING,
+                'title' => ts('From Email'),
+                                 'maxlength' => 255,
+                                 'size' => \CRM_Utils_Type::HUGE,
+                           
                                     
                           ),
       

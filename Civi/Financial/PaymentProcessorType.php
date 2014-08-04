@@ -923,7 +923,7 @@ class PaymentProcessorType extends \Civi\Core\Entity {
                                                      
                                     
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_Core_SelectValues::billingMode',
                     )
                  ),
       

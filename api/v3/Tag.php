@@ -42,6 +42,8 @@
  *
  * {@example TagCreate.php}
  *
+ * @param $params
+ *
  * @return array of newly created tag property values.
  * {@getfields tag_create}
  * @access public

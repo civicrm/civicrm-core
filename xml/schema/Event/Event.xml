@@ -682,6 +682,7 @@
     <title>Is an Event Template</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>whether the event has template</comment>
     <add>3.0</add>
     <html>
@@ -776,6 +777,17 @@
     </html>
   </field>
   <field>
+    <name>is_confirm_enabled</name>
+    <title>Is the booking confirmation screen enabled?</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>If false, the event booking confirmation screen gets skipped</comment>
+    <add>4.5</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
     <name>parent_event_id</name>
     <type>int unsigned</type>
     <title>Parent Event ID</title>
@@ -802,4 +814,27 @@
           <type>Select</type>
         </html>
   </field>
+  <field>
+    <name>dedupe_rule_group_id</name>
+    <type>int unsigned</type>
+    <title>Dedupe Rule</title>
+    <default>NULL</default>
+    <comment>Rule to use when matching registrations for this event</comment>
+    <pseudoconstant>
+      <table>civicrm_dedupe_rule_group</table>
+      <keyColumn>id</keyColumn>
+      <nameColumn>name</nameColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <add>4.5</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>dedupe_rule_group_id</name>
+    <table>civicrm_dedupe_rule_group</table>
+    <key>id</key>
+    <add>4.5</add>
+  </foreignKey>
 </table>

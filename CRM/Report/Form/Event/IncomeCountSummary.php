@@ -49,6 +49,12 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
 
   public $_drilldownReport = array('event/participantlist' => 'Link to Detail Report');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
     $this->_columns = array(
@@ -241,10 +247,15 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
         }
       }
     }
-    $clauses[] = "({$this->_aliases['civicrm_event']}.is_template IS NULL OR {$this->_aliases['civicrm_event']}.is_template = 0)";
+    $clauses[] = "{$this->_aliases['civicrm_event']}.is_template = 0";
     $this->_where = "WHERE  " . implode(' AND ', $clauses);
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     $select = "
@@ -333,6 +344,9 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function buildChart(&$rows) {
 
     $this->_interval = 'events';
@@ -371,6 +385,9 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
     }
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
 
     if (is_array($rows)) {

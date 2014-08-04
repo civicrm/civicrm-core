@@ -38,6 +38,15 @@
  */
 class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
 
+  /**
+   * class constructor
+   *
+   * @access public
+   * @return \CRM_Core_DAO_WordReplacement
+   */
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
@@ -60,6 +69,8 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   /**
    * Get the domain BAO
    *
+   * @param null $reset
+   *
    * @return null|object CRM_Core_BAO_WordRepalcement
    * @access public
    * @static
@@ -80,6 +91,9 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   /**
    * Save the values of a WordReplacement
    *
+   * @param $params
+   * @param $id
+   *
    * @return WordReplacement array
    * @access public
    */
@@ -96,6 +110,8 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
 
   /**
    * Create a new WordReplacement
+   *
+   * @param $params
    *
    * @return WordReplacement array
    * @access public
@@ -191,6 +207,8 @@ WHERE  domain_id = %1
       CRM_Core_BAO_Navigation::resetNavigation();
       // Clear js string cache
       CRM_Core_Resources::singleton()->flushStrings();
+      // Clear dynamic js files which may contain localization
+      CRM_Utils_File::flushDynamicResources();
 
       return TRUE;
     }

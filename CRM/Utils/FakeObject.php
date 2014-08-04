@@ -12,10 +12,19 @@
  * @endcode
  */
 class CRM_Utils_FakeObject {
+  /**
+   * @param $array
+   */
   function __construct($array) {
     $this->array = $array;
   }
 
+  /**
+   * @param $name
+   * @param $arguments
+   *
+   * @throws Exception
+   */
   function __call($name, $arguments) {
     if (isset($this->array[$name]) && is_callable($this->array[$name])) {
       return call_user_func_array($this->array[$name], $arguments);

@@ -41,6 +41,8 @@
  * {@getfields print_label_create}
  * @example print_labelCreate.php
  *
+ * @param $params
+ *
  * @return array of newly created print_label property values.
  * @access public
  */
@@ -55,6 +57,8 @@ function civicrm_api3_print_label_create($params) {
  * {@getfields print_label_get}
  * @example print_labelCreate.php
  *
+ * @param $params
+ *
  * @return array of retrieved print_label property values.
  * @access public
  */
@@ -68,6 +72,8 @@ function civicrm_api3_print_label_get($params) {
  * Allowed @params array keys are:
  * {@getfields print_label_delete}
  * @example print_labelCreate.php
+ *
+ * @param $params
  *
  * @return array of deleted values.
  * @access public

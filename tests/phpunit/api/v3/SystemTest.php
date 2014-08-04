@@ -88,7 +88,9 @@ class api_v3_SystemTest extends CiviUnitTestCase {
    *
    * @access protected
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+    $this->quickCleanup(array('civicrm_system_log'));
+  }
 
   ///////////////// civicrm_domain_get methods
 
@@ -111,5 +113,25 @@ class api_v3_SystemTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('system', 'flush', $params, __FUNCTION__, __FILE__, "Flush all system caches", 'Flush', 'flush');
 
     $this->assertTrue(NULL === CRM_Core_BAO_Cache::getItem(self::TEST_CACHE_GROUP, self::TEST_CACHE_PATH));
+  }
+
+  /**
+   * Test system log function
+   */
+  function testSystemLog() {
+    $this->callAPISuccess('system', 'log', array('level' => 'info', 'message' => 'We wish you a merry Christmas'));
+    $result = $this->callAPISuccess('SystemLog', 'getsingle', array('sequential' => 1, 'message' => array('LIKE' => '%Chris%')));
+    $this->assertEquals($result['message'], 'We wish you a merry Christmas');
+    $this->assertEquals($result['level'], 'info');
+  }
+
+  /**
+   * Test system log function
+   */
+  function testSystemLogNoLevel() {
+    $this->callAPISuccess('system', 'log', array( 'message' => 'We wish you a merry Christmas', 'level' => 'alert'));
+    $result = $this->callAPISuccess('SystemLog', 'getsingle', array('sequential' => 1, 'message' => array('LIKE' => '%Chris%')));
+    $this->assertEquals($result['message'], 'We wish you a merry Christmas');
+    $this->assertEquals($result['level'], 'alert');
   }
 }

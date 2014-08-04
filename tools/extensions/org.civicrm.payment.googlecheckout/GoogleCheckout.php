@@ -36,6 +36,10 @@
 require_once 'CRM/Core/Payment.php';
 require_once ('packages/Google/library/googlecart.php');
 require_once ('packages/Google/library/googleitem.php');
+
+/**
+ * Class org_civicrm_payment_googlecheckout
+ */
 class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
 
   /**
@@ -60,8 +64,11 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
-   */ function __construct($mode, &$paymentProcessor) {
+   * @param $paymentProcessor
+   *
+   * @return \org_civicrm_payment_googlecheckout
+   */
+  function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('Google Checkout');
@@ -72,9 +79,9 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param object $paymentProcessor
    * @return object
    * @static
-   *
    */
   static
   function &singleton($mode, &$paymentProcessor) {
@@ -112,6 +119,15 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
     }
   }
 
+  /**
+   * This function collects all the information from a web/api form and invokes
+   * the relevant payment processor specific functions to perform the transaction
+   *
+   * @param  array $params assoc array of input parameters for this transaction
+   *
+   * @return array the result in an nice formatted array (or an error object)
+   * @abstract
+   */
   function doDirectPayment(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
@@ -119,11 +135,12 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
   /**
    * Sets appropriate parameters for checking out to google
    *
-   * @param array $params  name value pair of contribution datat
+   * @param array $params name value pair of contribution datat
    *
+   * @param $component
+   * @throws Exception
    * @return void
    * @access public
-   *
    */
   function doTransferCheckout(&$params, $component) {
     $component = strtolower($component);
@@ -270,6 +287,11 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
     return self::getArrayFromXML($xmlResponse);
   }
 
+  /**
+   * @param $searchParams
+   *
+   * @return string
+   */
   static
   function buildXMLQuery($searchParams) {
     $xml = '<?xml version="1.0" encoding="UTF-8"?>
@@ -304,6 +326,11 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
     return $xml;
   }
 
+  /**
+   * @param $xmlData
+   *
+   * @return array
+   */
   static
   function getArrayFromXML($xmlData) {
     require_once 'Google/library/xml-processing/xmlparser.php';

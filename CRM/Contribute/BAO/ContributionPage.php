@@ -74,6 +74,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_ContributionPage', $id, 'is_active', $is_active);
   }
 
+  /**
+   * @param $id
+   * @param $values
+   */
   static function setValues($id, &$values) {
     $params = array(
       'id' => $id,
@@ -104,16 +108,18 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Function to send the emails
    *
-   * @param int     $contactID         contact id
-   * @param array   $values            associated array of fields
-   * @param boolean $isTest            if in test mode
+   * @param int $contactID contact id
+   * @param array $values associated array of fields
+   * @param boolean $isTest if in test mode
    * @param boolean $returnMessageText return the message text instead of sending the mail
+   *
+   * @param null $fieldTypes
    *
    * @return void
    * @access public
    * @static
    */
-  static function sendMail($contactID, &$values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
+  static function sendMail($contactID, $values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
     $gIds = $params = array();
     $email = NULL;
     if (isset($values['custom_pre_id'])) {
@@ -269,6 +275,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       if ($preID = CRM_Utils_Array::value('custom_pre_id', $values)) {
         if (!empty($values['related_contact'])) {
           $preProfileTypes = CRM_Core_BAO_UFGroup::profileGroups($preID);
+          //@todo - following line should not refer to undefined $postProfileTypes? figure out way to test
           if (in_array('Individual', $preProfileTypes) || in_array('Contact', $postProfileTypes)) {
             //Take Individual contact ID
             $userID = CRM_Utils_Array::value('related_contact', $values);
@@ -341,6 +348,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         list($ccDisplayName, $ccEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($values['related_contact']);
         $ccMailId = "{$ccDisplayName} <{$ccEmail}>";
 
+        //@todo - this is the only place in this function where  $values is altered - but I can't find any evidence it is used
         $values['cc_receipt'] = !empty($values['cc_receipt']) ? ($values['cc_receipt'] . ',' . $ccMailId) : $ccMailId;
 
         // reset primary-email in the template
@@ -411,6 +419,13 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
      * Construct the message to be sent by the send function
      *
      */
+  /**
+   * @param $tplParams
+   * @param $contactID
+   * @param $isTest
+   *
+   * @return array
+   */
   function composeMessage($tplParams, $contactID, $isTest) {
     $sendTemplateParams = array(
       'groupName' => $tplParams['membershipID'] ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
@@ -434,11 +449,11 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Function to send the emails for Recurring Contribution Notication
    *
-   * @param string  $type         txnType
-   * @param int     $contactID    contact id for contributor
-   * @param int     $pageID       contribution page id
-   * @param object  $recur        object of recurring contribution table
-   * @param object  $autoRenewMembership   is it a auto renew membership.
+   * @param string $type txnType
+   * @param int $contactID contact id for contributor
+   * @param int $pageID contribution page id
+   * @param object $recur object of recurring contribution table
+   * @param bool|object $autoRenewMembership is it a auto renew membership.
    *
    * @return void
    * @access public
@@ -532,10 +547,13 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Function to add the custom fields for contribution page (ie profile)
    *
-   * @param int    $gid            uf group id
+   * @param int $gid uf group id
    * @param string $name
-   * @param int    $cid            contact id
-   * @param array  $params         params to build component whereclause
+   * @param int $cid contact id
+   * @param $template
+   * @param array $params params to build component whereclause
+   *
+   * @param null $fieldTypes
    *
    * @return void
    * @access public
@@ -704,6 +722,7 @@ WHERE entity_table = 'civicrm_contribution_page'
   /**
    * Function to get info for all sections enable/disable.
    *
+   * @param array $contribPageIds
    * @return array $info info regarding all sections.
    * @access public
    * @static
@@ -867,6 +886,21 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
       $sctJson = json_encode($sctJson);
     }
     return $sctJson;
+  }
+
+
+  /**
+   * helper to determine if the page supports separate membership payments
+   * @param integer id form id
+   *
+   * @return bool isSeparateMembershipPayment
+   */
+  static function getIsMembershipPayment($id) {
+    $membershipBlocks = civicrm_api3('membership_block', 'get', array('entity_table' => 'civicrm_contribution_page', 'entity_id' => $id, 'sequential' => TRUE));
+    if(!$membershipBlocks['count']) {
+      return FALSE;
+    }
+    return $membershipBlocks['values'][0]['is_separate_payment'];
   }
 }
 

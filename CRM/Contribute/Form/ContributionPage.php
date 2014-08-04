@@ -435,6 +435,15 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Use the form name to create the tpl file name
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     if ($this->controller->getPrint() || $this->getVar('_id') <= 0 ||
       ($this->_action & CRM_Core_Action::DELETE) ||

@@ -52,8 +52,8 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
    *
    * @param object $stateMachine reference to state machine object
    *
-   * @return object
-   * @access public
+   * @return \CRM_Core_QuickForm_Action_Display
+  @access public
    */
   function __construct(&$stateMachine) {
     parent::__construct($stateMachine);
@@ -104,8 +104,9 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
    * render the page using a custom templating
    * system
    *
-   * @param object  $page the CRM_Core_Form page
-   * @param boolean $ret  should we echo or return output
+   * @param object $page the CRM_Core_Form page
+   *
+   * @internal param bool $ret should we echo or return output
    *
    * @return void
    * @access public
@@ -126,7 +127,8 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
     $template->assign('isForm', 1);
 
     $controller = &$page->controller;
-    if ($controller->getEmbedded()) {
+    // Stop here if we are in embedded mode. Exception: displaying form errors via ajax
+    if ($controller->getEmbedded() && !(!empty($form['errors']) && $controller->_QFResponseType == 'json')) {
       return;
     }
 
@@ -208,7 +210,7 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   /**
    * initialize the various templates
    *
-   * @param object  $page the CRM_Core_Form page
+   * @internal param object $page the CRM_Core_Form page
    *
    * @return void
    * @access public

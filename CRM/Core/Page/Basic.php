@@ -127,9 +127,9 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * class constructor
    *
    * @param string $title title of the page
-   * @param int    $mode  mode of the page
+   * @param int $mode mode of the page
    *
-   * @return CRM_Core_Page
+   * @return \CRM_Core_Page_Basic
    */
   function __construct($title = NULL, $mode = NULL) {
     parent::__construct($title, $mode);
@@ -185,6 +185,9 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     return parent::run();
   }
 
+  /**
+   * @return string
+   */
   function superRun() {
     return parent::run();
   }
@@ -192,7 +195,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   /**
    * browse all entities.
    *
-   * @param int $action
+   * @internal param int $action
    *
    * @return void
    * @access public
@@ -241,8 +244,10 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
       $object->orderBy($key . ' asc');
     }
 
-
-    $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements();
+    //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
+    // this is loaded onto then replace with something like '__' & test
+    $separator = CRM_Core_DAO::VALUE_SEPARATOR;
+    $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, $separator);
     // find all objects
     $object->find();
     while ($object->fetch()) {
@@ -282,10 +287,12 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * actions
    *
    * @param CRM_Core_DAO $object the object being considered
-   * @param int     $action the base set of actions
-   * @param array   $values the array of values that we send to the template
-   * @param array   $links  the array of links
-   * @param string  $permission the permission assigned to this object
+   * @param int $action the base set of actions
+   * @param array $values the array of values that we send to the template
+   * @param array $links the array of links
+   * @param string $permission the permission assigned to this object
+   *
+   * @param bool $forceAction
    *
    * @return void
    * @access private
@@ -360,6 +367,9 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    *
    * @param int $mode - what mode for the form ?
    * @param int $id - id of the entity (for update, view operations)
+   *
+   * @param bool $imageUpload
+   * @param bool $pushUserContext
    *
    * @return void
    */

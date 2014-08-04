@@ -42,6 +42,8 @@
 /**
  * Function to retrieve activity types
  *
+ * @param $params
+ *
  * @return array $activityTypes activity types keyed by id
  * @access public
  *

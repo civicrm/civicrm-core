@@ -69,8 +69,12 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    * @param int $contactId - contact whose activities we want to display
    * @param int $permission - the permission we have for this contact
    *
-   * @return CRM_Contact_Selector_Activity
-   * @access public
+   * @param bool $admin
+   * @param string $context
+   * @param null $activityTypeIDs
+   *
+   * @return \CRM_Activity_Selector_Activity
+  @access public
    */
   function __construct($contactId,
                        $permission,
@@ -95,11 +99,17 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    *
    * - View
    *
-   * @param string $activityType type of activity
+   * @param $activityTypeId
+   * @param null $sourceRecordId
+   * @param bool $accessMailingReport
+   * @param null $activityId
+   * @param null $key
+   * @param null $compContext
+   *
+   * @internal param string $activityType type of activity
    *
    * @return array
    * @access public
-   *
    */
   public static function actionLinks($activityTypeId,
                                      $sourceRecordId      = NULL,
@@ -108,8 +118,10 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
                                      $key                 = NULL,
                                      $compContext         = NULL) {
     static $activityActTypes = NULL;
+    //CRM-14277 added addtitional param to handle activity search
+    $extraParams = "&searchContext=activity";
 
-    $extraParams = ($key) ? "&key={$key}" : NULL;
+    $extraParams .= ($key) ? "&key={$key}" : NULL;
     if ($compContext) {
       $extraParams .= "&compContext={$compContext}";
     }
@@ -264,7 +276,10 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -306,6 +321,8 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    *
    * @param string $action - action being performed
    *
+   * @param null $case
+   *
    * @return int Total number of rows
    * @access public
    */
@@ -326,11 +343,13 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   /**
    * returns all the rows in the given offset and rowCount
    *
-   * @param enum   $action   the action being performed
-   * @param int    $offset   the row number to start from
-   * @param int    $rowCount the number of rows to return
-   * @param string $sort     the sql string that describes the sort order
-   * @param enum   $output   what should the result set include (web/email/csv)
+   * @param enum $action the action being performed
+   * @param int $offset the row number to start from
+   * @param int $rowCount the number of rows to return
+   * @param string $sort the sql string that describes the sort order
+   * @param enum $output what should the result set include (web/email/csv)
+   *
+   * @param null $case
    *
    * @return int   the total number of rows for this action
    */

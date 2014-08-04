@@ -13,6 +13,10 @@ use Symfony\Component\DependencyInjection\Reference;
 
 // TODO use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
+/**
+ * Class Container
+ * @package Civi\Core
+ */
 class Container {
 
   const SELF = 'civi_container_factory';
@@ -23,10 +27,11 @@ class Container {
   private static $singleton;
 
   /**
+   * @param bool $reset whether to forcibly rebuild the entire container
    * @return \Symfony\Component\DependencyInjection\TaggedContainerInterface
    */
-  public static function singleton() {
-    if (self::$singleton === NULL) {
+  public static function singleton($reset = FALSE) {
+    if ($reset || self::$singleton === NULL) {
       $c = new self();
       self::$singleton = $c->createContainer();
     }
@@ -35,6 +40,7 @@ class Container {
 
   /**
    * @var ContainerBuilder
+   * @return \Symfony\Component\DependencyInjection\ContainerBuilder
    */
   public function createContainer() {
     $civicrm_base_path = dirname(dirname(__DIR__));
@@ -167,6 +173,10 @@ class Container {
    */
   public function createEventDispatcher() {
     $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+    $dispatcher->addListener('hook_civicrm_post::Activity', array('\Civi\CCase\Events', 'fireCaseChange'));
+    $dispatcher->addListener('hook_civicrm_post::Case', array('\Civi\CCase\Events', 'fireCaseChange'));
+    $dispatcher->addListener('hook_civicrm_caseChange', array('\Civi\CCase\Events', 'delegateToXmlListeners'));
+    $dispatcher->addListener('hook_civicrm_caseChange', array('\Civi\CCase\SequenceListener', 'onCaseChange_static'));
     return $dispatcher;
   }
 
@@ -174,6 +184,8 @@ class Container {
    * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
    * @param \Civi\API\Registry $apiRegistry
    * @param \Doctrine\Common\Annotations\Reader $annotationReader
+   * @param $magicFunctionProvider
+   *
    * @return \Civi\API\Kernel
    */
   public function createApiKernel($dispatcher, $apiRegistry, $annotationReader, $magicFunctionProvider) {

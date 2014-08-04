@@ -243,7 +243,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       );
 
       // this is the first time we are hitting this, so check for permissions here
-      if (!CRM_Core_Permission::event(CRM_Core_Permission::EDIT, $this->_eventId)) {
+      if (!CRM_Core_Permission::event(CRM_Core_Permission::EDIT, $this->_eventId, 'register for events')) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to register for this event'), $infoUrl);
       }
 
@@ -567,6 +567,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Function to add the custom fields
    *
+   * @param $id
+   * @param $name
+   * @param bool $viewOnly
+   *
    * @return void
    * @access public
    */
@@ -674,6 +678,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @param $form
+   * @param $eventID
+   *
+   * @throws Exception
+   */
   static function initEventFee(&$form, $eventID) {
     // get price info
 
@@ -728,6 +738,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   /**
    * Function to handle  process after the confirmation of payment by User
+   *
+   * @param null $contactID
+   * @param null $contribution
+   * @param null $payment
    *
    * @return void
    * @access public
@@ -827,6 +841,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   /**
    * Process the participant
+   *
+   * @param $params
+   * @param $contactID
    *
    * @return void
    * @access public
@@ -929,6 +946,13 @@ WHERE  v.option_group_id = g.id
    * @return $totalCount total participant count.
    * @access public
    */
+  /**
+   * @param $form
+   * @param $params
+   * @param bool $skipCurrent
+   *
+   * @return int|string
+   */
   public static function getParticipantCount(&$form, $params, $skipCurrent = FALSE) {
     $totalCount = 0;
     if (!is_array($params) || empty($params)) {
@@ -1021,6 +1045,12 @@ WHERE  v.option_group_id = g.id
    * @return array $formatted, formatted price set params.
    * @access public
    */
+  /**
+   * @param $form
+   * @param $params
+   *
+   * @return mixed
+   */
   public static function formatPriceSetParams(&$form, $params) {
     if (!is_array($params) || empty($params)) {
       return $params;
@@ -1064,6 +1094,11 @@ WHERE  v.option_group_id = g.id
    *
    * @return array $optionsCount, array of each option w/ count total.
    * @access public
+   */
+  /**
+   * @param $form
+   *
+   * @return array
    */
   public static function getPriceSetOptionCount(&$form) {
     $params     = $form->get('params');
@@ -1130,6 +1165,11 @@ WHERE  v.option_group_id = g.id
     return $optionsCount;
   }
 
+  /**
+   * @param string $suffix
+   *
+   * @return null|string
+   */
   function checkTemplateFileExists($suffix = '') {
     if ($this->_eventId) {
       $templateName = $this->_name;
@@ -1146,11 +1186,17 @@ WHERE  v.option_group_id = g.id
     return NULL;
   }
 
+  /**
+   * @return null|string
+   */
   function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
 
+  /**
+   * @return null|string
+   */
   function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
@@ -1296,6 +1342,9 @@ WHERE  v.option_group_id = g.id
   }
 
   // set the first participant ID if not set, CRM-10032
+  /**
+   * @param $participantID
+   */
   function processFirstParticipant($participantID) {
     $this->_participantId = $participantID;
     $this->set('participantId', $this->_participantId);
@@ -1316,6 +1365,13 @@ WHERE  v.option_group_id = g.id
     }
   }
 
+  /**
+   * @todo - combine this with CRM_Event_BAO_Event::validRegistrationRequest
+   * (probably extract relevant values here & call that with them & handle bounces & redirects here -as
+   * those belong in the form layer)
+   *
+   * @param string $redirect
+   */
   function checkValidEvent($redirect = NULL) {
     // is the event active (enabled)?
     if (!$this->_values['event']['is_active']) {

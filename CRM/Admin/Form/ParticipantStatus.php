@@ -67,6 +67,9 @@ class CRM_Admin_Form_ParticipantStatus extends CRM_Admin_Form {
     $this->add('select', 'visibility_id', ts('Visibility'), CRM_Core_PseudoConstant::visibility(), TRUE);
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     if (empty($defaults['weight'])) {

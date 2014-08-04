@@ -64,6 +64,9 @@ class CRM_Utils_GlobalStack {
     return self::$_singleton;
   }
 
+  /**
+   * @param $newFrame
+   */
   public function push($newFrame) {
     $this->backups[] = $this->createBackup($newFrame);
     $this->applyFrame($newFrame);
@@ -91,6 +94,9 @@ class CRM_Utils_GlobalStack {
     return $frame;
   }
 
+  /**
+   * @param $newFrame
+   */
   public function applyFrame($newFrame) {
     foreach ($newFrame as $globalKey => $values) {
       if (is_array($values)) {

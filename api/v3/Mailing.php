@@ -45,6 +45,8 @@
  * Handle a create event.
  *
  * @param array $params
+ * @param array $ids
+ *
  * @return array API Success Array
  */
 function civicrm_api3_mailing_create($params, $ids = array()) {
@@ -70,6 +72,8 @@ function _civicrm_api3_mailing_create_spec(&$params) {
  * Handle a delete event.
  *
  * @param array $params
+ * @param array $ids
+ *
  * @return array API Success Array
  */
 function civicrm_api3_mailing_delete($params, $ids = array()) {
@@ -92,6 +96,7 @@ function civicrm_api3_mailing_get($params) {
  *
  * @param array $params
  *
+ * @throws API_Exception
  * @return array
  */
 function civicrm_api3_mailing_event_bounce($params) {

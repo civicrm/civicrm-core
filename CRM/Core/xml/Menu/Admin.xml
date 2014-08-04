@@ -461,7 +461,6 @@
      <desc>Payment Processor setup for CiviCRM transactions</desc>
      <page_callback>CRM_Admin_Page_PaymentProcessor</page_callback>
      <adminGroup>System Settings</adminGroup>
-     <access_arguments>administer payment processors</access_arguments>
      <icon>admin/small/online_contribution_pages.png</icon>
      <weight>30</weight>
   </item>
@@ -476,7 +475,7 @@
   <item>
      <path>civicrm/admin/setting/misc</path>
      <title>Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)</title>
-   <desc>Enable undelete/move to trash feature, detailed change logging, ReCAPTCHA to protect forms.</desc>
+   	 <desc>Enable undelete/move to trash feature, detailed change logging, ReCAPTCHA to protect forms.</desc>
      <page_callback>CRM_Admin_Form_Setting_Miscellaneous</page_callback>
      <adminGroup>System Settings</adminGroup>
      <icon>admin/small/36.png</icon>
@@ -503,7 +502,7 @@
      <title>Cleanup Caches and Update Paths</title>
      <desc>Reset the Base Directory Path and Base URL settings - generally when a CiviCRM site is moved to another location in the file system and/or to another domain.</desc>
      <page_callback>CRM_Admin_Form_Setting_UpdateConfigBackend</page_callback>
-     <adminGroup>Configure</adminGroup>
+     <adminGroup>System Settings</adminGroup>
      <icon>admin/small/updatepath.png</icon>
      <weight>80</weight>
   </item>
@@ -667,7 +666,7 @@
      <title>Price Sets</title>
      <page_callback>CRM_Price_Page_Set</page_callback>
      <desc>Price sets allow you to offer multiple options with associated fees (e.g. pre-conference workshops, additional meals, etc.). Configure Price Sets for events which need more than a single set of fee levels.</desc>
-     <access_arguments>administer CiviCRM;access CiviEvent</access_arguments>
+     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
      <adminGroup>Customize</adminGroup>
      <icon>admin/small/price_sets.png</icon>
      <weight>380</weight>
@@ -677,7 +676,7 @@
      <title>New Price Set</title>
      <page_callback>CRM_Price_Page_Set</page_callback>
      <desc>Price sets allow you to offer multiple options with associated fees (e.g. pre-conference workshops, additional meals, etc.). Configure Price Sets for events which need more than a single set of fee levels.</desc>
-     <access_arguments>administer CiviCRM;access CiviEvent</access_arguments>
+     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
      <path_arguments>action=add</path_arguments>
   </item>
   <item>
@@ -692,20 +691,9 @@
      <page_callback>CRM_Price_Page_Option</page_callback>
   </item>
   <item>
-       <path>civicrm/ajax/taglist</path>
-       <page_callback>CRM_Admin_Page_AJAX::getTagList</page_callback>
-       <access_arguments>access CiviCRM</access_arguments>
-  </item>
-  <item>
        <path>civicrm/ajax/mergeTagList</path>
        <page_callback>CRM_Admin_Page_AJAX::mergeTagList</page_callback>
        <access_arguments>access CiviCRM</access_arguments>
-  </item>
-  <item>
-       <path>civicrm/ajax/processTags</path>
-       <page_callback>CRM_Admin_Page_AJAX::processTags</page_callback>
-       <access_arguments>access CiviCRM</access_arguments>
-       <page_type>3</page_type>
   </item>
   <item>
      <path>civicrm/admin/tplstrings/add</path>

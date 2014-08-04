@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Campaign_PetitionUsageScenarioTest
+ */
 class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -173,7 +177,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     );
 
     foreach ($expected as $column => $value) {
-      $this->verifyText("xpath=//table[@class='selector']/tbody/tr[2]/td[$column]", preg_quote($value));
+      $this->verifyText("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[$column]/", preg_quote($value));
     }
 
     // ONCE MORE, NO EMAIL VERIFICATION AND CUSTOM THANK-YOU
@@ -266,7 +270,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     );
 
     foreach ($expected as $column => $value) {
-      $this->verifyText("xpath=//table[@class='selector']/tbody/tr[2]/td[$column]", preg_quote($value));
+      $this->verifyText("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[$column]/", preg_quote($value));
     }
   }
 }

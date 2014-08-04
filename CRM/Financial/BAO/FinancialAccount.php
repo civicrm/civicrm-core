@@ -160,6 +160,8 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    *
    * @financialTypeId int      Financial Type Id
    *
+   * @param $financialTypeId
+   *
    * @return accounting code
    * @static
    */
@@ -185,7 +187,7 @@ WHERE cft.id = %1
    *
    * @param $financialAccountTypeId financial account type id
    *
-   * @param $accountTypeCode account type code
+   * @param \account|string $accountTypeCode account type code
    *
    * @return integer count
    * @static

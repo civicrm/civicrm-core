@@ -112,6 +112,9 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
    *
    * @param array $fields posted values of the form
    *
+   * @param $values
+   * @param $mappingTypeId
+   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public

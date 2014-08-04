@@ -100,6 +100,10 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
     self::preProcessCommon($this);
   }
 
+  /**
+   * @param $form
+   * @param bool $useTable
+   */
   static function preProcessCommon(&$form, $useTable = FALSE) {
     $form->_contributionIds = array();
 
@@ -152,7 +156,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
 
       $form->assign('totalSelectedContributions', count($ids));
     }
-    if ($form->_includesSoftCredits && !empty($contactIds)) {
+    if (!empty($form->_includesSoftCredits) && !empty($contactIds)) {
       $form->_contactIds = $contactIds;
       $form->_contributionContactIds = $contributionContactIds;
     }
@@ -197,7 +201,11 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
    * the form with a customized title for the main Submit
    *
    * @param string $title title of the main button
-   * @param string $type  button type for the form after processing
+   * @param string $nextType
+   * @param string $backType
+   * @param bool $submitOnce
+   *
+   * @internal param string $type button type for the form after processing
    *
    * @return void
    * @access public

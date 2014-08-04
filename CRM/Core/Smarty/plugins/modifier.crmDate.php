@@ -38,6 +38,9 @@
  *
  * @param string $dateString date which needs to converted to human readable format
  *
+ * @param null $dateFormat
+ * @param bool $onlyTime
+ *
  * @return string human readable date format | invalid date message
  * @access public
  */

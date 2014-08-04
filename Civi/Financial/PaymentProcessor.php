@@ -145,10 +145,10 @@ class PaymentProcessor extends \Civi\Core\Entity {
   private $password;
   
   /**
-   * @var string
+   * @var text
    *
-   * @JMS\Type("string")
-   * @ORM\Column(name="signature", type="string", length=255, nullable=true)
+   * @JMS\Type("text")
+   * @ORM\Column(name="signature", type="text", length=65535, nullable=true)
    * 
    */
   private $signature;
@@ -426,7 +426,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * Set signature
    *
-   * @param string $signature
+   * @param text $signature
    * @return PaymentProcessor
    */
   public function setSignature($signature) {
@@ -437,7 +437,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * Get signature
    *
-   * @return string
+   * @return text
    */
   public function getSignature() {
     return $this->signature;
@@ -654,7 +654,12 @@ class PaymentProcessor extends \Civi\Core\Entity {
                                                      
                                     
                 'FKClassName' => 'CRM_Core_DAO_Domain',
-                          ),
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_domain',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
       
               'name' => array(
       
@@ -745,11 +750,10 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'signature',
         'propertyName' => 'signature',
-        'type' => \CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Signature'),
-                                 'maxlength' => 255,
-                                 'size' => \CRM_Utils_Type::HUGE,
-                           
+                                 'maxlength' => 65535,
+                                            
                                     
                           ),
       

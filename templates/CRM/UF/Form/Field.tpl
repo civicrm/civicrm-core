@@ -34,7 +34,7 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout-compressed">
     <tr class="crm-uf-field-form-block-field_name">
-      <td class="label">{$form.field_name.label}</td>
+      <td class="label">{$form.field_name.label} {help id='field_name_0'}</td>
       <td>{$form.field_name.html}<br />
         <span class="description">&nbsp;{ts}Select the type of CiviCRM record and the field you want to include in this Profile.{/ts}</span></td>
     </tr>
@@ -306,6 +306,3 @@ function verify( ) {
 
 </script>
 {/literal}
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}

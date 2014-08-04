@@ -44,6 +44,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    *
    * @param array $params (reference), array $ids
    *
+   * @param $ids
+   *
    * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
    * @access public
    * @static
@@ -70,6 +72,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * Creates a new entry in the database.
    *
    * @param array $params (reference), array $ids
+   *
+   * @param $ids
    *
    * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue object
    * @access public
@@ -126,7 +130,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue extends CRM_Upgrade_Snapsho
    * @param int $fieldId price_field_id
    * @param array $values (reference ) to hold the values
    * @param string $orderBy for order by, default weight
-   * @param int $isActive is_active, default false
+   * @param bool|int $isActive is_active, default false
    *
    * @return array $values
    *

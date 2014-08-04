@@ -71,6 +71,7 @@ class CRM_Core_CommunityMessages {
   /**
    * @param CRM_Utils_Cache_Interface $cache
    * @param CRM_Utils_HttpClient $client
+   * @param null $messagesUrl
    */
   public function __construct($cache, $client, $messagesUrl = NULL) {
     $this->cache = $cache;

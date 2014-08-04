@@ -37,8 +37,6 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
   protected $_entity = 'dashboard';
   protected $_apiversion = 3;
 
-  public $_eNoticeCompliant = TRUE;
-
   /**
    *  Test setup for every test
    *
@@ -80,6 +78,10 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
     $this->DashboardDelete($dashboard['id'], $oldCount);
   }
 
+  /**
+   * @param $id
+   * @param $oldCount
+   */
   function DashboardDelete($id, $oldCount) {
     $params = array(
       'version' => 3,

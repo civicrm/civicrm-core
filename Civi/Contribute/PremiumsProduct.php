@@ -253,7 +253,12 @@ class PremiumsProduct extends \Civi\Core\Entity {
                                            'default' => 'NULL',
          
                 'FKClassName' => 'CRM_Financial_DAO_FinancialType',
-                          ),
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_financial_type',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
              );
     }
     return self::$_fields;

@@ -55,9 +55,11 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * - Edit
    * - Cancel
    *
+   * @param bool $recurID
+   * @param string $context
+   *
    * @return array
    * @access public
-   *
    */
   static function &recurLinks($recurID = FALSE, $context = 'contribution') {
     if (!(self::$_links)) {
@@ -127,7 +129,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     $controller->reset();
     $controller->set('cid', $this->_contactId);
     $controller->set('crid', $this->_crid);
-    $controller->set('context', 'Search');
+    $controller->set('context', 'contribution');
     $controller->set('limit', 50);
     $controller->process();
     $controller->run();
@@ -177,7 +179,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     }
     $this->assign('isTest', $isTest);
 
-    $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $isTest);
+    $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, NULL, $isTest);
 
     if (!empty($softCreditList)) {
       $softCreditTotals = array();
@@ -281,7 +283,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     $this->preProcess();
 
     // check if we can process credit card contribs
-    CRM_Core_Payment::allowBackofficeCreditCard($this);
+    $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
 
     $this->setContext();
 
@@ -304,6 +306,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $this, FALSE, 'search'
     );
     $compContext = CRM_Utils_Request::retrieve('compContext', 'String', $this);
+
+    $searchContext = CRM_Utils_Request::retrieve('searchContext', 'String', $this);
 
     //swap the context.
     if ($context == 'search' && $compContext) {
@@ -354,6 +358,9 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         $this->assign('searchKey', $qfKey);
         if ($context == 'advanced') {
           $url = CRM_Utils_System::url('civicrm/contact/search/advanced', $extraParams);
+        }
+        else if ($searchContext) {
+          $url = CRM_Utils_System::url("civicrm/$searchContext/search", $extraParams);
         }
         else {
           $url = CRM_Utils_System::url('civicrm/contribute/search', $extraParams);

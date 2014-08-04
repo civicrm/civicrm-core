@@ -26,6 +26,9 @@
 */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Core_JobManagerTest
+ */
 class CRM_Core_JobManagerTest extends CiviUnitTestCase {
 
   function setUp() {

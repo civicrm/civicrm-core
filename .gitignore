@@ -80,6 +80,7 @@ CRM/Core/DAO/PriceSetEntity.php
 CRM/Core/DAO/PrintLabel.php
 CRM/Core/DAO/Setting.php
 CRM/Core/DAO/StateProvince.php
+CRM/Core/DAO/SystemLog.php
 CRM/Core/DAO/Tag.php
 CRM/Core/DAO/Timezone.php
 CRM/Core/DAO/UFField.php
@@ -122,6 +123,7 @@ packages/doc
 packages/temp
 packages/test
 settings_location.php
+sql/case_sample.mysql
 sql/civicrm.mysql
 sql/civicrm_acl.??_??.mysql
 sql/civicrm_acl.mysql
@@ -142,6 +144,7 @@ WordPress
 joomla
 packages/
 tests/phpunit/CiviTest/civicrm.settings.local.php
+tests/phpunit/CiviTest/truncate.xml
 tools/scripts/releaser/releaser.conf
 tools/tests/reports/logfile.tap
 tools/tests/reports/testdox.html

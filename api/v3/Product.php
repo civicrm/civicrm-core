@@ -41,6 +41,9 @@
  * {@getfields product_create}
  * @example productCreate.php
  *
+ * @param $params
+ *
+ * @throws API_Exception
  * @return array of newly created product property values.
  * @access public
  */
@@ -54,6 +57,8 @@ function civicrm_api3_product_create($params) {
  * Allowed @params array keys are:
  * {@getfields product_get}
  * @example productCreate.php
+ *
+ * @param $params
  *
  * @return array of retrieved product property values.
  * @access public
@@ -69,6 +74,9 @@ function civicrm_api3_product_get($params) {
  * {@getfields product_delete}
  * @example productCreate.php
  *
+ * @param $params
+ *
+ * @throws API_Exception
  * @return array of deleted values.
  * @access public
  */

@@ -86,6 +86,11 @@ function civicrm_api3_mailing_group_event_subscribe($params) {
   return civicrm_api('mailing_event_subscribe', 'create', $params);
 }
 
+/**
+ * @param $params
+ *
+ * @return array
+ */
 function civicrm_api3_mailing_group_getfields($params) {
   $dao = _civicrm_api3_get_DAO('Subscribe');
   $d = new $dao();

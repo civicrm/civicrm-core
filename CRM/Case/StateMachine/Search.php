@@ -76,6 +76,8 @@ class CRM_Case_StateMachine_Search extends CRM_Core_StateMachine {
    *
    * @param CRM_Core_Controller $controller the controller object
    *
+   * @param string $formName
+   *
    * @return string the name of the form that will handle the task
    * @access protected
    */

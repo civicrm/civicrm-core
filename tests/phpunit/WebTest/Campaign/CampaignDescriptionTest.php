@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Campaign_CampaignDescriptionTest
+ */
 class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -73,8 +77,8 @@ class WebTest_Campaign_CampaignDescriptionTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Campaign $title");
 
     //Opening Edit Page of the created Campaign
-    $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']");
-    $this->clickLink("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']", "//textarea[@id='description']");
+    $this->waitForElementPresent("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']");
+    $this->clickLink("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody//tr/td[text()='{$campaignTitle}']/../td[13]/span/a[text()='Edit']", "//textarea[@id='description']");
     $fetchedVaue = $this->getValue('description');
     $this->assertEquals($campaignDescription, $fetchedVaue);
   }

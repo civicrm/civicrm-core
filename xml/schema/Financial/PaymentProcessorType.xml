@@ -153,7 +153,9 @@
       <type>int unsigned</type>
       <required>true</required>
       <comment>Billing Mode</comment>
-      <pseudoconstant>true</pseudoconstant>
+      <pseudoconstant>
+        <callback>CRM_Core_SelectValues::billingMode</callback>
+      </pseudoconstant>
 <html>
   <type>Select</type>
 </html>

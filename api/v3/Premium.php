@@ -41,6 +41,9 @@
  * {@getfields premium_create}
  * @example premiumCreate.php
  *
+ * @param $params
+ *
+ * @throws API_Exception
  * @return array of newly created premium property values.
  * @access public
  */
@@ -54,6 +57,8 @@ function civicrm_api3_premium_create($params) {
  * Allowed @params array keys are:
  * {@getfields premium_get}
  * @example premiumCreate.php
+ *
+ * @param $params
  *
  * @return array of retrieved premium property values.
  * @access public
@@ -69,6 +74,9 @@ function civicrm_api3_premium_get($params) {
  * {@getfields premium_delete}
  * @example premiumCreate.php
  *
+ * @param $params
+ *
+ * @throws API_Exception
  * @return array of deleted values.
  * @access public
  */
@@ -80,12 +88,12 @@ function civicrm_api3_premium_delete($params) {
  * return field specification specific to get requests
  */
 function _civicrm_api3_premium_get_spec(&$params) {
-  $params['premium_active']['api.aliases'] = array('is_active');
+  $params['premiums_active']['api.aliases'] = array('is_active');
 }
 
 /**
  * return field specification specific to create requests
  */
 function _civicrm_api3_premium_create_spec(&$params) {
-  $params['premium_active']['api.aliases'] = array('is_active');
+  $params['premiums_active']['api.aliases'] = array('is_active');
 }

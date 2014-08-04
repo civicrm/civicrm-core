@@ -111,6 +111,9 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    * @param string $action
    * @param array $params
    * @param bool $throws whether we should pass any exceptions for authorization failures
+   *
+   * @throws API_Exception
+   * @throws Exception
    * @return bool TRUE or FALSE depending on the outcome of the authorization check
    */
   function runPermissionCheck($entity, $action, $params, $throws = FALSE) {

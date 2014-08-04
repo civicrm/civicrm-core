@@ -39,6 +39,8 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   public static function buildAdvanceSetting(&$form) {

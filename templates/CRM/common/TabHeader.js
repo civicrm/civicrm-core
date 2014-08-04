@@ -9,10 +9,9 @@ CRM.$(function($) {
   tabSettings.active = tabSettings.active ? $('#tab_' + tabSettings.active).prevAll().length : 0;
   $("#mainTabContainer")
     .on('tabsbeforeactivate', function(e, ui) {
-      // Warn of unsaved changes - requires formNavigate.tpl to be included in each tab
-      if (!global_formNavigate) {
+      // CRM-14353 - Warn of unsaved changes for all forms except those which have opted out
+      if (CRM.utils.initialValueChanged($('form:not([data-warn-changes=false])', ui.oldPanel))) {
         CRM.alert(ts('Your changes in the <em>%1</em> tab have not been saved.', {1: ui.oldTab.text()}), ts('Unsaved Changes'), 'warning');
-        global_formNavigate = true;
       }
     })
     .on('tabsbeforeload', function(e, ui) {
@@ -66,6 +65,13 @@ CRM.$(function($) {
   CRM.tabHeader = CRM.tabHeader || {};
 
   /**
+   * Return active tab
+   */
+  CRM.tabHeader.getActiveTab = function() {
+    return $('.ui-tabs-active', '#mainTabContainer');
+  }
+
+  /**
    * Make a given tab the active one
    * @param tab jQuery selector
    */
@@ -80,6 +86,10 @@ CRM.$(function($) {
   CRM.tabHeader.getTabPanel = function(tab) {
     return $('#' + $(tab).attr('aria-controls'));
   };
+
+  CRM.tabHeader.getCount = function(tab) {
+    return parseInt($(tab).find('a em').text(), 10);
+  }
 
   /**
    * Update the counter in a tab

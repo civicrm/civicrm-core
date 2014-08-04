@@ -325,7 +325,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if (!empty($this->_fields) && !empty($this->_values['custom_pre_id'])) {
       $profileAddressFields = array();
       foreach ($this->_fields as $key => $value) {
-        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields, array('uf_group_id' => $this->_values['custom_pre_id']));      }
+        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields, array(
+          'uf_group_id' => $this->_values['custom_pre_id']
+        ));
+      }
       $this->set('profileAddressFields', $profileAddressFields);
     }
 
@@ -508,10 +511,23 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       if (empty($this->_values['event']['is_monetary'])) {
         $js = array('onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');");
       }
+
+      // CRM-11182 - Optional confirmation screen
+      // Change button label depending on whether the next action is confirm or register
+      if (
+        !$this->_values['event']['is_multiple_registrations']
+        && !$this->_values['event']['is_monetary']
+        && !$this->_values['event']['is_confirm_enabled']
+      ) {
+        $buttonLabel = ts('Register >>');
+      } else {
+        $buttonLabel = ts('Continue >>');
+      }
+
       $this->addButtons(array(
           array(
             'type' => 'upload',
-            'name' => ts('Continue >>'),
+            'name' => $buttonLabel,
             'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
             'isDefault' => TRUE,
             'js' => $js,
@@ -548,7 +564,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     //if payment done, no need to build the fee block.
     if (!empty($form->_paymentId)) {
-      //fix to diaplay line item in update mode.
+      //fix to display line item in update mode.
       $form->assign('priceSet', isset($form->_priceSet) ? $form->_priceSet : NULL);
       return;
     }
@@ -595,9 +611,18 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
       $form->add('hidden', 'priceSetId', $form->_priceSetId);
 
+      // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
+      $adminFieldVisible = false;
+      if (CRM_Core_Permission::check('administer CiviCRM')) {
+        $adminFieldVisible = true;
+      }
+
       foreach ($form->_feeBlock as $field) {
+        // public AND admin visibility fields are included for back-office registration and back-office change selections
         if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
-          $className == 'CRM_Event_Form_Participant'
+          (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == true) ||
+          $className == 'CRM_Event_Form_Participant' ||
+          $className == 'CRM_Event_Form_ParticipantFeeSelection'
         ) {
           $fieldId = $field['id'];
           $elementName = 'price_' . $fieldId;
@@ -667,6 +692,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
   }
 
+  /**
+   * @param $form
+   */
   public static function formatFieldsForOptionFull(&$form) {
     $priceSet = $form->get('priceSet');
     $priceSetId = $form->get('priceSetId');
@@ -677,7 +705,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     $skipParticipants = $formattedPriceSetDefaults = array();
-    if ($form->_allowConfirmation && (isset($form->_pId) || isset($form->_additionalParticipantId))) {
+    if (!empty($form->_allowConfirmation) && (isset($form->_pId) || isset($form->_additionalParticipantId))) {
       $participantId = isset($form->_pId) ? $form->_pId : $form->_additionalParticipantId;
       $pricesetDefaults = CRM_Event_Form_EventFees::setDefaultPriceSet($participantId,
         $form->_eventId
@@ -759,9 +787,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $self
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -1152,7 +1182,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->_params[] = $params;
       $this->set('params', $this->_params);
 
-      if (empty($params['additional_participants'])) {
+      if (
+        empty($params['additional_participants'])
+        && !$this->_values['event']['is_confirm_enabled'] // CRM-11182 - Optional confirmation screen
+      ) {
         self::processRegistration($this->_params);
       }
     }
@@ -1174,6 +1207,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @return void
    * access public
    *
+   */
+  /**
+   * @param $params
+   * @param null $contactID
    */
   public function processRegistration($params, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
@@ -1376,33 +1413,21 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     if (!$contactID && is_array($fields) && $fields) {
 
-      //CRM-6996
-      //as we are allowing w/ same email address,
-      //lets check w/ other contact params.
-      if ($self->_values['event']['allow_same_participant_emails']) {
-        $params = $fields;
-        $level = ($isAdditional) ? 'Supervised' : 'Unsupervised';
+      //CRM-14134 use Unsupervised rule for everyone
+      $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
 
-        $dedupeParams = CRM_Dedupe_Finder::formatParams($params, 'Individual');
+      // disable permission based on cache since event registration is public page/feature.
+      $dedupeParams['check_permission'] = FALSE;
 
-        // disable permission based on cache since event registration is public page/feature.
-        $dedupeParams['check_permission'] = FALSE;
-        $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', $level);
-        $contactID = CRM_Utils_Array::value(0, $ids);
+      // find event dedupe rule
+      if (CRM_Utils_Array::value('dedupe_rule_group_id', $self->_values['event'], 0) > 0) {
+        $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised', array(), $self->_values['event']['dedupe_rule_group_id']);
       }
       else {
-        foreach ($fields as $fieldname => $fieldvalue) {
-          if (substr($fieldname, 0, 6) == 'email-') {
-            $emailString = trim($fieldvalue);
-            if (!empty($emailString)) {
-              $match = CRM_Contact_BAO_Contact::matchContactOnEmail($emailString, 'Individual');
-              if (!empty($match)) {
-                $contactID = $match->contact_id;
-              }
-            }
-          }
-        }
+        $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised');
       }
+      $contactID = CRM_Utils_Array::value(0, $ids);
+
     }
 
     if ($returnContactId) {
@@ -1460,4 +1485,3 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
   }
 }
-

@@ -39,6 +39,9 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
 
   protected $loggingDB;
 
+  /**
+   *
+   */
   function __construct() {
     // don’t display the ‘Add these Contacts to Group’ button
     $this->_add2groupSupported = FALSE;
@@ -145,7 +148,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
         'log_civicrm_activity_for_source' =>
         array(
           'fk' => 'contact_id',
-          'table_name' => 'log_civicrm_activity_contact',
+          'table_name' => 'log_civicrm_activity',
           'joins' => array(
             'table' => 'log_civicrm_activity_contact',
             'join' => "entity_log_civireport.id = fk_table.activity_id AND fk_table.record_type_id = {$sourceID}"
@@ -165,7 +168,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
           ),
           'bracket_info' => array(
             'entity_column' => 'case_type_id',
-            'options' => CRM_Case_PseudoConstant::caseType('label', FALSE)
+            'options' => CRM_Case_PseudoConstant::caseType('title', FALSE)
           ),
         ),
       );
@@ -181,7 +184,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     // build _logTables for address custom tables
     $customTables = $logging->entityCustomDataLogTables('Address');
     foreach ($customTables as $table) {
-      $this->_logTables[$table] = 
+      $this->_logTables[$table] =
         array(
           'fk' => 'contact_id',// for join of fk_table with contact table
           'joins' => array(
@@ -221,6 +224,9 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
   }
 
   function where() {
+    // reset where clause as its called multiple times, every time insert sql is built.
+    $this->_whereClauses = array();
+
     parent::where();
     $this->_where .= " AND (entity_log_civireport.log_action != 'Initialization')";
   }
@@ -335,6 +341,11 @@ ORDER BY log_civicrm_entity_log_date DESC {$this->_limit}";
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $entity
+   *
+   * @return string
+   */
   function getLogType($entity) {
     if (!empty($this->_logTables[$entity]['log_type'])) {
       return $this->_logTables[$entity]['log_type'];
@@ -343,6 +354,13 @@ ORDER BY log_civicrm_entity_log_date DESC {$this->_limit}";
     return $logType;
   }
 
+  /**
+   * @param $id
+   * @param $entity
+   * @param $logDate
+   *
+   * @return mixed|null|string
+   */
   function getEntityValue($id, $entity, $logDate) {
     if (!empty($this->_logTables[$entity]['bracket_info'])) {
       if (!empty($this->_logTables[$entity]['bracket_info']['entity_column'])) {
@@ -388,6 +406,14 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
     return NULL;
   }
 
+  /**
+   * @param $id
+   * @param $connId
+   * @param $entity
+   * @param $oldAction
+   *
+   * @return null|string
+   */
   function getEntityAction($id, $connId, $entity, $oldAction) {
     if (!empty($this->_logTables[$entity]['action_column'])) {
       $sql = "select {$this->_logTables[$entity]['action_column']} from `{$this->loggingDB}`.{$entity} where id = %1 AND log_conn_id = %2";

@@ -683,7 +683,12 @@ class MembershipType extends \Civi\Core\Entity {
                                                      
                                     
                 'FKClassName' => 'CRM_Core_DAO_Domain',
-                          ),
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_domain',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
       
               'membership_type' => array(
       
@@ -734,7 +739,12 @@ class MembershipType extends \Civi\Core\Entity {
                                                      
                                     
                 'FKClassName' => 'CRM_Financial_DAO_FinancialType',
-                          ),
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_financial_type',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
       
               'minimum_fee' => array(
       
@@ -851,7 +861,7 @@ class MembershipType extends \Civi\Core\Entity {
                            
                                     
                                      'pseudoconstant' => array(
-                                'optionGroupName' => 'visibility',
+                                'callback' => 'CRM_Core_SelectValues::memberVisibility',
                     )
                  ),
       

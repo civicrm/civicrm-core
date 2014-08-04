@@ -79,7 +79,6 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
     $this->_values = $this->get('values');
     if ($this->_id && empty($this->_values)) {
-
       //get location values.
       $params = array(
         'entity_id' => $this->_id,

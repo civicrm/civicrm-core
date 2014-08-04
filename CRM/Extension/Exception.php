@@ -25,5 +25,8 @@
  +--------------------------------------------------------------------+
 */
 
+/**
+ * Class CRM_Extension_Exception
+ */
 class CRM_Extension_Exception extends CRM_Core_Exception {
 }

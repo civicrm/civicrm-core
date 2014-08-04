@@ -185,6 +185,9 @@ class CRM_Core_Block {
    * @params int    $id        one of the class constants (ADD, SEARCH, etc.)
    * @params string $property  the desired property
    *
+   * @param $id
+   * @param $property
+   *
    * @return string  the value of the desired property
    */
   static function getProperty($id, $property) {
@@ -201,6 +204,9 @@ class CRM_Core_Block {
    * @params string $property  the desired property
    * @params string $value     the value of the desired property
    *
+   * @param $id
+   * @param $property
+   * @param $value
    * @return void
    */
   static function setProperty($id, $property, $value) {
@@ -279,6 +285,8 @@ class CRM_Core_Block {
    *
    * php is lame and u cannot call functions from static initializers
    * hence this hack
+   *
+   * @param $id
    *
    * @return void
    * @access private
@@ -360,7 +368,7 @@ class CRM_Core_Block {
 
       if (!empty($config->enableComponents)) {
         // check if we can process credit card contribs
-        $newCredit = CRM_Core_Payment::allowBackofficeCreditCard();
+        $newCredit = CRM_Core_Config::isEnabledBackOfficeCreditCardPayments();
 
         foreach ($components as $componentName => $obj) {
           if (in_array($componentName, $config->enableComponents)) {
@@ -401,17 +409,8 @@ class CRM_Core_Block {
     }
 
     $values = array();
-    foreach ($shortCuts as $short) {
-      $value = array();
-      if (isset($short['url'])) {
-        $value['url'] = $short['url'];
-      }
-      else {
-        $value['url'] = CRM_Utils_System::url($short['path'], $short['query'], FALSE);
-      }
-      $value['title'] = $short['title'];
-      $value['ref']   = $short['ref'];
-      $values[]       = $value;
+    foreach ($shortCuts as $key => $short) {
+      $values[$key] = self::setShortCutValues($short);
     }
 
     // call links hook to add user defined links
@@ -430,6 +429,29 @@ class CRM_Core_Block {
     }
 
     self::setProperty(self::CREATE_NEW, 'templateValues', array('shortCuts' => $values));
+  }
+
+  /**
+   * @param $short
+   *
+   * @return array
+   */
+  private static function setShortcutValues($short) {
+    $value = array();
+    if (isset($short['url'])) {
+      $value['url'] = $short['url'];
+    }
+    elseif (isset($short['path'])) {
+      $value['url'] = CRM_Utils_System::url($short['path'], $short['query'], FALSE);
+    }
+    $value['title'] = $short['title'];
+    $value['ref']   = $short['ref'];
+    if (!empty($short['shortCuts'])) {
+      foreach ($short['shortCuts'] as $shortCut) {
+        $value['shortCuts'][] = self::setShortcutValues($shortCut);
+      }
+    }
+    return $value;
   }
 
   /**
@@ -532,6 +554,8 @@ class CRM_Core_Block {
       $session = CRM_Core_Session::singleton();
       // check if registration link should be displayed
       foreach ($info as $id => $event) {
+        //@todo FIXME  - validRegistraionRequest takes eventID not contactID as a param
+        // this is called via an obscure patch from Joomla event block rendering (only)
         $info[$id]['onlineRegistration'] = CRM_Event_BAO_Event::validRegistrationRequest($event,
           $session->get('userID')
         );

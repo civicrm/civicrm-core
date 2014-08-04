@@ -37,12 +37,14 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
   /**
    * Function to set variables up before form is built
    *
+   * @param $form
+   *
    * @return void
    * @access public
    */
   static function preProcess(&$form) {
     $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
+    $contactID = $form->_contactID;
 
     $ufJoinParams = array(
       'module' => 'onBehalf',
@@ -82,11 +84,22 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
       }
 
       if ($form->_relatedOrganizationFound) {
-        $locDataURL = CRM_Utils_System::url('civicrm/ajax/permlocation', 'cid=', FALSE, NULL, FALSE);
+        // Related org url - pass checksum if needed
+        $args = array('cid' => '');
+        if (!empty($_GET['cs'])) {
+          $args = array(
+            'uid' => $form->_contactID,
+            'cs' => $_GET['cs'],
+            'cid' => '',
+          );
+        }
+        $locDataURL = CRM_Utils_System::url('civicrm/ajax/permlocation', $args, FALSE, NULL, FALSE);
         $form->assign('locDataURL', $locDataURL);
 
-        $dataURL = CRM_Utils_System::url('civicrm/ajax/employer', 'cid=' . $contactID, FALSE, NULL, FALSE);
-        $form->assign('employerDataURL', $dataURL);
+        if (!empty($form->_submitValues['onbehalf'])) {
+          $form->assign('submittedOnBehalf', $form->_submitValues['onbehalfof_id']);
+          $form->assign('submittedOnBehalfInfo', json_encode($form->_submitValues['onbehalf']));
+        }
       }
 
       if ($form->_values['is_for_organization'] != 2) {
@@ -111,8 +124,9 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
    * Function to build form for related contacts / on behalf of organization.
    *
    * @param $form              object  invoking Object
-   * @param $contactType       string  contact type
-   * @param $title             string  fieldset title
+   *
+   * @internal param string $contactType contact type
+   * @internal param string $title fieldset title
    *
    * @static
    */
@@ -120,14 +134,15 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
     $form->assign('fieldSetTitle', ts('Organization Details'));
     $form->assign('buildOnBehalfForm', TRUE);
 
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
+    $contactID = $form->_contactID;
 
     if ($contactID && count($form->_employers) >= 1) {
       $form->add('text', 'organization_id', ts('Select an existing related Organization OR enter a new one'));
-      $form->add('hidden', 'onbehalfof_id', '', array('id' => 'onbehalfof_id'));
 
-      $orgOptions = array(0 => ts('Select an existing organization'),
+      $form->add('select', 'onbehalfof_id', '', CRM_Utils_Array::collect('name', $form->_employers));
+
+      $orgOptions = array(
+        0 => ts('Select an existing organization'),
         1 => ts('Enter a new organization'),
       );
 
@@ -191,4 +206,3 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
     $form->addElement('hidden', 'hidden_onbehalf_profile', 1);
   }
 }
-

@@ -44,6 +44,12 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    *
    * @param array $params input parameters
    */
+  /**
+   * @param $params
+   *
+   * @return object
+   * @throws API_Exception
+   */
   static function create($params) {
     // Ensure mysql phone function exists
     CRM_Core_DAO::checkSqlFunctionsExist();
@@ -102,6 +108,10 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * Get all the phone numbers for a specified contact_id, with the primary being first
    *
    * @param int $id the contact id
+   *
+   * @param bool $updateBlankLocInfo
+   * @param null $type
+   * @param array $filters
    *
    * @return array  the array of phone ids which are potential numbers
    * @access public
@@ -173,6 +183,8 @@ ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
    *
    * @param array $entityElements the array containing entity_id and
    * entity_table name
+   *
+   * @param null $type
    *
    * @return array  the array of phone ids which are potential numbers
    * @access public

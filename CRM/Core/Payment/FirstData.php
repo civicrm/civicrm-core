@@ -67,8 +67,11 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
-   **********************************************************/ function __construct($mode, &$paymentProcessor) {
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_FirstData *******************************************************
+   */
+  function __construct($mode, &$paymentProcessor) {
     // live or test
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
@@ -79,9 +82,10 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param object $paymentProcessor
+   *
    * @return object
    * @static
-   *
    */
   static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
@@ -356,11 +360,13 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
    * NOTE: Called by Events and Contribute to check config params are set prior to trying
    *       register any credit card details
    *
-   * @param string $mode the mode we are operating in (live or test) - not used
+   * @return null|string
+   * @internal param string $mode the mode we are operating in (live or test) - not used
    *
    * returns string $errorMsg if any errors found - null if OK
    *
-   ********************************************************************************************/
+   ******************************************************************************************
+   */
   //  function checkConfig( $mode )          // CiviCRM V1.9 Declaration
   // CiviCRM V2.0 Declaration
   function checkConfig() {

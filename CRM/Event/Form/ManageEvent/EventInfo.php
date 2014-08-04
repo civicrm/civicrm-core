@@ -239,7 +239,9 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
   /**
    * global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param $values
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -355,6 +357,11 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
      * @return $defaults an array of custom data defaults.
      */
 
+  /**
+   * @param $templateId
+   *
+   * @return array
+   */
   public function templateCustomDataValues($templateId) {
     $defaults = array();
     if (!$templateId) {

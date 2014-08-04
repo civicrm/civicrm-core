@@ -2,6 +2,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Utils_HtmlToTextTest
+ */
 class CRM_Utils_HtmlToTextTest extends CiviUnitTestCase {
   protected $_testInput = array(
     '<br><p>' => '', // empty test
@@ -30,6 +33,9 @@ Links:
 ',
   );
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'HtmlToText Test',

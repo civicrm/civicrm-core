@@ -55,6 +55,7 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
     $dao = new CRM_Member_DAO_MembershipBlock();
     $dao->copyValues($params);
     $dao->id = CRM_Utils_Array::value('id', $params);
+    $dao->save();
     CRM_Utils_Hook::post($hook, 'MembershipBlock', $dao->id, $dao);
     return $dao;
   }
@@ -63,6 +64,8 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
    * Function to delete membership Blocks
    *
    * @param int $id
+   *
+   * @return bool
    * @static
    */
   static function del($id) {

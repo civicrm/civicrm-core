@@ -77,6 +77,9 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
    *
    * @access public
    *
+   * @param $form
+   * @param $proxSearch
+   *
    * @return void
    */
   function buildQuickForm($form, $proxSearch) {
@@ -122,9 +125,11 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $form
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -151,6 +156,8 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
    * Set the default form values
    *
    * @access protected
+   *
+   * @param $form
    *
    * @return array the default array reference
    */

@@ -88,6 +88,8 @@ class CRM_Utils_Check {
    * Throw an exception if any of the checks fail
    *
    * @param array|NULL $messages list of CRM_Utils_Check_Message; or NULL if the default list should be fetched
+   *
+   * @throws Exception
    */
   public function assertValid($messages = NULL) {
     if ($messages === NULL) {
@@ -117,12 +119,24 @@ class CRM_Utils_Check {
    * https://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_requirements
    */
   public function checkAll() {
-    $security = new CRM_Utils_Check_Security();
-    $env = new CRM_Utils_Check_Env();
-    $messages = array_merge(
-      $security->checkAll(),
-      $env->checkAll()
-    );
+    $checks = array();
+    $checks[] = new CRM_Utils_Check_Security();
+    $checks[] = new CRM_Utils_Check_Env();
+
+    $compInfo = CRM_Core_Component::getEnabledComponents();
+    foreach ($compInfo as $compObj) {
+      switch ($compObj->info['name']) {
+        case 'CiviCase':
+          $checks[] = new CRM_Utils_Check_Case(CRM_Case_XMLRepository::singleton(), CRM_Case_PseudoConstant::caseType('name'));
+          break;
+        default:
+      }
+    }
+
+    $messages = array();
+    foreach ($checks as $check) {
+      $messages = array_merge($messages, $check->checkAll());
+    }
     return $messages;
   }
 

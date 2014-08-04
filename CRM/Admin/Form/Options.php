@@ -197,7 +197,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $financialAccount = CRM_Contribute_PseudoConstant::financialAccount(NULL, key($accountType));
 
       $this->add('select', 'financial_account_id', ts('Financial Account'),
-        array('' => ts('- select -')) + $financialAccount
+        array('' => ts('- select -')) + $financialAccount,
+        TRUE
       );
     }
 
@@ -284,6 +285,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       'payment_instrument',
       'communication_style',
       'soft_credit_type',
+      'website_type',
     );
 
     if (in_array($this->_gName, $showIsDefaultGroups)) {

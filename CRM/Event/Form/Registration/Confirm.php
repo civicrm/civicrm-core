@@ -225,7 +225,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    */
   public function buildQuickForm() {
     $this->assignToTemplate();
-    if ($this->_params[0]['amount'] || $this->_params[0]['amount'] == 0) {
+
+    if ($this->_values['event']['is_monetary'] &&
+      ($this->_params[0]['amount'] || $this->_params[0]['amount'] == 0)
+    ) {
       $this->_amount = array();
 
       foreach ($this->_params as $k => $v) {
@@ -312,18 +315,17 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       );
     }
     else {
-      $contribButton = ts('Continue');
+      $contribButton = ts('Continue >>');
       $this->addButtons(array(
+          array(
+            'type' => 'back',
+            'name' => ts('<< Go Back'),
+          ),
           array(
             'type' => 'next',
             'name' => $contribButton,
             'isDefault' => TRUE,
             'js' => array('onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"),
-          ),
-          array(
-            'type' => 'back',
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'name' => ts('Go Back'),
           ),
         )
       );
@@ -410,7 +412,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $cancelledIds = $this->_additionalParticipantIds;
 
     $params = $this->_params;
-    $this->set('finalAmount', $this->_amount);
+    if ($this->_values['event']['is_monetary']) {
+      $this->set('finalAmount', $this->_amount);
+    }
     $participantCount = array();
 
     //unset the skip participant from params.
@@ -607,14 +611,17 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $value['currencyID'] = $primaryCurrencyID;
       }
 
-      if (!$pending && !empty($value['is_primary']) &&
-        !$this->_allowWaitlist && !$this->_requireApproval
-      ) {
-        // transactionID & receive date required while building email template
-        $this->assign('trxn_id', $value['trxn_id']);
-        $this->assign('receive_date', CRM_Utils_Date::mysqlToIso($value['receive_date']));
-        $this->set('receiveDate', CRM_Utils_Date::mysqlToIso($value['receive_date']));
-        $this->set('trxnId', CRM_Utils_Array::value('trxn_id', $value));
+      // CRM-11182 - Confirmation page might not be monetary
+      if ($this->_values['event']['is_monetary']) {
+        if (!$pending && !empty($value['is_primary']) &&
+          !$this->_allowWaitlist && !$this->_requireApproval
+        ) {
+          // transactionID & receive date required while building email template
+          $this->assign('trxn_id', $value['trxn_id']);
+          $this->assign('receive_date', CRM_Utils_Date::mysqlToIso($value['receive_date']));
+          $this->set('receiveDate', CRM_Utils_Date::mysqlToIso($value['receive_date']));
+          $this->set('trxnId', CRM_Utils_Array::value('trxn_id', $value));
+        }
       }
 
       $value['fee_amount'] = CRM_Utils_Array::value('amount', $value);
@@ -778,7 +785,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $this->assign('isPrimary', 0);
           $this->assign('customProfile', NULL);
           //Additional Participant should get only it's payment information
-          if ($this->_amount) {
+          if (!empty($this->_amount)) {
             $amount = array();
             $params = $this->get('params');
             $amount[$participantNum]['label'] = preg_replace('//', '', $params[$participantNum]['amount_level']);
@@ -812,6 +819,13 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
   /**
    * Process the contribution
+   *
+   * @param $form
+   * @param $params
+   * @param $result
+   * @param $contactID
+   * @param bool $pending
+   * @param bool $isAdditionalAmount
    *
    * @return void
    * @access public
@@ -926,6 +940,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Fix the Location Fields
    *
+   * @param $params
+   * @param $fields
+   * @param $form
+   *
    * @return void
    * @access public
    */
@@ -969,6 +987,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
   /**
    * function to update contact fields
+   *
+   * @param $contactID
+   * @param $params
+   * @param $fields
+   * @param $form
    *
    * @return void
    * @access public
@@ -1062,6 +1085,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     return $contactID;
   }
 
+  /**
+   * @param $form
+   */
   public static function assignProfiles(&$form) {
     $addParticipantProfile = $form->get('addParticipantProfile');
     $primaryParticipantProfile = $form->get('primaryParticipantProfile');

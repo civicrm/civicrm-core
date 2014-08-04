@@ -98,6 +98,15 @@ class Managed extends \Civi\Core\Entity {
    * 
    */
   private $entityId;
+  
+  /**
+   * @var string
+   *
+   * @JMS\Type("string")
+   * @ORM\Column(name="cleanup", type="string", length=32, nullable=true)
+   * 
+   */
+  private $cleanup;
 
   /**
    * Get id
@@ -187,6 +196,26 @@ class Managed extends \Civi\Core\Entity {
   public function getEntityId() {
     return $this->entityId;
   }
+  
+  /**
+   * Set cleanup
+   *
+   * @param string $cleanup
+   * @return Managed
+   */
+  public function setCleanup($cleanup) {
+    $this->cleanup = $cleanup;
+    return $this;
+  }
+
+  /**
+   * Get cleanup
+   *
+   * @return string
+   */
+  public function getCleanup() {
+    return $this->cleanup;
+  }
 
   /**
    * returns all the column names of this table
@@ -257,6 +286,21 @@ class Managed extends \Civi\Core\Entity {
                                                      
                                     
                           ),
+      
+              'cleanup' => array(
+      
+        'name' => 'cleanup',
+        'propertyName' => 'cleanup',
+        'type' => \CRM_Utils_Type::T_STRING,
+                'title' => ts('Cleanup'),
+                                 'maxlength' => 32,
+                                 'size' => \CRM_Utils_Type::MEDIUM,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                'callback' => 'CRM_Core_ManagedEntities::getCleanupOptions',
+                    )
+                 ),
              );
     }
     return self::$_fields;

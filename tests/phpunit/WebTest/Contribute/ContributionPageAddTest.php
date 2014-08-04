@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_ContributionPageAddTest
+ */
 class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
   function testContributionPageAdd() {
     // open browser, login
@@ -59,15 +63,25 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
       'Organization Details',
       'Other Amount',
       'I pledge to contribute this amount every',
-      "Honoree Section Title $hash",
-      "Honoree Introductory Message $hash",
-      'In Honor of',
       'Name and Address',
       'Summary Overlay',
     );
     foreach ($texts as $text) {
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
     }
+
+    // Disable and re-enable Other Amounts (verify fix for CRM-15021)
+    $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id=$pageId", '_qf_Amount_next-bottom');
+    $this->click("is_allow_other_amount");
+    $this->clickLink("_qf_Amount_upload_done-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId", '_qf_Main_upload-bottom');
+    $this->assertFalse($this->isTextPresent('Other Amount'), 'Other Amount present but not expected.');
+    $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id=$pageId", '_qf_Amount_next-bottom');
+    $this->click("is_allow_other_amount");
+    $this->clickLink("_qf_Amount_upload_done-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&action=preview&id=$pageId", '_qf_Main_upload-bottom');
+    $this->assertTrue($this->isTextPresent('Other Amount'), 'Other Amount not present but expected.');
+    $this->isElementPresent("xpath=//div[@class='content other_amount-content']/input");
   }
 
   // CRM-12510 Test copy contribution page
@@ -93,12 +107,12 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
     // Call URL to make a copy of the page
     $this->openCiviPage("admin/contribute", "action=copy&gid=$pageId");
-    
+
     // search for the new copy page and go to its test version
     $this->type('title', 'Copy of ' . $pageTitle);
     $this->click('_qf_SearchContribution_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     $this->isTextPresent('Copy of ' . $pageTitle);
     // get page id of the copy
     // $copyPageId = $this->getText("xpath=//div[@id='configure_contribution_page']/tr[@id='row_4']/td[2]");
@@ -117,9 +131,6 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
       'Organization Details',
       'Other Amount',
       'I pledge to contribute this amount every',
-      "Honoree Section Title $hash",
-      "Honoree Introductory Message $hash",
-      'In Honor of',
       'Name and Address',
       'Summary Overlay',
     );
@@ -165,9 +176,6 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
       'Organization Details',
       'Other Amount',
       'I pledge to contribute this amount every',
-      "Honoree Section Title $hash",
-      "Honoree Introductory Message $hash",
-      'In Honor of',
       'Name and Address',
       'Summary Overlay',
     );
@@ -214,6 +222,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->type('first_name', $firstName);
     $this->type('last_name', $lastName);
 
+    $this->select('state_province-1',"value=1002");
     $this->clickLink('_qf_Main_upload-bottom', '_qf_Confirm_next-bottom');
 
     $this->click('_qf_Confirm_next-bottom');
@@ -228,7 +237,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->type('sort_name', "$firstName $lastName");
     $this->select('financial_type_id',"label=Member Dues");
     $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom');
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);
     $expected = array(
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Member Dues',
@@ -247,7 +256,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->select('financial_type_id',"label=Donation");
     $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
 
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom');
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);
     $expected = array(
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Donation',
@@ -259,8 +268,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     //Find Member
     $this->openCiviPage("member/search", "reset=1", 'member_source');
     $this->type('sort_name', "$firstName $lastName");
-    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_MembershipView_cancel-bottom');
+    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", FALSE);
+    $this->clickLink("xpath=//div[@id='memberSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_MembershipView_cancel-bottom', FALSE);
 
     //View Membership Record
     $expected = array(
@@ -273,7 +282,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * CRM-12994 
+   * CRM-12994
    */
   function testContributionPageAddPremiumRequiredField() {
     // open browser, login
@@ -289,7 +298,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     while (list($processorName, $processorType) = each($processor)) {
       $this->webtestAddPaymentProcessor($processorName, $processorType);
     }
-    
+
     // go to the New Contribution Page page
     $this->openCiviPage('admin/contribute', 'action=add&reset=1');
 
@@ -300,11 +309,11 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->select('financial_type_id', "label=Donation");
 
     $this->click('is_organization');
-    $this->select('onbehalf_profile_id', 'label=On Behalf Of Organization');
+    $this->select("xpath=//*[@class='crm-contribution-onbehalf_profile_id']//span[@class='crm-profile-selector-select']//select", 'label=On Behalf Of Organization');
     $this->type('for_organization', "On behalf $hash");
     // make onBehalf optional
     $this->click('CIVICRM_QFID_1_2');
-    
+
     $this->fillRichTextField('intro_text', 'This is introductory message for ' . $pageTitle, 'CKEditor');
     $this->fillRichTextField('footer_text', 'This is footer message for ' . $pageTitle, 'CKEditor');
 
@@ -334,10 +343,10 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->type('value_2', 2);
     $this->type('label_3', 'Fixed Amount 3');
     $this->type('value_3', 3);
-    $this->click('CIVICRM_QFID_1_2');
+    $this->click('CIVICRM_QFID_1_4');
     $this->click('_qf_Amount_submit_savenext-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    
+
     // click through to the membership view screen
     $this->click("css=li#tab_thankyou a");
     $this->waitForElementPresent('_qf_ThankYou_next-bottom');
@@ -370,7 +379,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->click('_qf_Premium_submit_savenext-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $premiumText = "'Premium' information has been saved.";
-    // check if clicking Save & Next button 
+    // check if clicking Save & Next button
     // Premium is saved rather than required validation error
     // for No Thank-you Label textfield
     $this->assertTrue($this->isTextPresent($premiumText));
@@ -382,10 +391,10 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->click('_qf_SearchContribution_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->isElementPresent("xpath=//table[@id='option11_wrapper']/tbody/tr/td/strong[text()='$pageTitle']");
-    $this->waitForElementPresent("xpath=//table[@id='option11']/tbody/tr/td[5]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']");
-    $this->click("xpath=//table[@id='option11']/tbody/tr/td[5]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']");
-    $this->waitForElementPresent("xpath=//table[@id='option11']/tbody/tr/td[5]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']/ul[@class='panel']/li[8]/a[@title='Premiums']");
-    $this->click("xpath=//table[@id='option11']/tbody/tr/td[5]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']/ul[@class='panel']/li[8]/a[@title='Premiums']");
+    $this->waitForElementPresent("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']");
+    $this->click("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']");
+    $this->waitForElementPresent("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']/ul[@class='panel']/li[8]/a[@title='Premiums']");
+    $this->click("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']/ul[@class='panel']/li[8]/a[@title='Premiums']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('premiums_active');
     $this->waitForElementPresent('_qf_Premium_cancel-bottom');
@@ -397,10 +406,10 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->type('premiums_intro_title', 'Premiums Intro Title');
     $this->type('premiums_intro_text', 'Premiums Into Text');
     $this->type('premiums_contact_email', "$hash@example.net");
-    
+
     // let No Thank-you Label text be blank
     // so that validation error appears
-    // $this->type('premiums_nothankyou_label', );    
+    // $this->type('premiums_nothankyou_label', );
     $this->select('premiums_nothankyou_position', 'value=2');
 
     // click on save & next button
@@ -410,20 +419,20 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     // check if clicking Save & Next button
     // required validation error appears
     // for No Thank-you Label textfield
-    $this->waitForElementPresent("xpath=//ul[@id='errorList']");
+    $this->waitForElementPresent("xpath=//*[@id='premiumSettings']/div/div[2]/table/tbody/tr[6]/td[2]/span[1]");
     $this->assertTrue($this->isTextPresent($premiumRequiredText));
-    
+
     // fill in value for Premiums No Thank-you Label textfield
-    $this->type('premiums_nothankyou_label', 'Premiums No Thank-you Label');    
+    $this->type('premiums_nothankyou_label', 'Premiums No Thank-you Label');
     $this->waitForElementPresent('_qf_Premium_upload_done-bottom');
-    
+
     // click save & done button
     $this->click('_qf_Premium_upload_done-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $premiumSavedText = "'Premium' information has been saved.";
     // check if clicking Save & Done button
     // contribution page is saved.
-    $this->assertTrue($this->isTextPresent($premiumSavedText));  
+    $this->assertTrue($this->isTextPresent($premiumSavedText));
   }
 }
 

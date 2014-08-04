@@ -30,6 +30,9 @@ require_once 'ReleaseTestCase.php';
 // webtest is not picked up by the suite, since it needs to run
 // on specially prepare sandbox
 // more details: http://wiki.civicrm.org/confluence/display/CRMDOC/Release+testing+script
+/**
+ * Class WebTest_Release_UpgradeScript
+ */
 class WebTest_Release_UpgradeScript extends WebTest_Release_ReleaseTestCase {
 
   protected function setUp() {

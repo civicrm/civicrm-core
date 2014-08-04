@@ -39,8 +39,9 @@ class CRM_Mailing_MailStore {
   /**
    * Return the proper mail store implementation, based on config settings
    *
-   * @param  string $name  name of the settings set from civimail_mail_settings to use (null for default)
+   * @param  string $name name of the settings set from civimail_mail_settings to use (null for default)
    *
+   * @throws Exception
    * @return object        mail store implementation for processing CiviMail-bound emails
    */
   function getStore($name = NULL) {
@@ -135,8 +136,9 @@ class CRM_Mailing_MailStore {
   /**
    * Point to (and create if needed) a local Maildir for storing retrieved mail
    *
-   * @param string $name  name of the Maildir
+   * @param string $name name of the Maildir
    *
+   * @throws Exception
    * @return string       path to the Maildir's cur directory
    */
   function maildir($name) {

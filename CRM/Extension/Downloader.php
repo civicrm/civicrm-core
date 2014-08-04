@@ -45,6 +45,7 @@ class CRM_Extension_Downloader {
   public $tmpDir;
 
   /**
+   * @param CRM_Extension_Manager $manager
    * @param string $containerDir the place to store downloaded & extracted extensions
    * @param string $tmpDir
    */
@@ -184,6 +185,9 @@ class CRM_Extension_Downloader {
 
   /**
    * Validate that $extractedZipPath contains valid for extension $key
+   *
+   * @param $key
+   * @param $extractedZipPath
    *
    * @return bool
    */

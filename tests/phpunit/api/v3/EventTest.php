@@ -28,11 +28,18 @@
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_EventTest
+ */
 class api_v3_EventTest extends CiviUnitTestCase {
   protected $_params;
   protected $_apiversion;
   protected $_entity;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Event Create',
@@ -287,6 +294,17 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
     $this->callAPISuccess($this->_entity, 'Delete', array('id' => $result['id']));
+  }
+
+  /**
+   * Test that an event with a price set can be created
+   */
+  function testCreatePaidEvent() {
+    //@todo alter API so that an integer is converted to an array
+    $priceSetParams = array('price_set_id' => (array) 1, 'is_monetary' => 1);
+    $result = $this->callAPISuccess('Event', 'Create', array_merge($this->_params[0], $priceSetParams));
+    $event = $this->callAPISuccess('Event', 'getsingle', array('id' => $result['id'], 'return' => 'price_set_id'));
+    $this->assertArrayKeyExists('price_set_id', $event);
   }
 
   function testCreateEventParamsNotArray() {

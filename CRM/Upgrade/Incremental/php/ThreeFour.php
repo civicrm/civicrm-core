@@ -32,10 +32,18 @@
  *
  */
 class CRM_Upgrade_Incremental_php_ThreeFour {
+  /**
+   * @param $errors
+   *
+   * @return bool
+   */
   function verifyPreDBstate(&$errors) {
     return TRUE;
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_3_4_alpha3($rev) {
     // CRM-7681, update report instance criteria.
     $modifiedReportIds = array('contact/summary', 'contact/detail', 'event/participantListing', 'member/summary', 'pledge/summary', 'pledge/pbnp', 'member/detail', 'member/lapse', 'grant/detail', 'contribute/bookkeeping', 'contribute/lybunt', 'contribute/summary', 'contribute/repeat', 'contribute/detail', 'contribute/organizationSummary', 'contribute/sybunt', 'contribute/householdSummary', 'contact/relationship', 'contact/currentEmployer', 'case/demographics', 'walklist', 'case/detail', 'contact/log', 'activitySummary', 'case/timespent', 'case/summary');
@@ -99,6 +107,9 @@ class CRM_Upgrade_Incremental_php_ThreeFour {
     $upgrade->processSQL($rev);
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_3_4_beta2($rev) {
     $addPetitionOptionGroup = !(boolean) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'msg_tpl_workflow_petition', 'id', 'name');
     $upgrade = new CRM_Upgrade_Form();
@@ -106,6 +117,9 @@ class CRM_Upgrade_Incremental_php_ThreeFour {
     $upgrade->processSQL($rev);
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_3_4_beta3($rev) {
     // do the regular upgrade
     $upgrade = new CRM_Upgrade_Form;
@@ -130,6 +144,9 @@ class CRM_Upgrade_Incremental_php_ThreeFour {
     }
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_3_4_3($rev) {
     // CRM-8147, update group_type for uf groups, check and add component field types
     $ufGroups = new CRM_Core_DAO_UFGroup();
@@ -171,6 +188,9 @@ INSERT INTO civicrm_location_type ( name, description, is_reserved, is_active )
     $upgrade->processSQL($rev);
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_3_4_4($rev) {
     // CRM-8315, update report instance criteria.
     $modifiedReportIds = array('member/summary', 'member/detail');
@@ -204,6 +224,9 @@ INSERT INTO civicrm_location_type ( name, description, is_reserved, is_active )
     $upgrade->processSQL($rev);
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_3_4_5($rev) {
     // handle db changes done for CRM-8218
     $alterContactDashboard = FALSE;
@@ -225,6 +248,9 @@ INSERT INTO civicrm_location_type ( name, description, is_reserved, is_active )
     $upgrade->processSQL($rev);
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade_3_4_6($rev) {
     $modifiedReportIds = array('event/summary', 'activity', 'Mailing/bounce', 'Mailing/clicks', 'Mailing/opened');
 
@@ -300,6 +326,11 @@ WHERE  v.option_group_id = g.id
     $upgrade->processSQL($rev);
   }
 
+  /**
+   * @param $rev
+   *
+   * @throws Exception
+   */
   function upgrade_3_4_7($rev) {
     $onBehalfProfileId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', 'on_behalf_organization', 'id', 'name');
     if (!$onBehalfProfileId) {

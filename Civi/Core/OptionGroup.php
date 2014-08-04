@@ -107,6 +107,15 @@ class OptionGroup extends \Civi\Core\Entity {
    * 
    */
   private $isActive;
+  
+  /**
+   * @var boolean
+   *
+   * @JMS\Type("boolean")
+   * @ORM\Column(name="is_locked", type="boolean", nullable=true)
+   * 
+   */
+  private $isLocked;
 
   /**
    * Get id
@@ -216,6 +225,26 @@ class OptionGroup extends \Civi\Core\Entity {
   public function getIsActive() {
     return $this->isActive;
   }
+  
+  /**
+   * Set isLocked
+   *
+   * @param boolean $isLocked
+   * @return OptionGroup
+   */
+  public function setIsLocked($isLocked) {
+    $this->isLocked = $isLocked;
+    return $this;
+  }
+
+  /**
+   * Get isLocked
+   *
+   * @return boolean
+   */
+  public function getIsLocked() {
+    return $this->isLocked;
+  }
 
   /**
    * returns all the column names of this table
@@ -290,6 +319,15 @@ class OptionGroup extends \Civi\Core\Entity {
       
         'name' => 'is_active',
         'propertyName' => 'isActive',
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
+                                                             
+                                    
+                          ),
+      
+              'is_locked' => array(
+      
+        'name' => 'is_locked',
+        'propertyName' => 'isLocked',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                              
                                     

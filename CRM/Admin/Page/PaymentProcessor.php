@@ -116,6 +116,8 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
   /**
    * Browse all payment processors.
    *
+   * @param null $action
+   *
    * @return void
    * @access public
    * @static
@@ -180,6 +182,8 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
 
   /**
    * Get user context.
+   *
+   * @param null $mode
    *
    * @return string user context.
    */

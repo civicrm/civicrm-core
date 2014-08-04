@@ -27,7 +27,7 @@
     <div class="crm-designer-palette-search">
       <div class="crm-filter-objects">
         <span>{ts}Contact Type{/ts}:
-          <select class="crm-contact-types">
+          <select class="crm-form-select crm-contact-types">
           <option value="IndividualModel">{ts}Individual{/ts}</option>
           <option value="OrganizationModel">{ts}Organization{/ts}</option>
           <option value="HouseholdModel">{ts}Household{/ts}</option>
@@ -35,8 +35,8 @@
         </span>
       </div>
       <hr>
-      <input type="text" placeholder="{ts}Search Fields{/ts}" />
-      <a class="crm-designer-palette-clear-search" href="#" title="{ts}Clear search{/ts}"><img src="{$config->resourceBase}i/close.png" class="action-icon" alt="X" /></a>
+      <input type="text" class="crm-form-text" placeholder="{ts}Search Fields{/ts}" />
+      <a class="crm-designer-palette-clear-search crm-hover-button" href="#" style="visibility:hidden" title="{ts}Clear search{/ts}"><span class="icon close-icon"></span></a>
       <div class="crm-designer-palette-controls">
         <a href="#" class="crm-designer-palette-toggle" rel="open_all">{ts}Open All{/ts}</a>&nbsp; |&nbsp;
         <a href="#" class="crm-designer-palette-toggle" rel="close_all">{ts}Close All{/ts}</a>
@@ -114,9 +114,10 @@
 <script type="text/template" id="profile_selector_template">
     <div>
         <span class="crm-profile-selector-select"></span>
-        <button class="crm-profile-selector-edit">Edit</button>
-        <button class="crm-profile-selector-copy">Copy</button>
-        <button class="crm-profile-selector-create">Create</button>
+        <button type="button" class="crm-profile-selector-preview" title="{ts}Preview{/ts}"><div class="icon details-icon">{ts}Preview{/ts}</div></button>
+        <button class="crm-profile-selector-edit">{ts}Edit{/ts}</button>
+        <button class="crm-profile-selector-copy">{ts}Copy{/ts}</button>
+        <button class="crm-profile-selector-create">{ts}Create{/ts}</button>
     </div>
     <form>
     <div class="crm-profile-selector-preview-pane">
@@ -127,10 +128,6 @@
 
 <script type="text/template" id="profile_selector_empty_preview_template">
 {ts}(Preview Area){/ts}
-</script>
-
-<script type="text/template" id="profile_selector_option_template">
-<%= title %>
 </script>
 
 <script type="text/template" id="profile_selector_option_template">

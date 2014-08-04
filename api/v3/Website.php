@@ -44,6 +44,8 @@
  * @example WebsiteCreate.php
  * {@example WebsiteCreate.php}
  *
+ * @param $params
+ *
  * @return array of newly created website property values.
  * @access public
  * @todo convert to using basic create - BAO function non-std

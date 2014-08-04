@@ -70,13 +70,14 @@ AND    TABLE_NAME LIKE 'civicrm_%'
       $this->tables[] = $dao->TABLE_NAME;
     }
 
-    // do not log temp import, cache and log tables
+    // do not log temp import, cache, menu and log tables
     $this->tables = preg_grep('/^civicrm_import_job_/', $this->tables, PREG_GREP_INVERT);
     $this->tables = preg_grep('/_cache$/', $this->tables, PREG_GREP_INVERT);
     $this->tables = preg_grep('/_log/', $this->tables, PREG_GREP_INVERT);
     $this->tables = preg_grep('/^civicrm_task_action_temp_/', $this->tables, PREG_GREP_INVERT);
     $this->tables = preg_grep('/^civicrm_export_temp_/', $this->tables, PREG_GREP_INVERT);
     $this->tables = preg_grep('/^civicrm_queue_/', $this->tables, PREG_GREP_INVERT);
+    $this->tables = preg_grep('/^civicrm_menu/', $this->tables, PREG_GREP_INVERT); //CRM-14672
 
     // do not log civicrm_mailing_event* tables, CRM-12300
     $this->tables = preg_grep('/^civicrm_mailing_event_/', $this->tables, PREG_GREP_INVERT);
@@ -260,6 +261,11 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     return TRUE;
   }
 
+  /**
+   * @param $table
+   *
+   * @return array
+   */
   private function _getCreateQuery($table) {
     $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE {$table}");
     $dao->fetch();
@@ -267,6 +273,12 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     return $create;
   }
 
+  /**
+   * @param $col
+   * @param $createQuery
+   *
+   * @return array|mixed|string
+   */
   private function _getColumnQuery($col, $createQuery) {
     $line = preg_grep("/^  `$col` /", $createQuery);
     $line = rtrim(array_pop($line), ',');
@@ -275,6 +287,9 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     return $line;
   }
 
+  /**
+   * @param bool $rebuildTrigger
+   */
   function fixSchemaDifferencesForAll($rebuildTrigger = FALSE) {
     $diffs = array();
     foreach ($this->tables as $table) {
@@ -300,6 +315,11 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
    * log_civicrm_contact.modified_date for example would always be copied from civicrm_contact.modified_date,
    * so there's no need for a default timestamp and therefore we remove such default timestamps
    * also eliminate the NOT NULL constraint, since we always copy and schema can change down the road)
+   */
+  /**
+   * @param $query
+   *
+   * @return mixed
    */
   function fixTimeStampAndNotNullSQL($query) {
     $query = str_ireplace("TIMESTAMP NOT NULL", "TIMESTAMP NULL", $query);
@@ -398,6 +418,12 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     return $columnSpecs[$table];
   }
 
+  /**
+   * @param $civiTable
+   * @param $logTable
+   *
+   * @return array
+   */
   function columnsWithDiffSpecs($civiTable, $logTable) {
     $civiTableSpecs = $this->columnSpecsOf($civiTable);
     $logTableSpecs  = $this->columnSpecsOf($logTable);
@@ -411,21 +437,21 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     // NOTE: we consider only those columns for modifications where there is a spec change, and that the column definition
     // wasn't deliberately modified by fixTimeStampAndNotNullSQL() method.
     foreach ($civiTableSpecs as $col => $colSpecs) {
-      if ( !is_array($logTableSpecs[$col]) ) {
+      if (!isset($logTableSpecs[$col]) || !is_array($logTableSpecs[$col]) ) {
         $logTableSpecs[$col] = array();
       }
 
       $specDiff = array_diff($civiTableSpecs[$col], $logTableSpecs[$col]);
       if (!empty($specDiff) && $col != 'id' && !array_key_exists($col, $diff['ADD'])) {
         // ignore 'id' column for any spec changes, to avoid any auto-increment mysql errors
-        if ($civiTableSpecs[$col]['DATA_TYPE'] != $logTableSpecs[$col]['DATA_TYPE']) {
+        if ($civiTableSpecs[$col]['DATA_TYPE'] != CRM_Utils_Array::value('DATA_TYPE', $logTableSpecs[$col])) {
           // if data-type is different, surely consider the column
           $diff['MODIFY'][] = $col;
-        } else if ($civiTableSpecs[$col]['IS_NULLABLE'] != $logTableSpecs[$col]['IS_NULLABLE'] &&
+        } else if ($civiTableSpecs[$col]['IS_NULLABLE'] != CRM_Utils_Array::value('IS_NULLABLE', $logTableSpecs[$col]) &&
           $logTableSpecs[$col]['IS_NULLABLE'] == 'NO') {
           // if is-null property is different, and log table's column is NOT-NULL, surely consider the column
           $diff['MODIFY'][] = $col;
-        } else if ($civiTableSpecs[$col]['COLUMN_DEFAULT'] != $logTableSpecs[$col]['COLUMN_DEFAULT'] &&
+        } else if ($civiTableSpecs[$col]['COLUMN_DEFAULT'] != CRM_Utils_Array::value('COLUMN_DEFAULT', $logTableSpecs[$col]) &&
           !strstr($civiTableSpecs[$col]['COLUMN_DEFAULT'], 'TIMESTAMP')) {
           // if default property is different, and its not about a timestamp column, consider it
           $diff['MODIFY'][] = $col;
@@ -533,6 +559,11 @@ COLS;
     return (bool) CRM_Core_DAO::singleValueQuery("SHOW TRIGGERS LIKE 'civicrm_contact'");
   }
 
+  /**
+   * @param $info
+   * @param null $tableName
+   * @param bool $force
+   */
   function triggerInfo(&$info, $tableName = NULL, $force = FALSE) {
     // check if we have logging enabled
     $config =& CRM_Core_Config::singleton();

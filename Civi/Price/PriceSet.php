@@ -421,7 +421,12 @@ class PriceSet extends \Civi\Core\Entity {
                                                              
                                     
                 'FKClassName' => 'CRM_Core_DAO_Domain',
-                          ),
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_domain',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
       
               'name' => array(
       
@@ -508,7 +513,12 @@ class PriceSet extends \Civi\Core\Entity {
                                  'size' => \CRM_Utils_Type::HUGE,
                            
                                     
-                          ),
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_component',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
       
               'financial_type_id' => array(
       
@@ -520,7 +530,12 @@ class PriceSet extends \Civi\Core\Entity {
                                            'default' => 'NULL',
          
                 'FKClassName' => 'CRM_Financial_DAO_FinancialType',
-                          ),
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_financial_type',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
       
               'is_quick_config' => array(
       

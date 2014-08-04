@@ -50,12 +50,14 @@ class CRM_Case_Page_AJAX {
     if (!empty($_GET['excludeCaseIds'])) {
       $excludeCaseIds = explode(',', CRM_Utils_Type::escape($_GET['excludeCaseIds'], 'String'));
     }
-    $unclosedCases = CRM_Case_BAO_Case::getUnclosedCases($params, $excludeCaseIds);
+    $unclosedCases = CRM_Case_BAO_Case::getUnclosedCases($params, $excludeCaseIds, TRUE, TRUE);
     $results = array();
     foreach ($unclosedCases as $caseId => $details) {
       $results[] = array(
         'id' => $caseId,
-        'text' => $details['sort_name'] . ' (' . $details['case_type'] . ': ' . $details['case_subject'] . ')',
+        'label' => $details['sort_name'] . ' - ' . $details['case_type'] . ($details['end_date'] ? ' (' . ts('closed') . ')' : ''),
+        'label_class' => $details['end_date'] ? 'strikethrough' : '',
+        'description' => array($details['case_subject'] . ' (' . $details['case_status'] . ')'),
         'extra' => $details,
       );
     }
@@ -125,18 +127,17 @@ class CRM_Case_Page_AJAX {
 
   function caseDetails() {
     $caseId    = CRM_Utils_Type::escape($_GET['caseId'], 'Integer');
-    $sql       = "SELECT * FROM civicrm_case where id = %1";
+    $sql       = "SELECT civicrm_case.*, civicrm_case_type.title as case_type
+        FROM civicrm_case
+        INNER JOIN civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id
+        WHERE civicrm_case.id = %1";
     $dao       = CRM_Core_DAO::executeQuery($sql, array(1 => array($caseId, 'Integer')));
 
     if ($dao->fetch()) {
-      $caseType = CRM_Case_BAO_Case::getCaseType((str_replace(CRM_Core_DAO::VALUE_SEPARATOR,
-            "",
-            $dao->case_type_id
-          )));
       $caseStatuses = CRM_Case_PseudoConstant::caseStatus();
       $cs           = $caseStatuses[$dao->status_id];
       $caseDetails  = "<table><tr><td>" . ts('Case Subject') . "</td><td>{$dao->subject}</td></tr>
-                                    <tr><td>" . ts('Case Type') . "</td><td>{$caseType}</td></tr>
+                                    <tr><td>" . ts('Case Type') . "</td><td>{$dao->case_type}</td></tr>
                                     <tr><td>" . ts('Case Status') . "</td><td>{$cs}</td></tr>
                                     <tr><td>" . ts('Case Start Date') . "</td><td>" . CRM_Utils_Date::customFormat($dao->start_date) . "</td></tr>
                                     <tr><td>" . ts('Case End Date') . "</td><td></td></tr>" . CRM_Utils_Date::customFormat($dao->end_date) . "</table>";

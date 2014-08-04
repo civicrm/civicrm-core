@@ -40,6 +40,8 @@
  * Allowed @params array keys are:
  * {@getfields im_create}
  *
+ * @param $params
+ *
  * @return array of newly created IM property values.
  * @access public
  */

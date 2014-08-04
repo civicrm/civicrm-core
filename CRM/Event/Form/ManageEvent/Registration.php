@@ -206,8 +206,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Fix what blocks to show/hide based on the default values set
    *
-   * @param array   $defaults the array of default values
-   * @param boolean $force    should we set show hide based on input defaults
+   * @param array $defaults the array of default values
+   *
+   * @internal param bool $force should we set show hide based on input defaults
    *
    * @return void
    */
@@ -217,15 +218,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     );
     if (empty($defaults)) {
       $this->_showHide->addHide('registration');
-      $this->_showHide->addHide('additional_profile_pre');
-      $this->_showHide->addHide('additional_profile_post');
       $this->_showHide->addHide('id-approval-text');
     }
     else {
-      if (empty($defaults['is_multiple_registrations'])) {
-        $this->_showHide->addHide('additional_profile_pre');
-        $this->_showHide->addHide('additional_profile_post');
-      }
       if (empty($defaults['requires_approval'])) {
         $this->_showHide->addHide('id-approval-text');
       }
@@ -285,20 +280,20 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     $this->addElement('checkbox',
       'is_multiple_registrations',
-      ts('Register multiple participants?'),
-      NULL,
-      array(
-        'onclick' => "return (showHideByValue('is_multiple_registrations', '', 'additional_profile_pre|additional_profile_post', 'table-row', 'radio', false) ||
-                                                      showRuleFields( " . json_encode($ruleFields) . " ));")
+      ts('Register multiple participants?')
     );
 
     $this->addElement('checkbox',
       'allow_same_participant_emails',
-      ts('Allow multiple registrations from the same email address?'),
-      NULL,
-      array('onclick' => "return showRuleFields( " . json_encode($ruleFields) . " );")
+      ts('Same email address?')
     );
     $this->assign('ruleFields', json_encode($ruleFields));
+
+    $dedupeRules = array(
+      '' => '- Unsupervised rule -',
+    );
+    $dedupeRules += CRM_Dedupe_BAO_RuleGroup::getByType('Individual');
+    $this->add('select', 'dedupe_rule_group_id', ts('Duplicate matching rule'), $dedupeRules);
 
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     if (in_array('Awaiting approval', $participantStatuses) and in_array('Pending from approval', $participantStatuses) and in_array('Rejected', $participantStatuses)) {
@@ -325,74 +320,107 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Function to build Registration Block
    *
-   * @param int $pageId
+   * @param $form
+   *
+   * @internal param int $pageId
    * @static
    */
   function buildRegistrationBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
+    $attributes['intro_text']['click_wysiwyg'] = true;
     $form->addWysiwyg('intro_text', ts('Introductory Text'), $attributes['intro_text']);
     // FIXME: This hack forces height of editor to 175px. Need to modify QF classes for editors to allow passing
     // explicit height and width.
-    $form->addWysiwyg('footer_text', ts('Footer Text'), array('rows' => 2, 'cols' => 40));
-
-    $types = array_merge(array('Contact', 'Individual', 'Participant'),
-      CRM_Contact_BAO_ContactType::subTypes('Individual')
+    $footerAttribs = array(
+      'rows' => 2,
+      'cols' => 40,
+      'click_wysiwyg' => true,
     );
+    $form->addWysiwyg('footer_text', ts('Footer Text'), $footerAttribs);
 
-    $profiles = CRM_Core_BAO_UFGroup::getProfiles($types);
+    extract( self::getProfileSelectorTypes() );
 
-    $mainProfiles = array(
-      '' => ts('- select -')) + $profiles;
-    $addtProfiles = array(
-      '' => ts('- same as for main contact -')) + $profiles;
+    $form->addProfileSelector( 'custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
+    $form->addProfileSelector( 'custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
 
-    $form->add('select', 'custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $mainProfiles);
-    $form->add('select', 'custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $mainProfiles);
-
-    $form->add('select', 'additional_custom_pre_id', ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $addtProfiles);
-    // Allow user to NOT provide a bottom profile for Additional Participant registration
-    $form->add('select', 'additional_custom_post_id', ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), array('none' => ts('- no profile -')) + $addtProfiles);
+    $form->addProfileSelector( 'additional_custom_pre_id',  ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
+    $form->addProfileSelector( 'additional_custom_post_id',  ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities);
   }
 
-  function buildMultipleProfileBottom(&$form, $count, $prefix = '', $name = 'Include Profile') {
-    $types = array_merge(array('Contact', 'Individual', 'Participant'),
-      CRM_Contact_BAO_ContactType::subTypes('Individual')
+  /**
+   * Subroutine to insert a Profile Editor widget
+   * depends on getProfileSelectorTypes
+   *
+   * @param array &$form
+   * @param int $count unique index
+   * @param string $prefix dom element ID prefix
+   * @param string $label Label
+   * @param array $configs Optional, for addProfileSelector(), defaults to using getProfileSelectorTypes()
+   **/
+  function buildMultipleProfileBottom(&$form, $count, $prefix = '', $label = 'Include Profile', $configs = null) {
+    extract( ( is_null($configs) ) ? self::getProfileSelectorTypes() : $configs );
+    $element = $prefix . "custom_post_id_multiple[$count]";
+    $label .= '<br />'.ts('(bottom of page)');
+    $form->addProfileSelector( $element,  $label, $allowCoreTypes, $allowSubTypes, $profileEntities);
+  }
+
+  /**
+   * Create initializers for addprofileSelector
+   *
+   * @return array( 'allowCoreTypes' => array(), 'allowSubTypes' => array(), 'profileEntities' => array() )
+   **/
+  static function getProfileSelectorTypes() {
+    $configs = array(
+      'allowCoreTypes' => array(),
+      'allowSubTypes' => array(),
+      'profileEntities' => array(),
     );
 
-    $profiles = CRM_Core_BAO_UFGroup::getProfiles($types);
+    $configs['allowCoreTypes'][] = 'Contact';
+    $configs['allowCoreTypes'][] = 'Individual';
+    $configs['allowCoreTypes'][] = 'Participant';
 
-    if ($prefix == 'additional_') {
-      $mainProfiles = array(
-        '' => ts('- same as for main contact -'), 'none' => ts('- no profile -')) + $profiles;
-    }
-    else {
-      $mainProfiles = array(
-        '' => ts('- select -')) + $profiles;
-    }
+    $configs['profileEntities'][] = array('entity_name' => 'contact_1', 'entity_type' => 'IndividualModel');
+    $configs['profileEntities'][] = array('entity_name' => 'participant_1', 'entity_type' => 'ParticipantModel');
 
-    $element = $prefix . "custom_post_id_multiple[$count]";
-    $form->add('select', $element, $name . '<br />' . ts('(bottom of page)'), $mainProfiles);
+   return $configs;
   }
 
   /**
    * Function to build Confirmation Block
    *
-   * @param int $pageId
+   * @param $form
+   *
+   * @internal param int $pageId
    * @static
    */
   function buildConfirmationBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
+    $attributes['confirm_text']['click_wysiwyg'] = true;
+    // CRM-11182 - Optional confirmation page for free events
+    $is_monetary = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_id, 'is_monetary');
+    $form->assign('is_monetary', $is_monetary);
+    if ($is_monetary == "0") {
+      $form->addYesNo('is_confirm_enabled', ts('Use a confirmation screen?'), NULL, NULL, array('onclick' => "return showHideByValue('is_confirm_enabled','','confirm_screen_settings','block','radio',false);"));
+    }
     $form->add('text', 'confirm_title', ts('Title'), $attributes['confirm_title']);
     $form->addWysiwyg('confirm_text', ts('Introductory Text'), $attributes['confirm_text']);
     // FIXME: This hack forces height of editor to 175px. Need to modify QF classes for editors to allow passing
     // explicit height and width.
-    $form->addWysiwyg('confirm_footer_text', ts('Footer Text'), array('rows' => 2, 'cols' => 40));
+    $footerAttribs = array(
+      'rows' => 2,
+      'cols' => 40,
+      'click_wysiwyg' => true,
+    );
+    $form->addWysiwyg('confirm_footer_text', ts('Footer Text'), $footerAttribs);
   }
 
   /**
    * Function to build Email Block
    *
-   * @param int $pageId
+   * @param $form
+   *
+   * @internal param int $pageId
    * @static
    */
   function buildMailBlock(&$form) {
@@ -409,13 +437,22 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $form->addRule('confirm_from_email', ts('Email is not valid.'), 'email');
   }
 
+  /**
+   * @param $form
+   */
   function buildThankYouBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
+    $attributes['thankyou_text']['click_wysiwyg'] = true;
     $form->add('text', 'thankyou_title', ts('Title'), $attributes['thankyou_title']);
     $form->addWysiwyg('thankyou_text', ts('Introductory Text'), $attributes['thankyou_text']);
     // FIXME: This hack forces height of editor to 175px. Need to modify QF classes for editors to allow passing
     // explicit height and width.
-    $form->addWysiwyg('thankyou_footer_text', ts('Footer Text'), array('rows' => 2, 'cols' => 40));
+    $footerAttribs = array(
+      'rows' => 2,
+      'cols' => 40,
+      'click_wysiwyg' => true,
+    );
+    $form->addWysiwyg('thankyou_footer_text', ts('Footer Text'), $footerAttribs);
   }
 
   /**
@@ -435,7 +472,11 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param $values
+   * @param $files
+   * @param $form
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -492,6 +533,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       self::addMultipleProfiles($additionalProfileIds, $values, 'additional_custom_post_id_multiple');
       $isProfileComplete = self::isProfileComplete($profileIds);
       $isAdditionalProfileComplete = self::isProfileComplete($additionalProfileIds);
+
       //Check main profiles have an email address available if 'send confirmation email' is selected
       if ($values['is_email_confirm']) {
         $emailFields = self::getEmailFields($profileIds);
@@ -624,6 +666,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Collect all email fields for an array of profile ids
    *
+   * @param $profileIds
    * @return boolean
    */
   static function getEmailFields($profileIds) {
@@ -644,6 +687,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Check if a profile contains required fields
    *
+   * @param $profileIds
    * @return boolean
    */
   static function isProfileComplete($profileIds) {
@@ -675,6 +719,88 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   }
 
   /**
+   * Check if the profiles collect enough information to dedupe
+   *
+   * @param $profileIds
+   * @param int $rgId
+   * @return boolean
+   */
+
+  function canProfilesDedupe($profileIds, $rgId = 0) {
+
+    // find the unsupervised rule
+
+    $rgParams = array(
+      'used' => 'Unsupervised',
+      'contact_type' => 'Individual',
+    );
+    if ($rgId > 0) {
+      $rgParams['id'] = $rgId;
+    }
+    $activeRg = CRM_Dedupe_BAO_RuleGroup::dedupeRuleFieldsWeight($rgParams);
+
+    // get the combinations that could be a match for the rule
+    $okCombos = $combos = array();
+    CRM_Dedupe_BAO_RuleGroup::combos($activeRg[0], $activeRg[1], $combos);
+
+    // create an index of what combinations involve each field
+    $index = array();
+    foreach ($combos as $comboid => $combo) {
+      foreach ($combo as $cfield) {
+        $index[$cfield][$comboid] = true;
+      }
+      $combos[$comboid] = array_fill_keys($combo, 0);
+      $okCombos[$comboid] = array_fill_keys($combo, 2);
+    }
+
+    // get profiles and see if they have the necessary combos
+    $profileReqFields = array();
+    foreach ($profileIds as $profileId) {
+      if ($profileId && is_numeric($profileId)) {
+        $fields = CRM_Core_BAO_UFGroup::getFields($profileId);
+
+        // walk through the fields in the profile
+        foreach ($fields as $field) {
+
+          // check each of the fields in the index against the profile field
+          foreach ($index as $ifield => $icombos) {
+            if(strpos($field['name'], $ifield) !== false) {
+
+              // we found the field in the profile, now record it in the index
+              foreach ($icombos as $icombo => $dontcare) {
+                $combos[$icombo][$ifield] = ($combos[$icombo][$ifield] != 2 && !$field['is_required']) ? 1 : 2;
+
+                if ($combos[$icombo] == $okCombos[$icombo]) {
+                  // if any combo is complete with 2s (all fields are present and required), we can go home
+                  return 2;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // check the combos to see if everything is > 0
+    foreach ($combos as $comboid => $combo) {
+      $complete = false;
+      foreach ($combo as $cfield) {
+        if ($cfield > 0) {
+          $complete = true;
+        }
+        else {
+          // this combo isn't complete--skip to the next combo
+          continue 2;
+        }
+      }
+      if ($complete) { return 1; }
+    }
+
+    // no combo succeeded
+    return 0;
+  }
+
+  /**
    * Add additional profiles from the form to an array of profile ids.
    *
    */
@@ -698,8 +824,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     $params['id'] = $this->_id;
 
-    //format params
+    // format params
     $params['is_online_registration'] = CRM_Utils_Array::value('is_online_registration', $params, FALSE);
+    $params['is_confirm_enabled'] = CRM_Utils_Array::value('is_confirm_enabled', $params, FALSE); // CRM-11182
     $params['is_multiple_registrations'] = CRM_Utils_Array::value('is_multiple_registrations', $params, FALSE);
     $params['allow_same_participant_emails'] = CRM_Utils_Array::value('allow_same_participant_emails', $params, FALSE);
     $params['requires_approval'] = CRM_Utils_Array::value('requires_approval', $params, FALSE);
@@ -820,6 +947,60 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
           unset($ufJoinParamsAdd['id']);
         }
       }
+    }
+
+    // get the profiles to evaluate what they collect
+    $profileIds = array(
+      CRM_Utils_Array::value('custom_pre_id', $params),
+      CRM_Utils_Array::value('custom_post_id', $params),
+    );
+    $additionalProfileIds = array(
+      CRM_Utils_Array::value('additional_custom_pre_id', $params),
+      CRM_Utils_Array::value('additional_custom_post_id', $params),
+    );
+    // additional profile fields default to main if not set
+    if (!is_numeric($additionalProfileIds[0])) {
+      $additionalProfileIds[0] = $profileIds[0];
+    }
+    if (!is_numeric($additionalProfileIds[1])) {
+      $additionalProfileIds[1] = $profileIds[1];
+    }
+    //add multiple profiles if set
+    self::addMultipleProfiles($profileIds, $params, 'custom_post_id_multiple');
+    self::addMultipleProfiles($additionalProfileIds, $params, 'additional_custom_post_id_multiple');
+
+    $cantDedupe = false;
+    $rgId = CRM_Utils_Array::value('dedupe_rule_group_id', $params, 0);
+
+    switch (self::canProfilesDedupe($profileIds, $rgId)) {
+      case 0:
+        $dedupeTitle = 'Duplicate Matching Impossible';
+        $cantDedupe = ts("The selected profiles do not contain the fields necessary to match registrations with existing contacts.  This means all anonymous registrations will result in a new contact.");
+        break;
+      case 1:
+        $dedupeTitle = 'Duplicate Contacts Possible';
+        $cantDedupe = ts("The selected profiles can collect enough information to match registrations with existing contacts, but not all of the relevant fields are required.  Anonymous registrations may result in duplicate contacts.");
+    }
+    if (!empty($params['is_multiple_registrations'])) {
+      switch(self::canProfilesDedupe($additionalProfileIds, $rgId)) {
+        case 0:
+          $dedupeTitle = 'Duplicate Matching Impossible';
+          if ($cantDedupe) {
+            $cantDedupe = ts("The selected profiles do not contain the fields necessary to match registrations with existing contacts.  This means all anonymous registrations will result in a new contact.");
+          }
+          else {
+            $cantDedupe = ts("The selected profiles do not contain the fields necessary to match additional participants with existing contacts.  This means all additional participants will result in a new contact.");
+          }
+          break;
+        case 1:
+          if (!$cantDedupe) {
+            $dedupeTitle = 'Duplicate Contacts Possible';
+            $cantDedupe = ts("The selected profiles can collect enough information to match additional participants with existing contacts, but not all of the relevant fields are required.  This may result in duplicate contacts.");
+          }
+      }
+    }
+    if ($cantDedupe) {
+      CRM_Core_Session::setStatus($cantDedupe, $dedupeTitle, 'alert dedupenotify', array('expires' => 0));
     }
 
     // Update tab "disabled" css class

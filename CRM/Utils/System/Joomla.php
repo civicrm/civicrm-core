@@ -37,7 +37,16 @@
  * Joomla specific stuff goes here
  */
 class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
+  /**
+   *
+   */
   function __construct() {
+    /**
+     * deprecated property to check if this is a drupal install. The correct method is to have functions on the UF classes for all UF specific
+     * functions and leave the codebase oblivious to the type of CMS
+     * @deprecated
+     * @var bool
+     */
     $this->is_drupal = FALSE;
   }
 
@@ -91,7 +100,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     return $ufID;
   }
 
-  /*
+  /**
    *  Change user name in host CMS
    *
    *  @param integer $ufID User ID in CMS
@@ -102,7 +111,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $ufName = CRM_Utils_Type::escape($ufName, 'String');
 
     $values = array();
-    $user = &JUser::getInstance($ufID);
+    $user = JUser::getInstance($ufID);
 
     $values['email'] = $ufName;
     $user->bind($values);
@@ -116,6 +125,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @params $params    array   array of name and mail values
    * @params $errors    array   array of errors
    * @params $emailName string  field label for the 'email'
+   *
+   * @param $params
+   * @param $errors
+   * @param string $emailName
    *
    * @return void
    */
@@ -191,8 +204,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb
    *
-   * @param string $title
-   * @param string $url
+   * @param $breadCrumbs
+   *
+   * @internal param string $title
+   * @internal param string $url
    *
    * @return void
    * @access public
@@ -224,7 +239,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Reset an additional breadcrumb tag to the existing breadcrumb
    *
-   * @param string $bc the new breadcrumb to be appended
+   * @internal param string $bc the new breadcrumb to be appended
    *
    * @return void
    * @access public
@@ -236,7 +251,9 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * Append a string to the head of the html file
    *
-   * @param string $head the new string to be appended
+   * @param null $string
+   *
+   * @internal param string $head the new string to be appended
    *
    * @return void
    * @access public
@@ -334,9 +351,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @param $htmlize  boolean  whether to convert to html eqivalant
    * @param $frontend boolean  a gross joomla hack
    *
+   * @param bool $forceBackend
+   *
    * @return string            an HTML string containing a link to the given path.
    * @access public
-   *
    */
   function url($path = NULL, $query = NULL, $absolute = TRUE,
     $fragment = NULL, $htmlize = TRUE,
@@ -488,8 +506,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $row = $users[0];
     }
 
+    $joomlaBase = dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
     if ( !defined('JVERSION') ) {
-      $joomlaBase = dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
       require $joomlaBase . '/libraries/cms/version/version.php';
       $jversion = new JVersion;
       define('JVERSION', $jversion->getShortVersion());
@@ -519,6 +537,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       }
       else {
         if (!JUserHelper::verifyPassword($password, $dbPassword, $dbId)) return FALSE;
+
+        //include additional files required by Joomla 3.2.1+
+        if ( version_compare(JVERSION, '3.2.1', 'ge') ) {
+          require $joomlaBase . '/libraries/cms/application/helper.php';
+          require $joomlaBase . '/libraries/cms/application/cms.php';
+          require $joomlaBase . '/libraries/cms/application/administrator.php';
+        }
       }
 
       CRM_Core_BAO_UFMatch::synchronizeUFMatch($row, $dbId, $dbEmail, 'Joomla');
@@ -559,6 +584,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     return;
   }
 
+  /**
+   * @param $user
+   *
+   * @return bool
+   */
   function loadUser($user) {
     return TRUE;
   }
@@ -586,6 +616,9 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     return NULL;
   }
 
+  /**
+   * @return string
+   */
   function getVersion() {
     if (class_exists('JVersion')) {
       $version = new JVersion;
@@ -596,12 +629,16 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
   }
 
-  /*
+  /**
    * load joomla bootstrap
    *
    * @param $params array with uid or name and password
    * @param $loadUser boolean load cms user?
-   * @param $throwError throw error on failure?
+   * @param bool|\throw $throwError throw error on failure?
+   * @param null $realPath
+   * @param bool $loadDefines
+   *
+   * @return bool
    */
   function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL, $loadDefines = TRUE) {
     // Setup the base path related constant.
@@ -636,11 +673,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       require $joomlaBase . '/libraries/joomla/application/component/helper.php';
     }
     else {
+      require $joomlaBase . '/libraries/cms.php';
       require $joomlaBase . '/libraries/joomla/uri/uri.php';
     }
 
     jimport('joomla.application.cli');
-    
+
     // CRM-14281 Joomla wasn't available during bootstrap, so hook_civicrm_config never executes.
     $config = CRM_Core_Config::singleton();
     CRM_Utils_Hook::config($config);
@@ -732,15 +770,54 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $loginURL = $config->userFrameworkBaseURL;
     $loginURL = str_replace('administrator/', '', $loginURL);
     $loginURL .= 'index.php?option=com_users&view=login';
+
+    //CRM-14872 append destination
+    if ( !empty($destination) ) {
+      $loginURL .= '&return='.urlencode(base64_encode($destination));
+    }
     return $loginURL;
   }
 
+  /**
+   * @param $form
+   */
   public function getLoginDestination(&$form) {
-    return;
+    $args = NULL;
+
+    $id = $form->get('id');
+    if ($id) {
+      $args .= "&id=$id";
+    }
+    else {
+      $gid = $form->get('gid');
+      if ($gid) {
+        $args .= "&gid=$gid";
+      }
+      else {
+        // Setup Personal Campaign Page link uses pageId
+        $pageId = $form->get('pageId');
+        if ($pageId) {
+          $component = $form->get('component');
+          $args .= "&pageId=$pageId&component=$component&action=add";
+        }
+      }
+    }
+
+    $destination = NULL;
+    if ($args) {
+      // append destination so user is returned to form they came from after login
+      $args = 'reset=1'.$args;
+      $destination = CRM_Utils_System::url(CRM_Utils_System::currentPath(), $args, TRUE, NULL, TRUE, TRUE);
+    }
+
+    return $destination;
   }
 
   /**
    * Return default Site Settings
+   *
+   * @param $dir
+   *
    * @return array array
    * - $url, (Joomla - non admin url)
    * - $siteName,
@@ -759,6 +836,51 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $config->imageUploadDir
     );
     return array($url, NULL, $siteRoot);
+  }
+
+  /**
+   * Get Url to view user record
+   * @param integer $contactID Contact ID
+   *
+   * @return string
+   */
+  function getUserRecordUrl($contactID) {
+    $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
+    $userRecordUrl = NULL;
+    // if logged in user is super user, then he can view other users joomla profile
+    if (JFactory::getUser()->authorise('core.admin')) {
+      return CRM_Core_Config::singleton()->userFrameworkBaseURL . "index.php?option=com_users&view=user&task=user.edit&id=" . $uid;
+    }
+    elseif (CRM_Core_Session::singleton()->get('userID') == $contactID) {
+      return CRM_Core_Config::singleton()->userFrameworkBaseURL . "index.php?option=com_admin&view=profile&layout=edit&id=" . $uid;
+    }
+  }
+
+  /**
+   * Is the current user permitted to add a user
+   * @return bool
+   */
+  function checkPermissionAddUser() {
+    if (JFactory::getUser()->authorise('core.create', 'com_users')) {
+      return TRUE;
+    }
+  }
+
+  /**
+   * output code from error function
+   * @param string $content
+   */
+  function outputError($content) {
+    if (class_exists('JErrorPage')) {
+      $error = new Exception($content);
+      JErrorPage::render($error);
+    }
+    else if (class_exists('JError')) {
+      JError::raiseError('CiviCRM-001', $content);
+    }
+    else {
+      parent::outputError($content);
+    }
   }
 }
 

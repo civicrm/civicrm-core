@@ -82,7 +82,7 @@
                     <td class="label">{$form.financial_type_id.label}<span class="marker"> *</span></td>
                     <td>{$form.financial_type_id.html}<br /><span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span></td>
                 </tr>
-                <tr class="crm-event-eventfees-form-block-total_amount"><td class="label">{$form.total_amount.label}</td><td>{$form.total_amount.html|crmMoney:$currency}<br/><span class="description">{ts}Actual payment amount for this registration.{/ts}</span></td></tr>
+                <tr class="crm-event-eventfees-form-block-total_amount"><td class="label">{$form.total_amount.label}</td><td>{$form.total_amount.html|crmMoney:$currency}</td></tr>
                 <tr>
                     <td class="label" >{$form.receive_date.label}</td>
                     <td>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}</td>
@@ -205,13 +205,13 @@
 <script type="text/javascript">
 {literal}
 CRM.$(function($) {
-    cj("#contact_1").blur( function( ) {
+    cj("#contact_id").change( function( ) {
         checkEmail( );
     } );
     checkEmail( );
 });
 function checkEmail( ) {
-    var contactID =  cj("input[name='contact_select_id[1]']").val();
+    var contactID =  cj("#contact_id").val();
     if ( contactID ) {
         var postUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' h=0}{literal}";
         cj.post( postUrl, {contact_id: contactID},

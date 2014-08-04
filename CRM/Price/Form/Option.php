@@ -271,7 +271,10 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   /**
    * global validation rules for the form
    *
-   * @param array  $fields   (referance) posted values of the form
+   * @param array $fields (referance) posted values of the form
+   *
+   * @param $files
+   * @param $form
    *
    * @return array    if errors then list of errors to be posted back to the form,
    *                  true otherwise

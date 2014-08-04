@@ -67,7 +67,7 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
     }
 
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
-    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_contact', NULL, TRUE, FALSE, TRUE);
+    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_contact', NULL, TRUE, FALSE);
 
     $this->addDefaultButtons(ts('Remove Tags from Contacts'));
   }
@@ -76,6 +76,12 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
     $this->addFormRule(array('CRM_Contact_Form_Task_RemoveFromTag', 'formRule'));
   }
 
+  /**
+   * @param $form
+   * @param $rule
+   *
+   * @return array
+   */
   static function formRule($form, $rule) {
     $errors = array();
     if (empty($form['tag']) && empty($form['contact_taglist'])) {

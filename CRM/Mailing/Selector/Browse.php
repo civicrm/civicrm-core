@@ -59,10 +59,10 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
   /**
    * Class constructor
    *
-   * @param
+   * @internal param $
    *
-   * @return CRM_Contact_Selector_Profile
-   * @access public
+   * @return \CRM_Mailing_Selector_Browse
+  @access public
    */
   function __construct() {
   }
@@ -83,7 +83,10 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -374,7 +377,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           }
         }
 
-        if (in_array($row['status'], array('Complete', 'Canceled')) && 
+        if (in_array($row['status'], array('Complete', 'Canceled')) &&
           !$row['archived']) {
           if ($allAccess || $showCreateLinks) {
             $actionMask |= CRM_Core_Action::RENEW;
@@ -427,10 +430,19 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
     return ts('CiviMail Mailings');
   }
 
+  /**
+   * @param $parent
+   */
   function setParent($parent) {
     $this->_parent = $parent;
   }
 
+  /**
+   * @param $params
+   * @param bool $sortBy
+   *
+   * @return int|string
+   */
   function whereClause(&$params, $sortBy = TRUE) {
     $values = $clauses = array();
     $isFormSubmitted   = $this->_parent->get('hidden_find_mailings');

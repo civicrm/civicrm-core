@@ -121,7 +121,7 @@
       <td>&nbsp;</td>
     {/if}
     {if $isTagset}
-      <td colspan="2">{include file="CRM/common/Tag.tpl"}</td>
+      <td colspan="2">{include file="CRM/common/Tagset.tpl"}</td>
     {/if}
     <td>{$form.tag_search.label}  {help id="id-all-tags"}<br />{$form.tag_search.html}</td>
     {if ! $isTagset}

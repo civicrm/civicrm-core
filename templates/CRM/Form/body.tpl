@@ -33,7 +33,7 @@
   <div>{$form.hidden}</div>
 {/if}
 
-{if $snippet neq 'json' and !$suppressForm and count($form.errors) gt 0}
+{if ($snippet !== 'json') and !$suppressForm and count($form.errors) gt 0}
    <div class="messages crm-error">
        <div class="icon red-icon alert-icon"></div>
      {ts}Please correct the following errors in the form fields below:{/ts}

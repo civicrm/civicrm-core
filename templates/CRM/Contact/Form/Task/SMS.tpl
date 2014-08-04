@@ -49,7 +49,7 @@
     <tr class="crm-contactsms-form-block-recipient">
        <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if}</td>
        <td>{$form.to.html}
-    <div class="spacer"></div> 
+    <div class="spacer"></div>
       </td>
      </tr>
    <tr><td class="label">{$form.activity_subject.label}</td>
@@ -63,7 +63,7 @@
         <td>{$form.template.html}</td>
     </tr>
 {/if}
-    
+
 </table>
 {include file="CRM/Contact/Form/Task/SMSCommon.tpl"}
 
@@ -92,13 +92,24 @@
 {/if}
 
 {literal}
-
-var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name or email address of an existing contact.{/ts}{literal}";
-var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkphone' h=0 }{literal}";
-var toDataUrl     = "{/literal}{crmURL p='civicrm/ajax/checkphone' q='id=1' h=0 }{literal}";
-
-cj( "#to"     ).tokenInput( toDataUrl,     { prePopulate: toContact,  theme: 'facebook', hintText: hintText });
-cj( 'ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px' );
+CRM.$(function($){
+  var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkphone' h=0 }{literal}";
+  function phoneSelect(el){
+    $(el).data('api-entity', 'contact').crmSelect2({
+      minimumInputLength: 1,
+      multiple: true,
+      ajax: {
+        url: sourceDataUrl,
+        data: function(term) {
+          return { name: term,};
+        },
+        results: function(response) {
+          return { results: response };
+        }
+      }
+    }).select2('data', toContact);
+  }
+  phoneSelect('#to');
+});
 </script>
 {/literal}
-{include file="CRM/common/formNavigate.tpl"}

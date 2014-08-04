@@ -47,7 +47,7 @@ use JMS\Serializer\Annotation as JMS;
  *
  * @CiviAPI\Entity("Mailing")
  * @CiviAPI\Permission()
- * @ORM\Table(name="civicrm_mailing", indexes={@ORM\Index(name="FK_civicrm_mailing_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_mailing_header_id", columns={"header_id"}),@ORM\Index(name="FK_civicrm_mailing_footer_id", columns={"footer_id"}),@ORM\Index(name="FK_civicrm_mailing_reply_id", columns={"reply_id"}),@ORM\Index(name="FK_civicrm_mailing_unsubscribe_id", columns={"unsubscribe_id"}),@ORM\Index(name="FK_civicrm_mailing_optout_id", columns={"optout_id"}),@ORM\Index(name="FK_civicrm_mailing_msg_template_id", columns={"msg_template_id"}),@ORM\Index(name="FK_civicrm_mailing_created_id", columns={"created_id"}),@ORM\Index(name="FK_civicrm_mailing_scheduled_id", columns={"scheduled_id"}),@ORM\Index(name="FK_civicrm_mailing_approver_id", columns={"approver_id"}),@ORM\Index(name="FK_civicrm_mailing_campaign_id", columns={"campaign_id"}),@ORM\Index(name="FK_civicrm_mailing_sms_provider_id", columns={"sms_provider_id"})})
+ * @ORM\Table(name="civicrm_mailing", indexes={@ORM\Index(name="index_hash", columns={"hash"}),@ORM\Index(name="FK_civicrm_mailing_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_mailing_header_id", columns={"header_id"}),@ORM\Index(name="FK_civicrm_mailing_footer_id", columns={"footer_id"}),@ORM\Index(name="FK_civicrm_mailing_reply_id", columns={"reply_id"}),@ORM\Index(name="FK_civicrm_mailing_unsubscribe_id", columns={"unsubscribe_id"}),@ORM\Index(name="FK_civicrm_mailing_optout_id", columns={"optout_id"}),@ORM\Index(name="FK_civicrm_mailing_msg_template_id", columns={"msg_template_id"}),@ORM\Index(name="FK_civicrm_mailing_created_id", columns={"created_id"}),@ORM\Index(name="FK_civicrm_mailing_scheduled_id", columns={"scheduled_id"}),@ORM\Index(name="FK_civicrm_mailing_approver_id", columns={"approver_id"}),@ORM\Index(name="FK_civicrm_mailing_campaign_id", columns={"campaign_id"}),@ORM\Index(name="FK_civicrm_mailing_sms_provider_id", columns={"sms_provider_id"})})
  * @ORM\Entity
  *
  */
@@ -337,10 +337,10 @@ class Mailing extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="visibility", type="string", length=40, nullable=true, options={"default": "User and User Admin Only"})
+   * @ORM\Column(name="visibility", type="string", length=40, nullable=true, options={"default": "Public Pages"})
    * 
    */
-  private $visibility = 'User and User Admin Only';
+  private $visibility = 'Public Pages';
   
   /**
    * @var \Civi\Campaign\Campaign
@@ -368,6 +368,15 @@ class Mailing extends \Civi\Core\Entity {
    * @ORM\JoinColumns({@ORM\JoinColumn(name="sms_provider_id", referencedColumnName="id", onDelete="SET NULL")})
    */
   private $smsProvider;
+  
+  /**
+   * @var string
+   *
+   * @JMS\Type("string")
+   * @ORM\Column(name="hash", type="string", length=16, nullable=true)
+   * 
+   */
+  private $hash;
 
   /**
    * Get id
@@ -1057,6 +1066,26 @@ class Mailing extends \Civi\Core\Entity {
   public function getSmsProvider() {
     return $this->smsProvider;
   }
+  
+  /**
+   * Set hash
+   *
+   * @param string $hash
+   * @return Mailing
+   */
+  public function setHash($hash) {
+    $this->hash = $hash;
+    return $this;
+  }
+
+  /**
+   * Get hash
+   *
+   * @return string
+   */
+  public function getHash() {
+    return $this->hash;
+  }
 
   /**
    * returns all the column names of this table
@@ -1088,7 +1117,12 @@ class Mailing extends \Civi\Core\Entity {
                                                              
                                     
                 'FKClassName' => 'CRM_Core_DAO_Domain',
-                          ),
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_domain',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
       
               'header_id' => array(
       
@@ -1399,7 +1433,7 @@ class Mailing extends \Civi\Core\Entity {
                                  'maxlength' => 40,
                                  'size' => \CRM_Utils_Type::BIG,
                            
-                                           'default' => 'User and User Admin Only',
+                                           'default' => 'Public Pages',
          
                                      'pseudoconstant' => array(
                                 'callback' => 'CRM_Core_SelectValues::groupVisibility',
@@ -1439,6 +1473,18 @@ class Mailing extends \Civi\Core\Entity {
                                                              
                                     
                 'FKClassName' => 'CRM_SMS_DAO_Provider',
+                          ),
+      
+              'hash' => array(
+      
+        'name' => 'hash',
+        'propertyName' => 'hash',
+        'type' => \CRM_Utils_Type::T_STRING,
+                'title' => ts('Mailing Hash'),
+                                 'maxlength' => 16,
+                                 'size' => \CRM_Utils_Type::TWELVE,
+                           
+                                    
                           ),
              );
     }

@@ -38,11 +38,13 @@ class CRM_Utils_Address {
    * Format an address basing on the address fields provided.
    * Use Setting's address_format if there's no format specified.
    *
-   * @param array   $fields            the address fields
-   * @param string  $format            the desired address format
-   * @param boolean $microformat       if true indicates, the address to be built in hcard-microformat standard.
-   * @param boolean $mailing           if true indicates, the call has been made from mailing label
-   * @param boolean $individualFormat  if true indicates, the call has been made for the contact of type 'individual'
+   * @param array $fields the address fields
+   * @param string $format the desired address format
+   * @param boolean $microformat if true indicates, the address to be built in hcard-microformat standard.
+   * @param boolean $mailing if true indicates, the call has been made from mailing label
+   * @param boolean $individualFormat if true indicates, the call has been made for the contact of type 'individual'
+   *
+   * @param null $tokenFields
    *
    * @return string  formatted address string
    *
@@ -204,7 +206,7 @@ class CRM_Utils_Address {
     // for every token, replace {fooTOKENbar} with fooVALUEbar if
     // the value is not empty, otherwise drop the whole {fooTOKENbar}
     foreach ($replacements as $token => $value) {
-      if ($value && is_string($value)) {
+      if ($value && is_string($value) || is_numeric($value)) {
         $formatted = preg_replace("/{([^{}]*)\b{$token}\b([^{}]*)}/u", "\${1}{$value}\${2}", $formatted);
       }
       else {
@@ -267,6 +269,11 @@ class CRM_Utils_Address {
     return $finalFormatted;
   }
 
+  /**
+   * @param $format
+   *
+   * @return array
+   */
   static function sequence($format) {
     // also compute and store the address sequence
     $addressSequence = array(

@@ -142,9 +142,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->addRule('imageOption', ts('Please select an option for the premium image.'), 'required');
 
     $this->addElement('text', 'imageUrl', ts('Image URL'));
-    $this->addRule('imageUrl', 'Please enter the valid URL to display this image.', 'url');
     $this->addElement('text', 'thumbnailUrl', ts('Thumbnail URL'));
-    $this->addRule('thumbnailUrl', 'Please enter the valid URL to display a thumbnail of this image.', 'url');
 
     $this->add('file', 'uploadFile', ts('Image File Name'), 'onChange="select_option();"');
 
@@ -232,6 +230,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    * Function for validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
+   *
+   * @param $files
    *
    * @return mixed true or array of errors
    * @access public
@@ -376,6 +376,11 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    * Resize a premium image to a different size
    *
    * @access private
+   *
+   * @param $filename
+   * @param $resizedName
+   * @param $width
+   * @param $height
    *
    * @return Path to image
    */

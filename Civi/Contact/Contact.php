@@ -511,16 +511,16 @@ class Contact extends \Civi\Core\Entity {
    * @ORM\Column(name="created_date", type="datetime", nullable=true, columnDefinition="TIMESTAMP NULL DEFAULT NULL")
    * 
    */
-  private $createdDate;
+  private $createdDate = 'NULL';
   
   /**
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="modified_date", type="datetime", nullable=true, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+   * @ORM\Column(name="modified_date", type="datetime", nullable=true, columnDefinition="TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
    * 
    */
-  private $modifiedDate;
+  private $modifiedDate = 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP';
 
   /**
    * Get id
@@ -2375,7 +2375,12 @@ class Contact extends \Civi\Core\Entity {
                 'title' => ts('Created Date'),
                         'required' => false,
                                                      
-                                    
+                         'export' => true,
+                'where' => 'civicrm_contact.created_date',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                                          'default' => 'NULL',
+         
                           ),
       
               'modified_date' => array(
@@ -2386,7 +2391,12 @@ class Contact extends \Civi\Core\Entity {
                 'title' => ts('Modified Date'),
                         'required' => false,
                                                      
-                                    
+                         'export' => true,
+                'where' => 'civicrm_contact.modified_date',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                                          'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+         
                           ),
              );
     }

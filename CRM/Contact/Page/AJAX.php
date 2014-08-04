@@ -36,6 +36,9 @@
  * This class contains all contact related functions that are called using AJAX (jQuery)
  */
 class CRM_Contact_Page_AJAX {
+  /**
+   * @deprecated
+   */
   static function getContactList() {
     // if context is 'customfield'
     if (CRM_Utils_Array::value('context', $_GET) == 'customfield') {
@@ -90,21 +93,26 @@ class CRM_Contact_Page_AJAX {
     CRM_Core_Page_AJAX::autocompleteResults(CRM_Utils_Array::value('values', $result), 'data');
   }
 
+  /**
+   * Ajax callback for custom fields of type ContactReference
+   *
+   * Todo: Migrate contact reference fields to use EntityRef
+   */
   static function contactReference() {
-    $name = CRM_Utils_Array::value('s', $_GET);
+    $name = CRM_Utils_Array::value('term', $_GET);
     $name = CRM_Utils_Type::escape($name, 'String');
     $cfID = CRM_Utils_Type::escape($_GET['id'], 'Positive');
 
     // check that this is a valid, active custom field of Contact Reference type
-    $params           = array('id' => $cfID);
+    $params = array('id' => $cfID);
     $returnProperties = array('filter', 'data_type', 'is_active');
-    $fldValues        = array();
+    $cf = array();
     CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $cf, $returnProperties);
     if (!$cf['id'] || !$cf['is_active'] || $cf['data_type'] != 'ContactReference') {
-      CRM_Core_Page_AJAX::autocompleteResults(array('error' => $name));
+      CRM_Utils_System::civiExit('error');
     }
 
-    if ($cf['filter']) {
+    if (!empty($cf['filter'])) {
       $filterParams = array();
       parse_str($cf['filter'], $filterParams);
 
@@ -113,7 +121,7 @@ class CRM_Contact_Page_AJAX {
       if (!empty($action) &&
         !in_array($action, array('get', 'lookup'))
       ) {
-        CRM_Core_Page_AJAX::autocompleteResults(array('error' => $name));
+        CRM_Utils_System::civiExit('error');
       }
     }
 
@@ -123,12 +131,7 @@ class CRM_Contact_Page_AJAX {
 
     $return = array_unique(array_merge(array('sort_name'), $list));
 
-    $config = CRM_Core_Config::singleton();
-
-    $limit = 10;
-    if (!empty($_GET['limit'])) {
-      $limit = CRM_Utils_Type::escape($_GET['limit'], 'Positive');
-    }
+    $limit = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
 
     $params = array('offset' => 0, 'rowCount' => $limit, 'version' => 3);
     foreach ($return as $fld) {
@@ -166,7 +169,7 @@ class CRM_Contact_Page_AJAX {
     $contact = civicrm_api('Contact', 'Get', $params);
 
     if (!empty($contact['is_error'])) {
-      CRM_Core_Page_AJAX::autocompleteResults(array('error' => $name));
+      CRM_Utils_System::civiExit('error');
     }
 
     $contactList = array();
@@ -177,14 +180,10 @@ class CRM_Contact_Page_AJAX {
           $view[] = $value[$fld];
         }
       }
-      $contactList[$value['id']] = implode(' :: ', $view);
+      $contactList[] = array('id' => $value['id'], 'text' => implode(' :: ', $view));
     }
 
-    if (!$contactList) {
-      $contactList = array($name => $name);
-    }
-
-    CRM_Core_Page_AJAX::autocompleteResults($contactList);
+    CRM_Utils_System::civiExit(json_encode($contactList));
   }
 
   /**
@@ -227,7 +226,12 @@ class CRM_Contact_Page_AJAX {
             SELECT pcp.id as id, CONCAT_WS( ' :: ', {$select} ) as data, sort_name
             FROM civicrm_pcp pcp, civicrm_contribution_page cp, civicrm_contact cc
             {$includeEmailFrom}
-            {$whereClause}
+            {$whereClause} AND pcp.page_type = 'contribute'
+            UNION ALL
+            SELECT pcp.id as id, CONCAT_WS( ' :: ', {$select} ) as data, sort_name
+            FROM civicrm_pcp pcp, civicrm_event cp, civicrm_contact cc
+            {$includeEmailFrom}
+            {$whereClause} AND pcp.page_type = 'event'
             LIMIT 0, {$limit}
             ) t
         ORDER BY sort_name
@@ -318,25 +322,6 @@ class CRM_Contact_Page_AJAX {
     echo json_encode($values);
     CRM_Utils_System::civiExit();
   }
-
-  /**
-   * Function to obtain list of permissioned employer for the given contact-id.
-   */
-  static function getPermissionedEmployer() {
-    $cid  = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
-    $name = trim(CRM_Utils_Type::escape($_GET['s'], 'String'));
-    $name = str_replace('*', '%', $name);
-
-    $elements = CRM_Contact_BAO_Relationship::getPermissionedEmployer($cid, $name);
-    $results = array();
-    if (!empty($elements)) {
-      foreach ($elements as $cid => $name) {
-        $results[$cid] = $name['name'];
-      }
-    }
-    CRM_Core_Page_AJAX::autocompleteResults($results);
-  }
-
 
   static function groupTree() {
     $gids = CRM_Utils_Type::escape($_GET['gids'], 'String');
@@ -656,10 +641,9 @@ ORDER BY sort_name ";
 
       if ($queryString) {
         $offset = CRM_Utils_Array::value('offset', $_GET, 0);
-        $rowCount = CRM_Utils_Array::value('rowcount', $_GET, 20);
+        $rowCount = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
 
         $offset = CRM_Utils_Type::escape($offset, 'Int');
-        $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
 
         // add acl clause here
         list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
@@ -686,8 +670,8 @@ LIMIT {$offset}, {$rowCount}
           $dao = CRM_Core_DAO::executeQuery($query);
           while ($dao->fetch()) {
             $result[] = array(
-              'name' => $dao->name,
               'id' => $dao->id,
+              'text' => $dao->name,
             );
           }
         }
@@ -712,13 +696,13 @@ LIMIT {$offset}, {$rowCount}
           $dao = CRM_Core_DAO::executeQuery($query);
 
           while ($dao->fetch()) {
+              //working here
             $result[] = array(
-              'name' => '"' . $dao->name . '" &lt;' . $dao->email . '&gt;',
+              'text' => '"' . $dao->name . '" <' . $dao->email . '>',
               'id' => (CRM_Utils_Array::value('id', $_GET)) ? "{$dao->id}::{$dao->email}" : '"' . $dao->name . '" <' . $dao->email . '>',
             );
           }
         }
-
         if ($result) {
           echo json_encode($result);
         }
@@ -733,7 +717,7 @@ LIMIT {$offset}, {$rowCount}
     //check for mobile type
     $phoneTypes = CRM_Core_OptionGroup::values('phone_type', TRUE, FALSE, FALSE, NULL, 'name');
     $mobileType = CRM_Utils_Array::value('Mobile', $phoneTypes);
-    
+
     $name = CRM_Utils_Array::value('name', $_GET);
     if ($name) {
       $name = CRM_Utils_Type::escape($name, 'String');
@@ -784,7 +768,7 @@ LIMIT {$offset}, {$rowCount}
 
       while ($dao->fetch()) {
         $result[] = array(
-          'name' => '"' . $dao->name . '" &lt;' . $dao->phone . '&gt;',
+          'text' => '"' . $dao->name . '" (' . $dao->phone . ')',
           'id' => (CRM_Utils_Array::value('id', $_GET)) ? "{$dao->id}::{$dao->phone}" : '"' . $dao->name . '" <' . $dao->phone . '>',
         );
       }
@@ -935,6 +919,8 @@ LIMIT {$offset}, {$rowCount}
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
     $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
     $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
+    $sort      = 'sort_name';
+    $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
 
     $gid         = isset($_REQUEST['gid']) ? CRM_Utils_Type::escape($_REQUEST['gid'], 'Integer') : 0;
     $rgid        = isset($_REQUEST['rgid']) ? CRM_Utils_Type::escape($_REQUEST['rgid'], 'Integer') : 0;
@@ -1038,6 +1024,11 @@ LIMIT {$offset}, {$rowCount}
     CRM_Utils_System::civiExit();
   }
 
+  /**
+   * @param $name
+   *
+   * @return string
+   */
   static function _convertToId($name) {
     if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
       $cId = substr($name, CRM_Core_Form::CB_PREFIX_LEN);

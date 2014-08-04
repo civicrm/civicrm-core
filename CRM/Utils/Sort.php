@@ -116,11 +116,11 @@ class CRM_Utils_Sort {
    * key names of variable (which should be the same as the column name)
    * value: ascending or descending
    *
-   * @param mixed  $vars             - assoc array as described above
+   * @param mixed $vars - assoc array as described above
    * @param string $defaultSortOrder - order to sort
    *
-   * @return void
-   * @access public
+   * @return \CRM_Utils_Sort
+  @access public
    */
   function __construct(&$vars, $defaultSortOrder = NULL) {
     $this->_vars = array();
@@ -276,6 +276,9 @@ class CRM_Utils_Sort {
 
   /**
    * Universal callback function for sorting by weight
+   *
+   * @param $a
+   * @param $b
    *
    * @return array of items sorted by weight
    * @access public

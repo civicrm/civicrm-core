@@ -298,7 +298,12 @@ class WordReplacement extends \Civi\Core\Entity {
                                                              
                                     
                 'FKClassName' => 'CRM_Core_DAO_Domain',
-                          ),
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_domain',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
              );
     }
     return self::$_fields;

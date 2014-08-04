@@ -49,10 +49,7 @@
  * @access public
  */
 function civicrm_api3_grant_create($params) {
-  $values = array();
-  _civicrm_api3_custom_format_params($params, $values, 'Grant');
-  $params = array_merge($values, $params);
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'grant');
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Grant');
 }
 
 /**
@@ -77,7 +74,7 @@ function _civicrm_api3_grant_create_spec(&$params) {
  * @access public
  */
 function civicrm_api3_grant_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Grant');
 }
 
 /**

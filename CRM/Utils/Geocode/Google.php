@@ -59,7 +59,10 @@ class CRM_Utils_Geocode_Google {
    * address. Note that at a later stage, we could make this function also clean up
    * the address into a more valid format
    *
-   * @param object $address
+   * @param $values
+   * @param bool $stateName
+   *
+   * @internal param object $address
    *
    * @return boolean true if we modified the address, false otherwise
    * @static

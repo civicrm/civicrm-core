@@ -24,6 +24,10 @@
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
 */
+
+/**
+ * Class CRM_Utils_Weight
+ */
 class CRM_Utils_Weight {
   /**
    * @var array, list of GET fields which must be validated
@@ -81,6 +85,7 @@ class CRM_Utils_Weight {
    *
    * @param string $daoName full name of the DAO
    * $param integer $weight the weight to be removed
+   * @param $fieldID
    * @param array $fieldValues field => value to be used in the WHERE
    * @param string $weightField field which contains the weight value,
    * defaults to 'weight'
@@ -255,7 +260,10 @@ class CRM_Utils_Weight {
    * @param string $daoName full name of the DAO
    * @param array $fieldValues field => value to be used in the WHERE
    * @param string $queryData data to be used, dependent on the query type
+   * @param null $additionalWhere
    * @param string $orderBy optional ORDER BY field
+   *
+   * @param null $groupBy
    *
    * @return Object CRM_Core_DAO objet that holds the results of the query
    */
@@ -328,6 +336,13 @@ class CRM_Utils_Weight {
     return $resultDAO;
   }
 
+  /**
+   * @param $rows
+   * @param $daoName
+   * @param $idName
+   * @param $returnURL
+   * @param null $filter
+   */
   static function addOrder(&$rows, $daoName, $idName, $returnURL, $filter = NULL) {
     if (empty($rows)) {
       return;
@@ -457,7 +472,10 @@ class CRM_Utils_Weight {
 
     self::fixOrderOutput($url);
   }
-  
+
+  /**
+   * @param $url
+   */
   static function fixOrderOutput($url) {
     if (empty($_GET['snippet']) || $_GET['snippet'] !== 'json') {
       CRM_Utils_System::redirect($url);

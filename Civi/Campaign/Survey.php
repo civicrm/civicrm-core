@@ -684,7 +684,7 @@ class Survey extends \Civi\Core\Entity {
         'name' => 'activity_type_id',
         'propertyName' => 'activityTypeId',
         'type' => \CRM_Utils_Type::T_INT,
-                'title' => ts('Activity Type ID'),
+                'title' => ts('Activity Type'),
                                                              
                 'import' => true,
         'where' => 'civicrm_survey.activity_type_id',

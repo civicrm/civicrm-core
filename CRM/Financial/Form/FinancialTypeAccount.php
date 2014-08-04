@@ -245,7 +245,11 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   /**
    * global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param $values
+   * @param $files
+   * @param $self
+   *
+   * @internal param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static

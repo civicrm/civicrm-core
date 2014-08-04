@@ -44,10 +44,11 @@ class CRM_Auction_StateMachine_Item extends CRM_Core_StateMachine {
   /**
    * class constructor
    *
-   * @param object  CRM_Auction_Controller
-   * @param int     $action
+   * @param object $controller
+   * @param \const|int $action
    *
-   * @return object CRM_Contact_Import_StateMachine
+   * @internal param \CRM_Auction_Controller $object
+   * @return \CRM_Auction_StateMachine_Item CRM_Contact_Import_StateMachine
    */
   function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);

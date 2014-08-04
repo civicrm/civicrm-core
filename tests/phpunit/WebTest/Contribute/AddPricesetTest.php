@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_AddPricesetTest
+ */
 class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -64,6 +68,12 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->_testVerifyPriceSet($validateStrings, $sid);
   }
 
+  /**
+   * @param $setTitle
+   * @param $usedFor
+   * @param $setHelp
+   * @param null $financialType
+   */
   function _testAddSet($setTitle, $usedFor, $setHelp, $financialType = NULL) {
     $this->openCiviPage("admin/price", "reset=1&action=add", '_qf_Set_next-bottom');
 
@@ -85,6 +95,12 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
   }
 
+  /**
+   * @param $fields
+   * @param $validateString
+   * @param $financialType
+   * @param bool $dateSpecificFields
+   */
   function _testAddPriceFields(&$fields, &$validateString, $financialType, $dateSpecificFields = FALSE) {
     $validateStrings[] = $financialType;
     foreach ($fields as $label => $type) {
@@ -165,6 +181,9 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @return string
+   */
   function _testAddFinancialType() {
     //Add new Financial Type
     $financialType['name'] = 'FinancialType ' . substr(sha1(rand()), 0, 4);
@@ -174,6 +193,10 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     return $financialType['name'];
   }
 
+  /**
+   * @param $validateStrings
+   * @param $sid
+   */
   function _testVerifyPriceSet($validateStrings, $sid) {
     // verify Price Set at Preview page
     // start at Manage Price Sets listing
@@ -576,7 +599,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     // select price set items
     $this->select('price_set_id', "label=$setTitle");
-    $this->type("xpath=//input[@class='four crm-form-text required']", "2");
+    $this->type("xpath=//input[@class='four crm-form-text required']", "1");
     $this->click("xpath=//input[@class='crm-form-radio']");
     $this->click("xpath=//input[@class='crm-form-checkbox']");
     // select payment instrument type = Check and enter chk number
@@ -588,7 +611,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     $this->webtestFillAutocomplete("{$lastNameSoft}, {$firstNameSoft}", 'soft_credit_contact_id_1');
 
-    $this->type('soft_credit_amount_1', "1");
+    $this->type('soft_credit_amount_1', "65");
     //Additional Detail section
     $this->click('AdditionalDetail');
     $this->waitForElementPresent('thankyou_date');

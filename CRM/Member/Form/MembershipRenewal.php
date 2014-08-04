@@ -260,6 +260,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $defaults['num_terms'] = 1;
     $defaults['send_receipt'] = 0;
 
+    //set Soft Credit Type to Gift by default
+    $scTypes = CRM_Core_OptionGroup::values("soft_credit_type");
+    $defaults['soft_credit_type_id'] = CRM_Utils_Array::value(ts('Gift'), array_flip($scTypes));
+
     $renewalDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('renewal_date', $defaults),
       NULL, NULL, 'Y-m-d'
     );
@@ -727,10 +731,11 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     if ($formValues['contribution_status_id'] == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus())) {
       $this->_params['is_pay_later'] = 1;
     }
-    $renewMembership = CRM_Member_BAO_Membership::renewMembership($this->_contactID,
+    $renewMembership = CRM_Member_BAO_Membership::renewMembershipFormWrapper($this->_contactID,
       $formValues['membership_type_id'][1],
       $isTestMembership, $this, NULL, NULL,
-      $customFieldsFormatted, $numRenewTerms
+      $customFieldsFormatted, $numRenewTerms,
+      $this->_membershipId
     );
 
     $endDate = CRM_Utils_Date::processDate($renewMembership->end_date);
@@ -772,10 +777,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       if($this->_contributorContactID != $this->_contactID){
         $formValues['contribution_contact_id'] = $this->_contributorContactID;
         if (!empty($this->_params['soft_credit_type_id'])){
-          $formValues['soft_credit'][] = array(
+          $formValues['soft_credit'] = array(
             'soft_credit_type_id' => $this->_params['soft_credit_type_id'],
             'contact_id' => $this->_contactID,
-            'amount' => $formValues['total_amount'],
           );
         }
       }

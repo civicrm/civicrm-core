@@ -29,7 +29,7 @@
 
     <p>If you do not want users to send outbound mail from CiviCRM, select "Disable Outbound Email". NOTE: If you disable outbound email, and you are using Online Contribution pages or online Event Registration - you will need to disable automated receipts and registration confirmations.</p>
 
-   <p>If you choose Redirect to Database, all emails will be recorded as archived mailings instead of being sent out.</p>{/ts}
+   <p>If you choose Redirect to Database, all emails will be recorded as archived mailings instead of being sent out. They can be found in the civicrm_mailing_spool table in the CiviCRM database.</p>{/ts}
 
 </div>
      <table class="form-layout-compressed">

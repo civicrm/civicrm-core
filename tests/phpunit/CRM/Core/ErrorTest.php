@@ -31,6 +31,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Tests for linking to resource files
  */
 class CRM_Core_ErrorTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name'    => 'Errors',
@@ -89,6 +92,9 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
     $this->assertLogRegexp('/static-1.*static-2.*obj-1.*static-3.*obj-2.*static-4.*obj-3.*static-5/s');
 }
 
+  /**
+   * @param $pattern
+   */
   function assertLogRegexp($pattern) {
     $config = CRM_Core_Config::singleton();
     $logFiles = glob($config->configAndLogDir.'/CiviCRM*log*/');

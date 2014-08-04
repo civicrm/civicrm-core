@@ -110,6 +110,14 @@ class CRM_Core_CodeGen_EntitySpecification {
 
       $tables[$name]['fields'][$fkey]['propertyName'] = str_replace('Id', '', $tables[$name]['fields'][$fkey]['propertyName']);
       $tables[$name]['fields'][$fkey]['functionName'] = str_replace('Id', '', $tables[$name]['fields'][$fkey]['functionName']);
+      // There's a naming conflict between civicrm_mail_settings.domain
+      // and civicrm_mail_settings.domain_id when using the normal Doctrine
+      // rules
+      if ($name == 'civicrm_mail_settings' && $tables[$name]['fields'][$fkey]['name'] == 'domain_id')
+      {
+        $tables[$name]['fields'][$fkey]['propertyName'] = 'civiDomain';
+        $tables[$name]['fields'][$fkey]['functionName'] = 'CiviDomain';
+      }
       $tables[$name]['foreignKey'][$fkey]['className'] = $classNames[$ftable];
       $tables[$name]['foreignKey'][$fkey]['fileName'] = str_replace('_', '/', $classNames[$ftable]) . '.php';
       $tables[$name]['fields'][$fkey]['FKClassName'] = $fkClassNames[$ftable];
@@ -236,15 +244,11 @@ class CRM_Core_CodeGen_EntitySpecification {
         $columnInfoOptions[] = '"unsigned":true';
       }
 
-      if (array_key_exists('default_ts', $field)) {
-        if ($field['default_ts'] == 'NULL') {
-          $field['columnInfo'] .= ', columnDefinition="TIMESTAMP NULL DEFAULT ' . $field['default_ts'] .'"';
-        }
-        else {
-          $field['columnInfo'] .= ', columnDefinition="TIMESTAMP DEFAULT ' . $field['default_ts'] .'"';
-        }
-      }
-      if (array_key_exists('default', $field) && $field['default'] !== NULL && $field['default'] !== 'NULL') {
+      // Doctrine doesn't handle well setting a timestamp default to:
+      // CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      if ($field['xmlType'] == 'timestamp' && $field['default'] != '') {
+        $field['columnInfo'] .= ", columnDefinition=\"TIMESTAMP NULL DEFAULT {$field['default']}\"";
+      } elseif (array_key_exists('default', $field) && $field['default'] !== NULL && $field['default'] !== 'NULL') {
         $columnInfoOptions[] = '"default": ' . str_replace("'", '"', $field['default']);
       }
       if (!empty($field['default'])) {
@@ -357,6 +361,7 @@ class CRM_Core_CodeGen_EntitySpecification {
     $name  = trim((string ) $fieldXML->name);
     $field = array('name' => $name, 'localizable' => $fieldXML->localizable);
     $type  = (string ) $fieldXML->type;
+    $field['xmlType'] = $type;
     switch ($type) {
       case 'varchar':
       case 'char':

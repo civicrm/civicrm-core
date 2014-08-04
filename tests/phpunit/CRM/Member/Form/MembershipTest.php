@@ -332,7 +332,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   function testFormRuleRollingLifetimeEnd() {
     $unixNow         = time();
     $unixYearFromNow = $unixNow + (365 * 24 * 60 * 60);
-    $params          = array('join_date' => date('m/d/Y', $unixNow),
+    $params          = array(
+      'join_date' => date('m/d/Y', $unixNow),
       'start_date' => date('m/d/Y', $unixNow),
       'end_date' => date('m/d/Y',
         $unixYearFromNow
@@ -342,12 +343,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $files = array();
     $obj   = new CRM_Member_Form_Membership;
     $rc    = $obj->formRule($params, $files, $obj);
-    $this->assertType('array', $rc,
-      'In line ' . __LINE__
-    );
-    $this->assertTrue(array_key_exists('end_date', $rc),
-      'In line ' . __LINE__
-    );
+    $this->assertType('array', $rc);
+    $this->assertTrue(array_key_exists('status_id', $rc));
   }
 
   /**

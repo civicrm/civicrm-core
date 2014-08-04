@@ -35,6 +35,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class api_v3_MembershipTest
+ */
 class api_v3_MembershipTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_contactID;
@@ -208,7 +211,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * Test civicrm_membership_get with params not array.
    * Gets treated as contact_id, memberships expected.
    */
-
   function testGetWithParamsMemberShipTypeId() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $params = array(
@@ -229,7 +231,32 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($result['is_override'], 1, "In line " . __LINE__);
     $this->assertEquals($result['id'], $membership['id']);
   }
+  /**
+   * Test civicrm_membership_get with params not array.
+   * Gets treated as contact_id, memberships expected.
+   */
+  function testGetWithParamsMemberShipTypeIdContactID() {
+    $params = $this->_params;
+    $this->callAPISuccess($this->_entity, 'create', $params);
+    $params['membership_type_id'] = $this->_membershipTypeID2;
+    $this->callAPISuccess($this->_entity, 'create', $params);
+    $this->callAPISuccessGetCount('membership', array('contact_id' => $this->_contactID), 2);
+    $params = array(
+      'membership_type_id' => $this->_membershipTypeID,
+      'contact_id' => $this->_contactID,
+    );
+    $result = $this->callAPISuccess('membership', 'getsingle', $params);
+    $this->assertEquals($result['contact_id'], $this->_contactID);
+    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID);
 
+    $params = array(
+      'membership_type_id' => $this->_membershipTypeID2,
+      'contact_id' => $this->_contactID,
+    );
+    $result = $this->callAPISuccess('membership', 'getsingle', $params);
+    $this->assertEquals($result['contact_id'], $this->_contactID);
+    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID2);
+  }
   /**
    * check with complete array + custom field
    * Note that the test is written on purpose without any
@@ -317,8 +344,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     $membership = $this->callAPISuccess('membership', 'get', $params);
     $result = $membership['values'][$this->_membershipID];
-    $this->assertEquals($membership['values'][$this->_membershipID]['status_id'], $this->_membershipStatusID, "In line " . __LINE__);
-    $this->assertEquals($membership['values'][$this->_membershipID]['contact_id'], $this->_contactID, "In line " . __LINE__);
+    $this->assertEquals($membership['values'][$this->_membershipID]['status_id'], $this->_membershipStatusID);
+    $this->assertEquals($membership['values'][$this->_membershipID]['contact_id'], $this->_contactID);
     $params = array(
       'contact_id' => $this->_contactID,
       'filters' => array(
@@ -328,8 +355,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     $membership = $this->callAPIAndDocument('membership', 'get', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $result = $membership['values'][$this->_membershipID];
-    $this->assertEquals($membership['values'][$this->_membershipID]['status_id'], $this->_membershipStatusID, "In line " . __LINE__);
-    $this->assertEquals($membership['values'][$this->_membershipID]['contact_id'], $this->_contactID, "In line " . __LINE__);
+    $this->assertEquals($membership['values'][$this->_membershipID]['status_id'], $this->_membershipStatusID);
+    $this->assertEquals($membership['values'][$this->_membershipID]['contact_id'], $this->_contactID);
 
 
     $result = $this->callAPISuccess('Membership', 'Delete', array(
@@ -411,6 +438,132 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->relationshipTypeDelete($relTypeID);
     $this->contactDelete($membershipOrgId);
     $this->contactDelete($memberContactId);
+  }
+
+  /**
+   * Test civicrm_membership_create with relationships.
+   * create/get Memberships.
+   *
+   * Test suite for CRM-14758: API ( contact, create ) does not always create related membership
+   * and max_related property for Membership_Type and Membership entities
+   */
+  function testCreateWithRelationship() {
+    // Create membership type: inherited through employment, max_related = 2
+    $params = array(
+      'name_a_b' => 'Employee of',
+    );
+    $result = $this->callAPISuccess('relationship_type', 'get', $params);
+    $relationshipTypeId = $result['id'];
+    $membershipOrgId = $this->organizationCreate();
+    $params = array(
+      'name' => 'Corporate Membership',
+      'duration_unit' => 'year',
+      'duration_interval' => 1,
+      'period_type' => 'rolling',
+      'member_of_contact_id' => $membershipOrgId,
+      'domain_id' => 1,
+      'financial_type_id' => 1,
+      'relationship_type_id' => $relationshipTypeId,
+      'relationship_direction' => 'b_a',
+      'max_related' => 2,
+      'is_active' => 1,
+    );
+    $result = $this->callAPISuccess('membership_type', 'create', $params);
+    $membershipTypeId = $result['id'];
+
+    // Create employer and first employee
+    $employerId[0] = $this->organizationCreate(array(), 1);
+    $memberContactId[0] = $this->individualCreate(array('employer_id' => $employerId[0]), 0);
+
+    // Create organization's membership
+    $params = array(
+      'contact_id' => $employerId[0],
+      'membership_type_id' => $membershipTypeId,
+      'source' => 'Test suite',
+      'start_date' => date('Y-m-d'),
+      'end_date' => "+1 year",
+    );
+    $OrganizationMembershipID = $this->contactMembershipCreate($params);
+
+    // Check that the employee inherited the membership
+    $params = array(
+      'contact_id' => $memberContactId[0],
+      'membership_type_id' => $membershipTypeId,
+    );
+
+    $result = $this->callAPISuccess('membership', 'get', $params);
+
+    $this->assertEquals(1, $result['count']);
+    $result = $result['values'][$result['id']];
+    $this->assertEquals($OrganizationMembershipID, $result['owner_membership_id']);
+
+    // Create second employee
+    $memberContactId[1] = $this->individualCreate(array('employer_id' => $employerId[0]), 1);
+
+    // Check that the employee inherited the membership
+    $params = array(
+      'contact_id' => $memberContactId[1],
+      'membership_type_id' => $membershipTypeId,
+    );
+    $result = $this->callAPISuccess('membership', 'get', $params);
+    //exit;
+    // If it fails here CRM-14758 is not fixed
+    $this->assertEquals(1, $result['count']);
+    $result = $result['values'][$result['id']];
+    $this->assertEquals($OrganizationMembershipID, $result['owner_membership_id']);
+
+    // Create third employee
+    $memberContactId[2] = $this->individualCreate(array('current_employer' => $employerId[0]), 2);
+
+    // Check that employee does NOT inherit the membership (max_related = 2)
+    $params = array(
+      'contact_id' => $memberContactId[2],
+      'membership_type_id' => $membershipTypeId,
+    );
+    $result = $this->callAPISuccess('membership', 'get', $params);
+    $this->assertEquals(0, $result['count']);
+
+    // Increase max_related for the employer's membership
+    $params = array(
+      'id' => $OrganizationMembershipID,
+      'max_related' => 3,
+    );
+    $this->contactMembershipCreate($params);
+
+    // Check that the employee inherited the membership
+    $params = array(
+      'contact_id' => $memberContactId[2],
+      'membership_type_id' => $membershipTypeId,
+    );
+    $result = $this->callAPISuccess('membership', 'get', $params);
+    $this->assertEquals(1, $result['count']);
+    $result = $result['values'][$result['id']];
+    $this->assertEquals($OrganizationMembershipID, $result['owner_membership_id']);
+
+    // First employee moves to a new job
+    $employerId[1] = $this->organizationCreate(array(), 2);
+    $params = array(
+      'id' => $memberContactId[0],
+      'employer_id' => $employerId[1],
+    );
+    $this->callAPISuccess('contact', 'create', $params);
+
+    // Check that employee does NO LONGER inherit the membership
+    $params = array(
+      'contact_id' => $memberContactId[0],
+      'membership_type_id' => $membershipTypeId,
+    );
+    $result = $this->callAPISuccess('membership', 'get', $params);
+    $this->assertEquals(0, $result['count']);
+
+    // Tear down - reverse of creation to be safe
+    $this->contactDelete($memberContactId[2]);
+    $this->contactDelete($memberContactId[1]);
+    $this->contactDelete($memberContactId[0]);
+    $this->contactDelete($employerId[1]);
+    $this->contactDelete($employerId[0]);
+    $this->membershipTypeDelete(array('id' => $membershipTypeId));
+    $this->contactDelete($membershipOrgId);
   }
 
   /**
@@ -842,4 +995,3 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
    }
 }
-

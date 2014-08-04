@@ -108,8 +108,10 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
-   **********************************************************/
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_eWAY *******************************************************
+   */
   function __construct($mode, &$paymentProcessor) {
     // require Standaard eWAY API libraries
     require_once 'eWAY/eWAY_GatewayRequest.php';
@@ -126,9 +128,12 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param object $paymentProcessor
+   * @param null $paymentForm
+   * @param bool $force
+   *
    * @return object
    * @static
-   *
    */
   static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = false) {
     $processorName = $paymentProcessor['name'];
@@ -472,13 +477,15 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    * NOTE: Called by Events and Contribute to check config params are set prior to trying
    *       register any credit card details
    *
-   * @param string $mode the mode we are operating in (live or test) - not used but could be
+   * @return null|string
+   * @internal param string $mode the mode we are operating in (live or test) - not used but could be
    * to check that the 'test' mode CustomerID was equal to '87654321' and that the URL was
    * set to https://www.eway.com.au/gateway_cvn/xmltest/TestPage.asp
    *
    * returns string $errorMsg if any errors found - null if OK
    *
-   ********************************************************************************************/
+   ******************************************************************************************
+   */
   //function checkConfig( $mode )          // CiviCRM V1.9 Declaration
   // CiviCRM V2.0 Declaration
   function checkConfig() {
@@ -500,6 +507,13 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     }
   }
 
+  /**
+   * @param $p_eWAY_tran_num
+   * @param $p_trxn_out
+   * @param $p_trxn_back
+   * @param $p_request
+   * @param $p_response
+   */
   function send_alert_email($p_eWAY_tran_num, $p_trxn_out, $p_trxn_back, $p_request, $p_response) {
     // Initialization call is required to use CiviCRM APIs.
     civicrm_initialize(TRUE);

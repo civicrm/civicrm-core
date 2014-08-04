@@ -25,6 +25,13 @@ class API_Exception extends Exception
   const NOT_IMPLEMENTED = 'not-found';
 
   private $extraParams = array();
+
+  /**
+   * @param string $message
+   * @param int $error_code
+   * @param array $extraParams
+   * @param Exception $previous
+   */
   public function __construct($message, $error_code = 0, $extraParams = array(),Exception $previous = null) {
     if (is_numeric ($error_code)) // using int for error code "old way")
       $code = $error_code;
@@ -35,14 +42,23 @@ class API_Exception extends Exception
   }
 
   // custom string representation of object
+  /**
+   * @return string
+   */
   public function __toString() {
     return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
   }
 
+  /**
+   * @return array
+   */
   public function getExtraParams() {
     return $this->extraParams;
   }
 
+  /**
+   * @return array
+   */
   public function getErrorCodes(){
     return array(
         2000 => '$params was not an array',
@@ -64,12 +80,22 @@ class API_Exception extends Exception
 class CiviCRM_API3_Exception extends Exception
 {
   private $extraParams = array();
+
+  /**
+   * @param string $message
+   * @param int $error_code
+   * @param array $extraParams
+   * @param Exception $previous
+   */
   public function __construct($message, $error_code, $extraParams = array(),Exception $previous = null) {
     parent::__construct(ts($message));
     $this->extraParams = $extraParams + array('error_code' => $error_code);
   }
 
   // custom string representation of object
+  /**
+   * @return string
+   */
   public function __toString() {
     return __CLASS__ . ": [{$this->extraParams['error_code']}: {$this->message}\n";
   }
@@ -77,6 +103,10 @@ class CiviCRM_API3_Exception extends Exception
   public function getErrorCode() {
     return $this->extraParams['error_code'];
   }
+
+  /**
+   * @return array
+   */
   public function getExtraParams() {
     return $this->extraParams;
   }

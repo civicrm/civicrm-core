@@ -202,12 +202,17 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
   /**
    * Get user context
    *
+   * @param null $mode
+   *
    * @return string  user context
    */
   function userContext($mode = NULL) {
     return 'civicrm/contact/deduperules';
   }
 
+  /**
+   * @param $id
+   */
   function delete($id) {
     $ruleDao = new CRM_Dedupe_DAO_Rule();
     $ruleDao->dedupe_rule_group_id = $id;

@@ -92,6 +92,19 @@ function _civicrm_api3_mailing_contact_get_spec(&$params) {
   );
 }
 
+/**
+ * @param $type
+ * @param $contactID
+ * @param $offset
+ * @param $limit
+ * @param $selectFields
+ * @param $fromClause
+ * @param $whereClause
+ * @param $sort
+ * @param $getCount
+ *
+ * @return array
+ */
 function _civicrm_api3_mailing_contact_query(
   $type,
   $contactID,
@@ -194,6 +207,15 @@ LIMIT %2, %3
   return $results;
 }
 
+/**
+ * @param $contactID
+ * @param $offset
+ * @param $limit
+ * @param $sort
+ * @param $getCount
+ *
+ * @return array
+ */
 function _civicrm_api3_mailing_contact_get_delivered(
   $contactID,
   $offset,
@@ -225,6 +247,15 @@ AND        meb.id IS NULL
   );
 }
 
+/**
+ * @param $contactID
+ * @param $offset
+ * @param $limit
+ * @param $sort
+ * @param $getCount
+ *
+ * @return array
+ */
 function _civicrm_api3_mailing_contact_get_bounced(
   $contactID,
   $offset,

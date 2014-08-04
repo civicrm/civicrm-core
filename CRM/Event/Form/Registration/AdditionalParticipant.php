@@ -367,9 +367,11 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $self
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -511,6 +513,12 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     return $errors;
   }
 
+  /**
+   * @param $self
+   * @param $fields
+   *
+   * @return bool
+   */
   function validatePaymentValues($self, $fields) {
 
     if (!empty($self->_params[0]['bypass_payment']) ||
@@ -712,13 +720,22 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       CRM_Core_Session::setStatus($statusMsg, ts('Registration Saved'), 'success');
     }
 
-    //to check whether call processRegistration()
-    if (!$this->_values['event']['is_monetary'] && !empty($this->_params[0]['additional_participants']) && $this->isLastParticipant()
+    // Check whether to process the registration now, calling processRegistration()
+    if (
+      !$this->_values['event']['is_confirm_enabled'] // CRM-11182 - Optional confirmation screen
+      && !$this->_values['event']['is_monetary']
+      && CRM_Utils_Array::value('additional_participants', $this->_params[0])
+      && $this->isLastParticipant()
     ) {
       CRM_Event_Form_Registration_Register::processRegistration($this->_params, NULL);
     }
   }
 
+  /**
+   * @param $additionalParticipant
+   *
+   * @return array
+   */
   public static function &getPages($additionalParticipant) {
     $details = array();
     for ($i = 1; $i <= $additionalParticipant; $i++) {
@@ -732,6 +749,8 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
   /**
    * check whether call current participant is last one
+   *
+   * @param bool $isButtonJs
    *
    * @return boolean ture on success.
    * @access public
@@ -804,6 +823,10 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     }
   }
 
+  /**
+   * @param $elementName
+   * @param array $optionIds
+   */
   function resetSubmittedValue($elementName, $optionIds = array(
     )) {
     if (empty($elementName) ||

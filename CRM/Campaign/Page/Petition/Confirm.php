@@ -33,6 +33,10 @@
  *
  */
 class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
+  /**
+   * @return string
+   * @throws Exception
+   */
   function run() {
     $contact_id   = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);
     $subscribe_id = CRM_Utils_Request::retrieve('sid', 'Integer', CRM_Core_DAO::$_nullObject);
@@ -84,9 +88,12 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
   /**
    * Confirm email verification
    *
-   * @param int $contact_id       The id of the contact
-   * @param int $subscribe_id     The id of the subscription event
-   * @param string $hash          The hash
+   * @param int $contact_id The id of the contact
+   * @param int $subscribe_id The id of the subscription event
+   * @param string $hash The hash
+   *
+   * @param $activity_id
+   * @param $petition_id
    *
    * @return boolean              True on success
    * @access public

@@ -26,6 +26,10 @@
 */
 namespace Civi\API;
 
+/**
+ * Class Request
+ * @package Civi\API
+ */
 class Request {
   private static $nextId = 1;
 
@@ -36,6 +40,8 @@ class Request {
    * @param string $action
    * @param array $params
    * @param mixed $extra
+   *
+   * @throws \API_Exception
    * @return array the request descriptor; keys:
    *   - version: int
    *   - entity: string

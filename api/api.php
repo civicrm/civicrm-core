@@ -98,6 +98,12 @@ function civicrm_error($result) {
   return FALSE;
 }
 
+/**
+ * @param $entity
+ * @param null $version
+ *
+ * @return string
+ */
 function _civicrm_api_get_camel_name($entity, $version = NULL) {
   $fragments = explode('_', $entity);
   foreach ($fragments as & $fragment) {

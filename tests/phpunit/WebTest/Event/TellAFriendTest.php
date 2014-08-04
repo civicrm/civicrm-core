@@ -25,6 +25,10 @@
   */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_TellAFriendTest
+ */
 class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -55,7 +59,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->_testAddTellAFriend($subject, $thankYouMsg, $eventTitle);
 
     // get the url for registration
-    $this->waitForElementPresent("xpath=//div[@id='event_status_id']//div[@class='dataTables_wrapper']/table/tbody//tr/td[1]/a[text()='$eventTitle']");
+    $this->waitForElementPresent("xpath=//div[@id='event_status_id']//div[@id='option11_wrapper']/table/tbody//tr/td[1]/a[text()='$eventTitle']");
     $this->click("link=$eventTitle");
     $this->waitForElementPresent("link=Register Now");
     $this->click("link=Register Now");
@@ -77,6 +81,8 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->type('last_name', "$lastName");
     $this->type('email-Primary', "$firstName@$lastName.com");
     $this->click('_qf_Register_upload-bottom');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click('_qf_Confirm_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("css=div.crm-event-thankyou-form-block div#tell-a-friend a");
     $this->waitForElementPresent('_qf_Form_cancel');
@@ -135,36 +141,38 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/search", "reset=1", '_qf_Basic_refresh');
     $this->type('sort_name', $firstName);
     $this->click('_qf_Basic_refresh ');
-    $this->waitForElementPresent('Print');
-    $this->assertTrue($this->isTextPresent('1 Contact'));
+    $this->waitForTextPresent('1 Contact');
 
     // Verify Activity created
     $this->openCiviPage("activity/search", "reset=1", '_qf_Search_refresh');
     $this->type('sort_name', $firstName1);
     $this->click('_qf_Search_refresh');
-    $this->waitForElementPresent("_qf_Search_next_print");
-    $this->click("xpath=//div[@class='crm-search-results']//table[@class='selector']/tbody/tr[2]/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='crm-search-results']//table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='crm-search-results']//table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
-
-    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[1]/td[2]",
+    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[1]/td[2]/span/a[1]",
       preg_quote("$lastName, $firstName")
     );
 
-    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/a[1]",
+    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/span/a[1]",
       preg_quote("$lastName1, $firstName1")
     );
-    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/a[2]",
+    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/span/a[2]",
       preg_quote("$lastName2, $firstName2")
     );
-    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/a[3]",
+    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/span/a[3]",
       preg_quote("$lastName3, $firstName3")
     );
 
-    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[4]/td[2]",
+    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[4]/td[2]/span",
       preg_quote("Tell a Friend:")
     );
   }
 
+  /**
+   * @param $eventTitle
+   * @param $eventDescription
+   */
   function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
@@ -190,6 +198,9 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->click("_qf_EventInfo_upload-bottom");
   }
 
+  /**
+   * @param $streetAddress
+   */
   function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -206,10 +217,14 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->click("_qf_Location_upload-bottom");
 
     // Wait for "saved" status msg
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Location' information has been saved.");
+    $this->waitForElementPresent("_qf_Location_upload-bottom");
+    $this->waitForTextPresent("'Event Location' information has been saved.");
   }
 
+  /**
+   * @param $registerIntro
+   * @param bool $multipleRegistrations
+   */
   function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
     // Go to Online Registration tab
     $this->click("link=Online Registration");
@@ -222,6 +237,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
       $this->assertChecked("is_multiple_registrations");
     }
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField("intro_text", $registerIntro);
 
     // enable confirmation email
@@ -230,10 +246,15 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->type("confirm_from_email", "jane.doe@example.org");
 
     $this->click("_qf_Registration_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Registration' information has been saved.");
+    $this->waitForElementPresent("_qf_Registration_upload-bottom");
+    $this->waitForTextPresent("'Online Registration' information has been saved.");
   }
 
+  /**
+   * @param $subject
+   * @param $thankYouMsg
+   * @param $eventTitle
+   */
   function _testAddTellAFriend($subject, $thankYouMsg, $eventTitle) {
     // Go to Tell A Friend Tab
     $this->click('link=Tell a Friend');
@@ -251,7 +272,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->type('tf_thankyou_text', $thankYouMsg);
 
     $this->click('_qf_Event_upload_done-bottom');
-    $this->waitForElementPresent("xpath=//div[@id='event_status_id']//div[@class='dataTables_wrapper']/table/tbody//tr/td[1]/a[text()='$eventTitle']");
+    $this->waitForElementPresent("xpath=//div[@id='event_status_id']//div[@id='option11_wrapper']/table/tbody//tr/td[1]/a[text()='$eventTitle']");
   }
 }
 

@@ -42,6 +42,8 @@ class CRM_Core_BAO_ActionLog extends CRM_Core_DAO_ActionLog {
   /**
    * Create or update an action log entry
    *
+   * @param $params
+   *
    * @return actionLog array
    * @access public
    */

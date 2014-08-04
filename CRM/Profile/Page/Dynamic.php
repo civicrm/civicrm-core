@@ -107,10 +107,14 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   /**
    * class constructor
    *
-   * @param int $id  the contact id
+   * @param int $id the contact id
    * @param int $gid the group id
    *
-   * @return void
+   * @param $restrict
+   * @param bool $skipPermission
+   * @param null $profileIds
+   *
+   * @return \CRM_Profile_Page_Dynamic
    * @access public
    */
   function __construct($id, $gid, $restrict, $skipPermission = FALSE, $profileIds = NULL) {
@@ -317,16 +321,15 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $profileFields = array();
       $labels = array();
 
-      //CRM-14338
-      $nullValueIndex = ' ';
       foreach ($fields as $name => $field) {
-        if ( isset($labels[$field['title']]) ) {
-          $labels[$field['title'].$nullValueIndex] = preg_replace('/\s+|\W+/', '_', $name);
-          $nullValueIndex .= $nullValueIndex;
-        }
-        else {
-          $labels[$field['title']] = preg_replace('/\s+|\W+/', '_', $name);
-        }
+        //CRM-14338
+        // Create a unique, non-empty index for each field.
+        $index = $field['title'];
+        if ($index === '') $index = ' ';
+        while (array_key_exists($index, $labels))
+          $index .= ' ';
+
+        $labels[$index] = preg_replace('/\s+|\W+/', '_', $name);
       }
 
       foreach ($values as $title => $value) {
@@ -383,6 +386,11 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     return trim($template->fetch($this->getHookedTemplateFileName()));
   }
 
+  /**
+   * @param string $suffix
+   *
+   * @return null|string
+   */
   function checkTemplateFileExists($suffix = '') {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/Dynamic.{$suffix}tpl";
@@ -403,11 +411,30 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     return NULL;
   }
 
+  /**
+   * Use the form name to create the tpl file name
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
 
+  /**
+   * Default extra tpl file basically just replaces .tpl with .extra.tpl
+   * i.e. we dont override
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();

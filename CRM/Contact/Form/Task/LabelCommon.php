@@ -41,9 +41,12 @@
 class CRM_Contact_Form_Task_LabelCommon {
   /**
    * Check for presence of tokens to be swapped out
+   *
    * @param array $contact
    * @param array $mailingFormatProperties
    * @param array $tokenFields
+   *
+   * @return bool
    */
   function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
     foreach (array_merge($mailingFormatProperties, array_fill_keys($tokenFields, 1)) as $key => $dontCare) {
@@ -86,9 +89,13 @@ class CRM_Contact_Form_Task_LabelCommon {
   /**
    * function to get the rows for the labels
    *
-   * @param array $contactIds Contact IDS to do labels for
+   * @param $contactIDs
    * @param integer $locationTypeID
    * @param boolean $respectDoNotMail
+   * @param $mergeSameAddress
+   * @param $mergeSameHousehold
+   *
+   * @internal param array $contactIds Contact IDS to do labels for
    * @return array of rows for labels
    * @access  public
    */
@@ -382,6 +389,11 @@ class CRM_Contact_Form_Task_LabelCommon {
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function mergeSameHousehold(&$rows) {
     # group selected contacts by type
     $individuals = array();

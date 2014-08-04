@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Campaign_PledgeTest
+ */
 class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -65,7 +69,7 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     $firstName2 = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName2, "John", "$firstName2.john@example.org");
@@ -78,7 +82,7 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Remove');
 
     $this->openCiviPage("campaign/add", "reset=1", "_qf_Campaign_upload-bottom");
 
@@ -110,11 +114,15 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
       "Status message didn't show up after saving campaign!"
     );
 
-    $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
-    $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $this->waitForElementPresent("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $id = (int) $this->getText("//div[@id='campaignList']/div[@id='campaigns_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
     $this->pledgeAddTest($campaignTitle, $id);
   }
 
+  /**
+   * @param $campaignTitle
+   * @param $id
+   */
   function pledgeAddTest($campaignTitle, $id) {
     // create unique name
     $name = substr(sha1(rand()), 0, 7);
@@ -154,19 +162,6 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
 
     $this->select("contribution_page_id", "value=3");
 
-    //Honoree section
-    $this->click("Honoree");
-    $this->waitForElementPresent("honor_email");
-
-    $this->click("CIVICRM_QFID_1_2");
-    $this->select("honor_prefix_id", "value=3");
-
-    $honreeFirstName = 'First' . substr(sha1(rand()), 0, 4);
-    $honreeLastName = 'last' . substr(sha1(rand()), 0, 7);
-    $this->type("honor_first_name", $honreeFirstName);
-    $this->type("honor_last_name", $honreeLastName);
-    $this->type("honor_email", $honreeFirstName . "@example.com");
-
     //PaymentReminders
     $this->click("PaymentReminders");
     $this->waitForElementPresent("additional_reminder_day");
@@ -175,13 +170,13 @@ class WebTest_Campaign_PledgeTest extends CiviSeleniumTestCase {
     $this->type("additional_reminder_day", "4");
 
     $this->click("_qf_Pledge_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Add Pledge');
 
-    $this->assertTrue($this->isTextPresent("Pledge has been recorded and the payment schedule has been created."));
+    $this->waitForText('crm-notification-container', "Pledge has been recorded and the payment schedule has been created.");
 
-    $this->waitForElementPresent("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span[1]/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span[1]/a[text()='View']");
     //click through to the Pledge view screen
-    $this->click("xpath=//div[@id='Pledges']//table//tbody/tr[1]/td[10]/span[1]/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span[1]/a[text()='View']");
     $this->waitForElementPresent("_qf_PledgeView_next-bottom");
     $pledgeDate = date('F jS, Y', strtotime('now'));
 

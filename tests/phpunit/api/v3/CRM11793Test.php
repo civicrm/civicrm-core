@@ -59,6 +59,9 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
     $this->_testCRM11793ContactType('Individual');
   }
 
+  /**
+   * @param $contactType
+   */
   function _testCRM11793ContactType($contactType) {
     $result = $this->callAPISuccess(
       'contact',

@@ -47,7 +47,7 @@ use JMS\Serializer\Annotation as JMS;
  *
  * @CiviAPI\Entity("MessageTemplate")
  * @CiviAPI\Permission()
- * @ORM\Table(name="civicrm_msg_template", indexes={@ORM\Index(name="FK_civicrm_msg_template_pdf_format_id", columns={"pdf_format_id"})})
+ * @ORM\Table(name="civicrm_msg_template")
  * @ORM\Entity
  *
  */
@@ -136,13 +136,13 @@ class MessageTemplate extends \Civi\Core\Entity {
   private $isReserved;
   
   /**
-   * @var \Civi\Core\OptionValue
+   * @var integer
    *
+   * @JMS\Type("integer")
+   * @ORM\Column(name="pdf_format_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * @ORM\ManyToOne(targetEntity="Civi\Core\OptionValue")
-   * @ORM\JoinColumns({@ORM\JoinColumn(name="pdf_format_id", referencedColumnName="id", onDelete="SET NULL")})
    */
-  private $pdfFormat;
+  private $pdfFormatId;
 
   /**
    * Get id
@@ -314,23 +314,23 @@ class MessageTemplate extends \Civi\Core\Entity {
   }
   
   /**
-   * Set pdfFormat
+   * Set pdfFormatId
    *
-   * @param \Civi\Core\OptionValue $pdfFormat
+   * @param integer $pdfFormatId
    * @return MessageTemplate
    */
-  public function setPdfFormat(\Civi\Core\OptionValue $pdfFormat = null) {
-    $this->pdfFormat = $pdfFormat;
+  public function setPdfFormatId($pdfFormatId) {
+    $this->pdfFormatId = $pdfFormatId;
     return $this;
   }
 
   /**
-   * Get pdfFormat
+   * Get pdfFormatId
    *
-   * @return \Civi\Core\OptionValue
+   * @return integer
    */
-  public function getPdfFormat() {
-    return $this->pdfFormat;
+  public function getPdfFormatId() {
+    return $this->pdfFormatId;
   }
 
   /**
@@ -440,14 +440,12 @@ class MessageTemplate extends \Civi\Core\Entity {
               'pdf_format_id' => array(
       
         'name' => 'pdf_format_id',
-        'propertyName' => 'pdfFormat',
+        'propertyName' => 'pdfFormatId',
         'type' => \CRM_Utils_Type::T_INT,
                                                              
                                     
-                'FKClassName' => 'CRM_Core_DAO_OptionValue',
                                      'pseudoconstant' => array(
                                 'optionGroupName' => 'pdf_format',
-                      'keyColumn' => 'id',
                     )
                  ),
              );

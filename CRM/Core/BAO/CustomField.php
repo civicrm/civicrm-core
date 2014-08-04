@@ -92,6 +92,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     return self::$_dataType;
   }
 
+  /**
+   * @return array
+   */
   static function dataToHtml() {
     if (!self::$_dataToHtml) {
       self::$_dataToHtml = array(
@@ -495,6 +498,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
                             $cfTable.default_value,
                             $cfTable.options_per_line, $cfTable.text_length,
                             $cfTable.custom_group_id,
+                            $cfTable.is_required,
                             $cgTable.extends, $cfTable.is_search_range,
                             $cgTable.extends_entity_column_value,
                             $cgTable.extends_entity_column_id,
@@ -569,6 +573,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $fields[$dao->id]['option_group_id'] = $dao->option_group_id;
           $fields[$dao->id]['date_format'] = $dao->date_format;
           $fields[$dao->id]['time_format'] = $dao->time_format;
+          $fields[$dao->id]['is_required'] = $dao->is_required;
         }
 
         CRM_Core_BAO_Cache::setItem($fields,
@@ -585,11 +590,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   /**
    * Return the field ids and names (with groups) for import purpose.
    *
-   * @param int      $contactType     Contact type
-   * @param boolean  $showAll         If true returns all fields (includes disabled fields)
-   * @param boolean  $onlyParent      return fields ONLY related to basic types
-   * @param boolean  $search          when called from search and multiple records need to be returned
-   * @param boolean  $checkPermission if false, do not include permissioning clause
+   * @param int|string $contactType Contact type
+   * @param boolean $showAll If true returns all fields (includes disabled fields)
+   * @param boolean $onlyParent return fields ONLY related to basic types
+   * @param boolean $search when called from search and multiple records need to be returned
+   * @param boolean $checkPermission if false, do not include permissioning clause
+   *
+   * @param bool $withMultiple
    *
    * @return array   $fields -
    *
@@ -654,8 +661,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   /**
    * Get the field id from an import key
    *
-   * @param string $key       The key to parse
+   * @param string $key The key to parse
    *
+   * @param bool $all
    * @return int|null         The id (if exists)
    * @access public
    * @static
@@ -714,13 +722,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   /**
    * This function for building custom fields
    *
-   * @param CRM_Core_Form  $qf             form object (reference)
-   * @param string  $elementName    name of the custom field
+   * @param CRM_Core_Form $qf form object (reference)
+   * @param string $elementName name of the custom field
+   * @param $fieldId
    * @param boolean $inactiveNeeded
-   * @param boolean $userRequired   true if required else false
-   * @param boolean $search         true if used for search else false
-   * @param string  $label          label for custom field
+   * @param bool $useRequired
+   * @param boolean $search true if used for search else false
+   * @param string $label label for custom field
    *
+   * @internal param bool $userRequired true if required else false
    * @access public
    * @static
    */
@@ -1015,18 +1025,23 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'Autocomplete-Select':
         static $customUrls = array();
+        // Fixme: why is this a string in the first place??
+        $attributes = array();
+        if ($field->attributes) {
+          foreach(explode(' ', $field->attributes) as $at) {
+            if (strpos($at, '=')) {
+              list($k, $v) = explode('=', $at);
+              $attributes[$k] = trim($v, ' "');
+            }
+          }
+        }
         if ($field->data_type == 'ContactReference') {
-          $qf->add('text', $elementName, $label, $field->attributes,
+          $attributes['class'] = (isset($attributes['class']) ? $attributes['class'] . ' ' : '') . 'crm-form-contact-reference huge';
+          $attributes['data-api-entity'] = 'contact';
+          $qf->add('text', $elementName, $label, $attributes,
             $useRequired && !$search
           );
 
-          $hiddenEleName = $elementName . '_id';
-          if (substr($elementName, -1) == ']') {
-            $hiddenEleName = substr($elementName, 0, -1) . '_id]';
-          }
-          $qf->addElement('hidden', $hiddenEleName, '', array('id' => str_replace(array(']', '['), array('', '_'), $hiddenEleName)));
-
-          //$urlParams = "className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&reset=1&context=customfield&id={$field->id}";
           $urlParams = "context=customfield&id={$field->id}";
 
           $customUrls[$elementName] = CRM_Utils_System::url('civicrm/ajax/contactref',
@@ -1034,21 +1049,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             FALSE, NULL, FALSE
           );
 
-          $actualElementValue = $qf->getSubmitValue($hiddenEleName);
-          $qf->addRule($elementName, ts('Select a valid contact for %1.', array(1 => $label)), 'validContact', $actualElementValue);
         }
         else {
           // FIXME: This won't work with customFieldOptions hook
-          $attributes = array();
-          // Fixme: why is this a string in the first place???
-          if ($field->attributes) {
-            foreach(explode(' ', $field->attributes) as $at) {
-              if (strpos($at, '=')) {
-                list($k, $v) = explode('=', $at);
-                $attributes[$k] = trim($v, ' "');
-              }
-            }
-          }
           $attributes += array(
             'entity' => 'option_value',
             'placeholder' => $placeholder,
@@ -1150,9 +1153,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * Given a custom field value, its id and the set of options
    * find the display value for this field
    *
-   * @param mixed  $value     the custom field value
-   * @param int    $id        the custom field id
-   * @param int    $options   the assoc array of option name/value pairs
+   * @param mixed $value the custom field value
+   * @param int $id the custom field id
+   * @param int $options the assoc array of option name/value pairs
+   *
+   * @param null $contactID
+   * @param null $fieldID
    *
    * @return  string   the display value
    *
@@ -1176,6 +1182,17 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     );
   }
 
+  /**
+   * @param $value
+   * @param $option
+   * @param $html_type
+   * @param $data_type
+   * @param null $format
+   * @param null $contactID
+   * @param null $fieldID
+   *
+   * @return array|mixed|null|string
+   */
   static function getDisplayValueCommon($value,
     &$option,
     $html_type,
@@ -1381,9 +1398,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @params string $elementName   custom field name
    * @params array  $defaults      associated array of fields
    * @params int    $contactId     contact id
-   * @param  int    $mode          profile mode
-   * @param  mixed  $value         if passed - dont fetch value from db,
+   * @param $customFieldId
+   * @param $elementName
+   * @param $defaults
+   * @param null $contactId
+   * @param  int $mode profile mode
+   * @param  mixed $value if passed - dont fetch value from db,
    *                               just format the given value
+   *
    * @static
    * @access public
    */
@@ -1486,6 +1508,22 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
   }
 
+  /**
+   * @param $contactID
+   * @param $cfID
+   * @param null $fileID
+   * @param bool $absolute
+   *
+   * @return array
+   */
+  /**
+   * @param $contactID
+   * @param $cfID
+   * @param null $fileID
+   * @param bool $absolute
+   *
+   * @return array
+   */
   static function getFileURL($contactID, $cfID, $fileID = NULL, $absolute = FALSE) {
     if ($contactID) {
       if (!$fileID) {
@@ -1738,7 +1776,6 @@ SELECT id
       // rename this file to go into the secure directory
       if (!rename($fName, $config->customFileUploadDir . $filename)) {
         CRM_Core_Error::statusBounce(ts('Could not move custom file to custom upload directory'));
-        break;
       }
 
       if ($customValueId) {
@@ -1797,6 +1834,11 @@ SELECT $columnName
     return $customFormatted;
   }
 
+  /**
+   * @param $params
+   *
+   * @return array
+   */
   static function &defaultCustomTableSchema(&$params) {
     // add the id and extends_id
     $table = array(
@@ -1835,6 +1877,12 @@ SELECT $columnName
     return $table;
   }
 
+  /**
+   * @param $field
+   * @param $operation
+   * @param bool $indexExist
+   * @param bool $triggerRebuild
+   */
   static function createField($field, $operation, $indexExist = FALSE, $triggerRebuild = TRUE) {
     $tableName = CRM_Core_DAO::getFieldValue(
       'CRM_Core_DAO_CustomGroup',
@@ -2067,8 +2115,9 @@ AND    cf.id = %1";
    *
    * @access public
    *
-   * @return $customOptionGroup
-   * @static
+   * @param null $includeFieldIds
+   *
+   * @return mixed $customOptionGroup@static
    */
   public static function &customOptionGroup($includeFieldIds = NULL) {
     static $customOptionGroup = NULL;
@@ -2112,6 +2161,9 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
    *
    * @access public
    *
+   * @param $customFieldId
+   * @param $optionGroupId
+   *
    * @return void
    * @static
    */
@@ -2138,8 +2190,10 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
    *
    * @params int $optionGroupId option group id
    *
-   * @return
-   * @static
+   * @param $optionGroupId
+   *
+   * @return void
+  @static
    */
   static function checkOptionGroup($optionGroupId) {
     $query = "
@@ -2155,6 +2209,12 @@ WHERE  option_group_id = {$optionGroupId}";
     }
   }
 
+  /**
+   * @param $optionGroupId
+   * @param $htmlType
+   *
+   * @return null|string
+   */
   static function getOptionGroupDefault($optionGroupId, $htmlType) {
     $query = "
 SELECT   default_value, html_type
@@ -2196,6 +2256,15 @@ ORDER BY html_type";
     return $defaultValue;
   }
 
+  /**
+   * @param $params
+   * @param $customFields
+   * @param $entityID
+   * @param $customFieldExtends
+   * @param bool $inline
+   *
+   * @return array
+   */
   static function postProcess(&$params,
     &$customFields,
     $entityID,
@@ -2230,6 +2299,12 @@ ORDER BY html_type";
     return $customData;
   }
 
+  /**
+   * @param $field
+   * @param $options
+   *
+   * @throws Exception
+   */
   static function buildOption($field, &$options) {
     // Fixme - adding anything but options to the $options array is a bad idea
     // What if an option had the key 'attributes'?
@@ -2278,6 +2353,12 @@ SELECT label, value
     }
   }
 
+  /**
+   * @param $fieldLabel
+   * @param null $groupTitle
+   *
+   * @return null
+   */
   static function getCustomFieldID($fieldLabel, $groupTitle = NULL) {
     $params = array(1 => array($fieldLabel, 'String'));
     if ($groupTitle) {
@@ -2443,6 +2524,11 @@ WHERE      f.id IN ($ids)";
     return $errors;
   }
 
+  /**
+   * @param $customId
+   *
+   * @return bool
+   */
   static function isMultiRecordField($customId) {
     $isMultipleWithGid = FALSE;
     if (!is_numeric($customId)) {

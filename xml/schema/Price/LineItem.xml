@@ -38,6 +38,18 @@
     <add>1.7</add>
   </dynamicForeignKey>
   <field>
+    <name>contribution_id</name>
+    <type>int unsigned</type>
+    <comment>FK to civicrm_contribution</comment>
+    <add>4.5</add>
+  </field>
+  <foreignKey>
+    <name>contribution_id</name>
+    <table>civicrm_contribution</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
     <name>price_field_id</name>
     <type>int unsigned</type>
     <comment>FK to civicrm_price_field</comment>
@@ -106,7 +118,7 @@
       <type>Text</type>
     </html>d</comment>
     <add>3.2</add>
-    
+
   </field>
   <index>
     <name>index_entity</name>
@@ -118,10 +130,13 @@
     <name>UI_line_item_value</name>
     <fieldName>entity_table</fieldName>
     <fieldName>entity_id</fieldName>
+    <fieldName>contribution_id</fieldName>
     <fieldName>price_field_value_id</fieldName>
     <fieldName>price_field_id</fieldName>
     <unique>true</unique>
     <add>3.3</add>
+    <change>4.5</change>
+    <!-- Add contribution_id to unique index in 4.5  -->
   </index>
   <field>
     <name>price_field_value_id</name>
@@ -141,6 +156,11 @@
     <title>Financial Type</title>
     <type>int unsigned</type>
     <default>NULL</default>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <comment>FK to Financial Type.</comment>
     <add>4.3</add>
     <html>

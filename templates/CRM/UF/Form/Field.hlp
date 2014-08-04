@@ -1,3 +1,18 @@
+{htxt id='field_name_0-title'}
+{ts}Field Name{/ts}
+{/htxt}
+{htxt id='field_name_0'}
+  {capture assign="ltURL"}{crmURL p="civicrm/admin/locationType" q="reset=1"}{/capture}
+  <p>
+    {ts}Choose the field to add to the profile.{/ts}<br/>
+    <strong>{ts}Restrictions:{/ts}</strong><br/>
+    {ts}Only one field of each communication type (EG. phone) can use the primary location type.{/ts}
+  </p>
+  <p>
+    {ts 1=$ltURL}When you choose the primary location type the collected data will use the default location type from the <a href="%1">Location types</a> setup.{/ts}
+  </p>
+{/htxt}
+
 {htxt id='label-title'}
   {ts}Field Label{/ts}
 {/htxt}

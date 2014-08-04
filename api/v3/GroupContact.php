@@ -122,8 +122,7 @@ function civicrm_api3_group_contact_create($params) {
  *
  * @param <type> $params
  *
- * @return <type>
- * @deprecated
+ * @return array <type>@deprecated
  */
 function civicrm_api3_group_contact_delete($params) {
   $params['status'] = CRM_Utils_Array::value('status', $params, empty($params['skip_undelete']) ? 'Removed' : 'Deleted');
@@ -143,8 +142,7 @@ function _civicrm_api3_group_contact_delete_spec(&$params) {
  *
  * @param <type> $params
  *
- * @return <type>
- * @deprecated
+ * @return array|int <type>@deprecated
  */
 function civicrm_api3_group_contact_pending($params) {
   $params['status'] = 'Pending';

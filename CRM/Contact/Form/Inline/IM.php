@@ -99,11 +99,10 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
   /**
    * global validation rules for the form
    *
-   * @param array $fields     posted values of the form
-   * @param array $errors     list of errors to be posted back to the form
+   * @param array $fields posted values of the form
+   * @param array $errors list of errors to be posted back to the form
    *
-   * @return $errors
-   * @static
+   * @return array $errors@static
    * @access public
    */
   static function formRule($fields, $errors) {

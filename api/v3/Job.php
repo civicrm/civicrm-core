@@ -40,11 +40,6 @@
  */
 
 /**
- * Include common API util functions
- */
-require_once 'api/v3/utils.php';
-
-/**
  * Adjust metadata for "Create" action
  *
  * The metadata is used for setting defaults, documentation & validation
@@ -88,7 +83,9 @@ function civicrm_api3_job_get($params) {
 /**
  * Delete a job
  *
- * @param int $id
+ * @param $params
+ *
+ * @internal param int $id
  *
  * @return array API Result Array
  * {@getfields Job_delete}
@@ -96,15 +93,7 @@ function civicrm_api3_job_get($params) {
  * @access public
  */
 function civicrm_api3_job_delete($params) {
-  if ($params['id'] != NULL && !CRM_Utils_Rule::integer($params['id'])) {
-    return civicrm_api3_create_error('Invalid value for job ID');
-  }
-
-  $result = CRM_Core_BAO_Job::del($params['id']);
-  if (!$result) {
-    return civicrm_api3_create_error('Could not delete job');
-  }
-  return civicrm_api3_create_success($result, $params, 'job', 'delete');
+  _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -252,10 +241,11 @@ function civicrm_api3_job_mail_report($params) {
  *
  *                        id - Integer - greetings option group
  *
+ * @param $params
+ *
  * @return boolean        true if success, else false
  * @static
  * @access public
- *
  */
 function civicrm_api3_job_update_greeting($params) {
 

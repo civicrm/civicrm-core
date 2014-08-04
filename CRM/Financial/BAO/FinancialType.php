@@ -120,7 +120,10 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   /**
    * Function to delete financial Types
    *
-   * @param int $contributionTypeId
+   * @param $financialTypeId
+   *
+   * @return array|bool
+   * @internal param int $contributionTypeId
    * @static
    */
   static function del($financialTypeId) {

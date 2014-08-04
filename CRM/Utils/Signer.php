@@ -107,6 +107,8 @@ class CRM_Utils_Signer {
    *
    * @param $token string, the full public token representing the signature
    * @param $params array, key-value pairs
+   *
+   * @throws Exception
    * @return bool, TRUE iff all $paramNames for the submitted validate($params) and the original sign($params)
    */
   function validate($token, $params) {
@@ -118,6 +120,9 @@ class CRM_Utils_Signer {
     return ($token == $newToken);
   }
 
+  /**
+   * @return string
+   */
   function createSalt() {
     // It would be more secure to generate a new value but liable to run this
     // many times on certain admin pages; so instead we'll re-use the hash.

@@ -160,6 +160,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       }
     }
 
+    if (array_key_exists('is_reserved', $params)) {
+      $group->is_reserved = $params['is_reserved'] ? 1 : 0;
+    }
+    $op = isset($params['id']) ? 'edit' : 'create';
+    CRM_Utils_Hook::pre($op, 'CustomGroup', CRM_Utils_Array::value('id', $params), $params);
+
     // enclose the below in a transaction
     $transaction = new CRM_Core_Transaction();
 
@@ -250,6 +256,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param string $extends e.g. "Individual", "Activity"
    * @param int $columnId e.g. custom-group matching mechanism (usu NULL for matching on sub type-id); see extends_entity_column_id
    * @param string $columnValue e.g. "Student" or "3" or "3\05"; see extends_entity_column_value
+   *
+   * @return bool
    */
   public static function hasCustomGroup($extends, $columnId, $columnValue) {
     $dao = new CRM_Core_DAO_CustomGroup();
@@ -294,14 +302,18 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * @param string $entityType - of the contact whose contact type is needed
    * @param object $form - not used but required
-   * @param int    $entityId   - optional - id of entity if we need to populate the tree with custom values.
-   * @param int    $groupId    - optional group id (if we need it for a single group only)
-   *                           - if groupId is 0 it gets for inline groups only
-   *                           - if groupId is -1 we get for all groups
+   * @param null $entityID
+   * @param null $groupID
    * @param string $subType
    * @param string $subName
    * @param boolean $fromCache
    *
+   * @param null $onlySubType
+   *
+   * @internal param int $entityId - optional - id of entity if we need to populate the tree with custom values.
+   * @internal param int $groupId - optional group id (if we need it for a single group only)
+   *                           - if groupId is 0 it gets for inline groups only
+   *                           - if groupId is -1 we get for all groups
    * @return array $groupTree  - array  The returned array is keyed by group id and has the custom group table fields
    * and a subkey 'fields' holding the specific custom fields.
    * If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
@@ -314,7 +326,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @access public
    *
    * @static
-   *
    */
   public static function &getTree(
     $entityType,
@@ -612,6 +623,8 @@ ORDER BY civicrm_custom_group.weight,
    * @param integer $entityID id of entity for whom we are checking data for
    * @param string $table table that we are checking
    *
+   * @param bool $getCount
+   *
    * @return boolean does this entity have data in this custom table
    */
   static public function customGroupDataExistsForEntity($entityID, $table, $getCount = FALSE){
@@ -831,16 +844,17 @@ ORDER BY civicrm_custom_group.weight,
    *
    * An array containing custom group details (including their custom field) is returned.
    *
-   * @param int     $groupId    - group id whose details are needed
+   * @param int $groupId - group id whose details are needed
    * @param boolean $searchable - is this field searchable
-   * @param array   $extends    - which table does it extend if any
+   * @param array $extends - which table does it extend if any
+   *
+   * @param null $inSelector
    *
    * @return array $groupTree - array consisting of all group and field details
    *
    * @access public
    *
    * @static
-   *
    */
   public static function &getGroupDetail($groupId = NULL, $searchable = NULL, &$extends = NULL, $inSelector = NULL) {
     // create a new tree
@@ -987,6 +1001,13 @@ ORDER BY civicrm_custom_group.weight,
     return $groupTree;
   }
 
+  /**
+   * @param $entityType
+   * @param $path
+   * @param string $cidToken
+   *
+   * @return array
+   */
   public static function &getActiveGroups($entityType, $path, $cidToken = '%%cid%%') {
     // for Group's
     $customGroupDAO = new CRM_Core_DAO_CustomGroup();
@@ -1031,11 +1052,12 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return string $tableName
    *
-   * @access private
+   * @access public
    * @static
    *
+   * @see _apachesolr_civiAttachments_dereference_file_parent
    */
-  private static function _getTableName($entityType) {
+  public static function getTableNameByEntityName($entityType) {
     $tableName = '';
     switch ($entityType) {
       case 'Contact':
@@ -1101,14 +1123,16 @@ ORDER BY civicrm_custom_group.weight,
    * Add the whereAdd clause for the DAO depending on the type of entity
    * the custom group is extending.
    *
+   * @param $customGroupDAO
+   * @param string $entityType - what entity are we extending here ?
+   *
    * @param object CRM_Core_DAO_CustomGroup (reference) - Custom Group DAO.
-   * @param string $entityType    - what entity are we extending here ?
+   * @param bool $allSubtypes
    *
    * @return void
    *
    * @access private
    * @static
-   *
    */
   private static function _addWhereAdd(&$customGroupDAO, $entityType, $entityID = NULL, $allSubtypes = FALSE) {
     $addSubtypeClause = FALSE;
@@ -1134,6 +1158,7 @@ ORDER BY civicrm_custom_group.weight,
         }
         break;
 
+      case 'Case':
       case 'Location':
       case 'Address':
       case 'Activity':
@@ -1201,6 +1226,13 @@ ORDER BY civicrm_custom_group.weight,
     return TRUE;
   }
 
+  /**
+   * @param $groupTree
+   * @param $defaults
+   * @param bool $viewMode
+   * @param bool $inactiveNeeded
+   * @param int $action
+   */
   static function setDefaults(&$groupTree, &$defaults, $viewMode = FALSE, $inactiveNeeded = FALSE, $action = CRM_Core_Action::NONE) {
     foreach ($groupTree as $id => $group) {
       if (!isset($group['fields'])) {
@@ -1224,7 +1256,9 @@ ORDER BY civicrm_custom_group.weight,
         }
 
         $fieldId = $field['id'];
-        $elementName = $field['element_name'];
+        if (!empty($field['element_name'])) {
+          $elementName = $field['element_name'];
+        }
         switch ($field['html_type']) {
           case 'Multi-Select':
           case 'AdvMulti-Select':
@@ -1321,22 +1355,6 @@ ORDER BY civicrm_custom_group.weight,
             }
             break;
 
-          case 'Autocomplete-Select':
-            $hiddenEleName = $elementName . '_id';
-            if (substr($elementName, -1) == ']') {
-              $hiddenEleName = substr($elementName, 0, -1) . '_id]';
-            }
-            if ($field['data_type'] == "ContactReference") {
-              if (is_numeric($value)) {
-                $defaults[$hiddenEleName] = $value;
-                $defaults[$elementName] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $value, 'sort_name');
-              }
-            }
-            else {
-              $defaults[$elementName] = $value;
-            }
-            break;
-
           default:
             if ($field['data_type'] == "Float") {
               $defaults[$elementName] = (float)$value;
@@ -1354,6 +1372,11 @@ ORDER BY civicrm_custom_group.weight,
     }
   }
 
+  /**
+   * @param $groupTree
+   * @param $params
+   * @param bool $skipFile
+   */
   static function postProcess(&$groupTree, &$params, $skipFile = FALSE) {
     // Get the Custom form values and groupTree
     // first reset all checkbox and radio data
@@ -1631,6 +1654,12 @@ ORDER BY civicrm_custom_group.weight,
     return TRUE;
   }
 
+  /**
+   * @param $table
+   *
+   * @return string
+   * @throws Exception
+   */
   static function mapTableName($table) {
     switch ($table) {
       case 'Contact':
@@ -1694,6 +1723,9 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
     }
   }
 
+  /**
+   * @param $group
+   */
   static function createTable($group) {
     $params = array(
       'name' => $group->table_name,
@@ -1743,7 +1775,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
       // add field information
       foreach ($value['fields'] as $k => $properties) {
         $properties['element_name'] = "custom_{$k}_-{$groupCount}";
-        if (isset($properties['customValue']) && !CRM_Utils_system::isNull($properties['customValue'])) {
+        if (isset($properties['customValue']) && !CRM_Utils_System::isNull($properties['customValue'])) {
           if (isset($properties['customValue'][$groupCount])) {
             $properties['element_name'] = "custom_{$k}_{$properties['customValue'][$groupCount]['id']}";
             $formattedGroupTree[$key]['table_id'] = $properties['customValue'][$groupCount]['id'];
@@ -1776,9 +1808,15 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
 
   /**
    * Build custom data view
-   *  @param object  $form page object
-   *  @param array   $groupTree associated array
-   *  @param boolean $returnCount true if customValue count needs to be returned
+   *
+   * @param object $form page object
+   * @param array $groupTree associated array
+   * @param boolean $returnCount true if customValue count needs to be returned
+   * @param null $gID
+   * @param null $prefix
+   * @param null $customValueId
+   *
+   * @return array|int
    */
   static function buildCustomDataView(&$form, &$groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL, $customValueId = NULL) {
     $details = array();
@@ -1861,6 +1899,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * @param array $field associated array
    * @param boolean $dncOptionPerLine true if optionPerLine should not be consider
    *
+   * @return array|null|string
    */
   static function formatCustomValues(&$values, &$field, $dncOptionPerLine = FALSE) {
     $value = $values['data'];
@@ -2200,6 +2239,12 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     return $objTypes;
   }
 
+  /**
+   * @param $customGroupId
+   * @param $entityId
+   *
+   * @return bool
+   */
   static function hasReachedMaxLimit($customGroupId, $entityId) {
     //check whether the group is multiple
     $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'is_multiple');
@@ -2224,6 +2269,9 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     return $hasReachedMax;
   }
 
+  /**
+   * @return array
+   */
   static function getMultipleFieldGroup() {
     $multipleGroup = array();
     $dao = new CRM_Core_DAO_CustomGroup();

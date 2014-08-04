@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_ParticipantTest
+ */
 class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
@@ -97,6 +101,9 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide data for participant import for Individuals.
      */
+  /**
+   * @return array
+   */
   function _participantIndividualCSVData() {
     $eventInfo = $this->_addNewEvent();
 
@@ -142,6 +149,9 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide data for participant import for Household.
      */
+  /**
+   * @return array
+   */
   function _participantHouseholdCSVData() {
     $eventInfo = $this->_addNewEvent();
 
@@ -185,6 +195,9 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide data for participant import for Organization.
      */
+  /**
+   * @return array
+   */
   function _participantOrganizationCSVData() {
     $eventInfo = $this->_addNewEvent();
 
@@ -232,6 +245,11 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
      *
      * @return array $params event details of newly created event
      */
+  /**
+   * @param array $params
+   *
+   * @return array
+   */
   function _addNewEvent($params = array(
     )) {
 
@@ -249,8 +267,8 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
         'event_type_id' => 4,
         'payment_processor' => $processorName,
         'fee_level' => array(
-          'Member' => "250.00",
-          'Non-Member' => "325.00",
+        'Member' => "250.00",
+        'Non-Member' => "325.00",
         ),
       );
     }
@@ -298,16 +316,16 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
     }
 
     $this->click("_qf_Fee_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("_qf_Fee_upload-bottom");
 
     // Go to Online Registration tab
     $this->click("link=Online Registration");
     $this->waitForElementPresent("_qf_Registration_upload-bottom");
 
-    $this->check("is_online_registration");
+    $this->click("is_online_registration");
     $this->assertChecked("is_online_registration");
 
-    $this->fillRichTextField("intro_text", "Fill in all the fields below and click Continue.");
+    $this->fillRichTextField("intro_text", "Fill in all the fields below and click Continue.", 'CKEditor', TRUE);
 
     // enable confirmation email
     $this->click("CIVICRM_QFID_1_is_email_confirm");
@@ -315,8 +333,8 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
     $this->type("confirm_from_email", "jane.doe@example.org");
 
     $this->click("_qf_Registration_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Registration' information has been saved.");
+    $this->waitForElementPresent("_qf_Registration_upload-bottom");
+    $this->waitForTextPresent("'Online Registration' information has been saved.");
 
     // verify event input on info page
     // start at Manage Events listing

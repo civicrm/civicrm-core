@@ -39,6 +39,11 @@
  */
 class CRM_Case_Form_Activity_ChangeCaseStatus {
 
+  /**
+   * @param $form
+   *
+   * @throws Exception
+   */
   static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
@@ -51,6 +56,8 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function setDefaultValues(&$form) {
@@ -61,28 +68,46 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     return $defaults;
   }
 
+  /**
+   * @param $form
+   */
   static function buildQuickForm(&$form) {
     $form->removeElement('status_id');
     $form->removeElement('priority_id');
 
     $form->_caseStatus = CRM_Case_PseudoConstant::caseStatus();
-    $form->_defaultCaseStatus = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $form->_caseId, 'status_id');
 
-    if (!array_key_exists($form->_defaultCaseStatus, $form->_caseStatus)) {
-      $form->_caseStatus[$form->_defaultCaseStatus] = CRM_Core_OptionGroup::getLabel('case_status',
-        $form->_defaultCaseStatus,
-        FALSE
-      );
+    foreach ($form->_caseId as $key => $val) {
+      $form->_oldCaseStatus[] = $form->_defaultCaseStatus[] = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $val, 'status_id');
     }
-    $form->add('select', 'case_status_id', ts('Case Status'),
+
+    foreach ($form->_defaultCaseStatus as $keydefault => $valdefault) {
+      if (!array_key_exists($valdefault, $form->_caseStatus)) {
+        $form->_caseStatus[$valdefault] = CRM_Core_OptionGroup::getLabel('case_status',
+          $valdefault,
+          FALSE
+        );
+      }
+    }
+    $element = $form->add('select', 'case_status_id', ts('Case Status'),
       $form->_caseStatus, TRUE
     );
+    // check if the case status id passed in url is a valid one, set as default and freeze
+    if (CRM_Utils_Request::retrieve('case_status_id', 'Positive', $form)) {
+      $caseStatusId = CRM_Utils_Request::retrieve('case_status_id', 'Positive', $form);
+      $caseStatus = CRM_Case_PseudoConstant::caseStatus();
+      $form->_defaultCaseStatus = array_key_exists($caseStatusId, $caseStatus) ? $caseStatusId : NULL;
+      $element->freeze();
+    }
   }
 
   /**
    * global validation rules for the form
    *
    * @param array $values posted values of the form
+   *
+   * @param $files
+   * @param $form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -97,6 +122,9 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    *
    * @access public
    *
+   * @param $form
+   * @param $params
+   *
    * @return void
    */
   static function beginPostProcess(&$form, &$params) {
@@ -107,6 +135,10 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    * Function to process the form
    *
    * @access public
+   *
+   * @param $form
+   * @param $params
+   * @param $activity
    *
    * @return void
    */
@@ -149,13 +181,15 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     $params['priority_id'] = CRM_Core_OptionGroup::getValue('priority', 'Normal', 'name');
     $activity->priority_id = $params['priority_id'];
 
-    if ($activity->subject == 'null') {
-      $activity->subject = ts('Case status changed from %1 to %2', array(
-          1 => CRM_Utils_Array::value($form->_defaults['case_status_id'], $form->_caseStatus),
-          2 => CRM_Utils_Array::value($params['case_status_id'], $form->_caseStatus)
-        )
-      );
-      $activity->save();
+    foreach ($form->_oldCaseStatus as $statuskey => $statusval ) {
+      if ($activity->subject == 'null') {
+        $activity->subject = ts('Case status changed from %1 to %2', array(
+            1 => CRM_Utils_Array::value($statusval, $form->_caseStatus),
+            2 => CRM_Utils_Array::value($params['case_status_id'], $form->_caseStatus)
+          )
+        );
+        $activity->save();
+      }
     }
 
     // FIXME: does this do anything ?

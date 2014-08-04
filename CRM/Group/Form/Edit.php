@@ -159,6 +159,9 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * @access public
    * @return void
    */
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array();
 
@@ -306,6 +309,9 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    *
    * @param array $fields posted values of the form
    *
+   * @param $fileParams
+   * @param $options
+   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public
@@ -443,6 +449,11 @@ WHERE  title = %1
    * @return parent groups array
    * @static
    * @access public
+   */
+  /**
+   * @param $obj
+   *
+   * @return array
    */
   static function buildParentGroups( &$obj ) {
     $groupNames = CRM_Core_PseudoConstant::group();

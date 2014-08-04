@@ -63,9 +63,10 @@ class CRM_Utils_JSON {
   /**
    * Function to encode json format for flexigrid, NOTE: "id" should be present in $params for each row
    *
-   * @param array  $params associated array of values rows
-   * @param int    $page  page no for selector
-   * @param array  $selectorElements selector rows
+   * @param array $params associated array of values rows
+   * @param int $page page no for selector
+   * @param $total
+   * @param array $selectorElements selector rows
    *
    * @return json encode string
    */
@@ -126,7 +127,6 @@ class CRM_Utils_JSON {
         if ($addcomma) {
           $sOutput .= ",";
         }
-
         //CRM-7130 --lets addslashes to only double quotes,
         //since we are using it to quote the field value.
         //str_replace helps to provide a break for new-line

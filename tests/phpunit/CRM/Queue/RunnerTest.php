@@ -32,6 +32,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Ensure that various queue implementations comply with the interface
  */
 class CRM_Queue_RunnerTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'SQL Queue',
@@ -242,22 +245,46 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
 
   static $_recordedValues;
 
+  /**
+   * @param $taskCtx
+   * @param $value
+   *
+   * @return bool
+   */
   static
   function _recordValue($taskCtx, $value) {
     self::$_recordedValues[] = $value;
     return TRUE;
   }
 
+  /**
+   * @param $taskCtx
+   *
+   * @return bool
+   */
   static
   function _returnFalse($taskCtx) {
     return FALSE;
   }
 
+  /**
+   * @param $taskCtx
+   * @param $value
+   *
+   * @throws Exception
+   */
   static
   function _throwException($taskCtx, $value) {
     throw new Exception("Manufactured error: $value");
   }
 
+  /**
+   * @param $taskCtx
+   * @param $low
+   * @param $high
+   *
+   * @return bool
+   */
   static
   function _enqueueNumbers($taskCtx, $low, $high) {
     for ($i = $low; $i <= $high; $i++) {

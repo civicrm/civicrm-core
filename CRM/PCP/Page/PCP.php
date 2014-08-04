@@ -161,6 +161,8 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    * Browse all custom data groups.
    *
    *
+   * @param null $action
+   *
    * @return void
    * @access public
    * @static
@@ -375,6 +377,8 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
   /**
    * Get user context.
    *
+   * @param null $mode
+   *
    * @return string user context.
    */
   function userContext($mode = NULL) {
@@ -382,6 +386,10 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
   }
 
   //@TODO this function changed, debug this at runtime
+  /**
+   * @param $whereClause
+   * @param $whereParams
+   */
   function pagerAtoZ($whereClause, $whereParams) {
     $where = '';
     if ($whereClause) {

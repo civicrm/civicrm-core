@@ -37,6 +37,11 @@
  * Helper class to build navigation links
  */
 class CRM_Contribute_Form_ContributionPage_TabHeader {
+  /**
+   * @param $form
+   *
+   * @return array
+   */
   static function build(&$form) {
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
@@ -52,6 +57,11 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     return $tabs;
   }
 
+  /**
+   * @param $form
+   *
+   * @return array
+   */
   static function process(&$form) {
     if ($form->getVar('_id') <= 0) {
       return NULL;
@@ -169,11 +179,19 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     return $tabs;
   }
 
+  /**
+   * @param $form
+   */
   static function reset(&$form) {
     $tabs = self::process($form);
     $form->set('tabHeader', $tabs);
   }
 
+  /**
+   * @param $tabs
+   *
+   * @return int|string
+   */
   static function getCurrentTab($tabs) {
     static $current = FALSE;
 

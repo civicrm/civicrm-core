@@ -106,6 +106,8 @@ class CRM_Admin_Page_PdfFormats extends CRM_Core_Page_Basic {
   /**
    * Get user context.
    *
+   * @param null $mode
+   *
    * @return string user context.
    */
   function userContext($mode = NULL) {
@@ -114,6 +116,8 @@ class CRM_Admin_Page_PdfFormats extends CRM_Core_Page_Basic {
 
   /**
    * Browse all PDF Page Formats
+   *
+   * @param null $action
    *
    * @return void
    * @access public

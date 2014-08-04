@@ -43,6 +43,8 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
    * has more business logic
    *
    * @param array $params input parameters
+   *
+   * @return object
    */
   static function create($params) {
     // if id is set & is_primary isn't we can assume no change
@@ -125,6 +127,8 @@ WHERE  contact_id = {$params['contact_id']}
    * Get all the emails for a specified contact_id, with the primary email being first
    *
    * @param int $id the contact id
+   *
+   * @param bool $updateBlankLocInfo
    *
    * @return array  the array of email id's
    * @access public
@@ -316,6 +320,9 @@ AND    reset_date IS NULL
     return $fromEmailValues;
   }
 
+  /**
+   * @return object
+   */
   static function isMultipleBulkMail() {
     return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'civimail_multiple_bulk_emails', NULL, FALSE);
   }

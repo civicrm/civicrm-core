@@ -84,14 +84,14 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
   /**
    * Class constructor
    *
-   * @param string $event         The event type (queue/delivered/open...)
-   * @param boolean $distinct     Count only distinct contact events?
-   * @param int $mailing          ID of the mailing to query
-   * @param int $job              ID of the job to query.  If null, all jobs from $mailing are queried.
-   * @param int $url              If the event type is a click-through, do we want only those from a specific url?
+   * @param string $event The event type (queue/delivered/open...)
+   * @param boolean $distinct Count only distinct contact events?
+   * @param int $mailing ID of the mailing to query
+   * @param int $job ID of the job to query.  If null, all jobs from $mailing are queried.
+   * @param int $url If the event type is a click-through, do we want only those from a specific url?
    *
-   * @return CRM_Contact_Selector_Profile
-   * @access public
+   * @return \CRM_Mailing_Selector_Event
+  @access public
    */
   function __construct($event, $distinct, $mailing, $job = NULL, $url = NULL) {
     $this->_event_type  = $event;
@@ -117,7 +117,10 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param
+   * @param $action
+   * @param $params
+   *
+   * @internal param $
    * @access public
    */
   function getPagerParams($action, &$params) {

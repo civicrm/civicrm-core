@@ -41,6 +41,8 @@
  * {@getfields acl_create}
  * @example aclCreate.php
  *
+ * @param $params
+ *
  * @return array of newly created acl property values.
  * @access public
  */
@@ -55,6 +57,8 @@ function civicrm_api3_acl_create($params) {
  * {@getfields acl_get}
  * @example aclCreate.php
  *
+ * @param $params
+ *
  * @return array of retrieved acl property values.
  * @access public
  */
@@ -68,6 +72,8 @@ function civicrm_api3_acl_get($params) {
  * Allowed @params array keys are:
  * {@getfields acl_delete}
  * @example aclCreate.php
+ *
+ * @param $params
  *
  * @return array of deleted values.
  * @access public

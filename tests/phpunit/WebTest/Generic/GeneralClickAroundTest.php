@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Generic_GeneralClickAroundTest
+ */
 class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -33,7 +37,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
 
   function login() {
     $this->webtestLogin();
-    $this->click("//a[contains(text(),'CiviCRM')]");
+    $this->open($this->sboxPath . "civicrm");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
@@ -56,10 +60,8 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     // Advanced Search by Tag
     $this->click("css=ul#civicrm-menu li.crm-Search");
     $this->click("css=ul#civicrm-menu li.crm-Advanced_Search a");
-    $this->waitForElementPresent('css=select#crmasmSelect3');
-    $this->click('crmasmSelect3');
-    $this->select('crmasmSelect3', 'label=Major Donor');
-    $this->waitForElementPresent("//ul[@id='crmasmList3']/li/span");
+    $this->waitForElementPresent('contact_tags');
+    $this->select('contact_tags', 'label=Major Donor');
     $this->click('_qf_Advanced_refresh');
     $this->waitForElementPresent('search-status');
     $this->assertText('search-status', 'Tagged IN Major Donor');
@@ -179,7 +181,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertElementPresent("contribution_check_number");
     $this->assertTextPresent("Financial Type");
     $this->assertTextPresent("Contribution Page");
-    $this->assertElementPresent("contribution_in_honor_of");
+    $this->assertElementPresent("s2id_contribution_or_softcredits");
     $this->assertElementPresent("contribution_source");
     $this->assertTextPresent("Personal Campaign Page");
     $this->assertTextPresent("Personal Campaign Page Honor Roll");
@@ -270,7 +272,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
 
     $this->assertTextPresent("CiviCRM Profile");
     // Verify Reserved Profiles
-    $this->click("ui-id-2");
+    $this->click("ui-id-3");
     $this->assertTextPresent("New Household");
     $this->assertTextPresent("New Individual");
     $this->assertTextPresent("New Organization");
@@ -279,7 +281,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Summary Overlay");
 
     // Verify profiles that are not reserved
-    $this->click("ui-id-1");
+    $this->click("ui-id-2");
     $this->assertTextPresent("Name and Address");
     $this->assertTextPresent("Supporter Profile");
 

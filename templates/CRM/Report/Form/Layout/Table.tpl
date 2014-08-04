@@ -33,7 +33,7 @@
         {capture assign="tableHeader"}
             {foreach from=$columnHeaders item=header key=field}
                 {assign var=class value=""}
-                {if $header.type eq 1024 OR $header.type eq 1}
+                {if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512}
                 {assign var=class value="class='reports-header-right'"}
                 {else}
                     {assign var=class value="class='reports-header'"}
@@ -99,7 +99,7 @@
                 {foreach from=$columnHeaders item=header key=field}
                     {assign var=fieldLink value=$field|cat:"_link"}
                     {assign var=fieldHover value=$field|cat:"_hover"}
-                    <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1} report-contents-right{elseif $row.$field eq 'Subtotal'} report-label{/if}">
+                    <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512} report-contents-right{elseif $row.$field eq 'Subtotal'} report-label{/if}">
                         {if $row.$fieldLink}
                             <a title="{$row.$fieldHover}" href="{$row.$fieldLink}">
                         {/if}

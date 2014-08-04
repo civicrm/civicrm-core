@@ -43,6 +43,9 @@ class CRM_Utils_Address_BatchUpdate {
   var $returnMessages = array();
   var $returnError = 0;
 
+  /**
+   * @param $params
+   */
   public function __construct($params) {
 
     foreach ($params as $name => $value) {
@@ -52,6 +55,9 @@ class CRM_Utils_Address_BatchUpdate {
     // fixme: more params verification
   }
 
+  /**
+   * @return array
+   */
   public function run() {
 
     $config = &CRM_Core_Config::singleton();
@@ -59,7 +65,7 @@ class CRM_Utils_Address_BatchUpdate {
     // do check for geocoding.
     $processGeocode = FALSE;
     if (empty($config->geocodeMethod)) {
-      if ($this->geocoding == 'true') {
+      if (CRM_Utils_String::strtobool($this->geocoding) === TRUE) {
         $this->returnMessages[] = ts('Error: You need to set a mapping provider under Administer > System Settings > Mapping and Geocoding');
         $this->returnError = 1;
         $this->returnResult();
@@ -68,7 +74,7 @@ class CRM_Utils_Address_BatchUpdate {
     else {
       $processGeocode = TRUE;
       // user might want to over-ride.
-      if ($this->geocoding == 'false') {
+      if (CRM_Utils_String::strtobool($this->geocoding) === FALSE) {
         $processGeocode = FALSE;
       }
     }
@@ -83,7 +89,7 @@ class CRM_Utils_Address_BatchUpdate {
     );
     $parseStreetAddress = FALSE;
     if (!$parseAddress) {
-      if ($this->parse == 'true') {
+      if (CRM_Utils_String::strtobool($this->parse) === TRUE) {
         $this->returnMessages[] = ts('Error: You need to enable Street Address Parsing under Administer > Localization > Address Settings.');
         $this->returnError = 1;
         return $this->returnResult();
@@ -92,7 +98,7 @@ class CRM_Utils_Address_BatchUpdate {
     else {
       $parseStreetAddress = TRUE;
       // user might want to over-ride.
-      if ($this->parse == 'false') {
+      if (CRM_Utils_String::strtobool($this->parse) === FALSE) {
         $parseStreetAddress = FALSE;
       }
     }
@@ -108,6 +114,14 @@ class CRM_Utils_Address_BatchUpdate {
     return $this->processContacts($config, $processGeocode, $parseStreetAddress);
   }
 
+  /**
+   * @param $config
+   * @param $processGeocode
+   * @param $parseStreetAddress
+   *
+   * @return array
+   * @throws Exception
+   */
   function processContacts(&$config, $processGeocode, $parseStreetAddress) {
     // build where clause.
     $clause = array('( c.id = a.contact_id )');
@@ -262,6 +276,9 @@ class CRM_Utils_Address_BatchUpdate {
     return $this->returnResult();
   }
 
+  /**
+   * @return array
+   */
   function returnResult() {
     $result             = array();
     $result['is_error'] = $this->returnError;

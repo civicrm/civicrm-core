@@ -31,22 +31,18 @@
 /**
  *  Include class definitions
  */
-require_once 'CiviTest/CiviUnitTestCase.php';
+require_once 'CiviTest/CiviCaseTestCase.php';
 
 /**
  *  Test APIv3 civicrm_case_* functions
  *
  *  @package CiviCRM_APIv3
  */
-class api_v3_CaseTest extends CiviUnitTestCase {
+class api_v3_CaseTest extends CiviCaseTestCase {
   protected $_params;
   protected $_entity;
   protected $_apiversion =3;
   protected $followup_activity_type_value;
-  protected $caseTypeId;
-  protected $caseStatusGroup;
-  protected $caseTypeGroup;
-  protected $optionValues;
 
   /**
    *  Test setup for every test
@@ -58,60 +54,6 @@ class api_v3_CaseTest extends CiviUnitTestCase {
     $this->_entity = 'case';
 
     parent::setUp();
-    // CRM-9404 - set-up is a bit cumbersome but had to put something in place to set up activity types & case types
-    //. Using XML was causing breakage as id numbers were changing over time
-    // & was really hard to troubleshoot as involved truncating option_value table to mitigate this & not leaving DB in a
-    // state where tests could run afterwards without re-loading.
-    $this->caseStatusGroup = $this->callAPISuccess('option_group', 'get', array(
-      'name' => 'case_status',
-      'format.only_id' => 1)
-    );
-    $this->caseTypeGroup = $this->callAPISuccess('option_group', 'get', array(
-      'name' => 'case_type',
-      'format.only_id' => 1)
-    );
-    $caseTypes = $this->callAPISuccess('option_value', 'Create', array(
-        'option_group_id' => $this->caseTypeGroup,
-        'name' => 'housing_support',
-        'label' => "Housing Support",
-        'sequential' => 1,
-        'description' => 'Help homeless individuals obtain temporary and long-term housing',
-      ));
-
-    $this->caseTypeId = $caseTypes['values'][0]['value'];
-    $this->optionValues[] = $caseTypes['id'];
-    $optionValues = array(
-      'Medical evaluation' => 'Medical evaluation',
-      'Mental health evaluation' => "Mental health evaluation",
-      'Secure temporary housing' => 'Secure temporary housing',
-      'Long-term housing plan' => 'Long-term housing plan',
-      'ADC referral' => 'ADC referral',
-      'Income and benefits stabilization' => 'Income and benefits stabilization',
-    );
-    foreach ($optionValues as $name => $label) {
-      $activityTypes = $this->callAPISuccess('option_value', 'Create', array(
-          'option_group_id' => 2,
-          'name' => $name,
-          'label' => $label,
-          'component_id' => 7,
-        ));
-      // store for cleanup
-      $this->optionValues[] = $activityTypes['id'];
-    }
-    $tablesToTruncate = array(
-      'civicrm_activity',
-      'civicrm_contact',
-      'civicrm_custom_group',
-      'civicrm_custom_field',
-      'civicrm_case',
-      'civicrm_case_contact',
-      'civicrm_case_activity',
-      'civicrm_activity_contact',
-      'civicrm_relationship',
-      'civicrm_relationship_type',
-    );
-
-    $this->quickCleanup($tablesToTruncate);
 
     $activityTypes = $this->callAPISuccess('option_value', 'get', array(
       'option_group_id' => 2,
@@ -120,126 +62,12 @@ class api_v3_CaseTest extends CiviUnitTestCase {
       'sequential' => 1,
     ));
     $this->followup_activity_type_value = $activityTypes['values'][0]['value'];
-    //  Insert a row in civicrm_contact creating contact 17
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_17.xml'
-      )
-    );
-
-    //Create relationship types
-    $relTypeParams = array(
-      'name_a_b' => 'Case Coordinator is',
-      'label_a_b' => 'Case Coordinator is',
-      'name_b_a' => 'Case Coordinator',
-      'label_b_a' => 'Case Coordinator',
-      'description' => 'Case Coordinator',
-      'contact_type_a' => 'Individual',
-      'contact_type_b' => 'Individual',
-      'is_reserved' => 0,
-      'is_active' => 1,
-    );
-    $this->relationshipTypeCreate($relTypeParams);
-
-    $relTypeParams = array(
-      'name_a_b' => 'Homeless Services Coordinator is',
-      'label_a_b' => 'Homeless Services Coordinator is',
-      'name_b_a' => 'Homeless Services Coordinator',
-      'label_b_a' => 'Homeless Services Coordinator',
-      'description' => 'Homeless Services Coordinator',
-      'contact_type_a' => 'Individual',
-      'contact_type_b' => 'Individual',
-      'is_reserved' => 0,
-      'is_active' => 1,
-    );
-    $this->relationshipTypeCreate($relTypeParams);
-
-    $relTypeParams = array(
-      'name_a_b' => 'Health Services Coordinator is',
-      'label_a_b' => 'Health Services Coordinator is',
-      'name_b_a' => 'Health Services Coordinator',
-      'label_b_a' => 'Health Services Coordinator',
-      'description' => 'Health Services Coordinator',
-      'contact_type_a' => 'Individual',
-      'contact_type_b' => 'Individual',
-      'is_reserved' => 0,
-      'is_active' => 1,
-    );
-    $this->relationshipTypeCreate($relTypeParams);
-
-    $relTypeParams = array(
-      'name_a_b' => 'Senior Services Coordinator is',
-      'label_a_b' => 'Senior Services Coordinator is',
-      'name_b_a' => 'Senior Services Coordinator',
-      'label_b_a' => 'Senior Services Coordinator',
-      'description' => 'Senior Services Coordinator',
-      'contact_type_a' => 'Individual',
-      'contact_type_b' => 'Individual',
-      'is_reserved' => 0,
-      'is_active' => 1,
-    );
-    $this->relationshipTypeCreate($relTypeParams);
-
-    $relTypeParams = array(
-      'name_a_b' => 'Benefits Specialist is',
-      'label_a_b' => 'Benefits Specialist is',
-      'name_b_a' => 'Benefits Specialist',
-      'label_b_a' => 'Benefits Specialist',
-      'description' => 'Benefits Specialist',
-      'contact_type_a' => 'Individual',
-      'contact_type_b' => 'Individual',
-      'is_reserved' => 0,
-      'is_active' => 1,
-    );
-    $this->relationshipTypeCreate($relTypeParams);
-
-    // enable the default custom templates for the case type xml files
-    $this->customDirectories(array('template_path' => TRUE));
-
-    // case is not enabled by default
-    $enableResult = CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-    $this->assertTrue($enableResult, 'Cannot enable CiviCase in line ' . __LINE__);
 
     $this->_params = array(
       'case_type_id' => $this->caseTypeId,
       'subject' => 'Test case',
       'contact_id' => 17,
     );
-
-    // create a logged in USER since the code references it for source_contact_id
-    $this->createLoggedInUser();
-    $session = CRM_Core_Session::singleton();
-    $this->_loggedInUser = $session->get('userID');
-    /// note that activityType options are cached by the FULL set of options you pass in
-    // ie. because Activity api includes campaign in it's call cache is not flushed unless
-    // included in this call. Also note flush function doesn't work on this property as it sets to null not empty array
-    CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name', TRUE);
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   *
-   * @access protected
-   */
-  function tearDown() {
-    foreach ($this->optionValues as $id) {
-      $this->callAPISuccess('option_value', 'delete', array('id' => $id));
-    }
-    $tablesToTruncate = array(
-      'civicrm_contact',
-      'civicrm_activity',
-      'civicrm_case',
-      'civicrm_case_contact',
-      'civicrm_case_activity',
-      'civicrm_activity_contact',
-      'civicrm_relationship',
-      'civicrm_relationship_type',
-    );
-    $this->quickCleanup($tablesToTruncate, TRUE);
-
-    $this->customDirectories(array('template_path' => FALSE));
   }
 
   /**
@@ -269,13 +97,13 @@ class api_v3_CaseTest extends CiviUnitTestCase {
     $params = $this->_params;
     // Test using label instead of value
     unset($params['case_type_id']);
-    $params['case_type'] = 'Housing Support';
+    $params['case_type'] = $this->caseType;
     $result = $this->callAPISuccess('case', 'create', $params);
     $id = $result['id'];
 
     // Check result
     $result = $this->callAPISuccess('case', 'get', array('id' => $id));
-    $this->assertEquals($result['values'][$id]['id'], 1, 'in line ' . __LINE__);
+    $this->assertEquals($result['values'][$id]['id'], $id, 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$id]['case_type_id'], $this->caseTypeId, 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$id]['subject'], $params['subject'], 'in line ' . __LINE__);
   }
@@ -287,7 +115,8 @@ class api_v3_CaseTest extends CiviUnitTestCase {
     // Create Case
     $params = $this->_params;
     // Test using name instead of value
-    $params['case_type_id'] = 'housing_support';
+    unset($params['case_type_id']);
+    $params['case_type'] = $this->caseType;
     $result = $this->callAPISuccess('case', 'create', $params);
     $id = $result['id'];
     $result = $this->callAPISuccess('case', 'get', array('id' => $id));

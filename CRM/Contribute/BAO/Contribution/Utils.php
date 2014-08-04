@@ -37,14 +37,16 @@ class CRM_Contribute_BAO_Contribution_Utils {
   /**
    * Function to process payment after confirmation
    *
-   * @param object  $form   form object
-   * @param array   $paymentParams   array with payment related key
+   * @param object $form form object
+   * @param array $paymentParams array with payment related key
    * value pairs
-   * @param array   $premiumParams   array with premium related key
+   * @param array $premiumParams array with premium related key
    * value pairs
-   * @param int     $contactID       contact id
-     * @param int     $contributionTypeId   financial type id
-   * @param int     $component   component id
+   * @param int $contactID contact id
+   * @param int $contributionTypeId financial type id
+   * @param int|string $component component id
+   *
+   * @param null $fieldTypes
    *
    * @return array associated array
    *
@@ -60,6 +62,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $fieldTypes = NULL
   ) {
     CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $paymentParams, TRUE);
+    $isTest = ($form->_mode == 'test') ? 1 : 0;
+    $lineItems = $form->_lineItem;
 
     $contributionType = new CRM_Financial_DAO_FinancialType();
     if (isset($paymentParams['financial_type'])) {
@@ -109,7 +113,9 @@ class CRM_Contribute_BAO_Contribution_Utils {
         NULL,
         $contactID,
         $contributionType,
-        TRUE, TRUE, TRUE
+        TRUE, TRUE,
+        $isTest,
+        $lineItems
       );
 
       if ($contribution) {
@@ -209,14 +215,35 @@ class CRM_Contribute_BAO_Contribution_Utils {
         // When we get a callback from the payment processor
 
         $paymentParams['contactID'] = $contactID;
+
+        // Fix for CRM-14354. If the membership is recurring, don't create a
+        // civicrm_contribution_recur record for the additional contribution
+        // (i.e., the amount NOT associated with the membership). Temporarily
+        // cache the is_recur values so we can process the additional gift as a
+        // one-off payment.
+        if ($form->_membershipBlock['is_separate_payment']) {
+          $cachedFormValue = CRM_Utils_Array::value('is_recur', $form->_values);
+          unset($form->_values['is_recur']);
+          $cachedParamValue = CRM_Utils_Array::value('is_recur', $paymentParams);
+          unset($paymentParams['is_recur']);
+        }
+
         $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution(
           $form,
           $paymentParams,
           NULL,
           $contactID,
           $contributionType,
-          TRUE, TRUE, TRUE
+          TRUE, TRUE,
+          $isTest,
+          $lineItems
         );
+
+        // restore cached values (part of fix for CRM-14354)
+        if ($form->_membershipBlock['is_separate_payment']) {
+          $form->_values['is_recur'] = $cachedFormValue;
+          $paymentParams['is_recur'] = $cachedParamValue;
+        }
 
         $paymentParams['contributionID'] = $contribution->id;
         $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
@@ -279,15 +306,16 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
       // check if pending was set to true by payment processor
       $pending = FALSE;
-      if (!empty($form->_params
-['contribution_status_pending'])) {
+      if (!empty($form->_params['contribution_status_pending'])) {
         $pending = TRUE;
       }
       if (!(!empty($paymentParams['is_recur']) && $form->_contributeMode == 'direct')) {
         $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($form,
           $form->_params, $result,
           $contactID, $contributionType,
-          TRUE, $pending, TRUE
+          $pending, TRUE,
+          $isTest,
+          $lineItems
         );
       }
       $form->postProcessPremium($premiumParams, $contribution);
@@ -408,6 +436,11 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     return $params;
   }
 
+  /**
+   * @param $params
+   * @param $contactID
+   * @param $mail
+   */
   static function createCMSUser(&$params, $contactID, $mail) {
     // lets ensure we only create one CMS user
     static $created = FALSE;
@@ -425,6 +458,12 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     }
   }
 
+  /**
+   * @param $params
+   * @param string $type
+   *
+   * @return bool
+   */
   static function _fillCommonParams(&$params, $type = 'paypal') {
     if (array_key_exists('transaction', $params)) {
       $transaction = &$params['transaction'];
@@ -489,6 +528,14 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     return TRUE;
   }
 
+  /**
+   * @param $apiParams
+   * @param $mapper
+   * @param string $type
+   * @param bool $category
+   *
+   * @return array
+   */
   static function formatAPIParams($apiParams, $mapper, $type = 'paypal', $category = TRUE) {
     $type = strtolower($type);
 
@@ -682,6 +729,11 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     }
   }
 
+  /**
+   * @param $params
+   *
+   * @return bool
+   */
   static function processAPIContribution($params) {
     if (empty($params) || array_key_exists('error', $params)) {
       return FALSE;
@@ -760,6 +812,11 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     return TRUE;
   }
 
+  /**
+   * @param $contactID
+   *
+   * @return mixed
+   */
   static function getFirstLastDetails($contactID) {
     static $_cache;
 

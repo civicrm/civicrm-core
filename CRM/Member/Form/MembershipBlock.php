@@ -202,6 +202,9 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
+   * @param $files
+   * @param null $contributionPageId
+   *
    * @return mixed true or array of errors
    * @access public
    * @static

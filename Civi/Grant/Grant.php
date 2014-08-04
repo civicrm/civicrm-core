@@ -551,7 +551,7 @@ class Grant extends \Civi\Core\Entity {
                                    
                           ),
       
-              'money_transfer_date' => array(
+              'grant_money_transfer_date' => array(
       
         'name' => 'money_transfer_date',
         'propertyName' => 'moneyTransferDate',
@@ -599,7 +599,7 @@ class Grant extends \Civi\Core\Entity {
                 'title' => ts('Grant Type'),
                         'required' => true,
                                                      
-                         'export' => false,
+                         'export' => true,
                 'where' => 'civicrm_grant.grant_type_id',
         'headerPattern' => '',
         'dataPattern' => '',
@@ -719,7 +719,12 @@ class Grant extends \Civi\Core\Entity {
                                            'default' => 'NULL',
          
                 'FKClassName' => 'CRM_Financial_DAO_FinancialType',
-                          ),
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_financial_type',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
              );
     }
     return self::$_fields;

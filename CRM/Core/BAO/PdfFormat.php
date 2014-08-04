@@ -53,6 +53,11 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
       'type' => CRM_Utils_Type::T_STRING,
       'default' => 'letter',
     ),
+    'stationery' => array(
+      'name' => 'stationery',
+      'type' =>CRM_Utils_Type::T_STRING,
+      'default' => '',
+    ),
     'orientation' => array(
       'name' => 'orientation',
       'type' => CRM_Utils_Type::T_STRING,
@@ -256,9 +261,11 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get PDF Page Format field from associative array
    *
-   * @param string              $field         name of a PDF Page Format field
-   * @param array (reference)   $values        associative array of name/value pairs containing
+   * @param string $field name of a PDF Page Format field
+   * @param array (reference) $values associative array of name/value pairs containing
    *                                           PDF Page Format field selections
+   *
+   * @param null $default
    *
    * @return value
    * @access public
@@ -361,7 +368,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
     // serialize PDF Page Format fields into a single string to store in the 'value' column of the Option Value table
     $v = json_decode($this->value, TRUE);
     foreach (self::$optionValueFields as $name => $field) {
-      $v[$name] = self::getValue($name, $values, $v[$name]);
+      $v[$name] = self::getValue($name, $values, CRM_Utils_Array::value($name, $v));
     }
     $this->value = json_encode($v);
 

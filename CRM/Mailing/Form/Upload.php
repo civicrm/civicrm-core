@@ -37,6 +37,7 @@
  * This file is used to build the form configuring mailing details
  */
 class CRM_Mailing_Form_Upload extends CRM_Core_Form {
+
   public $_mailingID;
 
   function preProcess() {
@@ -503,6 +504,9 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
    * Function for validation
    *
    * @param array $params (ref.) an assoc array of name/value pairs
+   *
+   * @param $files
+   * @param $self
    *
    * @return mixed true or array of errors
    * @access public

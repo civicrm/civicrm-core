@@ -37,6 +37,10 @@
     $('input[name=link_to_case_id]', $form).crmSelect2({
       placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
       minimumInputLength: 1,
+      formatResult: CRM.utils.formatSelect2Result,
+      formatSelection: function(row) {
+        return row.label;
+      },
       ajax: {
         url: {/literal}"{crmURL p='civicrm/case/ajax/unclosed' h=0}"{literal},
         data: function(term) {
@@ -50,7 +54,7 @@
       if ($(this).val()) {
         var info = $(this).select2('data').extra;
         {/literal}{* Mix in variables and placeholders for clientside substitution *}
-        var subject = "{ts escape=js 1="%1" 2="%2" 3="%3" 4=$client.sort_name 5=$caseTypeLabel 6=$caseId}Create link between %1 - %2 (CaseID: %3) and %4 - %5 (CaseID: %6){/ts}";
+        var subject = "{ts escape=js 1="%1" 2="%2" 3="%3" 4=$client.sort_name 5=$caseTypeLabel 6=$caseID}Create link between %1 - %2 (CaseID: %3) and %4 - %5 (CaseID: %6){/ts}";
         {literal}
         $('#subject', $form).val(ts(subject, {1: info.sort_name, 2: info.case_type, 3: $(this).val()}));
       }

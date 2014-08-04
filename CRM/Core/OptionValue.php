@@ -172,12 +172,13 @@ class CRM_Core_OptionValue {
   /**
    * Function to add/edit option-value of a particular group
    *
-   * @param  array     $params           Array containing exported values from the invoking form.
-   * @param  array     $groupParams      Array containing group fields whose option-values is to retrieved/saved.
-   * @param  string    $orderBy          for orderBy clause
-   * @param  integer   $optionValueID    has the id of the optionValue being edited, disabled ..etc
+   * @param  array $params Array containing exported values from the invoking form.
+   * @param  array $groupParams Array containing group fields whose option-values is to retrieved/saved.
+   * @param $action
+   * @param  integer $optionValueID has the id of the optionValue being edited, disabled ..etc
    *
-   * @return array of option-values
+   * @internal param string $orderBy for orderBy clause
+   * @return CRM_Core_DAO_OptionValue
    *
    * @access public
    * @static
@@ -239,10 +240,11 @@ class CRM_Core_OptionValue {
   /**
    * Check if there is a record with the same name in the db
    *
-   * @param string $value     the value of the field we are checking
-   * @param string $daoName   the dao object name
-   * @param string $daoID     the id of the object being updated. u can change your name
+   * @param string $value the value of the field we are checking
+   * @param string $daoName the dao object name
+   * @param string $daoID the id of the object being updated. u can change your name
    *                          as long as there is no conflict
+   * @param $optionGroupID
    * @param string $fieldName the name of the field in the DAO
    *
    * @return boolean     true if object exists
@@ -265,11 +267,14 @@ class CRM_Core_OptionValue {
   /**
    * Check if there is a record with the same name in the db
    *
-   * @param string $value     the value of the field we are checking
-   * @param string $daoName   the dao object name
-   * @param string $daoID     the id of the object being updated. u can change your name
+   * @param string $mode
+   * @param string $contactType
+   *
+   * @internal param string $value the value of the field we are checking
+   * @internal param string $daoName the dao object name
+   * @internal param string $daoID the id of the object being updated. u can change your name
    *                          as long as there is no conflict
-   * @param string $fieldName the name of the field in the DAO
+   * @internal param string $fieldName the name of the field in the DAO
    *
    * @return boolean     true if object exists
    * @access public
@@ -341,6 +346,8 @@ class CRM_Core_OptionValue {
 
   /**
    * build select query in case of option-values
+   *
+   * @param $query
    *
    * @return void
    * @access public

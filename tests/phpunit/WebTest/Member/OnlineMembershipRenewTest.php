@@ -25,6 +25,10 @@
   */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_OnlineMembershipRenewTest
+ */
 class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -81,7 +85,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // fill in Profiles
     $this->waitForElementPresent('custom_pre_id');
-    $this->select('custom_pre_id', 'value=1');
+    $this->select('css=tr.crm-contribution-contributionpage-custom-form-block-custom_pre_id span.crm-profile-selector-select select', 'value=1');
 
     // save
     $this->click('_qf_Custom_upload_done');
@@ -103,6 +107,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
     $this->type("email-5", $email);
+    $this->select("state_province-1", "value=1001");
 
     //Credit Card Info
     $this->select("credit_card_type", "value=Visa");
@@ -160,6 +165,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
     $this->type("email-5", $email);
+    $this->select("state_province-1", "value=1001");
 
     //Credit Card Info
     $this->select("credit_card_type", "value=Visa");
@@ -255,7 +261,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
 
     // fill in Profiles
     $this->waitForElementPresent('custom_pre_id');
-    $this->select('custom_pre_id', 'value=1');
+    $this->select('css=tr.crm-contribution-contributionpage-custom-form-block-custom_pre_id span.crm-profile-selector-select select', 'value=1');
 
     // save
     $this->click('_qf_Custom_upload_done');
@@ -271,6 +277,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
 
+    $this->select("state_province-1", "value=1001");
     //Credit Card Info
     $this->select("credit_card_type", "value=Visa");
     $this->select("credit_card_type", "label=Visa");
@@ -388,16 +395,13 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $membershipTypeTitle = "Membership Type $title";
     $this->type('name', "Membership Type $title");
 
-    $this->type('member_of_contact', $title);
-    $this->click('member_of_contact');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('member_of_contact_id', $title);
 
     $this->type('minimum_fee', '100');
     $this->select( 'financial_type_id', 'value=2' );
     $this->type('duration_interval', 1);
     $this->select('duration_unit', 'label=year');
-    $this->select('period_type', 'label=rolling');
+    $this->select('period_type', 'value=rolling');
 
     $this->removeSelection('relationship_type_id', 'label=- select -');
     $this->addSelection('relationship_type_id', 'label=Employer of');
@@ -406,7 +410,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('link=Add Membership Type');
     $this->waitForText('crm-notification-container', "The membership type 'Membership Type $title' has been saved.");
 
-    $url = $this->getAttribute("xpath=//div[@id='membership_type']//div[@class='dataTables_wrapper']//table/tbody//tr/td[1][text()='{$membershipTypeTitle}']/../td[12]/span/a[3][text()='Delete']/@href");
+    $url = $this->getAttribute("xpath=//div[@id='membership_type']//div[@id='option11_wrapper']//table/tbody//tr/td[1][text()='{$membershipTypeTitle}']/../td[12]/span/a[3][text()='Delete']/@href");
 
     $matches = array();
     preg_match('/id=([0-9]+)/', $url, $matches);
@@ -459,7 +463,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->click('link=Title');
     $this->waitForElementPresent('_qf_Settings_cancel-bottom');
     $this->click('is_organization');
-    $this->select('onbehalf_profile_id', "value=9");
+    $this->select("xpath=//input[@id='onbehalf_profile_id']/parent::td/div/div/span/select", "value=9");
     $this->type('for_organization', "On behalf $hash");
     $this->click('_qf_Settings_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -499,6 +503,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
 
     $this->type('first_name', $firstName);
     $this->type('last_name', $lastName);
+    $this->select("state_province-1", "value=1001");
 
     //Credit Card Info
     $this->select("credit_card_type", "value=Visa");
@@ -587,6 +592,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
 
     $this->type('first_name', $firstName);
     $this->type('last_name', $lastName);
+    $this->select("state_province-1", "value=1001");
 
     //Credit Card Info
     $this->select("credit_card_type", "value=Visa");

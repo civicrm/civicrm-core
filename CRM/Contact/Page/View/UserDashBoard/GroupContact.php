@@ -78,7 +78,9 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
   /**
    * This function is called when action is update
    *
-   * @param int    $groupID group id
+   * @param null $groupId
+   *
+   * @internal param int $groupID group id
    *
    * return null
    * @access public

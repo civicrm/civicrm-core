@@ -112,9 +112,11 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   /**
    * global form rule
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields the input form values
+   * @param array $files the uploaded files if any
+   * @param $self
+   *
+   * @internal param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -533,6 +535,11 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @param $list array array of relationship name.
    * @static
    * return array array of relationship name.
+   */
+  /**
+   * @param $list
+   *
+   * @return array
    */
   static function getFormattedList(&$list) {
     $relName = array();

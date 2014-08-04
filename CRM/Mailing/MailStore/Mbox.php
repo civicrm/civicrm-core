@@ -35,14 +35,18 @@
 
 require_once 'ezc/Base/src/ezc_bootstrap.php';
 require_once 'ezc/autoload/mail_autoload.php';
+
+/**
+ * Class CRM_Mailing_MailStore_Mbox
+ */
 class CRM_Mailing_MailStore_Mbox extends CRM_Mailing_MailStore {
 
   /**
    * Connect to and lock the supplied file and make sure the two mail dirs exist
    *
-   * @param string $file  mbox to operate upon
+   * @param string $file mbox to operate upon
    *
-   * @return void
+   * @return \CRM_Mailing_MailStore_Mbox
    */
   function __construct($file) {
     $this->_transport = new ezcMailMboxTransport($file);

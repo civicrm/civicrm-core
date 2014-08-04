@@ -110,6 +110,8 @@ function _civicrm_api3_custom_field_create_spec(&$params) {
  * Use this API to delete an existing custom group field.
  *
  * @param $params     Array id of the field to be deleted
+ *
+ * @return array
  * @example CustomFieldDelete.php
  *
  * {@example CustomFieldDelete.php 0}
@@ -130,7 +132,10 @@ function civicrm_api3_custom_field_delete($params) {
  * Use this API to get existing custom fields.
  *
  * @param array $params Array to search on
- *{@getfields CustomField_get}
+ *{*
+ *
+ * @return array
+@getfields CustomField_get}
  * @access public
  *
  **/
@@ -157,6 +162,11 @@ function civicrm_api3_custom_field_get($params) {
  * @params Mixed  $value        Field value to be validate
  * @params Array  $fieldDetails Field Details
  * @params Array  $errors       Collect validation  errors
+ *
+ * @param $fieldName
+ * @param $value
+ * @param $fieldDetails
+ * @param array $errors
  *
  * @return Array  Validation errors
  * @todo remove this function - not in use but need to review functionality before

@@ -27,7 +27,14 @@
 
 namespace Civi\API\Event;
 
+/**
+ * Class ResolveEvent
+ * @package Civi\API\Event
+ */
 class ResolveEvent extends Event {
+  /**
+   * @param $apiRequest
+   */
   function __construct($apiRequest) {
     parent::__construct(NULL, $apiRequest);
   }

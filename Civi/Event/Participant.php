@@ -655,7 +655,7 @@ class Participant extends \Civi\Core\Entity {
         'name' => 'role_id',
         'propertyName' => 'roleId',
         'type' => \CRM_Utils_Type::T_STRING,
-                'title' => ts('Participant Role Id'),
+                'title' => ts('Participant Role(s)'),
                                  'maxlength' => 128,
                                  'size' => \CRM_Utils_Type::HUGE,
                            

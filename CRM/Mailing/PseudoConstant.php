@@ -154,6 +154,8 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
+   * @param null $mode
+   *
    * @return array - array reference of all mailing templates if any
    * @static
    */
@@ -211,8 +213,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param boolean $name pseudoconstant to be flushed
-   *
+   * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'template') {
    if (isset(self::$$name)) {

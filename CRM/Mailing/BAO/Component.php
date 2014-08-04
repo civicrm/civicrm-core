@@ -82,40 +82,27 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    * Create and Update mailing component
    *
    * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $ids (reference ) the array that holds all the db ids
+   * @param array $ids (deprecated) the array that holds all the db ids
    *
    * @return object CRM_Mailing_BAO_Component object
    *
    * @access public
    * @static
    */
-  static function add(&$params, &$ids = array()) {
-    // action is taken depending upon the mode
+  static function add(&$params, $ids = array()) {
+    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
     $component = new CRM_Mailing_DAO_Component();
-    $component->name = $params['name'];
-    $component->component_type = CRM_Utils_Array::value('component_type', $params);
-    $component->subject = CRM_Utils_Array::value('subject', $params);
-    if (CRM_Utils_Array::value('body_text', $params)) {
-      $component->body_text = CRM_Utils_Array::value('body_text', $params);
-    }
-    else {
+    $component->id = $id;
+    $component->copyValues($params);
+    if (empty($id) && empty($params['body_text'])) {
       $component->body_text = CRM_Utils_String::htmlToText(CRM_Utils_Array::value('body_html', $params));
     }
-    $component->body_html = CRM_Utils_Array::value('body_html', $params);
-    $component->is_active = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $component->is_default = CRM_Utils_Array::value('is_default', $params, FALSE);
 
     if ($component->is_default) {
-      $query = "UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type ='{$component->component_type}'";
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type ='{$component->component_type}' AND id <> $id");
     }
 
-    $component->id = CRM_Utils_Array::value('id', $ids);
-
     $component->save();
-
-    CRM_Core_Session::setStatus(ts('The mailing component \'%1\' has been saved.',
-        array(1 => $component->name)
-      ), ts('Saved'), 'success');
+    return $component;
   }
 }

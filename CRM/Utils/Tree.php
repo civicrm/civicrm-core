@@ -88,12 +88,12 @@ class CRM_Utils_Tree {
   /**
    * Constructor for the tree.
    *
-   * @param string $root
+   * @param $nodeName
+   *
+   * @internal param string $root
    *
    * @return CRM_Utils_Tree
-
    * @access public
-   *
    */
   public function __construct($nodeName) {
     // create the root node

@@ -23,6 +23,11 @@
       <type>int unsigned</type>
       <required>true</required>
       <comment>Which Domain is this match entry for</comment>
+      <pseudoconstant>
+          <table>civicrm_domain</table>
+          <keyColumn>id</keyColumn>
+          <labelColumn>name</labelColumn>
+      </pseudoconstant>
       <add>3.0</add>
   </field>
   <foreignKey>

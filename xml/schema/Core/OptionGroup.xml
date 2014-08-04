@@ -55,6 +55,12 @@
        <comment>Is this option group active?</comment>
        <add>1.5</add>
   </field>
+  <field>
+       <name>is_locked</name>
+       <type>boolean</type>
+       <comment>A lock to remove the ability to add new options via the UI.</comment>
+       <add>4.5</add>
+  </field>
   <index>
     <name>UI_name</name>
     <fieldName>name</fieldName>

@@ -47,7 +47,7 @@ use JMS\Serializer\Annotation as JMS;
  *
  * @CiviAPI\Entity("MailSettings")
  * @CiviAPI\Permission()
- * @ORM\Table(name="civicrm_mail_settings")
+ * @ORM\Table(name="civicrm_mail_settings", indexes={@ORM\Index(name="FK_civicrm_mail_settings_domain_id", columns={"domain_id"})})
  * @ORM\Entity
  *
  */
@@ -64,13 +64,13 @@ class MailSettings extends \Civi\Core\Entity {
   private $id;
     
   /**
-   * @var integer
+   * @var \Civi\Core\Domain
    *
-   * @JMS\Type("integer")
-   * @ORM\Column(name="domain_id", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
+   * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
    */
-  private $domainId;
+  private $civiDomain;
   
   /**
    * @var string
@@ -190,23 +190,23 @@ class MailSettings extends \Civi\Core\Entity {
   }
     
   /**
-   * Set domainId
+   * Set civiDomain
    *
-   * @param integer $domainId
+   * @param \Civi\Core\Domain $civiDomain
    * @return MailSettings
    */
-  public function setDomainId($domainId) {
-    $this->domainId = $domainId;
+  public function setCiviDomain(\Civi\Core\Domain $civiDomain = null) {
+    $this->civiDomain = $civiDomain;
     return $this;
   }
 
   /**
-   * Get domainId
+   * Get civiDomain
    *
-   * @return integer
+   * @return \Civi\Core\Domain
    */
-  public function getDomainId() {
-    return $this->domainId;
+  public function getCiviDomain() {
+    return $this->civiDomain;
   }
   
   /**
@@ -474,12 +474,18 @@ class MailSettings extends \Civi\Core\Entity {
               'domain_id' => array(
       
         'name' => 'domain_id',
-        'propertyName' => 'domainId',
+        'propertyName' => 'civiDomain',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                                      
                                     
-                          ),
+                'FKClassName' => 'CRM_Core_DAO_Domain',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_domain',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
       
               'name' => array(
       

@@ -42,6 +42,8 @@ class CRM_Event_Form_EventFees {
   /**
    * Function to set variables up before form is built
    *
+   * @param $form
+   *
    * @return void
    * @access public
    */
@@ -70,6 +72,8 @@ class CRM_Event_Form_EventFees {
    * the default values are retrieved from the database
    *
    * @access public
+   *
+   * @param $form
    *
    * @return void
    */
@@ -124,7 +128,7 @@ class CRM_Event_Form_EventFees {
     if ($form->_action == CRM_Core_Action::ADD && !$form->_mode && $form->_isPaidEvent) {
       $defaults[$form->_pId]['record_contribution'] = 1;
     }
-    
+
     //CRM-13420
     if (empty($defaults['payment_instrument_id'])) {
       $defaults[$form->_pId]['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
@@ -254,6 +258,10 @@ class CRM_Event_Form_EventFees {
    *
    * @access public
    *
+   * @param $participantID
+   * @param null $eventID
+   * @param bool $includeQtyZero
+   *
    * @return void
    */
   static function setDefaultPriceSet($participantID, $eventID = NULL, $includeQtyZero = TRUE) {
@@ -335,6 +343,8 @@ SELECT  id, html_type
 
   /**
    * Function to build the form
+   *
+   * @param $form
    *
    * @return void
    * @access public
@@ -447,7 +457,7 @@ SELECT  id, html_type
           CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'check_number')
         );
 
-        $form->add('text', 'total_amount', ts('Total Amount'),
+        $form->add('text', 'total_amount', ts('Amount'),
           CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'total_amount')
         );
       }

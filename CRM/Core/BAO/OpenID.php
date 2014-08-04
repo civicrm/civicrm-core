@@ -96,6 +96,8 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
    *
    * @param int $id the contact id
    *
+   * @param bool $updateBlankLocInfo
+   *
    * @return array  the array of openid's
    * @access public
    * @static

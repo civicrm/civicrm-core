@@ -89,6 +89,13 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'title' => ts('Use Profile-Create Mode'),
           'fe' => true,
         ),
+        CRM_Core_Action::BASIC => array(
+          'name' => ts('Use Profile-Listings Mode'),
+          'url' => 'civicrm/profile',
+          'qs' => 'gid=%%id%%&reset=1',
+          'title' => ts('Use Profile-Listings Mode'),
+          'fe' => true,
+        ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
@@ -380,6 +387,8 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    *
    * @param int $id uf group id
    *
+   * @param $action
+   *
    * @return void
    * @access public
    */
@@ -391,6 +400,10 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     $controller->run();
   }
 
+  /**
+   * @param $id
+   * @param $action
+   */
   function setContext($id, $action) {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
@@ -410,6 +423,11 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     $session->pushUserContext($url);
   }
 
+  /**
+   * @param $groupType
+   *
+   * @return array
+   */
   static function extractGroupTypes($groupType) {
     $returnGroupTypes = array();
     if (!$groupType) {

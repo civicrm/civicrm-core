@@ -61,6 +61,8 @@ abstract class CRM_Import_DataSource {
    * form snippet. It should add all fields necesarry to get the data
    * uploaded to the temporary table in the DB.
    *
+   * @param $form
+   *
    * @return void (operates directly on form argument)
    * @access public
    */

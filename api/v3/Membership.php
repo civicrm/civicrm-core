@@ -187,32 +187,21 @@ function civicrm_api3_membership_get($params) {
   $activeOnly = $membershipTypeId = $membershipType = NULL;
 
   $contactID = CRM_Utils_Array::value('contact_id', $params);
-  if (!empty($params['filters']) && is_array($params['filters'])) {
-    $activeOnly = CRM_Utils_Array::value('is_current', $params['filters'], FALSE);
+  if (!empty($params['filters']) && is_array($params['filters']) && isset($params['filters']['is_current'])) {
+    $activeOnly = $params['filters']['is_current'];
+    unset($params['filters']['is_current']);
   }
   $activeOnly = CRM_Utils_Array::value('active_only', $params, $activeOnly);
-
-  //@todo replace this by handling in API layer - we should have enough info to do this
-  // between pseudoconstant & fk - see comments in format_params
-  $membershipTypeId = CRM_Utils_Array::value('membership_type_id', $params);
-  if (!$membershipTypeId) {
-    $membershipType = CRM_Utils_Array::value('membership_type', $params);
-    if ($membershipType) {
-      $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-          $membershipType, 'id', 'name'
-      );
-    }
+  if ($activeOnly && empty($params['status_id'])) {
+    $params['status_id'] = array('IN' => CRM_Member_BAO_MembershipStatus::getMembershipStatusCurrent());
   }
 
-  if (!empty($params['contact_id']) && !is_array($params['contact_id'])) {
-    $membershipValues = _civicrm_api3_membership_get_customv2behaviour($params, $membershipTypeId, $activeOnly );
+  $options = _civicrm_api3_get_options_from_params($params, TRUE,'membership', 'get');
+  if ($options['is_count']) {
+    return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
-  else {
-    //legacy behaviour only ever worked when contact_id passed in - use standard api function otherwise
-    $membershipValues = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
-  }
+  $membershipValues = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Membership');
 
-  $options = _civicrm_api3_get_options_from_params($params, TRUE,'membership','get');
   $return = $options['return'];
   if(empty($membershipValues) ||
     (!empty($return)
@@ -235,6 +224,9 @@ function civicrm_api3_membership_get($params) {
  * as stable as possible
  *
  * @param array $params parameters passed into get function
+ * @param $membershipTypeId
+ * @param $activeOnly
+ *
  * @return array result for calling function
  */
 function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTypeId, $activeOnly) {
@@ -251,9 +243,13 @@ function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTyp
 
 /**
  * non-standard behaviour inherited from v2
-* @param array $params parameters passed into get function
-* @return array result for calling function
-*/
+ *
+ * @param array $params parameters passed into get function
+ * @param $membershipValues
+ * @param $contactID
+ *
+ * @return array result for calling function
+ */
 function _civicrm_api3_membership_relationsship_get_customv2behaviour(&$params, $membershipValues, $contactID) {
   $relationships = array();
   foreach ($membershipValues as $membershipId => $values) {

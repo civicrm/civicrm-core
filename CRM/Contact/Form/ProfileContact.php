@@ -39,6 +39,8 @@ class CRM_Contact_Form_ProfileContact {
   /**
    * Function to set variables up before form is built
    *
+   * @param $form
+   *
    * @return void
    * @access public
    */
@@ -76,8 +78,9 @@ class CRM_Contact_Form_ProfileContact {
    * Function to build form for honoree contact / on behalf of organization.
    *
    * @param $form              object  invoking Object
-   * @param $contactType       string  contact type
-   * @param $title             string  fieldset title
+   *
+   * @internal param string $contactType contact type
+   * @internal param string $title fieldset title
    *
    * @static
    */
@@ -108,9 +111,12 @@ class CRM_Contact_Form_ProfileContact {
     }
   }
 
+  /**
+   * @param $form
+   */
   static function postProcess($form) {
     $params = $form->_params;
-    if ($form->_honor_block_is_active && !empty($params['soft_credit_type_id'])) {
+    if (!empty($form->_honor_block_is_active) && !empty($params['soft_credit_type_id'])) {
       $honorId = null;
 
       //check if there is any duplicate contact

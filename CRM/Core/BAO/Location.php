@@ -46,9 +46,11 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   /**
    * Function to create various elements of location block
    *
-   * @param array    $params       (reference ) an assoc array of name/value pairs
-   * @param boolean  $fixAddress   true if you need to fix (format) address values
+   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param boolean $fixAddress true if you need to fix (format) address values
    *                               before inserting in db
+   *
+   * @param null $entity
    *
    * @return array   $location
    * @access public
@@ -234,8 +236,11 @@ WHERE e.id = %1";
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $params        input parameters to find object
-   * @param array $values        output values of the object
+   * @param $entityBlock
+   * @param bool $microformat
+   *
+   * @internal param array $params input parameters to find object
+   * @internal param array $values output values of the object
    *
    * @return array   array of objects(CRM_Core_BAO_Location)
    * @access public
@@ -304,6 +309,12 @@ WHERE e.id = %1";
    * @param  int  $locBlockId  location block id.
    * @param  int  $updateLocBlockId update location block id
    * @return int  newly created/updated location block id.
+   */
+  /**
+   * @param $locBlockId
+   * @param null $updateLocBlockId
+   *
+   * @return mixed
    */
   static function copyLocBlock($locBlockId, $updateLocBlockId = NULL) {
     //get the location info.

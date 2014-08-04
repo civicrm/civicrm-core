@@ -841,7 +841,8 @@
     <type>timestamp</type>
     <comment>When was the contact was created.</comment>
     <required>false</required>
-    <defaultTs>NULL</defaultTs>
+    <export>true</export>
+    <default>NULL</default>
     <add>4.3</add>
   </field>
   <field>
@@ -849,7 +850,8 @@
     <type>timestamp</type>
     <comment>When was the contact (or closely related entity) was created or modified or deleted.</comment>
     <required>false</required>
-    <defaultTs>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</defaultTs>
+    <export>true</export>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
     <add>4.3</add>
   </field>
 </table>

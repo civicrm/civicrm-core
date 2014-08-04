@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class AuthorizeNet
+ */
 class AuthorizeNet extends PHPUnit_Framework_Testcase {
   /*
      * Helper function to create
@@ -6,6 +10,9 @@ class AuthorizeNet extends PHPUnit_Framework_Testcase {
      *
      * @return $paymentProcessor id of created payment processor
      */
+  /**
+   * @return CRM_Financial_DAO_PaymentProcessor
+   */
   function create() {
 
     $paymentProcessor = new CRM_Financial_DAO_PaymentProcessor();
@@ -36,6 +43,11 @@ class AuthorizeNet extends PHPUnit_Framework_Testcase {
      * @return boolean true if payment processor deleted, false otherwise
      *
      */
+  /**
+   * @param $id
+   *
+   * @return mixed
+   */
   function delete($id) {
     $paymentProcessor = new CRM_Financial_DAO_PaymentProcessor();
     $paymentProcessor->id = $id;

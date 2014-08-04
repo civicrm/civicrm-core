@@ -33,6 +33,10 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
+
+/**
+ * Class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field
+ */
 class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
 {
     /**
@@ -181,12 +185,13 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
      * @var int unsigned
      */
     public $visibility_id;
-    /**
-     * class constructor
-     *
-     * @access public
-     * @return civicrm_price_field
-     */
+
+  /**
+   * class constructor
+   *
+   * @access public
+   * @return \CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field
+   */
     function __construct()
     {
         $this->__table = 'civicrm_price_field';

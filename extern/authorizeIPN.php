@@ -35,6 +35,8 @@ session_start();
 
 require_once '../civicrm.config.php';
 $config = CRM_Core_Config::singleton();
+$log = new CRM_Utils_SystemLogger();
+$log->alert('payment_notification processor_name=AuthNet', $_REQUEST);
 
 $authorizeNetIPN = new CRM_Core_Payment_AuthorizeNetIPN();
 $authorizeNetIPN->main();

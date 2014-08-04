@@ -118,7 +118,7 @@
         {/if}
 
         {if $ppID}{ts}<a href='#' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
-        <br /><span class="description">{ts}Actual amount given by contributor.{/ts}{if $hasPriceSets} {ts}Alternatively, you can use a price set.{/ts}{/if}</span>
+        <br /><span class="description">{ts}Total amount of this contribution.{/ts}{if $hasPriceSets} {ts}Alternatively, you can use a price set.{/ts}{/if}</span>
       </td>
     </tr>
 
@@ -203,7 +203,7 @@
                 {if $hideCalendar neq true}
                   {include file="CRM/common/jcalendar.tpl" elementName=cancel_date}
                 {else}
-                  {$form.cancel_date.html|crmDate}
+                  {$form.cancel_date.value|crmDate}
                 {/if}
               </td>
             </tr>
@@ -399,7 +399,7 @@
     {if $context eq 'standalone' and $outBound_option != 2 }
       {literal}
       CRM.$(function($) {
-        cj("#contact_1").blur( function( ) {
+        cj("#contact_id").change( function( ) {
           checkEmail( );
         });
         checkEmail( );
@@ -408,7 +408,7 @@
       });
 
       function checkEmail( ) {
-        var contactID = cj("input[name='contact_select_id[1]']").val();
+        var contactID = cj("#contact_id").val();
         if (contactID) {
           var postUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' h=0}{literal}";
           cj.post( postUrl, {contact_id: contactID},
@@ -533,9 +533,6 @@
         }
     {/if}
   {/if} {* not delete mode if*}
-
-  {* include jscript to warn if unsaved form field changes *}
-  {include file="CRM/common/formNavigate.tpl"}
 
 {/if} {* closing of main custom data if *}
 

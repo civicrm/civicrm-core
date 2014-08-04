@@ -38,21 +38,31 @@
  *
  */
 class CRM_Case_Form_Activity_LinkCases {
+  /**
+   * @param $form
+   *
+   * @throws Exception
+   */
   static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
     }
+    if (count($form->_caseId) != 1) {
+      CRM_Core_Resources::fatal(ts('Expected one case-type'));
+    }
+
+    $caseId = CRM_Utils_Array::first($form->_caseId);
 
     $form->assign('clientID', $form->_currentlyViewedContactId);
-    $form->assign('caseTypeLabel', CRM_Case_BAO_Case::getCaseType($form->_caseId));
+    $form->assign('caseTypeLabel', CRM_Case_BAO_Case::getCaseType($caseId));
 
     // get the related cases for given case.
     $relatedCases = $form->get('relatedCases');
     if (!isset($relatedCases)) {
-      $relatedCases = CRM_Case_BAO_Case::getRelatedCases($form->_caseId, $form->_currentlyViewedContactId);
+      $relatedCases = CRM_Case_BAO_Case::getRelatedCases($caseId, $form->_currentlyViewedContactId);
       $form->set('relatedCases', empty($relatedCases) ? FALSE : $relatedCases);
     }
-    $excludeCaseIds = array($form->_caseId);
+    $excludeCaseIds = array($caseId);
     if (is_array($relatedCases) && !empty($relatedCases)) {
       $excludeCaseIds = array_merge($excludeCaseIds, array_keys($relatedCases));
     }
@@ -65,12 +75,17 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function setDefaultValues(&$form) {
     return $defaults = array();
   }
 
+  /**
+   * @param $form
+   */
   static function buildQuickForm(&$form) {
     $form->add('text', 'link_to_case_id', ts('Link To Case'), array('class' => 'huge'), TRUE);
   }
@@ -80,6 +95,9 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @param array $values posted values of the form
    *
+   * @param $files
+   * @param $form
+   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public
@@ -88,7 +106,8 @@ class CRM_Case_Form_Activity_LinkCases {
     $errors = array();
 
     $linkCaseId = CRM_Utils_Array::value('link_to_case_id', $values);
-    if ($linkCaseId == $form->_caseId) {
+    assert('is_numeric($linkCaseId)');
+    if ($linkCaseId == CRM_Utils_Array::first($form->_caseId)) {
       $errors['link_to_case'] = ts('Please select some other case to link.');
     }
 
@@ -106,6 +125,9 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @access public
    *
+   * @param $form
+   * @param $params
+   *
    * @return void
    */
   static function beginPostProcess(&$form, &$params) {}
@@ -114,6 +136,10 @@ class CRM_Case_Form_Activity_LinkCases {
    * Function to process the form
    *
    * @access public
+   *
+   * @param $form
+   * @param $params
+   * @param $activity
    *
    * @return void
    */

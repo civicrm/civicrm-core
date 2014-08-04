@@ -69,6 +69,36 @@ function civicrm_api3_extension_install($params) {
 }
 
 /**
+ * Upgrade an extension - runs upgrade_N hooks and system.flush
+ *
+ * @return array API result
+ * @static void
+ * @access public
+ *
+ */
+function civicrm_api3_extension_upgrade() {
+  CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+  $queue = CRM_Extension_Upgrades::createQueue();
+  $runner = new CRM_Queue_Runner(array(
+    'title' => 'Extension Upgrades',
+    'queue' => $queue,
+    'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+  ));
+
+  try {
+    $result = $runner->runAll();
+  } catch (CRM_Extension_Exception $e) {
+    return civicrm_api3_create_error($e->getMessage());
+  }
+
+  if ($result === TRUE) {
+    return civicrm_api3_create_success();
+  } else {
+    return $result;
+  }
+}
+
+/**
  * Enable an extension
  *
  * @param  array       $params input parameters
@@ -145,15 +175,15 @@ function civicrm_api3_extension_uninstall($params) {
 /**
  * Download and install an extension
  *
- * @param  array       $params input parameters
+ * @param  array $params input parameters
  *                          - key: string, eg "com.example.myextension"
  *                          - url: string eg "http://repo.com/myextension-1.0.zip"
  *
+ * @throws API_Exception
  * @return array API result
  * @static void
  * @access public
  * @example ExtensionDownload.php
- *
  */
 function civicrm_api3_extension_download($params) {
   if (! array_key_exists('key', $params)) {
@@ -230,11 +260,12 @@ function civicrm_api3_extension_refresh($params) {
 /**
  * Get a list of available extensions
  *
+ * @param $params
+ *
  * @return array API result
  * @static void
  * @access public
  * @example ExtensionGet.php
- *
  */
 function civicrm_api3_extension_get($params) {
   $statuses = CRM_Extension_System::singleton()->getManager()->getStatuses();

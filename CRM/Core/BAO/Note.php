@@ -237,11 +237,11 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array $params        input parameters to find object
-   * @param array $values        output values of the object
-   * @param array $ids           the array that holds all the db ids
-   * @param int   $numNotes      the maximum number of notes to return (0 if all)
+   * @param array $params input parameters to find object
+   * @param array $values output values of the object
+   * @param int $numNotes the maximum number of notes to return (0 if all)
    *
+   * @internal param array $ids the array that holds all the db ids
    * @return object $notes  Object of CRM_Core_BAO_Note
    * @access public
    * @static
@@ -282,12 +282,10 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   /**
    * Function to delete the notes
    *
-   * @param int $id  note id
+   * @param int $id note id
    * @param boolean $showStatus do we need to set status or not
    *
-   * @return $return no of deleted notes on success, false otherwise
-   *
-   * @access public
+   * @return mixed|null $return no of deleted notes on success, false otherwise@access public
    * @static
    */
   static function del($id, $showStatus = TRUE) {
@@ -356,7 +354,9 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   /**
    * retrieve all records for this entity-id
    *
-   * @param int  $id ID of the relationship for which records needs to be retrieved.
+   * @param int $id ID of the relationship for which records needs to be retrieved.
+   *
+   * @param string $entityTable
    *
    * @return array $viewNote array of note properties
    *
@@ -388,7 +388,9 @@ ORDER BY  modified_date desc";
   /**
    * Function to get log record count for a Contact
    *
-   * @param int $contactId Contact ID
+   * @param $contactID
+   *
+   * @internal param int $contactId Contact ID
    *
    * @return int $count count of log records
    *
@@ -488,6 +490,10 @@ ORDER BY  modified_date desc";
         $tree[$note->id]['createdById'] = $createdById;
         $tree[$note->id]['modified_date'] = CRM_Utils_Date::customFormat($tree[$note->id]['modified_date']);
 
+        // paper icon view for attachments part
+        $paperIconAttachmentInfo = CRM_Core_BAO_File::paperIconAttachment('civicrm_note', $note->id);
+        $tree[$note->id]['attachment'] = implode('', $paperIconAttachmentInfo);
+
         if ($snippet) {
           $tree[$note->id]['note'] = nl2br($tree[$note->id]['note']);
           $tree[$note->id]['note'] = smarty_modifier_mb_truncate(
@@ -538,7 +544,8 @@ ORDER BY  modified_date desc";
    * function to delete all note related to contact when contact is deleted
    *
    * @param int $contactID contact id whose notes to be deleted
-   * @param array $deleteNoteID to store all deleted note ids
+   *
+   * @internal param array $deleteNoteID to store all deleted note ids
    *
    * @return void
    * @static

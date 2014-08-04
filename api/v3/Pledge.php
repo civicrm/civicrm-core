@@ -83,6 +83,9 @@ function civicrm_api3_pledge_delete($params) {
   }
 }
 
+/**
+ * @param $params
+ */
 function _civicrm_api3_pledge_delete_spec(&$params) {
   // set as not required as pledge_id also acceptable & no either/or std yet
   $params['id']['api.aliases'] = array('pledge_id');
@@ -121,9 +124,9 @@ function _civicrm_api3_pledge_create_spec(&$params) {
 /**
  * Retrieve a set of pledges, given a set of input params
  *
- * @param  array   $params           (reference ) input parameters. Use interogate for possible fields
+ * @param  array $params input parameters. Use interrogate for possible fields
  *
- * @return array (reference )        array of pledges, if error an array with an error id and error message
+ * @return array  array of pledges, if error an array with an error id and error message
  * {@getfields pledge_get}
  * @example PledgeGet.php
  * @access public
@@ -155,11 +158,13 @@ function _civicrm_api3_pledge_get_defaults() {
  * take the input parameter list as specified in the data model and
  * convert it into the same format that we use in QF and BAO object
  *
- * @param array  $params       Associative array of property name/value
- *                             pairs to insert in new contact.
- * @param array  $values       The reformatted properties that we can use internally
+ * @param array $values The reformatted properties that we can use internally
  *                            '
  *
+ * @param bool $create
+ *
+ * @internal param array $params Associative array of property name/value
+ *                             pairs to insert in new contact.
  * @return array|CRM_Error
  * @access public
  */

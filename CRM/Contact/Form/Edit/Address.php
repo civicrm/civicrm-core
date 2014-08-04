@@ -294,8 +294,12 @@ class CRM_Contact_Form_Edit_Address {
   /**
    * check for correct state / country mapping.
    *
-   * @param array reference $fields - submitted form values.
-   * @param array reference $errors - if any errors found add to this array. please.
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @internal param \reference $array $fields - submitted form values.
+   * @internal param \reference $array $errors - if any errors found add to this array. please.
    *
    * @return true if no errors
    *         array of errors if any present.
@@ -393,6 +397,14 @@ class CRM_Contact_Form_Edit_Address {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * @param $form
+   * @param $countryElementName
+   * @param $stateElementName
+   * @param $countyElementName
+   * @param $countryDefaultValue
+   * @param null $stateDefaultValue
+   */
   static function fixStateSelect(&$form,
     $countryElementName,
     $stateElementName,
@@ -461,7 +473,8 @@ class CRM_Contact_Form_Edit_Address {
     // CRM-7296 freeze the select for state if address is shared with household
     // CRM-9070 freeze the select for state if it is view only
     if (isset($form->_fields) && !empty($form->_fields[$stateElementName]) &&
-      (!empty($form->_fields[$stateElementName]['is_shared']) || !empty($form->_fields[$stateElementName]['is_view']))
+      (!empty($form->_fields[$stateElementName]['is_shared']) || !empty($form->_fields[$stateElementName]['is_view'])) &&
+      !empty($stateSelect)
     ) {
       $stateSelect->freeze();
     }
@@ -566,6 +579,10 @@ class CRM_Contact_Form_Edit_Address {
   }
 
 
+  /**
+   * @param $form
+   * @param $groupTree
+   */
   static function storeRequiredCustomDataInfo(&$form, $groupTree) {
     if (CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Contact') {
       $requireOmission = NULL;

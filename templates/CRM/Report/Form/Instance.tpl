@@ -99,12 +99,24 @@
         <span class="description">{ts}Users with appropriate permissions can add this report to their dashboard.{/ts}</span>
       </td>
     </tr>
+    <tr id ="limit_result" class="crm-report-instanceForm-form-block-limitUser">
+      <td class="report-label">{$form.row_count.label} {help id="id-dash_limit" file="CRM/Report/Form/Settings.hlp"}</td>
+      <td>{$form.row_count.html}</td>
+    </tr>
 </table>
 
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    ="is_navigation"
     trigger_value       =""
     target_element_id   ="navigation_menu"
+    target_element_type ="table-row"
+    field_type          ="radio"
+    invert              = 0
+}
+{include file="CRM/common/showHideByFieldValue.tpl"
+    trigger_field_id    ="addToDashboard"
+    trigger_value       =""
+    target_element_id   ="limit_result"
     target_element_type ="table-row"
     field_type          ="radio"
     invert              = 0

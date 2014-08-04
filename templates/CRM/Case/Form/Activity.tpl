@@ -55,7 +55,11 @@
         <div id="help">{$activityTypeDescription}</div>
       </tr>
     {/if}
-    {if $activityTypeFile}
+    {* Block for change status, case type and start date. *}
+    {if $activityTypeFile EQ 'ChangeCaseStatus'
+    || $activityTypeFile EQ 'ChangeCaseType'
+    || $activityTypeFile EQ 'LinkCases'
+    || $activityTypeFile EQ 'ChangeCaseStartDate'}
       {include file="CRM/Case/Form/Activity/$activityTypeFile.tpl"}
       <tr class="crm-case-activity-form-block-details">
         <td class="label">{ts}Notes{/ts}</td>
@@ -64,26 +68,31 @@
           {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
         </td>
       </tr>
+      {* Added Activity Details accordion tab *}
+      <tr class="crm-case-activity-form-block-activity-details">
+        <td colspan="2">
+          <div id="activity-details" class="crm-accordion-wrapper collapsed">
+            <div class="crm-accordion-header">
+              {ts}Activity Details{/ts}
+            </div><!-- /.crm-accordion-header -->
+            <div class="crm-accordion-body">
     {/if}
-    <tr class="crm-case-activity-form-block-activity-details">
-      <td colspan="2">
-        <div id="activity-details" class="crm-accordion-wrapper collapsed">
-          <div class="crm-accordion-header">
-            {ts} Activity Details{/ts}
-          </div><!-- /.crm-accordion-header -->
-          <div class="crm-accordion-body">
+    {* End block for change status, case type and start date. *}
             <table class="form-layout-compressed">
               <tbody>
                 <tr id="with-clients" class="crm-case-activity-form-block-client_name">
                   <td class="label font-size12pt">{ts}Client{/ts}</td>
-                  <td class="view-value">
+                  <td class="view-value">	
                     <span class="font-size12pt">
-                      {foreach from=$client_names item=client name=clients}
-                        {$client.display_name}{if not $smarty.foreach.clients.last}; &nbsp; {/if}
+                      {foreach from=$client_names item=client name=clients key=id}
+                        {foreach from=$client_names.$id item=client1}
+                          {$client1.display_name}
+                        {/foreach}
+                        {if not $smarty.foreach.clients.last}; &nbsp; {/if}
                       {/foreach}
                     </span>
 
-                   {if $action eq 1 or $action eq 2}
+                    {if $action eq 1 or $action eq 2}
                       <br />
                       <a href="#" class="crm-with-contact">&raquo; {ts}With other contact(s){/ts}</a>
                     {/if}
@@ -125,7 +134,7 @@
                 </tr>
 
               {* Include special processing fields if any are defined for this activity type (e.g. Change Case Status / Change Case Type). *}
-    
+
               {if $activityTypeFile neq 'ChangeCaseStartDate'}
                 <tr class="crm-case-activity-form-block-subject">
                   <td class="label">{$form.subject.label}</td><td class="view-value">{$form.subject.html|crmAddClass:huge}</td>
@@ -167,8 +176,13 @@
                 </td>
               </tr>
             </table>
+        {if $activityTypeFile EQ 'ChangeCaseStatus'
+        || $activityTypeFile EQ 'ChangeCaseType'
+        || $activityTypeFile EQ 'ChangeCaseStartDate'}
           </div><!-- /.crm-accordion-body -->
         </div><!-- /.crm-accordion-wrapper -->
+        {* End of Activity Details accordion tab *}
+      {/if}
       </td>
     </tr>
     <tr class="crm-case-activity-form-block-attachment">
@@ -185,20 +199,24 @@
 
               <div class="description">{ts}Email a complete copy of this activity record to other people involved with the case. Click the top left box to select all.{/ts}</div>
               {strip}
-                <table>
+                <table class="row-highlight">
                   <tr class="columnheader">
                     <th>{$form.toggleSelect.html}&nbsp;</th>
                     <th>{ts}Case Role{/ts}</th>
                     <th>{ts}Name{/ts}</th>
                     <th>{ts}Email{/ts}</th>
+                    {if $countId gt 1}<th>{ts}Target Contact{/ts}</th>{/if}
                   </tr>
                   {foreach from=$searchRows item=row key=id}
-                    <tr class="{cycle values="odd-row,even-row"}">
-                      <td class="crm-case-activity-form-block-contact_{$id}">{$form.contact_check[$id].html}</td>
-                      <td class="crm-case-activity-form-block-role">{$row.role}</td>
-                      <td class="crm-case-activity-form-block-display_name">{$row.display_name}</td>
-                      <td class="crm-case-activity-form-block-email">{$row.email}</td>
-                    </tr>
+                    {foreach from=$searchRows.$id item=row1 key=id1}
+                      <tr class="{cycle values="odd-row,even-row"}">
+                        <td class="crm-case-activity-form-block-contact_{$id}">{$form.contact_check[$id].html}</td>
+                        <td class="crm-case-activity-form-block-role">{$row1.role}</td>
+                        <td class="crm-case-activity-form-block-display_name">{$row1.display_name}</td>
+                        <td class="crm-case-activity-form-block-email">{$row1.email}</td>
+                        {if $countId gt 1}<td class="crm-case-activity-form-block-display_name">{$row1.managerOf}</td>{/if}
+                      </tr>
+                    {/foreach}
                   {/foreach}
                 </table>
               {/strip}
@@ -246,12 +264,14 @@
     {if $activityTypeFile NEQ 'ChangeCaseStatus'
     && $activityTypeFile NEQ 'ChangeCaseType'
     && $activityTypeFile NEQ 'ChangeCaseStartDate'}
-    <tr class="crm-case-activity-form-block-status_id">
-      <td class="label">{$form.status_id.label}</td><td class="view-value">{$form.status_id.html}</td>
-    </tr>
-    <tr class="crm-case-activity-form-block-priority_id">
-      <td class="label">{$form.priority_id.label}</td><td class="view-value">{$form.priority_id.html}</td>
-    </tr>
+    <table class="form-layout-compressed">
+      <tr class="crm-case-activity-form-block-status_id">
+        <td class="label">{$form.status_id.label}</td><td class="view-value">{$form.status_id.html}</td>
+      </tr>
+      <tr class="crm-case-activity-form-block-priority_id">
+        <td class="label">{$form.priority_id.label}</td><td class="view-value">{$form.priority_id.html}</td>
+      </tr>
+    </table>
     {/if}
     {if $form.tag.html}
     <tr class="crm-case-activity-form-block-tag">
@@ -261,10 +281,12 @@
       </td>
     </tr>
     {/if}
-  <tr class="crm-case-activity-form-block-tag_set"><td colspan="2">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td></tr>
+  <tr class="crm-case-activity-form-block-tag_set"><td colspan="2">{include file="CRM/common/Tagset.tpl" tagsetType='activity'}</td></tr>
   </table>
 
   {/if}
+
+{crmRegion name='case-activity-form'}{/crmRegion}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 
@@ -286,7 +308,7 @@
     {/literal}
   {/if}
 
-  {if $action neq 8 and $action neq 32768}
+  {if $action neq 8 and $action neq 32768 and empty($activityTypeFile)}
   <script type="text/javascript">
     {if $searchRows}
       cj('#sendcopy').crmAccordionToggle();
@@ -295,9 +317,6 @@
     cj('#follow-up').crmAccordionToggle();
   </script>
   {/if}
-
-  {* include jscript to warn if unsaved form field changes *}
-  {include file="CRM/common/formNavigate.tpl"}
 
   {if $action eq 2 or $action eq 1}
     {literal}

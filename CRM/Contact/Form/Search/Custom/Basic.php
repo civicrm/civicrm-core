@@ -36,6 +36,12 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
 
   protected $_query;
 
+  /**
+   * @param $formValues
+   */
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     parent::__construct($formValues);
 
@@ -104,8 +110,14 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
     return;
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
-    $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements();
+    //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
+    // this is loaded onto then replace with something like '__' & test
+    $separator = CRM_Core_DAO::VALUE_SEPARATOR;
+    $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, $separator);
     $form->add('select', 'contact_type', ts('Find...'), $contactTypes);
 
     // add select for groups
@@ -122,10 +134,22 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
     $form->assign('elements', array('sort_name', 'contact_type', 'group', 'tag'));
   }
 
+  /**
+   * @return CRM_Contact_DAO_Contact
+   */
   function count() {
     return $this->_query->searchQuery(0, 0, NULL, TRUE);
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowCount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return CRM_Contact_DAO_Contact
+   */
   function all(
     $offset = 0,
     $rowCount = 0,
@@ -145,10 +169,18 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
     );
   }
 
+  /**
+   * @return string
+   */
   function from() {
     return $this->_query->_fromClause;
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string|void
+   */
   function where($includeContactIDs = FALSE) {
     if ($whereClause = $this->_query->whereClause()) {
       return $whereClause;
@@ -156,10 +188,16 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
     return ' (1) ';
   }
 
+  /**
+   * @return string
+   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Basic.tpl';
   }
 
+  /**
+   * @return CRM_Contact_BAO_Query
+   */
   function getQueryObj() {
     return $this->_query;
   }

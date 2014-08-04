@@ -194,6 +194,9 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    *
    * @param array $fields posted values of the form
    *
+   * @param $files
+   * @param $form
+   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public

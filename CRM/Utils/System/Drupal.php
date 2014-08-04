@@ -104,6 +104,10 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *  @param integer $ufID User ID in CMS
    *  @param string $ufName User name
    */
+  /**
+   * @param $ufID
+   * @param $ufName
+   */
   function updateCMSName($ufID, $ufName) {
     // CRM-5555
     if (function_exists('user_load')) {
@@ -121,6 +125,10 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @params $params    array   array of name and mail values
    * @params $errors    array   array of errors
    * @params $emailName string  field label for the 'email'
+   *
+   * @param $params
+   * @param $errors
+   * @param string $emailName
    *
    * @return void
    */
@@ -178,6 +186,11 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @return string $destination destination value for URL
    *
    */
+  /**
+   * @param $form
+   *
+   * @return null|string
+   */
   function getLoginDestination(&$form) {
     $args = NULL;
 
@@ -217,14 +230,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @static
    */
   public function getLoginURL($destination = '') {
-    $config = CRM_Core_Config::singleton();
-    $loginURL = $config->userFrameworkBaseURL;
-    $loginURL .= 'user';
-    if (!empty($destination)) {
-      // append destination so user is returned to form they came from after login
-      $loginURL .= '?destination=' . urlencode($destination);
-    }
-    return $loginURL;
+    $query = $destination ? array('destination' => $destination) : array();
+    return url('user', array('query' => $query));
   }
 
 
@@ -232,6 +239,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * sets the title of the page
    *
    * @param string $title
+   * @param null $pageTitle
+   *
    * @paqram string $pageTitle
    *
    * @return void
@@ -250,8 +259,10 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb
    *
-   * @param string $title
-   * @param string $url
+   * @param $breadCrumbs
+   *
+   * @internal param string $title
+   * @internal param string $url
    *
    * @return void
    * @access public
@@ -524,6 +535,11 @@ AND    u.status = 1
   /*
    * Load user into session
    */
+  /**
+   * @param $username
+   *
+   * @return bool
+   */
   function loadUser($username) {
     global $user;
 
@@ -581,6 +597,9 @@ AND    u.status = 1
     drupal_set_message($message);
   }
 
+  /**
+   * @return mixed
+   */
   function logout() {
     module_load_include('inc', 'user', 'user.pages');
     return user_logout();
@@ -632,6 +651,9 @@ AND    u.status = 1
     return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->language, 0, 2));
   }
 
+  /**
+   * @return string
+   */
   function getVersion() {
     return defined('VERSION') ? VERSION : 'Unknown';
   }
@@ -643,6 +665,8 @@ AND    u.status = 1
    * @param boolean $loadUser boolean Require CMS user load.
    * @param boolean $throwError If true, print error on failure and exit.
    * @param boolean|string $realPath path to script
+   *
+   * @return bool
    */
   function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     //take the cms root path.
@@ -827,6 +851,9 @@ AND    u.status = 1
    *
    * @param string $url
    *
+   * @param bool $addLanguagePart
+   * @param bool $removeLanguagePart
+   *
    * @return string $url, formatted url.
    * @static
    */
@@ -863,7 +890,12 @@ AND    u.status = 1
         if ($urlType == LOCALE_LANGUAGE_NEGOTIATION_URL_DOMAIN) {
           if (isset($language->domain) && $language->domain) {
             if ($addLanguagePart) {
-              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $language->domain . base_path();
+              $cleanedUrl = preg_replace('#^https?://#', '', $language->domain);
+              // drupal function base_path() adds a "/" to the beginning and end of the returned path
+              if (substr($cleanedUrl, -1) == '/') {
+                $cleanedUrl = substr($cleanedUrl, 0, -1);
+              }
+              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $cleanedUrl . base_path();
             }
             if ($removeLanguagePart && defined('CIVICRM_UF_BASEURL')) {
               $url = str_replace('\\', '/', $url);
@@ -960,30 +992,20 @@ AND    u.status = 1
   }
 
   /**
-   * Get timezone from Drupal
-   * @return boolean|string
+   * Over-ridable function to get timezone as a string eg.
+   * @return string Timezone e.g. 'America/Los_Angeles'
    */
-  function getTimeZoneOffset(){
+  function getTimeZoneString() {
     global $user;
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
       $timezone = $user->timezone;
     } else {
       $timezone = variable_get('date_default_timezone', null);
     }
-    $tzObj = new DateTimeZone($timezone);
-    $dateTime = new DateTime("now", $tzObj);
-    $tz = $tzObj->getOffset($dateTime);
-
-    if(empty($tz)){
-      return false;
+    if (!$timezone) {
+      $timezone = parent::getTimeZoneString();
     }
-
-    $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz/60)%60));
-
-    if($timeZoneOffset > 0){
-      $timeZoneOffset = '+' . $timeZoneOffset;
-    }
-    return $timeZoneOffset;
+    return $timezone;
   }
   /**
    * Reset any system caches that may be required for proper CiviCRM

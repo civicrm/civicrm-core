@@ -63,7 +63,9 @@ function _civicrm_api3_mailing_job_create_spec(&$params) {
 /**
  * Returns array of Mailing Jobs  matching a set of one or more group properties
  *
- * @param array $params  Array of one or more valid
+ * @param array $params Array of one or more valid
+ * @param array $ids
+ *
  * @return array API return Array of matching mailing jobs
  * {@getfields mailing_job_get}
  * @access public

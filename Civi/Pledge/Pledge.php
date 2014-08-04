@@ -764,7 +764,12 @@ class Pledge extends \Civi\Core\Entity {
                                                              
                                     
                 'FKClassName' => 'CRM_Financial_DAO_FinancialType',
-                          ),
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_financial_type',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
       
               'pledge_contribution_page_id' => array(
       

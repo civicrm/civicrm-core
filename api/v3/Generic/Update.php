@@ -41,6 +41,8 @@
  *  - version: string
  *  - function: callback (mixed)
  *  - params: array, varies
+ *
+ * @return array|int|mixed
  */
 function civicrm_api3_generic_update($apiRequest) {
   //$key_id = strtolower ($apiRequest['entity'])."_id";

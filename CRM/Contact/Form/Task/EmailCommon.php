@@ -45,6 +45,9 @@ class CRM_Contact_Form_Task_EmailCommon {
   public $_allContactDetails = array();
   public $_toContactEmails = array();
 
+  /**
+   * @param $form
+   */
   static function preProcessFromAddress(&$form) {
     $form->_single = FALSE;
     $className = CRM_Utils_System::getClassName($form);
@@ -120,6 +123,8 @@ class CRM_Contact_Form_Task_EmailCommon {
    *
    * @access public
    *
+   * @param $form
+   *
    * @return void
    */
   static function buildQuickForm(&$form) {
@@ -128,12 +133,18 @@ class CRM_Contact_Form_Task_EmailCommon {
     //here we are getting logged in user id as array but we need target contact id. CRM-5988
     $cid = $form->get('cid');
     if ($cid) {
-      $form->_contactIds = array($cid);
+      $form->_contactIds = explode(',',$cid);
+    }
+    if (count($form->_contactIds) > 1) {
+      $form->_single = FALSE;
     }
 
-    $to  = $form->add('text', 'to', ts('To'), '', TRUE);
-    $cc  = $form->add('text', 'cc_id', ts('CC'));
-    $bcc = $form->add('text', 'bcc_id', ts('BCC'));
+    $emailAttributes = array(
+      'class' => 'huge',
+    );
+    $to  = $form->add('text', 'to', ts('To'), $emailAttributes, TRUE);
+    $cc  = $form->add('text', 'cc_id', ts('CC'), $emailAttributes);
+    $bcc = $form->add('text', 'bcc_id', ts('BCC'), $emailAttributes);
 
     $setDefaults = TRUE;
     if (property_exists($form, '_context') && $form->_context == 'standalone') {
@@ -218,19 +229,19 @@ class CRM_Contact_Form_Task_EmailCommon {
           if (in_array($contactId, $form->_toContactIds)) {
             $form->_toContactDetails[$contactId] = $form->_contactDetails[$contactId];
             $toArray[] = array(
-              'name' => '"' . $value['sort_name'] . '" &lt;' . $email . '&gt;',
+              'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
               'id' => "$contactId::{$email}",
             );
           }
           elseif (in_array($contactId, $form->_ccContactIds)) {
             $ccArray[] = array(
-              'name' => '"' . $value['sort_name'] . '" &lt;' . $email . '&gt;',
+              'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
               'id' => "$contactId::{$email}",
             );
           }
           elseif (in_array($contactId, $form->_bccContactIds)) {
             $bccArray[] = array(
-              'name' => '"' . $value['sort_name'] . '" &lt;' . $email . '&gt;',
+              'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
               'id' => "$contactId::{$email}",
             );
           }
@@ -323,6 +334,8 @@ class CRM_Contact_Form_Task_EmailCommon {
    * process the form after the input has been submitted and validated
    *
    * @access public
+   *
+   * @param $form
    *
    * @return void
    */
@@ -469,13 +482,18 @@ class CRM_Contact_Form_Task_EmailCommon {
       CRM_Core_Session::setStatus($status, ts('One Message Not Sent', array('count' => count($emailsNotSent), 'plural' => '%count Messages Not Sent')), 'info');
     }
 
-    if (isset($form->_caseId) && is_numeric($form->_caseId)) {
+    if (isset($form->_caseId)) {
       // if case-id is found in the url, create case activity record
-      $caseParams = array(
-        'activity_id' => $activityId,
-        'case_id' => $form->_caseId,
-      );
-      CRM_Case_BAO_Case::processCaseActivity($caseParams);
+      $cases = explode(',', $form->_caseId);
+      foreach($cases as $key => $val) {
+        if (is_numeric($val)) {
+          $caseParams = array(
+            'activity_id' => $activityId,
+            'case_id' => $val,
+          );
+          CRM_Case_BAO_Case::processCaseActivity($caseParams);
+        }
+      }
     }
   }
   //end of function

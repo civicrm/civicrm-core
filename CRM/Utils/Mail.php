@@ -166,7 +166,7 @@ class CRM_Utils_Mail {
     // Mail_smtp and Mail_sendmail mailers require Bcc anc Cc emails
     // be included in both $to and $headers['Cc', 'Bcc']
     if (get_class($mailer) != "Mail_mail") {
-        //get emails from headers, since these are 
+        //get emails from headers, since these are
         //combination of name and email addresses.
         if (!empty($headers['Cc'])) {
             $to[] = CRM_Utils_Array::value( 'Cc', $headers );
@@ -192,6 +192,12 @@ class CRM_Utils_Mail {
     return FALSE;
   }
 
+  /**
+   * @param $mailer
+   * @param $result
+   *
+   * @return string
+   */
   static function errorMessage($mailer, $result) {
     $message = '<p>' . ts('An error occurred when CiviCRM attempted to send an email (via %1). If you received this error after submitting on online contribution or event registration - the transaction was completed, but we were unable to send the email receipt.', array(
       1 => 'SMTP')) . '</p>' . '<p>' . ts('The mail library returned the following error message:') . '<br /><span class="font-red"><strong>' . $result->getMessage() . '</strong></span></p>' . '<p>' . ts('This is probably related to a problem in your Outbound Email Settings (Administer CiviCRM &raquo; System Settings &raquo; Outbound Email), OR the FROM email address specifically configured for your contribution page or event. Possible causes are:') . '</p>';
@@ -209,6 +215,11 @@ class CRM_Utils_Mail {
     return $message;
   }
 
+  /**
+   * @param $to
+   * @param $headers
+   * @param $message
+   */
   static function logger(&$to, &$headers, &$message) {
     if (is_array($to)) {
       $toString = implode(', ', $to);
@@ -292,6 +303,12 @@ class CRM_Utils_Mail {
     return FALSE;
   }
 
+  /**
+   * @param $message
+   * @param null $params
+   *
+   * @return mixed
+   */
   static function &setMimeParams(&$message, $params = NULL) {
     static $mimeParams = NULL;
     if (!$params) {
@@ -309,6 +326,13 @@ class CRM_Utils_Mail {
     return $message->get($params);
   }
 
+  /**
+   * @param $name
+   * @param $email
+   * @param bool $useQuote
+   *
+   * @return null|string
+   */
   static function formatRFC822Email($name, $email, $useQuote = FALSE) {
     $result = NULL;
 
@@ -362,6 +386,35 @@ class CRM_Utils_Mail {
     }
 
     return $name;
+  }
+
+  /**
+   *
+   * @param string $fileName
+   * @param string $html
+   * @param string $format
+   *
+   * @return array $attachments
+   */
+  static function appendPDF($fileName, $html, $format = NULL) {
+    $pdf_filename = CRM_Core_Config::singleton()->templateCompileDir . CRM_Utils_File::makeFileName($fileName);
+
+    //FIXME : CRM-7894
+    //xmlns attribute is required in XHTML but it is invalid in HTML,
+    //Also the namespace "xmlns=http://www.w3.org/1999/xhtml" is default,
+    //and will be added to the <html> tag even if you do not include it.
+    $html = preg_replace('/(<html)(.+?xmlns=["\'].[^\s]+["\'])(.+)?(>)/', '\1\3\4', $html);
+
+    file_put_contents($pdf_filename, CRM_Utils_PDF_Utils::html2pdf($html,
+      $fileName,
+      TRUE,
+      $format)
+    );
+    return array(
+      'fullPath' => $pdf_filename,
+      'mime_type' => 'application/pdf',
+      'cleanName' => $fileName,
+    );
   }
 }
 

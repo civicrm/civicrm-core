@@ -38,6 +38,11 @@
  */
 class CRM_Utils_Address_USPS {
 
+  /**
+   * @param $values
+   *
+   * @return bool
+   */
   static function checkAddress(&$values) {
     if (!isset($values['street_address']) ||
       (!isset($values['city']) &&
