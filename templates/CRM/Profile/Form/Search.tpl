@@ -40,6 +40,7 @@
         {continue}
       {/if}
       {assign var=n value=$field.name}
+      {assign var="operator_name" value=$n|cat:'_operator'}
       {if $field.is_search_range}
         {assign var=from value=$field.name|cat:'_from'}
         {assign var=to value=$field.name|cat:'_to'}
@@ -55,41 +56,6 @@
               &nbsp;&nbsp;{$form.$to.label}&nbsp;&nbsp;{include file="CRM/common/jcalendar.tpl" elementName=$to}</td>
           </tr>
         {/if}
-      {elseif $field.options_per_line}
-        <tr>
-          <td class="option-label">{$form.$n.label}</td>
-          <td>
-            {assign var="count" value="1"}
-            {strip}
-              <table class="form-layout-compressed">
-              <tr>
-              {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                {assign var="index" value="1"}
-                {foreach name=outer key=key item=item from=$form.$n}
-                  {if $index < 10} {* Hack to skip QF field properties that are not checkbox elements. *}
-                    {assign var="index" value=`$index+1`}
-                  {else}
-                    {if $field.html_type EQ 'CheckBox' AND  $smarty.foreach.outer.last EQ 1} {* Put 'match ANY / match ALL' checkbox in separate row. *}
-                    </tr>
-                    <tr>
-                      <td class="op-checkbox" colspan="{$field.options_per_line}" style="padding-top: 0px;">{$form.$n.$key.html}</td>
-                      {else}
-                      <td class="labels font-light">{$form.$n.$key.html}</td>
-                      {if $count EQ $field.options_per_line}
-                      </tr>
-                      <tr>
-                        {assign var="count" value="1"}
-                      {else}
-                        {assign var="count" value=`$count+1`}
-                      {/if}
-                    {/if}
-                  {/if}
-                {/foreach}
-              </tr>
-              </table>
-            {/strip}
-          </td>
-        </tr>
       {else}
         <tr>
           <td class="label">
@@ -119,10 +85,11 @@
               {else}
                 {$form.$n.html}
               {/if}
-              {if $field.html_type eq 'Autocomplete-Select'}
-                {if $field.data_type eq 'ContactReference'}
-                  {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $n}
-                {/if}
+              {if $field.html_type eq 'Autocomplete-Select' and $field.data_type eq 'ContactReference'}
+                {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $n}
+              {/if}
+              {if !empty($form.$operator_name)}
+                {$form.$operator_name.html}
               {/if}
             </td>
           {/if}
