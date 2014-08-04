@@ -726,7 +726,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param CRM_Core_Form $qf form object (reference)
    * @param string $elementName name of the custom field
    * @param $fieldId
-   * @param boolean $inactiveNeeded
+   * @param boolean $inactiveNeeded -deprecated
    * @param bool $useRequired
    * @param boolean $search true if used for search else false
    * @param string $label label for custom field
@@ -744,6 +744,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $label          = NULL
   ) {
     $field = self::getFieldObject($fieldId);
+    $widget = $field->html_type;
 
     // Custom field HTML should indicate group+field name
     $groupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $field->custom_group_id);
@@ -752,29 +753,44 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $field->attributes .= $dataCrmCustomAttr;
 
     // Fixed for Issue CRM-2183
-    if ($field->html_type == 'TextArea' && $search) {
-      $field->html_type = 'Text';
+    if ($widget == 'TextArea' && $search) {
+      $widget = 'Text';
+    }
+
+    if ($widget == 'Select State/Province' || $widget == 'Select Country') {
+      $qf->_stateCountryMap[$widget == 'Select Country' ? 'country' : 'state_province'][] = $elementName;
     }
 
     $placeholder = $search ? ts('- any -') : ($useRequired ? ts('- select -') : ts('- none -'));
 
     // FIXME: Why are select state/country separate widget types?
-    if (in_array($field->html_type, array('Select', 'Multi-Select', 'Select State/Province', 'Multi-Select State/Province', 'Select Country', 'Multi-Select Country'))) {
+    $isSelect = (in_array($widget, array('Select', 'Multi-Select', 'Select State/Province', 'Multi-Select State/Province', 'Select Country', 'Multi-Select Country', 'AdvMulti-Select', 'CheckBox', 'Radio')));
+
+    if ($isSelect) {
+      $options = CRM_Utils_Array::value('values', civicrm_api3('contact', 'getoptions', array('field' => "custom_$fieldId", 'context' => $search ? 'search' : 'create'), array()));
+
+      // Consolidate widget types to simplify the below switch statement
+      if ($search || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
+        $widget = 'Select';
+      }
       $selectAttributes = array(
         'data-crm-custom' => $dataCrmCustomVal,
         'class' => 'crm-select2',
       );
-      if (strpos($field->html_type, 'Multi') === 0) {
+      // Search field is always multi-select
+      if ($search || strpos($field->html_type, 'Multi') !== FALSE) {
+        $selectAttributes['class'] .= ' huge';
         $selectAttributes['multiple'] = 'multiple';
+        $selectAttributes['placeholder'] = $placeholder;
       }
-    }
-    // Add data so popup link. Normally this is handled by CRM_Core_Form->addSelect
-    if ($field->option_group_id && !$search && in_array($field->html_type, array('Select', 'Multi-Select')) && CRM_Core_Permission::check('administer CiviCRM')) {
-      $selectAttributes += array(
-        'data-api-entity' => 'contact', // FIXME: This works because the getoptions api isn't picky about custom fields, but it's WRONG
-        'data-api-field' => 'custom_' . $field->id,
-        'data-option-edit-path' => 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $field->option_group_id),
-      );
+      // Add data for popup link. Normally this is handled by CRM_Core_Form->addSelect
+      if ($field->option_group_id && !$search && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM')) {
+        $selectAttributes += array(
+          'data-api-entity' => 'contact', // FIXME: This works because the getoptions api isn't picky about custom fields, but it's WRONG
+          'data-api-field' => 'custom_' . $field->id,
+          'data-option-edit-path' => 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $field->option_group_id),
+        );
+      }
     }
 
     if (!isset($label)) {
@@ -785,14 +801,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
      * at some point in time we might want to split the below into small functions
      **/
 
-    switch ($field->html_type) {
+    switch ($widget) {
       case 'Text':
+      case 'Link':
         if ($field->is_search_range && $search) {
           $qf->add('text', $elementName . '_from', $label . ' ' . ts('From'), $field->attributes);
           $qf->add('text', $elementName . '_to', ts('To'), $field->attributes);
         }
         else {
-          $element = &$qf->add(strtolower($field->html_type), $elementName, $label,
+          $element = &$qf->add('text', $elementName, $label,
             $field->attributes,
             $useRequired && !$search
           );
@@ -816,7 +833,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if ($field->text_length) {
           $attributes .= ' maxlength=' . $field->text_length;
         }
-        $element = &$qf->add(strtolower($field->html_type),
+        $element = &$qf->add('textarea',
           $elementName,
           $label,
           $attributes,
@@ -861,20 +878,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'Radio':
         $choice = array();
-        if ($field->data_type != 'Boolean') {
-          $customOption = CRM_Core_BAO_CustomOption::valuesByID($field->id,
-            $field->option_group_id
-          );
-          foreach ($customOption as $v => $l) {
-            $choice[] = $qf->createElement('radio', NULL, '', $l, (string)$v, $field->attributes);
-          }
-          $group = $qf->addGroup($choice, $elementName, $label);
+        foreach ($options as $v => $l) {
+          $choice[] = $qf->createElement('radio', NULL, '', $l, (string)$v, $field->attributes);
         }
-        else {
-          $choice[] = $qf->createElement('radio', NULL, '', ts('Yes'), '1', $field->attributes);
-          $choice[] = $qf->createElement('radio', NULL, '', ts('No'), '0', $field->attributes);
-          $group = $qf->addGroup($choice, $elementName, $label);
-        }
+        $group = $qf->addGroup($choice, $elementName, $label);
         if ($useRequired && !$search) {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
         }
@@ -883,34 +890,30 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         }
         break;
 
+      // For all select elements
       case 'Select':
-        $selectOption = CRM_Core_BAO_CustomOption::valuesByID($field->id,
-          $field->option_group_id
-        );
+        if (empty($selectAttributes['multiple'])) {
+          $options = array('' => $placeholder) + $options;
+        }
+        $qf->add('select', $elementName, $label, $options, $useRequired && !$search, $selectAttributes);
 
-        $qf->add('select', $elementName, $label,
-          array('' => $placeholder) + $selectOption,
-          $useRequired && !$search,
-          $selectAttributes
-        );
+        // Add and/or option for fields that store multiple values
+        if ($search && self::isSerialized($field)) {
+
+          $operators = array(
+            $qf->createElement('radio', NULL, '', ts('Any'), 'or', array('title' => ts('Results may contain any of the selected options'))),
+            $qf->createElement('radio', NULL, '', ts('All'), 'and', array('title' => ts('Results must have all of the selected options'))),
+          );
+          $qf->addGroup($operators, $elementName . '_operator');
+          $qf->setDefaults(array($elementName . '_operator' => 'or'));
+        }
         break;
 
-      //added for select multiple
-
       case 'AdvMulti-Select':
-        $selectOption = CRM_Core_BAO_CustomOption::valuesByID($field->id,
-          $field->option_group_id
-        );
-        if ($search &&
-          count($selectOption) > 1
-        ) {
-          $selectOption['CiviCRM_OP_OR'] = ts('Select to match ANY; unselect to match ALL');
-        }
-
         $include =& $qf->addElement(
           'advmultiselect',
           $elementName,
-          $label, $selectOption,
+          $label, $options,
           array(
             'size' => 5,
             'style' => '',
@@ -927,34 +930,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         }
         break;
 
-      case 'Multi-Select':
-        $selectOption = CRM_Core_BAO_CustomOption::valuesByID($field->id,
-          $field->option_group_id
-        );
-        if ($search &&
-          count($selectOption) > 1
-        ) {
-          $selectOption['CiviCRM_OP_OR'] = ts('Select to match ANY; unselect to match ALL');
-        }
-        $qf->addElement('select', $elementName, $label, $selectOption, $selectAttributes);
-
-        if ($useRequired && !$search) {
-          $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
-        }
-        break;
-
       case 'CheckBox':
-        $customOption = CRM_Core_BAO_CustomOption::valuesByID($field->id,
-          $field->option_group_id
-        );
         $check = array();
-        foreach ($customOption as $v => $l) {
+        foreach ($options as $v => $l) {
           $check[] = &$qf->addElement('advcheckbox', $v, NULL, $l, array('data-crm-custom' => $dataCrmCustomVal));
-        }
-        if ($search &&
-          count($check) > 1
-        ) {
-          $check[] = &$qf->addElement('advcheckbox', 'CiviCRM_OP_OR', NULL, ts('Check to match ANY; uncheck to match ALL'), array('data-crm-custom' => $dataCrmCustomVal));
         }
         $qf->addGroup($check, $elementName, $label);
         if ($useRequired && !$search) {
@@ -975,45 +954,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $useRequired && !$search
         );
         $qf->addUploadElement($elementName);
-        break;
-
-      case 'Select State/Province':
-        //Add State
-        $stateOption = array('' => $placeholder) + CRM_Core_PseudoConstant::stateProvince();
-        $qf->add('select', $elementName, $label, $stateOption,
-          $useRequired && !$search,
-          $selectAttributes
-        );
-        $qf->_stateCountryMap['state_province'][] = $elementName;
-        break;
-
-      case 'Multi-Select State/Province':
-        //Add Multi-select State/Province
-        $stateOption = CRM_Core_PseudoConstant::stateProvince();
-
-        $qf->addElement('select', $elementName, $label, $stateOption, $selectAttributes);
-        if ($useRequired && !$search) {
-          $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
-        }
-        break;
-
-      case 'Select Country':
-        //Add Country
-        $countryOption = array('' => $placeholder) + CRM_Core_PseudoConstant::country();
-        $qf->add('select', $elementName, $label, $countryOption,
-          $useRequired && !$search,
-          $selectAttributes
-        );
-        $qf->_stateCountryMap['country'][] = $elementName;
-        break;
-
-      case 'Multi-Select Country':
-        //Add Country
-        $countryOption = CRM_Core_PseudoConstant::country();
-        $qf->addElement('select', $elementName, $label, $countryOption, $selectAttributes);
-        if ($useRequired && !$search) {
-          $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
-        }
         break;
 
       case 'RichTextEditor':
@@ -1074,7 +1014,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $qf->addRule($elementName . '_from', ts('%1 From must be an integer (whole number).', array(1 => $label)), 'integer');
           $qf->addRule($elementName . '_to', ts('%1 To must be an integer (whole number).', array(1 => $label)), 'integer');
         }
-        else {
+        elseif ($widget == 'Text') {
           $qf->addRule($elementName, ts('%1 must be an integer (whole number).', array(1 => $label)), 'integer');
         }
         break;
@@ -1084,7 +1024,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $qf->addRule($elementName . '_from', ts('%1 From must be a number (with or without decimal point).', array(1 => $label)), 'numeric');
           $qf->addRule($elementName . '_to', ts('%1 To must be a number (with or without decimal point).', array(1 => $label)), 'numeric');
         }
-        else {
+        elseif ($widget == 'Text') {
           $qf->addRule($elementName, ts('%1 must be a number (with or without decimal point).', array(1 => $label)), 'numeric');
         }
         break;
@@ -1094,23 +1034,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $qf->addRule($elementName . '_from', ts('%1 From must in proper money format. (decimal point/comma/space is allowed).', array(1 => $label)), 'money');
           $qf->addRule($elementName . '_to', ts('%1 To must in proper money format. (decimal point/comma/space is allowed).', array(1 => $label)), 'money');
         }
-        else {
+        elseif ($widget == 'Text') {
           $qf->addRule($elementName, ts('%1 must be in proper money format. (decimal point/comma/space is allowed).', array(1 => $label)), 'money');
         }
         break;
 
       case 'Link':
-        $qf->add(
-          'text',
-          $elementName,
-          $label,
-          array(
-            'onfocus' => "if (!this.value) {  this.value='http://';} else return false",
-            'onblur' => "if ( this.value == 'http://') {  this.value='';} else return false",
-            'data-crm-custom' => $dataCrmCustomVal,
-          ),
-          $useRequired && !$search
-        );
+        $element->setAttribute('onfocus', "if (!this.value) {this.value='http://';}");
+        $element->setAttribute('onblur', "if (this.value == 'http://') {this.value='';}");
+        $element->setAttribute('class', "url");
         $qf->addRule($elementName, ts('Enter a valid Website.'), 'wikiURL');
         break;
     }
@@ -2551,6 +2483,18 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
     }
 
     return $isMultipleWithGid;
+  }
+
+  /**
+   * Does this field store a serialized string?
+   * @param CRM_Core_DAO_CustomField|array $field
+   * @return bool
+   */
+  static function isSerialized($field) {
+    // Fields retrieved via api are an array, or from the dao are an object. We'll accept either.
+    $field = (array) $field;
+    // FIXME: Currently the only way to know if data is serialized is by looking at the html_type. It would be cleaner to decouple this.
+    return ($field['html_type'] == 'CheckBox' || strpos($field['html_type'], 'Multi') !== FALSE);
   }
 }
 

@@ -563,6 +563,13 @@ class CRM_Contact_BAO_Query {
         if (!array_key_exists($cfID, $this->_cfIDs)) {
           $this->_cfIDs[$cfID] = array();
         }
+        // Set wildcard value based on "and/or" selection
+        foreach ($this->_params as $key => $param) {
+          if ($param[0] == $value[0] . '_operator') {
+            $value[4] = $param[2] == 'or';
+            break;
+          }
+        }
         $this->_cfIDs[$cfID][] = $value;
       }
 
