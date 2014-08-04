@@ -86,8 +86,8 @@ div.crm-container fieldset label{
 }
 
 /* Styles for Sorting Header */
-.crm-container table.display thead th.sorting_asc,
-.crm-container table.display thead th.sorting_desc,
+.crm-container table thead th.sorting_asc,
+.crm-container table thead th.sorting_desc,
 .crm-container table .sticky th a.sort-ascending,
 .crm-container table .sticky th a.sort-descending,
 .crm-container table.caseSelector tr.columnheader th a.sort-ascending,
@@ -3648,8 +3648,12 @@ tbody.scrollContent tr.alternateRow {
   color: #a7a7a7;
 }
 
-.crm-container a.sorting {
+.crm-container a.sorting,
+.crm-container a.sorting_desc,
+.crm-container a.sorting_asc {
   color: #A7A7A7;
+  background: url("../packages/jquery/plugins/DataTables/media/images/sort_both.png") no-repeat left center;
+  padding-left: 20px;
 }
 .crm-container a.sorting_desc,
 .crm-container a.sorting_asc {
@@ -3661,6 +3665,25 @@ tbody.scrollContent tr.alternateRow {
 .crm-container tr a.sorting_desc {
   color: #52534D;
 }
+
+.crm-container table thead a.sorting_asc {
+  background: url("../packages/jquery/plugins/DataTables/media/images/sort_asc.png") no-repeat left center;
+}
+.crm-container table thead a.sorting_desc {
+  background: url("../packages/jquery/plugins/DataTables/media/images/sort_desc.png") no-repeat left center;
+}
+.crm-container table thead a.sorting_asc_disabled {
+  background: url("../packages/jquery/plugins/DataTables/media/images/sort_asc_disabled.png") no-repeat left center;
+}
+.crm-container table thead a.sorting_desc_disabled {
+  background: url("../packages/jquery/plugins/DataTables/media/images/sort_desc_disabled.png") no-repeat left center;
+}
+
+/* Otherwise for some reason we have 2 sort icons */
+.crm-container th.sorting .DataTables_sort_icon {
+  display: none;
+}
+
 
 /*contact summary page */
 #crm-container div.contact_details,
