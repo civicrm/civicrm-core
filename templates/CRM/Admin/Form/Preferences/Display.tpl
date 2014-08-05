@@ -154,7 +154,7 @@
 
     <tr class="crm-preferences-display-form-block-user_dashboard_options">
       <td class="label">{$form.user_dashboard_options.label}</td>
-      <td>{$form.user_dashboard_options.html}</td>
+      <td>{$form.user_dashboard_options.html}<span id="invoice_help">  {help id="id-invoices_id"}</span></td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
@@ -258,6 +258,14 @@
         }
         cj('#contact_edit_preferences').val(params.toString());
       }
+      cj(document).ready(function() {
+        var invoicesKey = '{/literal}{$invoicesKey}{literal}';
+        var invoicing = '{/literal}{$invoicing}{literal}';
+        if (!invoicing) {
+          cj('#user_dashboard_options_'+invoicesKey).attr("disabled", true);
+        }
+        cj("#invoice_help").insertAfter("label[for='user_dashboard_options_"+invoicesKey+"']");
+      });
     </script>
   {/literal}
 {/if}
