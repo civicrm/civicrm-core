@@ -450,9 +450,13 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       foreach ($fields['values'] as $field => $info) {
         if (!empty($info['options']) || !empty($info['pseudoconstant']) || !empty($info['option_group_id'])) {
           $options[$field] = $entity;
+          // Hack for when search field doesn't match db field - e.g. "country" instead of "country_id"
           if (substr($field, -3) == '_id') {
             $options[substr($field, 0, -3)] = $entity;
           }
+        }
+        elseif (!empty($info['data_type']) && in_array($info['data_type'], array('StateProvince', 'Country'))) {
+          $options[$field] = $entity;
         }
         elseif (in_array(substr($field, 0, 3), array('is_', 'do_')) || CRM_Utils_Array::value('data_type', $info) == 'Boolean') {
           $options[$field] = 'yesno';
