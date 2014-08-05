@@ -89,7 +89,8 @@
                 {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $n}
               {/if}
               {if !empty($form.$operator_name)}
-                {$form.$operator_name.html}
+                <span class="crm-multivalue-search-op" for="{$n}">{$form.$operator_name.html}</span>
+                {assign var="add_multivalue_js" value=true}
               {/if}
             </td>
           {/if}
@@ -128,3 +129,7 @@
     });
   </script>
 {/literal}
+
+{if !empty($add_multivalue_js)}
+  {include file="CRM/Custom/Form/MultiValueSearch.js.tpl"}
+{/if}
