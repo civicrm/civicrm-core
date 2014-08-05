@@ -996,6 +996,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $attributes += array(
             'entity' => 'option_value',
             'placeholder' => $placeholder,
+            'multiple' => $search,
             'api' => array(
               'params' => array('option_group_id' => $field->option_group_id),
             ),

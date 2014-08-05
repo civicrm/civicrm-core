@@ -351,6 +351,11 @@ SELECT label, value
 
         $fieldName = "{$field['table_name']}.{$field['column_name']}";
 
+        // Autocomplete comes back as a string not an array
+        if ($field['data_type'] == 'String' && $field['html_type'] == 'Autocomplete-Select' && $op == '=') {
+          $value = explode(',', $value);
+        }
+
         // Handle multi-select search for any data type
         if (is_array($value) && !$field['is_search_range']) {
           $isSerialized = CRM_Core_BAO_CustomField::isSerialized($field);
@@ -379,7 +384,9 @@ SELECT label, value
         }
 
         // fix $value here to escape sql injection attacks
-        $value = CRM_Core_DAO::escapeString(trim($value));
+        if (!is_array($value)) {
+          $value = CRM_Core_DAO::escapeString(trim($value));
+        }
 
         $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value, $id, $this->_options);
 
@@ -397,13 +404,7 @@ SELECT label, value
               );
             }
             else {
-              if (in_array($field['html_type'], array('Select', 'Radio', 'Autocomplete-Select'))) {
-                $wildcard = FALSE;
-                $val = CRM_Utils_Type::escape($value, 'String');
-              }
-              else {
-                $val = CRM_Utils_Type::escape($strtolower(trim($value)), 'String');
-              }
+              $val = CRM_Utils_Type::escape($strtolower(trim($value)), 'String');
 
               if ($wildcard) {
                 $val = $strtolower(CRM_Core_DAO::escapeString($val));
