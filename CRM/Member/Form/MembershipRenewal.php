@@ -790,14 +790,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       CRM_Member_BAO_Membership::recordMembershipContribution(array_merge($formValues, array('membership_id' => $renewMembership->id)));
     }
 
-    if (CRM_Utils_Array::value('send_receipt', $formValues)) {
-      CRM_Core_DAO::setFieldValue('CRM_Member_DAO_MembershipType',
-        $formValues['membership_type_id'][1],
-        'receipt_text_renewal',
-        $formValues['receipt_text_renewal']
-      );
-    }
-
     $receiptSend = FALSE;
     if (CRM_Utils_Array::value('send_receipt', $formValues)) {
       $receiptSend = TRUE;
