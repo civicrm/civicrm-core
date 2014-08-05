@@ -58,7 +58,8 @@
                     {include file="CRM/common/jcalendar.tpl" elementName=$element_name}
                 {/if}
                 {if !empty($form.$operator_name)}
-                  {$form.$operator_name.html}
+                  <span class="crm-multivalue-search-op" for="{$element_name}">{$form.$operator_name.html}</span>
+                  {assign var="add_multivalue_js" value=true}
                 {/if}
             {/if}
             {if $element.html_type eq 'Autocomplete-Select'}
@@ -74,5 +75,8 @@
   </div><!-- /.crm-accordion-wrapper -->
 
 {/foreach}
+  {if !empty($add_multivalue_js)}
+    {include file="CRM/Custom/Form/MultiValueSearch.js.tpl"}
+  {/if}
 {/if}
 
