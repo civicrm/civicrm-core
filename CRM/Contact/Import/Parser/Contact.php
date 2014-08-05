@@ -535,30 +535,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         if ($cid) {
           $params['id'] = $cid;
         }
-        else {
-          //update contact if dedupe found contact id, CRM-4148
-          $dedupeParams = $formatted;
-
-          //special case to check dedupe if external id present.
-          //if we send external id dedupe will stop.
-          unset($dedupeParams['external_identifier']);
-          require_once 'CRM/Utils/DeprecatedUtils.php';
-          $checkDedupe = _civicrm_api3_deprecated_duplicate_formatted_contact($dedupeParams);
-          if (CRM_Core_Error::isAPIError($checkDedupe, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
-            $matchingContactIds = explode(',', $checkDedupe['error_message']['params'][0]);
-            if (count($matchingContactIds) == 1) {
-              $params['id'] = array_pop($matchingContactIds);
-            }
-            else {
-              $message = "More than one matching contact found for given criteria.";
-              array_unshift($values, $message);
-              $this->_retCode = CRM_Import_Parser::NO_MATCH;
-            }
-          }
-          else {
-            $createNewContact = TRUE;
-          }
-        }
       }
 
       $error = _civicrm_api3_deprecated_duplicate_formatted_contact($formatted);
