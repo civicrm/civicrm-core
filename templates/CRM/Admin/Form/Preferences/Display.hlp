@@ -35,3 +35,11 @@ config.scayt_autoStartup = false;
 'SpellChecker'
 <p>{ts}<strong>NOTE:</strong> If you are modifying config.js you should first have configured a Custom PHP Path under Administer > System Settings > Directories, and place your modified version in the custom path.{/ts}</p>
 {/htxt}
+
+{htxt id="id-invoices_id-title"}
+  {ts}Invoices / Credit Notes{/ts}
+{/htxt}
+{htxt id="id-invoices_id"}
+{capture assign=invoiceURL}{crmURL p='civicrm/admin/setting/preferences/contribute' q="reset=1"}{/capture} 
+{ts 1=$invoiceURL}In order to enable logged in users to download invoices and credit notes from the dashboard. Please first enable CiviCRM invoicing functionality <a href='%1'>Administer > CiviContribute > CiviContribute Component Settings</a>{/ts}
+{/htxt}
