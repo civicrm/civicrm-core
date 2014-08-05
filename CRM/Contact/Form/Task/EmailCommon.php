@@ -133,7 +133,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     //here we are getting logged in user id as array but we need target contact id. CRM-5988
     $cid = $form->get('cid');
     if ($cid) {
-      $form->_contactIds = explode(',',$cid);
+      $form->_contactIds = explode(',', $cid);
     }
     if (count($form->_contactIds) > 1) {
       $form->_single = FALSE;

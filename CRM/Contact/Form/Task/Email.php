@@ -106,14 +106,15 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
     $cid = CRM_Utils_Request::retrieve('cid', 'String', $this, FALSE);
     if ($cid){
       $cid = explode(',',$cid);
+      $displayName = array();
 
-      foreach ($cid as $key => $val) {
+      foreach ($cid as $val) {
         $displayName[] = CRM_Contact_BAO_Contact::displayName($val);
       }
 
-      CRM_Utils_System::setTitle(implode(',',$displayName) . ' - ' . ts('Email'));
+      CRM_Utils_System::setTitle(implode(',', $displayName) . ' - ' . ts('Email'));
     }
-    else{
+    else {
       CRM_Utils_System::setTitle(ts('New Email'));          
     }
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
