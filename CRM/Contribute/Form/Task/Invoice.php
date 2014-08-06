@@ -219,11 +219,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $stateProvinceAbbreviation = CRM_Core_PseudoConstant::stateProvinceAbbreviation($billingAddress[$contribution->contact_id]['state_province_id']);
       
       if ($contribution->contribution_status_id == $refundedStatusId) {
-        $invoiceId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue). "" .$contribution->id;
+        $creditNoteId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue) . "" . $contribution->id;
       }
-      else {
-        $invoiceId = CRM_Utils_Array::value('invoice_prefix', $prefixValue). "" .$contribution->id;
-      }
+      $invoiceId = CRM_Utils_Array::value('invoice_prefix', $prefixValue) . "" . $contribution->id;
       
       //to obtain due date for PDF invoice
       $contributionReceiveDate = date('F j,Y', strtotime(date($input['receive_date'])));
@@ -309,6 +307,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
                          'component' => $input['component'],
                          'id' => $contribution->id,
                          'invoice_id' => $invoiceId,
+                         'creditnote_id' => $creditNoteId,
                          'imageUploadURL' => $config->imageUploadURL,
                          'defaultCurrency' => $config->defaultCurrency,
                          'amount' => $contribution->total_amount,
@@ -381,6 +380,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       }
       
       $updateInvoiceId = CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'invoice_id', $invoiceId);
+      if ($contribution->contribution_status_id == $refundedStatusId) {
+        $updateInvoiceId = CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'creditnote_id', $creditNoteId);
+      }
       $this->_invoiceTemplate->clearTemplateVars();
     }
     

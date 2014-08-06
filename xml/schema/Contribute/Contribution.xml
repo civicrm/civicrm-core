@@ -449,6 +449,19 @@
     </html>
   </field>
   <field>
+    <name>creditnote_id</name>
+    <title>Credit Note ID</title>
+    <type>varchar</type>
+    <length>255</length>
+    <import>true</import>
+    <headerPattern>/creditnote(.?id)?/i</headerPattern>
+    <comment>unique credit note id, system generated or passed in</comment>
+    <add>4.5</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
     <name>tax_amount</name>
     <type>decimal</type>
     <import>true</import>
