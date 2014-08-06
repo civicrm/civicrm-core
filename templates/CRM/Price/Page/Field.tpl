@@ -89,12 +89,9 @@
             <td>{if $row.html_type eq "Text / Numeric Quantity"}{$row.price|crmMoney}{else}<a href="{crmURL p="civicrm/admin/price/field/option" q="action=browse&reset=1&sid=$sid&fid=$fid"}">{if $isReserved}{ts}View Price Options{/ts}{else}{ts}Edit Price Options{/ts}{/if}</a>{/if}</td>
             {if $getTaxDetails}
               <td>{if $row.tax_rate != '' && $row.html_type eq "Text / Numeric Quantity"}
-                    {if $row.tax_rate == 0.00}
-                     {ts}VAT(Exempt){/ts}
-                    {else}
-                     {ts}VAT{/ts}({$row.tax_rate|string_format:"%.2f"}%)
-                    {/if}
-                  {/if}</td>
+                      {$taxTerm} ({$row.tax_rate|string_format:"%.2f"}%)
+                  {/if}
+	      </td>
               <td>{if $row.html_type eq "Text / Numeric Quantity" }{$row.tax_amount|crmMoney}{/if}</td>
             {/if}
             <td class="field-action">{$row.action|replace:'xx':$row.id}</td>

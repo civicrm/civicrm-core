@@ -74,19 +74,24 @@
              <td>
               {$line.unit_price|crmMoney:$currency}
              </td>
-	     {if $dataArray}
+             {if $getTaxDetails}
               <td>
                {$line.unit_price*$line.qty|crmMoney:$currency}
               </td>
-              <td>
-               {$line.tax_rate|crmMoney:$currency}
-              </td>
-              <td>
-               {$line.tax_amount|crmMoney:$currency}
-              </td>
+              {if $line.tax_rate != "" || $line.tax_amount != ""}
+               <td>
+                {$line.tax_rate|string_format:"%.2f"}%
+               </td>
+               <td>
+                {$line.tax_amount|crmMoney:$currency}
+               </td>
+              {else}
+               <td></td>
+               <td></td>
+              {/if}
              {/if}
              <td>
-              {$line.line_total|crmMoney:$currency}
+              {$line.line_total+$line.tax_amount|crmMoney:$currency}
              </td>
             </tr>
            {/foreach}
@@ -106,16 +111,18 @@
 
         {foreach from=$dataArray item=value key=priceset}
          <tr>
-          {if $priceset}
-           <td>&nbsp;{ts}Vat{/ts}{$priceset|string_format:"%.2f"}%</td>    
+          {if $priceset || $priceset == 0}
+           <td>&nbsp;{$taxTerm} {$priceset}%</td>    
            <td>&nbsp;{$value|crmMoney:$currency}</td>
-          {elseif  $priceset == 0}
-           <td>&nbsp;{ts}No Vat{/ts}</td>
+          {else}
+           <td>&nbsp;{ts}No{/ts} {$taxTerm}</td>
            <td>&nbsp;{$value|crmMoney:$currency}</td>
           {/if}
          </tr>
         {/foreach}
 
+       {/if}
+       {if $totalTaxAmount}
         <tr>
          <td {$labelStyle}>
           {ts}Total Tax{/ts}

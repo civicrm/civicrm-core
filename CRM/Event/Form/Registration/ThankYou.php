@@ -98,15 +98,22 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     }
     $this->assignToTemplate();
 
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $getTaxDetails = FALSE;
     $taxAmount = 0;
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $lineItemForTemplate = array();
       foreach ($this->_lineItem as $key => $value) {
         if (!empty($value)) {
           $lineItemForTemplate[$key] = $value;
-          foreach ($value as $v) {
-            if (isset($v['tax_amount'])) {
-              $taxAmount += $v['tax_amount'];
+          if ($invoicing) {
+            foreach ($value as $v) {
+              if (isset($v['tax_amount']) || isset($v['tax_rate'])) {
+                $taxAmount += $v['tax_amount'];
+                $getTaxDetails = TRUE;
+              }
             }
           }
         }
@@ -116,18 +123,25 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
       }
     }
     else {
-      foreach ($this->_lineItem as $lineItemKey => $lineItemValue) {
-        foreach ($lineItemValue as $v) {
-          if (isset($v['tax_amount'])) {
-            $taxAmount += $v['tax_amount'];
+      if ($invoicing) {
+        foreach ($this->_lineItem as $lineItemKey => $lineItemValue) {
+          foreach ($lineItemValue as $v) {
+            if (isset($v['tax_amount']) || isset($v['tax_rate'])) {
+              $taxAmount += $v['tax_amount'];
+              $getTaxDetails = TRUE;
+            }
           }
         }
       }
     }
 
-    $this->assign('totalTaxAmount', $taxAmount);
+    if ($invoicing) {
+      $this->assign('getTaxDetails', $getTaxDetails);
+      $this->assign('totalTaxAmount', $taxAmount);
+      $this->assign('taxTerm', $taxTerm);
+    }
     $this->assign('totalAmount', $this->_totalAmount);
-
+    
     $hookDiscount = $this->get('hookDiscount');
     if ($hookDiscount) {
       $this->assign('hookDiscount', $hookDiscount);

@@ -1661,6 +1661,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
     if (!empty($lineItem[$priceSetId])) {
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       $totalTaxAmount = 0;
       foreach ($lineItem[$priceSetId] as & $priceFieldOp) {
         if (!empty($priceFieldOp['membership_type_id'])) {
@@ -1671,25 +1673,25 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         else {
           $priceFieldOp['start_date'] = $priceFieldOp['end_date'] = 'N/A';
         }
-        if (isset($priceFieldOp['tax_amount'])) {
+        if ($invoicing && isset($priceFieldOp['tax_amount'])) {
           $totalTaxAmount += $priceFieldOp['tax_amount'];
         }
       }
-      //add dataArray membership receipt
-      $dataArray = array();
-      foreach ($lineItem[$priceSetId] as $key => $value) {
-        if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
-          if (isset($dataArray[$value['tax_rate']])) {
-            $dataArray[$value['tax_rate']] += $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
-          } else {
-            $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
-          }
-        } 
+      if ($invoicing) {
+        $dataArray = array();
+        foreach ($lineItem[$priceSetId] as $key => $value) {
+          if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
+            if (isset($dataArray[$value['tax_rate']])) {
+              $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
+            } else {
+              $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
+            }
+          } 
+        }
+        $this->assign('totalTaxAmount', $totalTaxAmount);
+        $this->assign('dataArray', $dataArray);
       }
-      $smarty = CRM_Core_Smarty::singleton();
-      $smarty->assign('dataArray', $dataArray);
     }
-    $this->assign('totalTaxAmount', $totalTaxAmount);
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
 
     $receiptSend = FALSE;

@@ -28,7 +28,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
                                                                   'title' => ts('Credit Notes Prefix'),
                                                                   'weight' => 2,
                                                                   'description' => ts('Enter prefix to be display on PDF for credit notes.'),
-                                                                  ),	
+                                                                  ),
                                    'due_date' => array(
                                                        'html_type' => 'text',
                                                        'title' => ts('Due Date'),
@@ -40,10 +40,10 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
                                                               'description' => ts('Select the interval for due date.'),
                                                               ),
                                    'notes' => array(
-                                                    'html_type' => 'textarea',
+                                                    'html_type' => 'CKeditor',
                                                     'title' => ts('Notes or Standard Terms'),
                                                     'weight' => 5,
-                                                    'description' => ts('Enter note or message to be display on PDF invoice or credit notes '),
+                                                    'description' => ts('Enter note or message to be displayed on PDF invoice or credit notes '),
                                                     ),
                                    'tax_term' => array(
                                                        'html_type' => 'text',
@@ -82,12 +82,14 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
                );
     $this->add('select','tax_display_settings', ts('Tax Display Settings'),
                array(
-                     'Do_not_show' => ts('Do not show brakedown, only show total -i.e '.$config->defaultCurrencySymbol.'120.00'),
+                     'Do_not_show' => ts('Do not show breakdown, only show total -i.e '.$config->defaultCurrencySymbol.'120.00'),
                      'Inclusive' => ts('Show [tax term] inclusive price - i.e. '.$config->defaultCurrencySymbol.'120.00 (includes [tax term] of '.$config->defaultCurrencySymbol.'20.00)'),
                      'Exclusive' => ts('Show [tax term] exclusive price - i.e. '.$config->defaultCurrencySymbol.'100.00 + '.$config->defaultCurrencySymbol.'20.00 [tax term]')
                      )    
                );
     $this->add('checkbox', 'is_email_pdf', ts('Automatically email invoice when user purchases online'));
+    $this->add('checkbox', 'invoicing', ts('Sales Taxes and Invoicing'));
+    $this->addWysiwyg('notes', ts('Notes or Standard Terms'), array('rows' => 2, 'cols' => 40));
     parent::buildQuickForm();
   }
 

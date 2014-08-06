@@ -163,6 +163,8 @@ AND li.entity_id = {$entityId}
 
     $dao = CRM_Core_DAO::executeQuery("$selectClause $fromClause $whereClause", $params);
     $getTaxDetails = FALSE;
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     while ($dao->fetch()) {
       if (!$dao->id) {
         continue;
@@ -190,8 +192,12 @@ AND li.entity_id = {$entityId}
         $getTaxDetails = TRUE;
       }
     }
-    $smarty = CRM_Core_Smarty::singleton();
-    $smarty->assign('getTaxDetails', $getTaxDetails);
+    if ($invoicing) {
+      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+      $smarty = CRM_Core_Smarty::singleton();
+      $smarty->assign('taxTerm', $taxTerm);
+      $smarty->assign('getTaxDetails', $getTaxDetails);
+    }
     return $lineItems;
   }
 
@@ -444,10 +450,10 @@ AND li.entity_id = {$entityId}
    */
   public static function calculateTaxRate($lineItemId) {
     if ($lineItemId['html_type'] == 'Text') {
-      $tax = (($lineItemId['line_total'] - ($lineItemId['unit_price'] * $lineItemId['qty'])))/($lineItemId['unit_price'] * $lineItemId['qty'])*100;
+      $tax = $lineItemId['tax_amount']/($lineItemId['unit_price'] * $lineItemId['qty'])*100;
     }
     else {
-      $tax = (($lineItemId['line_total'] - $lineItemId['unit_price'])/$lineItemId['unit_price']) * 100;
+      $tax = ($lineItemId['tax_amount']/$lineItemId['unit_price']) * 100;
     }
     return $tax;
   }

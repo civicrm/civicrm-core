@@ -119,7 +119,24 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('useForMember', $this->get('useForMember'));
 
     $params = $this->_params;
-    $this->assign('totalTaxAmount', $params['tax_amount']);
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    if ($invoicing) {
+      $getTaxDetails = FALSE;
+      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+      foreach ($this->_lineItem as $key => $value) {
+        foreach ($value as $v) {
+          if (isset($v['tax_rate'])) {
+            if ($v['tax_rate'] != '') {
+              $getTaxDetails = TRUE;
+            }
+          }
+        }
+      }
+      $this->assign('getTaxDetails', $getTaxDetails);
+      $this->assign('taxTerm', $taxTerm);
+      $this->assign('totalTaxAmount', $params['tax_amount']);
+    }
     if ($this->_honor_block_is_active && !empty($params['soft_credit_type_id'])) {
       $honorName = null;
       $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
