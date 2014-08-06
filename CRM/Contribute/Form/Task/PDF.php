@@ -154,7 +154,8 @@ AND    {$this->_componentClause}";
     $message = array();
     $template = CRM_Core_Smarty::singleton();
 
-    $elements = self::getElements();
+    $params = $this->controller->exportValues($this->_name);
+    $elements = self::getElements($this->_contributionIds, $params, $this->_contactIds);
 
     foreach ($elements['details'] as $contribID => $detail) {
       $input = $ids = $objects = array();
@@ -234,19 +235,23 @@ AND    {$this->_componentClause}";
    *
    * @access public
    *
+   * @param array $contribIds Contribution Id
+   * @param array $params parameter for pdf or email invoices
+   * @param array $contactIds Contact Id
+   *
    * @return array array of common elements
    *
    */
-  public function getElements() {
+  public function getElements($contribIds, $params, $contactIds) {
     $pdfElements = array();
 
-    $pdfElements['contribIDs'] = implode(',', $this->_contributionIds);
+    $pdfElements['contribIDs'] = implode(',', $contribIds);
 
     $pdfElements['details'] = CRM_Contribute_Form_Task_Status::getDetails($pdfElements['contribIDs']);
 
     $pdfElements['baseIPN'] = new CRM_Core_Payment_BaseIPN();
 
-    $pdfElements['params'] = $this->controller->exportValues($this->_name);
+    $pdfElements['params'] = $params;
 
     $pdfElements['createPdf'] = FALSE;
     if ($pdfElements['params']['output'] == "pdf_invoice" || $pdfElements['params']['output'] == "pdf_receipt") {
@@ -262,7 +267,7 @@ AND    {$this->_componentClause}";
                                 'on_hold' => 1,
                                 );
 
-      list($contactDetails) = CRM_Utils_Token::getTokenDetails($this->_contactIds, $returnProperties, FALSE, FALSE);
+      list($contactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, $returnProperties, FALSE, FALSE);
       $pdfElements['suppressedEmails'] = 0;
       foreach ($contactDetails as $id => $values) {
         if (empty($values['email']) || !empty($values['do_not_email']) ||
