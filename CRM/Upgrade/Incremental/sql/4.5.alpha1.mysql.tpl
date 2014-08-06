@@ -565,3 +565,6 @@ INSERT INTO
    `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
 VALUES
    (@option_group_id_udOpt, {localize}'{ts escape="sql"}Invoices / Credit Notes{/ts}'{/localize}, @option_group_id_udOpt_val+1, 'Invoices / Credit Notes', NULL, 0, NULL, @option_group_id_udOpt_wt+1, NULL, 0, 0, 1, NULL, NULL);
+
+-- Add new column creditnote_id in contribution table
+ALTER TABLE `civicrm_contribution` ADD `creditnote_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'unique credit note id, system generated or passed in';
