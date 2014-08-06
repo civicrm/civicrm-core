@@ -206,6 +206,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @var boolean
    */
   public $_useForMember;
+
+  public $_isBillingAddressRequiredForPayLater;
   /**
    * Function to set variables up before form is built
    *
@@ -520,6 +522,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     //do check for cancel recurring and clean db, CRM-7696
     if (CRM_Utils_Request::retrieve('cancel', 'Boolean', CRM_Core_DAO::$_nullObject)) {
       self::cancelRecurring();
+    }
+
+    // check if billing block is required for pay later
+    if (CRM_Utils_Array::value('is_pay_later', $this->_values)) {
+      $this->_isBillingAddressRequiredForPayLater = CRM_Utils_Array::value('is_billing_required', $this->_values);
+      $this->assign('isBillingAddressRequiredForPayLater', $this->_isBillingAddressRequiredForPayLater);
     }
   }
 

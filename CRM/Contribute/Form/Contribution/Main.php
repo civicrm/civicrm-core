@@ -385,7 +385,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     // Build payment processor form
-    if ($this->_ppType && empty($_GET['onbehalf'])) {
+    if (($this->_ppType || $this->_isBillingAddressRequiredForPayLater) && empty($_GET['onbehalf'])) {
       CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
       // Return if we are in an ajax callback
       if ($this->_snippet) {
@@ -1006,7 +1006,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     // also return if paylater mode
-    if (CRM_Utils_Array::value('payment_processor', $fields) == 0) {
+    if (CRM_Utils_Array::value('payment_processor', $fields) == 0 && $self->_isBillingAddressRequiredForPayLater == 0) {
       return empty($errors) ? TRUE : $errors;
     }
 

@@ -333,7 +333,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     // Build payment processor form
-    if ($this->_ppType) {
+    if ($this->_ppType || $this->_isBillingAddressRequiredForPayLater) {
       CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
       // Return if we are in an ajax callback
       if ($this->_snippet) {
@@ -971,7 +971,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     //set as Primary participant
     $params['is_primary'] = 1;
 
-    if ($this->_values['event']['is_pay_later'] && !array_key_exists('hidden_processor', $params)) {
+    if ($this->_values['event']['is_pay_later']
+      && (!array_key_exists('hidden_processor', $params) || $params['payment_processor'] == 0)) {
       $params['is_pay_later'] = 1;
     }
     else {

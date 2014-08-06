@@ -279,7 +279,7 @@
 
   <div id="billing-payment-block">
     {* If we have a payment processor, load it - otherwise it happens via ajax *}
-    {if $ppType}
+    {if $ppType or $isBillingAddressRequiredForPayLater}
       {include file="CRM/Contribute/Form/Contribution/Main.tpl" snippet=4}
     {/if}
   </div>
