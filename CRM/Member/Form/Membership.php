@@ -470,6 +470,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       return CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
 
+    $this->assign('taxRates', json_encode(CRM_Core_PseudoConstant::getTaxRates()));
     // build price set form.
     $buildPriceSet = FALSE;
     if ($this->_priceSetId || !empty($_POST['price_set_id'])) {
