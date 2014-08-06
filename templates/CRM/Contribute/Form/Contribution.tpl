@@ -629,7 +629,7 @@ cj("#financial_type_id").on("change",function(){
 })
 
 cj("#currency").on("change",function(){
-    cj('#total_amount').trigger("change");
+  cj('#total_amount').trigger("change");
 })
 
 cj('#total_amount').on("change",function(event) {
@@ -643,11 +643,11 @@ cj('#total_amount').on("change",function(event) {
     var currencySymbol = currencies[currencySelect];
     var re= /\((.*?)\)/g;
     for(m = re.exec(currencySymbol); m; m = re.exec(currencySymbol)){
-       var currencySymbol = m[1];
+      var currencySymbol = m[1];
     }
     var taxRate = taxRates[financialType]; 
     if (!taxRate) {
-       taxRate = 0;
+      taxRate = 0;
     }  
     var totalAmount = cj('#total_amount').val();
     var totalTaxAmount = parseFloat(Number((taxRate/100)*totalAmount)+Number(totalAmount)).toFixed(2);
