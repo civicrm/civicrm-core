@@ -638,6 +638,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         'import' => 1,
         'custom_field_id' => $id,
         'options_per_line' => CRM_Utils_Array::value('options_per_line', $values),
+        'text_length' => CRM_Utils_Array::value('text_length', $values, 255),
         'data_type' => CRM_Utils_Array::value('data_type', $values),
         'html_type' => CRM_Utils_Array::value('html_type', $values),
         'is_search_range' => CRM_Utils_Array::value('is_search_range', $values),
