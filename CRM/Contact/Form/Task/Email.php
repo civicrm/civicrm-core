@@ -104,7 +104,21 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
     $cid = CRM_Utils_Request::retrieve('cid', 'String', $this, FALSE);
-    if ($cid){
+
+    // Allow request to specify email id rather than contact id
+    $toEmailId = CRM_Utils_Request::retrieve('email_id', 'String', $this);
+    if ($toEmailId) {
+      $toEmail = civicrm_api('email', 'getsingle', array('version' => 3, 'id' => $toEmailId));
+      if (!empty($toEmail['email']) && !empty($toEmail['contact_id'])) {
+        $this->_toEmail = $toEmail;
+      }
+      if (!$cid) {
+        $cid = $toEmail['contact_id'];
+        $this->set('cid', $cid);
+      }
+    }
+
+    if ($cid) {
       $cid = explode(',',$cid);
       $displayName = array();
 

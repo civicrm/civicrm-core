@@ -228,6 +228,10 @@ class CRM_Contact_Form_Task_EmailCommon {
           // build array's which are used to setdefaults
           if (in_array($contactId, $form->_toContactIds)) {
             $form->_toContactDetails[$contactId] = $form->_contactDetails[$contactId];
+            // If a particular address has been specified as the default, use that instead of contact's primary email
+            if (!empty($form->_toEmail) && $form->_toEmail['contact_id'] == $contactId) {
+              $email = $form->_toEmail['email'];
+            }
             $toArray[] = array(
               'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
               'id' => "$contactId::{$email}",
