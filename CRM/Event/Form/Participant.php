@@ -1684,6 +1684,18 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc', $this->_fromEmails);
         }
 
+        //send email with pdf invoice
+        $template = CRM_Core_Smarty::singleton( );
+        $taxAmt = $template->get_template_vars('dataArray');
+        $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+                                                      $this->_id, 'contribution_id', 'participant_id'
+                                                      );
+        $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+        $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
+        if (count($taxAmt) > 0 && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
+          $sendTemplateParams['isEmailPdf'] = True; 
+          $sendTemplateParams['contributionId'] = $contributionId; 
+        }
         list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         if ($mailSent) {
           $sent[] = $contactID;

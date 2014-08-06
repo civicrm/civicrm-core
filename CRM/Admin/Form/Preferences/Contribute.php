@@ -54,6 +54,11 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
                                                                   'html_type' => 'select',
                                                                   'weight' => 7,
                                                                   ),
+                                   'is_email_pdf' => array(
+                                     'html_type' => 'checkbox',
+                                     'title' => ts('Automatically email invoice when user purchases online'),
+                                     'weight' => 5,
+                                   ),
                                    ),
                              );
     parent::preProcess();
@@ -82,6 +87,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
                      'Exclusive' => ts('Show [tax term] exclusive price - i.e. '.$config->defaultCurrencySymbol.'100.00 + '.$config->defaultCurrencySymbol.'20.00 [tax term]')
                      )    
                );
+    $this->add('checkbox', 'is_email_pdf', ts('Automatically email invoice when user purchases online'));
     parent::buildQuickForm();
   }
 
