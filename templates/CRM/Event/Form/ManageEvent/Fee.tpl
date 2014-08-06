@@ -107,6 +107,10 @@
                 </td>
             </tr>
 
+            <tr>
+               <td class="extra-long-fourty label">{$form.is_billing_required.html}</td>
+               <td>{$form.is_billing_required.label}</td>
+            </tr>
         </table>
 
         <table id="contributionType" class="form-layout">
