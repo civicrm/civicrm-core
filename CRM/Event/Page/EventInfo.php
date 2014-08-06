@@ -145,7 +145,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
               $labelClass = 'price_set_field-label';
             }
             // show tax rate with amount
-            $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+            $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
             $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
             $displayOpt = CRM_Utils_Array::value('tax_display_settings', $invoiceSettings);
             $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
