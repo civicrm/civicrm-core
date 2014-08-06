@@ -633,7 +633,7 @@ cj("#currency").on("change",function(){
 })
 
 cj('#total_amount').on("change",function(event) {
-if(event.handled !== true) {
+  if (event.handled !== true) {
     var financialType = cj('#financial_type_id').val();
     var taxRates = '{/literal}{$taxRates}{literal}';
     var taxRates = JSON.parse(taxRates);
@@ -651,10 +651,10 @@ if(event.handled !== true) {
     }  
     var totalAmount = cj('#total_amount').val();
     var totalTaxAmount = parseFloat(Number((taxRate/100)*totalAmount)+Number(totalAmount)).toFixed(2);
-    cj( "#totalTaxAmount" ).html('Total Amount : <span id="currencySymbolShow">'+currencySymbol+'</span> '+totalTaxAmount);
+    cj( "#totalTaxAmount" ).html('Total Amount : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
     event.handled = true;
-    }
-     return false;
+  }
+  return false;
 });
 </script>
 {/literal}
