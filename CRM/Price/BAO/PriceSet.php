@@ -675,6 +675,16 @@ WHERE  id = %1";
             $lineItem = self::setLineItem($field, $lineItem, key($field['options']));
             $totalTax += $field['options'][key($field['options'])]['tax_amount'] * $lineItem[key($field['options'])]['qty'];
           }
+          if (CRM_Utils_Array::value('name', $field['options'][key($field['options'])]) == 'contribution_amount') {
+            $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+            if (array_key_exists($params['financial_type_id'], $taxRates)) {
+              $field['options'][key($field['options'])]['tax_rate'] = $taxRates[$params['financial_type_id']];
+              $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($field['options'][key($field['options'])]['amount'], $field['options'][key($field['options'])]['tax_rate']);
+              $field['options'][key($field['options'])]['tax_amount'] = round($taxAmount['tax_amount'], 2);
+              $lineItem = self::setLineItem($field, $lineItem, key($field['options']));
+              $totalTax += $field['options'][key($field['options'])]['tax_amount'] * $lineItem[key($field['options'])]['qty'];
+            }
+          }
           $totalPrice += $lineItem[key($field['options'])]['line_total'];
           break;
 
