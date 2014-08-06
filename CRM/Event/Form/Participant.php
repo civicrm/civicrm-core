@@ -1635,8 +1635,11 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
         if ($this->_isPaidEvent) {
           // fix amount for each of participants ( for bulk mode )
           $eventAmount = array();
-          //add dataArray in the receipts in ADD and UPDATE condition
+          $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+          $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
           $totalTaxAmount = 0;
+          
+          //add dataArray in the receipts in ADD and UPDATE condition
           $dataArray = array();
           if ($this->_action & CRM_Core_Action::ADD) {
             $line = $lineItem[0];
@@ -1644,19 +1647,21 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
           elseif ($this->_action & CRM_Core_Action::UPDATE) {
             $line = $this->_values['line_items'];
           }
-          foreach ($line as $key => $value) {
-            if (isset($value['tax_amount'])) {
-              $totalTaxAmount += $value['tax_amount'];
-              if (isset($dataArray[$value['tax_rate']])) {
-                $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
-              }
-              else {
-                $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
+          if ($invoicing) {
+            foreach ($line as $key => $value) {
+              if (isset($value['tax_amount'])) {
+                $totalTaxAmount += $value['tax_amount'];
+                if (isset($dataArray[$value['tax_rate']])) {
+                  $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
+                }
+                else {
+                  $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
+                }
               }
             }
+            $this->assign('totalTaxAmount', $totalTaxAmount);
+            $this->assign('dataArray', $dataArray);
           }
-          $this->assign('totalTaxAmount', $totalTaxAmount);
-          $this->assign('dataArray', $dataArray);
           if (!empty($additionalParticipantDetails)) {
             $params['amount_level'] = preg_replace('//', '', $params['amount_level']) . ' - ' . $this->_contributorDisplayName;
           }

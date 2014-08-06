@@ -392,7 +392,24 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $amount_block_is_active = $this->get('amount_block_is_active');
     $this->assign('amount_block_is_active', $amount_block_is_active);
 
-    $this->assign('totalTaxAmount', $params['tax_amount']);
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    if ($invoicing) {
+      $getTaxDetails = FALSE;
+      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+      foreach ($this->_lineItem as $key => $value) {
+        foreach ($value as $v) {
+          if (isset($v['tax_rate'])) {
+            if ($v['tax_rate'] != '') {
+              $getTaxDetails = TRUE;
+            }
+          }
+        }
+      }
+      $this->assign('getTaxDetails', $getTaxDetails);
+      $this->assign('taxTerm', $taxTerm);
+      $this->assign('totalTaxAmount', $params['tax_amount']);
+    }
     if (!empty($params['selectProduct']) && $params['selectProduct'] != 'no_thanks') {
       $option = CRM_Utils_Array::value('options_' . $params['selectProduct'], $params);
       $productID = $params['selectProduct'];
@@ -1297,23 +1314,27 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if (isset($params['amount'])) {
       $contribParams['line_item'] = $form->_lineItem;
-      //add dataArray in the receipt
-      $dataArray = array();
-      foreach ($form->_lineItem as $lineItemKey => $lineItemValue) {
-        foreach ($lineItemValue as $key => $value) {
-          if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
-            if (isset($dataArray[$value['tax_rate']])) {
-              $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
-            }
-            else {
-              $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+      if ($invoicing) {
+        $totalTaxAmount = 0;
+        $dataArray = array();
+        foreach ($form->_lineItem as $lineItemKey => $lineItemValue) {
+          foreach ($lineItemValue as $key => $value) {
+            if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
+              if (isset($dataArray[$value['tax_rate']])) {
+                $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
+              }
+              else {
+                $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
+              }
             }
           }
         }
+        $smarty = CRM_Core_Smarty::singleton();
+        $smarty->assign('dataArray', $dataArray);
+        $smarty->assign('totalTaxAmount', $params['tax_amount']);
       }
-      $smarty = CRM_Core_Smarty::singleton();
-      $smarty->assign('dataArray', $dataArray);
-      $smarty->assign('totalTaxAmount', $totalTaxAmount);
       //add contribution record
       $contribution = CRM_Contribute_BAO_Contribution::add($contribParams, $ids);
       if (is_a($contribution, 'CRM_Core_Error')) {

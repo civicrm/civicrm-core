@@ -2343,6 +2343,9 @@ div.grippie {
 }
 
 .crm-container a.button,
+.crm-container a.crm-invoiceButton,
+.crm-container a.crm-invoiceButton:link,
+.crm-container a.crm-invoiceButton:visited,
 .crm-container a.button:link,
 .crm-container a.button:visited,
 .crm-container input.form-submit,
@@ -2388,23 +2391,26 @@ div.grippie {
 }
 
 .crm-container a.button,
+.crm-container a.crm-invoiceButton,
+.crm-container a.crm-invoiceButton:link,
+.crm-container a.crm-invoiceButton:visited,
 .crm-container a.button:link,
 .crm-container a.button:visited {
   display: block;
   float: left;
 }
 
-.crm-container a.button span {
+.crm-container a.button .crm-container a.crm-invoiceButton span {
   display: block;
   line-height: 14px;
   padding: 2px 0px;
 }
 
-.crm-container .button .red {
+.crm-container .button .red .crm-invoiceButton{
   background-image: url(../i/icons/jquery-ui-FFFFFF.png);
 }
 
-.crm-container a.button:active {
+.crm-container a.button:active .crm-container a.crm-invoiceButton:active,{
   color: #000;
   outline: none;
   /* hide dotted outline in Firefox */
@@ -2415,6 +2421,8 @@ div.grippie {
 .crm-container input[type=submit]:hover,
 .crm-container input[type=button]:hover,
 .crm-container a.button:hover,
+.crm-container a.crm-invoiceButton:hover,
+.crm-container a.crm-invoiceButton:focus,
 .crm-container a.button:focus {
   background-position: 0px -25px;
 }
@@ -2547,6 +2555,7 @@ div.grippie {
 }
 
 .crm-container .button .icon,
+.crm-container a.invoiceButton .icon,
 .crm-container .crm-button .icon,
 .crm-accordion-header .icon {
   position: relative;
@@ -3736,6 +3745,8 @@ tbody.scrollContent tr.alternateRow {
 /* rounded corners - we will call dd_roundies on all this */
 .crm-container .crm-button,
 .crm-container a.button,
+.crm-container a.crm-invoiceButton,
+.crm-container a.crm-invoiceButton:link,
 .crm-container a.button:link,
 .crm-container input.form-submit,
 .crm-container input[type=button],
@@ -4674,19 +4685,5 @@ span.crm-status-icon {
 }
 
 .crm-printButton {
-  padding-left: 469px;
-}
-
-.crm-invoiceButton {
-  text-shadow: 0 1px 0 black;
-  background: #70716B url(../i/crm-button-bg.gif) repeat-x top left;
-  color: #FFFFFF !important;
-  font-size: 13px;
-  font-weight: normal;
-  margin-right: 16px;
-  padding: 2px 6px;
-  text-decoration: none;
-  cursor: pointer;
-  border: 1px solid #3e3e3e;
-  border-radius: 3px 3px 3px 3px;
+  float: right;
 }

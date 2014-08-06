@@ -34,7 +34,7 @@
                 <th>{ts}Received date{/ts}</th>
                 <th>{ts}Receipt Sent{/ts}</th>
                 <th>{ts}Status{/ts}</th>
-		{if $invoices}
+		{if $invoicing && $invoices}
                   <th></th>
 		{/if}
             </tr>
@@ -50,7 +50,7 @@
                     <td>{$row.receive_date|truncate:10:''|crmDate}</td>
                     <td>{$row.receipt_date|truncate:10:''|crmDate}</td>
                     <td>{$row.contribution_status}</td>
-                    {if $invoices}
+                    {if $invoicing && $invoices}
                       <td>
 		        {assign var='id' value=$row.contribution_id}
 			{assign var='contact_id' value=$row.contact_id}
@@ -59,7 +59,7 @@
 		      	{if $row.contribution_status != 'Refunded'}
                           <span>{ts}Print Invoice{/ts}</span>
 		        {else}
-			  <span>{ts}Print Credit Note{/ts}</span>
+			  <span>{ts}Print Invoice and Credit Note{/ts}</span>
 		        {/if}
                         </a>
                       </td>

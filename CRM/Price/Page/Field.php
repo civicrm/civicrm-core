@@ -132,6 +132,10 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     $priceFieldBAO->orderBy('weight, label');
     $priceFieldBAO->find();
 
+    // display taxTerm for priceFields
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $getTaxDetails = FALSE;
     $taxRate = CRM_Core_PseudoConstant::getTaxRates();
     while ($priceFieldBAO->fetch()) {
@@ -147,7 +151,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
 
         $financialTypeId = $optionValues['financial_type_id'];
         $priceField[$priceFieldBAO->id]['price'] = CRM_Utils_Array::value('amount', $optionValues);
-        if (isset($taxRate[$financialTypeId])) {
+        if ($invoicing && isset($taxRate[$financialTypeId])) {
           $priceField[$priceFieldBAO->id]['tax_rate'] = $taxRate[$financialTypeId];
           $getTaxDetails = TRUE;
         }
@@ -196,6 +200,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
         'PriceField',
         $priceFieldBAO->id
       );
+      $this->assign('taxTerm', $taxTerm);
       $this->assign('getTaxDetails', $getTaxDetails);
     }
 
