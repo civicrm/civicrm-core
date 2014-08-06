@@ -401,7 +401,7 @@ registration process.{/ts}</p>
         </tr>
        {/if}
 
-       {if $contributeMode ne 'notify' and !$isAmountzero and !$is_pay_later and !$isOnWaitlist and !$isRequireApproval}
+       {if $contributeMode ne 'notify' and !$isAmountzero and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and !$isOnWaitlist and !$isRequireApproval}
         <tr>
          <th {$headerStyle}>
           {ts}Billing Name and Address{/ts}

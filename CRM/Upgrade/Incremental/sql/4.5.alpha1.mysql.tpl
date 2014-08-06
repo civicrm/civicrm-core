@@ -568,3 +568,7 @@ VALUES
 
 -- Add new column creditnote_id in contribution table
 ALTER TABLE `civicrm_contribution` ADD `creditnote_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'unique credit note id, system generated or passed in';
+
+-- Add new column is_billing_required in contribution_page and event table
+ALTER TABLE `civicrm_event` ADD COLUMN `is_billing_required` tinyint(4) DEFAULT '0' COMMENT 'Billing block required for Event';
+ALTER TABLE `civicrm_contribution_page` ADD COLUMN `is_billing_required` tinyint(4) DEFAULT '0' COMMENT 'Billing block required for Contribution Page';
