@@ -837,4 +837,15 @@
     <key>id</key>
     <add>4.5</add>
   </foreignKey>
+  <field>
+    <name>is_billing_required</name>
+    <title>Is Billing Required</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is Billing Required enabled or disabled for this Event</comment>
+    <add>4.5</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
 </table>
