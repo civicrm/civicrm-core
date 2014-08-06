@@ -116,7 +116,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
          ));
     
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
-    CRM_Utils_System::setTitle(ts('Print Contribution Invoice'));
+    if (in_array("email", $this->urlPath)) {
+      CRM_Utils_System::setTitle(ts('Email Invoice'));
+    } else {
+      CRM_Utils_System::setTitle(ts('Print Contribution Invoice'));
+    }
   }
   
   /**
@@ -127,26 +131,97 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @return void
    */
   public function buildQuickForm() {
-    $this->addElement('radio', 'output', NULL, ts('Email Invoice'), 'email_invoice', 
-      array('onClick' => "document.getElementById('selectPdfFormat').style.display = 'none';document.getElementById ('comment').style.display = 'block';")
-    );
-    $this->addElement('radio', 'output', NULL, ts('PDF Invoice'), 'pdf_invoice',
-      array('onClick' => "document.getElementById('comment').style.display = 'none';document.getElementById('selectPdfFormat').style.display = 'block';")
-    );
-    $this->addRule('output', ts('Selection required'), 'required');
-    $this->add('textarea', 'email_comment', ts('If you would like to add personal message to email please add it here. (The same messages will sent to all receipients.)'));
-    $this->addButtons(array(
-        array(
-         'type' => 'next',
-         'name' => ts('Process Invoice(s)'),
-         'isDefault' => TRUE,
-        ),
-        array(
-         'type' => 'back',
-         'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $session = CRM_Core_Session::singleton();
+    if (CRM_Core_Permission::check('administer CiviCRM')) {
+      $this->assign('isAdmin', 1);
+    }
+    $contactID = $session->get('userID');
+    $contactEmails = CRM_Core_BAO_Email::allEmails($contactID);
+    $emails = array();
+    $fromDisplayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+                                                   $contactID, 'display_name'
+                                                   );
+    foreach ($contactEmails as $emailId => $item) {
+      $email = $item['email'];
+      if ($email) {
+        $emails[$emailId] = '"' . $fromDisplayName . '" <' . $email . '> ';
+      }
+      if (isset($emails[$emailId])) {
+        $emails[$emailId] .= $item['locationType'];
+        if ($item['is_primary']) {
+          $emails[$emailId] .= ' ' . ts('(preferred)');
+        }
+        $emails[$emailId] = htmlspecialchars($emails[$emailId]);
+      }
+    }
+    $fromEmailAddress = CRM_Core_OptionGroup::values('from_email_address');
+    foreach ($fromEmailAddress as $key => $email) {
+      $fromEmailAddress[$key] = htmlspecialchars($fromEmailAddress[$key]);
+    }
+    $fromEmail = CRM_Utils_Array::crmArrayMerge($emails, $fromEmailAddress);
+
+    $this->addElement('radio', 'output', NULL, ts('Email Invoice'), 'email_invoice');
+    $this->addElement('radio', 'output', NULL, ts('PDF Invoice'), 'pdf_invoice');
+    $this->add('select', 'from_email_address', ts('From Email Address'), array('' => '- select -') + $fromEmail);
+    $this->addFormRule(array('CRM_Contribute_Form_Task_Invoice', 'formRule'));
+    $this->addWysiwyg('email_comment', ts('If you would like to add personal message to email please add it here. (If sending to more then one receipient the same message will be sent to each contact.)'), array('rows' => 2, 'cols' => 40));
+
+    if (in_array("email", $this->urlPath)) {
+      $this->addButtons(array(
+          array(
+           'type' => 'next',
+           'name' => ts('Email Invoice'),
+           'isDefault' => TRUE,
+          ),
+          array(
+           'type' => 'back',
+           'name' => ts('Cancel'),
+          ),
+        )
+      );
+    } else {
+      $this->addButtons(array(
+          array(
+           'type' => 'next',
+           'name' => ts('Process Invoice(s)'),
+           'isDefault' => TRUE,
+          ),
+          array(
+           'type' => 'back',
+           'name' => ts('Cancel'),
+          ),
+        )
+      );
+    }
+  }
+
+  /**
+   * global validation rules for the form
+   *
+   * @param $values
+   *
+   * @internal param array $fields posted values of the form
+   *
+   * @return array list of errors to be posted back to the form
+   * @static
+   * @access public
+   */
+  static function formRule($values) {
+    $errors = array();
+    if (!$values['from_email_address']) {
+      if (in_array("Email Invoice", $values)) {
+        $errors['from_email_address'] = ts("From Email Address is required");
+      }
+      else {
+        if (in_array("email_invoice", $values)) {
+          $errors['from_email_address'] = ts("From Email Address is required");
+        }
+        else {
+          $errors['output'] = ts("Selection required");
+        }
+      }
+    }
+    return $errors;
   }
   
    /**
@@ -157,15 +232,32 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @return void
    */
   public function postProcess() {
+    $params = $this->controller->exportValues($this->_name);
+    $this->printPDF($this->_contributionIds, $params, $this->_contactIds);
+  }
+
+   /**
+   * 
+   * process the PDf and email with activity and attachment
+   * on click of Print Invoices
+   * 
+   * @param array $contribIDs Contribution Id
+   * @param array $params for pdf or email invoices
+   * @param array $contactIds Contact Id
+   * @static
+   *
+   */
+  static function printPDF($contribIDs, $params, $contactIds) {
     // get all the details needed to generate a invoice
-    $this->_messageInvoice = array();
+    $messageInvoice = array();
     
-    $this->_invoiceTemplate = CRM_Core_Smarty::singleton();
+    $invoiceTemplate = CRM_Core_Smarty::singleton();
     
-    $invoiceElements = CRM_Contribute_Form_Task_PDF::getElements();
+    $invoiceElements = CRM_Contribute_Form_Task_PDF::getElements($contribIDs, $params, $contactIds);
     
     // gives the status id when contribution status is 'Refunded'
-    $refundedStatusId = CRM_Utils_Array::key('Refunded', $this->_contributionStatusId);
+    $contributionStatusID = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $refundedStatusId = CRM_Utils_Array::key('Refunded', $contributionStatusID);
 
     // getting data from admin page
     $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
@@ -216,7 +308,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         }
       }
       
-      $stateProvinceAbbreviation = CRM_Core_PseudoConstant::stateProvinceAbbreviation($billingAddress[$contribution->contact_id]['state_province_id']);
+      if (!empty($billingAddress[$contribution->contact_id]['state_province_id'])) {
+        $stateProvinceAbbreviation = CRM_Core_PseudoConstant::stateProvinceAbbreviation($billingAddress[$contribution->contact_id]['state_province_id']);
+      }
+      else {
+        $stateProvinceAbbreviation = '';
+      }
       
       if ($contribution->contribution_status_id == $refundedStatusId) {
         $creditNoteId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue) . "" . $contribution->id;
@@ -245,11 +342,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $dataArray = array();
       $subTotal = 0;
       foreach ($lineItem as $entity_id => $taxRate) {
-        if (isset($dataArray[$taxRate['tax_rate']])) {
-          $dataArray[$taxRate['tax_rate']] = $dataArray[$taxRate['tax_rate']] + CRM_Utils_Array::value('tax_amount', $taxRate);
+        if (isset($dataArray[(string)$taxRate['tax_rate']])) {
+          $dataArray[(string)$taxRate['tax_rate']] = $dataArray[(string)$taxRate['tax_rate']] + CRM_Utils_Array::value('tax_amount', $taxRate);
         }
         else {
-          $dataArray[$taxRate['tax_rate']] = CRM_Utils_Array::value('tax_amount', $taxRate);
+          $dataArray[(string)$taxRate['tax_rate']] = CRM_Utils_Array::value('tax_amount', $taxRate);
         }
         $subTotal += CRM_Utils_Array::value('subTotal', $taxRate);
       }
@@ -268,7 +365,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
                               'bcc_confirm',
                               );
         CRM_Core_DAO::commonRetrieveAll($daoName, 'id', $pageId, $mailDetails, $mailElements);
-        
         $values['title'] = CRM_Utils_Array::value('title', $mailDetails[$contribution->_relatedObjects['event']->id]);
         $values['confirm_from_name'] = CRM_Utils_Array::value('confirm_from_name', $mailDetails[$contribution->_relatedObjects['event']->id]);
         $values['confirm_from_email'] = CRM_Utils_Array::value('confirm_from_email', $mailDetails[$contribution->_relatedObjects['event']->id]);
@@ -288,19 +384,19 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
                               'bcc_receipt',
                               );
         CRM_Core_DAO::commonRetrieveAll($daoName, 'id', $pageId, $mailDetails, $mailElements);
-        
-        $values['title'] = CRM_Utils_Array::value('title',$mailDetails[$contribution->contribution_page_id]);
-        $values['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $mailDetails[$contribution->contribution_page_id]);
-        $values['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $mailDetails[$contribution->contribution_page_id]);
-        $values['cc_receipt'] = CRM_Utils_Array::value('cc_receipt', $mailDetails[$contribution->contribution_page_id]);
-        $values['bcc_receipt'] = CRM_Utils_Array::value('bcc_receipt', $mailDetails[$contribution->contribution_page_id]);
-        
-        $title = CRM_Utils_Array::value('title', $mailDetails[$contribution->contribution_page_id]);
+
+        $values['title'] = CRM_Utils_Array::value('title',CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
+        $values['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
+        $values['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
+        $values['cc_receipt'] = CRM_Utils_Array::value('cc_receipt', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
+        $values['bcc_receipt'] = CRM_Utils_Array::value('bcc_receipt', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
+
+        $title = CRM_Utils_Array::value('title', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
       }
       
       $config = CRM_Core_Config::singleton();
       $config->doNotAttachPDFReceipt = 1;
-      
+
       // parameters to be assign for template
       $tplParams = array(
                          'title' => $title,
@@ -321,12 +417,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
                          'refundedStatusId' => $refundedStatusId,
                          'contribution_status_id' => $contribution->contribution_status_id,
                          'subTotal' => $subTotal,
-                         'street_address' => CRM_Utils_Array::value('street_address', $billingAddress[$contribution->contact_id]),
-                         'supplemental_address_1' => CRM_Utils_Array::value('supplemental_address_1', $billingAddress[$contribution->contact_id]),
-                         'supplemental_address_2' => CRM_Utils_Array::value('supplemental_address_2', $billingAddress[$contribution->contact_id]),
-                         'city' => CRM_Utils_Array::value('city', $billingAddress[$contribution->contact_id]),
+                         'street_address' => CRM_Utils_Array::value('street_address', CRM_Utils_Array::value($contribution->contact_id,$billingAddress)),
+                         'supplemental_address_1' => CRM_Utils_Array::value('supplemental_address_1', CRM_Utils_Array::value($contribution->contact_id,$billingAddress)),
+                         'supplemental_address_2' => CRM_Utils_Array::value('supplemental_address_2', CRM_Utils_Array::value($contribution->contact_id,$billingAddress)),
+                         'city' => CRM_Utils_Array::value('city', CRM_Utils_Array::value($contribution->contact_id,$billingAddress)),
                          'stateProvinceAbbreviation' => $stateProvinceAbbreviation,
-                         'postal_code' => CRM_Utils_Array::value('postal_code', $billingAddress[$contribution->contact_id]),
+                         'postal_code' => CRM_Utils_Array::value('postal_code', CRM_Utils_Array::value($contribution->contact_id,$billingAddress)),
                          'is_pay_later' => $contribution->is_pay_later,
                          'organization_name' => $contribution->_relatedObjects['contact']->organization_name,
                          );
@@ -338,8 +434,26 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
                                   'tplParams' => $tplParams,
                                   'PDFFilename' => 'Invoice.pdf',
                                   );
+      $session = CRM_Core_Session::singleton();
+      $contactID = $session->get('userID');
+      $contactEmails = CRM_Core_BAO_Email::allEmails($contactID);
+      $emails = array();
+      $fromDisplayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+                                                     $contactID, 'display_name'
+                                                     );
+
+      foreach ($contactEmails as $emailId => $item) {
+        $email = $item['email'];
+        if ($email) {
+          $emails[$emailId] = '"' . $fromDisplayName . '" <' . $email . '> ';
+        }
+      }
+      $fromEmail = CRM_Utils_Array::crmArrayMerge($emails, CRM_Core_OptionGroup::values('from_email_address'));
       
-      
+      // from email address
+      if (isset($params['from_email_address'])) {
+        $fromEmailAddress = CRM_Utils_Array::value($params['from_email_address'], $fromEmail);
+      }
       // condition to check for download PDF Invoice or email Invoice
       if ($invoiceElements['createPdf']) {
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
@@ -350,44 +464,55 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
                       );
         
         if ($mail['html']) {
-          $this->_messageInvoice[] = $mail['html'];
+          $messageInvoice[] = $mail['html'];
         }     
         else {
-          $this->_messageInvoice[] = nl2br($mail['body']);
+          $messageInvoice[] = nl2br($mail['body']);
         }
       }
       elseif ($contribution->_component == 'contribute') {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id);
         
         $sendTemplateParams['tplParams'] = array_merge($tplParams,array('email_comment' => $invoiceElements['params']['email_comment']));
-        $sendTemplateParams['from'] = CRM_Utils_Array::value('receipt_from_name', $values) . ' <' . $mailDetails[$contribution->contribution_page_id]['receipt_from_email']. '>';
+        $sendTemplateParams['from'] = $fromEmailAddress;
         $sendTemplateParams['toEmail'] = $email;
         $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_receipt', $values);
         $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc_receipt', $values);
         
         list($sent, $subject, $message, $html) =  CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        // functions call for adding activity with attachment
+        $fileName = self::putFile($html);
+        self::addActivities($subject, $contribution->contact_id, $fileName, $params);
       }
       elseif ($contribution->_component == 'event') {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id);
         
         $sendTemplateParams['tplParams'] = array_merge($tplParams,array('email_comment' => $invoiceElements['params']['email_comment']));
-        $sendTemplateParams['from'] = CRM_Utils_Array::value('confirm_from_name', $values) . ' <' . $mailDetails[$contribution->_relatedObjects['event']->id]['confirm_from_email'].  '>';
+        $sendTemplateParams['from'] = $fromEmailAddress;
         $sendTemplateParams['toEmail'] = $email;
         $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_confirm', $values);
         $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc_confirm', $values);
         
         list($sent, $subject, $message, $html) =  CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        // functions call for adding activity with attachment
+        $fileName = self::putFile($html);
+        self::addActivities($subject, $contribution->contact_id, $fileName, $params);
       }
       
       $updateInvoiceId = CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'invoice_id', $invoiceId);
       if ($contribution->contribution_status_id == $refundedStatusId) {
         $updateInvoiceId = CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'creditnote_id', $creditNoteId);
       }
-      $this->_invoiceTemplate->clearTemplateVars();
+      $invoiceTemplate->clearTemplateVars();
     }
     
     if ($invoiceElements['createPdf']) {
-      CRM_Utils_PDF_Utils::html2pdf($this->_messageInvoice, 'Invoice.pdf', FALSE);
+      CRM_Utils_PDF_Utils::html2pdf($messageInvoice, 'Invoice.pdf', FALSE);
+
+      // functions call for adding activity with attachment
+      $fileName = self::putFile($html);
+      self::addActivities($subject, $contactIds, $fileName, $params['output']);
+      
       CRM_Utils_System::civiExit();
     }
     else {
@@ -404,5 +529,71 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       CRM_Core_Session::setStatus($status, $msgTitle, $msgType);
     }
   }
+
+ /**
+   * 
+   * This function is use for adding activity for 
+   * Email Invoice and the PDF Invoice
+   *
+   * @param string $subject Activity subject 
+   * @param array $contactIds Contact Id
+   * @param string $fileName gives the location with name of the file 
+   * @param array $output for invoices
+   *
+   */
+  public function addActivities($subject, $contactIds, $fileName, $output) {
+    $session        = CRM_Core_Session::singleton();
+    $userID         = $session->get('userID');
+    $config = CRM_Core_Config::singleton();
+    $config->doNotAttachPDFReceipt = 1;
+    if ($output['output'] == 'email_invoice' || (is_array($output) && array_key_exists("from_email_address", $output))) {
+      $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
+        'Emailed Invoice',
+        'name'
+      );
+    } else {
+      $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
+        'Downloaded Invoice',
+        'name'
+      );
+    }
+    $activityParams = array(
+      'subject' => $subject,
+      'source_contact_id' => $userID,
+      'target_contact_id' => $contactIds,
+      'activity_type_id' => $activityTypeID,
+      'activity_date_time' => date('YmdHis'),
+      'attachFile_1' => array ('uri' => $fileName, 
+         'type' => 'application/pdf', 
+         'location' => $fileName, 
+         'upload_date' => date('YmdHis'), 
+       ),
+    );
+    $activity = CRM_Activity_BAO_Activity::create($activityParams);
+  }
+  
+ /**
+   * 
+   * This function is use for creating the Invoice file in upload folder
+   * for attachment
+   *
+   * @param $html content for pdf in html format
+   *
+   * return $fileName of file which is in pdf format
+   *
+   */
+  public function putFile($html) {
+    require_once("packages/dompdf/dompdf_config.inc.php");
+    spl_autoload_register('DOMPDF_autoload');
+    $doc = new DOMPDF();
+    $doc->load_html($html);
+    $doc->render();
+    $html = $doc->output();
+    $config = CRM_Core_Config::singleton();
+    $fileName = $config->uploadDir.'Invoice.pdf';
+    $file = file_put_contents($fileName, $html);
+    return $fileName;
+  }
+
 }
 
