@@ -108,7 +108,10 @@
                     {/if}
                 </div>
                 </fieldset>
-
+            {else}
+                </fieldset>
+            {/if}
+{/if}
                 {if $profileAddressFields}
                   <input type="checkbox" id="billingcheckbox" value="0"> <label for="billingcheckbox">{ts}My billing address is the same as above{/ts}</label>
                 {/if}
@@ -162,9 +165,7 @@
                         </div>
                     </div>
                 </fieldset>
-            {else}
-                </fieldset>
-            {/if}
+
     </div>
 
      {if $profileAddressFields}
@@ -292,5 +293,5 @@ CRM.$(function($) {
 {/literal}
 </script>
 {/if}
-{/if}
+
 {/crmRegion}

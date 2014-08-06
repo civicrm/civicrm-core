@@ -358,6 +358,40 @@ class CRM_Core_Payment_Form {
   }
 
   /**
+   * Function to add address block
+   *
+   * @param $form
+   * @param bool $useRequired
+   *
+   * @return void
+   * @access public
+   */
+  static function buildAddressBlock(&$form, $useRequired = FALSE) {
+    CRM_Core_Payment_Form::_setPaymentFields($form);
+    foreach ($form->_paymentFields as $name => $field) {
+      if (isset($field['cc_field']) &&
+        $field['cc_field']
+      ) {
+        $form->add($field['htmlType'],
+          $field['name'],
+          $field['title'],
+          $field['attributes'],
+          $useRequired ? $field['is_required'] : FALSE
+        );
+      }
+    }
+
+    // also take care of state country widget
+    $stateCountryMap = array(
+      1 => array(
+        'country' => "billing_country_id-{$form->_bltID}",
+        'state_province' => "billing_state_province_id-{$form->_bltID}",
+      )
+    );
+    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
+  }
+
+  /**
    * Make sure that credit card number and cvv are valid
    * Called within the scope of a QF formRule function
    */
