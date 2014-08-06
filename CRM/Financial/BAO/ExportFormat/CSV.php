@@ -177,12 +177,14 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
         }
 
         $financialItems[] = array(
+          'Internal ID' => $dao->financial_trxn_id,
           'Transaction Date' => $dao->trxn_date,
           'Debit Account' => $dao->to_account_code,
           'Debit Account Name' => $dao->to_account_name,
           'Debit Account Type' => $dao->to_account_type_code,
           'Debit Account Amount (Unsplit)' => $dao->debit_total_amount,
           'Transaction ID (Unsplit)' => $dao->trxn_id,
+          'Debit amount (Split)' => $dao->amount,
           'Payment Instrument' => $dao->payment_instrument,
           'Check Number' => $dao->check_number,
           'Source' => $dao->source,
