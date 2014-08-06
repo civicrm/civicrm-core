@@ -71,7 +71,7 @@
                   {if $element.is_display_amounts && $element.html_type eq 'Text'}
                     <span class="price-field-amount">
                       {foreach item=option from=$element.options}
-		        {if $option.tax_amount || $option.tax_amount == "0" && $displayOpt}
+		        {if ($option.tax_amount || $option.tax_amount == "0") && $displayOpt}
 			  {assign var="amount" value=`$option.amount+$option.tax_amount`}
 			  {if $displayOpt == 'Do_not_show'}
 			    {$amount|crmMoney}
