@@ -1299,12 +1299,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       if (!$this->_onlinePendingContributionId) {
         if (empty($formValues['source'])) {
-          $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)',
-                                                  array(1 => $membershipType, 2 => $userName)
-                                                  );
+          $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)', array(1 => $membershipType, 2 => $userName));
         }
         else {
-            $params['contribution_source'] = $formValues['source'];	
+          $params['contribution_source'] = $formValues['source'];	
         }
       }	
 
