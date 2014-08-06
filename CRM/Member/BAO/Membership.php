@@ -1270,7 +1270,11 @@ AND civicrm_membership.is_test = %2";
         $contributionTypeId = CRM_Utils_Array::value('financial_type_id' ,$membershipParams);
       }
     }
-
+    
+    if (CRM_Utils_Array::value('membership_source', $form->_params)) {
+      $membershipParams['contribution_source'] = $form->_params['membership_source'];
+    }
+ 
     //amount must be greater than zero for
     //adding contribution record  to contribution table.
     //this condition arises when separate membership payment is

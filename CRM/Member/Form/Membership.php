@@ -1298,10 +1298,15 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
 
       if (!$this->_onlinePendingContributionId) {
-        $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)',
-          array(1 => $membershipType, 2 => $userName)
-        );
-      }
+        if (empty($formValues['source'])) {
+          $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)',
+                                                  array(1 => $membershipType, 2 => $userName)
+                                                  );
+        }
+        else {
+            $params['contribution_source'] = $formValues['source'];	
+        }
+      }	
 
       if (empty($params['is_override']) &&
         CRM_Utils_Array::value('contribution_status_id', $params) == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'))
