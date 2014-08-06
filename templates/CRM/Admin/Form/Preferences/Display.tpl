@@ -262,9 +262,9 @@
         var invoicesKey = '{/literal}{$invoicesKey}{literal}';
         var invoicing = '{/literal}{$invoicing}{literal}';
         if (!invoicing) {
-          cj('#user_dashboard_options_'+invoicesKey).attr("disabled", true);
+          cj('#user_dashboard_options_' + invoicesKey).attr("disabled", true);
         }
-        cj("#invoice_help").insertAfter("label[for='user_dashboard_options_"+invoicesKey+"']");
+        cj("#invoice_help").insertAfter("label[for='user_dashboard_options_" + invoicesKey + "']");
       });
     </script>
   {/literal}

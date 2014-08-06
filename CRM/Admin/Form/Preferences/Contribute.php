@@ -113,21 +113,19 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
 
     // to set default value for 'Invoices / Credit Notes' checkbox on display preferences
     $values = CRM_Core_BAO_Setting::getItem("CiviCRM Preferences");
-    $optionValues = CRM_Core_BAO_OptionValue::getOptionValuesAssocArrayFromName("user_dashboard_options");
+    $optionValues = CRM_Core_OptionGroup::values('user_dashboard_options', FALSE, FALSE, FALSE, NULL, 'name');
     $setKey = array_search('Invoices / Credit Notes', $optionValues);
 
     if (isset($params['invoicing'])) {
       $value = array($setKey => $optionValues[$setKey]);
-      $setInvoice = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                    array_keys($value)) . CRM_Core_DAO::VALUE_SEPARATOR;
-      CRM_Core_BAO_Setting::setItem($values['user_dashboard_options'].$setInvoice, 'CiviCRM Preferences', 'user_dashboard_options');
+      $setInvoice = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($value)) . CRM_Core_DAO::VALUE_SEPARATOR;
+      CRM_Core_BAO_Setting::setItem($values['user_dashboard_options'] . $setInvoice, 'CiviCRM Preferences', 'user_dashboard_options');
     }
     else {
       $setting = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($values['user_dashboard_options'], 1, -1));
       $invoiceKey = array_search ($setKey, $setting);
       unset($setting[$invoiceKey]);
-      $settingName = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                     array_values($setting)) . CRM_Core_DAO::VALUE_SEPARATOR;
+      $settingName = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, array_values($setting)) . CRM_Core_DAO::VALUE_SEPARATOR;
       CRM_Core_BAO_Setting::setItem($settingName, 'CiviCRM Preferences', 'user_dashboard_options');
     }
   }
