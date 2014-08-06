@@ -139,6 +139,19 @@ class CRM_Contribute_Form_AdditionalInfo {
         array('CRM_Contribute_DAO_Contribution', $form->_id, 'invoice_id')
       );
     }
+    $element = $form->add('text', 'creditnote_id', ts('Credit Note ID'),
+      $attributes['creditnote_id']
+    );
+    if ($form->_online) {
+      $element->freeze();
+    }
+    else {
+      $form->addRule('creditnote_id',
+        ts('This Credit Note ID already exists in the database.'),
+        'objectExists',
+        array('CRM_Contribute_DAO_Contribution', $form->_id, 'creditnote_id')
+      );
+    }
 
     $form->add('select', 'contribution_page_id',
       ts('Online Contribution Page'),
@@ -286,6 +299,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       'net_amount',
       'trxn_id',
       'invoice_id',
+      'creditnote_id',
       'campaign_id',
       'contribution_page_id',
     );
