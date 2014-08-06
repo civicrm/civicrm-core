@@ -88,8 +88,8 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
                      )    
                );
     $this->add('checkbox', 'is_email_pdf', ts('Automatically email invoice when user purchases online'));
-    $this->add('checkbox', 'invoicing', ts('Sales Taxes and Invoicing'));
     $this->addWysiwyg('notes', ts('Notes or Standard Terms'), array('rows' => 2, 'cols' => 40));
+    $this->add('checkbox', 'invoicing', ts('Enable Tax and Invoicing'));
     parent::buildQuickForm();
   }
 
@@ -117,6 +117,24 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
     $setInvoiceSettings = CRM_Core_BAO_Setting::setItem($params, CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+
+    // to set default value for 'Invoices / Credit Notes' checkbox on display preferences
+    $values = CRM_Core_BAO_Setting::getItem("CiviCRM Preferences");
+    $optionValues = CRM_Core_OptionGroup::values('user_dashboard_options', FALSE, FALSE, FALSE, NULL, 'name');
+    $setKey = array_search('Invoices / Credit Notes', $optionValues);
+
+    if (isset($params['invoicing'])) {
+      $value = array($setKey => $optionValues[$setKey]);
+      $setInvoice = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($value)) . CRM_Core_DAO::VALUE_SEPARATOR;
+      CRM_Core_BAO_Setting::setItem($values['user_dashboard_options'] . $setInvoice, 'CiviCRM Preferences', 'user_dashboard_options');
+    }
+    else {
+      $setting = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($values['user_dashboard_options'], 1, -1));
+      $invoiceKey = array_search ($setKey, $setting);
+      unset($setting[$invoiceKey]);
+      $settingName = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, array_values($setting)) . CRM_Core_DAO::VALUE_SEPARATOR;
+      CRM_Core_BAO_Setting::setItem($settingName, 'CiviCRM Preferences', 'user_dashboard_options');
+    }
   }
 }
 
