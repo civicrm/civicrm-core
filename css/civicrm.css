@@ -2895,7 +2895,6 @@ div.grippie {
 
 #civicrm-menu #crm-qsearch {
   padding: 1px 3px 1px 2px;
-  height: 20px;
   background-color: #000 !important;
 }
 
@@ -2904,12 +2903,16 @@ div.grippie {
   border: 1px solid black;
   margin: 0px;
   padding: 2px 16px 3px 2px;
-  height: 17px;
+  height: 16px;
 }
 #civicrm-menu #crm-qsearch input:hover,
 #civicrm-menu #crm-qsearch input:focus,
 #civicrm-menu #crm-qsearch.activetarget input {
   background-color: #ffffff;
+}
+/* This ensures the drop-down menus appear at the right height */
+#civicrm-menu > li.menumain {
+  height: 19px !important;
 }
 
 /* Status message box */
