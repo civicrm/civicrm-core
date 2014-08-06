@@ -108,6 +108,12 @@ class CRM_Core_Payment_ProcessorForm {
       $form->assign('profileAddressFields', $profileAddressFields);
     }
 
+    // check if show billing setting is enabled
+    if ($form->getVar( '_ppType' ) == 0 && $form->_isBillingAddressRequiredForPayLater) {
+      CRM_Core_Payment_Form::buildAddressBlock($form);
+      return;
+    }
+
     // before we do this lets see if the payment processor has implemented a buildForm method
     if (method_exists($form->_paymentProcessor['instance'], 'buildForm') &&
       is_callable(array($form->_paymentProcessor['instance'], 'buildForm'))) {

@@ -651,7 +651,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     //unset the billing parameters if it is pay later mode
     //to avoid creation of billing location
-    if ($params['is_pay_later']) {
+    if ($params['is_pay_later'] && !$this->_isBillingAddressRequiredForPayLater) {
       $billingFields = array(
         'billing_first_name',
         'billing_middle_name',
