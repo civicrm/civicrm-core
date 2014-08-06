@@ -71,22 +71,19 @@
                   {if $element.is_display_amounts && $element.html_type eq 'Text'}
                     <span class="price-field-amount">
                       {foreach item=option from=$element.options}
-		        {if $option.tax_amount && $displayOpt}
+		        {if ($option.tax_amount || $option.tax_amount == "0") && $displayOpt}
 			  {assign var="amount" value=`$option.amount+$option.tax_amount`}
 			  {if $displayOpt == 'Do_not_show'}
 			    {$amount|crmMoney}
 			  {elseif $displayOpt == 'Inclusive'}
 			    {$amount|crmMoney}
-			    <span class='crm-price-amount-label'> (includes {$option.tax_rate|round:2}% VAT - {$option.tax_amount|crmMoney})</span>
+			    <span class='crm-price-amount-label'> (includes {$taxTerm} of {$option.tax_amount|crmMoney})</span>
 			  {else}
 			    {$option.amount|crmMoney}
-			    <span class='crm-price-amount-label'> + {$option.tax_rate|round:2}% VAT - {$option.tax_amount|crmMoney}</span>
+			    <span class='crm-price-amount-label'> + {$option.tax_amount|crmMoney} {$taxTerm}</span>
 			  {/if}
 			{else}
 			  {$option.amount|crmMoney}
-			  {if $option.tax_amount == "0" && $displayOpt != 'Do_not_show'}
-			    <span class='crm-price-amount-label'>{ts} VAT (exempt){/ts}</span>
-			  {/if}
 			{/if}
 		      {/foreach}
                     </span>
