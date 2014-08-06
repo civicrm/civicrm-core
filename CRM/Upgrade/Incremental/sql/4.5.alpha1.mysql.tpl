@@ -545,3 +545,23 @@ INSERT INTO `civicrm_navigation`
         ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
   ( {$domainID}, 'civicrm/admin/setting/preferences/contribute',      '{ts escape="sql" skip="true"}CiviContribute Component Settings{/ts}', 'CiviContribute Component Settings', 'administer CiviCRM', '', @parent_id, '1', NULL, @add_weight_id + 1 );
+
+-- New activity types required for Print and Email Invoice
+SELECT @option_group_id_act_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_act;
+SELECT @option_group_id_act_val := MAX(CAST( `value` AS UNSIGNED )) FROM civicrm_option_value WHERE option_group_id = @option_group_id_act;
+
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
+VALUES
+   (@option_group_id_act, {localize}'{ts escape="sql"}Downloaded Invoice{/ts}'{/localize}, @option_group_id_act_val+1, 'Downloaded Invoice', NULL, 1, NULL, @option_group_id_act_wt+1, {localize}'{ts escape="sql"}Downloaded Invoice.{/ts}'{/localize}, 0, 1, 1, NULL, NULL),
+   (@option_group_id_act, {localize}'{ts escape="sql"}Emailed Invoice{/ts}'{/localize}, @option_group_id_act_val+2, 'Emailed Invoice', NULL, 1, NULL, @option_group_id_act_wt+2, {localize}'{ts escape="sql"}Emailed Invoice.{/ts}'{/localize}, 0, 1, 1, NULL, NULL);
+
+-- New option for Contact Dashboard
+SELECT @option_group_id_udOpt     := max(id) from civicrm_option_group where name = 'user_dashboard_options';
+SELECT @option_group_id_udOpt_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_udOpt;
+SELECT @option_group_id_udOpt_val := MAX(CAST( `value` AS UNSIGNED )) FROM civicrm_option_value WHERE option_group_id = @option_group_id_udOpt;
+
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
+VALUES
+   (@option_group_id_udOpt, {localize}'{ts escape="sql"}Invoices / Credit Notes{/ts}'{/localize}, @option_group_id_udOpt_val+1, 'Invoices / Credit Notes', NULL, 0, NULL, @option_group_id_udOpt_wt+1, NULL, 0, 0, 1, NULL, NULL);
