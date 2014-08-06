@@ -1236,10 +1236,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
       if ($proceFieldAmount) {
         $lineItem[$params['priceSetId']][$fieldOption]['unit_price'] = $proceFieldAmount;
+        $lineItem[$params['priceSetId']][$fieldOption]['line_total'] = $proceFieldAmount;
         if (isset($lineItem[$params['priceSetId']][$fieldOption]['tax_amount'])) {
           $proceFieldAmount += $lineItem[$params['priceSetId']][$fieldOption]['tax_amount'];
         }
-        $lineItem[$params['priceSetId']][$fieldOption]['line_total'] = $proceFieldAmount;
         if (!$this->_membershipBlock['is_separate_payment']) {
           $params['amount'] = $proceFieldAmount; //require when separate membership not used
         }

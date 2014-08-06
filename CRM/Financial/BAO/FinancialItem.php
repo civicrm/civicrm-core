@@ -122,14 +122,9 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       CRM_Financial_BAO_FinancialTypeAccount::retrieve( $searchParams, $result );
       $params['financial_account_id'] = CRM_Utils_Array::value( 'financial_account_id', $result );
     }
+    $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
+    $trxnId['id'] = $trxn['financialTrxnId'];
 
-    if ($taxTrxnID) {
-      $trxnId['id'] = $contribution->tax_trxn_id;
-    }
-    else {
-      $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
-      $trxnId['id'] = $trxn['financialTrxnId'];
-    }
     return self::create($params, NULL, $trxnId);
   }
 
