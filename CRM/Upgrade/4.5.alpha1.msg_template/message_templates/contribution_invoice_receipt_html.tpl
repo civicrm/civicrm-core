@@ -8,99 +8,99 @@
     <table style = "margin-top:2px;padding-left:29px;">
       <tr>
         <td><img src = "{$imageUploadURL}/logo.png" height = "39" width = "108"></td>
-	</tr>
+      </tr>
     </table>
     <center>
       <br/><br/>
-      <table style = "padding-right:19px;" width = "500" height = "100" border = "0" cellpadding = "2" cellspacing = "1">
+      <table style = "padding-right:19px;font-family: Arial, Verdana, sans-serif;" width = "500" height = "100" border = "0" cellpadding = "2" cellspacing = "1">
 	<tr>
-          {if $contribution_status_id == $refundedStatusId}
-            <td style = "padding-left:35px;" ><b><font size = "3" align = "center">CREDIT NOTE</font></b></td>
-            {else}
-              <td style = "padding-left:35px;" ><b><font size = "3" align = "center">TAX INVOICE</font></b></td>
-          {/if}
+
+              <td style = "padding-left:35px;" ><b><font size = "4" align = "center">TAX INVOICE</font></b></td>
+        
           <td colspan = "1"></td>
-          {if $contribution_status_id == $refundedStatusId}
-            <td style = "padding-left:88px;"><b><font size = "1" align = "right">Date:</font></b></td> 
-            {else}
-              <td style = "padding-left:88px;"><b><font size = "1" align = "right">Invoice Date:</font></b></td> 
-          {/if}
-          <td ><b><font size = "1" align = "right">{$organization_name}</font></b></td>       
+         
+              <td style = "padding-left:88px;"><b><font size = "1" align = "center" >Invoice Date:</font></b></td> 
+          
+          <td style="padding-top:13px" ><font size = "1" align = "right">{$organization_name}</font></td>
 	</tr>
         <tr>
          {if $organization_name}
-           <td style = "padding-left:48px;"><font size = "1" align = "center">{$display_name}  ({$organization_name})</font></td>
+           <td style = "padding-left:37px;"><font size = "1" align = "center" >{$display_name}  ({$organization_name})</font></td>
            {else}
-             <td style = "padding-left:48px;"><font size = "1" align = "center">{$display_name}</font></td>
+             <td style = "padding-left:37px;"><font size = "1" align = "center" >{$display_name}</font></td>
          {/if}
          <td colspan = "1"></td>
          <td style = "padding-left:88px;"><font size = "1" align = "right">{$invoice_date}</font></td>  
 	</tr>
         <tr>
-          <td style = "padding-left:48px;"><font size = "1" align = "center">{$street_address}   {$supplemental_address_1}</font></td>
+          <td style = "padding-left:37px;"><font size = "1" align = "center">{$street_address}   {$supplemental_address_1}</font></td>
           <td colspan = "1"></td>
-          {if $contribution_status_id == $refundedStatusId}
-            <td style = "padding-left:88px;"><b><font size = "1" align = "right">Credit Note Number:</font></b></td>     
-            {else}
               <td style = "padding-left:88px;"><b><font size = "1" align = "right">Incoice Number:</font></b></td> 
-          {/if}
+
         </tr>
         <tr>
-          <td style = "padding-left:48px;"><font size = "1" align = "center">{$supplemental_address_2}  {$stateProvinceAbbreviation}</font></td>
+          <td style = "padding-left:37px;"><font size = "1" align = "center">{$supplemental_address_2}  {$stateProvinceAbbreviation}</font></td>
           <td colspan="1"></td>
           <td style = "padding-left:88px;"><font size = "1" align = "right">{$invoice_id}</font></td>
 	</tr>
 	<tr>
-          <td style = "padding-left:48px;"><font size = "1" align = "right">{$city}  {$postal_code}</font></td>    
+          <td style = "padding-left:37px;"><font size = "1" align = "right">{$city}  {$postal_code}</font></td>    
           <td colspan="1"></td>
-          <td height = "10" style = "padding-left:88px;"><b><font size = "1"align = "right">Reference: {$title}</font></b></td>  
+	   <td height = "10" style = "padding-left:88px;"><b><font size = "1"align = "right">Reference:</font></b></td>
+	</tr>
+	<tr>
+	  <td></td>
+	  <td></td>
+	  <td style = "padding-left:88px;"><font size = "1"align = "right">{$title}</font></td>  
 	</tr>
       </table>
 
-      <table style = "margin-top:75px;padding-right:20px;" width = "590" border = "0"cellpadding = "-5" cellspacing = "19" id = "desc">
+      <table style = "margin-top:75px;padding-right:20px;font-family: Arial, Verdana, sans-serif" width = "590" border = "0"cellpadding = "-5" cellspacing = "19" id = "desc">
 	<tr>
           <td colspan = "2" {$valueStyle}>
             <table> {* FIXME: style this table so that it looks like the text version (justification, etc.) *}
               <tr>
-                <th style = "padding-right:30px;"><center><b><font size = "1" align = "center">Description</font></b></center></th>
-                <th style = "padding-left:30px;"><center><b><font size = "1" align = "center">Quantity</font> </b></center></th>
-                <th style = "padding-left:30px;"><center><b><font size = "1" align = "center">Unit Price</font></b></center></th>
-                <th style = "padding-left:33px;"><center><b><font size = "1" align = "center">VAT </font></b></center></th>
-                <th style = "padding-left:30px;"><center><b><font size = "1" align = "center">Amount {$defaultCurrency}</font></b></center></th>
+                <th style = "padding-right:34px;text-align:left;font-weight:bold;width:200px;"><font size = "1">Description</font></th>
+                <th style = "padding-left:34px;text-align:right;font-weight:bold;" ><font size = "1">Quantity</font></th>
+                <th style = "padding-left:34px;text-align:right;font-weight:bold;"><font size = "1">Unit Price</font></th>
+                <th style = "padding-left:34px;text-align:right;font-weight:bold;width:20px;"><font size = "1">{$taxTerm} </font></th>
+                <th style = "padding-left:34px;text-align:right;font-weight:bold;"><font size = "1">Amount {$defaultCurrency}</font></th>
               </tr>
-              {foreach from=$lineItem item=value key=priceset}
-	        <tr><td  colspan = "5" style = "color:#F5F5F5;"><hr></hr></td></tr>
+              {foreach from=$lineItem item=value key=priceset name=taxpricevalue}
+		{if $smarty.foreach.taxpricevalue.index eq 0}
+	        <tr><td  colspan = "5" ><hr size="3" style = "color:#000;"></hr></td></tr>
+		{else}
+		<tr><td  colspan = "5" style = "color:#F5F5F5;"><hr></hr></td></tr>
+		{/if}
                 <tr>
-                  <td><font size = "1" align = "center">
+                  <td style="text-align:left;" ><font size = "1">
 		  {if $value.html_type eq 'Text'}{$value.label}{else}{$value.field_title} - {$value.label}{/if} {if $value.description}<div>{$value.description|truncate:30:"..."}</div>{/if}
 		  </font></td>
-		  <td style = "padding-left:52px;"><font size = "1" align = "center"> {$value.qty}</font></td>
-		  <td style = "padding-left:52px;"><font size = "1" align = "center"> {$value.unit_price|crmMoney:$currency}</font></td>
-		    {if $value.tax_rate}
-		      <td style = "padding-left:52px;"><center><font size = "1" align = "center"> {$value.tax_rate}%</font></center></td>
-		      {elseif $value.tax_amount != ''}
-		        <td style = "padding-left:52px;"><center><font size = "1" align = "center">VAT (exempt)</font></center></td>
+		  <td style = "padding-left:34px;text-align:right;"><font size = "1"> {$value.qty}</font></td>
+		  <td style = "padding-left:34px;text-align:right;"><font size = "1"> {$value.unit_price|crmMoney:$currency}</font></td>
+		    {if $value.tax_amount != ''}
+		      <td style = "padding-left:34px;text-align:right;width:20px;"><font size = "1"> {$value.tax_rate}%</font></td>
                         {else}
-		          <td style = "padding-left:52px;"><center><font size = "1" align = "center"></font>No VAT</center></td>
+		          <td style = "padding-left:34px;text-align:right;width:20px;"><font size = "1">No {$taxTerm}</font></td>
 	            {/if}
-		    <td style = "padding-left:52px;"><font size = "1" align = "center">{$value.subTotal|crmMoney:$currency}</font></td>
+		    <td style = "padding-left:34px;text-align:right;"><font size = "1">{$value.subTotal|crmMoney:$currency}</font></td>
 		</tr>
                 {/foreach}
 	        <tr><td  colspan = "5" style = "color:#F5F5F5;"><hr></hr></td></tr>
 	        <tr>
 		  <td colspan = "3"></td>
-		  <td style = "padding-left:52px;"><font size = "1" align = "right">Sub Total</font></td>
-		  <td style = "padding-left:52px;"><font size = "1" align = "center"> {$subTotal|crmMoney:$currency}</font></td>
+		  <td style = "padding-left:34px;text-align:right;"><font size = "1">Sub Total</font></td>
+		  <td style = "padding-left:34px;text-align:right;"><font size = "1"> {$subTotal|crmMoney:$currency}</font></td>
 		</tr>
 		{foreach from = $dataArray item = value key = priceset}
 	          <tr>
 		    <td colspan = "3"></td>
 		    {if $priceset}
-		      <td style = "padding-left:52px;"><font size = "1" align="right"> TOTAL VAT {$priceset}%</font></td>    
-		      <td style = "padding-left:52px;"><font size = "1" align = "right">{$value|crmMoney:$currency}</font> </td>
+		      <td style = "padding-left:34px;text-align:right;"><font size = "1"> TOTAL {$taxTerm} {$priceset}%</font></td>    
+		      <td style = "padding-left:34px;text-align:right"><font size = "1" align = "right">{$value|crmMoney:$currency}</font> </td>
                       {elseif $priceset == 0}
-                        <td style = "padding-left:52px;"><font size = "1" align = "right">TOTAL NO VAT</font></td>
-                        <td style = "padding-left:52px;"><font size = "1" align = "right">{$value|crmMoney:$currency}</font> </td>
+                        <td style = "padding-left:34px;text-align:right;"><font size = "1">TOTAL NO {$taxTerm}</font></td>
+                        <td style = "padding-left:34px;text-align:right"><font size = "1" align = "right">{$value|crmMoney:$currency}</font> </td>
                   </tr>
 		    {/if}
 		{/foreach}
@@ -111,19 +111,23 @@
 
 	        <tr>
 		  <td colspan = "3"></td>
-		  <td style = "padding-left:52px;"><b><font size = "1" align = "right">TOTAL {$defaultCurrency}</font></b></td>
-		  <td style = "padding-left:52px;"><font size = "1" align = "center">{$amount|crmMoney:$currency}</font></td>     
+		  <td style = "padding-left:34px;text-align:right;"><b><font size = "1">TOTAL {$defaultCurrency}</font></b></td>
+		  <td style = "padding-left:34px;text-align:right;"><font size = "1">{$amount|crmMoney:$currency}</font></td>     
 		</tr>
 
 		{if $is_pay_later == 0}
 	          <tr>
 		    <td colspan = "3"></td>
-		    {if $contribution_status_id == $refundedStatusId}
-		      <td style = "padding-left:52px;"><font size = "1" align = "right">LESS Credit to invoice(s)</font></td>
-		      {else}
-		        <td style = "padding-left:52px;"><font size = "1" align = "righ">LESS Amount Paid</font></td>
-		    {/if}
-		    <td style = "padding-left:52px;"><font size = "1" align = "right">{$amount|crmMoney:$currency}</font></td>
+		   
+		        <td style = "padding-left:34px;text-align:right;"><font size = "1">
+			{if $contribution_status_id == $refundedStatusId}
+			    LESS Amount Credited
+			{else}
+			    LESS Amount Paid
+			{/if}
+			</font></td>
+		
+		    <td style = "padding-left:34px;text-align:right;"><font size = "1">{$amount|crmMoney:$currency}</font></td>
 		  </tr>
 	          <tr>
 		    <td colspan = "3"></td>
@@ -131,14 +135,11 @@
 		  </tr>
 	          <tr>
 		    <td colspan = "3"></td>
-		    {if $contribution_status_id == $refundedStatusId}
-		      <td style = "padding-left:52px;"><b><font size = "1" align = "center">REMAINING CREDIT</font></b></td>
-		      <td style = "padding-left:52px;"><b><font size = "1" align = "center">{$amountDue|crmMoney:$currency}</font></b></td>
-		      {else}
-		        <td style = "padding-left:52px;"><b><font size = "1" align = "center">AMOUNT DUE: </font></b></td> 
-                        <td style = "padding-left:52px;"><b><font size = "1" align = "center">{$amountDue|crmMoney:$currency}</font></b></td> 
-                    {/if}
-		    <td style = "padding-left:52px;"><font size = "1" align = "right"></fonts></td>
+		    
+		        <td style = "padding-left:34px;text-align:right;"><b><font size = "1">AMOUNT DUE: </font></b></td> 
+                        <td style = "padding-left:34px;text-align:right;"><b><font size = "1">{$amountDue|crmMoney:$currency}</font></b></td> 
+                    
+		    <td style = "padding-left:34px;"><font size = "1" align = "right"></fonts></td>
 		  </tr>
 		{/if}
 		<br/><br/><br/>
@@ -146,11 +147,208 @@
 		  <td colspan = "3"></td>
 		</tr>
 	        <tr>
-		  {if $contribution_status_id == $refundedStatusId}
-		    <td ></td>
-		    {else}
+		 
 		      <td><b><font size = "1" align = "center">DUE DATE: {$dueDate}</font></b></td>
-                  {/if}
+                 
+		  <td colspan = "3"></td>
+		</tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <table style = "margin-top:5px;padding-right:45px;">
+        <tr>
+          <td><img src = "{$imageUploadURL}/img.png" height = "15" width = "630"></td>
+        </tr>
+      </table>
+	<table style = "margin-top:6px;padding-right:30px;font-family: Arial, Verdana, sans-serif" width = "585" border = "0"cellpadding = "-10" cellspacing="19" id = "desc">
+	  <tr>
+	    <td><b><font size = "4" align = "right">PAYMENT ADVICE</font></b> <br/><br/> <b><font size = "1" align = "right">To:            
+              {$organization_name}</font></b><br/><br/><font size="1" align="right">{$notes}</font>
+            </td>
+            <td>
+	      <table  cellpadding = "-10" cellspacing = "22"  align="center" style="margin-left:40px;">
+		<tr>
+	          <td  colspan = "2"></td>
+		  <td><font size = "1" align = "right" style="font-weight:bold;">Customer: </font></td>
+		  <td ><font size = "1" align = "right">{$display_name}</font></td>   
+		</tr>
+		<tr>
+		  <td colspan = "2"></td>
+		  <td><font size = "1" align = "right" style="font-weight:bold;">Invoice Number: </font></td>
+		  <td><font size = "1" align = "right">{$invoice_id}</font></td>   
+		</tr>
+		<tr><td  colspan = "5"style = "color:#F5F5F5;"><hr></hr></td></tr>
+		{if $is_pay_later == 1}       
+		<tr>
+                  <td colspan = "2"></td>
+                  <td><font size = "1" align = "right" style="font-weight:bold;">Amount Due:</font></td> 
+                  <td><font size = "1" align = "right" style="font-weight:bold;">{$amount|crmMoney:$currency}</font></td> 
+		</tr>
+		{else}
+		<tr>
+		  <td colspan = "2"></td>
+		  <td><font size = "1" align = "right" style="font-weight:bold;">Amount Due: </font></td>
+		  <td><font size = "1" align = "right" style="font-weight:bold;">{$amountDue|crmMoney:$currency}</font></td>   
+		</tr>
+		{/if}
+		<tr>   
+		  <td colspan = "2"></td>
+		  <td><font size = "1" align = "right" style="font-weight:bold;">Due Date:  </font></td>
+		  <td><font size = "1" align = "right">{$dueDate}</font></td>   
+		</tr>
+		<tr>
+                  <td colspan = "5" style = "color:#F5F5F5;"><hr></hr></td>
+                </tr>
+	      </table>
+            </td>
+	  </tr>   
+	</table>
+	
+	
+      {if $contribution_status_id == $refundedStatusId}
+    <table style = "margin-top:2px;padding-left:29px;page-break-before: always;">
+      <tr>
+        <td><img src = "{$imageUploadURL}/logo.png" height = "39" width = "108"></td>
+      </tr>
+    </table>
+    <center>
+      <br/><br/>
+      <table style = "padding-right:19px;font-family: Arial, Verdana, sans-serif" width = "500" height = "100" border = "0" cellpadding = "2" cellspacing = "1">
+	<tr>
+          
+            <td style = "padding-left:35px;" ><b><font size = "4" align = "center">CREDIT NOTE</font></b></td>
+            
+         
+          <td colspan = "1"></td>
+          
+            <td style = "padding-left:88px;"><b><font size = "1" align = "right">Date:</font></b></td> 
+            
+          <td style="padding-top:13px"><font size = "1" align = "right" style="font-weight:normal;">{$organization_name}</font></td>       
+	</tr>
+        <tr>
+         {if $organization_name}
+           <td style = "padding-left:37px;"><font size = "1" align = "center">{$display_name}  ({$organization_name})</font></td>
+           {else}
+             <td style = "padding-left:37px;"><font size = "1" align = "center">{$display_name}</font></td>
+         {/if}
+         <td colspan = "1"></td>
+         <td style = "padding-left:88px;"><font size = "1" align = "right">{$invoice_date}</font></td>  
+	</tr>
+        <tr>
+          <td style = "padding-left:37px;"><font size = "1" align = "center">{$street_address}   {$supplemental_address_1}</font></td>
+          <td colspan = "1"></td>
+         
+            <td style = "padding-left:88px;"><b><font size = "1" align = "right">Credit Note Number:</font></b></td>     
+           
+        </tr>
+        <tr>
+          <td style = "padding-left:37px;"><font size = "1" align = "center">{$supplemental_address_2}  {$stateProvinceAbbreviation}</font></td>
+          <td colspan="1"></td>
+          <td style = "padding-left:88px;"><font size = "1" align = "right">{$creditnote_id}</font></td>
+	</tr>
+	<tr>
+          <td style = "padding-left:37px;"><font size = "1" align = "right">{$city}  {$postal_code}</font></td>    
+          <td colspan="1"></td>
+          <td height = "10" style = "padding-left:88px;"><b><font size = "1"align = "right">Reference:</font></b></td>  
+	</tr>
+	<tr>
+          <td></td>    
+          <td></td>
+          <td style = "padding-left:88px;"><font size = "1"align = "right">{$title}</font></td>  
+	</tr>
+      </table>
+
+      <table style = "margin-top:75px;padding-right:20px;font-family: Arial, Verdana, sans-serif" width = "590" border = "0"cellpadding = "-5" cellspacing = "19" id = "desc">
+	<tr>
+          <td colspan = "2" {$valueStyle}>
+            <table> {* FIXME: style this table so that it looks like the text version (justification, etc.) *}
+              <tr>
+                <th style = "padding-right:28px;text-align:left;font-weight:bold;width:200px;"><font size = "1">Description</font></th>
+                <th style = "padding-left:28px;text-align:right;font-weight:bold;"><font size = "1">Quantity</font></th>
+                <th style = "padding-left:28px;text-align:right;font-weight:bold;"><font size = "1">Unit Price</font></th>
+                <th style = "padding-left:28px;text-align:right;font-weight:bold;"><font size = "1">{$taxTerm} </font></th>
+                <th style = "padding-left:28px;text-align:right;font-weight:bold;"><font size = "1">Amount {$defaultCurrency}</font></th>
+              </tr>
+              {foreach from=$lineItem item=value key=priceset name=pricevalue}
+		{if $smarty.foreach.pricevalue.index eq 0}
+	        <tr><td  colspan = "5" ><hr size="3" style = "color:#000;"></hr></td></tr>
+		{else}
+		<tr><td  colspan = "5" style = "color:#F5F5F5;"><hr></hr></td></tr>
+		{/if}
+                <tr>
+                  <td style ="text-align:left;"  ><font size = "1">
+		  {if $value.html_type eq 'Text'}{$value.label}{else}{$value.field_title} - {$value.label}{/if} {if $value.description}<div>{$value.description|truncate:30:"..."}</div>{/if}
+		  </font></td>
+		  <td style = "padding-left:28px;text-align:right;"><font size = "1"> {$value.qty}</font></td>
+		  <td style = "padding-left:28px;text-align:right;"><font size = "1"> {$value.unit_price|crmMoney:$currency}</font></td>
+		    {if $value.tax_amount != ''}
+		      <td style = "padding-left:28px;text-align:right;"><font size = "1"> {$value.tax_rate}%</font></td>
+                        {else}
+		          <td style = "padding-left:28px;text-align:right"><font size = "1" >No {$taxTerm}</font></td>
+	            {/if}
+		    <td style = "padding-left:28px;text-align:right;"><font size = "1" >{$value.subTotal|crmMoney:$currency}</font></td>
+		</tr>
+                {/foreach}
+	        <tr><td  colspan = "5" style = "color:#F5F5F5;"><hr></hr></td></tr>
+	        <tr>
+		  <td colspan = "3"></td>
+		  <td style = "padding-left:28px;text-align:right;"><font size = "1">Sub Total</font></td>
+		  <td style = "padding-left:28px;text-align:right;"><font size = "1"> {$subTotal|crmMoney:$currency}</font></td>
+		</tr>
+		{foreach from = $dataArray item = value key = priceset}
+	          <tr>
+		    <td colspan = "3"></td>
+		    {if $priceset}
+		      <td style = "padding-left:28px;text-align:right;"><font size = "1"> TOTAL {$taxTerm} {$priceset}%</font></td>    
+		      <td style = "padding-left:28px;text-align:right;"><font size = "1" align = "right">{$value|crmMoney:$currency}</font> </td>
+                      {elseif $priceset == 0}
+                        <td style = "padding-left:28px;text-align:right;"><font size = "1">TOTAL NO {$taxTerm}</font></td>
+                        <td style = "padding-left:28px;text-align:right;"><font size = "1" align = "right">{$value|crmMoney:$currency}</font> </td>
+                  </tr>
+		    {/if}
+		{/foreach}
+	        <tr>
+		  <td colspan = "3"></td>
+		  <td colspan = "2"><hr></hr></td>
+		</tr>
+
+	        <tr>
+		  <td colspan = "3"></td>
+		  <td style = "padding-left:28px;text-align:right;"><b><font size = "1">TOTAL {$defaultCurrency}</font></b></td>
+		  <td style = "padding-left:28px;text-align:right;"><font size = "1">{$amount|crmMoney:$currency}</font></td>     
+		</tr>
+
+		{if $is_pay_later == 0}
+	          <tr>
+		    <td colspan = "3"></td>
+		  
+		      <td style = "padding-left:28px;text-align:right;"><font size = "1" >LESS Credit to invoice(s)</font></td>
+		      
+		    <td style = "padding-left:28px;text-align:right;"><font size = "1">{$amount|crmMoney:$currency}</font></td>
+		  </tr>
+	          <tr>
+		    <td colspan = "3"></td>
+		    <td colspan = "2" ><hr></hr></td>
+		  </tr>
+	          <tr>
+		    <td colspan = "3"></td>
+		   
+		      <td style = "padding-left:28px;text-align:right;"><b><font size = "1">REMAINING CREDIT</font></b></td>
+		      <td style = "padding-left:28px;text-align:right;"><b><font size = "1">{$amountDue|crmMoney:$currency}</font></b></td>
+		      
+		    <td style = "padding-left:28px;"><font size = "1" align = "right"></fonts></td>
+		  </tr>
+		{/if}
+		<br/><br/><br/>
+	        <tr>
+		  <td colspan = "3"></td>
+		</tr>
+	        <tr>
+		 
+		    <td ></td>
+		   
 		  <td colspan = "3"></td>
 		</tr>
             </table>
@@ -164,77 +362,34 @@
         </tr>
       </table>
 
-      {if $contribution_status_id == $refundedStatusId}
-        <table  style = "margin-top:6px;padding-right:30px;" width = "585" border = "0" cellpadding = "-10" cellspacing = "19" id = "desc">
+     
+        <table   style = "margin-top:6px;padding-right:30px;font-family: Arial, Verdana, sans-serif" width = "585" border = "0" cellpadding = "-10" cellspacing = "19" id = "desc">
 	  <tr>
-	    <td ><b><font size = "4" align = "right">CREDIT ADVICE<br/><br/><font size = "1" >{$notes}</font></font></b></td>
+	    <td ><font size = "4" align = "right"><b>CREDIT ADVICE</b><br/><br /><div  style="font-size:10px;max-width:300px;">Please do not pay on this advice. Deduct the amount of this Credit Note
+from your next payment to us</div><br/><font size = "1" >{$notes}</font></font></td>
 	    <td>
-              <table style = "margin-top:0px;margin-right:-2;padding-right:45px;" cellpadding = "-10" cellspacing = "22"   >
+              <table style = "margin-top:0px;margin-right:20px;"  cellpadding = "-10" cellspacing = "22" align="left" >
 		<tr>
 	          <td colspan = "2"></td>
-		  <td><font size = "1" align = "right">Customer: </font></td>
-		  <td><font size = "1" align = "right">{$display_name}</font></td>   
+		  <td><font size = "1" align = "right" style="font-weight:bold;">Customer: </font></td>
+		  <td><font size = "1" align = "right" >{$display_name}</font></td>   
 		</tr>
 		<tr>
 		  <td colspan = "2"></td>
-		  <td><font size = "1" align = "right">Credit Note#: </font></td>
-		  <td><font size = "1" align = "right">{$invoice_id}</font></td>   
+		  <td><font size = "1" align = "right" style="font-weight:bold;">Credit Note#: </font></td>
+		  <td><font size = "1" align = "right">{$creditnote_id}</font></td>   
 		</tr>
 		<tr><td  colspan = "5"style = "color:#F5F5F5;"><hr></hr></td></tr>
 		<tr>
                   <td colspan = "2"></td>
-		  <td><font size = "1" align = "right">Credit Amount:</font></td> 
-		  <td><font size = "1" align = "right">{$amount|crmMoney:$currency}</font></td> 
+		  <td><font size = "1" align = "right" style="font-weight:bold;">Credit Amount:</font></td> 
+		  <td width='50px'><font size = "1" align = "right" style="font-weight:bold;">{$amount|crmMoney:$currency}</font></td> 
 		</tr>
               </table>
             </td>
 	  </tr>
 	</table>
-      {else}
-	<table style = "margin-top:6px;padding-right:30px;" width = "585" border = "0"cellpadding = "-10" cellspacing="19" id = "desc">
-	  <tr>
-	    <td><b><font size = "4" align = "right">PAYMENT ADVICE</font><b/> <br/><br/> <b><font size = "1" align = "right">To:            
-              {$organization_name}</font><b/><br/><br/><b><font size="1" align="right">{$notes}</font><b/>
-            </td>
-            <td>
-	      <table style = "margin-right:-2;" cellpadding = "-10" cellspacing = "22">
-		<tr>
-	          <td  colspan = "2"></td>
-		  <td><font size = "1" align = "right">Customer: </font></td>
-		  <td><font size = "1" align = "right">{$display_name}</font></td>   
-		</tr>
-		<tr>
-		  <td colspan = "2"></td>
-		  <td><font size = "1" align = "right">Invoice Number: </font></td>
-		  <td><font size = "1" align = "right">{$invoice_id}</font></td>   
-		</tr>
-		<tr><td  colspan = "5"style = "color:#F5F5F5;"><hr></hr></td></tr>
-		{if $is_pay_later == 1}       
-		<tr>
-                  <td colspan = "2"></td>
-                  <td><font size = "1" align = "right">Amount Due:</font></td> 
-                  <td><font size = "1" align = "right">{$amount|crmMoney:$currency}</font></td> 
-		</tr>
-		{else}
-		<tr>
-		  <td colspan = "2"></td>
-		  <td><font size = "1" align = "right">Amount Due: </font></td>
-		  <td><font size = "1" align = "right">{$amountDue|crmMoney:$currency}</font></td>   
-		</tr>
-		{/if}
-		<tr>   
-		  <td colspan = "2"></td>
-		  <td><font size = "1" align = "right">Due Date:  </font></td>
-		  <td><font size = "1" align = "right">{$dueDate}</font></td>   
-		</tr>
-		<tr>
-                  <td colspan = "5" style = "color:#F5F5F5;"><hr></hr></td>
-                </tr>
-	      </table>
-            </td>
-	  </tr>   
-	</table>
-      {/if}
+ {/if}
     </center>
   </body>
 </html>
