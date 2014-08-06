@@ -1338,8 +1338,13 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
 
         //build contribution params
         if (!$this->_onlinePendingContributionId) {
-          $contributionParams['source'] = "{$eventTitle}: Offline registration (by {$userName})";
-        }
+          if (empty($params['source'])) { 
+            $contributionParams['source'] = ts('%1 : Offline registration (by %2)', array(1 => $eventTitle, 2 => $userName));
+          }                                                           
+          else {                                                     
+            $contributionParams['source'] = $params['source'];                                                             
+          }                                                          
+        } 
 
         $contributionParams['currency'] = $config->defaultCurrency;
         $contributionParams['non_deductible_amount'] = 'null';
