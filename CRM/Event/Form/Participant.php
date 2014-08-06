@@ -1690,7 +1690,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
         $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
                                                       $this->_id, 'contribution_id', 'participant_id'
                                                       );
-        $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
+        $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
         $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
         if (count($taxAmt) > 0 && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
           $sendTemplateParams['isEmailPdf'] = True; 
