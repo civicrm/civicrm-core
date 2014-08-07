@@ -49,7 +49,7 @@
     {include file="CRM/common/formButtons.tpl" location="top"}
     {assign var='pdfUrlParams' value="reset=1&id=$id&cid=$contact_id"}
     {assign var='emailUrlParams' value="reset=1&id=$id&cid=$contact_id&select=email"}
-    {if $invoicing && $contribution_status_id != 3}
+    {if $invoicing && $cancelledStatus}
       <div class="crm-printButton">
         <a class="button" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
         {if $contribution_status != 'Refunded'}
@@ -326,7 +326,7 @@
           class="icon delete-icon"></div>{ts}Delete{/ts}</span></a>
   {/if}
   {include file="CRM/common/formButtons.tpl" location="bottom"}
-  {if $invoicing && $contribution_status_id != 3}
+  {if $invoicing && $cancelledStatus}
     <div class="crm-printButton">
       <a class="button" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
       {if $contribution_status != 'Refunded'}
