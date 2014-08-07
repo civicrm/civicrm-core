@@ -840,19 +840,19 @@ VALUES
    (@option_group_id_ere, '{ts escape="sql"}Participant Role{/ts}', 1, 'participant_role', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
 
 -- default conference slots
-   (@option_group_id_conference_slot, '{ts escape="sql"}Morning Sessions{/ts}', 1, '{ts escape="sql"}Morning Sessions{/ts}', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_conference_slot, '{ts escape="sql"}Evening Sessions{/ts}', 2, '{ts escape="sql"}Evening Sessions{/ts}', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_conference_slot, '{ts escape="sql"}Morning Sessions{/ts}', 1, 'Morning Sessions', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_conference_slot, '{ts escape="sql"}Evening Sessions{/ts}', 2, 'Evening Sessions', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
 
 -- default batch type
-   (@option_group_id_batch_type, '{ts escape="sql"}Contribution{/ts}', 1, '{ts escape="sql"}Contribution{/ts}', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_batch_type, '{ts escape="sql"}Membership{/ts}', 2, '{ts escape="sql"}Membership{/ts}', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_batch_type, '{ts escape="sql"}Contribution{/ts}', 1, 'Contribution', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_batch_type, '{ts escape="sql"}Membership{/ts}', 2, 'Membership', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
 
--- default batch statues
-   (@option_group_id_batch_status, '{ts escape="sql"}Open{/ts}', 1, '{ts escape="sql"}Open{/ts}', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_batch_status, '{ts escape="sql"}Closed{/ts}', 2, '{ts escape="sql"}Closed{/ts}', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_batch_status, '{ts escape="sql"}Data Entry{/ts}', 3, '{ts escape="sql"}Data Entry{/ts}', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_batch_status, '{ts escape="sql"}Reopened{/ts}', 4, '{ts escape="sql"}Reopened{/ts}', NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL),
-   (@option_group_id_batch_status, '{ts escape="sql"}Exported{/ts}', 5, '{ts escape="sql"}Exported{/ts}', NULL, 0, NULL, 5, NULL, 0, 0, 1, NULL, NULL),
+-- default batch statuses
+   (@option_group_id_batch_status, '{ts escape="sql"}Open{/ts}', 1, 'Open', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_batch_status, '{ts escape="sql"}Closed{/ts}', 2, 'Closed', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_batch_status, '{ts escape="sql"}Data Entry{/ts}', 3, 'Data Entry', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_batch_status, '{ts escape="sql"}Reopened{/ts}', 4, 'Reopened', NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_batch_status, '{ts escape="sql"}Exported{/ts}', 5, 'Exported', NULL, 0, NULL, 5, NULL, 0, 0, 1, NULL, NULL),
 
 -- default batch modes
    (@option_group_id_batch_mode, '{ts escape="sql"}Manual Batch{/ts}', 1, 'Manual Batch', NULL, 0, 0, 1, 'Manual Batch', 0, 1, 1, 2, NULL),
