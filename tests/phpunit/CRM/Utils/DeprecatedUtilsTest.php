@@ -50,12 +50,12 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
     //  Insert a row in civicrm_contact creating individual contact
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-        new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+        $this->createXMLDataSet(
             dirname(__FILE__) . '/../../api/v3/dataset/contact_17.xml'
         )
     );
     $op->execute($this->_dbconn,
-        new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+        $this->createXMLDataSet(
             dirname(__FILE__) . '/../../api/v3/dataset/email_contact_17.xml'
         )
     );
@@ -82,12 +82,12 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
     //  Insert a row in civicrm_contact creating individual contact
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-        new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+        $this->createXMLDataSet(
             dirname(__FILE__) . '/../../api/v3/dataset/contact_17.xml'
         )
     );
     $op->execute($this->_dbconn,
-        new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
+        $this->createXMLDataSet(
             dirname(__FILE__) . '/../../api/v3/dataset/email_contact_17.xml'
         )
     );
