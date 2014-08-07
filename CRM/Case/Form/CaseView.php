@@ -321,7 +321,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
           $this->getButtonName('next', 'merge_case'),
           ts('Merge'),
           array(
-            'class' => 'form-submit-inline hiddenElement',
+            'class' => 'crm-form-submit-inline hiddenElement',
           )
         );
       }

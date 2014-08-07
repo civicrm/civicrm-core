@@ -135,7 +135,7 @@
           .click(function() {
             $(form).find('input[name=oplock_ts]').val(errorTag.attr('data:update_oplock_ts'));
             errorTag.parent().hide();
-            $(this).closest('form').find('.form-submit.default').first().click();
+            $(this).closest('form').find('.crm-form-submit.default').first().click();
             return false;
           })
           .appendTo(buttonContainer)
