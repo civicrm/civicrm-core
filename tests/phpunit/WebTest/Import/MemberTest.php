@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_MemberTest
+ */
 class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
@@ -76,6 +80,9 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
   /*
      * Helper function to provide data for Membeship import for Individuals.
      */
+  /**
+   * @return array
+   */
   function _memberIndividualCSVData() {
     $memTypeParams = $this->webtestAddMembershipType();
 
@@ -120,6 +127,9 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
   /*
      * Helper function to provide data for Membeship import for Households.
      */
+  /**
+   * @return array
+   */
   function _memberHouseholdCSVData() {
     $memTypeParams = $this->webtestAddMembershipType();
 
@@ -162,6 +172,9 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
   /*
      * Helper function to provide data for Membeship import for Organizations.
      */
+  /**
+   * @return array
+   */
   function _memberOrganizationCSVData() {
     $memTypeParams = $this->webtestAddMembershipType();
 

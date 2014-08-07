@@ -37,6 +37,9 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Se
   protected $_formValues;
   public $_permissionedComponent;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     $this->_formValues = $formValues;
     $this->_permissionedComponent = 'CiviContribute';
@@ -81,6 +84,9 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Se
     }
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
 
     foreach ($this->_amounts as $name => $title) {
@@ -106,6 +112,9 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Se
     // @TODO: Add rule to ensure that exclusion dates are not in the inclusion range
   }
 
+  /**
+   * @return mixed
+   */
   function count() {
     $sql = $this->all();
 
@@ -113,10 +122,26 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Se
     return $dao->N;
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   *
+   * @return string
+   */
   function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return string
+   */
   function all(
     $offset = 0,
     $rowcount = 0,
@@ -138,13 +163,14 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Se
     $from = $this->from();
 
     if ($justIDs) {
-      $select = 'contact_a.id as contact_id';
+      $select = $this->select();
+      $select .= ', contact_a.id, display_name';
     }
     else {
       $select = $this->select();
       $select = "
-           DISTINCT contact.id as contact_id,
-           contact.display_name as display_name,
+           DISTINCT contact_a.id as contact_id,
+           contact_a.display_name as display_name,
            $select
 ";
 
@@ -152,23 +178,33 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Se
 
     $sql = "
 SELECT     $select
-FROM       civicrm_contact AS contact
-LEFT JOIN  civicrm_contribution contrib_1 ON contrib_1.contact_id = contact.id
+FROM       civicrm_contact AS contact_a
+LEFT JOIN  civicrm_contribution contrib_1 ON contrib_1.contact_id = contact_a.id
            $from
-WHERE      contrib_1.contact_id = contact.id
+WHERE      contrib_1.contact_id = contact_a.id
 AND        contrib_1.is_test = 0
            $where
-GROUP BY   contact.id
+GROUP BY   contact_a.id
            $having
 ORDER BY   donation_amount desc
 ";
 
-    // CRM_Core_Error::debug('sql',$sql); exit();
+
+    if ($justIDs) {
+      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS CustomSearch_SYBNT_temp");
+      $query = "CREATE TEMPORARY TABLE CustomSearch_SYBNT_temp AS ({$sql})";
+      $dao = CRM_Core_DAO::executeQuery($query);
+      $sql = "SELECT contact_a.id as contact_id FROM CustomSearch_SYBNT_temp as contact_a";
+    }
+
     return $sql;
   }
 
+  /**
+   * @return string
+   */
   function select() {
-    if ($this->start_date_2 || $this->end_date_2) {
+    if (!empty($this->start_date_2) || !empty($this->end_date_2)) {
       return "
 sum(contrib_1.total_amount) + sum(contrib_2.total_amount) AS donation_amount,
 count(contrib_1.id) + count(contrib_1.id) AS donation_count
@@ -182,50 +218,56 @@ count(contrib_1.id) AS donation_count
     }
   }
 
+  /**
+   * @return null|string
+   */
   function from() {
     $from = NULL;
-    if ($this->start_date_2 || $this->end_date_2) {
-      $from .= " LEFT JOIN civicrm_contribution contrib_2 ON contrib_2.contact_id = contact.id ";
+    if (!empty($this->start_date_2) || !empty($this->end_date_2)) {
+      $from .= " LEFT JOIN civicrm_contribution contrib_2 ON contrib_2.contact_id = contact_a.id ";
     }
 
-    if ($this->exclude_start_date ||
-      $this->exclude_end_date ||
-      $this->is_first_amount
+    if (!empty($this->exclude_start_date) ||
+      !empty($this->exclude_end_date) ||
+      !empty($this->is_first_amount)
     ) {
-      $from .= " LEFT JOIN XG_CustomSearch_SYBNT xg ON xg.contact_id = contact.id ";
+      $from .= " LEFT JOIN XG_CustomSearch_SYBNT xg ON xg.contact_id = contact_a.id ";
     }
 
     return $from;
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     $clauses = array();
 
-    if ($this->start_date_1) {
+    if (!empty($this->start_date_1)) {
       $clauses[] = "contrib_1.receive_date >= {$this->start_date_1}";
     }
 
-    if ($this->end_date_1) {
+    if (!empty($this->end_date_1)) {
       $clauses[] = "contrib_1.receive_date <= {$this->end_date_1}";
     }
 
-    if ($this->start_date_2 ||
-      $this->end_date_2
-    ) {
+    if (!empty($this->start_date_2) || !empty($this->end_date_2)) {
       $clauses[] = "contrib_2.is_test = 0";
 
-      if ($this->start_date_2) {
+      if (!empty($this->start_date_2)) {
         $clauses[] = "contrib_2.receive_date >= {$this->start_date_2}";
       }
 
-      if ($this->end_date_2) {
+      if (!empty($this->end_date_2)) {
         $clauses[] = "contrib_2.receive_date <= {$this->end_date_2}";
       }
     }
 
-    if ($this->exclude_start_date ||
-      $this->exclude_end_date ||
-      $this->is_first_amount
+    if (!empty($this->exclude_start_date) ||
+      !empty($this->exclude_end_date) ||
+      !empty($this->is_first_amount)
     ) {
 
       // first create temp table to store contact ids
@@ -296,6 +338,11 @@ AND      c.receive_date < {$this->start_date_1}
     return implode(' AND ', $clauses);
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function having($includeContactIDs = FALSE) {
     $clauses = array();
     $min = CRM_Utils_Array::value('min_amount', $this->_formValues);
@@ -311,18 +358,30 @@ AND      c.receive_date < {$this->start_date_1}
     return implode(' AND ', $clauses);
   }
 
+  /**
+   * @return array
+   */
   function &columns() {
     return $this->_columns;
   }
 
+  /**
+   * @return string
+   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Custom/ContribSYBNT.tpl';
   }
 
+  /**
+   * @return null
+   */
   function summary() {
     return NULL;
   }
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);

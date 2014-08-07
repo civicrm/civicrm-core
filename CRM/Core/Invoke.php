@@ -57,6 +57,9 @@ class CRM_Core_Invoke {
     }
   }
 
+  /**
+   * @param $args
+   */
   protected static function _invoke($args) {
     if ($args[0] !== 'civicrm') {
       return;
@@ -375,6 +378,12 @@ class CRM_Core_Invoke {
     $template->assign('newer_civicrm_version', $newerVersion);
   }
 
+  /**
+   * @param bool $triggerRebuild
+   * @param bool $sessionReset
+   *
+   * @throws Exception
+   */
   static function rebuildMenuAndCaches($triggerRebuild = FALSE, $sessionReset = FALSE) {
     $config = CRM_Core_Config::singleton();
     $config->clearModuleList();
@@ -393,8 +402,12 @@ class CRM_Core_Invoke {
     // also rebuild word replacement cache
     CRM_Core_BAO_WordReplacement::rebuild();
 
+    // Clear dynamic js files
+    CRM_Utils_File::flushDynamicResources();
+
     CRM_Core_BAO_Setting::updateSettingsFromMetaData();
     CRM_Core_Resources::singleton()->resetCacheCode();
+    CRM_Case_XMLRepository::singleton(TRUE);
 
     // also rebuild triggers if requested explicitly
     if (
@@ -407,4 +420,3 @@ class CRM_Core_Invoke {
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }
 }
-

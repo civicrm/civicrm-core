@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_AdvanceSearchPaneTest
+ */
 class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -82,6 +86,9 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
     $this->_checkOpenedPanes(array_keys($allpanes));
   }
 
+  /**
+   * @param array $openedPanes
+   */
   function _checkOpenedPanes($openedPanes = array(
     )) {
     if (!$this->isTextPresent('No matches found')) {
@@ -101,6 +108,10 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $paneRef
+   * @param array $selectFields
+   */
   function _selectPaneFields($paneRef, $selectFields = array(
     )) {
     $pane = $this->_advanceSearchPanes($paneRef);
@@ -147,6 +158,11 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param null $paneRef
+   *
+   * @return array
+   */
   function _advanceSearchPanes($paneRef = NULL) {
     static $_advance_search_panes;
 

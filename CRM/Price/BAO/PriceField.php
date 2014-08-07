@@ -56,7 +56,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @access public
    * @static
    */
-  static function &add(&$params) {
+  static function add(&$params) {
     $priceFieldBAO = new CRM_Price_BAO_PriceField();
 
     $priceFieldBAO->copyValues($params);
@@ -81,6 +81,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @static
    */
   static function create(&$params) {
+    if(empty($params['id']) && empty($params['name'])) {
+      $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
+    }
     $transaction = new CRM_Core_Transaction();
 
     $priceField = self::add($params);
@@ -90,7 +93,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       return $priceField;
     }
 
-    $options = $optionsIds = array();
+    $optionsIds = array();
     $maxIndex = CRM_Price_Form_Field::NUM_OPTION;
 
     if ($priceField->html_type == 'Text') {
@@ -105,7 +108,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       }
     }
     $defaultArray = array();
-    if ($params['html_type'] == 'CheckBox' && isset($params['default_checkbox_option'])) {
+    //html type would be empty in update scenario not sure what would happen ...
+    if (!empty($params['html_type']) && $params['html_type'] == 'CheckBox' && isset($params['default_checkbox_option'])) {
       $tempArray = array_keys($params['default_checkbox_option']);
       foreach ($tempArray as $v) {
         if ($params['option_amount'][$v]) {
@@ -216,7 +220,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   /**
    * This function for building custom fields
    *
-   * @param object $qf form object (reference)
+   * @param CRM_Core_Form $qf form object (reference)
    * @param string $elementName name of the custom field
    * @param $fieldId
    * @param boolean $inactiveNeeded
@@ -558,6 +562,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     return $options[$fieldId];
   }
 
+  /**
+   * @param $optionLabel
+   * @param $fid
+   *
+   * @return mixed
+   */
   public static function getOptionId($optionLabel, $fid) {
     if (!$optionLabel || !$fid) {
       return;
@@ -614,6 +624,9 @@ WHERE
     return NULL;
   }
 
+  /**
+   * @return array
+   */
   static function &htmlTypes() {
     static $htmlTypes = NULL;
     if (!$htmlTypes) {

@@ -64,8 +64,157 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    */
   static function add(&$params) {
     $caseTypeDAO = new CRM_Case_DAO_CaseType();
+
+    // form the name only if missing: CRM-627
+    $nameParam = CRM_Utils_Array::value('name', $params, NULL);
+    if (!$nameParam && empty($params['id'])) {
+      $params['name'] = CRM_Utils_String::titleToVar($params['title']);
+    }
+    if (!empty($params['name']) && !CRM_Case_BAO_CaseType::isValidName($params['name'])) {
+      throw new CRM_Core_Exception("Cannot create caseType with malformed name [{$params['name']}]");
+    }
+
+    // function to format definition column
+    if (isset($params['definition']) && is_array($params['definition'])) {
+      $params['definition'] = self::convertDefinitionToXML($params['name'], $params['definition']);
+      CRM_Core_ManagedEntities::scheduleReconcilation();
+    }
+
     $caseTypeDAO->copyValues($params);
     return $caseTypeDAO->save();
+  }
+
+  /**
+   * Function to format / convert submitted array to xml for case type definition
+   *
+   * @param string $name
+   * @param array $definition the case-type defintion expressed as an array-tree
+   * @return string XML
+   * @static
+   * @access public
+   */
+  static function convertDefinitionToXML($name, $definition) {
+    $xmlFile = '<?xml version="1.0" encoding="iso-8859-1" ?>' . "\n\n<CaseType>\n";
+    $xmlFile .= "<name>{$name}</name>\n";
+
+    if (isset($definition['activityTypes'])) {
+      $xmlFile .= "<ActivityTypes>\n";
+      foreach ($definition['activityTypes'] as $values) {
+        $xmlFile .= "<ActivityType>\n";
+        foreach ($values as $key => $value) {
+          $xmlFile .= "<{$key}>{$value}</{$key}>\n";
+        }
+        $xmlFile .= "</ActivityType>\n";
+      }
+      $xmlFile .= "</ActivityTypes>\n";
+    }
+
+    if (isset($definition['activitySets'])) {
+      $xmlFile .= "<ActivitySets>\n";
+      foreach ($definition['activitySets'] as $k => $val) {
+        $xmlFile .= "<ActivitySet>\n";
+        foreach ($val as $index => $setVal) {
+          switch ($index) {
+            case 'activityTypes':
+              if (!empty($setVal)) {
+                $xmlFile .= "<ActivityTypes>\n";
+                foreach ($setVal as $values) {
+                  $xmlFile .= "<ActivityType>\n";
+                  foreach ($values as $key => $value) {
+                    $xmlFile .= "<{$key}>{$value}</{$key}>\n";
+                  }
+                  $xmlFile .= "</ActivityType>\n";
+                }
+                $xmlFile .= "</ActivityTypes>\n";
+              }
+              break;
+            case 'sequence': // passthrough
+            case 'timeline':
+              if ($setVal) {
+                $xmlFile .= "<{$index}>true</{$index}>\n";
+              }
+              break;
+            default:
+              $xmlFile .= "<{$index}>{$setVal}</{$index}>\n";
+          }
+        }
+
+        $xmlFile .= "</ActivitySet>\n";
+      }
+
+      $xmlFile .= "</ActivitySets>\n";
+    }
+
+    if (isset($definition['caseRoles'])) {
+      $xmlFile .= "<CaseRoles>\n";
+      foreach ($definition['caseRoles'] as $values) {
+        $xmlFile .= "<RelationshipType>\n";
+        foreach ($values as $key => $value) {
+          $xmlFile .= "<{$key}>{$value}</{$key}>\n";
+        }
+        $xmlFile .= "</RelationshipType>\n";
+      }
+      $xmlFile .= "</CaseRoles>\n";
+    }
+
+    $xmlFile .= '</CaseType>';
+    return $xmlFile;
+  }
+
+  /**
+   * Function to get the case definition either from db or read from xml file
+   *
+   * @param SimpleXmlElement $xml a single case-type record
+   *
+   * @return array the definition of the case-type, expressed as PHP array-tree
+   * @static
+   */
+  static function convertXmlToDefinition($xml) {
+    // build PHP array based on definition
+    $definition = array();
+
+    // set activity types
+    if (isset($xml->ActivityTypes)) {
+      $definition['activityTypes'] = array();
+      foreach ($xml->ActivityTypes->ActivityType as $activityTypeXML) {
+        $definition['activityTypes'][] = json_decode(json_encode($activityTypeXML), TRUE);
+      }
+    }
+
+    // set activity sets
+    if (isset($xml->ActivitySets)) {
+      $definition['activitySets'] = array();
+      foreach ($xml->ActivitySets->ActivitySet as $activitySetXML) {
+        // parse basic properties
+        $activitySet = array();
+        $activitySet['name'] = (string) $activitySetXML->name;
+        $activitySet['label'] = (string) $activitySetXML->label;
+        if ('true' == (string) $activitySetXML->timeline) {
+          $activitySet['timeline'] = 1;
+        }
+        if ('true' == (string) $activitySetXML->sequence) {
+          $activitySet['sequence'] = 1;
+        }
+
+        if (isset($activitySetXML->ActivityTypes)) {
+          $activitySet['activityTypes'] = array();
+          foreach ($activitySetXML->ActivityTypes->ActivityType as $activityTypeXML) {
+            $activitySet['activityTypes'][] = json_decode(json_encode($activityTypeXML), TRUE);
+          }
+        }
+        $definition['activitySets'][] = $activitySet;
+      }
+    }
+
+    // set case roles
+    if (isset($xml->CaseRoles)) {
+      $definition['caseRoles'] = array();
+      foreach ($xml->CaseRoles->RelationshipType as $caseRoleXml) {
+        $definition['caseRoles'][] = json_decode(json_encode($caseRoleXml), TRUE);
+      }
+    }
+
+    return $definition;
   }
 
   /**
@@ -128,6 +277,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       CRM_Utils_Hook::post('create', 'CaseType', $caseType->id, $case);
     }
     $transaction->commit();
+    CRM_Case_XMLRepository::singleton(TRUE);
 
     return $caseType;
   }
@@ -153,9 +303,31 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     return $caseType;
   }
 
+  /**
+   * @param $caseTypeId
+   *
+   * @return mixed
+   */
   static function del($caseTypeId) {
     $caseType = new CRM_Case_DAO_CaseType();
     $caseType->id = $caseTypeId;
-    return $caseType->delete();
+    $refCounts = $caseType->getReferenceCounts();
+    $total = array_sum(CRM_Utils_Array::collect('count', $refCounts));
+    if ($total) {
+      throw new CRM_Core_Exception(ts("You can not delete this case type -- it is assigned to %1 existing case record(s). If you do not want this case type to be used going forward, consider disabling it instead.", array(1 => $total)));
+    }
+    $result = $caseType->delete();
+    CRM_Case_XMLRepository::singleton(TRUE);
+    return $result;
+  }
+
+  /**
+   * Determine if a case-type name is well-formed
+   *
+   * @param string $caseType
+   * @return bool
+   */
+  static function isValidName($caseType) {
+    return preg_match('/^[a-zA-Z0-9_]+$/',  $caseType);
   }
 }

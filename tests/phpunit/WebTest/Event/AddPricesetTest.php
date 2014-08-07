@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_AddPricesetTest
+ */
 class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -61,6 +65,12 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->_testVerifyPriceSet($validateStrings, $sid);
   }
 
+  /**
+   * @param $setTitle
+   * @param $usedFor
+   * @param $setHelp
+   * @param string $financialType
+   */
   function _testAddSet($setTitle, $usedFor, $setHelp, $financialType = 'Event Fee') {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
@@ -81,6 +91,11 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
   }
 
+  /**
+   * @param $fields
+   * @param $validateStrings
+   * @param bool $dateSpecificFields
+   */
   function _testAddPriceFields(&$fields, &$validateStrings, $dateSpecificFields = FALSE) {
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;
@@ -164,6 +179,10 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $validateStrings
+   * @param $sid
+   */
   function _testVerifyPriceSet($validateStrings, $sid) {
     // verify Price Set at Preview page
     // start at Manage Price Sets listing
@@ -256,6 +275,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->check('is_online_registration');
     $this->assertChecked('is_online_registration');
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField('intro_text', $registerIntro);
 
     // enable confirmation email
@@ -416,6 +436,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->check('is_online_registration');
     $this->assertChecked('is_online_registration');
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField('intro_text', $registerIntro);
 
     // enable confirmation email
@@ -647,27 +668,27 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         'Contribution Status' => 'Completed',
         'Paid By' => 'Check',
         'Check Number' => '1044',
-        'Total Amount' => '$ 2,705.00',
         'Received Into' => 'Deposit Bank Account',
       )
     );
+    $this->verifyText("xpath=//td[text()='Contribution Amount']/following-sibling::td//div/div", preg_quote('Contribution Total: $ 2,705.00'));
   }
 
 
   function testDeletePriceSetforEventTemplate() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
-    
+
     $setTitle = 'Conference Fees - ' . substr(sha1(rand()), 0, 7);
     $usedFor = 'Event';
     $setHelp = 'Select your conference options.';
     $this->_testAddSet($setTitle, $usedFor, $setHelp);
-    
+
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
     // which is where we are after adding Price Set.
     $sid = $this->urlArg('sid');
     $this->assertType('numeric', $sid);
-    
+
     $validStrings = array();
     $fields = array(
       'Test Field' => 'Text',
@@ -686,7 +707,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->select("default_role_id", "value=1");
     $this->type("title", "Test Event");
     $this->type("summary", "This is a great conference. Sign up now!");
-    
+
     $this->click("_qf_EventInfo_upload-bottom");
     $this->waitForElementPresent('link=Fees');
     // Go to Fees tab
@@ -697,7 +718,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->select('price_set_id', 'label=' . $setTitle);
     $templateId = $this->urlArg('id');
     $this->click('_qf_Fee_upload-bottom');
-    
+
     //check the delete for price field
     $this->openCiviPage("admin/price/field", "reset=1&action=browse&sid={$sid}");
     $this->click("xpath=//table[@id='option11']/tbody/tr/td[9]/span[2]/ul/li[2]/a");
@@ -710,7 +731,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     //assert the message
     $this->waitForText('price_set_used_by',
       "it is currently in use by one or more active events or contribution pages or contributions or event templates.");
-    
+
     //check the delete for priceset
     $this->openCiviPage("admin/price", "reset=1");
     $this->click("xpath=//table[@id='option11']/tbody/tr/td[4]/span[2]/ul/li[3]/a");
@@ -724,7 +745,10 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->waitForText('price_set_used_by',
       "it is currently in use by one or more active events or contribution pages or contributions or event templates.");
   }
- 
+
+  /**
+   * @param $expectedLineItems
+   */
   function _checkLineItems($expectedLineItems) {
     foreach ($expectedLineItems as $lineKey => $lineValue) {
       foreach ($lineValue as $key => $value) {

@@ -59,6 +59,15 @@ class CRM_Contact_Form_Task_Map_Event extends CRM_Contact_Form_Task_Map {
     $this->assign('skipLocationType', TRUE);
   }
 
+  /**
+   * Use the form name to create the tpl file name
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     return 'CRM/Contact/Form/Task/Map.tpl';
   }

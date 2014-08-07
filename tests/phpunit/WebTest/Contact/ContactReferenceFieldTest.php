@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_ContactReferenceFieldTest
+ */
 class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

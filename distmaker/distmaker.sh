@@ -28,17 +28,7 @@ set -e
 P=`dirname $0`
 # Current dir
 ORIGPWD=`pwd`
-
-# List of files to exclude from all tarballs
-DM_EXCLUDES=".git .svn packages/_ORIGINAL_ packages/SeleniumRC packages/PHPUnit packages/PhpDocumentor packages/SymfonyComponents packages/amavisd-new packages/git-footnote"
-for DM_EXCLUDE in $DM_EXCLUDES ; do
-  DM_EXCLUDES_RSYNC="--exclude=${DM_EXCLUDE} ${DM_EXCLUDES_RSYNC}"
-done
-## Note: These small folders have items that previously were not published,
-## but there's no real cost to including them, and excluding them seems
-## likely to cause confusion as the codebase evolves:
-##   packages/Files packages/PHP packages/Text
-export DM_EXCLUDES DM_EXCLUDES_RSYNC
+source "$P/dists/common.sh"
 
 # Set no actions by default
 D5PACK=0
@@ -81,10 +71,16 @@ check_conf()
 	else
 		source "$P/distmaker.conf"
 		export DM_SOURCEDIR DM_GENFILESDIR DM_TMPDIR DM_TARGETDIR DM_PHP DM_RSYNC DM_ZIP DM_VERSION DM_REF_CORE DM_REF_DRUPAL DM_REF_DRUPAL6 DM_REF_JOOMLA DM_REF_WORDPRESS DM_REF_PACKAGES
-		for k in "$DM_SOURCEDIR" "$DM_GENFILESDIR" "$DM_TARGETDIR" "$DM_TMPDIR"; do
-			if [ ! -d "$k" ] ; then
+		if [ ! -d "$DM_SOURCEDIR" ]; then
+			echo; echo "ERROR! " DM_SOURCEDIR "directory not found!"; echo "(if you get empty directory name, it might mean that one of necessary variables is not set)"; echo;
+		fi
+		for k in "$DM_GENFILESDIR" "$DM_TARGETDIR" "$DM_TMPDIR"; do
+			if [ -z "$k" ] ; then
 				echo; echo "ERROR! " $k "directory not found!"; echo "(if you get empty directory name, it might mean that one of necessary variables is not set)"; echo;
 				exit 1
+			fi
+			if [ ! -d "$k" ]; then
+				mkdir -p "$k"
 			fi
 		done
 	fi
@@ -161,16 +157,11 @@ case $1 in
 esac
 
 ## Make sure we have the right branch or tag
-pushd "$DM_SOURCEDIR"
-git checkout "$DM_REF_CORE"
-popd
-pushd "$DM_SOURCEDIR/packages"
-git checkout "$DM_REF_PACKAGES"
-popd
+dm_git_checkout "$DM_SOURCEDIR" "$DM_REF_CORE"
+dm_git_checkout "$DM_SOURCEDIR/packages" "$DM_REF_PACKAGES"
+
 ## in theory, this shouldn't matter, but GenCode is CMS-dependent, and we've been doing our past builds based on D7
-pushd "$DM_SOURCEDIR/drupal"
-git checkout "$DM_REF_DRUPAL"
-popd
+dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
 
 # Before anything - regenerate DAOs
 
@@ -186,26 +177,31 @@ fi
 
 if [ "$D56PACK" = 1 ]; then
 	echo; echo "Packaging for Drupal6, PHP5 version"; echo;
+	dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL6"
 	bash $P/dists/drupal6_php5.sh
 fi
 
 if [ "$D5PACK" = 1 ]; then
 	echo; echo "Packaging for Drupal7, PHP5 version"; echo;
+	dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
 	bash $P/dists/drupal_php5.sh
 fi
 
 if [ "$SKPACK" = 1 ]; then
 	echo; echo "Packaging for Drupal7, PHP5 StarterKit version"; echo;
+	dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
 	bash $P/dists/drupal_sk_php5.sh
 fi
 
 if [ "$J5PACK" = 1 ]; then
 	echo; echo "Packaging for Joomla, PHP5 version"; echo;
+	dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
 	bash $P/dists/joomla_php5.sh
 fi
 
 if [ "$WP5PACK" = 1 ]; then
 	echo; echo "Packaging for Wordpress, PHP5 version"; echo;
+	dm_git_checkout "$DM_SOURCEDIR/WordPress" "$DM_REF_WORDPRESS"
 	bash $P/dists/wordpress_php5.sh
 fi
 

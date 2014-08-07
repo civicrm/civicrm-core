@@ -190,6 +190,9 @@ AND    g.refresh_date IS NULL
     }
   }
 
+  /**
+   * @param $groupID
+   */
   static function add($groupID) {
     // first delete the current cache
     self::remove($groupID);
@@ -205,6 +208,10 @@ AND    g.refresh_date IS NULL
     }
   }
 
+  /**
+   * @param $groupID
+   * @param $values
+   */
   static function store(&$groupID, &$values) {
     $processed = FALSE;
 
@@ -435,6 +442,7 @@ WHERE  id = %1
         $customClass =
           CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID);
         $searchSQL = $customClass->contactIDs();
+        $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
         $idName = 'contact_id';
       }
       else {
@@ -533,6 +541,9 @@ AND  civicrm_group_contact.group_id = $groupID ";
     $lock->release();
   }
 
+  /**
+   * @return int
+   */
   static function smartGroupCacheTimeout() {
     $config = CRM_Core_Config::singleton();
 
@@ -616,7 +627,7 @@ ORDER BY   gc.contact_id, g.children
       $contactGroup[$prevContactID]['groupTitle'] = implode(', ', $contactGroup[$prevContactID]['groupTitle']);
     }
 
-    if (is_numeric($contactID)) {
+    if ((!empty($contactGroup[$contactID]) && is_numeric($contactID))) {
       return $contactGroup[$contactID];
     }
     else {

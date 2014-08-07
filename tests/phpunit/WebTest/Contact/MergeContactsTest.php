@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_MergeContactsTest
+ */
 class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -195,6 +199,11 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertChecked("check_3");
   }
 
+  /**
+   * @param $firstName
+   * @param $lastName
+   * @param $subject
+   */
   function addActivity($firstName, $lastName, $subject) {
     $withContact = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($withContact, "Anderson", $withContact . "@anderson.name");
@@ -668,7 +677,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
   /**
    * Helper FN
-   * to create new membershiptype
+   * to create new membership type
    */
   function addMembershipType($membershipOrganization) {
     $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");

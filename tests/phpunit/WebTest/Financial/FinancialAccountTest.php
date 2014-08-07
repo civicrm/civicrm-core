@@ -26,6 +26,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Financial_FinancialAccountTest
+ */
 class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
 
   /**
@@ -76,7 +80,7 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
       'is_deductible' => 'off',
       'is_default' => 'off'
     );
-    
+
     $this->assertEquals($orgName, $this->getText("xpath=//*[@id='s2id_contact_id']/a/span[1]"));
 
     $this->_assertFinancialAccount($verifyData);
@@ -123,9 +127,9 @@ class WebTest_Financial_FinancialAccountTest extends CiviSeleniumTestCase {
       'is_deductible' => 'off',
       'is_default' => 'off',
     );
-    
+
     $this->assertEquals($orgName, $this->getText("xpath=//*[@id='s2id_contact_id']/a/span[1]"));
-    
+
     $this->_assertFinancialAccount($verifyData);
     $verifySelectFieldData = array('financial_account_type_id'   => $financialAccountType);
     $this->_assertSelectVerify($verifySelectFieldData);

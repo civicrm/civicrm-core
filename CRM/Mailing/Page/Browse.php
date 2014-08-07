@@ -311,6 +311,12 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $form->run();
   }
 
+  /**
+   * @param $params
+   * @param bool $sortBy
+   *
+   * @return string
+   */
   function whereClause(&$params, $sortBy = TRUE) {
     $values = array();
 

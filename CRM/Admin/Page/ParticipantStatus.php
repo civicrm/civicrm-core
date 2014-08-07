@@ -35,10 +35,17 @@
 class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
 
   public $useLivePageJS = TRUE;
+
+  /**
+   * @return string
+   */
   function getBAOName() {
     return 'CRM_Event_BAO_ParticipantStatusType';
   }
 
+  /**
+   * @return array
+   */
   function &links() {
     static $links = NULL;
     if ($links === NULL) {
@@ -107,14 +114,25 @@ class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
     $this->assign('rows', $statusTypes);
   }
 
+  /**
+   * @return string
+   */
   function editForm() {
     return 'CRM_Admin_Form_ParticipantStatus';
   }
 
+  /**
+   * @return string
+   */
   function editName() {
     return 'Participant Status';
   }
 
+  /**
+   * @param null $mode
+   *
+   * @return string
+   */
   function userContext($mode = NULL) {
     return 'civicrm/admin/participant_status';
   }

@@ -95,9 +95,9 @@ function civicrm_api3_membership_type_get($params) {
  * Deletes an existing membership type
  *
  * This API is used for deleting a membership type
- * Required parrmeters : id of a membership type
+ * Required parameters : id of a membership type
  *
- * @param  Array   $params  an associative array of name/value property values of civicrm_membership_type
+ * @param  array $params
  *
  * @return boolean        true if success, else false
  * @access public

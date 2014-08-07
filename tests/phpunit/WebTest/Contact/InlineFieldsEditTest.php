@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_InlineFieldsEditTest
+ */
 class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

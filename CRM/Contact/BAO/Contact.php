@@ -88,6 +88,16 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @static
    */
   static $_exportableFields = NULL;
+
+  /**
+   * class constructor
+   *
+   * @access public
+   * @return \CRM_Contact_DAO_Contact
+   */
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
@@ -224,10 +234,15 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     }
 
     if ($contact->contact_type == 'Individual' && (isset($params['current_employer']) || isset($params['employer_id']))) {
-      $newEmployer = !empty($params['employer_id']) ? $params['employer_id'] : CRM_Utils_Array::value('current_employer', $params);
       // create current employer
+      $newEmployer = !empty($params['employer_id']) ? $params['employer_id'] : CRM_Utils_Array::value('current_employer', $params);
+
+      $newContact = FALSE;
+      if (empty($params['contact_id'])) {
+        $newContact = TRUE;
+      }
       if ($newEmployer) {
-        CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($contact->id, $newEmployer, $employerId);
+        CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($contact->id, $newEmployer, $employerId, $newContact);
       }
       else {
         //unset if employer id exits
@@ -489,12 +504,48 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       CRM_Utils_Hook::alterDisplayName($displayName, $id, $dao);
 
       return $type ? array(
-        $dao->display_name,
+        $displayName,
         $image,
         $dao->contact_type,
         $dao->contact_sub_type,
         $imageUrl,
-      ) : array($dao->display_name, $image, $imageUrl);
+      ) : array($displayName, $image, $imageUrl);
+    }
+    return NULL;
+  }
+
+  /**
+   * @param array $crudLinkSpec with keys:
+   *  - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
+   *  - entity_table: string, eg "civicrm_contact"
+   *  - entity_id: int
+   * @return array|NULL NULL if unavailable, or an array. array has keys:
+   *  - path: string
+   *  - query: string
+   *  - title: string
+   * @see CRM_Utils_System::createDefaultCrudLink
+   */
+  public function createDefaultCrudLink($crudLinkSpec) {
+    switch ($crudLinkSpec['action']) {
+      case CRM_Core_Action::VIEW:
+        return array(
+          'title' => $this->display_name,
+          'path' => 'civicrm/contact/view',
+          'query' => array(
+            'reset' => 1,
+            'cid' => $this->id,
+          ),
+        );
+      case CRM_Core_Action::UPDATE:
+        return array(
+          'title' => $this->display_name,
+          'path' => 'civicrm/contact/add',
+          'query' => array(
+            'reset' => 1,
+            'action' => 'update',
+            'cid' => $this->id,
+          ),
+        );
     }
     return NULL;
   }
@@ -951,7 +1002,7 @@ WHERE id={$id}; ";
 
     if (in_array($params[$imageIndex]['type'], $mimeType)) {
       $photo = basename($params[$imageIndex]['name']);
-      $params[$imageIndex] =  CRM_Utils_System::url('civicrm/contact/imagefile', 'photo='.$photo, TRUE);
+      $params[$imageIndex] =  CRM_Utils_System::url('civicrm/contact/imagefile', 'photo='.$photo, TRUE, NULL, TRUE, TRUE);
       return TRUE;
     }
     else {
@@ -1845,6 +1896,16 @@ ORDER BY civicrm_email.is_primary DESC";
     return $contactID;
   }
 
+  /**
+   * @param $params
+   * @param $fields
+   * @param null $contactID
+   * @param null $ufGroupId
+   * @param null $ctype
+   * @param bool $skipCustom
+   *
+   * @return array
+   */
   static function formatProfileContactParams(
     &$params,
     &$fields,

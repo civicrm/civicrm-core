@@ -7,6 +7,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class RequestTest extends \CiviUnitTestCase {
 
+  /**
+   * @return array
+   */
   function v4options() {
     $cases = array(); // array(0 => $requestParams, 1 => $expectedOptions, 2 => $expectedData, 3 => $expectedChains)
     $cases[] = array(
@@ -98,6 +101,9 @@ class RequestTest extends \CiviUnitTestCase {
     Request::create('MyEntity', 'bad!action', array('version' => 4), NULL);
   }
 
+  /**
+   * @return array
+   */
   function validEntityActionPairs() {
     $cases = array();
     $cases[] = array(
@@ -124,6 +130,9 @@ class RequestTest extends \CiviUnitTestCase {
     $this->assertEquals($expected, array($apiRequest['entity'], $apiRequest['action'], $apiRequest['version']));
   }
 
+  /**
+   * @return array
+   */
   function invalidEntityActionPairs() {
     $cases = array();
     $cases[] = array('My+Entity', 'MyAction', 4);

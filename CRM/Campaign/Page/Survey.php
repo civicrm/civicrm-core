@@ -42,6 +42,9 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
 
   private static $_actionLinks;
 
+  /**
+   * @return array
+   */
   function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_actionLinks)) {
@@ -113,6 +116,9 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
     $this->assign('addSurveyUrl', CRM_Utils_System::url('civicrm/survey/add', 'reset=1&action=add'));
   }
 
+  /**
+   * @return string
+   */
   function run() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();

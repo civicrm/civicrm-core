@@ -49,6 +49,7 @@
 
     initialize: function(options) {
       CRM.designerApp.vent.on('ufUnsaved', this.onUfChanged, this);
+      CRM.designerApp.vent.on('ufSaved', this.onUfSaved, this);
     },
     onClose: function() {
       this.undoAlert && this.undoAlert.close && this.undoAlert.close();
@@ -56,6 +57,10 @@
     },
     onUfChanged: function(isUfUnsaved) {
       this.isUfUnsaved = isUfUnsaved;
+    },
+    onUfSaved: function() {
+      CRM.designerApp.vent.off('ufUnsaved', this.onUfChanged, this);
+      this.isUfUnsaved = false;
     },
     onRender: function() {
       var designerDialog = this;
@@ -215,7 +220,7 @@
         return;
       }
       var $dialog = this.$el.closest('.crm-designer-dialog'); // FIXME use events
-      $dialog.block({message: 'Saving...', theme: true});
+      $dialog.block();
       var profile = ufGroupModel.toStrictJSON();
       profile["api.UFField.replace"] = {values: ufGroupModel.getRel('ufFieldCollection').toSortedJSON(), 'option.autoweight': 0};
       CRM.api('UFGroup', 'create', profile, {
@@ -257,7 +262,7 @@
         return;
       }
       var $dialog = this.$el.closest('.crm-designer-dialog'); // FIXME use events
-      $dialog.block({message: 'Loading...', theme: true});
+      $dialog.block();
       // CRM-12188
       CRM.designerApp.clearPreviewArea();
       $.post(CRM.url("civicrm/ajax/inline"), {

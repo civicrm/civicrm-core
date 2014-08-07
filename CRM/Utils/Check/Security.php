@@ -267,6 +267,11 @@ class CRM_Utils_Check_Security {
     return $result;
   }
 
+  /**
+   * @param $topic
+   *
+   * @return string
+   */
   public function createDocUrl($topic) {
     return CRM_Utils_System::getWikiBaseURL() . $topic;
   }

@@ -1,5 +1,9 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Group_Page_AjaxTest
+ */
 class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   /**
    * Permissioned group is used both as an active group the contact can see and as a group that allows
@@ -17,6 +21,9 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
 
   protected $_params = array();
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Contact BAOs',

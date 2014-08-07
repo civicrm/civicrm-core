@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_TagAddTest
+ */
 class WebTest_Contact_TagAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

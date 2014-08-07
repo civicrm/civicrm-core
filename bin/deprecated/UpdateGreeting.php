@@ -37,7 +37,14 @@
  * IMPORTANT: You must first create valid option value before using via admin interface.
  * Check option lists for Email Greetings, Postal Greetings and Addressee
  */
+
+/**
+ * Class CRM_UpdateGreeting
+ */
 class CRM_UpdateGreeting {
+  /**
+   *
+   */
   function __construct() {
     $this->initialize();
 

@@ -136,8 +136,11 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     $lineItems = array();
     if ($id) {
-      $lineItem = CRM_Price_BAO_LineItem::getLineItems($id, 'contribution', 1);
-      empty($lineItem) ? null :$lineItems[] =  $lineItem;
+      $lineItem = CRM_Price_BAO_LineItem::getLineItems($id, 'contribution', 1, TRUE, TRUE);
+      if (!empty($lineItem)) {
+        $lineItems[] = $lineItem;
+      }
+
     }
     $this->assign('lineItem', empty($lineItems) ? FALSE : $lineItems);
     $values['totalAmount'] = $values['total_amount'];
@@ -215,4 +218,3 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     );
   }
 }
-

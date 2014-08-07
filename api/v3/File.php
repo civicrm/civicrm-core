@@ -95,14 +95,14 @@ function civicrm_api3_file_get($params) {
  * Update an existing file
  *
  * This api is used for updating an existing file.
- * Required parrmeters : id of a file
+ * Required parameters : id of a file
  *
- * @param  Array   $params  an associative array of name/value property values of civicrm_file
+ * @param  Array   $params an array of name/value property values of civicrm_file
  *
  * @return array of updated file object property values
  * @access public
  */
-function &civicrm_api3_file_update($params) {
+function civicrm_api3_file_update($params) {
 
   if (!isset($params['id'])) {
     return civicrm_api3_create_error('Required parameter missing');

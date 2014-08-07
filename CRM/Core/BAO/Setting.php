@@ -67,7 +67,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @param string $group (required) The group name of the item
    * @param string $name (required) The name of the setting
-   * @param int $componentID The optional component ID (so componenets can share the same name space)
+   * @param int $componentID The optional component ID (so components can share the same name space)
    * @param int $contactID If set, this is a contactID specific setting, else its a global setting
    * @param bool|int $load if true, load from local cache (typically memcache)
    *
@@ -119,6 +119,15 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $globalCache->delete($cacheKey);
   }
 
+  /**
+   * @param $values
+   * @param $group
+   * @param null $componentID
+   * @param null $contactID
+   * @param null $domainID
+   *
+   * @return string
+   */
   static function setCache($values,
     $group,
     $componentID = NULL,
@@ -139,6 +148,15 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     return $cacheKey;
   }
 
+  /**
+   * @param $group
+   * @param null $name
+   * @param null $componentID
+   * @param null $contactID
+   * @param null $domainID
+   *
+   * @return CRM_Core_DAO_Domain|CRM_Core_DAO_Setting
+   */
   static function dao($group,
     $name        = NULL,
     $componentID = NULL,
@@ -425,7 +443,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @throws api_Exception
    * @domains array an array of domains to get settings for. Default is the current domain
-   * @return void
+   * @return array
    * @static
    * @access public
    */
@@ -810,6 +828,18 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
   }
 
+  /**
+   * @param $group
+   * @param $name
+   * @param bool $system
+   * @param null $userID
+   * @param bool $localize
+   * @param string $returnField
+   * @param bool $returnNameANDLabels
+   * @param null $condition
+   *
+   * @return array
+   */
   static function valueOptions($group,
     $name,
     $system              = TRUE,
@@ -860,6 +890,14 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     return ($returnNameANDLabels) ? $nameAndLabels : $returnValues;
   }
 
+  /**
+   * @param $group
+   * @param $name
+   * @param $value
+   * @param bool $system
+   * @param null $userID
+   * @param string $keyField
+   */
   static function setValueOption($group,
     $name,
     $value,
@@ -896,6 +934,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     self::setItem($optionValue, $group, $name);
   }
 
+  /**
+   * @param $params
+   * @param null $domainID
+   */
   static function fixAndStoreDirAndURL(&$params, $domainID = NULL) {
     if (self::isUpgradeFromPreFourOneAlpha1()) {
       return;
@@ -967,6 +1009,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
   }
 
+  /**
+   * @param $params
+   * @param $group
+   */
   static function storeDirectoryOrURLPreferences(&$params, $group) {
     foreach ($params as $name => $value) {
       // always try to store relative directory or url from CMS root
@@ -976,6 +1022,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
   }
 
+  /**
+   * @param $params
+   * @param bool $setInConfig
+   */
   static function retrieveDirectoryAndURLPreferences(&$params, $setInConfig = FALSE) {
     if (CRM_Core_Config::isUpgradeMode()) {
       $isJoomla = (defined('CIVICRM_UF') && CIVICRM_UF == 'Joomla') ? TRUE : FALSE;

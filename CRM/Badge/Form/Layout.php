@@ -90,7 +90,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $fontNames = CRM_Core_BAO_LabelFormat::getFontNames('name_badge');
     $textAlignment = CRM_Core_BAO_LabelFormat::getTextAlignments();
     $imageAlignment = $textAlignment;
-    unset($imageAlignment['C']); 
+    unset($imageAlignment['C']);
 
     $rowCount = self::FIELD_ROWCOUNT;
     for ( $i =1; $i <= $rowCount; $i++ ) {
@@ -222,6 +222,9 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     }
   }
 
+  /**
+   * @param $params
+   */
   public function buildPreview(&$params) {
     // get a max participant id
     $participantID = CRM_Core_DAO::singleValueQuery('select max(id) from civicrm_participant');

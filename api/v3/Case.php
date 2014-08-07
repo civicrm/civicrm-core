@@ -417,9 +417,16 @@ function _civicrm_api3_case_read($caseId, $options) {
  */
 function _civicrm_api3_case_format_params(&$params) {
   // figure out case type id from case type and vice-versa
-  $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
+  $caseTypes = CRM_Case_PseudoConstant::caseType('name', FALSE);
   if (empty($params['case_type_id'])) {
     $params['case_type_id'] = array_search($params['case_type'], $caseTypes);
+
+    // DEPRECATED: lookup by label for backward compatibility
+    if (!$params['case_type_id']) {
+      $caseTypeLabels = CRM_Case_PseudoConstant::caseType('title', FALSE);
+      $params['case_type_id'] = array_search($params['case_type'], $caseTypeLabels);
+      $params['case_type'] = $caseTypes[$params['case_type_id']]; // label => name
+    }
   }
   elseif (empty($params['case_type'])) {
     $params['case_type'] = $caseTypes[$params['case_type_id']];

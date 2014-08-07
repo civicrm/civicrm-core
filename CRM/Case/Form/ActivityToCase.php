@@ -72,6 +72,17 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
     $defaults['file_on_case_activity_subject'] = $defaults['subject'];
     $defaults['file_on_case_target_contact_id'] = $defaults['target_contact'];
 
+    $cid = CRM_Utils_Request::retrieve('cid', 'Integer');
+    if ($cid) {
+      $cases = CRM_Case_BAO_Case::getUnclosedCases(array('contact_id' => $cid), $this->_currentCaseId);
+      foreach ($cases as $id => $details) {
+        $defaults['file_on_case_unclosed_case_id'] = $id;
+        $value = array('label' => $details['sort_name'] . ' - ' . $details['case_type']);
+        $this->updateElementAttr('file_on_case_unclosed_case_id', array('data-value' => json_encode($value)));
+        break;
+      }
+    }
+
     return $defaults;
   }
 

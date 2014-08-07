@@ -48,6 +48,25 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   protected $_entity;
 
+  /** Map custom group entities to civicrm components */
+  static $componentMap = array(
+    'Contact' => NULL,
+    'Individual' => NULL,
+    'Household' => NULL,
+    'Organization' => NULL,
+    'Contribution' => 'CiviContribute',
+    'Membership' => 'CiviMember',
+    'Participant' => 'CiviEvent',
+    'Group' => NULL,
+    'Relationship' => NULL,
+    'Event' => 'CiviEvent',
+    'Case' => 'CiviCase',
+    'Activity' => NULL,
+    'Pledge' => 'CiviPledge',
+    'Grant' => 'CiviGrant',
+    'Address' => NULL,
+  );
+
   /* they are two types of missing APIs:
        - Those that are to be implemented
          (in some future version when someone steps in -hint hint-). List the entities in toBeImplemented[ {$action} ]
@@ -74,6 +93,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * @param null $skip
+   *
+   * @return array
+   */
   public static function entities($skip = NULL) {
     // To only test specific entities, call phpunit with SYNTAX_CONFORMANCE_ENTITIES="TheEntityName"
     // or uncomment this line:
@@ -99,45 +123,74 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return $entities;
   }
 
+  /**
+   * @return array
+   */
   public static function entities_get() {
     // all the entities, beside the ones flagged
     return static::entities(static::toBeSkipped_get(TRUE));
   }
 
+  /**
+   * @return array
+   */
   public static function entities_create() {
     return static::entities(static::toBeSkipped_create(TRUE));
   }
 
+  /**
+   * @return array
+   */
   public static function entities_updatesingle() {
     return static::entities(static::toBeSkipped_updatesingle(TRUE));
   }
 
+  /**
+   * @return array
+   */
   public static function entities_getlimit() {
     return static::entities(static::toBeSkipped_getlimit());
   }
 
+  /**
+   * @return array
+   */
   public static function entities_delete() {
     return static::entities(static::toBeSkipped_delete(TRUE));
   }
 
+  /**
+   * @return array
+   */
   public static function custom_data_entities_get() {
     return static::custom_data_entities();
   }
 
+  /**
+   * @return array
+   */
   public static function custom_data_entities() {
-   $entities = CRM_Core_BAO_CustomQuery::$extendsMap;
-   $customDataEntities = array();
+    $enableComponents = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
+    $entities = CRM_Core_BAO_CustomQuery::$extendsMap;
+    $components = self::$componentMap;
+    $customDataEntities = array();
     $invalidEntities = array('Individual', 'Organization', 'Household');
     $entitiesToFix = array('Case', 'Relationship');
-   foreach ($entities as $entityName => $entity ) {
-     if(!in_array($entityName, $invalidEntities)
-       && !in_array($entityName, $entitiesToFix)) {
-       $customDataEntities[] = array($entityName );
-     }
-   }
+    foreach ($entities as $entityName => $entity ) {
+      if(!in_array($entityName, $invalidEntities)
+        && !in_array($entityName, $entitiesToFix)
+        && (!empty($components[$entityName]) && in_array($components[$entityName], $enableComponents) || $components[$entityName] == NULL)) {
+        $customDataEntities[] = array($entityName );
+      }
+    }
     return $customDataEntities;
   }
 
+  /**
+   * @param bool $sequential
+   *
+   * @return array
+   */
   public static function toBeSkipped_get($sequential = FALSE) {
     $entitiesWithoutGet = array('MailingEventSubscribe', 'MailingEventConfirm', 'MailingEventResubscribe', 'MailingEventUnsubscribe', 'MailingGroup', 'Location');
     if ($sequential === TRUE) {
@@ -163,6 +216,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return array('MailingContact');
   }
 
+  /**
+   * @param bool $sequential
+   *
+   * @return array
+   */
   public static function toBeSkipped_create($sequential = FALSE) {
     $entitiesWithoutCreate = array('MailingGroup', 'Constant', 'Entity', 'Location', 'Profile', 'MailingRecipients');
     if ($sequential === TRUE) {
@@ -175,6 +233,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return $entities;
   }
 
+  /**
+   * @param bool $sequential
+   *
+   * @return array
+   */
   public static function toBeSkipped_delete($sequential = FALSE) {
     $entitiesWithout = array('MailingContact', 'MailingEventConfirm', 'MailingEventResubscribe', 'MailingEventSubscribe', 'MailingEventUnsubscribe', 'MailingGroup', 'MailingRecipients', 'Constant', 'Entity', 'Location', 'Domain', 'Profile', 'CustomValue', 'Setting');
     if ($sequential === TRUE) {
@@ -368,6 +431,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'pledge_contribution_page_id',
           'pledge_status_id',
           'pledge_campaign_id',
+          'pledge_financial_type_id',
         )
       ),
       'PaymentProcessorType' => array(
@@ -912,6 +976,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'id' => $entity['id'],
         $field => isset($entity[$field]) ? $entity[$field] : NULL,
       );
+      if(isset($updateParams['financial_type_id']) && $entityName != 'Product') {
+        //api has special handling on these 2 fields for backward compatibility reasons
+        $entity['contribution_type_id'] = $updateParams['financial_type_id'];
+      }
 
       $update = $this->callAPISuccess($entityName, 'create', $updateParams);
       $checkParams = array(

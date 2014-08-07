@@ -284,7 +284,7 @@ UNION
    * @access public
    * @static
    */
-  static function createCurrentEmployerRelationship($contactID, $organizationId, $previousEmployerID = NULL) {
+  static function createCurrentEmployerRelationship($contactID, $organizationId, $previousEmployerID = NULL, $newContact = FALSE) {
     if ($organizationId && is_numeric($organizationId)) {
       $cid = array('contact' => $contactID);
 
@@ -305,8 +305,8 @@ UNION
       ) = CRM_Contact_BAO_Relationship::create($relationshipParams, $cid);
 
 
-      // In case we change employer, clean prveovious employer related records.
-      if (!$previousEmployerID) {
+      // In case we change employer, clean previous employer related records.
+      if (!$previousEmployerID && !$newContact) {
         $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
       }
       if ($previousEmployerID &&
@@ -888,11 +888,17 @@ Group By  componentId";
     CRM_Contact_BAO_GroupContactCache::remove();
   }
 
+  /**
+   * @param $params
+   *
+   * @throws Exception
+   */
   public static function updateGreeting($params) {
     $contactType = $params['ct'];
     $greeting    = $params['gt'];
     $valueID     = $id = CRM_Utils_Array::value('id', $params);
     $force       = CRM_Utils_Array::value('force', $params);
+    $limit       = CRM_Utils_Array::value('limit', $params);
 
     // if valueID is not passed use default value
     if (!$valueID) {
@@ -948,6 +954,10 @@ Group By  componentId";
           WHERE contact_type = %1
           AND ({$idFldName} IS NULL
           OR ( {$idFldName} IS NOT NULL AND ({$displayFldName} IS NULL OR {$displayFldName} = '')) )";
+      }
+
+      if ($limit) {
+        $sql .= " LIMIT $limit";
       }
 
       $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contactType, 'String')));
@@ -1080,4 +1090,3 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
     $templateString = $smarty->fetch("string:$templateString");
   }
 }
-

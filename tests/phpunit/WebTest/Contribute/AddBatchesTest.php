@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_AddBatchesTest
+ */
 class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -112,6 +116,11 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     $this->_verifyData($data, "Membership");
   }
 
+  /**
+   * @param $data
+   * @param $row
+   * @param $type
+   */
   function _fillData($data, $row, $type) {
     $email = $data['first_name'] . '@example.com';
     $this->webtestNewDialogContact($data['first_name'], $data['last_name'], $email, 4,
@@ -164,6 +173,10 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $data
+   * @param $type
+   */
   function _checkResult($data, $type) {
     if ($type == "Contribution") {
       $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
@@ -224,6 +237,10 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $data
+   * @param $type
+   */
   function _verifyData($data, $type) {
     $this->waitForElementPresent("xpath=//div[@id='crm-batch-selector_wrapper']//table//tbody/tr[1]/td[7]/span/a[text()='Enter records']");
     $this->clickLink("xpath=//div[@id='crm-batch-selector_wrapper']//table//tbody/tr[1]/td[7]/span/a[text()='Enter records']", "_qf_Entry_upload");

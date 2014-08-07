@@ -34,6 +34,9 @@
  *
  */
 class CRM_Pledge_BAO_Query {
+  /**
+   * @return array
+   */
   static function &getFields() {
     $fields = CRM_Pledge_BAO_Pledge::exportableFields();
     return $fields;
@@ -198,6 +201,9 @@ class CRM_Pledge_BAO_Query {
     }
   }
 
+  /**
+   * @param $query
+   */
   static function where(&$query) {
     $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
@@ -214,6 +220,10 @@ class CRM_Pledge_BAO_Query {
     }
   }
 
+  /**
+   * @param $values
+   * @param $query
+   */
   static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
@@ -267,13 +277,12 @@ class CRM_Pledge_BAO_Query {
 
           $status = implode(',', $val);
 
-          if (count($val) > 1) {
+          if (count($val) > 0) {
             $op = 'IN';
             $status = "({$status})";
           }
         }
         else {
-          $op = '=';
           $status = $value;
         }
 
@@ -286,7 +295,9 @@ class CRM_Pledge_BAO_Query {
           }
         }
         else {
-          $names[] = $statusValues[$value];
+          if (!empty($value) ) {
+            $names[] = $statusValues[$value];
+          }
         }
 
         $query->_qill[$grouping][] = ts('Pledge Status %1', array(1 => $op)) . ' ' . implode(' ' . ts('or') . ' ', $names);
@@ -314,7 +325,6 @@ class CRM_Pledge_BAO_Query {
           }
         }
         else {
-          $op = '=';
           $status = $value;
         }
 
@@ -327,7 +337,9 @@ class CRM_Pledge_BAO_Query {
           }
         }
         else {
-          $names[] = $statusValues[$value];
+          if (!empty($value) ) {
+            $names[] = $statusValues[$value];
+          }
         }
 
         $query->_qill[$grouping][] = ts('Pledge Payment Status %1', array(1 => $op)) . ' ' . implode(' ' . ts('or') . ' ', $names);
@@ -404,6 +416,13 @@ class CRM_Pledge_BAO_Query {
     }
   }
 
+  /**
+   * @param $name
+   * @param $mode
+   * @param $side
+   *
+   * @return null|string
+   */
   static function from($name, $mode, $side) {
     $from = NULL;
 
@@ -513,6 +532,9 @@ class CRM_Pledge_BAO_Query {
     return $properties;
   }
 
+  /**
+   * @param $form
+   */
   static function buildSearchForm(&$form) {
     // pledge related dates
     CRM_Core_Form_Date::buildDateRange($form, 'pledge_start_date', 1, '_low', '_high', ts('From'), FALSE);
@@ -598,8 +620,15 @@ class CRM_Pledge_BAO_Query {
     $form->setDefaults(array('pledge_test' => 0));
   }
 
+  /**
+   * @param $row
+   * @param $id
+   */
   static function searchAction(&$row, $id) {}
 
+  /**
+   * @param $tables
+   */
   static function tableNames(&$tables) {
     //add status table
     if (!empty($tables['pledge_status']) || !empty($tables['civicrm_pledge_payment'])) {

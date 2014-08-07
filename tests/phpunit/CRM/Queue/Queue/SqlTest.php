@@ -34,6 +34,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * priority-queueing.
  */
 class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'SQL Queue',

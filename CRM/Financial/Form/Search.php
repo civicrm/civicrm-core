@@ -41,6 +41,9 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
     $this->assign('batchStatus', $this->_batchStatus);
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array();
     $status = CRM_Utils_Request::retrieve('status', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, 1);
@@ -56,7 +59,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Batch_DAO_Batch');
     $attributes['total']['class'] = $attributes['item_count']['class'] = 'number';
     $this->add('text', 'title', ts('Batch Name'), $attributes['title']);
-    
+
     $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
     $this->add(
       'select',

@@ -21,7 +21,7 @@
 {ts}Membership End Date{/ts}: {$mem_end_date}
 {/if}
 
-{if $formValues.total_amount}
+{if $formValues.total_amount OR $formValues.total_amount eq 0 }
 ===========================================================
 {ts}Membership Fee{/ts}
 

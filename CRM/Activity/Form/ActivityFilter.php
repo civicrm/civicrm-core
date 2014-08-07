@@ -48,6 +48,27 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
     $this->assign('suppressForm', TRUE);
   }
 
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array reference to the array of default values
+   *
+   */
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array reference to the array of default values
+   *
+   */
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     // CRM-11761 retrieve user's activity filter preferences
     $defaults = array();

@@ -76,6 +76,12 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
     $this->addFormRule(array('CRM_Activity_Form_Task_RemoveFromTag', 'formRule'));
   }
 
+  /**
+   * @param $form
+   * @param $rule
+   *
+   * @return array
+   */
   static function formRule($form, $rule) {
     $errors = array();
     if (empty($form['tag']) && empty($form['activity_taglist'])) {

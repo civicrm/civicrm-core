@@ -431,6 +431,11 @@ class CRM_Core_Block {
     self::setProperty(self::CREATE_NEW, 'templateValues', array('shortCuts' => $values));
   }
 
+  /**
+   * @param $short
+   *
+   * @return array
+   */
   private static function setShortcutValues($short) {
     $value = array();
     if (isset($short['url'])) {

@@ -26,6 +26,10 @@
 
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Financial_FinancialBatchExport
+ */
 class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -53,6 +57,15 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
     $this->_testExportBatch($setTitle, $batchId, $exportFormat);
   }
 
+  /**
+   * @param $setTitle
+   * @param $setDescription
+   * @param $setPaymentInstrument
+   * @param $numberOfTrxn
+   * @param $totalAmt
+   *
+   * @return null
+   */
   function _testAddBatch($setTitle, $setDescription, $setPaymentInstrument, $numberOfTrxn, $totalAmt) {
     // Enter Optional Constraints
     $this->type('title', $setTitle);
@@ -83,6 +96,9 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
     return $batchId;
   }
 
+  /**
+   * @param $numberOfTrxn
+   */
   function _testAssignBatch($numberOfTrxn) {
     $this->select( "xpath=//div[@id='crm-transaction-selector-assign_length']/label/select[@name='crm-transaction-selector-assign_length']", "value=$numberOfTrxn" );
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
@@ -95,6 +111,11 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
+  /**
+   * @param $setTitle
+   * @param $batchId
+   * @param $exportFormat
+   */
   function _testExportBatch($setTitle, $batchId, $exportFormat) {
     $this->openCiviPage("financial/batch", "reset=1&action=export&id=$batchId");
     if ($exportFormat == 'CSV') {

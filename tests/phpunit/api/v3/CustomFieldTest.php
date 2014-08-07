@@ -39,6 +39,9 @@ require_once 'tests/phpunit/CiviTest/CiviUnitTestCase.php';
 class api_v3_CustomFieldTest extends CiviUnitTestCase {
   protected $_apiversion;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Custom Field Create',
@@ -158,12 +161,22 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 /*
  * Can't figure out the point of this?
  */
+  /**
+   * @param $params
+   */
   function _loopingCustomFieldCreateTest($params) {
     $customField = $this->callAPISuccess('custom_field', 'create', $params);
     $this->assertNotNull($customField['id']);
     $this->getAndCheck($params, $customField['id'], 'CustomField');
   }
 
+  /**
+   * @param $gid
+   * @param $htype
+   * @param $dtype
+   *
+   * @return array
+   */
   function _buildParams($gid, $htype, $dtype) {
     $params = $this->_buildBasicParams($gid, $htype, $dtype);
     /* //Not Working for any type. Maybe redundant with testCustomFieldCreateWithOptionValues()
@@ -181,6 +194,13 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     return $params;
   }
 
+  /**
+   * @param $gid
+   * @param $htype
+   * @param $dtype
+   *
+   * @return array
+   */
   function _buildBasicParams($gid, $htype, $dtype) {
     return array(
       'custom_group_id' => $gid,
@@ -445,6 +465,11 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * @param $getFieldsResult
+   *
+   * @return array
+   */
   function getCustomFieldKeys($getFieldsResult) {
     $isCustom = function($key) {
       return preg_match('/^custom_/', $key);

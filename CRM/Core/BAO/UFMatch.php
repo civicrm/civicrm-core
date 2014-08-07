@@ -44,6 +44,11 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    *
    * @param array $params input parameters
    */
+  /**
+   * @param $params
+   *
+   * @return CRM_Core_DAO_UFMatch
+   */
   static function create($params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'UFMatch', CRM_Utils_Array::value('id', $params), $params);
@@ -528,6 +533,9 @@ AND    domain_id    = %4
     return NULL;
   }
 
+  /**
+   * @return bool
+   */
   static function isEmptyTable() {
     $sql = "SELECT count(id) FROM civicrm_uf_match";
     return CRM_Core_DAO::singleValueQuery($sql) > 0 ? FALSE : TRUE;
@@ -593,6 +601,11 @@ AND    domain_id    = %4
     return $ufId;
   }
 
+  /**
+   * @param $email
+   *
+   * @return bool
+   */
   static function isDuplicateUser($email) {
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');

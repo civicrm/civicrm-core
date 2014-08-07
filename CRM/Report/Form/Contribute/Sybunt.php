@@ -43,6 +43,12 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
   protected $_add2groupSupported = FALSE;
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $yearsInPast   = 10;
     $yearsInFuture = 1;
@@ -261,7 +267,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
   function from() {
 
-    $this->_from = " 
+    $this->_from = "
         FROM  civicrm_contribution  {$this->_aliases['civicrm_contribution']}
               INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
@@ -337,6 +343,11 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $this->_groupBy = "Group BY {$this->_aliases['civicrm_contribution']}.contact_id, " . self::fiscalYearOffset($this->_aliases['civicrm_contribution'] . '.receive_date') . " WITH ROLLUP ";
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -436,6 +447,9 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function buildChart(&$rows) {
     $graphRows           = array();
     $count               = 0;
@@ -471,6 +485,9 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
@@ -508,6 +525,12 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   }
 
   // Override "This Year" $op options
+  /**
+   * @param string $type
+   * @param null $fieldName
+   *
+   * @return array
+   */
   function getOperationPair($type = "string", $fieldName = NULL) {
     if ($fieldName == 'yid') {
       return array('calendar' => ts('Is Calendar Year'), 'fiscal' => ts('Fiscal Year Starting'));

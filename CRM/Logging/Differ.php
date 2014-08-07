@@ -38,6 +38,11 @@ class CRM_Logging_Differ {
   private $log_date;
   private $interval;
 
+  /**
+   * @param $log_conn_id
+   * @param $log_date
+   * @param string $interval
+   */
   function __construct($log_conn_id, $log_date, $interval = '10 SECOND') {
     $dsn               = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
     $this->db          = $dsn['database'];
@@ -46,6 +51,11 @@ class CRM_Logging_Differ {
     $this->interval    = $interval;
   }
 
+  /**
+   * @param $tables
+   *
+   * @return array
+   */
   function diffsInTables($tables) {
     $diffs = array();
     foreach ($tables as $table) {
@@ -57,6 +67,12 @@ class CRM_Logging_Differ {
     return $diffs;
   }
 
+  /**
+   * @param $table
+   * @param null $contactID
+   *
+   * @return array
+   */
   function diffsInTable($table, $contactID = null) {
     $diffs = array();
 
@@ -76,7 +92,7 @@ class CRM_Logging_Differ {
         $contactIdClause = "AND id = %3";
         break;
       case 'civicrm_note':
-        $contactIdClause = "AND ( entity_id = %3 AND entity_table = 'civicrm_contact' ) OR (entity_id IN (SELECT note.id FROM `{$this->db}`.log_civicrm_note note WHERE note.entity_id = %3 AND note.entity_table = 'civicrm_contact') AND entity_table = 'civicrm_note')";
+        $contactIdClause = "AND (( entity_id = %3 AND entity_table = 'civicrm_contact' ) OR (entity_id IN (SELECT note.id FROM `{$this->db}`.log_civicrm_note note WHERE note.entity_id = %3 AND note.entity_table = 'civicrm_contact') AND entity_table = 'civicrm_note'))";
         break;
       case 'civicrm_entity_tag':
         $contactIdClause = "AND entity_id = %3 AND entity_table = 'civicrm_contact'";
@@ -134,6 +150,12 @@ WHERE lt.log_conn_id = %1 AND
     return $diffs;
   }
 
+  /**
+   * @param $table
+   * @param $id
+   *
+   * @return array
+   */
   private function diffsInTableForId($table, $id) {
     $diffs = array();
 
@@ -217,6 +239,11 @@ WHERE lt.log_conn_id = %1 AND
     return $diffs;
   }
 
+  /**
+   * @param $table
+   *
+   * @return array
+   */
   function titlesAndValuesForTable($table) {
     // static caches for subsequent calls with the same $table
     static $titles = array();
@@ -294,12 +321,23 @@ WHERE lt.log_conn_id = %1 AND
     return array($titles[$table], $values[$table]);
   }
 
+  /**
+   * @param $sql
+   * @param $params
+   *
+   * @return mixed
+   */
   private function sqlToArray($sql, $params) {
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     $dao->fetch();
     return $dao->toArray();
   }
 
+  /**
+   * @param $table
+   *
+   * @return array
+   */
   private function titlesAndValuesForCustomDataTable($table) {
     $titles = array();
     $values = array();

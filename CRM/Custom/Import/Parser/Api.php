@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class CRM_Custom_Import_Parser_Api
+ */
 class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
 
   protected $_entity = '';

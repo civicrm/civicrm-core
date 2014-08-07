@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Activity_StandaloneAddTest
+ */
 class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -172,6 +176,10 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
   }
 
+  /**
+   * @param $expected
+   * @param null $xpathPrefix
+   */
   function VerifyTabularData($expected, $xpathPrefix = NULL) {
     foreach ($expected as $label => $value) {
         $this->waitForElementPresent("xpath=//table/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td/span");

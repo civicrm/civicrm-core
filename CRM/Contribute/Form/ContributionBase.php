@@ -34,13 +34,13 @@
  */
 
 /**
- * This class generates form components for processing a ontribution
+ * This class generates form components for processing a contribution
  *
  */
 class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
-   * the id of the contribution page that we are proceessing
+   * the id of the contribution page that we are processsing
    *
    * @var int
    * @public
@@ -89,6 +89,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_membershipBlock = NULL;
 
   /**
+   * Does this form support a separate membership payment
+   * @var bool
+   */
+  protected $_separateMembershipPayment;
+  /**
    * the default values for the form
    *
    * @var array
@@ -110,7 +115,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @var array
    * @public
    */
-  public $_fields;
+  public $_fields = array();
 
   /**
    * The billing location id for this contribiution page

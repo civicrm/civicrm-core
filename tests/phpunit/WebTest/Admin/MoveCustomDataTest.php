@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Admin_MoveCustomDataTest
+ */
 class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -109,6 +113,11 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
   }
 
   //moves a field from one field to another
+  /**
+   * @param $field_to_move
+   * @param $from_group_id
+   * @param $to_group_id
+   */
   function _moveCustomField($field_to_move, $from_group_id, $to_group_id) {
     //go to the move field page
     $this->openCiviPage('admin/custom/group/field/move', "reset=1&fid={$field_to_move}");
@@ -135,6 +144,12 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
   }
 
   //create a contact and return the contact id
+  /**
+   * @param string $firstName
+   * @param string $lastName
+   *
+   * @return mixed
+   */
   function _createContact($firstName = "John", $lastName = "Doe") {
     $firstName .= "_" . substr(sha1(rand()), 0, 5);
     $lastName .= "_" . substr(sha1(rand()), 0, 5);
@@ -146,6 +161,13 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
   }
 
   //Get all custom field values for a given contact and custom group id using the api
+  /**
+   * @param $contact_id
+   * @param $group_id
+   * @param bool $reset_cache
+   *
+   * @return array
+   */
   function _loadDataFromApi($contact_id, $group_id, $reset_cache = FALSE) {
     // cache the fields, just to speed things up a little
     static $field_ids = array();
@@ -182,6 +204,11 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
   }
 
   //creates a new custom group and fields in that group, and returns the group Id
+  /**
+   * @param $prefix
+   *
+   * @return null
+   */
   function _buildCustomFieldset($prefix) {
     $group_id    = $this->_createCustomGroup($prefix);
     $field_ids[] = $this->_addCustomFieldToGroup($group_id, 'Alphanumeric', "CheckBox", $prefix);
@@ -193,6 +220,12 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
   }
 
   //Creates a custom field group for a specific entity type and returns the custom group Id
+  /**
+   * @param string $prefix
+   * @param string $entity
+   *
+   * @return null
+   */
   function _createCustomGroup($prefix = "custom", $entity = "Contact") {
 
     $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
@@ -217,6 +250,15 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
 
   //Adds a new custom field to a specfied custom field group, using the given
   //datatype and widget.
+  /**
+   * @param $group_id
+   * @param string $type
+   * @param string $widget
+   * @param string $prefix
+   *
+   * @return mixed
+   * @throws PHPUnit_Framework_AssertionFailedError
+   */
   function _addCustomFieldToGroup($group_id, $type = 'Alphanumeric', $widget = 'CheckBox', $prefix = '') {
     //A mapping of data type names to integer keys
     $type_map = array(
@@ -350,6 +392,11 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
   }
 
   //Populates $count options for a custom field on the add custom field page
+  /**
+   * @param int $count
+   * @param string $prefix
+   * @param array $values
+   */
   function _createFieldOptions($count = 3, $prefix = "option", $values = array(
     )) {
     // Only support up to 10 options on the creation form
@@ -363,6 +410,10 @@ class WebTest_Admin_MoveCustomDataTest extends CiviSeleniumTestCase {
   }
 
   //randomly generates data for a specific custom field
+  /**
+   * @param $contact_id
+   * @param $group_id
+   */
   function _fillCustomDataForContact($contact_id, $group_id) {
     //edit the given contact
     $this->openCiviPage('contact/add', "reset=1&action=update&cid={$contact_id}");

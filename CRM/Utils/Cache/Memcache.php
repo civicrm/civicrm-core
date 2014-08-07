@@ -107,6 +107,12 @@ class CRM_Utils_Cache_Memcache {
     }
   }
 
+  /**
+   * @param $key
+   * @param $value
+   *
+   * @return bool
+   */
   function set($key, &$value) {
     if (!$this->_cache->set($this->_prefix . $key, $value, FALSE, $this->_timeout)) {
       return FALSE;
@@ -114,15 +120,28 @@ class CRM_Utils_Cache_Memcache {
     return TRUE;
   }
 
+  /**
+   * @param $key
+   *
+   * @return mixed
+   */
   function &get($key) {
     $result = $this->_cache->get($this->_prefix . $key);
     return $result;
   }
 
+  /**
+   * @param $key
+   *
+   * @return mixed
+   */
   function delete($key) {
     return $this->_cache->delete($this->_prefix . $key);
   }
 
+  /**
+   * @return mixed
+   */
   function flush() {
     return $this->_cache->flush();
   }

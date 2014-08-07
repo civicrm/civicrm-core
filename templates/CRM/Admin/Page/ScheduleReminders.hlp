@@ -24,5 +24,14 @@
  +--------------------------------------------------------------------+
 *}
 {htxt id="recipient"}
-  {ts}Only send reminders to participants with the status(es) selected above AND who match this criteria. If you select Manual Recipients - only those people will receive the reminder (AND only if they are ALSO participants with the selected status).{/ts}
+  <p>{ts}Select 'Limit to' if you want to only send reminders to contacts with the criteria selected above AND who ALSO match this criteria. If you select 'Choose Recipients' - only the chosen contacts will receive the reminder (AND only if they ALSO match the criteria above).{/ts}</p>
+  <p>{ts}Select 'Also include' if you want to also send reminders to contacts who match this criteria. If you select 'Choose Recipients' - the chosen contacts will also receive the reminder (in ADDITION TO the contacts who match the criteria above).{/ts}
+{/htxt}
+
+{htxt id="id-from_name_email-title"}
+  {ts}Specify FROM Name and Email{/ts}
+{/htxt}
+
+{htxt id="id-from_name_email"}
+  {ts}You can set the FROM name and email address for this reminder in these fields. If you leave these fields blank, the default FROM name and email address for your site will be used (Administer > Communications > FROM Email Addresses).{/ts}
 {/htxt}

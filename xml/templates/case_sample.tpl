@@ -18,7 +18,6 @@ INSERT IGNORE INTO `civicrm_case_type` (  `title`, `name`, `description`, `weigh
   ('{ts}Housing Support{/ts}', 'housing_support', '{ts}Help homeless individuals obtain temporary and long-term housing{/ts}', @max_wt + 1, 0, 1),
   ('{ts}Adult Day Care Referral{/ts}', 'adult_day_care_referral', '{ts}Arranging adult day care for senior individuals{/ts}', @max_wt + 2, 0, 1);
 
-
 -- /*******************************************************
 -- *
 -- * Case Status - Set names for Open and Closed

@@ -185,6 +185,14 @@ class CRM_Contact_BAO_ProximityQuery {
     );
   }
 
+  /**
+   * @param $latitude
+   * @param $longitude
+   * @param $distance
+   * @param string $tablePrefix
+   *
+   * @return string
+   */
   static function where($latitude, $longitude, $distance, $tablePrefix = 'civicrm_address') {
     self::initialize();
 
@@ -233,6 +241,12 @@ ACOS(
     return $where;
   }
 
+  /**
+   * @param $query
+   * @param $values
+   *
+   * @throws Exception
+   */
   static function process(&$query, &$values) {
     list($name, $op, $distance, $grouping, $wildcard) = $values;
 
@@ -337,6 +351,9 @@ ACOS(
     return;
   }
 
+  /**
+   * @param $input
+   */
   static function fixInputParams(&$input) {
     foreach ($input as $param) {
       if (CRM_Utils_Array::value('0', $param) == 'prox_distance') {

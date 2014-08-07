@@ -46,19 +46,19 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    *
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
-   * @return void
+   * @return CRM_Contact_DAO_GroupOrganization
    * @access public
    * @static
    */
   static function add(&$params) {
-    $formatedValues = array();
-    self::formatValues($params, $formatedValues);
-    $dataExists = self::dataExists($formatedValues);
+    $formattedValues = array();
+    self::formatValues($params, $formattedValues);
+    $dataExists = self::dataExists($formattedValues);
     if (!$dataExists) {
       return NULL;
     }
     $groupOrganization = new CRM_Contact_DAO_GroupOrganization();
-    $groupOrganization->copyValues($formatedValues);
+    $groupOrganization->copyValues($formattedValues);
     // we have ensured we have group_id & organization_id so we can do a find knowing that
     // this can only find a matching record
     $groupOrganization->find(TRUE);
@@ -107,6 +107,10 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
     return FALSE;
   }
 
+  /**
+   * @param $groupID
+   * @param $defaults
+   */
   static function retrieve($groupID, &$defaults) {
     $dao = new CRM_Contact_DAO_GroupOrganization();
     $dao->group_id = $groupID;

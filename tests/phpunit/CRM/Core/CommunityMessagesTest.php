@@ -28,7 +28,18 @@
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Core_CommunityMessagesTest
+ */
 class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
+
+  /**
+   * The max difference between two times such that they should be
+   * treated as equals (expressed in seconds).
+   */
+  const APPROX_TIME_EQUALITY = 2;
+
   /**
    * @var CRM_Utils_Cache_Interface
    */
@@ -39,6 +50,9 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    */
   protected static $webResponses = NULL;
 
+  /**
+   * @return array
+   */
   public static function initWebResponses() {
     if (self::$webResponses === NULL) {
       self::$webResponses = array(
@@ -182,7 +196,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     );
     $doc1 = $communityMessages->getDocument();
     $this->assertEquals('<h1>First valid response</h1>', $doc1['messages'][0]['markup']);
-    $this->assertEquals(strtotime('2013-03-01 10:10:00'), $doc1['expires']);
+    $this->assertApproxEquals(strtotime('2013-03-01 10:10:00'), $doc1['expires'], self::APPROX_TIME_EQUALITY);
 
     // second try, $doc1 hasn't expired yet, so still use it
     CRM_Utils_Time::setTime('2013-03-01 10:09:00');
@@ -192,7 +206,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     );
     $doc2 = $communityMessages->getDocument();
     $this->assertEquals('<h1>First valid response</h1>', $doc2['messages'][0]['markup']);
-    $this->assertEquals(strtotime('2013-03-01 10:10:00'), $doc2['expires']);
+    $this->assertApproxEquals(strtotime('2013-03-01 10:10:00'), $doc2['expires'], self::APPROX_TIME_EQUALITY);
 
     // third try, $doc1 expired, update it
     CRM_Utils_Time::setTime('2013-03-01 12:00:02'); // more than 2 hours later (DEFAULT_RETRY)
@@ -202,7 +216,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     );
     $doc3 = $communityMessages->getDocument();
     $this->assertEquals('<h1>Second valid response</h1>', $doc3['messages'][0]['markup']);
-    $this->assertEquals(strtotime('2013-03-01 12:10:02'), $doc3['expires']);
+    $this->assertApproxEquals(strtotime('2013-03-01 12:10:02'), $doc3['expires'], self::APPROX_TIME_EQUALITY);
   }
 
   /**
@@ -267,7 +281,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     );
     $doc1 = $communityMessages->getDocument();
     $this->assertEquals('<h1>First valid response</h1>', $doc1['messages'][0]['markup']);
-    $this->assertEquals(strtotime('2013-03-01 10:10:00'), $doc1['expires']);
+    $this->assertApproxEquals(strtotime('2013-03-01 10:10:00'), $doc1['expires'], self::APPROX_TIME_EQUALITY);
 
     // second try, $doc1 has expired; bad response; keep old data
     CRM_Utils_Time::setTime('2013-03-01 12:00:02'); // more than 2 hours later (DEFAULT_RETRY)
@@ -297,7 +311,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     );
     $doc4 = $communityMessages->getDocument();
     $this->assertEquals('<h1>Second valid response</h1>', $doc4['messages'][0]['markup']);
-    $this->assertEquals(strtotime('2013-03-01 12:20:02'), $doc4['expires']);
+    $this->assertApproxEquals(strtotime('2013-03-01 12:20:02'), $doc4['expires'], self::APPROX_TIME_EQUALITY);
   }
 
   /**

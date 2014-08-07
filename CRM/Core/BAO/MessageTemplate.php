@@ -34,6 +34,10 @@
  */
 
 require_once 'Mail/mime.php';
+
+/**
+ * Class CRM_Core_BAO_MessageTemplate
+ */
 class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
   /**
@@ -152,6 +156,14 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     return $msgTpls;
   }
 
+  /**
+   * @param $contactId
+   * @param $email
+   * @param $messageTemplateID
+   * @param $from
+   *
+   * @return bool|null
+   */
   static function sendReminder($contactId, $email, $messageTemplateID, $from) {
 
     $messageTemplates = new CRM_Core_DAO_MessageTemplate();

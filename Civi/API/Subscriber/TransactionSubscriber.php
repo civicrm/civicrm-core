@@ -29,7 +29,14 @@ namespace Civi\API\Subscriber;
 use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Class TransactionSubscriber
+ * @package Civi\API\Subscriber
+ */
 class TransactionSubscriber implements EventSubscriberInterface {
+  /**
+   * @return array
+   */
   public static function getSubscribedEvents() {
     return array(
       Events::PREPARE => array('onApiPrepare', Events::W_EARLY),
@@ -51,6 +58,9 @@ class TransactionSubscriber implements EventSubscriberInterface {
    * @return bool
    */
   public function isTransactional($apiProvider, $apiRequest) {
+    if (isset($apiRequest['params']['is_transactional'])) {
+      return \CRM_Utils_String::strtobool($apiRequest['params']['is_transactional']);
+    }
     return strtolower($apiRequest['action']) == 'create' || strtolower($apiRequest['action']) == 'delete' || strtolower($apiRequest['action']) == 'submit';
   }
 

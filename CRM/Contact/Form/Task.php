@@ -98,6 +98,10 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     self::preProcessCommon($this);
   }
 
+  /**
+   * @param $form
+   * @param bool $useTable
+   */
   static function preProcessCommon(&$form, $useTable = FALSE) {
 
     $form->_contactIds = array();

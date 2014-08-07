@@ -38,6 +38,9 @@
  *
  */
 class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }

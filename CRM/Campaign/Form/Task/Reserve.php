@@ -303,6 +303,11 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     }
   }
 
+  /**
+   * @param $contactIds
+   *
+   * @return array
+   */
   private function _addRespondentToGroup($contactIds) {
     $groupAdditions = array();
     if (empty($contactIds)) {

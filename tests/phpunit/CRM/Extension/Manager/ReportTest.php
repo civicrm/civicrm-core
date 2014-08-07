@@ -2,6 +2,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Extension_Manager_ReportTest
+ */
 class CRM_Extension_Manager_ReportTest extends CiviUnitTestCase {
   function setUp() {
     parent::setUp();

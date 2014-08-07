@@ -201,6 +201,9 @@ class CRM_Core_Permission {
     return $config->userPermissionClass->group($groupType, $excludeHidden);
   }
 
+  /**
+   * @return bool
+   */
   public static function customGroupAdmin() {
     $admin = FALSE;
 
@@ -224,6 +227,12 @@ class CRM_Core_Permission {
     return FALSE;
   }
 
+  /**
+   * @param int $type
+   * @param bool $reset
+   *
+   * @return array
+   */
   public static function customGroup($type = CRM_Core_Permission::VIEW, $reset = FALSE) {
     $customGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id',
       array('fresh' => $reset));
@@ -238,6 +247,13 @@ class CRM_Core_Permission {
     return CRM_ACL_API::group($type, NULL, 'civicrm_custom_group', $customGroups, $defaultGroups);
   }
 
+  /**
+   * @param int $type
+   * @param null $prefix
+   * @param bool $reset
+   *
+   * @return string
+   */
   static function customGroupClause($type = CRM_Core_Permission::VIEW, $prefix = NULL, $reset = FALSE) {
     if (self::customGroupAdmin()) {
       return ' ( 1 ) ';
@@ -252,15 +268,26 @@ class CRM_Core_Permission {
     }
   }
 
+  /**
+   * @param $gid
+   * @param int $type
+   *
+   * @return bool
+   */
   public static function ufGroupValid($gid, $type = CRM_Core_Permission::VIEW) {
     if (empty($gid)) {
       return TRUE;
     }
 
     $groups = self::ufGroup($type);
-    return in_array($gid, $groups) ? TRUE : FALSE;
+    return !empty($groups) && in_array($gid, $groups) ? TRUE : FALSE;
   }
 
+  /**
+   * @param int $type
+   *
+   * @return array
+   */
   public static function ufGroup($type = CRM_Core_Permission::VIEW) {
     $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
 
@@ -300,6 +327,13 @@ class CRM_Core_Permission {
     return CRM_ACL_API::group($type, NULL, 'civicrm_uf_group', $ufGroups);
   }
 
+  /**
+   * @param int $type
+   * @param null $prefix
+   * @param bool $returnUFGroupIds
+   *
+   * @return array|string
+   */
   static function ufGroupClause($type = CRM_Core_Permission::VIEW, $prefix = NULL, $returnUFGroupIds = FALSE) {
     $groups = self::ufGroup($type);
     if ($returnUFGroupIds) {
@@ -313,6 +347,13 @@ class CRM_Core_Permission {
     }
   }
 
+  /**
+   * @param int $type
+   * @param null $eventID
+   * @param string $context
+   *
+   * @return array|null
+   */
   public static function event($type = CRM_Core_Permission::VIEW, $eventID = NULL, $context = '') {
     if(!empty($context)) {
       if(CRM_Core_Permission::check($context)) {
@@ -343,6 +384,12 @@ class CRM_Core_Permission {
     return NULL;
   }
 
+  /**
+   * @param int $type
+   * @param null $prefix
+   *
+   * @return string
+   */
   static function eventClause($type = CRM_Core_Permission::VIEW, $prefix = NULL) {
     $events = self::event($type);
     if (empty($events)) {
@@ -353,6 +400,12 @@ class CRM_Core_Permission {
     }
   }
 
+  /**
+   * @param $module
+   * @param bool $checkPermission
+   *
+   * @return bool
+   */
   static function access($module, $checkPermission = TRUE) {
     $config = CRM_Core_Config::singleton();
 
@@ -376,7 +429,7 @@ class CRM_Core_Permission {
    * check permissions for delete and edit actions
    *
    * @param string $module component name.
-   * @param $action action to be check across component
+   * @param integer $action action to be check across component
    *
    *
    * @return bool
@@ -408,6 +461,12 @@ class CRM_Core_Permission {
     }
   }
 
+  /**
+   * @param $args
+   * @param string $op
+   *
+   * @return bool
+   */
   static function checkMenu(&$args, $op = 'and') {
     if (!is_array($args)) {
       return $args;
@@ -424,6 +483,12 @@ class CRM_Core_Permission {
     return ($op == 'or') ? FALSE : TRUE;
   }
 
+  /**
+   * @param $item
+   *
+   * @return bool|mixed
+   * @throws Exception
+   */
   static function checkMenuItem(&$item) {
     if (!array_key_exists('access_callback', $item)) {
       CRM_Core_Error::backtrace();
@@ -473,6 +538,11 @@ class CRM_Core_Permission {
     }
   }
 
+  /**
+   * @param bool $all
+   *
+   * @return array
+   */
   static function &basicPermissions($all = FALSE) {
     static $permissions = NULL;
 
@@ -510,6 +580,9 @@ class CRM_Core_Permission {
     return $permissions;
   }
 
+  /**
+   * @return array
+   */
   static function getAnonymousPermissionsWarnings() {
     static $permissions = array();
     if (empty($permissions)) {
@@ -527,10 +600,18 @@ class CRM_Core_Permission {
     return $permissions;
   }
 
+  /**
+   * @param $anonymous_perms
+   *
+   * @return array
+   */
   static function validateForPermissionWarnings($anonymous_perms) {
     return array_intersect($anonymous_perms, self::getAnonymousPermissionsWarnings());
   }
 
+  /**
+   * @return array
+   */
   static function getCorePermissions() {
     $prefix = ts('CiviCRM') . ': ';
     $permissions = array(
@@ -681,6 +762,9 @@ class CRM_Core_Permission {
     return $config->userRoleClass->roleEmails($roleName);
   }
 
+  /**
+   * @return bool
+   */
   static function isMultisiteEnabled() {
     return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
       'is_enabled'

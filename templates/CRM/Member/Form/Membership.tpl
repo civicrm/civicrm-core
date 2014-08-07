@@ -202,7 +202,7 @@
             </td>
           </tr>
         {/if}
-        {if $accessContribution and ! $membershipMode AND ($action neq 2 or !$rows.0.contribution_id or $onlinePendingContributionId)}
+        {if $accessContribution and ! $membershipMode AND ($action neq 2 or (!$rows.0.contribution_id AND !$softCredit) or $onlinePendingContributionId)}
           <tr id="contri">
             <td class="label">{if $onlinePendingContributionId}{ts}Update Payment Status{/ts}{else}{$form.record_contribution.label}{/if}</td>
             <td>{$form.record_contribution.html}<br />
@@ -485,56 +485,80 @@
     {if $context eq 'standalone' and $outBound_option != 2 }
     {literal}
     CRM.$(function($) {
-      cj("#contact_1").blur( function( ) {
-        checkEmail( );
-      } );
+      var $form = $("#{/literal}{$form.formName}{literal}");
+      $("#contact_id", $form).change(checkEmail);
       checkEmail( );
+
+      function checkEmail( ) {
+        var data = $("#contact_id", $form).select2('data');
+        if (data && data.extra && data.extra.email && data.extra.email.length) {
+          $("#email-receipt", $form).show();
+          if ($("#send_receipt", $form).is(':checked')) {
+            $("#notice", $form).show();
+          }
+          $("#email-address", $form).html(data.extra.email);
+        }
+        else {
+          $("#email-receipt, #notice", $form).hide();
+        }
+      }
     });
 
-    function checkEmail( ) {
-      var contactID = cj("input[name='contact_select_id[1]']").val();
-      if ( contactID ) {
-        var postUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' h=0}{literal}";
-        cj.post( postUrl, {contact_id: contactID},
-          function ( response ) {
-            if ( response ) {
-              cj("#email-receipt").show( );
-              if ( cj("#send_receipt").is(':checked') ) {
-                cj("#notice").show( );
-              }
-              cj("#email-address").html( response );
-            }
-            else {
-              cj("#email-receipt").hide( );
-              cj("#notice").hide( );
-            }
-          }
-        );
-  }
-  else {
-        cj("#email-receipt").hide( );
-        cj("#notice").hide( );
-      }
-    }
-
-    function profileCreateCallback( blockNo ) {
-      checkEmail( );
-    }
     {/literal}
     {/if}
 
     {literal}
     //keep read only always checked.
     CRM.$(function($) {
+      var $form = $("#{/literal}{$form.formName}{literal}");
       var allowAutoRenew   = {/literal}'{$allowAutoRenew}'{literal};
       var alreadyAutoRenew = {/literal}'{$alreadyAutoRenew}'{literal};
       if ( allowAutoRenew || alreadyAutoRenew ) {
-        cj( "#auto_renew" ).click(function( ) {
-          if ( cj(this).attr( 'readonly' ) ) {
-            cj(this).prop('checked', true );
+        $( "#auto_renew" ).click(function( ) {
+          if ( $(this).attr( 'readonly' ) ) {
+            $(this).prop('checked', true );
           }
         });
       }
+
+      {/literal}
+      {if !empty($existingContactMemberships)}
+
+      var alert, memberorgs = {$existingContactMemberships|@json_encode};
+
+      {literal}
+      $("select[name='membership_type_id[0]']").change(checkExistingMemOrg);
+
+
+
+      function checkExistingMemOrg () {
+        alert && alert.close && alert.close();
+        var selectedorg = $("select[name='membership_type_id[0]']").val();
+        if (selectedorg in memberorgs) {
+          var andEndDate = '',
+            endDate = memberorgs[selectedorg].membership_end_date,
+            org = $('option:selected', "select[name='membership_type_id[0]']").text();
+          if (endDate) {
+            andEndDate = ' ' + ts("and end date of %1", {1:endDate});
+          }
+
+          alert = CRM.alert(
+            // Mixing client-side variables with a translated string in smarty is awkward!
+            ts({/literal}'{ts escape='js' 1='%1' 2='%2' 3='%3' 4='%4'}This contact has an existing %1 membership at %2 with %3 status%4.{/ts}'{literal}, {1:memberorgs[selectedorg].membership_type, 2: org, 3: memberorgs[selectedorg].membership_status, 4: andEndDate})
+              + '<ul><li><a href="' + memberorgs[selectedorg].renewUrl + '">'
+              + {/literal}'{ts escape='js''}Renew the existing membership instead{/ts}'
+              + '</a></li><li><a href="' + memberorgs[selectedorg].membershipTab + '">'
+              + '{ts escape='js'}View all existing and / or expired memberships for this contact{/ts}'{literal}
+              + '</a></li></ul>',
+            ts('Duplicate Membership?'), 'alert');
+        }
+      }
+      checkExistingMemOrg();
+      {/literal}
+      {/if}
+
+      {literal}
+
     });
     {/literal}
 

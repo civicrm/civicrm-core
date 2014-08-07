@@ -278,6 +278,9 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
      * @access private
      */
 
+  /**
+   * @param $names
+   */
   static function restoreSessionFromCache($names) {
     foreach ($names as $key => $sessionName) {
       if (is_array($sessionName)) {

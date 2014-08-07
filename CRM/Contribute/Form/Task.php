@@ -156,7 +156,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
 
       $form->assign('totalSelectedContributions', count($ids));
     }
-    if ($form->_includesSoftCredits && !empty($contactIds)) {
+    if (!empty($form->_includesSoftCredits) && !empty($contactIds)) {
       $form->_contactIds = $contactIds;
       $form->_contributionContactIds = $contributionContactIds;
     }

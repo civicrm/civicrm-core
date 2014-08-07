@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {if empty($tagsetType)}
-  {assign var="tagsetType" value="contact"}contact{/capture}
+  {assign var="tagsetType" value="contact"}
 {/if}
 {foreach from=$tagsetInfo.$tagsetType item=tagset}
   {assign var="elemName" value=$tagset.tagsetElementName}

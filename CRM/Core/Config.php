@@ -41,6 +41,9 @@ require_once 'Mail.php';
 
 require_once 'api/api.php';
 
+/**
+ * Class CRM_Core_Config
+ */
 class CRM_Core_Config extends CRM_Core_Config_Variables {
   ///
   /// BASE SYSTEM PROPERTIES (CIVICRM.SETTINGS.PHP)
@@ -81,6 +84,11 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * @var CRM_Utils_System_Base
    */
   public $userSystem = NULL;
+
+  /**
+   * @var CRM_Core_Permission_Base
+   */
+  public $userPermissionClass;
 
   /**
    * The root directory where Smarty should store compiled files
@@ -213,7 +221,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
           self::$_singleton->_initVariables();
 
-          // I dont think we need to do this twice
+          // I don't think we need to do this twice
           // however just keeping this commented for now in 4.4
           // in case we hit any issues - CRM-13064
           // We can safely delete this once we release 4.4.4
@@ -227,7 +235,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
         // CRM-9803, NYSS-4822
         // this causes various settings to be reset and hence we should
-        // only use the config object that we retrived from memcache
+        // only use the config object that we retrieved from memcache
       }
 
       self::$_singleton->initialized = 1;
@@ -499,7 +507,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
         CRM_Utils_System::mapConfigToSSL();
       }
       $rrb = parse_url($this->userFrameworkResourceURL);
-      // dont use absolute path if resources are stored on a different server
+      // don't use absolute path if resources are stored on a different server
       // CRM-4642
       $this->resourceBase = $this->userFrameworkResourceURL;
       if (isset($_SERVER['HTTP_HOST']) &&

@@ -43,6 +43,10 @@
  */
 
 require_once 'api/Wrapper.php';
+
+/**
+ * Class CRM_Utils_API_ReloadOption
+ */
 class CRM_Utils_API_ReloadOption implements API_Wrapper {
 
   /**

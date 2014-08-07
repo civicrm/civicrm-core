@@ -29,13 +29,23 @@ namespace Civi\API\Subscriber;
 use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Class XDebugSubscriber
+ * @package Civi\API\Subscriber
+ */
 class XDebugSubscriber implements EventSubscriberInterface {
+  /**
+   * @return array
+   */
   public static function getSubscribedEvents() {
     return array(
       Events::RESPOND => array('onApiRespond', Events::W_LATE),
     );
   }
 
+  /**
+   * @param \Civi\API\Event\RespondEvent $event
+   */
   function onApiRespond(\Civi\API\Event\RespondEvent $event) {
     $apiRequest = $event->getApiRequest();
     $result = $event->getResponse();

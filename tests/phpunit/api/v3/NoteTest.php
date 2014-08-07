@@ -40,10 +40,16 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   protected $_note;
 
 
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Note Create',

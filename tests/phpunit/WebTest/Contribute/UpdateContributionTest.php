@@ -26,6 +26,10 @@
 
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_UpdateContributionTest
+ */
 class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
  protected function setUp() {
@@ -132,7 +136,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->select("account_relationship", "label=Premiums Inventory Account is");
    $this->select("financial_account_id", "label=$to");
    $this->clickLink("_qf_FinancialTypeAccount_next-botttom", "xpath=//a[@id='newfinancialTypeAccount']", FALSE);
-   
+
    $premiumName = 'Premium'.substr(sha1(rand()), 0, 7);
    $amount = 500;
    $sku = 'SKU';
@@ -204,7 +208,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->click("xpath=//div[@id='ltype']/div/table/tbody//tr/td[text()='".$financialType['name']."']/../td[7]/span/a[text()='Accounts']");
    $this->waitForElementPresent("xpath=//a[@id='newfinancialTypeAccount']");
    $this->clickLink("xpath=//a[@id='newfinancialTypeAccount']", "_qf_FinancialTypeAccount_cancel-botttom", FALSE);
-   
+
    $this->select("account_relationship", "label=Premiums Inventory Account is");
    $this->select("financial_account_id", "label=$to");
    $this->clickLink("_qf_FinancialTypeAccount_next-botttom", "xpath=//a[@id='newfinancialTypeAccount']", FALSE);
@@ -384,7 +388,16 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->assertEquals($fValue2, "100.00", "Verify Amount");
  }
 
- function _getPremiumActualCost($entityId, $from = NULL, $to = NULL, $cost = NULL, $entityTable = NULL, $select = "ft.total_amount AS amount") {
+  /**
+   * @param $entityId
+   * @param null $from
+   * @param null $to
+   * @param null $cost
+   * @param null $entityTable
+   * @param string $select
+   *
+   * @return null|string
+   */function _getPremiumActualCost($entityId, $from = NULL, $to = NULL, $cost = NULL, $entityTable = NULL, $select = "ft.total_amount AS amount") {
    $financialAccount = CRM_Contribute_PseudoConstant::financialAccount();
    $query = "SELECT
      {$select}
@@ -408,7 +421,11 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    return $result;
  }
 
- function _getFinancialTrxnAmount($contId) {
+  /**
+   * @param $contId
+   *
+   * @return null|string
+   */function _getFinancialTrxnAmount($contId) {
    $query = "SELECT
      SUM( ft.total_amount ) AS total
      FROM civicrm_financial_trxn AS ft
@@ -419,7 +436,11 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    return $result;
  }
 
- function _getFinancialItemAmount($contId) {
+  /**
+   * @param $contId
+   *
+   * @return null|string
+   */function _getFinancialItemAmount($contId) {
    $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
    $query = "SELECT
      SUM(amount)
@@ -430,7 +451,11 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    return $result;
  }
 
- function _getTotalContributedAmount($contId) {
+  /**
+   * @param $contId
+   *
+   * @return null|string
+   */function _getTotalContributedAmount($contId) {
    $query = "SELECT
      SUM(amount)
      FROM civicrm_entity_financial_trxn
@@ -440,7 +465,14 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    return $result;
  }
 
- function _testOfflineContribution($firstName, $lastName, $email, $amount, $status="Completed") {
+  /**
+   * @param $firstName
+   * @param $lastName
+   * @param $email
+   * @param $amount
+   * @param string $status
+   */
+  function _testOfflineContribution($firstName, $lastName, $email, $amount, $status="Completed") {
 
    $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 

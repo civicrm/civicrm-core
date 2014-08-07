@@ -368,6 +368,10 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     return parent::run();
   }
 
+  /**
+   * @param $form
+   * @param null $contactId
+   */
   public static function setContext(&$form, $contactId = NULL) {
     $context = CRM_Utils_Request::retrieve('context', 'String', $form, FALSE, 'search' );
 

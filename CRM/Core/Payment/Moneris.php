@@ -55,7 +55,7 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
    *
    * @return \CRM_Core_Payment_Moneris
    */
-  function __construct($mode, &$paymentProcessor) {
+  function __construct($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('Moneris');
@@ -96,6 +96,15 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
     return self::$_singleton[$processorName];
   }
 
+  /**
+   * This function collects all the information from a web/api form and invokes
+   * the relevant payment processor specific functions to perform the transaction
+   *
+   * @param  array $params assoc array of input parameters for this transaction
+   *
+   * @return array the result in an nice formatted array (or an error object)
+   * @abstract
+   */
   function doDirectPayment(&$params) {
     //make sure i've been called correctly ...
     if (!$this->_profile) {
@@ -240,6 +249,11 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
     return $params;
   }
 
+  /**
+   * @param $response
+   *
+   * @return bool
+   */
   function isError(&$response) {
     $responseCode = $response->getResponseCode();
     if (is_null($responseCode)) {
@@ -255,6 +269,11 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
   }
 
   // ignore for now, more elaborate error handling later.
+  /**
+   * @param $response
+   *
+   * @return object
+   */
   function &checkResult(&$response) {
     return $response;
 
@@ -281,6 +300,11 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
     return $e;
   }
 
+  /**
+   * @param null $error
+   *
+   * @return object
+   */
   function &error($error = NULL) {
     $e = CRM_Core_Error::singleton();
     if (is_object($error)) {

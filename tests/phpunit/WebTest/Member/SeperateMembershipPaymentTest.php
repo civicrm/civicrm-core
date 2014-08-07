@@ -25,6 +25,10 @@
   */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_SeperateMembershipPaymentTest
+ */
 class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -138,6 +142,11 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
     $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
   }
 
+  /**
+   * @param $pageId
+   * @param $memTypeId
+   * @param null $cid
+   */
   function _testOnlineMembershipSignup($pageId, $memTypeId, $cid = NULL) {
     //Open Live Contribution Page
     $args = array('reset' => 1, 'id' => $pageId);

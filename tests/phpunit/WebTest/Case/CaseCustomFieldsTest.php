@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Case_CaseCustomFieldsTest
+ */
 class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -205,6 +209,10 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->_testDeleteCustomData($customGrpId1, $customId);
   }
 
+  /**
+   * @param $validateStrings
+   * @param $activityTypes
+   */
   function _testVerifyCaseSummary($validateStrings, $activityTypes) {
     $this->assertStringsPresent($validateStrings);
     foreach ($activityTypes as $aType) {
@@ -214,6 +222,12 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->assertElementPresent("name=case_report_all", "Print Case Summary button is missing.");
   }
 
+  /**
+   * @param $customGrpId1
+   * @param bool $noteRichEditor
+   *
+   * @return array
+   */
   function _testGetCustomFieldId($customGrpId1, $noteRichEditor=FALSE) {
     $customId = array();
 
@@ -285,6 +299,10 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     return $customId;
   }
 
+  /**
+   * @param $customGrpId1
+   * @param $customId
+   */
   function _testDeleteCustomData($customGrpId1, $customId) {
     // delete all custom data
     foreach ($customId as $cKey => $cValue) {
@@ -439,6 +457,12 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->_testDeleteCustomData($customGrpId1, $customId);
   }
 
+  /**
+   * @param $customId
+   * @param $custFname
+   * @param $custMname
+   * @param $custLname
+   */
   function _testAdvansearchCaseData($customId, $custFname, $custMname, $custLname) {
     // search casecontact
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');

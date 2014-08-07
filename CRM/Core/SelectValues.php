@@ -876,6 +876,14 @@ class CRM_Core_SelectValues {
     );
   }
 
+  static function billingMode() {
+    return array(
+      CRM_Core_Payment::BILLING_MODE_FORM => 'form',
+      CRM_Core_Payment::BILLING_MODE_BUTTON => 'button',
+      CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
+    );
+  }
+
   /**
    * Frequency unit for schedule reminders
    */

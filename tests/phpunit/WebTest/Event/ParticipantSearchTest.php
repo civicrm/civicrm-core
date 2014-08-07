@@ -25,12 +25,19 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_ParticipantSearchTest
+ */
 class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
+  /**
+   * @param $strings
+   */
   function _checkStrings(&$strings) {
     // search for elements
     foreach ($strings as $string) {

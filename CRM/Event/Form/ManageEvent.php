@@ -104,7 +104,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL, 'GET');
     if ($this->_id) {
       $this->assign('eventId', $this->_id);
-      if (empty($this->_addProfileBottom) && empty($this->_addProfileBottomAdd)) {
+      if (!empty($this->_addBlockName) && empty($this->_addProfileBottom) && empty($this->_addProfileBottomAdd)) {
         $this->add('hidden', 'id', $this->_id);
       }
       $this->_single = TRUE;
@@ -367,6 +367,9 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     if ($this->controller->getPrint() || $this->getVar('_id') <= 0 || $this->_action & CRM_Core_Action::DELETE) {
       return parent::getTemplateFileName();

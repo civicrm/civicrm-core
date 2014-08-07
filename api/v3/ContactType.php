@@ -34,8 +34,6 @@
  * @copyright CiviCRM LLC (c) 2004-2014
  */
 
-require_once 'api/v3/utils.php';
-
 /**
  * create/update contact_type
  *

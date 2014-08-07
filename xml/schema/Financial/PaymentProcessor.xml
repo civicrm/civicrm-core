@@ -20,6 +20,11 @@
     <name>domain_id</name>
     <type>int unsigned</type>
     <required>true</required>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <comment>Which Domain is this match entry for</comment>
     <add>3.0</add>
   </field>
@@ -107,8 +112,7 @@
   <field>
     <name>signature</name>
     <title>Signature</title>
-    <type>varchar</type>
-    <length>255</length>
+    <type>text</type>
     <add>1.8</add>
   </field>
   <field>

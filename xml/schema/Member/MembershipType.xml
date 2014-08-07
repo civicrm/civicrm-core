@@ -22,6 +22,11 @@
     <name>domain_id</name>
     <type>int unsigned</type>
     <required>true</required>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <comment>Which Domain is this match entry for</comment>
     <add>3.0</add>
   </field>
@@ -88,6 +93,11 @@
     <name>financial_type_id</name>
     <type>int unsigned</type>
     <required>true</required>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <comment>If membership is paid by a contribution - what financial type should be used. FK to civicrm_financial_type.id</comment>
     <add>4.3</add>
   </field>

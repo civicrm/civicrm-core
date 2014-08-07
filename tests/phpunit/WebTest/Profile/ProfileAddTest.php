@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Profile_ProfileAddTest
+ */
 class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -226,6 +230,9 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->_testdeleteProfile($profileTitle);
   }
 
+  /**
+   * @param $profileTitle
+   */
   function _testdeleteProfile($profileTitle) {
     //$this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
@@ -248,11 +255,11 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
     // open Add Profile page
     $this->openCiviPage("admin/uf/group/add", "action=add&reset=1");
-    
+
     $this->waitForElementPresent('_qf_Group_next-bottom');
     $profileTitle = 'Test Profile' . substr(sha1(rand()), 0, 7);
     $this->type('title', $profileTitle);
-    
+
     // check if description field is present
     $this->waitForElementPresent('description');
 
@@ -265,7 +272,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
     // Wait for "saved" status msg
     $this->waitForText('crm-notification-container', 'Profile Added');
-    
+
     $this->waitForElementPresent('_qf_Field_next-bottom');
 
     // select field(s) to be added in profile
@@ -298,7 +305,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
     // Wait for "saved" status msg
     $this->waitForText('crm-notification-container', 'Profile Saved');
-  
+
     $this->clickLink("xpath=//div[@id='breadcrumb']/div//a[text()='Profiles']");
     $this->waitForElementPresent("xpath=//div[@class='crm-submit-buttons']/a[@id='newCiviCRMProfile-bottom']");
     $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody/tr[@id='UFGroup-$id']/td[2]/a");
@@ -317,7 +324,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
 
     // Is contact present?
     $this->assertTrue($this->isTextPresent("$createdBy"), "Contact did not find!");
-    
+
     $this->openCiviPage('admin/uf/group', 'reset=1');
     // delete created profile
     $this->_testdeleteProfile($profileTitle);
