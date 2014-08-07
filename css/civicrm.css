@@ -5,6 +5,10 @@
  * Other civi blocks outside the main container also have the class crm-container (but not the id)
  * All styles should start with .crm-container unless they are specific to the main div only
  */
+.crm-container input,
+#civicrm-menu input {
+  box-sizing: content-box;
+}
 
 div.crm-container label {
   font-weight: normal;
@@ -105,11 +109,6 @@ div.crm-container fieldset label{
   border-top: none;
 }
 
-.crm-container tr {
-  font-size: .95em;
-  background: none !important;
-}
-
 .crm-container td {
   padding: 4px;
   vertical-align: top;
@@ -122,25 +121,11 @@ div.crm-container fieldset label{
   border-collapse: collapse;
 }
 
-.crm-container .crm-row-selected {
-  margin: 0px;
-  padding: 3px 0px 3px 0px;
-  clear: none;
-  background-color: #FFFFCC !important;
-}
-
 .crm-container .crm-row-child {
   margin: 0px;
   padding: 3px 0px 3px 0px;
   clear: none;
-  background-color: #F1F8EB !important;
-}
-
-.crm-container .row-highlighted {
-  margin: 0px;
-  padding: 3px 0px 3px 0px;
-  clear: none;
-  background-color: #FFFFCC;
+  background-color: #F1F8EB;
 }
 
 /*
@@ -3249,51 +3234,7 @@ div#crm-container form {
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * DataTables row classes
- */
-.crm-container table.display tr.odd.gradeA {
-  background-color: #ddffdd;
-}
-
-.crm-container table.display tr.even.gradeA {
-  background-color: #eeffee;
-}
-
-.crm-container table.display tr.odd.gradeC {
-  background-color: #ddddff;
-}
-
-.crm-container table.display tr.even.gradeC {
-  background-color: #eeeeff;
-}
-
-.crm-container table.display tr.odd.gradeX {
-  background-color: #ffdddd;
-}
-
-.crm-container table.display tr.even.gradeX {
-  background-color: #ffeeee;
-}
-
-.crm-container table.display tr.odd.gradeU {
-  background-color: #ddd;
-}
-
-.crm-container table.display tr.even.gradeU {
-  background-color: #eee;
-}
-
-
-.crm-container tr.odd {
-  background-color: #E2E4FF;
-}
-
-.crm-container tr.even {
-  background-color: white;
-}
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Misc
+ * Datatables misc
  */
 .crm-container .dataTables_scroll {
   clear: both;
@@ -3322,73 +3263,6 @@ div#crm-container form {
   margin: 0.5em 0;
   width: 100%;
   color: #444;
-}
-
-.crm-container tfoot input.search_init {
-  color: #999;
-}
-
-.crm-container td.group {
-  background-color: #d1cfd0;
-  border-bottom: 2px solid #A19B9E;
-  border-top: 2px solid #A19B9E;
-}
-
-.crm-container td.details {
-  background-color: #d1cfd0;
-  border: 2px solid #A19B9E;
-}
-
-
-.crm-container .example_alt_pagination div.dataTables_info {
-  width: 40%;
-}
-
-.crm-container .paging_full_numbers {
-  width: 400px;
-  height: 22px;
-  line-height: 22px;
-}
-
-.crm-container .paging_full_numbers a:active {
-  outline: none
-}
-
-.crm-container .paging_full_numbers a:hover {
-  text-decoration: none;
-}
-
-.crm-container .paging_full_numbers a.paginate_button,
-.crm-container .paging_full_numbers a.paginate_active {
-  border: 1px solid #aaa;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  padding: 2px 5px;
-  margin: 0 3px;
-  cursor: pointer;
-  *cursor: hand;
-  color: #333 !important;
-}
-
-.crm-container .paging_full_numbers a.paginate_button {
-  background-color: #ddd;
-}
-
-.crm-container .paging_full_numbers a.paginate_button:hover {
-  background-color: #ccc;
-  text-decoration: none !important;
-}
-
-.crm-container .paging_full_numbers a.paginate_active {
-  background-color: #99B3FF;
-}
-
-.crm-container table.display tr.even.row_selected td {
-  background-color: #B0BED9;
-}
-
-.crm-container table.display tr.odd.row_selected td {
-  background-color: #9FAFD1;
 }
 
 /*  DataTables fixes */
@@ -3857,6 +3731,10 @@ div.m ul#civicrm-menu,
 .crm-container .crm-action-menu.action-icon-clipboard .select2-default span.select2-chosen:before {
   background-position: -160px -128px;
 }
+/* Restore this property otherwise our css overrides it */
+.select2-search input {
+  box-sizing: border-box;
+}
 
 /* Special styling for specific form buttons */
 #crm-container span.crm-button_qf_Main_upload input,
@@ -3936,9 +3814,17 @@ div.m ul#civicrm-menu,
 }
 
 /* table row highlightng */
-.crm-container table.row-highlight tr:hover {
-  background-color: #FFFFCC !important;
+.crm-container table.row-highlight tr:hover,
+.crm-container .crm-row-selected {
+  background-color: #FFFFCC;
 }
+.crm-container table.row-highlight tr.even-row:hover,
+.crm-container table.row-highlight tr.even:hover,
+.crm-container .even-row.crm-row-selected,
+.crm-container .even.crm-row-selected {
+  background-color: #fffdb2;
+}
+
 #crm-container .civicrm-drupal-wysiwyg .collapsed {
   background: transparent;
   padding-left: 0px;
@@ -3985,31 +3871,22 @@ div.m ul#civicrm-menu,
 }
 
 /* classes related to batch entry operation */
-.crm-container span.batch-edit {
+.crm-container span.batch-edit,
+.crm-container span.batch-valid,
+.crm-container span.batch-invalid {
   padding: 2px 9px 2px 3px;
   margin: 2px 2px 3px 2px;
   cursor: pointer;
-  cursor: hand;
   background-position: -66px -114px;
   background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
 }
 
 .crm-container span.batch-valid {
-  padding: 2px 9px 2px 3px;
-  margin: 2px 2px 3px 2px;
-  cursor: pointer;
-  cursor: hand;
   background-position: -322px -143px;
-  background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
 }
 
 .crm-container span.batch-invalid {
-  padding: 2px 9px 2px 3px;
-  margin: 2px 2px 3px 2px;
-  cursor: pointer;
-  cursor: hand;
   background-position: -258px -143px;
-  background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
 }
 
 .crm-container #Entry ul#errorList {
