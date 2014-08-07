@@ -25,8 +25,6 @@
  +--------------------------------------------------------------------+
 */
 
-require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
-
 /**
  *  Include configuration
  */
