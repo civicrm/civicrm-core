@@ -63,7 +63,7 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
 
     $this->addElement(
       'submit', $this->getButtonName('next', 'cleanup'), 'Cleanup Caches',
-      array('class' => 'form-submit', 'id' => 'cleanup-cache')
+      array('class' => 'crm-form-submit', 'id' => 'cleanup-cache')
     );
 
     $this->add('text', 'newBaseURL', ts('New Base URL'), NULL, TRUE);

@@ -130,7 +130,7 @@
       <tr><td>Javascript</td><td><pre class="prettyprint linenums" id="api-json" title='javascript syntax'></pre></td></tr>
     </table>
   </div>
-  <input type="submit" value="{ts}Execute{/ts}" class="form-submit"/>
+  <input type="submit" value="{ts}Execute{/ts}" class="crm-form-submit"/>
 <pre id="api-result" class="linenums">
 {ts}The result of api calls are displayed in this area.{/ts}
 </pre>

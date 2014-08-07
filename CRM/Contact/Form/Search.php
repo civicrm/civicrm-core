@@ -446,7 +446,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->assign_by_ref('group', $groupValues);
       $this->add('submit', $this->_actionButtonName, ts('Add Contacts to %1', array(1 => $this->_group[$this->_amtgID])),
         array(
-          'class' => 'form-submit',
+          'class' => 'crm-form-submit',
         )
       );
       $this->add('hidden', 'task', CRM_Contact_Task::GROUP_CONTACTS);

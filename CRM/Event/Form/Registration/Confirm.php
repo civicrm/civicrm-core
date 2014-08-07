@@ -303,7 +303,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->add('image',
         $this->_checkoutButtonName,
         $this->_paymentProcessor['url_button'],
-        array('class' => 'form-submit')
+        array('class' => 'crm-form-submit')
       );
 
       $this->addButtons(array(
