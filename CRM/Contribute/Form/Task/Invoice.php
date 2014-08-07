@@ -403,7 +403,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       // get organization address
       $domain = CRM_Core_BAO_Domain::getDomain();
       $locParams = array('contact_id' => $domain->id);
-      $locationDefaults = $defaults = CRM_Core_BAO_Location::getValues($locParams);
+      $locationDefaults = CRM_Core_BAO_Location::getValues($locParams);
       if (isset($locationDefaults['address'][1]['state_province_id'])) {
         $stateProvinceAbbreviationDomain = CRM_Core_PseudoConstant::stateProvinceAbbreviation($locationDefaults['address'][1]['state_province_id']);              
       }
@@ -547,7 +547,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         return $html;
       }
       else {
-        CRM_Utils_PDF_Utils::html2pdf($messageInvoice, 'Invoice.pdf', FALSE, array('margin_top'=>10,'margin_left'=>65,'metric'=>'px'));
+        CRM_Utils_PDF_Utils::html2pdf($messageInvoice, 'Invoice.pdf', FALSE, array('margin_top'=>10, 'margin_left'=>65, 'metric'=>'px'));
         // functions call for adding activity with attachment
         $fileName = self::putFile($html);
         self::addActivities($subject, $contactIds, $fileName, $params['output']);
