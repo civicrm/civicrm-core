@@ -393,15 +393,36 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
         $title = CRM_Utils_Array::value('title', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
       }
+      $source = $contribution->source;
       
       $config = CRM_Core_Config::singleton();
-      $config->doNotAttachPDFReceipt = 1;
+      if ($params['forPage'] != 'confirmpage') {
+        $config->doNotAttachPDFReceipt = 1;
+      }
+
+      // get organization address
+      $domain = CRM_Core_BAO_Domain::getDomain();
+      $locParams = array('contact_id' => $domain->id);
+      $locationDefaults = $defaults = CRM_Core_BAO_Location::getValues($locParams);
+      if (isset($locationDefaults['address'][1]['state_province_id'])) {
+        $stateProvinceAbbreviationDomain = CRM_Core_PseudoConstant::stateProvinceAbbreviation($locationDefaults['address'][1]['state_province_id']);              
+      }
+      else {
+        $stateProvinceAbbreviationDomain = '';
+      }
+      if (isset($locationDefaults['address'][1]['country_id'])) {
+        $countryDomain = CRM_Core_PseudoConstant::country($locationDefaults['address'][1]['country_id']);  
+      }
+      else {
+        $countryDomain = '';
+      }
 
       // parameters to be assign for template
       $tplParams = array(
                          'title' => $title,
                          'component' => $input['component'],
                          'id' => $contribution->id,
+                         'source' => $source,
                          'invoice_id' => $invoiceId,
                          'creditnote_id' => $creditNoteId,
                          'imageUploadURL' => $config->imageUploadURL,
@@ -425,6 +446,16 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
                          'postal_code' => CRM_Utils_Array::value('postal_code', CRM_Utils_Array::value($contribution->contact_id,$billingAddress)),
                          'is_pay_later' => $contribution->is_pay_later,
                          'organization_name' => $contribution->_relatedObjects['contact']->organization_name,
+                         'domain_organization' => $domain->name,
+                         'domain_street_address' => CRM_Utils_Array::value('street_address', CRM_Utils_Array::value('1', $locationDefaults['address'])),
+                         'domain_supplemental_address_1' => CRM_Utils_Array::value('supplemental_address_1', CRM_Utils_Array::value('1', $locationDefaults['address'])),
+                         'domain_supplemental_address_2' => CRM_Utils_Array::value('supplemental_address_2', CRM_Utils_Array::value('1', $locationDefaults['address'])),
+                         'domain_city' => CRM_Utils_Array::value('city', CRM_Utils_Array::value('1', $locationDefaults['address'])),
+                         'domain_postal_code' => CRM_Utils_Array::value('postal_code', CRM_Utils_Array::value('1', $locationDefaults['address'])),
+                         'domain_state' => $stateProvinceAbbreviationDomain,
+                         'domain_country' => $countryDomain,
+                         'domain_email' => CRM_Utils_Array::value('email', CRM_Utils_Array::value('1', $locationDefaults['email'])),
+                         'domain_phone' => CRM_Utils_Array::value('phone', CRM_Utils_Array::value('1', $locationDefaults['phone'])),
                          );
       
       $sendTemplateParams = array(
@@ -457,17 +488,21 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       // condition to check for download PDF Invoice or email Invoice
       if ($invoiceElements['createPdf']) {
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
-        $mail = array(
-                      'subject' => $subject,
-                      'body' => $message,                                   
-                      'html' => $html,
-                      );
-        
-        if ($mail['html']) {
-          $messageInvoice[] = $mail['html'];
-        }     
+        if ($params['forPage'] == 'confirmpage') {
+          return $html;
+        }
         else {
-          $messageInvoice[] = nl2br($mail['body']);
+          $mail = array(
+            'subject' => $subject,
+            'body' => $message,                                   
+            'html' => $html,
+            );
+          if ($mail['html']) {
+            $messageInvoice[] = $mail['html'];
+          }     
+          else {
+            $messageInvoice[] = nl2br($mail['body']);
+          }
         }
       }
       elseif ($contribution->_component == 'contribute') {
@@ -507,13 +542,17 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     }
     
     if ($invoiceElements['createPdf']) {
-      CRM_Utils_PDF_Utils::html2pdf($messageInvoice, 'Invoice.pdf', FALSE);
+      if ($params['forPage'] == 'confirmpage') {
+        return $html;
+      }
+      else {
+        CRM_Utils_PDF_Utils::html2pdf($messageInvoice, 'Invoice.pdf', FALSE, array('margin_top'=>10,'margin_left'=>65,'metric'=>'px'));
+        // functions call for adding activity with attachment
+        $fileName = self::putFile($html);
+        self::addActivities($subject, $contactIds, $fileName, $params['output']);
 
-      // functions call for adding activity with attachment
-      $fileName = self::putFile($html);
-      self::addActivities($subject, $contactIds, $fileName, $params['output']);
-      
-      CRM_Utils_System::civiExit();
+        CRM_Utils_System::civiExit();
+      }
     }
     else {
       if ($invoiceElements['suppressedEmails']) {
