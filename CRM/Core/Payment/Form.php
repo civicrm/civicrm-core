@@ -289,7 +289,7 @@ class CRM_Core_Payment_Form {
       $form->add('image',
         $form->_expressButtonName,
         $form->_paymentProcessor['url_button'],
-        array('class' => 'form-submit')
+        array('class' => 'crm-form-submit')
       );
     }
   }
@@ -352,7 +352,7 @@ class CRM_Core_Payment_Form {
       $form->add('image',
         $form->_expressButtonName,
         $form->_paymentProcessor['url_button'],
-        array('class' => 'form-submit')
+        array('class' => 'crm-form-submit')
       );
     }
   }

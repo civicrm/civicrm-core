@@ -531,7 +531,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->add('image',
         $this->_checkoutButtonName,
         $this->_paymentProcessor['url_button'],
-        array('class' => 'form-submit')
+        array('class' => 'crm-form-submit')
       );
 
       $this->addButtons(array(

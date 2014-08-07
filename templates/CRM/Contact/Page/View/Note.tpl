@@ -38,7 +38,7 @@
                {include file="CRM/Form/attachment.tpl"}
             {/if}
           </table>
-          <div class="crm-submit-buttons"><input type="submit" class='cancel form-submit' value="{ts}Done{/ts}"/></div>
+          <div class="crm-submit-buttons"><input type="submit" class='cancel crm-form-submit' value="{ts}Done{/ts}"/></div>
 
         {if $comments}
         <fieldset>

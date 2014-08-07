@@ -44,7 +44,7 @@
             </td>
             <td style="vertical-align: bottom;">
               {assign var=caseid value=$caseID}
-              <span class="crm-button"><input class="form-submit default" name="_qf_Basic_refresh" value="Search" type="button" onclick="buildCaseActivities( true,{$caseid} )"; /></span>
+              <span class="crm-button"><input class="crm-form-submit default" name="_qf_Basic_refresh" value="Search" type="button" onclick="buildCaseActivities( true,{$caseid} )"; /></span>
             </td>
           </tr>
           <tr>

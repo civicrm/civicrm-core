@@ -98,7 +98,7 @@ br.clear {
 .container-inline div {
   display: inline;
 }
-.container-inline .form-submit {
+.container-inline .crm-form-submit {
   margin: 0;
 }
 .error {
@@ -151,7 +151,7 @@ tr.light .form-item, tr.dark .form-item {
 .form-item label.option {
   font-weight: normal;
 }
-.form-submit {
+.crm-form-submit {
   margin: 0.5em 0;
 }
 .marker, .form-required {
