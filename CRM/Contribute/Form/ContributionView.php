@@ -54,8 +54,11 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     CRM_Contribute_BAO_Contribution::getValues($params, $values, $ids);
     CRM_Contribute_BAO_Contribution::resolveDefaults($values);
+    $cancelledStatus = TRUE;
     $status = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $cancelledStatus = in_array('Cancelled', $status);
+    if (CRM_Utils_Array::value('contribution_status_id', $values) == array_search('Cancelled', $status)) {
+      $cancelledStatus = FALSE;
+    }
     $this->assign('cancelledStatus', $cancelledStatus);
 
     if (!empty($values['contribution_page_id'])) {
