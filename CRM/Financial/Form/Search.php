@@ -103,7 +103,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
 
     $this->add('submit','submit', ts('Go'),
       array(
-        'class' => 'form-submit',
+        'class' => 'crm-form-submit',
         'id' => 'Go',
       ));
 

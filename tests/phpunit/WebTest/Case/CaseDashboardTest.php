@@ -65,14 +65,14 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     $this->openCiviPage('case', 'reset=1', 'css=a.button');
 
     // Click on find my cases and check if right radio is checked
-    $this->clickLink("name=find_my_cases", "css=input.form-submit");
+    $this->clickLink("name=find_my_cases", "css=input.crm-form-submit");
     $this->assertTrue($this->isChecked("name=case_owner value=2"), 'Find my cases button not properly setting search form value to my cases.');
 
     // Go back to dashboard
     $this->openCivipage('case', 'reset=1', 'css=a.button');
 
     // Click on a drilldown cell and check if right radio is checked
-    $this->clickLink("css=a.crm-case-summary-drilldown", "css=input.form-submit");
+    $this->clickLink("css=a.crm-case-summary-drilldown", "css=input.crm-form-submit");
     $this->assertTrue($this->isChecked("name=case_owner value=1"), 'Drilldown on dashboard summary cells not properly setting search form value to all cases.');
 
     // Go back to dashboard and reset to my cases
@@ -80,7 +80,7 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     $this->clickLink("name=allupcoming value=0", "css=a.button");
 
     // Click on a drilldown cell and check if right radio is checked
-    $this->clickLink("css=a.crm-case-summary-drilldown", "css=input.form-submit");
+    $this->clickLink("css=a.crm-case-summary-drilldown", "css=input.crm-form-submit");
     $this->assertTrue($this->isChecked("name=case_owner value=2"), 'Drilldown on dashboard summary cells not properly setting search form value to my cases.');
   }
 }

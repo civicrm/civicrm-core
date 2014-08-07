@@ -12,7 +12,7 @@ CRM.$(function($) {
       cj('input[name="modified_date"]').val(
               cj('#update_modified_date').attr('data:latest_modified_date')
       );
-      cj('.crm-form-block .form-submit.default').first().click();
+      cj('.crm-form-block .crm-form-submit.default').first().click();
       return false;
     })
     .appendTo(cj('#update_modified_date'))

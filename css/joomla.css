@@ -166,7 +166,7 @@ br.clear {
 .container-inline div {
   display: inline;
 }
-.container-inline .form-submit {
+.container-inline .crm-form-submit {
   margin: 0;
 }
 .item-list .icon {
@@ -221,7 +221,7 @@ tr.light .form-item, tr.dark .form-item {
 .form-item label.option {
   font-weight: normal;
 }
-.form-submit {
+.crm-form-submit {
   margin: 0.5em 0;
 }
 .marker, .form-required {
@@ -289,7 +289,7 @@ tr.light .form-item, tr.dark .form-item {
   font-weight: bold;
   color: #9cf;
 }
-#search .form-text, #search .form-submit {
+#search .form-text, #search .crm-form-submit {
   border: 1px solid #369;
   font-size: 1.1em;
 }
@@ -299,7 +299,7 @@ tr.light .form-item, tr.dark .form-item {
   padding: 0 0.5em 0 0.5em;
   margin: 0 0 0.5em 0;
 }
-#search .form-submit {
+#search .crm-form-submit {
   height: 1.5em;
 }
 #main {
