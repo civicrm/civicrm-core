@@ -1268,6 +1268,10 @@ AND civicrm_membership.is_test = %2";
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = array();
 
+    if (CRM_Utils_Array::value('membership_source', $form->_params)) {
+      $membershipParams['contribution_source'] = $form->_params['membership_source'];
+    }
+
     if ($isPaidMembership) {
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
         $premiumParams, $contactID,
