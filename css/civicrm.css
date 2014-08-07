@@ -3731,6 +3731,10 @@ div.m ul#civicrm-menu,
 .crm-container .crm-action-menu.action-icon-clipboard .select2-default span.select2-chosen:before {
   background-position: -160px -128px;
 }
+/* Restore this property otherwise our css overrides it */
+.select2-search input {
+  box-sizing: border-box;
+}
 
 /* Special styling for specific form buttons */
 #crm-container span.crm-button_qf_Main_upload input,
