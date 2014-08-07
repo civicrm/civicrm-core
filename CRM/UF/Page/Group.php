@@ -400,6 +400,10 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     $controller->run();
   }
 
+  /**
+   * @param $id
+   * @param $action
+   */
   function setContext($id, $action) {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
@@ -419,6 +423,11 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     $session->pushUserContext($url);
   }
 
+  /**
+   * @param $groupType
+   *
+   * @return array
+   */
   static function extractGroupTypes($groupType) {
     $returnGroupTypes = array();
     if (!$groupType) {

@@ -655,6 +655,10 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     return $addresses;
   }
 
+  /**
+   * @param $stateCountryMap
+   * @param null $defaults
+   */
   static function addStateCountryMap(&$stateCountryMap, $defaults = NULL) {
     // first fix the statecountry map if needed
     if (empty($stateCountryMap)) {
@@ -669,6 +673,11 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     $config->stateCountryMap = array_merge($config->stateCountryMap, $stateCountryMap);
   }
 
+  /**
+   * @param $form
+   * @param $defaults
+   * @param bool $batchFieldNames
+   */
   static function fixAllStateSelects(&$form, $defaults, $batchFieldNames = false) {
     $config = CRM_Core_Config::singleton();
     $map = null;
@@ -773,7 +782,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
       CRM_Core_Session::setStatus(ts('Unsupported locale specified to parseStreetAddress: %1. Proceeding with en_US locale.', array(1 => $locale)), ts('Unsupported Locale'), 'alert');
       $locale = 'en_US';
     }
-    $parseFields = array(
+    $emptyParseFields = $parseFields = array(
       'street_name' => '',
       'street_unit' => '',
       'street_number' => '',
@@ -849,7 +858,8 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
       'en_CA', 'fr_CA'))) {
       $streetUnitFormats = array('APT', 'APP', 'SUITE', 'BUREAU', 'UNIT');
     }
-
+    //@todo per CRM-14459 this regex picks up words with the string in them - e.g APT picks up
+    //Captain - presuming fixing regex (& adding test) to ensure a-z does not preced string will fix
     $streetUnitPreg = '/(' . implode('|\s', $streetUnitFormats) . ')(.+)?/i';
     $matches = array();
     if (preg_match($streetUnitPreg, $streetAddress, $matches)) {
@@ -864,6 +874,14 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     //run parsed fields through stripSpaces to clean
     foreach ($parseFields as $parseField => $value) {
       $parseFields[$parseField] = CRM_Utils_String::stripSpaces($value);
+    }
+    //CRM-14459 if the field is too long we should assume it didn't get it right & skip rather than allow
+    // the DB to fatal
+    $fields = CRM_Core_BAO_Address::fields();
+    foreach ($fields as $fieldname => $field) {
+      if(!empty($field['maxlength']) && strlen(CRM_Utils_Array::value($fieldname, $parseFields)) > $field['maxlength']) {
+        return $emptyParseFields;
+      }
     }
 
     return $parseFields;

@@ -134,6 +134,18 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     $this->add('checkbox', 'is_default', ts('Is this a default provider?'));
   }
 
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array reference to the array of default values
+   *
+   */
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array();
 

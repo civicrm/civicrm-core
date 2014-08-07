@@ -26,6 +26,10 @@
 */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Core_Payment_PayPalProIPNTest
+ */
 class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   protected $_contributionID;
   protected $_invoiceID = 'c2r9c15f7be20b4f3fef1f77e4c37424';
@@ -35,6 +39,9 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   protected $_contributionPageID;
   protected $_paymentProcessorID;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'PaypalPro IPN processing',
@@ -144,7 +151,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
       // no change
       $this->assertEquals(2, $contribution['contribution_status_id']);
-      $this->assertEquals('Payment Express IPNS not currently handled', $e->getMessage());
+      $this->assertEquals('Paypal IPNS not handled other than recurring_payments', $e->getMessage());
       return;
     }
     $this->fail('The Paypal Express IPN should have caused an exception');
@@ -334,6 +341,10 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'residence_country' => 'US'
     );
   }
+
+  /**
+   * @return array
+   */
   function getPaypalProRecurSubsequentTransaction() {
     return array_merge($this->getPaypalProRecurTransaction(), array('txn_id' => 'secondone'));
     ;

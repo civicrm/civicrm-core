@@ -107,12 +107,13 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       'visibility' => 'Public',
       'is_active' => 1,
       'fixed_period_start_day' => 101,
-      'fixed_period_rollover_day' => 1231
+      'fixed_period_rollover_day' => 1231,
+      'domain_id' => CRM_Core_Config::domainID(),
     );
-    $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
-    $this->_membershipTypeID = $membershipType->id;
+    $membershipType = $this->callAPISuccess('membership_type', 'create', $params);
+    $this->_membershipTypeID = $membershipType['id'];
 
-    $this->_mebershipStatusID = $this->membershipStatusCreate('test status');
+    $this->_membershipStatusID = $this->membershipStatusCreate('test status');
     $this->_contactID = $this->individualCreate();
     $contact2Params = array(
       'first_name' => 'Anthonita',
@@ -129,6 +130,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
     $session = CRM_Core_Session::singleton();
     $session->set('dateTypes', 1);
+    $this->_sethtmlGlobals();
 
   }
 
@@ -137,12 +139,14 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    */
-  function tearDown() {
-    $tablesToTruncate = array('civicrm_membership', 'civicrm_membership_log', 'civicrm_contribution', 'civicrm_membership_payment');
-    $this->quickCleanup($tablesToTruncate);
+  function tearDown()
+  {
+    $this->quickCleanUpFinancialEntities();
     $this->relationshipTypeDelete($this->_relationshipTypeId);
-    $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
-    $this->membershipStatusDelete($this->_mebershipStatusID);
+    if ($this->callAPISuccessGetCount('membership', array('id' => $this->_membershipTypeID))) {
+      $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
+    }
+    $this->membershipStatusDelete($this->_membershipStatusID);
     $this->contactDelete($this->_contactID);
     $this->contactDelete($this->_contactID2);
     $this->contactDelete($this->_orgContactID);
@@ -157,7 +161,6 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->assertTrue($form->testProcessMembership($params));
     $result = $this->callAPISuccess('membership', 'get', array());
     $this->assertEquals(3, $result['count']);
-
     //check start dates #1 should default to 1 Jan this year, #2 should be as entered
     $this->assertEquals(date('Y-m-d', strtotime('first day of January 2013')), $result['values'][1]['start_date']);
     $this->assertEquals('2013-02-03', $result['values'][2]['start_date']);
@@ -171,19 +174,41 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-m-d', strtotime('07/22/2013')), $result['values'][1]['join_date']);
     $this->assertEquals(date('Y-m-d', strtotime('07/03/2013')), $result['values'][2]['join_date']);
     $this->assertEquals(date('Y-m-d', strtotime('now')), $result['values'][3]['join_date']);
+    $result = $this->callAPISuccess('contribution', 'get', array('return' => 'total_amount'));
+    $this->assertEquals(3, $result['count']);
+    foreach($result['values'] as $contribution) {
+      $this-> assertEquals($this->callAPISuccess('line_item', 'getvalue', array(
+        'contribution_id' => $contribution['id'],
+        'return' => 'line_total',
 
+      )), $contribution['total_amount']);
+    }
   }
 
-  /*
+  /**
+   *  Test Contribution Import
+   */
+  function testProcessContribution() {
+    $this->offsetDefaultPriceSet();
+    $form = new CRM_Batch_Form_Entry();
+    $params = $this->getContributionData();
+    $this->assertTrue($form->testProcessContribution($params));
+    $result = $this->callAPISuccess('contribution', 'get', array('return' => 'total_amount'));
+    $this->assertEquals(2, $result['count']);
+    foreach($result['values'] as $contribution) {
+     $this-> assertEquals($this->callAPISuccess('line_item', 'getvalue', array(
+       'contribution_id' => $contribution['id'],
+       'return' => 'line_total',
+
+     )), $contribution['total_amount']);
+    }
+  }
+  /**
    * data provider for test process membership
+   * @return array
    */
   function getMembershipData() {
 
-    /*
-     Array (
-
-    );
-    */
     return array(
       'batch_id' => 4,
       'primary_profiles' => array(1 => NULL, 2 => NULL, 3 => NULL),
@@ -239,6 +264,43 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
       ),
       'actualBatchTotal' => 0,
+
+    );
+  }
+
+  /**
+   * @return array
+   */
+  function getContributionData() {
+    return array(
+      //'batch_id' => 4,
+      'primary_profiles' => array(1 => NULL, 2 => NULL, 3 => NULL),
+      'primary_contact_id' => Array (
+        1 => $this->_contactID,
+        2 => $this->_contactID2,
+        3 => $this->_contactID3,
+      ),
+      'field' => array(
+        1 => array(
+          'financial_type' => 1,
+          'total_amount' => 15,
+          'receive_date' => '07/24/2013',
+          'receive_date_time' => NULL,
+          'payment_instrument' => 1,
+          'check_number' => NULL,
+          'contribution_status_id' => 1,
+        ),
+        2 => array(
+          'financial_type' => 1,
+          'total_amount' => 15,
+          'receive_date' => '07/24/2013',
+          'receive_date_time' => NULL,
+          'payment_instrument' => 1,
+          'check_number' => NULL,
+          'contribution_status_id' => 1,
+        ),
+      ),
+      'actualBatchTotal' => 30,
 
     );
   }

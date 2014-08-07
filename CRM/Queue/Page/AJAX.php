@@ -24,6 +24,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 */
+
+/**
+ * Class CRM_Queue_Page_AJAX
+ */
 class CRM_Queue_Page_AJAX {
 
   /**

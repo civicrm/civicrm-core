@@ -9,6 +9,10 @@
     padding: 4px;
 }
 
+.crm-container .crm-profile-selector-preview .icon {
+  float: none;
+}
+
 .crm-designer-toolbar {
   width: 290px;
   position: absolute;

@@ -32,8 +32,18 @@
  * Grateful acknowledgements go to Donald Lobo for invaluable assistance
  * in creating this payment processor module
  */
+
+/**
+ * Class CRM_Core_Payment_PaymentExpressUtils
+ */
 class CRM_Core_Payment_PaymentExpressUtils {
 
+  /**
+   * @param $element
+   * @param null $value
+   *
+   * @return string
+   */
   static function _valueXml($element, $value = NULL) {
     $nl = "\n";
 
@@ -47,16 +57,34 @@ class CRM_Core_Payment_PaymentExpressUtils {
     return "<" . $element . ">" . $value . "</" . $element . ">" . $nl;
   }
 
+  /**
+   * @param $xml
+   * @param $name
+   *
+   * @return mixed
+   */
   static function _xmlElement($xml, $name) {
     $value = preg_replace('/.*<' . $name . '[^>]*>(.*)<\/' . $name . '>.*/', '\1', $xml);
     return $value;
   }
 
+  /**
+   * @param $xml
+   * @param $name
+   *
+   * @return mixed|null
+   */
   static function _xmlAttribute($xml, $name) {
     $value = preg_replace('/<.*' . $name . '="([^"]*)".*>/', '\1', $xml);
     return $value != $xml ? $value : NULL;
   }
 
+  /**
+   * @param $query
+   * @param $url
+   *
+   * @return resource
+   */
   static function &_initCURL($query, $url) {
     $curl = curl_init();
 

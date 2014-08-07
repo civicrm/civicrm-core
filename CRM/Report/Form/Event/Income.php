@@ -41,6 +41,12 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
   protected $_add2groupSupported = FALSE;
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
     $this->_columns = array(
@@ -67,6 +73,9 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     parent::preProcess();
   }
 
+  /**
+   * @param $eventIDs
+   */
   function buildEventReport($eventIDs) {
 
     $this->assign('events', $eventIDs);
@@ -255,6 +264,11 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     $this->assign('statistics', $this->statistics($eventIDs));
   }
 
+  /**
+   * @param $eventIDs
+   *
+   * @return array
+   */
   function statistics(&$eventIDs) {
     $statistics = array();
     $count = count($eventIDs);
@@ -266,6 +280,9 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     return $statistics;
   }
 
+  /**
+   * @param int $rowCount
+   */
   function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);
 
@@ -280,6 +297,9 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     $this->_limit = ($pageId - 1) * self::ROW_COUNT_LIMIT;
   }
 
+  /**
+   * @param int $rowCount
+   */
   function setPager($rowCount = self::ROW_COUNT_LIMIT) {
     $params = array(
       'total' => $this->_rowsFound,

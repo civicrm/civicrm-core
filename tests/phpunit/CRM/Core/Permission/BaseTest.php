@@ -2,6 +2,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Core_Permission_BaseTest
+ */
 class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
 
   /**

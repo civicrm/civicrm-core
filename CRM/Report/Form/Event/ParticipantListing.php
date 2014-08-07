@@ -46,6 +46,12 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
 
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
 
@@ -396,6 +402,9 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
     parent::__construct();
   }
 
+  /**
+   * @return array
+   */
   function getPriceLevels() {
     $query = "
 SELECT     DISTINCT cv.label, cv.id
@@ -460,6 +469,13 @@ GROUP BY  cv.label
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     return $errors;
@@ -585,6 +601,9 @@ GROUP BY  cv.label
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
 

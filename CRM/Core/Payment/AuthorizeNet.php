@@ -185,7 +185,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     if (($this->_mode == 'test') || $response_fields[6] == 0) {
       $query             = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id RLIKE 'test[0-9]+'";
       $p                 = array();
-      $trxn_id           = strval(CRM_Core_Dao::singleValueQuery($query, $p));
+      $trxn_id           = strval(CRM_Core_DAO::singleValueQuery($query, $p));
       $trxn_id           = str_replace('test', '', $trxn_id);
       $trxn_id           = intval($trxn_id) + 1;
       $params['trxn_id'] = sprintf('test%08d', $trxn_id);
@@ -337,6 +337,9 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     }
   }
 
+  /**
+   * @return array
+   */
   function _getAuthorizeNetFields() {
     $amount = $this->_getParam('total_amount');//Total amount is from the form contribution field
     if(empty($amount)){//CRM-9894 would this ever be the case??
@@ -564,6 +567,12 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     return $value;
   }
 
+  /**
+   * @param null $errorCode
+   * @param null $errorMessage
+   *
+   * @return object
+   */
   function &error($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
     if ($errorCode) {
@@ -617,10 +626,19 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     }
   }
 
+  /**
+   * @return string
+   */
   function accountLoginURL() {
     return ($this->_mode == 'test') ? 'https://test.authorize.net' : 'https://authorize.net';
   }
 
+  /**
+   * @param string $message
+   * @param array $params
+   *
+   * @return bool|object
+   */
   function cancelSubscription(&$message = '', $params = array(
     )) {
     $template = CRM_Core_Smarty::singleton();
@@ -663,6 +681,12 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     return TRUE;
   }
 
+  /**
+   * @param string $message
+   * @param array $params
+   *
+   * @return bool|object
+   */
   function updateSubscriptionBillingInfo(&$message = '', $params = array(
     )) {
     $template = CRM_Core_Smarty::singleton();
@@ -717,6 +741,12 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     return TRUE;
   }
 
+  /**
+   * @param string $message
+   * @param array $params
+   *
+   * @return bool|object
+   */
   function changeSubscriptionAmount(&$message = '', $params = array(
     )) {
     $template = CRM_Core_Smarty::singleton();

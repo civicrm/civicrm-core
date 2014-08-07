@@ -248,6 +248,13 @@ class CRM_Core_Payment_BaseIPN {
     return TRUE;
   }
 
+  /**
+   * @param $objects
+   * @param $transaction
+   * @param array $input
+   *
+   * @return bool
+   */
   function cancelled(&$objects, &$transaction, $input = array()) {
     $contribution = &$objects['contribution'];
     $memberships = &$objects['membership'];
@@ -305,6 +312,12 @@ class CRM_Core_Payment_BaseIPN {
     return TRUE;
   }
 
+  /**
+   * @param $objects
+   * @param $transaction
+   *
+   * @return bool
+   */
   function unhandled(&$objects, &$transaction) {
     $transaction->rollback();
     // we dont handle this as yet
@@ -313,6 +326,13 @@ class CRM_Core_Payment_BaseIPN {
     return FALSE;
   }
 
+  /**
+   * @param $input
+   * @param $ids
+   * @param $objects
+   * @param $transaction
+   * @param bool $recur
+   */
   function completeTransaction(&$input, &$ids, &$objects, &$transaction, $recur = FALSE) {
     $contribution = &$objects['contribution'];
     $memberships = &$objects['membership'];
@@ -381,6 +401,7 @@ LIMIT 1;";
             // else fall back to using current membership type
             $dao->free();
 
+            $num_terms = $contribution->getNumTermsByContributionAndMembershipType($membership->membership_type_id);
             if ($currentMembership) {
               /*
                * Fixed FOR CRM-4433
@@ -389,13 +410,16 @@ LIMIT 1;";
                */
               CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, $changeToday);
 
+              // @todo - we should pass membership_type_id instead of null here but not
+              // adding as not sure of testing
               $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership->id,
-                $changeToday
+                $changeToday, NULL, $num_terms
               );
+
               $dates['join_date'] = CRM_Utils_Date::customFormat($currentMembership['join_date'], $format);
             }
             else {
-              $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membership->membership_type_id);
+              $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membership->membership_type_id, NULL, NULL, NULL, $num_terms);
             }
 
             //get the status for membership.
@@ -621,6 +645,11 @@ LIMIT 1;";
     CRM_Core_Error::debug_log_message("Success: Database updated");
   }
 
+  /**
+   * @param $ids
+   *
+   * @return bool
+   */
   function getBillingID(&$ids) {
     // get the billing location type
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
@@ -645,6 +674,16 @@ LIMIT 1;";
    * @params bool $recur is it part of a recurring contribution
    * @params bool $returnMessageText Should text be returned instead of sent. This
    * is because the function is also used to generate pdfs
+   */
+  /**
+   * @param $input
+   * @param $ids
+   * @param $objects
+   * @param $values
+   * @param bool $recur
+   * @param bool $returnMessageText
+   *
+   * @return mixed
    */
   function sendMail(&$input, &$ids, &$objects, &$values, $recur = FALSE, $returnMessageText = FALSE) {
     $contribution = &$objects['contribution'];
@@ -785,6 +824,9 @@ LIMIT 1;";
    * The pledge payment record should already exist & will need to be updated with the new contribution ID.
    * If not the contribution will also need to be linked to the pledge
    */
+  /**
+   * @param $contribution
+   */
   function updateRecurLinkedPledge(&$contribution) {
     $returnProperties = array('id', 'pledge_id');
     $paymentDetails   = $paymentIDs = array();
@@ -845,6 +887,11 @@ LIMIT 1;";
     );
   }
 
+  /**
+   * @param $recurId
+   * @param $contributionId
+   * @param $input
+   */
   function addrecurLineItems($recurId, $contributionId, &$input) {
     $lineSets = $lineItems = array();
 
@@ -871,6 +918,10 @@ LIMIT 1;";
 
   // function to copy custom data of the
   // initial contribution into its recurring contributions
+  /**
+   * @param $recurId
+   * @param $targetContributionId
+   */
   function copyCustomValues($recurId, $targetContributionId) {
     if ($recurId && $targetContributionId) {
       // get the initial contribution id of recur id
@@ -912,6 +963,10 @@ LIMIT 1;";
 
   // function to copy soft credit record of first recurring contribution
   // and add new soft credit against $targetContributionId
+  /**
+   * @param $recurId
+   * @param $targetContributionId
+   */
   function addrecurSoftCredit($recurId, $targetContributionId) {
     $contriID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
 

@@ -1,5 +1,9 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Utils_HttpClientTest
+ */
 class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
 
   const VALID_HTTP_URL = 'http://sandbox.civicrm.org/';

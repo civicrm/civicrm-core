@@ -72,6 +72,12 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     $handler    = opendir($config->uploadDir);
     $errorFiles = array('sqlImport.errors', 'sqlImport.conflicts', 'sqlImport.duplicates', 'sqlImport.mismatch');
 
+    // check for post max size avoid when called twice
+    $snippet = CRM_Utils_Array::value('snippet', $_GET, 0);
+    if (empty($snippet)) {
+      CRM_Core_Config_Defaults::formatUnitSize(ini_get('post_max_size'), TRUE);
+    }
+
     while ($file = readdir($handler)) {
       if ($file != '.' && $file != '..' &&
         in_array($file, $errorFiles) && !is_writable($config->uploadDir . $file)
@@ -227,6 +233,18 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     );
   }
 
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array reference to the array of default values
+   *
+   */
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $config = CRM_Core_Config::singleton();
     $defaults = array(
@@ -244,6 +262,10 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     return $defaults;
   }
 
+  /**
+   * @return array
+   * @throws Exception
+   */
   private function _getDataSources() {
     // Open the data source dir and scan it for class files
     $config        = CRM_Core_Config::singleton();

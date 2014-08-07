@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Admin_Form_Setting_LocalizationTest
+ */
 class WebTest_Admin_Form_Setting_LocalizationTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

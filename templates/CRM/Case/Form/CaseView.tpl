@@ -147,7 +147,7 @@
 
     {if $hasAccessToAllCases}
       <div class="crm-submit-buttons">
-        <a class="button case-miniform" href="#addCaseRoleDialog" data-key="{crmKey name='civicrm/ajax/relation'}" rel="#caseRoles-selector"><div class="icon add-icon"></div>{ts}Add new role{/ts}</a>
+        <a class="button case-miniform" href="#addCaseRoleDialog" data-key="{crmKey name='civicrm/ajax/relation'}" rel="#caseRoles-selector-{$caseID}"><div class="icon add-icon"></div>{ts}Add new role{/ts}</a>
       </div>
       <div id="addCaseRoleDialog" class="hiddenElement">
         <div>{$form.role_type.label}</div>
@@ -162,7 +162,7 @@
       <div><input name="edit_role_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" /></div>
     </div>
 
-    <table id="caseRoles-selector"  class="report-layout">
+    <table id="caseRoles-selector-{$caseID}"  class="report-layout">
       <thead><tr>
         <th>{ts}Case Role{/ts}</th>
         <th>{ts}Name{/ts}</th>
@@ -184,63 +184,61 @@
 
   CRM.$(function($) {
     buildCaseRoles(false);
-  });
+    function buildCaseRoles(filterSearch) {
+      if(filterSearch) {
+        oTable.fnDestroy();
+      }
+      var count   = 0;
+      var columns = '';
+      var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/caseroles' h=0 q='snippet=4&caseID='}{$caseID}"{literal};
+      sourceUrl = sourceUrl + '&cid={/literal}{$contactID}{literal}';
+      sourceUrl = sourceUrl + '&userID={/literal}{$userID}{literal}';
 
-  function buildCaseRoles(filterSearch) {
-    if(filterSearch) {
-      oTable.fnDestroy();
+      $('#caseRoles-selector-{/literal}{$caseID}{literal} th').each( function( ) {
+        if ( $(this).attr('id') != 'nosort' ) {
+          columns += '{"sClass": "' + $(this).attr('class') +'"},';
+        }
+        else {
+          columns += '{ "bSortable": false },';
+        }
+        count++;
+      });
+
+      columns    = columns.substring(0, columns.length - 1 );
+      eval('columns =[' + columns + ']');
+
+      oTable = $('#caseRoles-selector-{/literal}{$caseID}{literal}').dataTable({
+        "bFilter"    : false,
+        "bAutoWidth" : false,
+        "aaSorting"  : [],
+        "aoColumns"  : columns,
+        "bProcessing": true,
+        "bJQueryUI": true,
+        "asStripClasses" : [ "odd-row", "even-row" ],
+        "sPaginationType": "full_numbers",
+        "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
+        "bServerSide": true,
+        "sAjaxSource": sourceUrl,
+        "iDisplayLength": 10,
+        "fnDrawCallback": function() { setCaseRolesSelectorClass(); },
+        "fnServerData": function ( sSource, aoData, fnCallback ) {
+          $.ajax({
+            "dataType": 'json',
+            "type": "POST",
+            "url": sSource,
+            "data": aoData,
+            "success": fnCallback
+          });
+        }
+      });   
     }
-    var count   = 0;
-    var columns = '';
-    var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/caseroles' h=0 q='snippet=4&caseID='}{$caseID}"{literal};
-    sourceUrl = sourceUrl + '&cid={/literal}{$contactID}{literal}';
-    sourceUrl = sourceUrl + '&userID={/literal}{$userID}{literal}';
 
-    cj('#caseRoles-selector th').each( function( ) {
-      if ( cj(this).attr('id') != 'nosort' ) {
-        columns += '{"sClass": "' + cj(this).attr('class') +'"},';
-      }
-      else {
-        columns += '{ "bSortable": false },';
-      }
-      count++;
-    });
-
-    columns    = columns.substring(0, columns.length - 1 );
-    eval('columns =[' + columns + ']');
-
-    oTable = cj('#caseRoles-selector').dataTable({
-      "bFilter"    : false,
-      "bAutoWidth" : false,
-      "aaSorting"  : [],
-      "aoColumns"  : columns,
-      "bProcessing": true,
-      "bJQueryUI": true,
-      "asStripClasses" : [ "odd-row", "even-row" ],
-      "sPaginationType": "full_numbers",
-      "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
-      "bServerSide": true,
-      "sAjaxSource": sourceUrl,
-      "iDisplayLength": 10,
-      "fnDrawCallback": function() { setCaseRolesSelectorClass(); },
-      "fnServerData": function ( sSource, aoData, fnCallback ) {
-        cj.ajax({
-          "dataType": 'json',
-          "type": "POST",
-          "url": sSource,
-          "data": aoData,
-          "success": fnCallback
-        });
-      }
-    });
-  }
-
-  function setCaseRolesSelectorClass( ) {
-    cj("#caseRoles-selector td:last-child").each( function( ) {
-      cj(this).parent().addClass(cj(this).text() );
-    });
-  }
-
+    function setCaseRolesSelectorClass( ) {
+      $("#caseRoles-selector-{/literal}{$caseID}{literal} td:last-child").each( function( ) {
+        $(this).parent().addClass($(this).text() );
+      });
+    }
+  });
 </script>
 {/literal}
  </div><!-- /.crm-accordion-body -->
@@ -258,7 +256,7 @@
           <a class="button" href="{$relUrl}">
           <div class="icon add-icon"></div>{ts}Add client relationship{/ts}</a>
         </div>
-        <table id="clientRelationships-selector"  class="report-layout">
+        <table id="clientRelationships-selector-{$caseID}"  class="report-layout">
           <thead><tr>
             <th>{ts}Client Relationship{/ts}</th>
             <th>{ts}Name{/ts}</th>
@@ -276,76 +274,75 @@
  {literal}
  <script type="text/javascript">
    CRM.$(function($) {
-      buildCaseClientRelationships(false);
-   });
+   buildCaseClientRelationships(false);
+   function buildCaseClientRelationships(filterSearch) {
+     if (filterSearch) {
+       oTable.fnDestroy();
+     }
+     var count   = 0;
+     var columns = '';
+     var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/clientrelationships' h=0 q='snippet=4&caseID='}{$caseID}"{literal};
+     sourceUrl = sourceUrl + '&cid={/literal}{$contactID}{literal}';
+     sourceUrl = sourceUrl + '&userID={/literal}{$userID}{literal}';
 
- function buildCaseClientRelationships(filterSearch) {
-   if (filterSearch) {
-     oTable.fnDestroy();
+     $('#clientRelationships-selector-{/literal}{$caseID}{literal} th').each( function( ) {
+       if ( $(this).attr('id') != 'nosort' ) {
+         columns += '{"sClass": "' + $(this).attr('class') +'"},';
+       }
+       else {
+         columns += '{ "bSortable": false },';
+       }
+       count++;
+     });
+
+     columns    = columns.substring(0, columns.length - 1 );
+     eval('columns =[' + columns + ']');
+
+     oTable = $('#clientRelationships-selector-{/literal}{$caseID}{literal}').dataTable({
+       "bFilter"    : false,
+       "bAutoWidth" : false,
+       "aaSorting"  : [],
+       "aoColumns"  : columns,
+       "bProcessing": true,
+       "bJQueryUI": true,
+       "asStripClasses" : [ "odd-row", "even-row" ],
+       "sPaginationType": "full_numbers",
+       "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
+       "bServerSide": true,
+       "sAjaxSource": sourceUrl,
+       "iDisplayLength": 10,
+       "fnDrawCallback": function() { setClientRelationshipsSelectorClass(); },
+       "fnServerData": function (sSource, aoData, fnCallback) {
+         $.ajax( {
+           "dataType": 'json',
+           "type": "POST",
+           "url": sSource,
+           "data": aoData,
+           "success": fnCallback
+         });
+       }
+     });   
    }
-   var count   = 0;
-   var columns = '';
-   var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/clientrelationships' h=0 q='snippet=4&caseID='}{$caseID}"{literal};
-   sourceUrl = sourceUrl + '&cid={/literal}{$contactID}{literal}';
-   sourceUrl = sourceUrl + '&userID={/literal}{$userID}{literal}';
 
-    cj('#clientRelationships-selector th').each( function( ) {
-      if ( cj(this).attr('id') != 'nosort' ) {
-        columns += '{"sClass": "' + cj(this).attr('class') +'"},';
-      }
-      else {
-        columns += '{ "bSortable": false },';
-      }
-      count++;
-    });
-
-    columns    = columns.substring(0, columns.length - 1 );
-    eval('columns =[' + columns + ']');
-
-    oTable = cj('#clientRelationships-selector').dataTable({
-      "bFilter"    : false,
-      "bAutoWidth" : false,
-      "aaSorting"  : [],
-      "aoColumns"  : columns,
-      "bProcessing": true,
-      "bJQueryUI": true,
-      "asStripClasses" : [ "odd-row", "even-row" ],
-      "sPaginationType": "full_numbers",
-      "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
-      "bServerSide": true,
-      "sAjaxSource": sourceUrl,
-      "iDisplayLength": 10,
-      "fnDrawCallback": function() { setClientRelationshipsSelectorClass(); },
-      "fnServerData": function (sSource, aoData, fnCallback) {
-        cj.ajax( {
-          "dataType": 'json',
-          "type": "POST",
-          "url": sSource,
-          "data": aoData,
-          "success": fnCallback
-        } );
-      }
-    });
- }
-
-  function setClientRelationshipsSelectorClass( ) {
-    cj("#clientRelationships-selector td:last-child").each(function() {
-      cj(this).parent().addClass(cj(this).text());
-    });
-  }
+   function setClientRelationshipsSelectorClass( ) {
+     $("#clientRelationships-selector-{/literal}{$caseID}{literal} td:last-child").each(function() {
+       $(this).parent().addClass($(this).text());
+      });
+    }
+  });
  </script>
  {/literal}
   <br />
   {if !empty($globalGroupInfo.id)}
     <div class="crm-submit-buttons">
-      <a class="button case-miniform" href="#addMembersToGroupDialog" rel="#globalRelationships-selector" data-group_id="{$globalGroupInfo.id}">
+      <a class="button case-miniform" href="#addMembersToGroupDialog" rel="#globalRelationships-selector-{$caseId}" data-group_id="{$globalGroupInfo.id}">
         <div class="icon add-icon"></div>{ts 1=$globalGroupInfo.title}Add members to %1{/ts}
       </a>
     </div>
     <div id="addMembersToGroupDialog" class="hiddenElement">
       <input name="add_member_to_group_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" />
     </div>
-    <table id="globalRelationships-selector"  class="report-layout">
+    <table id="globalRelationships-selector-{$caseId}"  class="report-layout">
       <thead><tr>
         <th>{$globalGroupInfo.title}</th>
         <th>{ts}Phone{/ts}</th>
@@ -356,68 +353,66 @@
 
  {literal}
  <script type="text/javascript">
+   CRM.$(function($) {
+     buildCaseGlobalRelationships(false);
+     function buildCaseGlobalRelationships(filterSearch) {
+       if (filterSearch) {
+         oTable.fnDestroy();
+       }
+       var count   = 0;
+       var columns = '';
+       var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/globalrelationships' h=0 q='snippet=4&caseID='}{$caseID}"{literal};
+       sourceUrl = sourceUrl + '&cid={/literal}{$contactID}{literal}';
+       sourceUrl = sourceUrl + '&userID={/literal}{$userID}{literal}';
 
- CRM.$(function($) {
-    buildCaseGlobalRelationships(false);
- });
+       $('#globalRelationships-selector-{/literal}{$caseID}{literal} th').each( function( ) {
+         if ($(this).attr('id') != 'nosort') {
+           columns += '{"sClass": "' + $(this).attr('class') +'"},';
+         }
+         else {
+           columns += '{ "bSortable": false },';
+         }
+         count++;
+       });
 
- function buildCaseGlobalRelationships(filterSearch) {
-   if (filterSearch) {
-     oTable.fnDestroy();
-   }
-   var count   = 0;
-   var columns = '';
-   var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/globalrelationships' h=0 q='snippet=4&caseID='}{$caseID}"{literal};
-   sourceUrl = sourceUrl + '&cid={/literal}{$contactID}{literal}';
-   sourceUrl = sourceUrl + '&userID={/literal}{$userID}{literal}';
+       columns    = columns.substring(0, columns.length - 1 );
+       eval('columns =[' + columns + ']');
 
-    cj('#globalRelationships-selector th').each( function( ) {
-      if (cj(this).attr('id') != 'nosort') {
-        columns += '{"sClass": "' + cj(this).attr('class') +'"},';
-      }
-      else {
-        columns += '{ "bSortable": false },';
-      }
-      count++;
-    });
+       oTable = $('#globalRelationships-selector-{/literal}{$caseID}{literal}').dataTable({
+         "bFilter"    : false,
+         "bAutoWidth" : false,
+         "aaSorting"  : [],
+         "aoColumns"  : columns,
+         "bProcessing": true,
+         "bJQueryUI": true,
+         "asStripClasses" : [ "odd-row", "even-row" ],
+         "sPaginationType": "full_numbers",
+         "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
+         "bServerSide": true,
+         "sAjaxSource": sourceUrl,
+         "iDisplayLength": 10,
+         "fnDrawCallback": function() { setGlobalRelationshipsSelectorClass(); },
+         "oLanguage": {
+           "sEmptyTable": {/literal}'{ts escape='js' 1=$globalGroupInfo.title}The group %1 has no members.{/ts}'{literal}
+         },
+         "fnServerData": function ( sSource, aoData, fnCallback ) {
+           $.ajax( {
+             "dataType": 'json',
+             "type": "POST",
+             "url": sSource,
+             "data": aoData,
+             "success": fnCallback
+           });
+         }
+       });
+     }
 
-    columns    = columns.substring(0, columns.length - 1 );
-    eval('columns =[' + columns + ']');
-
-    oTable = cj('#globalRelationships-selector').dataTable({
-      "bFilter"    : false,
-      "bAutoWidth" : false,
-      "aaSorting"  : [],
-      "aoColumns"  : columns,
-      "bProcessing": true,
-      "bJQueryUI": true,
-      "asStripClasses" : [ "odd-row", "even-row" ],
-      "sPaginationType": "full_numbers",
-      "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
-      "bServerSide": true,
-      "sAjaxSource": sourceUrl,
-      "iDisplayLength": 10,
-      "fnDrawCallback": function() { setGlobalRelationshipsSelectorClass(); },
-      "oLanguage": {
-        "sEmptyTable": {/literal}'{ts escape='js' 1=$globalGroupInfo.title}The group %1 has no members.{/ts}'{literal}
-      },
-      "fnServerData": function ( sSource, aoData, fnCallback ) {
-        cj.ajax( {
-          "dataType": 'json',
-          "type": "POST",
-          "url": sSource,
-          "data": aoData,
-          "success": fnCallback
-        } );
-      }
-    });
- }
-
-  function setGlobalRelationshipsSelectorClass( ) {
-    cj("#globalRelationships-selector td:last-child").each( function( ) {
-      cj(this).parent().addClass(cj(this).text() );
-    });
-  }
+     function setGlobalRelationshipsSelectorClass( ) {
+       $("#globalRelationships-selector-{/literal}{$caseID}{literal} td:last-child").each( function( ) {
+         $(this).parent().addClass($(this).text() );
+       });
+     }
+   });
  </script>
  {/literal}
  </div><!-- /.crm-accordion-body -->

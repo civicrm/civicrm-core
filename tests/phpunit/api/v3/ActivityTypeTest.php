@@ -37,6 +37,9 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   protected $_apiversion;
 
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Activity Type',

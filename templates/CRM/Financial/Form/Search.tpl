@@ -50,7 +50,7 @@
   </div>
 </div>
 <div class="form-layout-compressed">{$form.batch_update.html}&nbsp;{$form.submit.html}</div><br/>
-<table id="crm-batch-selector" class="row-highlight">
+<table id="crm-batch-selector-{$batchStatus}" class="row-highlight">
   <thead>
     <tr>
       <th class="crm-batch-checkbox">{$form.toggleSelect.html}</th>
@@ -91,7 +91,7 @@ CRM.$(function($) {
     var ZeroRecordText = {/literal}'<div class="status messages">{ts escape="js"}No Accounting Batches match your search criteria.{/ts}</div>'{literal};
     var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/batchlist" h=0 q="snippet=4&context=financialBatch"}'{literal};
 
-    batchSelector = $('#crm-batch-selector').dataTable({
+    batchSelector = $('#crm-batch-selector-{/literal}{$batchStatus}{literal}').dataTable({
       "bFilter" : false,
       "bAutoWidth" : false,
       "aaSorting" : [],
@@ -137,7 +137,7 @@ CRM.$(function($) {
           }
         });
         checkedRows = [];
-        $("#crm-batch-selector input.select-row:checked").each(function() {
+        $("#crm-batch-selector-{/literal}{$batchStatus}{literal} input.select-row:checked").each(function() {
           checkedRows.push('#' + $(this).attr('id'));
         });
       },
@@ -149,7 +149,7 @@ CRM.$(function($) {
         return nRow;
       },
       "fnDrawCallback": function(oSettings) {
-        $('.crm-editable', '#crm-batch-selector').crmEditable();
+        $('.crm-editable', '#crm-batch-selector-{/literal}{$batchStatus}{literal}').crmEditable();
         $("#toggleSelect").prop('checked', false);
         if (checkedRows.length) {
           $(checkedRows.join(',')).prop('checked', true).change();

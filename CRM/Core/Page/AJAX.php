@@ -186,16 +186,16 @@ class CRM_Core_Page_AJAX {
     if ($session->getStatus(FALSE)) {
       $response['crmMessages'] = $session->getStatus(TRUE);
     }
+    $output = json_encode($response);
 
     // CRM-11831 @see http://www.malsup.com/jquery/form/#file-upload
-    $xhr = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
-    if (!$xhr) {
-      echo '<textarea>';
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') {
+      header('Content-Type: application/json');
     }
-    echo json_encode($response);
-    if (!$xhr) {
-      echo '</textarea>';
+    else {
+      $output = "<textarea>$output</textarea>";
     }
+    echo $output;
     CRM_Utils_System::civiExit();
   }
 

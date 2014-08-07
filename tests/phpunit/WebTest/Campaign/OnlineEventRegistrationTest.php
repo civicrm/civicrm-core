@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Campaign_OnlineEventRegistrationTest
+ */
 class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -110,6 +114,10 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     $this->onlineParticipantAddTest($campaignTitle, $id);
   }
 
+  /**
+   * @param $campaignTitle
+   * @param $id
+   */
   function onlineParticipantAddTest($campaignTitle, $id) {
     // We need a payment processor
     $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
@@ -143,6 +151,11 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     $this->_testOnlineRegistration($campaignTitle, $registerUrl, $numberRegistrations, $anonymous);
   }
 
+  /**
+   * @param $id
+   * @param $eventTitle
+   * @param $eventDescription
+   */
   function _testAddEventInfo($id, $eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
@@ -172,6 +185,9 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     $this->click("_qf_EventInfo_upload-bottom");
   }
 
+  /**
+   * @param $streetAddress
+   */
   function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
     $this->waitForElementPresent("_qf_Location_upload-bottom");
@@ -190,6 +206,11 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     $this->waitForText('crm-notification-container', "saved");
   }
 
+  /**
+   * @param bool $discount
+   * @param bool $priceSet
+   * @param $processorId
+   */
   function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorId) {
     // Go to Fees tab
     $this->click("link=Fees");
@@ -219,6 +240,10 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     $this->waitForText('crm-notification-container', "saved");
   }
 
+  /**
+   * @param $registerIntro
+   * @param bool $multipleRegistrations
+   */
   function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
     // Go to Online Registration tab
     $this->click("link=Online Registration");
@@ -242,6 +267,10 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     $this->waitForText('crm-notification-container', "saved");
   }
 
+  /**
+   * @param $eventTitle
+   * @param $eventInfoStrings
+   */
   function _testVerifyEventInfo($eventTitle, $eventInfoStrings) {
     // verify event input on info page
     // start at Manage Events listing
@@ -252,6 +281,11 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     $this->assertStringsPresent($eventInfoStrings);
   }
 
+  /**
+   * @param $registerStrings
+   *
+   * @return string
+   */
   function _testVerifyRegisterPage($registerStrings) {
     // Go to Register page and check for intro text and fee levels
     $this->click("link=Register Now");
@@ -260,6 +294,12 @@ class WebTest_Campaign_OnlineEventRegistrationTest extends CiviSeleniumTestCase 
     return $this->getLocation();
   }
 
+  /**
+   * @param $campaignTitle
+   * @param $registerUrl
+   * @param int $numberRegistrations
+   * @param bool $anonymous
+   */
   function _testOnlineRegistration($campaignTitle, $registerUrl, $numberRegistrations = 1, $anonymous = TRUE) {
     if ($anonymous) {
       $this->webtestLogout();

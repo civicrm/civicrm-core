@@ -197,10 +197,39 @@ abstract class CRM_Import_Parser {
    * Abstract function definitions
    */
   abstract function init();
+
+  /**
+   * @return mixed
+   */
   abstract function fini();
+
+  /**
+   * @param $values
+   *
+   * @return mixed
+   */
   abstract function mapField(&$values);
+
+  /**
+   * @param $values
+   *
+   * @return mixed
+   */
   abstract function preview(&$values);
+
+  /**
+   * @param $values
+   *
+   * @return mixed
+   */
   abstract function summary(&$values);
+
+  /**
+   * @param $onDuplicate
+   * @param $values
+   *
+   * @return mixed
+   */
   abstract function import($onDuplicate, &$values);
 
   /**
@@ -255,6 +284,9 @@ abstract class CRM_Import_Parser {
     return $params;
   }
 
+  /**
+   * @return array
+   */
   function getSelectValues() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
@@ -263,6 +295,9 @@ abstract class CRM_Import_Parser {
     return $values;
   }
 
+  /**
+   * @return array
+   */
   function getSelectTypes() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
@@ -273,6 +308,9 @@ abstract class CRM_Import_Parser {
     return $values;
   }
 
+  /**
+   * @return array
+   */
   function getHeaderPatterns() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
@@ -283,6 +321,9 @@ abstract class CRM_Import_Parser {
     return $values;
   }
 
+  /**
+   * @return array
+   */
   function getDataPatterns() {
     $values = array();
     foreach ($this->_fields as $name => $field) {

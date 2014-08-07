@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_CustomDataTest
+ */
 class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
@@ -101,6 +105,15 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide data for custom data import.
      */
+  /**
+   * @param $customGroupTitle
+   * @param $firstName1
+   * @param $firstName2
+   * @param $id1
+   * @param $id2
+   *
+   * @return array
+   */
   function _individualCustomCSVData($customGroupTitle, $firstName1, $firstName2, $id1, $id2) {
     list($customDataParams, $customDataVerify) = $this->_addCustomData($customGroupTitle, $id1, $id2);
 
@@ -136,6 +149,13 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows, $customDataVerify);
   }
 
+  /**
+   * @param $customGroupTitle
+   * @param $id1
+   * @param $id2
+   *
+   * @return array
+   */
   function _addCustomData($customGroupTitle, $id1, $id2) {
 
     $this->openCiviPage("admin/custom/group", "reset=1");

@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Grant_StandaloneAddTest
+ */
 class WebTest_Grant_StandaloneAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

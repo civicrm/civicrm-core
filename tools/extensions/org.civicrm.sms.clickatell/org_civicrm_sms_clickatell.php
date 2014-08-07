@@ -208,6 +208,13 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
     }
   }
 
+  /**
+   * @param $url
+   * @param $postDataArray
+   * @param null $id
+   *
+   * @return object|string
+   */
   function formURLPostData($url, &$postDataArray, $id = NULL) {
     $url = $this->_providerInfo['api_url'] . $url;
     $postDataArray['session_id'] = $this->_sessionID;
@@ -306,6 +313,9 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
     }
   }
 
+  /**
+   * @return bool
+   */
   function callback() {
     $apiMsgID = $this->retrieve('apiMsgId', 'String');
 
@@ -394,6 +404,9 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
     return FALSE;
   }
 
+  /**
+   * @return $this|null|object
+   */
   function inbound() {
     $like      = "";
     $fromPhone = $this->retrieve('from', 'String');

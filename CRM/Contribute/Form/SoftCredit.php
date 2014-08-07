@@ -106,7 +106,7 @@ class CRM_Contribute_Form_SoftCredit {
     if ($form->getAction() & CRM_Core_Action::UPDATE) {
       $form->_softCreditInfo = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($form->_id, TRUE);
     }
-    elseif ($form->_pledgeID) {
+    elseif (!empty($form->_pledgeID)) {
       //Check and select most recent completed contrubtion and use it to retrieve
       //soft-credit information to use as default for current pledge payment, CRM-13981
       $pledgePayments = CRM_Pledge_BAO_PledgePayment::getPledgePayments($form->_pledgeID);

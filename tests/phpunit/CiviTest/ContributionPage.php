@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class ContributionPage
+ */
 class ContributionPage extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to create

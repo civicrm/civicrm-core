@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_DeceasedContactsAdvancedSearchTest
+ */
 class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -85,6 +89,13 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     $this->assertElementContainsText('search-status', '3 Contacts');
   }
 
+  /**
+   * @param $firstName
+   * @param $lastName
+   * @param $email
+   * @param $groupName
+   * @param bool $deceased
+   */
   function _testAddContact($firstName, $lastName, $email, $groupName, $deceased = FALSE) {
     $this->webtestAddContact($firstName, $lastName, $email);
     if ($deceased) {

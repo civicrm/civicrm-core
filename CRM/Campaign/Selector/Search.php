@@ -273,6 +273,9 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
     return $rows;
   }
 
+  /**
+   * @param $sort
+   */
   function buildPrevNextCache($sort) {
     //for prev/next pagination
     $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
@@ -360,6 +363,9 @@ FROM {$from}
     return self::$_columnHeaders;
   }
 
+  /**
+   * @return string
+   */
   function &getQuery() {
     return $this->_query;
   }

@@ -250,6 +250,11 @@ class CRM_Utils_Date {
     return $fullMonthNames;
   }
 
+  /**
+   * @param $string
+   *
+   * @return int
+   */
   static function unixTime($string) {
     if (empty($string)) {
       return 0;
@@ -283,7 +288,7 @@ class CRM_Utils_Date {
    * %P - uppercase ante/post meridiem ('AM', 'PM')
    * %Y - year as a decimal number including the century ('2005')
    *
-   * @param $dateString
+   * @param string $dateString
    * @param string $format the output format
    * @param array $dateParts an array with the desired date parts
    *
@@ -458,6 +463,9 @@ class CRM_Utils_Date {
 
   /**
    * converts the date/datetime from ISO format to MySQL format
+   * Note that until CRM-14986/ 4.4.7 this was required whenever the pattern $dao->find(TRUE): $dao->save(); was
+   * used to update an object with a date field was used. The DAO now checks for a '-' in date field strings
+   * & runs this function if the - appears - meaning it is likely redundant in the form & BAO layers
    *
    * @param string $iso  date/datetime in ISO format
    *
@@ -656,6 +664,11 @@ class CRM_Utils_Date {
     return FALSE;
   }
 
+  /**
+   * @param $date
+   *
+   * @return bool
+   */
   static function isDate(&$date) {
     if (CRM_Utils_System::isNull($date)) {
       return FALSE;
@@ -663,10 +676,21 @@ class CRM_Utils_Date {
     return TRUE;
   }
 
+  /**
+   * @param null $timeStamp
+   *
+   * @return bool|string
+   */
   static function currentDBDate($timeStamp = NULL) {
     return $timeStamp ? date('YmdHis', $timeStamp) : date('YmdHis');
   }
 
+  /**
+   * @param $date
+   * @param null $now
+   *
+   * @return bool
+   */
   static function overdue($date, $now = NULL) {
     $mysqlDate = self::isoToMysql($date);
     if (!$now) {
@@ -1580,6 +1604,12 @@ class CRM_Utils_Date {
   }
 
 
+  /**
+   * @param $date
+   * @param $dateType
+   *
+   * @return null|string
+   */
   static function formatDate($date, $dateType) {
     $formattedDate = NULL;
     if (empty($date)) {

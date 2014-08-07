@@ -34,6 +34,10 @@
  */
 
 require_once 'Mail/mime.php';
+
+/**
+ * Class CRM_Mailing_Event_BAO_Resubscribe
+ */
 class CRM_Mailing_Event_BAO_Resubscribe {
 
   /**

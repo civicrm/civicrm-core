@@ -47,6 +47,9 @@ class CRM_Case_Form_Activity_OpenCase {
    */
   public $_contactID;
 
+  /**
+   * @param $form
+   */
   static function preProcess(&$form) {
     //get multi client case configuration
     $xmlProcessorProcess = new CRM_Case_XMLProcessor_Process();
@@ -81,6 +84,8 @@ class CRM_Case_Form_Activity_OpenCase {
 
     // Add attachments
     CRM_Core_BAO_File::buildAttachment( $form, 'civicrm_activity', $form->_activityId );
+    $session = CRM_Core_Session::singleton();
+    $session->pushUserContext(CRM_Utils_System::url('civicrm/case', 'reset=1'));
   }
 
   /**

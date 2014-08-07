@@ -320,6 +320,12 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   }
   //end of function
 
+  /**
+   * @param null $action
+   * @param null $output
+   *
+   * @return array
+   */
   function &getColHeads($action = NULL, $output = NULL) {
     $colHeads = self::_getColumnHeaders();
     $colHeads[] = array('desc' => ts('Actions'), 'name' => ts('Action'));
@@ -818,6 +824,11 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     return $rows;
   }
 
+  /**
+   * @param $sort
+   *
+   * @return string
+   */
   function buildPrevNextCache($sort) {
     $cacheKey = 'civicrm search ' . $this->_key;
 
@@ -844,11 +855,14 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $this->fillupPrevNextCache($sort, $cacheKey);
     }
     elseif ($firstRecord >= $countRow) {
-      $this->fillupPrevNextCache($sort, $cacheKey, $countRow, $firstRecord + 500);
+      $this->fillupPrevNextCache($sort, $cacheKey, $countRow, 500);
     }
     return $cacheKey;
   }
 
+  /**
+   * @param $rows
+   */
   function addActions(&$rows) {
     $config = CRM_Core_Config::singleton();
 
@@ -941,6 +955,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     }
   }
 
+  /**
+   * @param $rows
+   */
   function removeActions(&$rows) {
     foreach ($rows as $rid => & $rValue) {
       unset($rValue['contact_type']);
@@ -980,7 +997,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
     $insertSQL = "
 INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cacheKey, data )
-SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.display_name
+SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.display_name
 ";
 
     $sql = str_replace($replaceSQL, $insertSQL, $sql);
@@ -1027,7 +1044,7 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
     // build insert query, note that currently we build cache for 500 contact records at a time, hence below approach
     $insertValues = array();
     while($dao->fetch()) {
-      $insertValues[] = "('civicrm_contact', {$dao->contact_id}, {$dao->contact_id}, '{$cacheKey}', '{$dao->sort_name}')";
+      $insertValues[] = "('civicrm_contact', {$dao->contact_id}, {$dao->contact_id}, '{$cacheKey}', '" . CRM_Core_DAO::escapeString($dao->sort_name) . "')";
     }
 
     //update pre/next cache using single insert query
@@ -1130,14 +1147,29 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
     return self::$_columnHeaders;
   }
 
+  /**
+   * @return CRM_Contact_BAO_Query
+   */
   function &getQuery() {
     return $this->_query;
   }
 
+  /**
+   * @return CRM_Contact_DAO_Contact
+   */
   function alphabetQuery() {
     return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
   }
 
+  /**
+   * @param $params
+   * @param $action
+   * @param $sortID
+   * @param null $displayRelationshipType
+   * @param string $queryOperator
+   *
+   * @return CRM_Contact_DAO_Contact
+   */
   function contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
     $sortOrder = &$this->getSortOrder($this->_action);
     $sort = new CRM_Utils_Sort($sortOrder, $sortID);
@@ -1170,6 +1202,11 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
     return $value;
   }
 
+  /**
+   * @param $returnProperties
+   *
+   * @return array
+   */
   function &makeProperties(&$returnProperties) {
     $properties = array();
     foreach ($returnProperties as $name => $value) {

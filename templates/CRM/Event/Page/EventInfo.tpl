@@ -83,11 +83,11 @@
              <div class="crm-participant-list-inner">
                <ul>
                     {if $findParticipants.statusCounted}
-                <li><a class="crm-participant-counted" href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$event.id`&status=true"}">{$findParticipants.statusCounted|replace:'/':', '}</a></li>
+                <li><a class="crm-participant-counted" href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$event.id`&status=true"}"><b>{ts}List counted participants{/ts}</b> ({$findParticipants.statusCounted|replace:'/':', '})</a></li>
               {/if}
 
                 {if $findParticipants.statusNotCounted}
-            <li><a class="crm-participant-not-counted" href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$event.id`&status=false"}">{$findParticipants.statusNotCounted|replace:'/':', '}</a>
+            <li><a class="crm-participant-not-counted" href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$event.id`&status=false"}"><b>{ts}List uncounted participants{/ts}</b> ({$findParticipants.statusNotCounted|replace:'/':', '})</a>
             </li>
               {/if}
                 {if $participantListingURL}
@@ -182,7 +182,7 @@
               {* loop on any phones and emails for this event *}
               {foreach from=$location.phone item=phone}
                   {if $phone.phone}
-                      {if $phone.phone_type}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}:
+                      {if $phone.phone_type_id}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}:
                           <span class="tel">{$phone.phone} {if $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if} </span> <br />
                       {/if}
               {/foreach}

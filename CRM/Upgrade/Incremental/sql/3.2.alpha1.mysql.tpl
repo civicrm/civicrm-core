@@ -272,7 +272,7 @@ VALUES
    (@option_group_id_mt, {localize}'Export Activities'{/localize},  @max_val+1, 'Export Activity', NULL, 0, 0, @max_wt+1, 0, 1, 1);
 
 -- CRM-6063
-   INSERT INTO civicrm_state_province
+   INSERT IGNORE INTO civicrm_state_province
         (`name`, `abbreviation`, `country_id` )
    VALUES
         ( 'Andorra la Vella', '07', 1005 ),

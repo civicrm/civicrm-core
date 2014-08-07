@@ -35,6 +35,9 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   protected $_ppTypeID;
   protected $_apiversion;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'PaymentProcessorType Create',

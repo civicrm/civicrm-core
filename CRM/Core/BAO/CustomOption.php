@@ -212,6 +212,11 @@ WHERE  id = %1";
     }
   }
 
+  /**
+   * @param $params
+   *
+   * @throws Exception
+   */
   static function updateCustomValues($params) {
     $optionDAO = new CRM_Core_DAO_OptionValue();
     $optionDAO->id = $params['optionId'];
@@ -279,6 +284,12 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
     }
   }
 
+  /**
+   * @param $customFieldID
+   * @param null $optionGroupID
+   *
+   * @return array
+   */
   static function valuesByID($customFieldID, $optionGroupID = NULL) {
     if (!$optionGroupID) {
       $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',

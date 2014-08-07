@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_RelationshipAddTest
+ */
 class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -368,7 +372,7 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     $pageUrl = array('url' => 'contact/view/rel', 'args' => "cid={$contactId[1]}&action=add&reset=1");
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
   }
-  
+
   function testRelationshipAddCurrentEmployerTest() {
     $this->webtestLogin();
 

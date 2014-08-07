@@ -731,10 +731,11 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     if ($formValues['contribution_status_id'] == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus())) {
       $this->_params['is_pay_later'] = 1;
     }
-    $renewMembership = CRM_Member_BAO_Membership::renewMembership($this->_contactID,
+    $renewMembership = CRM_Member_BAO_Membership::renewMembershipFormWrapper($this->_contactID,
       $formValues['membership_type_id'][1],
       $isTestMembership, $this, NULL, NULL,
-      $customFieldsFormatted, $numRenewTerms
+      $customFieldsFormatted, $numRenewTerms,
+      $this->_membershipId
     );
 
     $endDate = CRM_Utils_Date::processDate($renewMembership->end_date);

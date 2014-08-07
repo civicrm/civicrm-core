@@ -87,6 +87,7 @@ function _civicrm_api3_relationship_type_create_spec(&$params) {
   $params['contact_type_b']['api.required'] = 1;
   $params['name_a_b']['api.required'] = 1;
   $params['name_b_a']['api.required'] = 1;
+  $params['is_active']['api.default'] = 1;
 }
 
 /**

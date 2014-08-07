@@ -195,6 +195,12 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
       ), ts('Field Type Changed'), 'success');
   }
 
+  /**
+   * @param $dataType
+   * @param $htmlType
+   *
+   * @return array|null
+   */
   static function fieldTypeTransitions($dataType, $htmlType) {
     // Text field is single value field,
     // can not be change to other single value option which contains option group
@@ -293,6 +299,11 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @param $str
+   *
+   * @return array
+   */
   static function explode($str) {
     if (empty($str) || $str == CRM_Core_DAO::VALUE_SEPARATOR . CRM_Core_DAO::VALUE_SEPARATOR) {
       return array();

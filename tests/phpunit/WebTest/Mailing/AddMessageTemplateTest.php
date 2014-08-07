@@ -25,12 +25,20 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Mailing_AddMessageTemplateTest
+ */
 class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
+  /**
+   * @param bool $useTokens
+   * @param null $msgTitle
+   */
   function testTemplateAdd($useTokens = FALSE, $msgTitle = NULL) {
     $this->webtestLogin();
 

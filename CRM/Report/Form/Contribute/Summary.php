@@ -45,6 +45,12 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
 
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
   // Check if CiviCampaign is a) enabled and b) has active campaigns
@@ -299,6 +305,11 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     parent::preProcess();
   }
 
+  /**
+   * @param bool $freeze
+   *
+   * @return array
+   */
   function setDefaultValues($freeze = TRUE) {
     return parent::setDefaultValues($freeze);
   }
@@ -405,6 +416,13 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     //check for searching combination of dispaly columns and
@@ -521,6 +539,11 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -598,6 +621,9 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
     parent::postProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function buildChart(&$rows) {
     $graphRows = array();
 
@@ -643,6 +669,9 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
     }
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

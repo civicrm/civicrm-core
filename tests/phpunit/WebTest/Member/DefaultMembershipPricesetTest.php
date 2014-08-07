@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_DefaultMembershipPricesetTest
+ */
 class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -119,6 +123,13 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
   }
 
+  /**
+   * @param $firstName
+   * @param $lastName
+   * @param $email
+   * @param $contactParams
+   * @param $streetAddress
+   */
   function contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress) {
     //Credit Card Info
     $this->select("credit_card_type", "value=Visa");
@@ -137,14 +148,28 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->type("billing_postal_code-5", "94129");
   }
 
+  /**
+   * @param $priceSetSection
+   * @param $optionNumber
+   */
   function checkOptions($priceSetSection, $optionNumber) {
     $this->assertChecked("xpath=//div[@id='priceset']/div[@class='crm-section {$priceSetSection}']/div[2]/div[{$optionNumber}]/span/input");
   }
 
+  /**
+   * @param $priceSetSection
+   * @param $optionNumber
+   */
   function _testDefaultSenarios($priceSetSection, $optionNumber) {
     $this->click("xpath=//div[@id='priceset']/div[@class='crm-section {$priceSetSection}']/div[2]/div[{$optionNumber}]/span/input");
   }
 
+  /**
+   * @param $setTitle
+   * @param $usedFor
+   * @param null $contributionType
+   * @param $setHelp
+   */
   function _testAddSet($setTitle, $usedFor, $contributionType = NULL, $setHelp) {
     $this->openCiviPage("admin/price", "reset=1&action=add", '_qf_Set_next-bottom');
 
@@ -169,6 +194,17 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->assertTrue($this->isTextPresent("Your Set '{$setTitle}' has been added. You can add fields to this set now."));
   }
 
+  /**
+   * @param $fields
+   * @param $validateString
+   * @param bool $dateSpecificFields
+   * @param $title
+   * @param $sid
+   * @param bool $defaultPriceSet
+   * @param $contributionType
+   *
+   * @return array
+   */
   function _testAddPriceFields(&$fields, &$validateString, $dateSpecificFields = FALSE, $title, $sid, $defaultPriceSet = FALSE, $contributionType) {
     if ($defaultPriceSet) {
 

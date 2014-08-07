@@ -177,6 +177,10 @@ class CRM_Utils_File {
     }
   }
 
+  /**
+   * @param $source
+   * @param $destination
+   */
   static function copyDir($source, $destination) {
     $dir = opendir($source);
     @mkdir($destination);
@@ -260,6 +264,13 @@ class CRM_Utils_File {
     return $name;
   }
 
+  /**
+   * @param $dsn
+   * @param $fileName
+   * @param null $prefix
+   * @param bool $isQueryString
+   * @param bool $dieOnErrors
+   */
   static function sourceSQLFile($dsn, $fileName, $prefix = NULL, $isQueryString = FALSE, $dieOnErrors = TRUE) {
     require_once 'DB.php';
 
@@ -302,6 +313,11 @@ class CRM_Utils_File {
     }
   }
 
+  /**
+   * @param $ext
+   *
+   * @return bool
+   */
   static function isExtensionSafe($ext) {
     static $extensions = NULL;
     if (!$extensions) {
@@ -353,6 +369,11 @@ class CRM_Utils_File {
     return $name;
   }
 
+  /**
+   * @param $name
+   *
+   * @return string
+   */
   static function makeFileName($name) {
     $uniqID   = md5(uniqid(rand(), TRUE));
     $info     = pathinfo($name);
@@ -370,6 +391,12 @@ class CRM_Utils_File {
     }
   }
 
+  /**
+   * @param $path
+   * @param $ext
+   *
+   * @return array
+   */
   static function getFilesByExtension($path, $ext) {
     $path  = self::addTrailingSlash($path);
     $dh    = opendir($path);
@@ -466,6 +493,11 @@ HTACCESS;
     return $_path;
   }
 
+  /**
+   * @param $directory
+   *
+   * @return string
+   */
   static function relativeDirectory($directory) {
     // Do nothing on windows
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -489,6 +521,11 @@ HTACCESS;
     return $directory;
   }
 
+  /**
+   * @param $directory
+   *
+   * @return string
+   */
   static function absoluteDirectory($directory) {
     // Do nothing on windows - config will need to specify absolute path
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -649,6 +686,61 @@ HTACCESS;
       return FALSE;
     }
     return TRUE;
+  }
+
+  /**
+   * Create a static file (e.g. css or js) in the dynamic resource directory
+   * Note: if the file already exists it will be overwritten
+   * @param string $fileName
+   * @param string $contents
+   */
+  static function addDynamicResource($fileName, $contents) {
+    // First ensure the directory exists
+    $path = self::dynamicResourcePath();
+    if (!is_dir($path)) {
+      self::createDir($path);
+      self::restrictBrowsing($path);
+    }
+    file_put_contents("$path/$fileName", $contents);
+  }
+
+  /**
+   * Get the path of a dynamic resource file
+   * With no fileName supplied, returns the path of the directory
+   * @param string $fileName
+   * @return string
+   */
+  static function dynamicResourcePath($fileName = NULL) {
+    $config = CRM_Core_Config::singleton();
+    // FIXME: Use self::baseFilePath once url issue has been resolved
+    $path = self::addTrailingSlash(str_replace('/persist/contribute', '', $config->imageUploadDir)) . 'dynamic';
+    if ($fileName !== NULL) {
+      $path .= "/$fileName";
+    }
+    return $path;
+  }
+
+  /**
+   * Get the URL of a dynamic resource file
+   * @param string $fileName
+   * @return string
+   */
+  static function dynamicResourceUrl($fileName) {
+    $config = CRM_Core_Config::singleton();
+    // FIXME: Need a better way of getting the url of the baseFilePath
+    return self::addTrailingSlash(str_replace('/persist/contribute', '', $config->imageUploadURL)) . 'dynamic/' . $fileName;
+  }
+
+  /**
+   * Delete all files from the dynamic resource directory
+   */
+  static function flushDynamicResources() {
+    $files = glob(self::dynamicResourcePath('*'));
+    foreach ($files ? $files : array() as $file) {
+      if (is_file($file)) {
+        unlink($file);
+      }
+    }
   }
 }
 

@@ -335,18 +335,17 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       );
     }
     else {
-      $contribButton = ts('Continue');
+      $contribButton = ts('Continue >>');
       $this->addButtons(array(
+          array(
+            'type' => 'back',
+            'name' => ts('<< Go Back'),
+          ),
           array(
             'type' => 'next',
             'name' => $contribButton,
             'isDefault' => TRUE,
             'js' => array('onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"),
-          ),
-          array(
-            'type' => 'back',
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'name' => ts('Go Back'),
           ),
         )
       );
@@ -1133,15 +1132,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     return $contactID;
   }
 
+  /**
+   * @param $form
+   */
   public static function assignProfiles(&$form) {
-    $addParticipantProfile = $form->get('addParticipantProfile');
-    $primaryParticipantProfile = $form->get('primaryParticipantProfile');
-    if (!empty($addParticipantProfile) || !empty($primaryParticipantProfile)) {
-      $form->assign('addParticipantProfile', $addParticipantProfile);
-      $form->assign('primaryParticipantProfile', $primaryParticipantProfile);
-      return;
-    }
-
     $participantParams = $form->_params;
     $formattedValues = $profileFields = array();
     $count             = 1;

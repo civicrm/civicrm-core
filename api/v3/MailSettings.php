@@ -80,11 +80,10 @@ function civicrm_api3_mail_settings_get($params) {
  * This method is used to delete any existing mail_settings. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params  (reference) array containing id of the group
+ * @param array $params array containing id of the group
  *                       to be deleted
  *
- * @return array  returns flag true if successfull, error
- *                message otherwise
+ * @return array api result array
  * {@getfields mail_settings_delete}
  * @access public
  */

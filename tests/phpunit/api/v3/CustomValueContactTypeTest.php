@@ -41,6 +41,9 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   protected $individualStudent;
 
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Custom Data For Contact Subtype',

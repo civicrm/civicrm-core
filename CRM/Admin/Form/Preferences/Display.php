@@ -109,6 +109,9 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     parent::preProcess();
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     parent::cbsDefaultValues($defaults);

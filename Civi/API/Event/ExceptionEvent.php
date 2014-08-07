@@ -27,6 +27,10 @@
 
 namespace Civi\API\Event;
 
+/**
+ * Class ExceptionEvent
+ * @package Civi\API\Event
+ */
 class ExceptionEvent extends Event {
 
   /**
@@ -34,6 +38,11 @@ class ExceptionEvent extends Event {
    */
   private $exception;
 
+  /**
+   * @param $exception
+   * @param $apiProvider
+   * @param $apiRequest
+   */
   function __construct($exception, $apiProvider, $apiRequest) {
     $this->exception = $exception;
     parent::__construct($apiProvider, $apiRequest);

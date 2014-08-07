@@ -429,6 +429,9 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     return $returnProperties;
   }
 
+  /**
+   * @param $rows
+   */
   function mergeSameAddress(&$rows) {
     $uniqueAddress = array();
     foreach (array_keys($rows) as $rowID) {

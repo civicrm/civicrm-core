@@ -66,6 +66,10 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     'Awaiting approval' => array('Cancelled', 'Pending from approval'),
     'Pending from approval' => array('Registered', 'Cancelled'),
   );
+
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
@@ -641,28 +645,34 @@ GROUP BY  participant.event_id
 
       $note = array(
         'participant_note' => array(
-          'title' => 'Participant Note',
+          'title' => ts('Participant Note'),
           'name' => 'participant_note',
           'headerPattern' => '/(participant.)?note$/i',
         ));
 
+      // Split status and status id into 2 fields
+      // Fixme: it would be better to leave as 1 field and intelligently handle both during import
       $participantStatus = array(
         'participant_status' => array(
-          'title' => 'Participant Status',
+          'title' => ts('Participant Status'),
           'name' => 'participant_status',
           'data_type' => CRM_Utils_Type::T_STRING,
         ));
+      $tmpFields['participant_status_id']['title'] = ts('Participant Status Id');
 
+      // Split role and role id into 2 fields
+      // Fixme: it would be better to leave as 1 field and intelligently handle both during import
       $participantRole = array(
         'participant_role' => array(
-          'title' => 'Participant Role',
+          'title' => ts('Participant Role'),
           'name' => 'participant_role',
           'data_type' => CRM_Utils_Type::T_STRING,
         ));
+      $tmpFields['participant_role_id']['title'] = ts('Participant Role Id');
 
       $eventType = array(
         'event_type' => array(
-          'title' => 'Event Type',
+          'title' => ts('Event Type'),
           'name' => 'event_type',
           'data_type' => CRM_Utils_Type::T_STRING,
         ));
@@ -1811,6 +1821,15 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
     }
   }
 
+  /**
+   * @param $params
+   * @param $participantId
+   * @param $contributionId
+   * @param $feeBlock
+   * @param $lineItems
+   * @param $paidAmount
+   * @param $priceSetId
+   */
   static function changeFeeSelections($params, $participantId, $contributionId, $feeBlock, $lineItems, $paidAmount, $priceSetId) {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
@@ -1945,6 +1964,11 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     self::addActivityForSelection($participantId, 'Change Registration');
   }
 
+  /**
+   * @param $updatedAmount
+   * @param $paidAmount
+   * @param $contributionId
+   */
   static function recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId) {
     $balanceAmt = $updatedAmount - $paidAmount;
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -1996,6 +2020,12 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     }
   }
 
+  /**
+   * @param $participantId
+   * @param $activityType
+   *
+   * @throws CRM_Core_Exception
+   */
   static function addActivityForSelection($participantId, $activityType) {
     $eventId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantId, 'event_id');
     $contactId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantId, 'contact_id');

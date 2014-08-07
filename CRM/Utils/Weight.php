@@ -24,6 +24,10 @@
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
 */
+
+/**
+ * Class CRM_Utils_Weight
+ */
 class CRM_Utils_Weight {
   /**
    * @var array, list of GET fields which must be validated
@@ -332,6 +336,13 @@ class CRM_Utils_Weight {
     return $resultDAO;
   }
 
+  /**
+   * @param $rows
+   * @param $daoName
+   * @param $idName
+   * @param $returnURL
+   * @param null $filter
+   */
   static function addOrder(&$rows, $daoName, $idName, $returnURL, $filter = NULL) {
     if (empty($rows)) {
       return;
@@ -462,6 +473,9 @@ class CRM_Utils_Weight {
     self::fixOrderOutput($url);
   }
 
+  /**
+   * @param $url
+   */
   static function fixOrderOutput($url) {
     if (empty($_GET['snippet']) || $_GET['snippet'] !== 'json') {
       CRM_Utils_System::redirect($url);

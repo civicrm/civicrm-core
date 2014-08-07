@@ -1,6 +1,13 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Utils_RestTest
+ */
 class CRM_Utils_RestTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Rest Test',

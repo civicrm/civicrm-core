@@ -802,7 +802,16 @@ class CRM_Utils_Token {
     }
     return $tokenHtml;
   }
-  public static function getHookTokenReplacement(
+
+  /**
+   * @param $token
+   * @param $contact
+   * @param $category
+   * @param bool $html
+   * @param bool $escapeSmarty
+   *
+   * @return mixed|string
+   */public static function getHookTokenReplacement(
     $token,
     &$contact,
     $category,
@@ -1355,9 +1364,40 @@ class CRM_Utils_Token {
           $escapeSmarty
         );
       }
+      // check if there are still any unevaluated tokens
+      $greetingTokens = self::getTokens($tokenString);
+
+      // $greetingTokens not empty, there are hook tokens to replace 
+      if (!empty($greetingTokens) ) {
+        // Fill the return properties array
+        reset($greetingTokens);
+        $greetingsReturnProperties = array();
+        while(list($key) = each($greetingTokens)) {
+          $props = array_flip(CRM_Utils_Array::value($key, $greetingTokens));
+          $props = array_fill_keys(array_keys($props), 1);
+          $greetingsReturnProperties = $greetingsReturnProperties + $props;
+        }
+        $contactParams = array('contact_id' => $contactId);
+        $greetingDetails = self::getTokenDetails($contactParams,
+          $greetingsReturnProperties,
+          FALSE, FALSE, NULL,
+          $greetingTokens,
+          $className
+        );
+        // Prepare variables for calling replaceHookTokens
+        $categories = array_keys($greetingTokens);
+        list($contact) = $greetingDetails;
+        // Replace tokens defined in Hooks.
+        $tokenString = CRM_Utils_Token::replaceHookTokens($tokenString, $contact[$contactId], $categories);
+      }
     }
   }
 
+  /**
+   * @param $tokens
+   *
+   * @return array
+   */
   static function flattenTokens(&$tokens) {
     $flattenTokens = array();
 

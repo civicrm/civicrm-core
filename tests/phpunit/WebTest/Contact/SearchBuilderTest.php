@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_SearchBuilderTest
+ */
 class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -68,6 +72,9 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
   }
 
   // function to create contact with details (contact details, address, Constituent information ...)
+  /**
+   * @param null $firstName
+   */
   function createDetailContact($firstName = NULL) {
 
     if (!$firstName) {
@@ -205,6 +212,13 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
   }
 
+  /**
+   * @param $field
+   * @param null $fieldValue
+   * @param null $name
+   * @param string $op
+   * @param null $count
+   */
   function _searchBuilder($field, $fieldValue = NULL, $name = NULL, $op = '=', $count = NULL) {
     // search builder using contacts(not using contactType)
     $this->openCiviPage("contact/search/builder", "reset=1");
@@ -264,6 +278,13 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param null $fieldValue
+   * @param null $name
+   * @param null $contactType
+   * @param null $count
+   * @param $field
+   */
   function _advancedSearch($fieldValue = NULL, $name = NULL, $contactType = NULL, $count = NULL, $field) {
     //advanced search by selecting the contactType
     $this->openCiviPage("contact/search/advanced", "reset=1");
@@ -309,6 +330,13 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $contactType
+   * @param $name
+   * @param $email
+   * @param null $streetName
+   * @param null $postalCode
+   */
   function _createContact($contactType, $name, $email, $streetName = NULL, $postalCode = NULL) {
     $this->openCiviPage('contact/add', array('reset' => 1, 'ct' => $contactType), '_qf_Contact_cancel');
 

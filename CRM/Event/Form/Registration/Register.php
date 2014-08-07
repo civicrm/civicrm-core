@@ -692,6 +692,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
   }
 
+  /**
+   * @param $form
+   */
   public static function formatFieldsForOptionFull(&$form) {
     $priceSet = $form->get('priceSet');
     $priceSetId = $form->get('priceSetId');
@@ -702,7 +705,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     $skipParticipants = $formattedPriceSetDefaults = array();
-    if ($form->_allowConfirmation && (isset($form->_pId) || isset($form->_additionalParticipantId))) {
+    if (!empty($form->_allowConfirmation) && (isset($form->_pId) || isset($form->_additionalParticipantId))) {
       $participantId = isset($form->_pId) ? $form->_pId : $form->_additionalParticipantId;
       $pricesetDefaults = CRM_Event_Form_EventFees::setDefaultPriceSet($participantId,
         $form->_eventId
@@ -1208,6 +1211,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @return void
    * access public
    *
+   */
+  /**
+   * @param $params
+   * @param null $contactID
    */
   public function processRegistration($params, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();

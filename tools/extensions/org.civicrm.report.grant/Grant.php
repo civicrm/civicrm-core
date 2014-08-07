@@ -34,10 +34,17 @@
  */
 
 require_once 'CRM/Report/Form.php';
+
+/**
+ * Class org_civicrm_report_grant
+ */
 class org_civicrm_report_grant extends CRM_Report_Form {
 
   protected $_addressField = FALSE;
 
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -233,13 +240,13 @@ class org_civicrm_report_grant extends CRM_Report_Form {
   function from() {
     $this->_from = "
         FROM civicrm_grant {$this->_aliases['civicrm_grant']}
-                        LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']} 
+                        LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                     ON ({$this->_aliases['civicrm_grant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  ) ";
     if ($this->_addressField) {
       $this->_from .= "
-                  LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} 
-                         ON {$this->_aliases['civicrm_contact']}.id = 
-                            {$this->_aliases['civicrm_address']}.contact_id AND 
+                  LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
+                         ON {$this->_aliases['civicrm_contact']}.id =
+                            {$this->_aliases['civicrm_address']}.contact_id AND
                             {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
   }
@@ -301,6 +308,9 @@ class org_civicrm_report_grant extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

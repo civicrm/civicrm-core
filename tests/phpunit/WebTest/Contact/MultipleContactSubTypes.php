@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_MultipleContactSubTypes
+ */
 class WebTest_Contact_MultipleContactSubTypes extends CiviSeleniumTestCase {
 
   protected function setUp() {

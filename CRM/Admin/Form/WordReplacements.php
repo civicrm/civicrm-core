@@ -57,6 +57,9 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
   }
 
+  /**
+   * @return array
+   */
   public function setDefaultValues() {
     if ($this->_defaults !== NULL) {
       return $this->_defaults;

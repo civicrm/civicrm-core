@@ -33,6 +33,11 @@
  *
  */
 class CRM_Upgrade_TwoTwo_Form_Step3 extends CRM_Upgrade_Form {
+  /**
+   * @param $errorMessage
+   *
+   * @return bool
+   */
   function verifyPreDBState(&$errorMessage) {
     $errorMessage = ts('Pre-condition failed for upgrade step %1.', array(1 => '3'));
     return $this->checkVersion('2.1.102');
@@ -48,6 +53,11 @@ class CRM_Upgrade_TwoTwo_Form_Step3 extends CRM_Upgrade_Form {
     $this->setVersion('2.1.103');
   }
 
+  /**
+   * @param $errorMessage
+   *
+   * @return bool
+   */
   function verifyPostDBState(&$errorMessage) {
     // check if Option Group & Option Values tables exists
     if (!CRM_Core_DAO::checkTableExists('civicrm_option_group') ||
@@ -83,14 +93,23 @@ class CRM_Upgrade_TwoTwo_Form_Step3 extends CRM_Upgrade_Form {
     return $this->checkVersion('2.1.103');
   }
 
+  /**
+   * @return string
+   */
   function getTitle() {
     return ts('CiviCRM 2.2 Upgrade: Step Three (Option Group And Values)');
   }
 
+  /**
+   * @return string
+   */
   function getTemplateMessage() {
     return '<p>' . ts('Step Three will upgrade the Option Group And Values in your database.') . '</p>';
   }
 
+  /**
+   * @return string
+   */
   function getButtonTitle() {
     return ts('Upgrade & Continue');
   }

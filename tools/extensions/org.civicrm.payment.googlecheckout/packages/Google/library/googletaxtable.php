@@ -19,7 +19,7 @@
 /* This class is used to add tax tables to the shopping cart
  * There are two types of tax tables
  * 1. default (there can be only a single default tax table)
- * 2. alternate 
+ * 2. alternate
  *
  * Invoke a separate instance of this class for each tax table required
  * Required field is the type
@@ -31,6 +31,12 @@ class GoogleTaxTable {
   var $name;
   var $tax_rules_arr;
   var $standalone;
+
+  /**
+   * @param $type
+   * @param string $name
+   * @param string $standalone
+   */
   function GoogleTaxTable($type, $name = "", $standalone = "false") {
     if (($type == "default") || ($type == "alternate" && $name != "")) {
       $this->name          = $name;
@@ -40,6 +46,9 @@ class GoogleTaxTable {
     }
   }
 
+  /**
+   * @param $rules
+   */
   function AddTaxRules($rules) {
     $this->tax_rules_arr[] = $rules;
   }

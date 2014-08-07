@@ -44,6 +44,12 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   protected $_customGroupExtends = array(
     'Contribution', 'Membership');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array('CiviCampaign', $config->enableComponents);
@@ -552,6 +558,9 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param bool $applyLimit
+   */
   function tempTable($applyLimit = TRUE) {
     // create temp table with contact ids,contribtuion id,membership id
     $dropTempTable = 'DROP TABLE IF EXISTS civireport_membership_contribution_detail';
@@ -576,6 +585,11 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     CRM_Core_DAO::executeQuery($fillTemp);
   }
 
+  /**
+   * @param bool $applyLimit
+   *
+   * @return string
+   */
   function buildQuery($applyLimit = TRUE) {
     $this->select();
     //create temp table to be used as base table
@@ -611,6 +625,11 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -646,6 +665,9 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     parent::postProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $checkList = array();

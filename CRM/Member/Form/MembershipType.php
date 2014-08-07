@@ -132,7 +132,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
     );
     $this->addRule('minimum_fee', ts('Please enter a monetary value for the Minimum Fee.'), 'money');
 
-    $this->addSelect('duration_unit', array('placeholder' => NULL), TRUE);
+    $this->addSelect('duration_unit', array(), TRUE);
 
     //period type
     $this->addSelect('period_type', array(), TRUE);
@@ -412,6 +412,12 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
     }
   }
 
+  /**
+   * @param $previousID
+   * @param $priceSetId
+   * @param $membershipTypeId
+   * @param $optionsIds
+   */
   public static function checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, &$optionsIds) {
     if ($previousID) {
       $editedFieldParams = array(

@@ -135,7 +135,7 @@ ORDER BY title";
     $config = CRM_Core_Config::singleton();
     $session   = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
-    
+
     if (empty($config->recaptchaPublicKey) ||
       empty($config->recaptchaPrivateKey) ||
       $contactID) {
@@ -173,6 +173,11 @@ ORDER BY title";
     );
   }
 
+  /**
+   * @param $fields
+   *
+   * @return array|bool
+   */
   static function formRule($fields) {
     foreach ($fields as $name => $dontCare) {
       if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {

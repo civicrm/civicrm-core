@@ -25,7 +25,7 @@
 *}
 
 <div class="crm-mailing-selector">
-  <table id="contact-mailing-selector">
+  <table class="contact-mailing-selector">
     <thead>
     <tr>
       <th class='crm-mailing-contact-subject'>{ts}Subject{/ts}</th>
@@ -50,7 +50,7 @@
 
       var ZeroRecordText = {/literal}'{ts escape="js"}No mailings found{/ts}.'{literal};
 
-      oTable = $('#contact-mailing-selector').dataTable({
+      oTable = $('.contact-mailing-selector').dataTable({
         "bFilter": false,
         "bAutoWidth": false,
         "aaSorting": [],

@@ -33,6 +33,9 @@
  *
  */
 class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     parent::__construct($formValues);
 
@@ -45,6 +48,9 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
     );
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
     $groups = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::allGroup();
     $form->addElement('select', 'group_id', ts('Group'), $groups);
@@ -56,11 +62,25 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
     $form->assign('elements', array('group_id'));
   }
 
+  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+    return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
+  }
+
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return string
+   */
   function all($offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
     if ($justIDs) {
       $selectClause = "contact_a.id as contact_id";
+      $sort = 'contact_a.id';
     }
     else {
     $selectClause = "
@@ -78,6 +98,9 @@ state_province.name     as state_province
     );
   }
 
+  /**
+   * @return string
+   */
   function from() {
     return "
 FROM      civicrm_group_contact as cgc,
@@ -88,6 +111,11 @@ LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.
 ";
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     $params = array();
 
@@ -114,6 +142,9 @@ LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.
     return $this->whereClause($where, $params);
   }
 
+  /**
+   * @return string
+   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }

@@ -3,8 +3,14 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CRM/Utils/DeprecatedUtils.php';
 
+/**
+ * Class CRM_Utils_DeprecatedUtilsTest
+ */
 class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name'      => 'Deprecated Utils Test',

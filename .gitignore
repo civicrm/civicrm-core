@@ -144,6 +144,7 @@ WordPress
 joomla
 packages/
 tests/phpunit/CiviTest/civicrm.settings.local.php
+tests/phpunit/CiviTest/truncate.xml
 tools/scripts/releaser/releaser.conf
 tools/tests/reports/logfile.tap
 tools/tests/reports/testdox.html

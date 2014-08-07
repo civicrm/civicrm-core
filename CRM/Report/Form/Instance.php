@@ -34,6 +34,9 @@
  */
 class CRM_Report_Form_Instance {
 
+  /**
+   * @param $form
+   */
   static function buildForm(&$form) {
     // we should not build form elements in dashlet mode
     if ($form->_section) {
@@ -80,15 +83,15 @@ class CRM_Report_Form_Instance {
       ts('CC'),
       $attributes['email_subject']
     );
-    
+
     $form->add('text',
       'row_count',
       ts('Limit Dashboard Results'),
       array('maxlength' => 64,
         'size' => 5
-      )         
+      )
     );
-    
+
     $form->add('textarea',
       'report_header',
       ts('Report Header'),
@@ -172,6 +175,13 @@ class CRM_Report_Form_Instance {
     $form->addFormRule(array('CRM_Report_Form_Instance', 'formRule'), $form);
   }
 
+  /**
+   * @param $fields
+   * @param $errors
+   * @param $self
+   *
+   * @return array|bool
+   */
   static function formRule($fields, $errors, $self) {
     $buttonName = $self->controller->getButtonName();
     $selfButtonName = $self->getVar('_instanceButtonName');
@@ -187,6 +197,10 @@ class CRM_Report_Form_Instance {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * @param $form
+   * @param $defaults
+   */
   static function setDefaultValues(&$form, &$defaults) {
     // we should not build form elements in dashlet mode
     if ($form->_section) {
@@ -249,6 +263,10 @@ class CRM_Report_Form_Instance {
     }
   }
 
+  /**
+   * @param $form
+   * @param bool $redirect
+   */
   static function postProcess(&$form, $redirect = TRUE) {
     $params = $form->getVar('_params');
     $instanceID = $form->getVar('_id');

@@ -27,11 +27,18 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class api_v3_ProductTest
+ */
 class api_v3_ProductTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params;
 
   protected $_entity = 'Product';
+
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Product Tests',

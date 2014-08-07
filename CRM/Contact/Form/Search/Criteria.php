@@ -270,6 +270,9 @@ class CRM_Contact_Form_Search_Criteria {
   }
 
 
+  /**
+   * @param $form
+   */
   static function location(&$form) {
     // Build location criteria based on _submitValues if
     // available; otherwise, use $form->_formValues.
@@ -409,11 +412,17 @@ class CRM_Contact_Form_Search_Criteria {
     }
   }
 
+  /**
+   * @param $form
+   */
   static function activity(&$form) {
     $form->add('hidden', 'hidden_activity', 1);
     CRM_Activity_BAO_Query::buildSearchForm($form);
   }
 
+  /**
+   * @param $form
+   */
   static function changeLog(&$form) {
     $form->add('hidden', 'hidden_changeLog', 1);
 
@@ -426,10 +435,16 @@ class CRM_Contact_Form_Search_Criteria {
     CRM_Core_Form_Date::buildDateRange($form, 'log_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
   }
 
+  /**
+   * @param $form
+   */
   static function task(&$form) {
     $form->add('hidden', 'hidden_task', 1);
   }
 
+  /**
+   * @param $form
+   */
   static function relationship(&$form) {
     $form->add('hidden', 'hidden_relationship', 1);
 
@@ -477,6 +492,9 @@ class CRM_Contact_Form_Search_Criteria {
     }
   }
 
+  /**
+   * @param $form
+   */
   static function demographics(&$form) {
     $form->add('hidden', 'hidden_demographics', 1);
     // radio button for gender
@@ -499,6 +517,9 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addYesNo( 'is_deceased', ts('Deceased'), TRUE);
   }
 
+  /**
+   * @param $form
+   */
   static function notes(&$form) {
     $form->add('hidden', 'hidden_notes', 1);
 
@@ -555,6 +576,9 @@ class CRM_Contact_Form_Search_Criteria {
     //TODO: validate for only one state if prox_distance isset
   }
 
+  /**
+   * @param $form
+   */
   static function CiviCase(&$form) {
     //Looks like obsolete code, since CiviCase is a component, but might be used by HRD
     $form->add('hidden', 'hidden_CiviCase', 1);

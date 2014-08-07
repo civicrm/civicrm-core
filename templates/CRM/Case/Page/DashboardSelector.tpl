@@ -63,7 +63,7 @@
     {if $list eq 'upcoming'}
        <td class="crm-case-case_scheduled_activity">
      {if $row.case_upcoming_activity_viewable}
-        <a class="crm-popup" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid="}{$row.contact_id}&aid={$row.case_scheduled_activity_id}" title="{ts}View this activity.{/ts}">{$row.case_scheduled_activity_type}</a>
+        <a class="crm-popup {$row.activity_status}" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid="}{$row.contact_id}&aid={$row.case_scheduled_activity_id}" title="{ts}View this activity.{/ts}">{$row.case_scheduled_activity_type}</a>
      {else}
         {$row.case_scheduled_activity_type}
      {/if}

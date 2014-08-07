@@ -86,6 +86,13 @@ class CRM_Contact_Form_Edit_Organization {
     }
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param null $contactID
+   *
+   * @return array|bool
+   */
   static function formRule($fields, $files, $contactID = NULL) {
     $errors = array();
     $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID);

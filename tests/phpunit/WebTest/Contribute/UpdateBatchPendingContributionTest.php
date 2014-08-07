@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_UpdateBatchPendingContributionTest
+ */
 class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -128,6 +132,9 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->webtestVerifyTabularData($expected);
   }
 
+  /**
+   * @param $firstName
+   */
   function _addParticipant($firstName) {
 
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", '_qf_Participant_upload-bottom');

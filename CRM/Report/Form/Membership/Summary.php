@@ -43,6 +43,12 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
     'pieChart' => 'Pie Chart',
   );
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     // UI for selecting columns to appear in the report list
     // array conatining the columns, group_bys and filters build and provided to Form
@@ -160,6 +166,9 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
     parent::preProcess();
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     return parent::setDefaultValues();
   }
@@ -189,6 +198,13 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     //check for searching combination of dispaly columns and
@@ -262,6 +278,11 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = array();
     $statistics[] = array('title' => ts('Row(s) Listed'),
@@ -356,6 +377,9 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
     parent::endPostProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

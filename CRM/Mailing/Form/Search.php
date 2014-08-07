@@ -54,11 +54,11 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($this);
 
-    $statusVals = array('Scheduled', 'Complete', 'Running', 'Canceled');
+    $statusVals = array(ts('Scheduled'), ts('Complete'), ts('Running'), ts('Canceled'));
     foreach ($statusVals as $status) {
       $this->addElement('checkbox', "mailing_status[$status]", NULL, $status);
     }
-    $this->addElement('checkbox', 'status_unscheduled', NULL, 'Draft / Unscheduled');
+    $this->addElement('checkbox', 'status_unscheduled', NULL, ts('Draft / Unscheduled'));
     $this->addYesNo('is_archived', ts('Mailing is Archived'), TRUE);
 
     if ($parent->_sms) {
@@ -75,6 +75,9 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
       ));
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = $statusVals = array();
     $parent = $this->controller->getParent();
@@ -106,7 +109,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
 
     $parent = $this->controller->getParent();
     if (!empty($params)) {
-      $fields = array('mailing_name', 'mailing_from', 'mailing_to', 'sort_name', 
+      $fields = array('mailing_name', 'mailing_from', 'mailing_to', 'sort_name',
                 'campaign_id', 'mailing_status', 'sms', 'status_unscheduled', 'is_archived', 'hidden_find_mailings');
       foreach ($fields as $field) {
         if (isset($params[$field]) &&

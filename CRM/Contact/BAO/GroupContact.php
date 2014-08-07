@@ -558,6 +558,12 @@ SELECT    *
     }
   }
 
+  /**
+   * @param $contactID
+   * @param $groupID
+   *
+   * @return bool
+   */
   static function isContactInGroup($contactID, $groupID) {
     if (!CRM_Utils_Rule::positiveInteger($contactID) ||
       !CRM_Utils_Rule::positiveInteger($groupID)

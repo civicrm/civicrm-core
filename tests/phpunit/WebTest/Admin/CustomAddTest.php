@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Admin_CustomAddTest
+ */
 class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

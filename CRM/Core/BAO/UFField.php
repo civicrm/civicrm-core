@@ -348,7 +348,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * @static
    * @access public
    */
-  function setUFFieldStatus($customGroupId, $is_active) {
+  static function setUFFieldStatus($customGroupId, $is_active) {
     //find the profile id given custom group id
     $queryString = "SELECT civicrm_custom_field.id as custom_field_id
                         FROM   civicrm_custom_field, civicrm_custom_group
@@ -1082,6 +1082,9 @@ SELECT  id
     return isset($availableFields[$fieldName]);
   }
 
+  /**
+   * @return array|null
+   */
   static function getContribBatchEntryFields() {
     if (self::$_contriBatchEntryFields === NULL) {
       self::$_contriBatchEntryFields = array(
@@ -1110,6 +1113,9 @@ SELECT  id
     return self::$_contriBatchEntryFields;
   }
 
+  /**
+   * @return array|null
+   */
   public static function getMemberBatchEntryFields() {
     if (self::$_memberBatchEntryFields === NULL) {
       self::$_memberBatchEntryFields = array(

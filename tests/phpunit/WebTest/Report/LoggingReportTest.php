@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Report_LoggingReportTest
+ */
 class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -265,6 +269,9 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("Changes Saved");
   }
 
+  /**
+   * @param $data
+   */
   function verifyReportData($data) {
     foreach ($data as $value) {
       // check for the row contains proper data
@@ -279,6 +286,10 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $dataForReportDetail
+   * @param array $filters
+   */
   function detailReportCheck($dataForReportDetail, $filters = array()) {
     foreach ($dataForReportDetail as $value) {
       $this->waitForElementPresent("xpath=//table/tbody//tr/td[2][contains(text(), '{$value['log_type']}')]/../td[4]/a[contains(text(), '{$value['altered_contact']}')]/../../td[1]/a[2]");

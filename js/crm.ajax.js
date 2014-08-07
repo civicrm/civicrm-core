@@ -3,7 +3,7 @@
  * @see https://wiki.civicrm.org/confluence/display/CRMDOC/AJAX+Interface
  * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Ajax+Pages+and+Forms
  */
-(function($, CRM) {
+(function($, CRM, undefined) {
   /**
    * Almost like {crmURL} but on the client side
    * eg: var url = CRM.url('civicrm/contact/view', {reset:1,cid:42});
@@ -213,6 +213,12 @@
       this.element.trigger('crmAjaxFail', data);
       CRM.alert(ts('Unable to reach the server. Please refresh this page in your browser and try again.'), ts('Network Error'), 'error');
     },
+    _onError: function(data) {
+      this.element.attr('data-unsaved-changes', 'false').trigger('crmAjaxError', data);
+      if (this.options.crmForm && this.options.crmForm.autoClose && this.element.data('uiDialog')) {
+        this.element.dialog('close');
+      }
+    },
     _formatUrl: function(url) {
       // Strip hash
       url = url.split('#')[0];
@@ -245,8 +251,12 @@
       }
       this.options.block && $('.blockOverlay', this.element).length < 1 && this.element.block();
       $.getJSON(url, function(data) {
-        if (typeof(data) != 'object' || typeof(data.content) != 'string') {
+        if (!$.isPlainObject(data)) {
           that._onFailure(data);
+          return;
+        }
+        if (data.status === 'error') {
+          that._onError(data);
           return;
         }
         data.url = url;
@@ -316,16 +326,7 @@
         refreshAction: ['next_new', 'submit_savenext', 'upload_new'],
         cancelButton: '.cancel',
         openInline: 'a.open-inline, a.button, a.action-item',
-        onCancel: function(event) {},
-        onError: function(data) {
-          var $el = $(this);
-          $el.html(data.content).trigger('crmLoad', data).trigger('crmFormLoad', data).trigger('crmFormError', data);
-          if (typeof(data.errors) == 'object') {
-            $.each(data.errors, function(formElement, msg) {
-              $('[name="'+formElement+'"]', $el).crmError(msg);
-            });
-          }
-        }
+        onCancel: function(event) {}
       }
     };
     // Move options that belong to crmForm. Others will be passed through to crmSnippet
@@ -340,12 +341,13 @@
 
     var widget = CRM.loadPage(url, settings).off('.crmForm');
 
+    // CRM-14353 - Warn of unsaved changes for all forms except those which have opted out
     function cancelAction() {
-      var dirty = CRM.utils.initialValueChanged(widget),
-        title = widget.dialog('option', 'title');
-      widget.attr('data-unsaved-changes', dirty ? 'true' : 'false').dialog('close');
+      var dirty = CRM.utils.initialValueChanged($('form:not([data-warn-changes=false])', widget));
+      widget.attr('data-unsaved-changes', dirty ? 'true' : 'false');
       if (dirty) {
         var id = widget.attr('id') + '-unsaved-alert',
+          title = widget.dialog('option', 'title'),
           alert = CRM.alert('<p>' + ts('%1 has not been saved.', {1: title}) + '</p><p><a href="#" id="' + id + '">' + ts('Restore') + '</a></p>', ts('Unsaved Changes'), 'alert unsaved-dialog', {expires: 60000});
         $('#' + id).button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}}).click(function(e) {
           widget.attr('data-unsaved-changes', 'false').dialog('open');
@@ -353,10 +355,13 @@
         });
       }
     }
-    if (widget.data('uiDialog')) {
-      // This is a bit harsh but we are removing jQuery UI's event handler from the close button and adding our own
-      $('.ui-dialog-titlebar-close').first().off().click(cancelAction);
-    }
+
+    widget.data('uiDialog') && widget.on('dialogbeforeclose', function(e) {
+      // CRM-14353 - Warn unsaved changes if user clicks close button or presses "esc"
+      if (e.originalEvent) {
+        cancelAction();
+      }
+    });
 
     widget.on('crmFormLoad.crmForm', function(event, data) {
       var $el = $(this)
@@ -369,6 +374,7 @@
           $el.trigger('crmFormCancel', e);
           if ($el.data('uiDialog') && settings.autoClose) {
             cancelAction();
+            $el.dialog('close');
           }
           else if (!settings.autoClose) {
             $el.crmSnippet('resetUrl').crmSnippet('refresh');
@@ -376,13 +382,13 @@
         }
       });
       if (settings.validate) {
-        $("form", this).validate(typeof(settings.validate) == 'object' ? settings.validate : CRM.validate.params);
+        $("form", this).crmValidate();
       }
       $("form:not('[data-no-ajax-submit=true]')", this).ajaxForm($.extend({
         url: data.url.replace(/reset=1[&]?/, ''),
         dataType: 'json',
         success: function(response) {
-          if (response.status !== 'form_error') {
+          if (response.content === undefined) {
             $el.crmSnippet('option', 'block') && $el.unblock();
             $el.trigger('crmFormSuccess', response);
             // Reset form for e.g. "save and new"
@@ -400,7 +406,13 @@
           }
           else {
             response.url = data.url;
-            settings.onError.call($el, response);
+            $el.html(response.content).trigger('crmLoad', response).trigger('crmFormLoad', response);
+            if (response.status === 'form_error') {
+              $el.trigger('crmFormError', response);
+              $.each(response.errors || [], function(formElement, msg) {
+                $('[name="'+formElement+'"]', $el).crmError(msg);
+              });
+            }
           }
         },
         beforeSerialize: function(form, options) {
@@ -422,6 +434,10 @@
           return false;
         });
       }
+      // Alow a button to prevent ajax submit
+      $('input[data-no-ajax-submit=true]').click(function() {
+        $(this).closest('form').ajaxFormUnbind();
+      });
       // For convenience, focus the first field
       $('input[type=text], textarea, select', this).filter(':visible').first().not('.dateplugin').focus();
     });
@@ -429,7 +445,6 @@
   };
   /**
    * Handler for jQuery click event e.g. $('a').click(CRM.popup)
-   * @returns {boolean}
    */
   CRM.popup = function(e) {
     var $el = $(this).first(),
@@ -468,7 +483,7 @@
     e.preventDefault();
   };
   /**
-   * An event callback for CRM.popup or a standalone function to refresh the content around a popup link
+   * An event callback for CRM.popup or a standalone function to refresh the content around a given element
    * @param e event|selector
    */
   CRM.refreshParent = function(e) {

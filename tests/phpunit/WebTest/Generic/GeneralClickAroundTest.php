@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Generic_GeneralClickAroundTest
+ */
 class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

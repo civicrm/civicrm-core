@@ -25,6 +25,10 @@
  */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_PCPAddTest
+ */
 class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -195,7 +199,7 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     //Check for SoftCredit
     $softCreditor = "{$firstName} {$lastName}";
     $this->verifyText("xpath=//div['PCPView']/div[2]/table[@class='crm-info-panel']/tbody/tr[2]/td[2]/a", preg_quote($softCreditor), 'In line ' . __LINE__);
-  
+
     // Check PCP Summary Report
     $this->openCiviPage('report/instance/16', 'reset=1');
     $this->verifyText("PCP", preg_quote($pcpTitle));

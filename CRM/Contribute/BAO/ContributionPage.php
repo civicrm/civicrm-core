@@ -119,7 +119,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @access public
    * @static
    */
-  static function sendMail($contactID, &$values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
+  static function sendMail($contactID, $values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
     $gIds = $params = array();
     $email = NULL;
     if (isset($values['custom_pre_id'])) {
@@ -348,6 +348,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         list($ccDisplayName, $ccEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($values['related_contact']);
         $ccMailId = "{$ccDisplayName} <{$ccEmail}>";
 
+        //@todo - this is the only place in this function where  $values is altered - but I can't find any evidence it is used
         $values['cc_receipt'] = !empty($values['cc_receipt']) ? ($values['cc_receipt'] . ',' . $ccMailId) : $ccMailId;
 
         // reset primary-email in the template
@@ -911,6 +912,20 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     );
     $pdfHtml = CRM_Contribute_Form_Task_Invoice::printPDF($contributionID, $pdfParams, $contactId);
     return $pdfHtml;
+  }
+
+  /**
+   * helper to determine if the page supports separate membership payments
+   * @param integer id form id
+   *
+   * @return bool isSeparateMembershipPayment
+   */
+  static function getIsMembershipPayment($id) {
+    $membershipBlocks = civicrm_api3('membership_block', 'get', array('entity_table' => 'civicrm_contribution_page', 'entity_id' => $id, 'sequential' => TRUE));
+    if(!$membershipBlocks['count']) {
+      return FALSE;
+    }
+    return $membershipBlocks['values'][0]['is_separate_payment'];
   }
 }
 

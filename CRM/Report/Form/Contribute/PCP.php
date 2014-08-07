@@ -34,6 +34,12 @@
  *
  */
 class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -271,6 +277,11 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -303,6 +314,10 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
     );
     return $statistics;
   }
+
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

@@ -58,6 +58,11 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
     return NULL;
   }
 
+  /**
+   * @param $contactType
+   *
+   * @return bool
+   */
   static function isActive($contactType) {
     $contact = self::contactTypeInfo(FALSE);
     $active = array_key_exists($contactType, $contact) ? TRUE : FALSE;
@@ -124,6 +129,12 @@ WHERE  parent_id IS NULL
     return array_keys(self::basicTypeInfo($all));
   }
 
+  /**
+   * @param bool $all
+   * @param string $key
+   *
+   * @return array
+   */
   static function basicTypePairs($all = FALSE, $key = 'name') {
     $subtypes = self::basicTypeInfo($all);
 
@@ -672,7 +683,7 @@ WHERE name = %1";
       $navigation = array(
         'label' => "New $contact",
         'name' => "New $contactName",
-        'url' => "civicrm/contact/add&ct=$name&cst=$contactName&reset=1",
+        'url' => "civicrm/contact/add?ct=$name&cst=$contactName&reset=1",
         'permission' => 'add contacts',
         'parent_id' => $navinfo['id'],
         'is_active' => $active,
@@ -708,6 +719,11 @@ WHERE name = %1";
     );
   }
 
+  /**
+   * @param $typeName
+   *
+   * @return mixed
+   */
   static function getLabel($typeName) {
     $types = self::contactTypeInfo(TRUE);
 
@@ -748,6 +764,12 @@ WHERE name = %1";
     return TRUE;
   }
 
+  /**
+   * @param $contactType
+   * @param null $contactId
+   *
+   * @return bool
+   */
   static function hasCustomData($contactType, $contactId = NULL) {
     $subTypeClause = '';
 

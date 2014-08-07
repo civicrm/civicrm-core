@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_AddressImportTest
+ */
 class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
@@ -64,6 +68,12 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
   /*
      *  Helper function to provide data for custom data import.
      */
+  /**
+   * @param $customDataParams
+   * @param $firstName1
+   *
+   * @return array
+   */
   function _individualCustomCSVData($customDataParams, $firstName1) {
 
     $headers = array(
@@ -97,6 +107,9 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
+  /**
+   * @return array
+   */
   function _addCustomData() {
 
     $this->openCiviPage('admin/custom/group', 'reset=1');
@@ -274,6 +287,12 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
                  );
   }
 
+  /**
+   * @param $customFieldName
+   * @param $type
+   *
+   * @return array
+   */
   function _createMultipleValueCustomField( $customFieldName, $type ){
     $this->type('label', $customFieldName);
     $this->select("data_type[0]","value=0");

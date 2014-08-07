@@ -27,7 +27,14 @@
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Core_BAO_SettingTest
+ */
 class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Setting BAO',

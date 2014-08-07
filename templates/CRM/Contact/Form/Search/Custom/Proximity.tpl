@@ -102,7 +102,7 @@
                     {foreach from=$columnHeaders item=header}
                         {assign var=fName value=$header.sort}
                         {if $fName eq 'sort_name'}
-                            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
+                            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&key=`$qfKey`&context=custom"}">{$row.sort_name}</a></td>
                         {else}
                             <td>{$row.$fName}</td>
                         {/if}

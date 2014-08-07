@@ -208,9 +208,9 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   /**
    * Function to find the membership status based on start date, end date, join date & status date.
    *
-   * @param  date $startDate start date of the member whose membership status is to be calculated.
-   * @param  date $endDate end date of the member whose membership status is to be calculated.
-   * @param  date $joinDate join date of the member whose membership status is to be calculated.
+   * @param  string $startDate start date of the member whose membership status is to be calculated.
+   * @param  string $endDate end date of the member whose membership status is to be calculated.
+   * @param  string $joinDate join date of the member whose membership status is to be calculated.
    * @param \date|string $statusDate status date of the member whose membership status is to be calculated.
    * @param  boolean $excludeIsAdmin exclude the statuses those having is_admin = 1
    * @param $membershipTypeID

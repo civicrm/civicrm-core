@@ -452,6 +452,9 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
     return self::$_columnHeaders;
   }
 
+  /**
+   * @return string
+   */
   function &getQuery() {
     return $this->_query;
   }

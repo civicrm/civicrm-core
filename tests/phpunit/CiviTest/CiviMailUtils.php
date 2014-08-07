@@ -43,6 +43,9 @@
 require_once 'ezc/Base/src/ezc_bootstrap.php';
 require_once 'ezc/autoload/mail_autoload.php';
 
+/**
+ * Class CiviMailUtils
+ */
 class CiviMailUtils extends PHPUnit_Framework_TestCase {
 
   /**
@@ -143,6 +146,11 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
     }
   }
 
+  /**
+   * @param string $type
+   *
+   * @return ezcMail|string
+   */
   function getMostRecentEmail($type = 'raw') {
     $msg = '';
 
@@ -201,6 +209,8 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
 
   /**
    * @param string $type 'raw'|'ezc'
+   *
+   * @throws Exception
    * @return array(ezcMail)|array(string)
    */
   function getAllMessages($type = 'raw') {
@@ -231,6 +241,9 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
     return $msgs;
   }
 
+  /**
+   * @return int
+   */
   function getSelectedOutboundOption() {
     $selectedOption = CRM_Mailing_Config::OUTBOUND_OPTION_MAIL;
     // Is there a better way to do this? How do you get the currently selected value of a radio button in selenium?

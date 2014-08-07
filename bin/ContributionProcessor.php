@@ -136,6 +136,12 @@ class CiviContributeProcessor {
     ),
   );
 
+  /**
+   * @param $paymentProcessor
+   * @param $paymentMode
+   * @param $start
+   * @param $end
+   */
   static
   function paypal($paymentProcessor, $paymentMode, $start, $end) {
     $url = "{$paymentProcessor['url_api']}nvp";
@@ -236,6 +242,12 @@ class CiviContributeProcessor {
     } while ($result['l_errorcode0'] == '11002');
   }
 
+  /**
+   * @param $paymentProcessor
+   * @param $paymentMode
+   * @param $start
+   * @param $end
+   */
   static
   function google($paymentProcessor, $paymentMode, $start, $end) {
     require_once "CRM/Contribute/BAO/Contribution/Utils.php";

@@ -56,6 +56,11 @@ class CRM_Core_CodeGen_Specification {
     }
   }
 
+  /**
+   * @param $dbXML
+   *
+   * @return array
+   */
   function &getDatabase(&$dbXML) {
     $database = array('name' => trim((string ) $dbXML->name));
 
@@ -75,6 +80,12 @@ class CRM_Core_CodeGen_Specification {
     return $database;
   }
 
+  /**
+   * @param $dbXML
+   * @param $database
+   *
+   * @return array
+   */
   function getTables($dbXML, &$database) {
     $tables = array();
     foreach ($dbXML->tables as $tablesXML) {
@@ -92,12 +103,21 @@ class CRM_Core_CodeGen_Specification {
     return $tables;
   }
 
+  /**
+   * @param $tables
+   * @param $classNames
+   */
   function resolveForeignKeys(&$tables, &$classNames) {
     foreach (array_keys($tables) as $name) {
       $this->resolveForeignKey($tables, $classNames, $name);
     }
   }
 
+  /**
+   * @param $tables
+   * @param $classNames
+   * @param $name
+   */
   function resolveForeignKey(&$tables, &$classNames, $name) {
     if (!array_key_exists('foreignKey', $tables[$name])) {
       return;
@@ -115,6 +135,11 @@ class CRM_Core_CodeGen_Specification {
     }
   }
 
+  /**
+   * @param $tables
+   *
+   * @return array
+   */
   function orderTables(&$tables) {
     $ordered = array();
 
@@ -129,6 +154,13 @@ class CRM_Core_CodeGen_Specification {
     return $ordered;
   }
 
+  /**
+   * @param $tables
+   * @param $valid
+   * @param $name
+   *
+   * @return bool
+   */
   function validTable(&$tables, &$valid, $name) {
     if (!array_key_exists('foreignKey', $tables[$name])) {
       return TRUE;
@@ -143,6 +175,11 @@ class CRM_Core_CodeGen_Specification {
     return TRUE;
   }
 
+  /**
+   * @param $tableXML
+   * @param $database
+   * @param $tables
+   */
   function getTable($tableXML, &$database, &$tables) {
     $name = trim((string ) $tableXML->name);
     $klass = trim((string ) $tableXML->class);
@@ -239,6 +276,10 @@ class CRM_Core_CodeGen_Specification {
     return;
   }
 
+  /**
+   * @param $fieldXML
+   * @param $fields
+   */
   function getField(&$fieldXML, &$fields) {
     $name  = trim((string ) $fieldXML->name);
     $field = array('name' => $name, 'localizable' => $fieldXML->localizable);
@@ -373,6 +414,11 @@ class CRM_Core_CodeGen_Specification {
     $fields[$name] = &$field;
   }
 
+  /**
+   * @param $name
+   *
+   * @return string
+   */
   function composeTitle($name) {
     $names = explode('_', strtolower($name));
     $title = '';
@@ -394,6 +440,11 @@ class CRM_Core_CodeGen_Specification {
     return trim($title);
   }
 
+  /**
+   * @param $primaryXML
+   * @param $fields
+   * @param $table
+   */
   function getPrimaryKey(&$primaryXML, &$fields, &$table) {
     $name = trim((string ) $primaryXML->name);
 
@@ -413,6 +464,11 @@ class CRM_Core_CodeGen_Specification {
     $table['primaryKey'] = &$primaryKey;
   }
 
+  /**
+   * @param $indexXML
+   * @param $fields
+   * @param $indices
+   */
   function getIndex(&$indexXML, &$fields, &$indices) {
     //echo "\n\n*******************************************************\n";
     //echo "entering getIndex\n";
@@ -474,6 +530,12 @@ class CRM_Core_CodeGen_Specification {
     $indices[$indexName] = &$index;
   }
 
+  /**
+   * @param $foreignXML
+   * @param $fields
+   * @param $foreignKeys
+   * @param $currentTableName
+   */
   function getForeignKey(&$foreignXML, &$fields, &$foreignKeys, &$currentTableName) {
     $name = trim((string ) $foreignXML->name);
 
@@ -499,6 +561,10 @@ class CRM_Core_CodeGen_Specification {
     $foreignKeys[$name] = &$foreignKey;
   }
 
+  /**
+   * @param $foreignXML
+   * @param $dynamicForeignKeys
+   */
   function getDynamicForeignKey(&$foreignXML, &$dynamicForeignKeys) {
     $foreignKey = array(
       'idColumn' => trim($foreignXML->idColumn),
@@ -508,6 +574,13 @@ class CRM_Core_CodeGen_Specification {
     $dynamicForeignKeys[] = $foreignKey;
   }
 
+  /**
+   * @param $key
+   * @param $object
+   * @param null $default
+   *
+   * @return null|string
+   */
   protected function value($key, &$object, $default = NULL) {
     if (isset($object->$key)) {
       return (string ) $object->$key;
@@ -515,6 +588,13 @@ class CRM_Core_CodeGen_Specification {
     return $default;
   }
 
+  /**
+   * @param $attributes
+   * @param $object
+   * @param $name
+   * @param null $pre
+   * @param null $post
+   */
   protected function checkAndAppend(&$attributes, &$object, $name, $pre = NULL, $post = NULL) {
     if (!isset($object->$name)) {
       return;
@@ -524,6 +604,11 @@ class CRM_Core_CodeGen_Specification {
     $this->append($attributes, ' ', trim($value));
   }
 
+  /**
+   * @param $str
+   * @param $delim
+   * @param $name
+   */
   protected function append(&$str, $delim, $name) {
     if (empty($name)) {
       return;

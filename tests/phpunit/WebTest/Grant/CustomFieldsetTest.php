@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Grant_CustomFieldsetTest
+ */
 class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

@@ -210,6 +210,9 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
     return 'civicrm/contact/deduperules';
   }
 
+  /**
+   * @param $id
+   */
   function delete($id) {
     $ruleDao = new CRM_Dedupe_DAO_Rule();
     $ruleDao->dedupe_rule_group_id = $id;

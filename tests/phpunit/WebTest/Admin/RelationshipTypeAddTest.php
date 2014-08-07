@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Admin_RelationshipTypeAddTest
+ */
 class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
