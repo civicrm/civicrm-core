@@ -396,7 +396,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $source = $contribution->source;
       
       $config = CRM_Core_Config::singleton();
-      if ($params['forPage'] != 'confirmpage') {
+      if (!isset($params['forPage'])) {
         $config->doNotAttachPDFReceipt = 1;
       }
 
@@ -424,7 +424,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
                          'id' => $contribution->id,
                          'source' => $source,
                          'invoice_id' => $invoiceId,
-                         'creditnote_id' => $creditNoteId,
                          'imageUploadURL' => $config->imageUploadURL,
                          'defaultCurrency' => $config->defaultCurrency,
                          'amount' => $contribution->total_amount,
@@ -457,7 +456,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
                          'domain_email' => CRM_Utils_Array::value('email', CRM_Utils_Array::value('1', $locationDefaults['email'])),
                          'domain_phone' => CRM_Utils_Array::value('phone', CRM_Utils_Array::value('1', $locationDefaults['phone'])),
                          );
-      
+      if (isset($creditNoteId)) {
+        $tplParams['creditnote_id'] = $creditNoteId;
+      }
       $sendTemplateParams = array(
                                   'groupName' => 'msg_tpl_workflow_contribution',
                                   'valueName' => 'contribution_invoice_receipt',
@@ -488,7 +489,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       // condition to check for download PDF Invoice or email Invoice
       if ($invoiceElements['createPdf']) {
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
-        if ($params['forPage'] == 'confirmpage') {
+        if (isset($params['forPage'])) {
           return $html;
         }
         else {
@@ -542,7 +543,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     }
     
     if ($invoiceElements['createPdf']) {
-      if ($params['forPage'] == 'confirmpage') {
+      if (isset($params['forPage'])) {
         return $html;
       }
       else {
