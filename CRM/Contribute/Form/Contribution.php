@@ -952,7 +952,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $softErrors = CRM_Contribute_Form_SoftCredit::formRule($fields, $errors, $self);
-   
+
     // If we have a net amount or fee amount that is NOT set to 0.00, then ensure
     // that the net_amount + the fee_amount is equal to the total amount.
     $total_amount = NULL;
@@ -1217,8 +1217,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
 
       // Set is_pay_later flag for back-office offline Pending status contributions CRM-8996
+      // else if contribution_status is changed to Completed is_pay_later flag is changed to 0, CRM-15041
       if ($params['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name')) {
         $params['is_pay_later'] = 1;
+      }
+      elseif ($params['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
+        $params['is_pay_later'] = 0;
       }
 
       $ids['contribution'] = $params['id'] = $this->_id;
@@ -1715,4 +1719,3 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
   }
 }
-
