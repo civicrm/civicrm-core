@@ -88,7 +88,7 @@ VALUES
   ( @domainID, NULL, 1, 'URL Preferences', 'imageUploadURL'           , NULL ),
   ( @domainID, NULL, 1, 'URL Preferences', 'customCSSURL'             , NULL ),
   ( @domainID, NULL, 1, 'URL Preferences', 'extensionsURL'            , NULL ),
-  ( @domainID, NULL, 1, 'Contribute Preferences', 'contribution_invoice_settings', '{literal}a:7:{s:14:"invoice_prefix";s:4:"INV_";s:19:"credit_notes_prefix";s:3:"CN_";s:8:"due_date";s:2:"10";s:15:"due_date_period";s:4:"days";s:5:"notes";s:0:"";s:8:"tax_term";s:3:"Sales Tax";s:20:"tax_display_settings";s:9:"Inclusive";}{/literal}');
+  ( @domainID, NULL, 1, 'Contribute Preferences', 'contribution_invoice_settings', {literal}'a:7:{s:14:"invoice_prefix";s:4:"INV_";s:19:"credit_notes_prefix";s:3:"CN_";s:8:"due_date";s:2:"10";s:15:"due_date_period";s:4:"days";s:5:"notes";s:0:"";s:8:"tax_term";s:9:"Sales Tax";s:20:"tax_display_settings";s:9:"Inclusive";}'{/literal});
 
 -- mail settings
 
