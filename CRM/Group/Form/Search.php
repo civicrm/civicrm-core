@@ -38,6 +38,9 @@ class CRM_Group_Form_Search extends CRM_Core_Form {
     parent::preProcess();
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array();
     $defaults['group_status[1]'] = 1;

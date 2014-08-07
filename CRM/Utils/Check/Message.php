@@ -48,6 +48,11 @@ class CRM_Utils_Check_Message {
    */
   private $title;
 
+  /**
+   * @param $name
+   * @param $message
+   * @param $title
+   */
   function __construct($name, $message, $title) {
     $this->name = $name;
     $this->message = $message;

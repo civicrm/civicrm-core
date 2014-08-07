@@ -144,7 +144,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     }
 
     $event = self::add($params);
-
+    CRM_Price_BAO_PriceSet::setPriceSets($params, $event, 'event');
     if (is_a($event, 'CRM_Core_Error')) {
       CRM_Core_DAO::transaction('ROLLBACK');
       return $event;
@@ -362,12 +362,15 @@ WHERE      civicrm_event.is_active = 1 AND
     }
 
     //get the participant status type values.
-    $query = 'SELECT id, name, class FROM civicrm_participant_status_type';
+    $cpstObject = new CRM_Event_DAO_ParticipantStatusType();
+    $cpst = $cpstObject->getTableName();
+    $query = "SELECT id, name, label, class FROM $cpst";
     $status = CRM_Core_DAO::executeQuery($query);
     $statusValues = array();
     while ($status->fetch()) {
       $statusValues[$status->id]['id'] = $status->id;
       $statusValues[$status->id]['name'] = $status->name;
+      $statusValues[$status->id]['label'] = $status->label;
       $statusValues[$status->id]['class'] = $status->class;
     }
 
@@ -377,6 +380,21 @@ WHERE      civicrm_event.is_active = 1 AND
     $optionGroupId = NULL;
     if ($optionGroupDAO->find(TRUE)) {
       $optionGroupId = $optionGroupDAO->id;
+    }
+    // Get the event summary display preferences
+    $show_max_events = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
+                       'show_events'
+    );
+    // default to 10 if no option is set
+    if (is_null($show_max_events)) {
+      $show_max_events = 10;
+    }
+    // show all events if show_events is set to a negative value
+    if ($show_max_events >= 0) {
+      $event_summary_limit = "LIMIT      0, $show_max_events";
+    }
+    else {
+      $event_summary_limit = "";
     }
 
     $query = "
@@ -398,7 +416,7 @@ WHERE      civicrm_event.is_active = 1 AND
            $validEventIDs
 GROUP BY   civicrm_event.id
 ORDER BY   civicrm_event.start_date ASC
-LIMIT      0, 10
+$event_summary_limit
 ";
     $eventParticipant = array();
 
@@ -535,6 +553,7 @@ LIMIT      0, 10
           $urlString = "reset=1&force=1&event={$dao->id}&status=$statusId";
           $statusInfo = array('url' => CRM_Utils_System::url('civicrm/event/search', $urlString),
             'name' => $statusValue['name'],
+            'label' => $statusValue['label'],
             'count' => $statusCount,
           );
           $eventSummary['events'][$dao->id]['statuses'][$class][] = $statusInfo;
@@ -1122,9 +1141,16 @@ WHERE civicrm_event.is_active = 1
             'email' => $email,
             'confirm_email_text' => CRM_Utils_Array::value('confirm_email_text', $values['event']),
             'isShowLocation' => CRM_Utils_Array::value('is_show_location', $values['event']),
-            'contributeMode' => NULL,
+            'contributeMode' => CRM_Utils_Array::value('contributeMode', $template->_tpl_vars),
             'participantID' => $participantId,
             'conference_sessions' => $sessions,
+            'credit_card_number' =>
+                CRM_Utils_System::mungeCreditCard(
+                    CRM_Utils_Array::value('credit_card_number', $participantParams)),
+            'credit_card_exp_date' =>
+                CRM_Utils_Date::mysqlToIso(
+                    CRM_Utils_Date::format(
+                        CRM_Utils_Array::value('credit_card_exp_date', $participantParams))),
           ));
 
         // CRM-13890 : NOTE wait list condition need to be given so that
@@ -1781,6 +1807,9 @@ WHERE  id = $cfID
    *
    * @return array $events array of all events.
    */
+  /**
+   * @return array
+   */
   static function getLocationEvents() {
     $events = array();
 
@@ -1801,6 +1830,11 @@ ORDER BY sp.name, ca.city, ca.street_address ASC
     return $events;
   }
 
+  /**
+   * @param $locBlockId
+   *
+   * @return int|null|string
+   */
   static function countEventsUsingLocBlockId($locBlockId) {
     if (!$locBlockId) {
       return 0;
@@ -1831,6 +1865,11 @@ WHERE  ce.loc_block_id = $locBlockId";
     return $hasPermission && self::validRegistrationDate($values);
   }
 
+  /**
+   * @param $values
+   *
+   * @return bool
+   */
   static function validRegistrationDate(&$values) {
     // make sure that we are between  registration start date and registration end date
     $startDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('registration_start_date', $values));
@@ -1856,6 +1895,11 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @param  array   $values key/value event info
    * @return boolean true if allow registration otherwise false
    * @access public
+   */
+  /**
+   * @param $values
+   *
+   * @return bool
    */
   static function showHideRegistrationLink($values) {
 
@@ -1888,6 +1932,11 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @param  array   $params key/value participant info
    * @return boolean $alreadyRegistered true/false
    * @access public
+   */
+  /**
+   * @param $params
+   *
+   * @return bool
    */
   static function checkRegistration($params) {
     $alreadyRegistered = FALSE;
@@ -2065,6 +2114,11 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
    *
    * @return $defaults an array of custom data defaults.
    */
+  /**
+   * @param $templateId
+   *
+   * @return array
+   */
   static function getTemplateDefaultValues($templateId) {
     $defaults = array();
     if (!$templateId) {
@@ -2086,6 +2140,11 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     return $defaults;
   }
 
+  /**
+   * @param $event_id
+   *
+   * @return object
+   */
   static function get_sub_events($event_id) {
     $params = array('parent_event_id' => $event_id);
     $defaults = array();
@@ -2098,6 +2157,10 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
    * @params int $eventID event id.
    * @params int $eventCampaignID campaign id of that event
    *
+   */
+  /**
+   * @param $eventID
+   * @param $eventCampaignID
    */
   static function updateParticipantCampaignID($eventID, $eventCampaignID) {
     $params = array();

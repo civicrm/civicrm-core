@@ -198,7 +198,17 @@ function setOrgName( ) {
 }
 
 
-function setLocationDetails(contactID) {
+function setLocationDetails(contactID , reset) {
+  var submittedCID = {/literal}"{$submittedOnBehalf}"{literal};
+  var submittedOnBehalfInfo = {/literal}'{$submittedOnBehalfInfo}'{literal};
+  submittedOnBehalfInfo = cj.parseJSON(submittedOnBehalfInfo);
+  if (submittedCID == contactID) {
+    cj.each(submittedOnBehalfInfo, function(key, value) {
+      cj('#onbehalf_' + key ).val(value);
+    });
+    return;
+  }
+
   resetValues();
   var locationUrl = {/literal}"{$locDataURL}"{literal} + contactID + "&ufId=" + {/literal}"{$profileId}"{literal};
   cj.ajax({
@@ -261,7 +271,7 @@ cj('#onbehalfof_id').change(function() {
 function selectCreateOrg( orgOption, reset ) {
   if (orgOption == 0) {
     cj("#onbehalfof_id").show().change();
-    cj("input#onbehalf_organization_name").hide()
+    cj("input#onbehalf_organization_name").hide();
   }
   else if ( orgOption == 1 ) {
     cj("input#onbehalf_organization_name").show();

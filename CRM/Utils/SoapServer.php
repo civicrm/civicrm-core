@@ -161,6 +161,15 @@ class CRM_Utils_SoapServer {
     return civicrm_api('Mailing', 'event_bounce', $params);
   }
 
+  /**
+   * @param $key
+   * @param $job
+   * @param $queue
+   * @param $hash
+   *
+   * @return array|int
+   * @throws SoapFault
+   */
   public function mailer_event_unsubscribe($key, $job, $queue, $hash) {
     $this->verify($key);
     $params = array(
@@ -174,6 +183,15 @@ class CRM_Utils_SoapServer {
     return civicrm_api('MailingGroup', 'event_unsubscribe', $params);
   }
 
+  /**
+   * @param $key
+   * @param $job
+   * @param $queue
+   * @param $hash
+   *
+   * @return array|int
+   * @throws SoapFault
+   */
   public function mailer_event_domain_unsubscribe($key, $job, $queue, $hash) {
     $this->verify($key);
     $params = array(
@@ -187,6 +205,15 @@ class CRM_Utils_SoapServer {
     return civicrm_api('MailingGroup', 'event_domain_unsubscribe', $params);
   }
 
+  /**
+   * @param $key
+   * @param $job
+   * @param $queue
+   * @param $hash
+   *
+   * @return array|int
+   * @throws SoapFault
+   */
   public function mailer_event_resubscribe($key, $job, $queue, $hash) {
     $this->verify($key);
     $params = array(
@@ -200,6 +227,15 @@ class CRM_Utils_SoapServer {
     return civicrm_api('MailingGroup', 'event_resubscribe', $params);
   }
 
+  /**
+   * @param $key
+   * @param $email
+   * @param $domain
+   * @param $group
+   *
+   * @return array|int
+   * @throws SoapFault
+   */
   public function mailer_event_subscribe($key, $email, $domain, $group) {
     $this->verify($key);
     $params = array(
@@ -210,6 +246,15 @@ class CRM_Utils_SoapServer {
     return civicrm_api('MailingGroup', 'event_subscribe', $params);
   }
 
+  /**
+   * @param $key
+   * @param $contact
+   * @param $subscribe
+   * @param $hash
+   *
+   * @return array|int
+   * @throws SoapFault
+   */
   public function mailer_event_confirm($key, $contact, $subscribe, $hash) {
     $this->verify($key);
     $params = array(
@@ -223,6 +268,19 @@ class CRM_Utils_SoapServer {
     return civicrm_api('Mailing', 'event_confirm', $params);
   }
 
+  /**
+   * @param $key
+   * @param $job
+   * @param $queue
+   * @param $hash
+   * @param $bodyTxt
+   * @param $rt
+   * @param null $bodyHTML
+   * @param null $fullEmail
+   *
+   * @return array|int
+   * @throws SoapFault
+   */
   public function mailer_event_reply($key, $job, $queue, $hash, $bodyTxt, $rt, $bodyHTML = NULL, $fullEmail = NULL) {
     $this->verify($key);
     $params = array(
@@ -239,6 +297,16 @@ class CRM_Utils_SoapServer {
     return civicrm_api('Mailing', 'event_reply', $params);
   }
 
+  /**
+   * @param $key
+   * @param $job
+   * @param $queue
+   * @param $hash
+   * @param $email
+   *
+   * @return array|int
+   * @throws SoapFault
+   */
   public function mailer_event_forward($key, $job, $queue, $hash, $email) {
     $this->verify($key);
     $params = array(
@@ -251,6 +319,13 @@ class CRM_Utils_SoapServer {
     return civicrm_api('Mailing', 'event_forward', $params);
   }
 
+  /**
+   * @param $key
+   * @param $params
+   *
+   * @return array|int
+   * @throws SoapFault
+   */
   public function get_contact($key, $params) {
     $this->verify($key);
     $params['version'] = 3;

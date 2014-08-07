@@ -107,7 +107,7 @@
                     {foreach from=$columnHeaders item=header}
                         {assign var=fName value=$header.sort}
                         {if $fName eq 'sort_name'}
-                            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
+                            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&key=`$qfKey`&context=custom"}">{$row.sort_name}</a></td>
                         {else}
                             <td>{$row.$fName}</td>
                         {/if}
@@ -130,45 +130,3 @@
 
 </div>
 {/if}
-{literal}
-<script type="text/javascript">
-
-function toggleContactSelection( name, qfKey, selection ){
-  var Url  = "{/literal}{crmURL p='civicrm/ajax/markSelection' h=0}{literal}";
-
-  if ( selection == 'multiple' ) {
-    var rowArr = new Array( );
-    {/literal}{foreach from=$rows item=row  key=keyVal}
-      {literal}rowArr[{/literal}{$keyVal}{literal}] = '{/literal}{$row.checkbox}{literal}';
-    {/literal}{/foreach}{literal}
-    var elements = rowArr.join('-');
-
-    if ( cj('#' + name).is(':checked') ){
-      cj.post( Url, { name: elements , qfKey: qfKey , variableType: 'multiple' } );
-    }
-    else {
-      cj.post( Url, { name: elements , qfKey: qfKey , variableType: 'multiple' , action: 'unselect' } );
-    }
-  }
-  else if ( selection == 'single' ) {
-    if ( cj('#' + name).is(':checked') ){
-      cj.post( Url, { name: name , qfKey: qfKey } );
-    }
-    else {
-      cj.post( Url, { name: name , qfKey: qfKey , state: 'unchecked' } );
-    }
-  }
-  else if ( name == 'resetSel' && selection == 'reset' ) {
-    cj.post( Url, {  qfKey: qfKey , variableType: 'multiple' , action: 'unselect' } );
-    {/literal}
-    {foreach from=$rows item=row}{literal}
-      cj("#{/literal}{$row.checkbox}{literal}").prop('checked', false);{/literal}
-    {/foreach}
-    {literal}
-    cj("#toggleSelect").prop('checked', false);
-  }
-  return false;
-}
-</script>
-
-{/literal}

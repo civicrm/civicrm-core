@@ -46,6 +46,9 @@
 require_once 'HTML/QuickForm/Controller.php';
 require_once 'HTML/QuickForm/Action/Direct.php';
 
+/**
+ * Class CRM_Core_Controller
+ */
 class CRM_Core_Controller extends HTML_QuickForm_Controller {
 
   /**
@@ -236,8 +239,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
         $this->_generateQFKey = FALSE;
       }
       elseif ($snippet == 5) {
-        // this is used for popups and inlined ajax forms
-        // also used for the various tabs via TabHeader
+        // mode deprecated in favor of json
+        // still used by dashlets, probably nothing else
         $this->_print = CRM_Core_Smarty::PRINT_NOFORM;
       }
       // Respond with JSON if in AJAX context (also support legacy value '6')
@@ -286,6 +289,13 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     );
   }
 
+  /**
+   * @param $name
+   * @param bool $addSequence
+   * @param bool $ignoreKey
+   *
+   * @return mixed|string
+   */
   function key($name, $addSequence = FALSE, $ignoreKey = FALSE) {
     $config = CRM_Core_Config::singleton();
 
@@ -346,6 +356,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     return $this->_pages[$pageName]->handle($action);
   }
 
+  /**
+   * @return bool
+   */
   function validate() {
     $this->_actionName = $this->getActionName();
     list($pageName, $action) = $this->_actionName;
@@ -581,6 +594,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     return $wizard;
   }
 
+  /**
+   * @param $wizard
+   */
   function addWizardStyle(&$wizard) {
     $wizard['style'] = array(
       'barClass' => '',
@@ -689,6 +705,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     return $this->_skipRedirection;
   }
 
+  /**
+   * @param null $fileName
+   */
   function setWord($fileName = NULL) {
     //Mark as a CSV file.
     header('Content-Type: application/vnd.ms-word');
@@ -700,6 +719,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     header("Content-Disposition: attachment; filename=Contacts_$fileName");
   }
 
+  /**
+   * @param null $fileName
+   */
   function setExcel($fileName = NULL) {
     //Mark as an excel file.
     header('Content-Type: application/vnd.ms-excel');
@@ -740,6 +762,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     return $this->_print;
   }
 
+  /**
+   * @return string
+   */
   function getTemplateFile() {
     if ($this->_print) {
       if ($this->_print == CRM_Core_Smarty::PRINT_PAGE) {
@@ -758,6 +783,10 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     }
   }
 
+  /**
+   * @param $uploadDir
+   * @param $uploadNames
+   */
   public function addUploadAction($uploadDir, $uploadNames) {
     if (empty($uploadDir)) {
       $config = CRM_Core_Config::singleton();
@@ -783,18 +812,31 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     $this->addAction('upload', $action);
   }
 
+  /**
+   * @param $parent
+   */
   public function setParent($parent) {
     $this->_parent = $parent;
   }
 
+  /**
+   * @return object
+   */
   public function getParent() {
     return $this->_parent;
   }
 
+  /**
+   * @return string
+   */
   public function getDestination() {
     return $this->_destination;
   }
 
+  /**
+   * @param null $url
+   * @param bool $setToReferer
+   */
   public function setDestination($url = NULL, $setToReferer = FALSE) {
     if (empty($url)) {
       if ($setToReferer) {
@@ -810,6 +852,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     $this->set('civicrmDestination', $this->_destination);
   }
 
+  /**
+   * @return mixed
+   */
   public function cancelAction() {
     $actionName = $this->getActionName();
     list($pageName, $action) = $actionName;

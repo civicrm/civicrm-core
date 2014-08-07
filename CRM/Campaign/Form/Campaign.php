@@ -259,17 +259,16 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     //get the campaign groups.
     $groups = CRM_Core_PseudoConstant::group();
 
-    $inG = &$this->addElement('advmultiselect', 'includeGroups',
-      ts('Include Group(s)') . ' ',
+    $this->add('select', 'includeGroups',
+      ts('Include Group(s)'),
       $groups,
+      FALSE,
       array(
-        'size' => 5,
-        'style' => 'width:240px',
-        'class' => 'advmultiselect',
+        'multiple' => TRUE,
+        'class' => 'crm-select2 huge',
+        'placeholder' => ts('- none -'),
       )
     );
-    $inG->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $inG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
 
     $this->addWysiwyg('goal_general', ts('Campaign Goals'), array('rows' => 2, 'cols' => 40));
     $this->add('text', 'goal_revenue', ts('Revenue Goal'), array('size' => 8, 'maxlength' => 12));

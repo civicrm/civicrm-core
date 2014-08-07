@@ -34,6 +34,11 @@
  */
 class CRM_Core_BAO_CustomValueTable {
 
+  /**
+   * @param $customParams
+   *
+   * @throws Exception
+   */
   static function create(&$customParams) {
     if (empty($customParams) ||
       !is_array($customParams)
@@ -300,6 +305,11 @@ class CRM_Core_BAO_CustomValueTable {
     }
   }
 
+  /**
+   * @param $params
+   * @param $entityTable
+   * @param $entityID
+   */
   static function store(&$params, $entityTable, $entityID) {
     $cvParams = array();
     foreach ($params as $fieldID => $param) {
@@ -341,6 +351,13 @@ class CRM_Core_BAO_CustomValueTable {
     }
   }
 
+  /**
+   * @param $params
+   * @param $customFields
+   * @param $entityTable
+   * @param $entityID
+   * @param $customFieldExtends
+   */
   static function postProcess(&$params, &$customFields, $entityTable, $entityID, $customFieldExtends) {
     $customData = CRM_Core_BAO_CustomField::postProcess($params,
       $customFields,
@@ -577,6 +594,10 @@ AND    cf.id IN ( $fieldIDList )
           'column_name' => $dao->column_name,
           'is_multiple' => $dao->is_multiple,
         );
+
+        if ($cvParam['type'] == 'File') {
+          $cvParam['file_id'] = $fieldValue['value'];
+        }
 
         if (!array_key_exists($dao->table_name, $cvParams)) {
           $cvParams[$dao->table_name] = array();

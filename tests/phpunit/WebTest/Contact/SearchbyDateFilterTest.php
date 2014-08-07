@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_SearchbyDateFilterTest
+ */
 class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -149,6 +153,9 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
   }
 
+  /**
+   * @param array $openedPanes
+   */
   function _checkOpenedPanes($openedPanes = array(
     )) {
     if (!$this->isTextPresent('No matches found')) {
@@ -168,6 +175,10 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $paneRef
+   * @param array $selectFields
+   */
   function _selectPaneFields($paneRef, $selectFields = array(
     )) {
     $pane = $this->_advanceSearchPanesDateFilter($paneRef);
@@ -214,6 +225,11 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param null $paneRef
+   *
+   * @return array
+   */
   function _advanceSearchPanesDateFilter($paneRef = NULL) {
     static $_advance_search_panes;
 

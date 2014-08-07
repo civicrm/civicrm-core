@@ -183,6 +183,8 @@ class CRM_Utils_System {
    * @param bool $maintenance
    *   (optional) For maintenance mode.
    *
+   * @return string
+   *
    * @access public
    */
   static function theme(
@@ -252,6 +254,18 @@ class CRM_Utils_System {
     return $config->userSystem->url($path, $query, $absolute, $fragment, $htmlize, $frontend, $forceBackend);
   }
 
+  /**
+   * @param $text
+   * @param null $path
+   * @param null $query
+   * @param bool $absolute
+   * @param null $fragment
+   * @param bool $htmlize
+   * @param bool $frontend
+   * @param bool $forceBackend
+   *
+   * @return string
+   */
   static function href($text, $path = NULL, $query = NULL, $absolute = TRUE,
     $fragment = NULL, $htmlize = TRUE, $frontend = FALSE, $forceBackend = FALSE
   ) {
@@ -259,11 +273,17 @@ class CRM_Utils_System {
     return "<a href=\"$url\">$text</a>";
   }
 
+  /**
+   * @return mixed
+   */
   static function permissionDenied() {
     $config = CRM_Core_Config::singleton();
     return $config->userSystem->permissionDenied();
   }
 
+  /**
+   * @return mixed
+   */
   static function logout() {
     $config = CRM_Core_Config::singleton();
     return $config->userSystem->logout();
@@ -959,7 +979,7 @@ class CRM_Utils_System {
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
     // lets capture the return stuff rather than echo
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true );
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE );
 
     return curl_exec($ch);
   }
@@ -1146,7 +1166,7 @@ class CRM_Utils_System {
     return
       (isset($_SERVER['HTTPS']) &&
         !empty($_SERVER['HTTPS']) &&
-        strtolower($_SERVER['HTTPS']) != 'off') ? true : false;
+        strtolower($_SERVER['HTTPS']) != 'off') ? TRUE : FALSE;
   }
 
   /**
@@ -1187,6 +1207,11 @@ class CRM_Utils_System {
    *
    * @return string
    *   IP address of logged in user.
+   */
+  /**
+   * @param bool $strictIPV4
+   *
+   * @return mixed|string
    */
   static function ipAddress($strictIPV4 = TRUE) {
     $address = CRM_Utils_Array::value('REMOTE_ADDR', $_SERVER);
@@ -1369,7 +1394,7 @@ class CRM_Utils_System {
    *   Response from URL.
    */
   static function getServerResponse($url, $addCookie = TRUE) {
-    $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
+    CRM_Core_TemporaryErrorScope::ignoreException();
     require_once 'HTTP/Request.php';
     $request = new HTTP_Request($url);
 
@@ -1816,6 +1841,9 @@ class CRM_Utils_System {
     return $cache;
   }
 
+  /**
+   * @return bool
+   */
   static function isInUpgradeMode() {
     $args = explode('/', $_GET['q']);
     $upgradeInProcess = CRM_Core_Session::singleton()->get('isUpgradePending');
@@ -1825,5 +1853,55 @@ class CRM_Utils_System {
     else {
       return FALSE;
     }
+  }
+
+  /**
+   * Determine the standard URL for viewing or editing the specified link
+   *
+   * This function delegates the decision-making to (a) the hook system and
+   * (b) the BAO system.
+   *
+   * @param array $crudLinkSpec with keys:
+   *  - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
+   *  - entity_table: string, eg "civicrm_contact"
+   *  - entity_id: int
+   * @return array|NULL NULL if unavailable, or an array. array has keys:
+   *  - path: string
+   *  - query: array
+   *  - title: string
+   *  - url: string
+   */
+  static function createDefaultCrudLink($crudLinkSpec) {
+    $crudLinkSpec['action'] = CRM_Utils_Array::value('action', $crudLinkSpec, CRM_Core_Action::VIEW);
+    $daoClass = CRM_Core_DAO_AllCoreTables::getClassForTable($crudLinkSpec['entity_table']);
+    if (!$daoClass) {
+      return NULL;
+    }
+
+    $baoClass = str_replace('_DAO_', '_BAO_', $daoClass);
+    if (!class_exists($baoClass)) {
+      return NULL;
+    }
+
+    $bao = new $baoClass();
+    $bao->id = $crudLinkSpec['entity_id'];
+    if (!$bao->find(TRUE)) {
+      return NULL;
+    }
+
+    $link = array();
+    CRM_Utils_Hook::crudLink($crudLinkSpec, $bao, $link);
+    if (empty($link) && is_callable(array($bao, 'createDefaultCrudLink'))) {
+      $link = $bao->createDefaultCrudLink($crudLinkSpec);
+    }
+
+    if (!empty($link)) {
+      if (!isset($link['url'])) {
+        $link['url'] = self::url($link['path'], $link['query'], TRUE, NULL, FALSE);
+      }
+      return $link;
+    }
+
+    return NULL;
   }
 }

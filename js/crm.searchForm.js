@@ -1,91 +1,122 @@
 // http://civicrm.org/licensing
+(function($, _, undefined) {
+  "use strict";
+  var selected = 0,
+    form = 'form.crm-search-form';
 
-function countSelectedCheckboxes(fldPrefix, form) {
-  fieldCount = 0;
-  for (i = 0; i < form.elements.length; i++) {
-    fpLen = fldPrefix.length;
-    if (form.elements[i].type == 'checkbox' && form.elements[i].name.slice(0, fpLen) == fldPrefix && form.elements[i].checked == true) {
-      fieldCount++;
+  function clearTaskMenu() {
+    $('select#task', form).val('').select2('val', '').prop('disabled', true).select2('disable');
+  }
+
+  function enableTaskMenu() {
+    if (selected || $('[name=radio_ts][value=ts_all]', form).is(':checked')) {
+      $('select#task', form).prop('disabled', false).select2('enable');
     }
   }
-  return fieldCount;
-}
 
-/**
- * This function is used to check if any action is selected and also to check if any contacts are checked.
- *
- * @access public
- * @param fldPrefix - common string which precedes unique checkbox ID and identifies field as
- *                    belonging to the resultset's checkbox collection
- * @param form - name of form that checkboxes are part of
- * Sample usage: onClick="javascript:checkPerformAction('chk_', myForm );"
- *
- */
-function checkPerformAction(fldPrefix, form, taskButton, selection) {
-  var cnt;
-  var gotTask = 0;
-
-  // taskButton TRUE means we don't need to check the 'task' field - it's a button-driven task
-  if (taskButton == 1) {
-    gotTask = 1;
+  function displayCount() {
+    $('label[for*=ts_sel] span', form).text(selected);
   }
-  else {
-    if (document.forms[form].task.selectedIndex) {
-      //force user to select all search contacts, CRM-3711
-      if (document.forms[form].task.value == 13 || document.forms[form].task.value == 14) {
-        var toggleSelect = document.getElementsByName('toggleSelect');
-        if (toggleSelect[0].checked || document.forms[form].radio_ts[0].checked) {
-          return true;
-        }
-        else {
-          alert("Please select all contacts for this action.\n\nTo use the entire set of search results, click the 'all records' radio button.");
-          return false;
-        }
+
+  function countCheckboxes() {
+    return $('input.select-row:checked', form).length;
+  }
+
+  function usesAjax() {
+    return $(form).hasClass('crm-ajax-selection-form');
+  }
+
+  // Use ajax to store selection server-side
+  function phoneHome(single, $el, event) {
+    var url = CRM.url('civicrm/ajax/markSelection');
+    var params = {qfKey: 'civicrm search ' + $('input[name=qfKey]', form).val()};
+    if (!$el.is(':checked')) {
+      params.action = 'unselect';
+      params.state = 'unchecked';
+    }
+    if (single) {
+      params.name = $el.attr('id');
+    } else {
+      params.variableType = 'multiple';
+      // "Reset all" button
+      if ($el.is('a')) {
+        event.preventDefault();
+        $("input.select-row, input.select-rows", form).prop('checked', false).closest('tr').removeClass('crm-row-selected');
       }
-      gotTask = 1;
-    }
-  }
-
-  if (gotTask == 1) {
-    // If user wants to perform action on ALL records and we have a task, return (no need to check further)
-    if (document.forms[form].radio_ts[0].checked) {
-      return true;
-    }
-
-    cnt = (selection == 1) ? countSelections() : countSelectedCheckboxes(fldPrefix, document.forms[form]);
-    if (!cnt) {
-      alert("Please select one or more contacts for this action.\n\nTo use the entire set of search results, click the 'all records' radio button.");
-      return false;
-    }
-  }
-  else {
-    alert("Please select an action from the drop-down menu.");
-    return false;
-  }
-}
-
-/**
- * Function to enable task action select
- */
-function toggleTaskAction(status) {
-  var radio_ts = document.getElementsByName('radio_ts');
-  if (!radio_ts[1]) {
-    radio_ts[0].checked = true;
-  }
-  if (radio_ts[0].checked || radio_ts[1].checked) {
-    status = true;
-  }
-
-  var formElements = ['task', 'Go', 'Print'];
-  for (var i = 0; i < formElements.length; i++) {
-    var element = document.getElementById(formElements[i]);
-    if (element) {
-      if (status) {
-        element.disabled = false;
-      }
+      // Master checkbox
       else {
-        element.disabled = true;
+        params.name = $('input.select-row').map(function() {return $(this).attr('id')}).get().join('-');
       }
     }
+    $.getJSON(url, params, function(data) {
+      if (data && data.getCount !== undefined) {
+        selected = data.getCount;
+        displayCount();
+        enableTaskMenu();
+      }
+    });
   }
-}
+
+  // Handle user interactions with search results
+  $('#crm-container')
+    // When initially loading and reloading (paging) the results
+    .on('crmLoad', function(e) {
+      if ($(e.target).is('#crm-container') || $(e.target).is('#crm-main-content-wrapper')) {
+        clearTaskMenu();
+        if (usesAjax()) {
+          selected = parseInt($('label[for*=ts_sel] span', form).text(), 10);
+        } else {
+          selected = countCheckboxes();
+          displayCount();
+        }
+        enableTaskMenu();
+      }
+    })
+    // When toggling between "all records" and "selected records only"
+    .on('change', '[name=radio_ts]', function() {
+      clearTaskMenu();
+      enableTaskMenu();
+    })
+    // When making a selection
+    .on('click', 'input.select-row, input.select-rows, a.crm-selection-reset', function(event) {
+      var $el = $(this),
+        $form = $el.closest('form'),
+        single = $el.is('input.select-row');
+      clearTaskMenu();
+      $('input[name=radio_ts][value=ts_sel]', $form).prop('checked', true);
+      if (!usesAjax()) {
+        if (single) {
+          selected = countCheckboxes();
+        } else {
+          selected = $el.is(':checked') ? $('input.select-row', $form).length : 0;
+        }
+        displayCount();
+        enableTaskMenu();
+      } else {
+        phoneHome(single, $el, event);
+      }
+    })
+    // When selecting a task
+    .on('change', 'select#task', function() {
+      var $form = $(this).closest('form'),
+        $go = $('input.crm-search-go-button', $form);
+      if (1) {
+        $go.click();
+      }
+      // The following code can load the task in a popup, however not all tasks function correctly with this
+      // So it's disabled pending a per-task opt-in mechanism
+      else {
+        var data = $form.serialize() + '&' + $go.attr('name') + '=' + $go.attr('value');
+        var url = $form.attr('action');
+        url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=json';
+        clearTaskMenu();
+        $.post(url, data, function(data) {
+          CRM.loadForm(data.userContext).on('crmFormSuccess', function() {
+            CRM.refreshParent($form);
+          });
+          enableTaskMenu();
+        }, 'json');
+      }
+    });
+
+})(CRM.$, CRM._);

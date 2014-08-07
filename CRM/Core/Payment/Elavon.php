@@ -374,6 +374,11 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     }
   }
   //end check config
+  /**
+   * @param $requestFields
+   *
+   * @return string
+   */
   function buildXML($requestFields) {
     $xmlFieldLength['ssl_first_name'] = 15;
     // credit card name
@@ -413,6 +418,12 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     return $xml;
   }
 
+  /**
+   * @param $value
+   * @param $fieldlength
+   *
+   * @return string
+   */
   function tidyStringforXML($value, $fieldlength) {
     // the xml is posted to a url so must not contain spaces etc. It also needs to be cut off at a certain
     // length to match the processor's field length. The cut needs to be made after spaces etc are
@@ -453,6 +464,11 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     return ($return);
   }
 
+  /**
+   * @param $Xml
+   *
+   * @return mixed
+   */
   function decodeXMLresponse($Xml) {
 
     /**

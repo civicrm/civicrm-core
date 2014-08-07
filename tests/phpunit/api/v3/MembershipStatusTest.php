@@ -26,6 +26,10 @@
 */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_MembershipStatusTest
+ */
 class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
   protected $_contactID;
@@ -35,6 +39,9 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
   protected $_apiversion =3;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'MembershipStatus Calc',

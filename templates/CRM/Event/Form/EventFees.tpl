@@ -205,13 +205,13 @@
 <script type="text/javascript">
 {literal}
 CRM.$(function($) {
-    cj("#contact_1").blur( function( ) {
+    cj("#contact_id").change( function( ) {
         checkEmail( );
     } );
     checkEmail( );
 });
 function checkEmail( ) {
-    var contactID =  cj("input[name='contact_select_id[1]']").val();
+    var contactID =  cj("#contact_id").val();
     if ( contactID ) {
         var postUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' h=0}{literal}";
         cj.post( postUrl, {contact_id: contactID},

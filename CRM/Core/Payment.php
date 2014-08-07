@@ -193,6 +193,11 @@ abstract class CRM_Core_Payment {
    */
   abstract function checkConfig();
 
+  /**
+   * @param $paymentProcessor
+   *
+   * @return bool
+   */
   static function paypalRedirect(&$paymentProcessor) {
     if (!$paymentProcessor) {
       return FALSE;
@@ -337,60 +342,80 @@ abstract class CRM_Core_Payment {
     return method_exists(CRM_Utils_System::getClassName($this), $method);
   }
 
+  /**
+   * @param null $entityID
+   * @param null $entity
+   * @param string $action
+   *
+   * @return string
+   */
   function subscriptionURL($entityID = NULL, $entity = NULL, $action = 'cancel') {
-    if ($action == 'cancel') {
-      $url = 'civicrm/contribute/unsubscribe';
+    // Set URL
+    switch ($action) {
+      case 'cancel' :
+        $url = 'civicrm/contribute/unsubscribe';
+        break;
+
+      case 'billing' :
+        //in notify mode don't return the update billing url
+        if ($this->_paymentProcessor['billing_mode'] == self::BILLING_MODE_NOTIFY) {
+          return NULL;
+        }
+      	$url = 'civicrm/contribute/updatebilling';
+        break;
+
+      case 'update' :
+        $url = 'civicrm/contribute/updaterecur';
+        break;
     }
-    elseif ($action == 'billing') {
-      //in notify mode don't return the update billing url
-      if ($this->_paymentProcessor['billing_mode'] == self::BILLING_MODE_NOTIFY) {
-        return NULL;
-      }
-      $url = 'civicrm/contribute/updatebilling';
-    }
-    elseif ($action == 'update') {
-      $url = 'civicrm/contribute/updaterecur';
-    }
+
     $session       = CRM_Core_Session::singleton();
     $userId        = $session->get('userID');
-    $checksumValue = "";
+    $contactID     = 0;
+    $checksumValue = '';
+    $entityArg     = '';
 
-    if ($entityID && $entity == 'membership') {
-      if (!$userId) {
-        $contactID     = CRM_Core_DAO::getFieldValue("CRM_Member_DAO_Membership", $entityID, "contact_id");
-        $checksumValue = CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, NULL, 'inf');
-        $checksumValue = "&cs={$checksumValue}";
-      }
-      return CRM_Utils_System::url($url, "reset=1&mid={$entityID}{$checksumValue}", TRUE, NULL, FALSE, TRUE);
-    }
+    // Find related Contact
+    if ($entityID) {
+      switch ($entity) {
+        case 'membership' :
+          $contactID = CRM_Core_DAO::getFieldValue("CRM_Member_DAO_Membership", $entityID, "contact_id");
+          $entityArg = 'mid';
+          break;
 
-    if ($entityID && $entity == 'contribution') {
-      if (!$userId) {
-        $contactID     = CRM_Core_DAO::getFieldValue("CRM_Contribute_DAO_Contribution", $entityID, "contact_id");
-        $checksumValue = CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, NULL, 'inf');
-        $checksumValue = "&cs={$checksumValue}";
-      }
-      return CRM_Utils_System::url($url, "reset=1&coid={$entityID}{$checksumValue}", TRUE, NULL, FALSE, TRUE);
-    }
+        case 'contribution' :
+          $contactID = CRM_Core_DAO::getFieldValue("CRM_Contribute_DAO_Contribution", $entityID, "contact_id");
+          $entityArg = 'coid';
+          break;
 
-    if ($entityID && $entity == 'recur') {
-      if (!$userId) {
-        $sql = "
+        case 'recur' :
+          $sql = "
     SELECT con.contact_id
       FROM civicrm_contribution_recur rec
 INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
      WHERE rec.id = %1
   GROUP BY rec.id";
-        $contactID     = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($entityID, 'Integer')));
-        $checksumValue = CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, NULL, 'inf');
-        $checksumValue = "&cs={$checksumValue}";
+          $contactID = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($entityID, 'Integer')));
+          $entityArg = 'crid';
+          break;
       }
-      return CRM_Utils_System::url($url, "reset=1&crid={$entityID}{$checksumValue}", TRUE, NULL, FALSE, TRUE);
     }
 
+    // Add entity arguments
+    if ($entityArg != '') {
+      // Add checksum argument
+      if ($contactID != 0 && $userId != $contactID) {
+        $checksumValue = '&cs=' . CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, NULL, 'inf');
+      }
+      return CRM_Utils_System::url($url, "reset=1&{$entityArg}={$entityID}{$checksumValue}", TRUE, NULL, FALSE, TRUE);
+    }
+
+    // Else login URL
     if ($this->isSupported('accountLoginURL')) {
       return $this->accountLoginURL();
     }
+
+    // Else default
     return $this->_paymentProcessor['url_recur'];
   }
 }

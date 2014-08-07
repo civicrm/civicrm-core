@@ -25,6 +25,10 @@
   */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_OnlineMembershipCreateTest
+ */
 class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -177,6 +181,15 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('search-status', '2 Results', 'Missing text: ' . '2 Results');
   }
 
+  /**
+   * @param $pageId
+   * @param $memTypeId
+   * @param $firstName
+   * @param $lastName
+   * @param $payLater
+   * @param $hash
+   * @param bool $otherAmount
+   */
   function _testOnlineMembershipSignup($pageId, $memTypeId, $firstName, $lastName, $payLater, $hash, $otherAmount = FALSE) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");

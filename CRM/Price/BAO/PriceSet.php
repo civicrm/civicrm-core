@@ -56,6 +56,9 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @static
    */
   static function create(&$params) {
+    if(empty($params['id']) && empty($params['name'])) {
+      $params['name'] = CRM_Utils_String::munge($params['title'], '_', 242);
+    }
     $priceSetBAO = new CRM_Price_BAO_PriceSet();
     $priceSetBAO->copyValues($params);
     if (self::eventPriceSetDomainID()) {
@@ -104,17 +107,16 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    *
    * @param string $entity
    *
-   * @return id $priceSetID
+   * @return array $defaultPriceSet default price set
    *
    * @access public
    * @static
    *
    */
   public static function getDefaultPriceSet($entity = 'contribution') {
-    if ($entity == 'contribution') {
-      $entityName = 'default_contribution_amount';
-    }
-    else if ($entity == 'membership') {
+
+    $entityName = 'default_contribution_amount';
+    if ($entity == 'membership') {
       $entityName = 'default_membership_type_amount';
     }
 
@@ -158,7 +160,7 @@ WHERE       ps.name = '{$entityName}'
    * Return a list of all forms which use this price set.
    *
    * @param int $id id of price set
-   * @param bool|\str $simpleReturn - get raw data. Possible values: 'entity', 'table'
+   * @param bool|string $simpleReturn - get raw data. Possible values: 'entity', 'table'
    *
    * @return array
    */
@@ -384,13 +386,13 @@ WHERE     ct.id = cp.financial_type_id AND
   }
 
   /**
-   * Find a price_set_id associatied with the given option value or  field ID
+   * Find a price_set_id associated with the given option value or  field ID
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *                      array may contain either option id or
    *                      price field id
    *
-   * @return price set id on success, null  otherwise
+   * @return integer|NULL price set id on success, null  otherwise
    * @static
    * @access public
    */
@@ -474,7 +476,6 @@ WHERE     ct.id = cp.financial_type_id AND
   public static function getSetDetail($setID, $required = TRUE, $validOnly = FALSE) {
     // create a new tree
     $setTree = array();
-    $select = $from = $where = $orderBy = '';
 
     $priceFields = array(
       'id',
@@ -559,6 +560,47 @@ WHERE  id = %1";
     return $setTree;
   }
 
+  /**
+   * Get the Price Field ID. We call this function when more than one being present would represent an error
+   * starting format derived from current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId))
+   * @param array $priceSet
+   *
+   * @throws CRM_Core_Exception
+   * @return int
+   */
+  static function getOnlyPriceFieldID(array $priceSet) {
+    if(count($priceSet['fields']) > 1) {
+      throw new CRM_Core_Exception(ts('expected only one price field to be in priceset but multiple are present'));
+    }
+    return (int) implode('_', array_keys($priceSet['fields']));
+  }
+
+  /**
+   * Get the Price Field Value ID. We call this function when more than one being present would represent an error
+   * current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId))
+   * @param array $priceSet
+   *
+   * @throws CRM_Core_Exception
+   * @return int
+   */
+  static function getOnlyPriceFieldValueID(array $priceSet) {
+    $priceFieldID = self::getOnlyPriceFieldID($priceSet);
+    if(count($priceSet['fields'][$priceFieldID]['options']) > 1) {
+      throw new CRM_Core_Exception(ts('expected only one price field to be in priceset but multiple are present'));
+    }
+    return (int) implode('_', array_keys($priceSet['fields'][$priceFieldID]['options']));
+  }
+
+
+  /**
+   * @param CRM_Core_Form $form
+   * @param $id
+   * @param string $entityTable
+   * @param bool $validOnly
+   * @param null $priceSetId
+   *
+   * @return bool|false|int|null
+   */
   static function initSet(&$form, $id, $entityTable = 'civicrm_event', $validOnly = FALSE, $priceSetId = NULL) {
     if (!$priceSetId) {
       $priceSetId = self::getFor($entityTable, $id);
@@ -651,6 +693,12 @@ WHERE  id = %1";
     return FALSE;
   }
 
+  /**
+   * @param $fields
+   * @param $params
+   * @param $lineItem
+   * @param string $component
+   */
   static function processAmount(&$fields, &$params, &$lineItem, $component = '') {
     // using price set
     $totalPrice = $totalTax = 0;
@@ -718,7 +766,7 @@ WHERE  id = %1";
           if (
             $component &&
             // auto_renew exists and is empty in some workflows, which php treat as a 0
-            // and hence we explicity check to see if auto_renew is numeric
+            // and hence we explicitly check to see if auto_renew is numeric
             isset($lineItem[$optionValueId]['auto_renew']) &&
             is_numeric($lineItem[$optionValueId]['auto_renew'])
           ) {
@@ -824,7 +872,7 @@ WHERE  id = %1";
   /**
    * Function to build the price set form.
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access public
@@ -968,9 +1016,50 @@ WHERE  id = %1";
   }
 
   /**
+   * Supports event create function by setting up required price sets, not tested but expect
+   * it will work for contribution page
+   * @param array $params as passed to api/bao create fn
+   * @param CRM_Core_DAO $entity object for given entity
+   * @param string $entityName name of entity - e.g event
+   */
+  static function setPriceSets(&$params, $entity, $entityName) {
+    if(empty($params['price_set_id']) || !is_array($params['price_set_id'])) {
+      return;
+    }
+    // CRM-14069 note that we may as well start by assuming more than one.
+    // currently the form does not pass in as an array & will be skipped
+    // test is passing in as an array but I feel the api should have a metadata that allows
+    // transform of single to array - seems good for managing transitions - in which case all api
+    // calls that set price_set_id will hit this
+    // e.g in getfields 'price_set_id' => array('blah', 'bao_type' => 'array') - causing
+    // all separated values, strings, json half-separated values (in participant we hit this)
+    // to be converted to json @ api layer
+    $pse = new CRM_Price_DAO_PriceSetEntity();
+    $pse->entity_table = 'civicrm_' . $entityName;
+    $pse->entity_id = $entity->id;
+    while ($pse->fetch()) {
+      if(!in_array($pse->price_set_id, $params['price_set_id'])) {
+        // note an even more aggressive form of this deletion currently happens in event form
+        // past price sets discounts are made inaccessible by this as the discount_id is set to NULL
+        // on the participant record
+        if (CRM_Price_BAO_PriceSet::removeFrom('civicrm_' . $entityName, $entity->id)) {
+          CRM_Core_BAO_Discount::del($this->_id,'civicrm_' . $entityName);
+        }
+      }
+    }
+    foreach ($params['price_set_id'] as $priceSetID) {
+      CRM_Price_BAO_PriceSet::addTo('civicrm_' . $entityName, $entity->id, $priceSetID);
+      //@todo - how should we do this - copied from form
+      //if (CRM_Utils_Array::value('price_field_id', $params)) {
+      //  $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $params['price_field_id'], 'price_set_id');
+      //  CRM_Price_BAO_PriceSet::setIsQuickConfig($priceSetID, 0);
+      //}
+    }
+  }
+  /**
    * Get field ids of a price set
    *
-   * @param int id Price Set id
+   * @param int $id Price Set id
    *
    * @return array of the field ids
    *
@@ -1092,6 +1181,11 @@ INNER JOIN  civicrm_price_set pset    ON ( pset.id = field.price_set_id )
     return $pricesetFieldCount[$sid];
   }
 
+  /**
+   * @param $ids
+   *
+   * @return array
+   */
   public static function getMembershipCount($ids) {
     $queryString = "
 SELECT       count( pfv.id ) AS count, pfv.id AS id
@@ -1179,6 +1273,9 @@ GROUP BY     mt.member_of_contact_id";
     return array($dao->duration_interval, $dao->duration_unit);
   }
 
+  /**
+   * @return object
+   */
   static function eventPriceSetDomainID() {
     return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
       'event_price_set_domain_id',
@@ -1241,13 +1338,16 @@ WHERE       ps.id = %1
     return false;
   }
 
-  /*
+  /**
    * Copy priceSet when event/contibution page is copied
    *
    * @params string $baoName  BAO name
    * @params int $id old event/contribution page id
    * @params int $newId newly created event/contribution page id
    *
+   * @param string $baoName
+   * @param integer $id
+   * @param integer $newId
    */
   static function copyPriceSet($baoName, $id, $newId) {
     $priceSetId = CRM_Price_BAO_PriceSet::getFor($baoName, $id);
@@ -1273,7 +1373,7 @@ WHERE       ps.id = %1
 
           $copyPriceSet = &CRM_Price_BAO_PriceSet::copy($setId);
 
-          $copyDiscount = &CRM_Core_DAO::copyGeneric(
+          CRM_Core_DAO::copyGeneric(
             'CRM_Core_DAO_Discount',
             array(
               'id' => $discountId,

@@ -26,6 +26,9 @@
 */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Extension_ManagerTest
+ */
 class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   const TESTING_TYPE = 'report';
   const OTHER_TESTING_TYPE = 'module';
@@ -391,12 +394,23 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->assertDBQuery('newextension', 'SELECT file FROM civicrm_extension WHERE full_name ="test.whiz.bang"');
   }
 
+  /**
+   * @param $typeManagers
+   *
+   * @return CRM_Extension_Manager
+   */
   function _createManager($typeManagers) {
     //list ($basedir, $c) = $this->_createContainer();
     $mapper = new CRM_Extension_Mapper($this->container);
     return new CRM_Extension_Manager($this->container, $this->container, $this->mapper, $typeManagers);
   }
 
+  /**
+   * @param CRM_Utils_Cache_Interface $cache
+   * @param null $cacheKey
+   *
+   * @return array
+   */
   function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
     $basedir = $this->createTempDir('ext-');
     mkdir("$basedir/weird");
@@ -410,6 +424,12 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     return array($basedir, $c);
   }
 
+  /**
+   * @param $key
+   * @param $file
+   *
+   * @return string
+   */
   function _createDownload($key, $file) {
     $basedir = $this->createTempDir('ext-dl-');
     file_put_contents("$basedir/info.xml", "<extension key='$key' type='".self::TESTING_TYPE."'><file>$file</file></extension>");

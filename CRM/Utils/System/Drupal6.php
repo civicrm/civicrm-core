@@ -124,6 +124,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *  @param integer $ufID User ID in CMS
    *  @param string $ufName User name
    */
+  /**
+   * @param $ufID
+   * @param $ufName
+   */
   function updateCMSName($ufID, $ufName) {
     // CRM-5555
     if (function_exists('user_load')) {
@@ -563,6 +567,9 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     drupal_set_message($message);
   }
 
+  /**
+   * @return mixed
+   */
   function logout() {
     module_load_include('inc', 'user', 'user.pages');
     return user_logout();
@@ -605,6 +612,9 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->language, 0, 2));
   }
 
+  /**
+   * @return string
+   */
   function getVersion() {
     return defined('VERSION') ? VERSION : 'Unknown';
   }

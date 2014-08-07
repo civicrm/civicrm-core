@@ -202,7 +202,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @return array - array reference of all activty types.
+   * @return array - array reference of all activity types.
    */
   public static function &caseActivityType($indexName = TRUE, $all = FALSE) {
     $cache = (int) $indexName . '_' . (int) $all;

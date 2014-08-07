@@ -27,6 +27,10 @@
 
 namespace Civi\API\Event;
 
+/**
+ * Class PrepareEvent
+ * @package Civi\API\Event
+ */
 class PrepareEvent extends Event {
   /**
    * @param array $apiRequest

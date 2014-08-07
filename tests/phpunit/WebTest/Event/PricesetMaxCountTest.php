@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_PricesetMaxCountTest
+ */
 class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -1026,6 +1030,10 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->_checkConfirmationAndRegister();
   }
 
+  /**
+   * @param $setTitle
+   * @param null $financialType
+   */
   function _testAddSet($setTitle, $financialType = NULL) {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
@@ -1044,6 +1052,9 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
   }
 
+  /**
+   * @param $fields
+   */
   function _testAddPriceFields($fields) {
     $fieldCount = count($fields);
     $count = 1;
@@ -1095,6 +1106,10 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $options
+   * @param $fieldType
+   */
   function _testAddMultipleChoiceOptions($options, $fieldType) {
     foreach ($options as $oIndex => $oValue) {
       $this->type("option_label_{$oIndex}", $oValue['label']);
@@ -1126,6 +1141,11 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $params
+   *
+   * @return string
+   */
   function _testAddEvent($params) {
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
@@ -1184,6 +1204,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       $this->click('is_multiple_registrations');
     }
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField('intro_text', 'Fill in all the fields below and click Continue.');
 
     // enable confirmation email

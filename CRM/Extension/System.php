@@ -68,10 +68,16 @@ class CRM_Extension_System {
     return self::$singleton;
   }
 
+  /**
+   * @param CRM_Extension_System $singleton
+   */
   public static function setSingleton(CRM_Extension_System $singleton) {
     self::$singleton = $singleton;
   }
 
+  /**
+   * @param array $parameters
+   */
   public function __construct($parameters = array()) {
     $config = CRM_Core_Config::singleton();
     if (!array_key_exists('extensionsDir', $parameters)) {

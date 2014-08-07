@@ -36,6 +36,10 @@
 require_once 'CRM/Core/Payment.php';
 require_once ('packages/Google/library/googlecart.php');
 require_once ('packages/Google/library/googleitem.php');
+
+/**
+ * Class org_civicrm_payment_googlecheckout
+ */
 class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
 
   /**
@@ -115,6 +119,15 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
     }
   }
 
+  /**
+   * This function collects all the information from a web/api form and invokes
+   * the relevant payment processor specific functions to perform the transaction
+   *
+   * @param  array $params assoc array of input parameters for this transaction
+   *
+   * @return array the result in an nice formatted array (or an error object)
+   * @abstract
+   */
   function doDirectPayment(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
@@ -274,6 +287,11 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
     return self::getArrayFromXML($xmlResponse);
   }
 
+  /**
+   * @param $searchParams
+   *
+   * @return string
+   */
   static
   function buildXMLQuery($searchParams) {
     $xml = '<?xml version="1.0" encoding="UTF-8"?>
@@ -308,6 +326,11 @@ class org_civicrm_payment_googlecheckout extends CRM_Core_Payment {
     return $xml;
   }
 
+  /**
+   * @param $xmlData
+   *
+   * @return array
+   */
   static
   function getArrayFromXML($xmlData) {
     require_once 'Google/library/xml-processing/xmlparser.php';

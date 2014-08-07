@@ -218,8 +218,8 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       if (CRM_Utils_Array::value('row_count', $params)) {
         $limitResult = '&rowCount=' . $params['row_count'];
       }
-      $dashletParams['url'] = "civicrm/report/instance/{$instance->id}&reset=1&section={$section}&snippet=5{$chart}&context=dashlet" . $limitResult;
-      $dashletParams['fullscreen_url'] = "civicrm/report/instance/{$instance->id}&reset=1&section={$section}&snippet=5{$chart}&context=dashletFullscreen" . $limitResult;
+      $dashletParams['url'] = "civicrm/report/instance/{$instance->id}?reset=1&section={$section}&snippet=5{$chart}&context=dashlet" . $limitResult;
+      $dashletParams['fullscreen_url'] = "civicrm/report/instance/{$instance->id}?reset=1&section={$section}&snippet=5{$chart}&context=dashletFullscreen" . $limitResult;
       $dashletParams['instanceURL'] = "civicrm/report/instance/{$instance->id}";
       CRM_Core_BAO_Dashboard::addDashlet($dashletParams);
     }
@@ -241,6 +241,12 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     return $dao->delete();
   }
 
+  /**
+   * @param $params
+   * @param $defaults
+   *
+   * @return CRM_Report_DAO_ReportInstance|null
+   */
   static function retrieve($params, &$defaults) {
     $instance = new CRM_Report_DAO_ReportInstance();
     $instance->copyValues($params);

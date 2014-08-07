@@ -215,8 +215,7 @@
       var payment_processor = cj("div.payment_processor-section");
       var payment_information = cj("div#payment_information");
 
-      if ((isMultiple && cj("#additional_participants").val()) ||
-          !(payment_options.length && payment_processor.length && payment_information.length)) {
+      if (isMultiple && cj("#additional_participants").val() && cj('#pricevalue').text() !== symbol + " 0.00") {
         flag = 0;
       }
 

@@ -129,6 +129,12 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
     $page->controller->_actions['upload']->realPerform($page, $actionName);
   }
 
+  /**
+   * @param $page
+   * @param $actionName
+   *
+   * @return mixed
+   */
   function realPerform(&$page, $actionName) {
     $pageName = $page->getAttribute('name');
     $data = &$page->controller->container();

@@ -469,6 +469,11 @@ WHERE {$clause}
     return;
   }
 
+  /**
+   * @param $params
+   *
+   * @return mixed
+   */
   static function registerInterview($params) {
     $activityId = CRM_Utils_Array::value('activity_id', $params);
     $surveyTypeId = CRM_Utils_Array::value('activity_type_id', $params);

@@ -101,7 +101,7 @@ function civicrm_api3_participant_payment_delete($params) {
 
 /**
  * Retrieve one / all contribution(s) / participant(s) linked to a
- * contrbution.
+ * contribution.
  *
  * @param  array   $params  input parameters
  *

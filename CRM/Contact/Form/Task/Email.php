@@ -104,16 +104,31 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
     $cid = CRM_Utils_Request::retrieve('cid', 'String', $this, FALSE);
-    if ($cid){
-      $cid = explode(',',$cid);
 
-      foreach ($cid as $key => $val) {
+    // Allow request to specify email id rather than contact id
+    $toEmailId = CRM_Utils_Request::retrieve('email_id', 'String', $this);
+    if ($toEmailId) {
+      $toEmail = civicrm_api('email', 'getsingle', array('version' => 3, 'id' => $toEmailId));
+      if (!empty($toEmail['email']) && !empty($toEmail['contact_id'])) {
+        $this->_toEmail = $toEmail;
+      }
+      if (!$cid) {
+        $cid = $toEmail['contact_id'];
+        $this->set('cid', $cid);
+      }
+    }
+
+    if ($cid) {
+      $cid = explode(',',$cid);
+      $displayName = array();
+
+      foreach ($cid as $val) {
         $displayName[] = CRM_Contact_BAO_Contact::displayName($val);
       }
 
-      CRM_Utils_System::setTitle(implode(',',$displayName) . ' - ' . ts('Email'));
+      CRM_Utils_System::setTitle(implode(',', $displayName) . ' - ' . ts('Email'));
     }
-    else{
+    else {
       CRM_Utils_System::setTitle(ts('New Email'));          
     }
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);

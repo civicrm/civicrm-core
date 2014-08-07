@@ -36,6 +36,10 @@
  */
 
 require_once 'api/Wrapper.php';
+
+/**
+ * Class CRM_Utils_API_AbstractFieldCoder
+ */
 abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
 
   /**
@@ -81,6 +85,11 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
    */
   public abstract function encodeInput(&$values);
 
+  /**
+   * @param $values
+   *
+   * @return mixed
+   */
   public abstract function decodeOutput(&$values);
 
   /**

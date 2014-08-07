@@ -33,7 +33,13 @@ require_once 'CiviTest/ContributionPage.php';
 require_once 'CiviTest/Membership.php';
 require_once 'CRM/Core/Controller.php';
 
+/**
+ * Class CRM_Member_BAO_MembershipTest
+ */
 class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Membership BAOs',
@@ -533,7 +539,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $membershipRenewal->controller = new CRM_Core_Controller;
     $isTestMembership = 0;
     $MembershipRenew =
-      CRM_Member_BAO_Membership::renewMembership(
+      CRM_Member_BAO_Membership::renewMembershipFormWrapper(
         $contactId,
         $this->_membershipTypeID,
         $isTestMembership,
@@ -614,7 +620,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $membershipRenewal = new CRM_Core_Form;
     $membershipRenewal->controller = new CRM_Core_Controller;
-    $MembershipRenew = CRM_Member_BAO_Membership::renewMembership($contactId, $this->_membershipTypeID, $isTestMembership = 0, $membershipRenewal, NULL, NULL);
+    $MembershipRenew = CRM_Member_BAO_Membership::renewMembershipFormWrapper($contactId, $this->_membershipTypeID, $isTestMembership = 0, $membershipRenewal, NULL, NULL);
 
     $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',
       $MembershipRenew->id,

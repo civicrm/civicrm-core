@@ -41,6 +41,14 @@ class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
   // permission mapping to stub check() calls
   public $permissions = NULL;
 
+  /**
+   * given a permission string, check for access requirements
+   *
+   * @param string $str the permission to check
+   *
+   * @return boolean true if yes, else false
+   * @access public
+   */
   function check($str) {
     // return the stubbed permission (defaulting to true if the array is missing)
     return is_array($this->permissions) ? in_array($str, $this->permissions) : TRUE;

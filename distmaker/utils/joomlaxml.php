@@ -53,6 +53,9 @@ function createDir($dir, $perm = 0755) {
   }
 }
 
+/**
+ * @param $version
+ */
 function generateJoomlaConfig($version) {
   global $targetDir, $sourceCheckoutDir, $pkgType;
 

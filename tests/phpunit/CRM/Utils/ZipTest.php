@@ -25,7 +25,14 @@
 +--------------------------------------------------------------------+
 */
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Utils_ZipTest
+ */
 class CRM_Utils_ZipTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Zip Test',
@@ -150,6 +157,11 @@ class CRM_Utils_ZipTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * @param $expectedBaseDirName
+   * @param $dirs
+   * @param $files
+   */
   function _doFindBaseDirName($expectedBaseDirName, $dirs, $files) {
     $this->file = tempnam(sys_get_temp_dir(), 'testzip-');
     $this->assertTrue(CRM_Utils_Zip::createTestZip($this->file, $dirs, $files));
@@ -159,6 +171,12 @@ class CRM_Utils_ZipTest extends CiviUnitTestCase {
     $this->assertEquals($expectedBaseDirName, CRM_Utils_Zip::findBaseDirName($zip));
   }
 
+  /**
+   * @param $expectedResult
+   * @param $dirs
+   * @param $files
+   * @param $expectedKey
+   */
   function _doGuessBaseDir($expectedResult, $dirs, $files, $expectedKey) {
     $this->file = tempnam(sys_get_temp_dir(), 'testzip-');
     $this->assertTrue(CRM_Utils_Zip::createTestZip($this->file, $dirs, $files));

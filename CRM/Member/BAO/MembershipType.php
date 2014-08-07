@@ -654,6 +654,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
 
+  /**
+   * @param $params
+   * @param $ids
+   * @param $previousID
+   * @param $membershipTypeId
+   */
   public static function createMembershipPriceField($params, $ids, $previousID, $membershipTypeId) {
 
     $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');

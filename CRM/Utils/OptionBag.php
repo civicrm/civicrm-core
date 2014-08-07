@@ -1,8 +1,14 @@
 <?php
 
+/**
+ * Class CRM_Utils_OptionBag
+ */
 class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
   protected $data;
 
+  /**
+   * @param array $data
+   */
   public function __construct($data = array()) {
     $this->data = $data;
   }
@@ -39,6 +45,11 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
     }
   }
 
+  /**
+   * @param $key
+   *
+   * @return bool
+   */
   public function has($key) {
     return isset($this->data[$key]);
   }

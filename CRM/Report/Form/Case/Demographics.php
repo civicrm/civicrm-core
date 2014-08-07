@@ -40,6 +40,13 @@ class CRM_Report_Form_Case_Demographics extends CRM_Report_Form {
   protected $_emailField = FALSE;
 
   protected $_phoneField = FALSE;
+
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -270,6 +277,13 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     return $errors;
@@ -383,6 +397,9 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
@@ -443,6 +460,12 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
     }
   }
 
+  /**
+   * @param $fname
+   * @param $val
+   *
+   * @return null|string
+   */
   function getCustomFieldLabel($fname, $val) {
     $query = "
 SELECT v.label

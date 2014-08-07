@@ -297,10 +297,10 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $gids = implode(',', $profileIds);
     $params = array();
     if ($restrict) {
-      $query = "SELECT g.* from civicrm_uf_group g, civicrm_uf_join j
+      $query = "SELECT g.* from civicrm_uf_group g
+                LEFT JOIN civicrm_uf_join j ON (j.uf_group_id = g.id)
                 WHERE g.id IN ( {$gids} )
-                AND j.uf_group_id IN ( {$gids} )
-                AND j.module      = %1
+                AND ((j.uf_group_id IN ( {$gids} ) AND j.module = %1) OR g.is_reserved = 1 )
                 ";
       $params = array(1 => array($restrict, 'String'));
     }
@@ -612,6 +612,13 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     return TRUE;
   }
 
+  /**
+   * @param $showAll
+   * @param $profileType
+   * @param $contactActivityProfile
+   *
+   * @return array
+   */
   protected static function getImportableFields($showAll, $profileType, $contactActivityProfile) {
     if (!$showAll) {
       $importableFields = CRM_Contact_BAO_Contact::importableFields('All', FALSE, FALSE, FALSE, TRUE, TRUE);
@@ -659,6 +666,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     return $locationFields;
   }
 
+  /**
+   * @param $ctype
+   *
+   * @return mixed
+   */
   protected static function getCustomFields($ctype) {
     static $customFieldCache = array();
     if (!isset($customFieldCache[$ctype])) {
@@ -946,7 +958,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $websiteTypes  = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
 
     $multipleFields = array('url');
-    $nullIndex = $nullValueIndex = ' ';
 
     //start of code to set the default values
     foreach ($fields as $name => $field) {
@@ -960,18 +971,12 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         continue;
       }
 
+      // Create a unique, non-empty index for each field.
       $index = $field['title'];
-      //handle for the label not set for the field
-      if (empty($field['title'])) {
-        $index = $nullIndex;
-        $nullIndex .= $nullIndex;
-      }
+      if ($index === '') $index = ' ';
+      while (array_key_exists($index, $values))
+        $index .= ' ';
 
-      //handle the case to avoid re-write where the profile field labels are the same
-      if (array_key_exists($index, $values)) {
-        $index .= $nullValueIndex;
-        $nullValueIndex .= $nullValueIndex;
-      }
       $params[$index] = $values[$index] = '';
       $customFieldName = NULL;
       // hack for CRM-665
@@ -1137,7 +1142,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
               }
             }
             elseif ($name == 'image_URL') {
-              list($width, $height) = getimagesize($details->$name);
+              list($width, $height) = getimagesize(CRM_Utils_String::unstupifyUrl($details->$name));
               list($thumbWidth, $thumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($width, $height);
 
               $image_URL = '<img src="' . $details->$name . '" height= ' . $thumbHeight . ' width= ' . $thumbWidth . '  />';
@@ -3444,7 +3449,7 @@ SELECT  group_id
   }
 
   /**
-   * Funtion to determine of we show overlay profile or not
+   * Function to determine of we show overlay profile or not
    *
    * @return boolean true if profile should be shown else false
    * @static
@@ -3520,6 +3525,9 @@ SELECT  group_id
     return $groupTypeValue;
   }
 
+  /**
+   * @return bool|object
+   */
   static function isProfileDoubleOptin() {
     // check for double optin
     $config = CRM_Core_Config::singleton();
@@ -3531,6 +3539,9 @@ SELECT  group_id
     return FALSE;
   }
 
+  /**
+   * @return bool|object
+   */
   static function isProfileAddToGroupDoubleOptin() {
     // check for add to group double optin
     $config = CRM_Core_Config::singleton();

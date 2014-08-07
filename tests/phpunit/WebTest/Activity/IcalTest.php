@@ -29,6 +29,9 @@ require_once 'CiviTest/CiviMailUtils.php';
 require_once 'ezc/Base/src/ezc_bootstrap.php';
 require_once 'ezc/autoload/mail_autoload.php';
 
+/**
+ * Class WebTest_Activity_IcalTest
+ */
 class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
 
   // This variable is a bit awkward, but the ezc callback function needed to walk through the email parts needs to be static, so use this variable to "report back" on whether we found what we're looking for or not.
@@ -98,6 +101,10 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
     $this->assertTrue(self::$foundIt, ts('Generated email does not contain an ical attachment.'));
   }
 
+  /**
+   * @param $context
+   * @param $mailPart
+   */
   public static function mailWalkCallback($context, $mailPart) {
 
     $disp = $mailPart->contentDisposition;

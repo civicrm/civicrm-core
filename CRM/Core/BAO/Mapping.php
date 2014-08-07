@@ -100,13 +100,13 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * contact object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params         (reference) an assoc array of name/value pairs
+   * @param array  $params an array of name/value pairs
    *
    * @return object    CRM_Core_DAO_Mapper object on success, otherwise null
    * @access public
    * @static
    */
-  static function add(&$params) {
+  static function add($params) {
     $mapping = new CRM_Core_DAO_Mapping();
     $mapping->copyValues($params);
     $mapping->save();
@@ -841,7 +841,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
         }
         //Fix for Search Builder
         if ($mappingType == 'Export') {
-          if (!isset($mappingId)) {
+          if (!isset($mappingId) || $i >= count(reset($mappingName))) {
             if (isset($formValues['mapper']) &&
               isset($formValues['mapper'][$x][$i][1]) &&
               array_key_exists($formValues['mapper'][$x][$i][1], $relationshipTypes)
@@ -939,6 +939,11 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @relationshipTypeId related relationship type id
    * @return $groupTitle all custom field titles
    */
+  /**
+   * @param $relationshipTypeId
+   *
+   * @return array
+   */
   function getRelationTypeCustomGroupData($relationshipTypeId) {
 
     $customFields = CRM_Core_BAO_CustomField::getFields('Relationship', NULL, NULL, $relationshipTypeId, NULL, NULL);
@@ -983,7 +988,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @return array $returnFields  formatted associated array of elements@static
    * @public
    */
-  static function &formattedFields(&$params, $row = FALSE) {
+  static function formattedFields(&$params, $row = FALSE) {
     $fields = array();
 
     if (empty($params) || !isset($params['mapper'])) {
@@ -1037,6 +1042,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           // CRM-14563: we store checkbox, multi-select and adv-multi select custom field using separator, hence it
           // needs special handling.
           if ($cfID = CRM_Core_BAO_CustomField::getKeyID($v[1])) {
+            $isCustomField = TRUE;
             $customFieldType = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $cfID, 'html_type');
             $specialHTMLType = array(
               'CheckBox',
@@ -1055,6 +1061,13 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
                 $params['operator'][$key][$k] = 'RLIKE';
               }
             }
+          }
+
+          // CRM-14983: verify if values are comma separated convert to array
+          if (!is_array($value) && (strpos($value,',') !== false || strstr($value, '(')) && empty($isCustomField) && $params['operator'][$key][$k] == 'IN') {
+            preg_match('#\((.*?)\)#', $value, $match);
+            $tmpArray = explode(',', $match[1]);
+            $value = array_combine(array_values($tmpArray),array_values($tmpArray));
           }
 
           if ($row) {
@@ -1103,6 +1116,11 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     return $fields;
   }
 
+  /**
+   * @param $params
+   *
+   * @return array
+   */
   static function &returnProperties(&$params) {
     $fields = array(
       'contact_type' => 1,

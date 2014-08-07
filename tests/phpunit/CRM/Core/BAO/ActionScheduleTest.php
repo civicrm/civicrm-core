@@ -27,12 +27,19 @@
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Core_BAO_ActionScheduleTest
+ */
 class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * @var object see CiviTest/CiviMailUtils
    */
   var $mut;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Action-Schedule BAO',
@@ -85,6 +92,13 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'is_deceased' => 0,
       'contact_type' => 'Individual',
       'email' => 'test-member@example.com',
+    );
+    $this->fixtures['contact_birthdate'] = array( // API
+      'version' => 3,
+      'is_deceased' => 0,
+      'contact_type' => 'Individual',
+      'email' => 'test-bday@example.com',
+      'birth_date' => '20050707',
     );
     $this->fixtures['sched_activity_1day'] = array( // create()
       'name' => 'One_Day_Phone_Call_Notice',
@@ -231,6 +245,124 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_offset' => '2',
       'start_action_unit' => 'month',
       'subject' => 'subject sched_membership_end_2month',
+    );
+
+    $this->fixtures['sched_contact_bday_yesterday'] = array( // create()
+      'name' => 'sched_contact_bday_yesterday',
+      'title' => 'sched_contact_bday_yesterday',
+      'absolute_date' => '',
+      'body_html' => '<p>you look like you were born yesterday!</p>',
+      'body_text' => 'you look like you were born yesterday!',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => 1,
+      'entity_value' => 'birth_date',
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 6,
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'after',
+      'start_action_date' => 'date_field',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'day',
+      'subject' => 'subject sched_contact_bday_yesterday',
+    );
+
+    $this->fixtures['sched_contact_bday_anniv'] = array( // create()
+      'name' => 'sched_contact_bday_anniv',
+      'title' => 'sched_contact_bday_anniv',
+      'absolute_date' => '',
+      'body_html' => '<p>happy birthday!</p>',
+      'body_text' => 'happy birthday!',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => 2,
+      'entity_value' => 'birth_date',
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 6,
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'before',
+      'start_action_date' => 'date_field',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'day',
+      'subject' => 'subject sched_contact_bday_anniv',
+    );
+
+    $this->fixtures['sched_contact_grad_tomorrow'] = array( // create()
+      'name' => 'sched_contact_grad_tomorrow',
+      'title' => 'sched_contact_grad_tomorrow',
+      'absolute_date' => '',
+      'body_html' => '<p>congratulations on your graduation!</p>',
+      'body_text' => 'congratulations on your graduation!',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => 1,
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 6,
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'before',
+      'start_action_date' => 'date_field',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'day',
+      'subject' => 'subject sched_contact_grad_tomorrow',
+    );
+
+    $this->fixtures['sched_contact_grad_anniv'] = array( // create()
+      'name' => 'sched_contact_grad_anniv',
+      'title' => 'sched_contact_grad_anniv',
+      'absolute_date' => '',
+      'body_html' => '<p>dear alum, please send us money.</p>',
+      'body_text' => 'dear alum, please send us money.',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => 2,
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 6,
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'after',
+      'start_action_date' => 'date_field',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'week',
+      'subject' => 'subject sched_contact_grad_anniv',
     );
 
     $this->_setUp();
@@ -462,7 +594,137 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ));
   }
 
+  function testContactBirthDate_noAnniv() {
+    $contact = civicrm_api('Contact', 'create', $this->fixtures['contact_birthdate']);
+    $this->assertAPISuccess($contact);
+    $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
+    $actionSchedule = $this->fixtures['sched_contact_bday_yesterday'];
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+    $this->assertCronRuns(array(
+      array( // On the birthday, no email
+        'time' => '2005-07-07 01:00:00',
+        'recipients' => array(),
+      ),
+      array( // The next day, send an email
+        'time' => '2005-07-08 20:00:00',
+        'recipients' => array(array('test-bday@example.com')),
+      ),
+    ));
+  }
 
+  function testContactBirthDate_Anniv() {
+    $contact = civicrm_api('Contact', 'create', $this->fixtures['contact_birthdate']);
+    $this->assertAPISuccess($contact);
+    $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
+    $actionSchedule = $this->fixtures['sched_contact_bday_anniv'];
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+    $this->assertCronRuns(array(
+      array( // On some random day, no email
+        'time' => '2014-03-07 01:00:00',
+        'recipients' => array(),
+      ),
+      array( // On the eve of their 9th birthday, send an email
+        'time' => '2014-07-06 20:00:00',
+        'recipients' => array(array('test-bday@example.com')),
+      ),
+    ));
+  }
+
+  function testContactCustomDate_noAnniv() {
+    $group = array(
+      'title' => 'Test_Group',
+      'name' => 'test_group',
+      'extends' => array('Individual'),
+      'style' => 'Inline',
+      'is_multiple' => false,
+      'is_active' => 1,
+      'version' => 3,
+    );
+    $createGroup = civicrm_api('custom_group', 'create', $group);
+    $this->assertAPISuccess($createGroup);
+    $field = array(
+      'version' => 3,
+      'label' => 'Graduation',
+      'data_type' => 'Date',
+      'html_type' => 'Select Date',
+      'custom_group_id' => $createGroup['id'],
+    );
+    $createField = civicrm_api('custom_field', 'create', $field);
+    $this->assertAPISuccess($createField);
+    $contactParams = $this->fixtures['contact'];
+    $contactParams["custom_{$createField['id']}"] = '2013-12-16';
+    $contact = civicrm_api('Contact', 'create', $contactParams);
+    $this->assertAPISuccess($contact);
+    $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
+    $actionSchedule = $this->fixtures['sched_contact_grad_tomorrow'];
+    $actionSchedule['entity_value'] = "custom_{$createField['id']}";
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+    $this->assertCronRuns(array(
+      array( // On some random day, no email
+        'time' => '2014-03-07 01:00:00',
+        'recipients' => array(),
+      ),
+      array( // On the eve of their graduation, send an email
+        'time' => '2013-12-15 20:00:00',
+        'recipients' => array(array('test-member@example.com')),
+      ),
+    ));
+    $deleteParams = array(
+      'version' => 3,
+      'id' => $createGroup['id'],
+    );
+    $deleteGroup = civicrm_api('custom_group', 'delete', $deleteParams);
+  }
+
+  function testContactCustomDate_Anniv() {
+    $group = array(
+      'title' => 'Test_Group now',
+      'name' => 'test_group_now',
+      'extends' => array('Individual'),
+      'style' => 'Inline',
+      'is_multiple' => false,
+      'is_active' => 1,
+      'version' => 3,
+    );
+    $createGroup = civicrm_api('custom_group', 'create', $group);
+    $this->assertAPISuccess($createGroup);
+    $field = array(
+      'version' => 3,
+      'label' => 'Graduation',
+      'data_type' => 'Date',
+      'html_type' => 'Select Date',
+      'custom_group_id' => $createGroup['id'],
+    );
+    $createField = civicrm_api('custom_field', 'create', $field);
+    $this->assertAPISuccess($createField);
+    $contactParams = $this->fixtures['contact'];
+    $contactParams["custom_{$createField['id']}"] = '2013-12-16';
+    $contact = civicrm_api('Contact', 'create', $contactParams);
+    $this->assertAPISuccess($contact);
+    $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
+    $actionSchedule = $this->fixtures['sched_contact_grad_anniv'];
+    $actionSchedule['entity_value'] = "custom_{$createField['id']}";
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+    $this->assertCronRuns(array(
+      array( // On some random day, no email
+        'time' => '2014-03-07 01:00:00',
+        'recipients' => array(),
+      ),
+      array( // A week after their 5th anniversary of graduation, send an email
+        'time' => '2018-12-23 20:00:00',
+        'recipients' => array(array('test-member@example.com')),
+      ),
+    ));
+    $deleteParams = array(
+      'version' => 3,
+      'id' => $createGroup['id'],
+    );
+    $deleteGroup = civicrm_api('custom_group', 'delete', $deleteParams);
+  }
 
   // TODO // function testMembershipEndDate_NonMatch() { }
   // TODO // function testEventTypeStartDate_Match() { }

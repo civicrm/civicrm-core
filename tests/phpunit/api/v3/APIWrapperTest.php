@@ -61,6 +61,10 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
+  /**
+   * @param $apiWrappers
+   * @param $apiRequest
+   */
   function onApiWrappers(&$apiWrappers, $apiRequest) {
     $this->assertTrue(is_string($apiRequest['entity']) && !empty($apiRequest['entity']));
     $this->assertTrue(is_string($apiRequest['action']) && !empty($apiRequest['action']));
@@ -84,6 +88,9 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
   }
 }
 
+/**
+ * Class api_v3_APIWrapperTest_Impl
+ */
 class api_v3_APIWrapperTest_Impl implements API_Wrapper {
   /**
    * {@inheritDoc}

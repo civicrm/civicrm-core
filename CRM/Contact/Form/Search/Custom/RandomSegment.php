@@ -36,6 +36,9 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
 
   protected $_debug = 0;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     parent::__construct($formValues);
 
@@ -70,6 +73,9 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     }
   }
 
+  /**
+   * @param CRM_Core_Form $form
+   */
   function buildForm(&$form) {
     $form->add('text',
       'segmentSize',
@@ -78,28 +84,27 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     );
 
     $groups = CRM_Core_PseudoConstant::group();
-    $inG = &$form->addElement('advmultiselect', 'includeGroups',
-      ts('Include Group(s)') . ' ', $groups,
-      array(
-        'size' => 5,
-        'style' => 'width:240px',
-        'class' => 'advmultiselect',
-      )
+
+    $select2style = array(
+      'multiple' => TRUE,
+      'style' => 'width: 100%; max-width: 60em;',
+      'class' => 'crm-select2',
+      'placeholder' => ts('- select -'),
     );
 
-    $outG = &$form->addElement('advmultiselect', 'excludeGroups',
-      ts('Exclude Group(s)') . ' ', $groups,
-      array(
-        'size' => 5,
-        'style' => 'width:240px',
-        'class' => 'advmultiselect',
-      )
+    $form->add('select', 'includeGroups',
+      ts('Include Group(s)'),
+      $groups,
+      FALSE,
+      $select2style
     );
 
-    $inG->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $outG->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $inG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-    $outG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
+    $form->add('select', 'excludeGroups',
+      ts('Exclude Group(s)'),
+      $groups,
+      FALSE,
+      $select2style
+    );
 
     $this->setTitle('Create a random segment of contacts');
 
@@ -110,10 +115,22 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     $form->assign('elements', array('segmentSize', 'includeGroups', 'excludeGroups'));
   }
 
+  /**
+   * @return null
+   */
   function summary() {
     return NULL;
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return string
+   */
   function all($offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
@@ -133,6 +150,9 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     );
   }
 
+  /**
+   * @return string
+   */
   function from() {
     //define table name
     $randomNum = md5(uniqid());
@@ -311,14 +331,25 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     return $from;
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     return '(1)';
   }
 
+  /**
+   * @return string
+   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
@@ -328,6 +359,12 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     }
   }
 
+  /**
+   * @return mixed
+   */
+  /**
+   * @return mixed
+   */
   function count() {
     $sql = $this->all();
 
@@ -337,7 +374,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
 
   function __destruct() {
     // the temporary tables are dropped automatically
-    // so we dont do it here
+    // so we don't do it here
     // but let mysql clean up
     return;
   }

@@ -375,6 +375,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         ) &&
         (!$contactSubType ||
           (in_array($value['contact_sub_type_a'], $contactSubType) ||
+            in_array($value['contact_sub_type_b'], $contactSubType) ||
             ((!$value['contact_sub_type_b'] &&
                 !$value['contact_sub_type_a']
               ) &&
@@ -395,6 +396,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         ) &&
         (!$contactSubType ||
           (in_array($value['contact_sub_type_b'], $contactSubType) ||
+            in_array($value['contact_sub_type_a'], $contactSubType) ||
             ((!$value['contact_sub_type_a'] &&
                 !$value['contact_sub_type_b']
               ) &&
@@ -423,6 +425,12 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     return $relationshipType;
   }
 
+  /**
+   * @param $id
+   * @param $action
+   *
+   * @return CRM_Contact_DAO_Relationship
+   */
   static function clearCurrentEmployer($id, $action) {
     $relationship = new CRM_Contact_DAO_Relationship();
     $relationship->id = $id;
@@ -838,9 +846,9 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
                               civicrm_state_province.abbreviation as state,
                               civicrm_country.name as country,
                               civicrm_email.email as email,
+                              civicrm_contact.contact_type as contact_type,
                               civicrm_phone.phone as phone,
                               civicrm_contact.id as civicrm_contact_id,
-                              civicrm_contact.contact_type as contact_type,
                               civicrm_relationship.contact_id_b as contact_id_b,
                               civicrm_relationship.contact_id_a as contact_id_a,
                               civicrm_relationship_type.id as civicrm_relationship_type_id,
@@ -1046,6 +1054,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         $values[$rid]['cid'] = $cid;
         $values[$rid]['contact_id_a'] = $relationship->contact_id_a;
         $values[$rid]['contact_id_b'] = $relationship->contact_id_b;
+        $values[$rid]['contact_type'] = $relationship->contact_type;
         $values[$rid]['relationship_type_id'] = $relationship->civicrm_relationship_type_id;
         $values[$rid]['relation'] = $relationship->relation;
         $values[$rid]['name'] = $relationship->sort_name;
@@ -1697,15 +1706,20 @@ AND cc.sort_name LIKE '%$name%'";
 
       // format params
       foreach ($relationships as $relationshipId => $values) {
-        $contactRelationships[$relationshipId]['name'] = CRM_Utils_System::href(
+        //Add image icon for related contacts: CRM-14919
+        $icon = CRM_Contact_BAO_Contact_Utils::getImage($values['contact_type'],
+          FALSE,
+          $values['cid']
+        );
+        $contactRelationships[$relationshipId]['name'] = $icon.' '.CRM_Utils_System::href(
           $values['name'],
           'civicrm/contact/view',
-          "reset=1&cid={$values['contact_id_b']}");
+          "reset=1&cid={$values['cid']}");
 
         $contactRelationships[$relationshipId]['relation'] = CRM_Utils_System::href(
           $values['relation'],
           'civicrm/contact/view/rel',
-          "action=view&reset=1&cid={$values['contact_id_a']}&id={$values['id']}&rtype={$values['rtype']}");
+          "action=view&reset=1&cid={$values['cid']}&id={$values['id']}&rtype={$values['rtype']}");
 
         if ($params['context'] == 'current') {
           if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR

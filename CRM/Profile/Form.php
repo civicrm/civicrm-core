@@ -67,11 +67,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_gid;
 
   /**
-   * The group id that we are editing
-   *
-   * @var string
+   * @var array details of the UFGroup used on this page
    */
-  protected $_ufGroupName = 'unknown';
+  protected $_ufGroup = array('name' => 'unknown');
 
   /**
    * The group id that we are passing in url
@@ -80,6 +78,11 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   public $_grid;
 
+  /**
+   * Name of button for saving matching contacts
+   * @var
+   */
+  protected $_duplicateButtonName;
   /**
    * The title of the category we are editing
    *
@@ -100,13 +103,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @var array
    */
   protected $_contact;
-
-  /**
-   * to store group_id of the group which is to be assigned to the contact
-   *
-   * @var int
-   */
-  protected $_addToGroupID;
 
   /**
    * Do we allow updates of the contact
@@ -194,7 +190,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   function preProcess() {
     $this->_id         = $this->get('id');
-    $this->_gid        = $this->get('gid');
     $this->_profileIds = $this->get('profileIds');
     $this->_grid       = CRM_Utils_Request::retrieve('grid', 'Integer', $this);
     $this->_context    = CRM_Utils_Request::retrieve('context', 'String', $this);
@@ -229,7 +224,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
     $this->_duplicateButtonName = $this->getButtonName('upload', 'duplicate');
 
-    $gids = explode(',', CRM_Utils_Request::retrieve('gid', 'String', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
+    $gids = explode(',', CRM_Utils_Request::retrieve('gid', 'String', CRM_Core_DAO::$_nullObject, FALSE, 0));
 
     if ((count($gids) > 1) && !$this->_profileIds && empty($this->_profileIds)) {
       if (!empty($gids)) {
@@ -252,7 +247,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     if (!$this->_gid) {
-      $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0, 'GET');
+      $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0);
+      $this->set('gid', $this->_gid);
     }
 
     $this->_activityId = CRM_Utils_Request::retrieve('aid', 'Positive', $this, FALSE, 0, 'GET');
@@ -271,13 +267,17 @@ class CRM_Profile_Form extends CRM_Core_Form {
       if ($dao->find(TRUE)) {
         $this->_isUpdateDupe = $dao->is_update_dupe;
         $this->_isAddCaptcha = $dao->add_captcha;
-        if (!empty($dao->name)) {
-          $this->_ufGroupName = $dao->name;
-        }
+        $this->_ufGroup = (array) $dao;
       }
       $dao->free();
+
+      if (!CRM_Utils_Array::value('is_active', $this->_ufGroup)) {
+        CRM_Core_Error::fatal(ts('The requested profile (gid=%1) is inactive or does not exist.', array(
+          1 => $this->_gid,
+        )));
+      }
     }
-    $this->assign('ufGroupName', $this->_ufGroupName);
+    $this->assign('ufGroupName', $this->_ufGroup['name']);
 
     $gids = empty($this->_profileIds) ? $this->_gid : $this->_profileIds;
 
@@ -390,19 +390,19 @@ class CRM_Profile_Form extends CRM_Core_Form {
         }
       }
 
-      //transfering all the multirecord custom fields in _fields
+      //transferring all the multi-record custom fields in _fields
       if ($this->_multiRecord && !empty($this->_multiRecordFields)) {
         $this->_fields = $this->_multiRecordFields;
         $this->_multiRecordProfile = TRUE;
       } elseif ($this->_multiRecord && empty($this->_multiRecordFields)) {
         CRM_Core_Session::setStatus(ts('This feature is not currently available.'), ts('Sorry'), 'error');
-        return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
       }
     }
 
     if (!is_array($this->_fields)) {
       CRM_Core_Session::setStatus(ts('This feature is not currently available.'), ts('Sorry'), 'error');
-      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
     }
   }
 
@@ -558,7 +558,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     if (!empty($this->_defaults['image_URL'])) {
-      list($imageWidth, $imageHeight) = getimagesize($this->_defaults['image_URL']);
+      list($imageWidth, $imageHeight) = getimagesize(CRM_Utils_String::unstupifyUrl($this->_defaults['image_URL']));
       list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
       $this->assign("imageWidth", $imageWidth);
       $this->assign("imageHeight", $imageHeight);
@@ -586,14 +586,16 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
+    $this->add('hidden', 'gid', $this->_gid);
+
     switch ($this->_mode) {
       case self::MODE_CREATE:
       case self::MODE_EDIT:
       case self::MODE_REGISTER:
-        CRM_Utils_Hook::buildProfile($this->_ufGroupName);
+        CRM_Utils_Hook::buildProfile($this->_ufGroup['name']);
         break;
       case self::MODE_SEARCH:
-        CRM_Utils_Hook::searchProfile($this->_ufGroupName);
+        CRM_Utils_Hook::searchProfile($this->_ufGroup['name']);
         break;
       default:
     }
@@ -676,7 +678,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
 
-    //lets have sigle status message,
+    //lets have single status message,
     $this->assign('statusMessage', $statusMessage);
     if ($return) {
       return FALSE;
@@ -819,8 +821,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     if ($this->_mode != self::MODE_SEARCH) {
       if (isset($addToGroupId)) {
-        $this->add('hidden', "add_to_group", $addToGroupId);
-        $this->_addToGroupID = $addToGroupId;
+        $this->_ufGroup['add_to_group_id'] = $addToGroupId;
       }
     }
 
@@ -865,6 +866,13 @@ class CRM_Profile_Form extends CRM_Core_Form {
    *
    * @return Array   $errors     Errors ( if any ).
    */
+  /**
+   * @param $activityId
+   * @param $contactId
+   * @param $gid
+   *
+   * @return array
+   */
   static function validateContactActivityProfile($activityId, $contactId, $gid) {
     $errors = array();
     if (!$activityId) {
@@ -908,7 +916,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @static
    */
   static function formRule($fields, $files, $form) {
-    CRM_Utils_Hook::validateProfile($form->_ufGroupName);
+    CRM_Utils_Hook::validateProfile($form->_ufGroup['name']);
 
     $errors = array();
     // if no values, return
@@ -1090,8 +1098,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
     if ($this->_deleteButtonName) {
       if (!empty($_POST[$this->_deleteButtonName]) && $this->_recordId) {
         $filterParams['id'] = $this->_customGroupId;
-        $returnProperities = array('is_multiple', 'table_name');
-        CRM_Core_DAO::commonRetrieve("CRM_Core_DAO_CustomGroup", $filterParams, $returnValues, $returnProperities);
+        $returnProperties = array('is_multiple', 'table_name');
+        CRM_Core_DAO::commonRetrieve("CRM_Core_DAO_CustomGroup", $filterParams, $returnValues, $returnProperties);
         if (!empty($returnValues['is_multiple'])) {
           if ($tableName = CRM_Utils_Array::value('table_name', $returnValues)) {
             $sql = "DELETE FROM {$tableName} WHERE id = %1 AND entity_id = %2";
@@ -1106,7 +1114,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         return;
       }
     }
-    CRM_Utils_Hook::processProfile($this->_ufGroupName);
+    CRM_Utils_Hook::processProfile($this->_ufGroup['name']);
     if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
@@ -1151,10 +1159,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     $transaction = new CRM_Core_Transaction();
 
-    //used to send subcribe mail to the group which user want.
+    //used to send subscribe mail to the group which user want.
     //if the profile double option in is enabled
     $mailingType = array();
-    $config = CRM_Core_Config::singleton();
 
     $result = NULL;
     foreach ($params as $name => $values) {
@@ -1205,10 +1212,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
 
-    $addToGroupId = NULL;
-    if (!empty($params['add_to_group'])) {
-      $addToGroupId = $params['add_to_group'];
-
+    $addToGroupId = CRM_Utils_Array::value('add_to_group_id', $this->_ufGroup);
+    if (!empty($addToGroupId)) {
       //run same check whether group is a mailing list
       $groupTypes = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',
         $addToGroupId, 'group_type', 'id'
@@ -1341,6 +1346,11 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $transaction->commit();
   }
 
+  /**
+   * @param null $suffix
+   *
+   * @return null|string
+   */
   function checkTemplateFileExists($suffix = NULL) {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Form/{$this->_gid}/{$this->_name}.{$suffix}tpl";
@@ -1361,11 +1371,30 @@ class CRM_Profile_Form extends CRM_Core_Form {
     return NULL;
   }
 
+  /**
+   * Use the form name to create the tpl file name
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
 
+  /**
+   * Default extra tpl file basically just replaces .tpl with .extra.tpl
+   * i.e. we dont override
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
+   */
   function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();

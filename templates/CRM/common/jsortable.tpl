@@ -76,8 +76,8 @@ eval('tableId =[' + tableId + ']');
                     sortColumn += '[' + count + ', "asc" ],';
                 }
                 sortId   = getRowId(tdObject, cj(this).attr('id') +' hiddenElement' );
-                sortEnabled = false;
-                columns += '{ "sType": \'' + stype + '\', "fnRender": function (oObj) { return oObj.aData[' + sortId + ']; },"bUseRendered": false},';
+                sortEnabled = true;
+                columns += '{ "render": function ( data, type, row ) { return "<div style=\'display:none\'>"+ data +"</div>" + row[sortId] ; }, "targets": sortColumn,"bUseRendered": false},';
             break;
             case 'nosort':
                 columns += '{ "bSortable": false, "sClass": "'+ getElementClass( this ) +'"},';

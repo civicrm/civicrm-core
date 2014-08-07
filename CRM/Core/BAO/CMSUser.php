@@ -38,6 +38,10 @@
  */
 
 require_once 'DB.php';
+
+/**
+ * Class CRM_Core_BAO_CMSUser
+ */
 class CRM_Core_BAO_CMSUser {
 
   /**
@@ -256,7 +260,7 @@ class CRM_Core_BAO_CMSUser {
    * @param object $form
    * @param integer $gid id of group of profile
    * @param bool $emailPresent true if the profile field has email(primary)
-   * @param const $action
+   * @param \const|int $action
    *
    * @return FALSE|void WTF
    *
@@ -343,6 +347,13 @@ class CRM_Core_BAO_CMSUser {
    *  @param  array $files uploaded files if any
    *  @param array $self reference to form object
    *
+   */
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array|bool
    */
   static function formRule($fields, $files, $self) {
     if (empty($fields['cms_create_account'])) {
@@ -480,6 +491,11 @@ class CRM_Core_BAO_CMSUser {
     return $result;
   }
 
+  /**
+   * @param $config
+   *
+   * @return object
+   */
   static function &dbHandle(&$config) {
     $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     $db_uf = DB::connect($config->userFrameworkDSN);

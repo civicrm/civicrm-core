@@ -33,6 +33,11 @@
  *
  */
 class CRM_Upgrade_ThreeOne_ThreeOne extends CRM_Upgrade_Form {
+  /**
+   * @param $errorMessage
+   *
+   * @return bool
+   */
   function verifyPreDBState(&$errorMessage) {
     $latestVer = CRM_Utils_System::version();
 
@@ -101,6 +106,9 @@ class CRM_Upgrade_ThreeOne_ThreeOne extends CRM_Upgrade_Form {
     return TRUE;
   }
 
+  /**
+   * @param $rev
+   */
   function upgrade($rev) {
 
     $upgrade = new CRM_Upgrade_Form();

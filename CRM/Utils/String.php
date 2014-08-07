@@ -265,6 +265,12 @@ class CRM_Utils_String {
     return CRM_Core_DAO::$_nullArray;
   }
 
+  /**
+   * @param $str
+   * @param $stringRules
+   *
+   * @return mixed
+   */
   static function redaction($str, $stringRules) {
     //redact the strings
     if (!empty($stringRules)) {
@@ -419,6 +425,10 @@ class CRM_Utils_String {
     return $text;
   }
 
+  /**
+   * @param $string
+   * @param $params
+   */
   static function extractName($string, &$params) {
     $name = trim($string);
     if (empty($name)) {
@@ -469,6 +479,11 @@ class CRM_Utils_String {
     }
   }
 
+  /**
+   * @param $string
+   *
+   * @return array
+   */
   static function &makeArray($string) {
     $string = trim($string);
 
@@ -702,5 +717,17 @@ class CRM_Utils_String {
     }
   }
 
+  /**
+   * Many parts of the codebase have a convention of internally passing around
+   * HTML-encoded URLs. This effectively means that "&" is replaced by "&amp;"
+   * (because most other odd characters are %-escaped in URLs; and %-escaped
+   * strings don't need any extra escaping in HTML).
+   *
+   * @param string $url URL with HTML entities
+   * @return string URL without HTML entities
+   */
+  public static function unstupifyUrl($htmlUrl) {
+    return str_replace('&amp;', '&', $htmlUrl);
+  }
 }
 

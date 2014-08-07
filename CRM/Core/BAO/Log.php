@@ -39,6 +39,12 @@
 class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
   static $_processed = NULL;
 
+  /**
+   * @param $id
+   * @param string $table
+   *
+   * @return array|null
+   */
   static function &lastModified($id, $table = 'civicrm_contact') {
 
     $log = new CRM_Core_DAO_Log();
@@ -74,6 +80,12 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
     $log->save();
   }
 
+  /**
+   * @param $contactID
+   * @param $tableName
+   * @param $tableID
+   * @param null $userID
+   */
   static function register($contactID,
     $tableName,
     $tableID,

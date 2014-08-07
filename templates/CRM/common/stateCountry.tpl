@@ -34,17 +34,30 @@
       var placeholder = $(this).val() ? "{/literal}{ts escape='js'}Loading{/ts}{literal}..." : info.placeholder;
       !multiple && info.target.html('<option value="">' + placeholder + '</option>');
       if ($(this).val()) {
-        $.getJSON(info.callback, {_value: $(this).val()}, function(data) {
+        if (multiple) {
           var options = '';
-          $.each(data, function() {
-            if (!multiple || this.value) {
-              options += '<option value="' + this.value + '">' + this.name + '</option>';
-            }
+          $.each($(this).val(), function(index, value) {
+            $.getJSON(info.callback, {_value: value}, function(data) {
+              $.each(data, function() {
+                if (this.value) {
+                  options += '<option value="' + this.value + '">' + this.name + '</option>';
+                }
+              });
+              info.target.html(options).val(val).trigger('change');
+            });
           });
-          info.target.html(options).val(val).trigger('change');
-        });
-      } else {
-        info.target.trigger('change');
+        }
+        else {
+          $.getJSON(info.callback, {_value: $(this).val()}, function(data) {
+            var options = '';
+            $.each(data, function() {
+              if (this.name) {
+                options += '<option value="' + this.value + '">' + this.name + '</option>';
+              }
+            });
+            info.target.html(options).val(val).trigger('change');
+          });
+        }
       }
     }
     {/literal}

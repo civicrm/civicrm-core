@@ -26,6 +26,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Generic_CheckDashboardTest
+ */
 class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -46,6 +50,11 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     // More dashlet tests can be added here using the functions modeled below
   }
 
+  /**
+   * @param $widgetConfigureID
+   * @param $widgetEnabledSelector
+   * @param $widgetTitle
+   */
   function _testAddDashboardElement($widgetConfigureID, $widgetEnabledSelector, $widgetTitle) {
     // Check if desired widget is already loaded on dashboard and remove it if it is so we can test adding it.
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
@@ -88,6 +97,10 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     $this->click("xpath=//*[@class='ui-button-text'][contains(text(), 'close')]");
   }
 
+  /**
+   * @param $widgetConfigureID
+   * @param $widgetEnabledSelector
+   */
   function _testRemoveDashboardElement($widgetConfigureID, $widgetEnabledSelector) {
     $this->click("link=Configure Your Dashboard");
     $this->waitForElementPresent("dashlets-header-col-0");

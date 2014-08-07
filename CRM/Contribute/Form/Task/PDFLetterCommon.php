@@ -70,7 +70,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       if(empty($groupBy) || empty($contact['is_sent'][$groupBy][$groupByID])) {
         if(!$validated && $realSeparator == '</td><td>' && !self::isValidHTMLWithTableSeparator($messageToken, $html_message)) {
           $realSeparator = ', ';
-          CRM_Core_Session::setStatus(ts('You have selected the table cell separator but the token field is not inside a table cell. This would result in invalid html so comma separator has been used'));
+          CRM_Core_Session::setStatus(ts('You have selected the table cell separator, but one or more token fields are not placed inside a table cell. This would result in invalid HTML, so comma separators have been used instead.'));
         }
         $validated = TRUE;
         $html[$contributionId] = str_replace($separator, $realSeparator, self::resolveTokens($html_message, $contact, $contribution, $messageToken, $categories, $grouped, $separator));
@@ -167,8 +167,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    */
   static function isHtmlTokenInTableCell($token, $entity, $textToSearch) {
     $tokenToMatch = $entity . '.' . $token;
-    $within = preg_match_all("|<td.+?{".$tokenToMatch."}.+?</td|si", $textToSearch);
-    $total = preg_match_all("|{".$tokenToMatch."}|", $textToSearch);
+    $dontCare = array();
+    $within = preg_match_all("|<td.+?{".$tokenToMatch."}.+?</td|si", $textToSearch, $dontCare);
+    $total = preg_match_all("|{".$tokenToMatch."}|", $textToSearch, $dontCare);
     return ($within == $total);
   }
 

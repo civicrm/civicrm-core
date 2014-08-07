@@ -507,6 +507,13 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     }
   }
 
+  /**
+   * @param $p_eWAY_tran_num
+   * @param $p_trxn_out
+   * @param $p_trxn_back
+   * @param $p_request
+   * @param $p_response
+   */
   function send_alert_email($p_eWAY_tran_num, $p_trxn_out, $p_trxn_back, $p_request, $p_response) {
     // Initialization call is required to use CiviCRM APIs.
     civicrm_initialize(TRUE);

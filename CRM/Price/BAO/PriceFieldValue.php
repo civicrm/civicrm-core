@@ -50,7 +50,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @access public
    * @static
    */
-  static function &add(&$params, $ids) {
+  static function add(&$params, $ids = array()) {
 
     $fieldValueBAO = new CRM_Price_BAO_PriceFieldValue();
     $fieldValueBAO->copyValues($params);
@@ -79,13 +79,16 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @access public
    * @static
    */
-  static function create(&$params, $ids) {
+  static function create(&$params, $ids = array()) {
 
     if (!is_array($params) || empty($params)) {
       return;
     }
+    if(empty($params['id']) && empty($params['name'])) {
+      $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
+    }
 
-    if ($id = CRM_Utils_Array::value('id', $ids)) {
+    if ($id = CRM_Utils_Array::value('id', $ids) && !empty($params['weight'])) {
       if (isset($params['name']))unset($params['name']);
 
       $oldWeight = NULL;
@@ -97,7 +100,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceFieldValue', $oldWeight, $params['weight'], $fieldValues);
     }
     else {
-      if (empty($params['name'])) {
+      if (!$id && empty($params['name'])) {
         $params['name'] = CRM_Utils_String::munge(CRM_Utils_Array::value('label', $params), '_', 64);
       }
       if (empty($params['weight'])) {
@@ -188,14 +191,13 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @param  int    $fieldId    Price field id
    *
-   * @return boolean
    *
    * @access public
    * @static
    */
   static function deleteValues($fieldId) {
     if (!$fieldId) {
-      return FALSE;
+      return;
     }
 
     $fieldValueDAO = new CRM_Price_DAO_PriceFieldValue();
@@ -231,13 +233,12 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param   String $entityTable entity table
    * @param   String $financialTypeID financial type id
    *
-   * @return bool
    * @access public
    * @static
    */
   static function updateFinancialType($entityId, $entityTable, $financialTypeID) {
     if (!$entityId || !$entityTable || !$financialTypeID) {
-      return FALSE;
+      return;
     }
     $params = array(
       1 => array($entityId, 'Integer'),

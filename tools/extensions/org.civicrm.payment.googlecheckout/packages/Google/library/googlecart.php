@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-/* This class is used to create a Google Checkout shopping cart and post it 
+/* This class is used to create a Google Checkout shopping cart and post it
   * to the Sandbox or Production environment
-  * A very useful function is the CheckoutButtonCode() which returns the HTML 
+  * A very useful function is the CheckoutButtonCode() which returns the HTML
   * code to post the cart using the standard technique
   * Refer demo/cartdemo.php for different use case scenarios for this code
   */
@@ -51,6 +51,11 @@ class GoogleCart {
 
   //The Constructor method which requires a merchant id, merchant key
   //and the operation type(sandbox or checkout)
+  /**
+   * @param $id
+   * @param $key
+   * @param string $server_type
+   */
   function GoogleCart($id, $key, $server_type = "checkout") {
     $this->merchant_id = $id;
     $this->merchant_key = $key;
@@ -74,26 +79,47 @@ class GoogleCart {
     $this->alternate_tax_table_arr = array();
   }
 
+  /**
+   * @param $cart_expire
+   */
   function SetCartExpiration($cart_expire) {
     $this->cart_expiration = $cart_expire;
   }
 
+  /**
+   * @param $data
+   */
   function SetMerchantPrivateData($data) {
     $this->merchant_private_data = $data;
   }
 
+  /**
+   * @param $url
+   */
   function SetEditCartUrl($url) {
     $this->edit_cart_url = $url;
   }
 
+  /**
+   * @param $url
+   */
   function SetContinueShoppingUrl($url) {
     $this->continue_shopping_url = $url;
   }
 
+  /**
+   * @param $req
+   */
   function SetRequestBuyerPhone($req) {
     $this->_SetBooleanValue('request_buyer_phone', $req, "");
   }
 
+  /**
+   * @param $url
+   * @param string $tax_option
+   * @param string $coupons
+   * @param string $gift_cert
+   */
   function SetMerchantCalculations($url, $tax_option = "false",
     $coupons = "false",
     $gift_cert = "false"
@@ -104,14 +130,23 @@ class GoogleCart {
     $this->_SetBooleanValue('accept_gift_certificates', $gift_cert, "false");
   }
 
+  /**
+   * @param $google_item
+   */
   function AddItem($google_item) {
     $this->item_arr[] = $google_item;
   }
 
+  /**
+   * @param $ship
+   */
   function AddShipping($ship) {
     $this->shipping_arr[] = $ship;
   }
 
+  /**
+   * @param $tax
+   */
   function AddTaxTables($tax) {
     if ($tax->type == "default") {
       $this->default_tax_table = $tax;
@@ -121,6 +156,9 @@ class GoogleCart {
     }
   }
 
+  /**
+   * @return string
+   */
   function GetXML() {
     require_once ('xml-processing/xmlbuilder.php');
 
@@ -380,6 +418,14 @@ class GoogleCart {
   }
 
   //Code for generating Checkout button
+  /**
+   * @param string $size
+   * @param string $style
+   * @param string $variant
+   * @param string $loc
+   *
+   * @return string
+   */
   function CheckoutButtonCode($size = "large", $style = "white",
     $variant = "text", $loc = "en_US"
   ) {
@@ -407,21 +453,26 @@ class GoogleCart {
     if ($variant == "text") {
       $data = "<p><form method=\"POST\" action=\"" . $this->checkout_url . "\">
            <input type=\"hidden\" name=\"cart\" value=\"" . base64_encode($this->GetXML()) . "\">
-           <input type=\"hidden\" name=\"signature\" value=\"" . base64_encode($this->CalcHmacSha1($this->GetXML())) . "\"> 
-           <input type=\"image\" name=\"Checkout\" alt=\"Checkout\" 
-              src=\"" . $this->server_url . "buttons/checkout.gif?merchant_id=" . $this->merchant_id . "&w=" . $width . "&h=" . $height . "&style=" . $style . "&variant=" . $variant . "&loc=" . $loc . "\" 
+           <input type=\"hidden\" name=\"signature\" value=\"" . base64_encode($this->CalcHmacSha1($this->GetXML())) . "\">
+           <input type=\"image\" name=\"Checkout\" alt=\"Checkout\"
+              src=\"" . $this->server_url . "buttons/checkout.gif?merchant_id=" . $this->merchant_id . "&w=" . $width . "&h=" . $height . "&style=" . $style . "&variant=" . $variant . "&loc=" . $loc . "\"
               height=\"" . $height . "\" width=\"" . $width . "\" />
           </form></p>";
     }
     elseif ($variant == "disabled") {
-      $data = "<p><img alt=\"Checkout\" 
-              src=\"" . $this->server_url . "buttons/checkout.gif?merchant_id=" . $this->merchant_id . "&w=" . $width . "&h=" . $height . "&style=" . $style . "&variant=" . $variant . "&loc=" . $loc . "\" 
+      $data = "<p><img alt=\"Checkout\"
+              src=\"" . $this->server_url . "buttons/checkout.gif?merchant_id=" . $this->merchant_id . "&w=" . $width . "&h=" . $height . "&style=" . $style . "&variant=" . $variant . "&loc=" . $loc . "\"
               height=\"" . $height . "\" width=\"" . $width . "\" /></p>";
     }
     return $data;
   }
 
   //Method which returns the encrypted google cart to make sure that the carts are not tampered with
+  /**
+   * @param $data
+   *
+   * @return string
+   */
   function CalcHmacSha1($data) {
     $key       = $this->merchant_key;
     $blocksize = 64;
@@ -445,6 +496,11 @@ class GoogleCart {
   }
 
   //Method used internally to set true/false cart variables
+  /**
+   * @param $string
+   * @param $value
+   * @param $default
+   */
   function _SetBooleanValue($string, $value, $default) {
     $value = strtolower($value);
     if ($value == "true" || $value == "false")eval('$this->' . $string . '="' . $value . '";');

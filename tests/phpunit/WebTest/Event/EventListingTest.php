@@ -1,5 +1,9 @@
 <?php
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_EventListingTest
+ */
 class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -109,6 +113,11 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("The block settings have been updated.");
   }
 
+  /**
+   * @param $eventTitle
+   * @param $startdate
+   * @param $enddate
+   */
   function _testCreateEvent($eventTitle, $startdate, $enddate) {
 
     $this->openCiviPage("event/add", "reset=1&action=add");
@@ -151,7 +160,7 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
 
     // Wait for "saved" status msg
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Location' information has been saved.");
+    $this->waitForText("crm-notification-container", "'Event Location' information has been saved.");
   }
 }
 

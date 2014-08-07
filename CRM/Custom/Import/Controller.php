@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class CRM_Custom_Import_Controller
+ */
 class CRM_Custom_Import_Controller extends CRM_Core_Controller {
   /**
    * class constructor

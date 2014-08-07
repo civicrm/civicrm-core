@@ -25,6 +25,10 @@
   */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_TellAFriendTest
+ */
 class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -137,14 +141,13 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/search", "reset=1", '_qf_Basic_refresh');
     $this->type('sort_name', $firstName);
     $this->click('_qf_Basic_refresh ');
-    $this->waitForElementPresent('Go');
-    $this->assertTrue($this->isTextPresent('1 Contact'));
+    $this->waitForTextPresent('1 Contact');
 
     // Verify Activity created
     $this->openCiviPage("activity/search", "reset=1", '_qf_Search_refresh');
     $this->type('sort_name', $firstName1);
     $this->click('_qf_Search_refresh');
-    $this->waitForElementPresent("Go");
+    $this->waitForElementPresent("xpath=//div[@class='crm-search-results']//table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[text()='View']");
     $this->click("xpath=//div[@class='crm-search-results']//table[@class='selector row-highlight']/tbody/tr[2]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
     $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[1]/td[2]/span/a[1]",
@@ -166,6 +169,10 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     );
   }
 
+  /**
+   * @param $eventTitle
+   * @param $eventDescription
+   */
   function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
@@ -191,6 +198,9 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->click("_qf_EventInfo_upload-bottom");
   }
 
+  /**
+   * @param $streetAddress
+   */
   function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -211,6 +221,10 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("'Event Location' information has been saved.");
   }
 
+  /**
+   * @param $registerIntro
+   * @param bool $multipleRegistrations
+   */
   function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
     // Go to Online Registration tab
     $this->click("link=Online Registration");
@@ -223,6 +237,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
       $this->assertChecked("is_multiple_registrations");
     }
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField("intro_text", $registerIntro);
 
     // enable confirmation email
@@ -235,6 +250,11 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("'Online Registration' information has been saved.");
   }
 
+  /**
+   * @param $subject
+   * @param $thankYouMsg
+   * @param $eventTitle
+   */
   function _testAddTellAFriend($subject, $thankYouMsg, $eventTitle) {
     // Go to Tell A Friend Tab
     $this->click('link=Tell a Friend');

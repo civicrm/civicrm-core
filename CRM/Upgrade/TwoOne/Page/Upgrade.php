@@ -87,6 +87,11 @@ class CRM_Upgrade_TwoOne_Page_Upgrade extends CRM_Core_Page {
     echo $contents;
   }
 
+  /**
+   * @param $stepID
+   *
+   * @throws Exception
+   */
   function runForm($stepID) {
     $formName = "CRM_Upgrade_TwoOne_Form_Step{$stepID}";
     $form = new $formName();

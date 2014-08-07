@@ -68,6 +68,9 @@ function civicrm_api3_price_field_value_create($params) {
  */
 function _civicrm_api3_price_field_value_create_spec(&$params) {
   $params['price_field_id']['api.required'] = TRUE;
+  $params['label']['api.required'] = TRUE;
+  $params['amount']['api.required'] = TRUE;
+  $params['is_active']['api.default'] = TRUE;
 }
 
 /**

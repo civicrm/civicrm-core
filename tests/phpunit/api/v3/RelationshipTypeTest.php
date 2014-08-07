@@ -64,6 +64,9 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   protected $_relTypeID;
   protected $_apiversion = 3;
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'RelationshipType Create',

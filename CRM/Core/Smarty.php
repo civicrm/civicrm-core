@@ -48,7 +48,7 @@ class CRM_Core_Smarty extends Smarty {
   CONST
     // use print.tpl and bypass the CMS. Civi prints a valid html file
     PRINT_PAGE = 1,
-    // this and all the below bypasses the CMS html surronding it and assumes we will embed this within other pages
+    // this and all the below bypasses the CMS html surrounding it and assumes we will embed this within other pages
     PRINT_SNIPPET = 2,
     // sends the generated html to the chosen pdf engine
     PRINT_PDF = 3,
@@ -72,6 +72,11 @@ class CRM_Core_Smarty extends Smarty {
    * @static
    */
   static private $_singleton = NULL;
+
+  /**
+   * @var array (string $name => mixed $value) a list of variables ot save temporarily
+   */
+  private $backupFrames = array();
 
   /**
    * class constructor
@@ -204,6 +209,31 @@ class CRM_Core_Smarty extends Smarty {
     return $output;
   }
 
+  /**
+   * Fetch a template (while using certain variables)
+   *
+   * @param string $resource_name
+   * @param array $vars (string $name => mixed $value) variables to export to Smarty
+   * @throws Exception
+   * @return bool|mixed|string
+   */
+  function fetchWith($resource_name, $vars) {
+    $this->pushScope($vars);
+    try {
+      $result = $this->fetch($resource_name);
+    } catch (Exception $e) {
+      // simulate try { ... } finally { ... }
+      $this->popScope();
+      throw $e;
+    }
+    $this->popScope();
+    return $result;
+  }
+
+  /**
+   * @param $name
+   * @param $value
+   */
   function appendValue($name, $value) {
     $currentValue = $this->get_template_vars($name);
     if (!$currentValue) {
@@ -230,6 +260,9 @@ class CRM_Core_Smarty extends Smarty {
     civicrm_smarty_register_string_resource();
   }
 
+  /**
+   * @param $path
+   */
   function addTemplateDir($path) {
     if ( is_array( $this->template_dir ) ) {
       array_unshift( $this->template_dir, $path );
@@ -237,6 +270,57 @@ class CRM_Core_Smarty extends Smarty {
       $this->template_dir = array( $path, $this->template_dir );
     }
 
+  }
+
+  /**
+   * Temporarily assign a list of variables.
+   *
+   * @code
+   * $smarty->pushScope(array(
+   *   'first_name' => 'Alice',
+   *   'last_name' => 'roberts',
+   * ));
+   * $html = $smarty->fetch('view-contact.tpl');
+   * $smarty->popScope();
+   * @endcode
+   *
+   * @param array $vars (string $name => mixed $value)
+   * @return CRM_Core_Smarty
+   * @see popScope
+   */
+  public function pushScope($vars) {
+    $oldVars = $this->get_template_vars();
+    $backupFrame = array();
+    foreach ($vars as $key => $value) {
+      $backupFrame[$key] = isset($oldVars[$key]) ? $oldVars[$key] : NULL;
+    }
+    $this->backupFrames[] = $backupFrame;
+
+    $this->assignAll($vars);
+
+    return $this;
+  }
+
+  /**
+   * Remove any values that were previously pushed.
+   *
+   * @return CRM_Core_Smarty
+   * @see pushScope
+   */
+  public function popScope() {
+    $this->assignAll(array_pop($this->backupFrames));
+    return $this;
+  }
+
+  /**
+   * @param array $vars (string $name => mixed $value)
+   * @return CRM_Core_Smarty
+   */
+  public function assignAll($vars) {
+    foreach ($vars as $key => $value) {
+      $this->assign($key, $value);
+    }
+    return $this;
   }
 }
 

@@ -57,6 +57,9 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    */
   static $_links = NULL;
 
+  /**
+   * @throws Exception
+   */
   function __construct() {
     parent::__construct();
 

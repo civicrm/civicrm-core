@@ -74,6 +74,11 @@ class CRM_Utils_REST {
   }
 
   // Generates values needed for error messages
+  /**
+   * @param string $message
+   *
+   * @return array
+   */
   static function error($message = 'Unknown Error') {
     $values = array(
       'error_message' => $message,
@@ -83,17 +88,28 @@ class CRM_Utils_REST {
   }
 
   // Generates values needed for non-error responses.
+  /**
+   * @param $params
+   *
+   * @return array
+   */
   static function simple($params) {
     $values = array('is_error' => 0);
     $values += $params;
     return $values;
   }
 
+  /**
+   * @return string
+   */
   function run() {
     $result = self::handle();
     return self::output($result);
   }
 
+  /**
+   * @return string
+   */
   function bootAndRun() {
     $response = $this->loadCMSBootstrap();
     if (is_array($response)) {
@@ -102,6 +118,11 @@ class CRM_Utils_REST {
     return $this->run();
   }
 
+  /**
+   * @param $result
+   *
+   * @return string
+   */
   static function output(&$result) {
     $requestParams = CRM_Utils_Request::exportValues();
 
@@ -160,6 +181,11 @@ class CRM_Utils_REST {
     return $xml;
   }
 
+  /**
+   * @param $json
+   *
+   * @return string
+   */
   static function jsonFormated($json) {
     $tabcount   = 0;
     $result     = '';
@@ -238,6 +264,9 @@ class CRM_Utils_REST {
     return $result;
   }
 
+  /**
+   * @return array|int
+   */
   static function handle() {
     $requestParams = CRM_Utils_Request::exportValues();
 
@@ -248,7 +277,8 @@ class CRM_Utils_REST {
     if (!empty($r)) {
       $q = $r;
     }
-    if (!empty($q)) {
+    $entity = CRM_Utils_array::value('entity', $requestParams);
+    if ( empty($entity) && !empty($q)) {
       $args = explode('/', $q);
       // If the function isn't in the civicrm namespace, reject the request.
       if ($args[0] != 'civicrm') {
@@ -308,6 +338,12 @@ class CRM_Utils_REST {
     return self::process($args, self::buildParamList());
   }
 
+  /**
+   * @param $args
+   * @param $params
+   *
+   * @return array|int
+   */
   static function process(&$args, $params) {
     $params['check_permissions'] = TRUE;
     $fnName = $apiFile = NULL;
@@ -366,6 +402,9 @@ class CRM_Utils_REST {
     return $result;
   }
 
+  /**
+   * @return array|mixed|null
+   */
   static function &buildParamList() {
     $requestParams = CRM_Utils_Request::exportValues();
     $params = array();
@@ -397,6 +436,9 @@ class CRM_Utils_REST {
     return $params;
   }
 
+  /**
+   * @param $pearError
+   */
   static function fatal($pearError) {
     header('Content-Type: text/xml');
     $error = array();

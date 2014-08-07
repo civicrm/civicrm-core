@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_ACL_AssignUsersToRolesTest
+ */
 class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

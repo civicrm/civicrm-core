@@ -34,6 +34,15 @@
  */
 
 class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
+  /**
+   * class constructor
+   *
+   * @access public
+   * @return \CRM_Financial_DAO_FinancialTrxn
+   */
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
@@ -83,6 +92,12 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
     return $trxn;
   }
 
+  /**
+   * @param $contributionId
+   * @param null $contributionFinancialTypeId
+   *
+   * @return array
+   */
   static function getBalanceTrxnAmt($contributionId, $contributionFinancialTypeId = NULL) {
     if (!$contributionFinancialTypeId) {
       $contributionFinancialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'financial_type_id');
@@ -140,7 +155,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *
    * @internal param string $entityTable name of the entity table usually 'civicrm_contact'
    * @internal param int $entityID id of the entity usually the contactID.
-   * @return array( ) reference $tag array of catagory id's the contact belongs to.
+   * @return array( ) reference $tag array of category id's the contact belongs to.
    *
    * @access public
    * @static
@@ -419,6 +434,14 @@ WHERE ceft.entity_id = %1";
    * function to get partial payment amount and type of it
    * return @array : payment type => amount
    * payment type  : 'amount_owed' or 'refund_due'
+   */
+  /**
+   * @param $entityId
+   * @param string $entityName
+   * @param bool $returnType
+   * @param null $lineItemTotal
+   *
+   * @return array|int|null|string
    */
   static function getPartialPaymentWithType($entityId, $entityName = 'participant', $returnType = TRUE, $lineItemTotal = NULL) {
     $value = NULL;

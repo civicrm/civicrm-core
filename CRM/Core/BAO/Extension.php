@@ -49,7 +49,7 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Core_BAO_LocaationType object on success, null otherwise
+   * @return object CRM_Core_BAO_LocationType object on success, null otherwise
    * @access public
    * @static
    */

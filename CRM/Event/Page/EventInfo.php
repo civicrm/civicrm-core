@@ -122,7 +122,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
           // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
           $adminFieldVisible = false;
           if (CRM_Core_Permission::check('administer CiviCRM')) {
-            $adminFieldVisible = true; 
+            $adminFieldVisible = true;
           }
 
           foreach ($priceSetFields as $fid => $fieldValues) {
@@ -172,6 +172,16 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     $params = array('entity_id' => $this->_id, 'entity_table' => 'civicrm_event');
     $values['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
+
+    // fix phone type labels
+    if (!empty($values['location']['phone'])) {
+      $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+      foreach ($values['location']['phone'] as &$val) {
+        if (!empty($val['phone_type_id'])) {
+          $val['phone_type_display'] = $phoneTypes[$val['phone_type_id']];
+        }
+      }
+    }
 
     //retrieve custom field information
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Event', $this, $this->_id, 0, $values['event']['event_type_id']);
@@ -235,8 +245,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     if (CRM_Core_Permission::check('view event participants') &&
       CRM_Core_Permission::check('view all contacts')
     ) {
-      $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
-      $statusTypesPending = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0');
+      $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1', 'label');
+      $statusTypesPending = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0', 'label');
       $findParticipants['statusCounted'] = implode(', ', array_values($statusTypes));
       $findParticipants['statusNotCounted'] = implode(', ', array_values($statusTypesPending));
       $this->assign('findParticipants', $findParticipants);
@@ -345,6 +355,9 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     return parent::run();
   }
 
+  /**
+   * @return string
+   */
   function getTemplateFileName() {
     if ($this->_id) {
       $templateFile = "CRM/Event/Page/{$this->_id}/EventInfo.tpl";

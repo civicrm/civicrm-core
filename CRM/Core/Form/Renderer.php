@@ -216,14 +216,15 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     }
     if ($val) {
       $entity = $field->getAttribute('data-api-entity');
-      $api = json_decode($field->getAttribute('data-api-params'), TRUE);
-      $params = CRM_Utils_Array::value('params', $api, array());
+      // Get api params, ensure it is an array
+      $params = $field->getAttribute('data-api-params');
+      $params = $params ? json_decode($params, TRUE) : array();
       // Support serialized values
       if (strpos($val, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
         $val = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($val, CRM_Core_DAO::VALUE_SEPARATOR));
         $field->setValue($val);
       }
-      $result = civicrm_api3($entity, 'getlist', array('id' => $val, 'params' => $params));
+      $result = civicrm_api3($entity, 'getlist', array('id' => $val) + $params);
       if ($field->isFrozen()) {
         $field->removeAttribute('class');
       }
@@ -297,7 +298,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       $path = $field->getAttribute('data-option-edit-path');
       // NOTE: If we ever needed to support arguments in this link other than reset=1 we could split $path here if it contains a ?
       $url = CRM_Utils_System::url($path, 'reset=1');
-      $el['html'] .= ' <a href="' . $url . '" class="crm-option-edit-link crm-hover-button" target="_blank" title="' . ts('Edit Options') . '" data-option-edit-path="' . $path . '"><span class="icon edit-icon"></span></a>';
+      $el['html'] .= ' <a href="' . $url . '" class="crm-option-edit-link medium-popup crm-hover-button" target="_blank" title="' . ts('Edit Options') . '" data-option-edit-path="' . $path . '"><span class="icon edit-icon"></span></a>';
     }
   }
 

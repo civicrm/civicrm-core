@@ -390,6 +390,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
     }
 
+    // rectify params to what proximity search expects if there is a value for prox_distance
+    // CRM-7021
+    if (!empty($params)) {
+      CRM_Contact_BAO_ProximityQuery::fixInputParams($params);
+    }
+
     $query = new CRM_Contact_BAO_Query($params, $returnProperties, NULL,
       FALSE, FALSE, $queryMode,
       FALSE, TRUE, TRUE, NULL, $queryOperator
@@ -1221,6 +1227,11 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     CRM_Utils_System::civiExit();
   }
 
+  /**
+   * @param $customSearchClass
+   * @param $formValues
+   * @param $order
+   */
   static function exportCustom($customSearchClass, $formValues, $order) {
     $ext = CRM_Extension_System::singleton()->getMapper();
     if (!$ext->isExtensionClass($customSearchClass)) {
@@ -1265,6 +1276,11 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     CRM_Utils_System::civiExit();
   }
 
+  /**
+   * @param $query
+   * @param $sqlColumns
+   * @param $field
+   */
   static function sqlColumnDefn(&$query, &$sqlColumns, $field) {
     if (substr($field, -4) == '_a_b' || substr($field, -4) == '_b_a') {
       return;
@@ -1351,10 +1367,14 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           if (isset($query->_fields[$field]['data_type'])) {
 
             switch ($query->_fields[$field]['data_type']) {
+              case 'String':
+                $length = empty($query->_fields[$field]['text_length']) ? 255 : $query->_fields[$field]['text_length'];
+                $sqlColumns[$fieldName] = "$fieldName varchar($length)";
+                break;
+
               case 'Country':
               case 'StateProvince':
               case 'Link':
-              case 'String':
                 $sqlColumns[$fieldName] = "$fieldName varchar(255)";
                 break;
 
@@ -1375,6 +1395,11 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     }
   }
 
+  /**
+   * @param $tableName
+   * @param $details
+   * @param $sqlColumns
+   */
   static function writeDetailsToTable($tableName, &$details, &$sqlColumns) {
     if (empty($details)) {
       return;
@@ -1418,6 +1443,11 @@ VALUES $sqlValueString
     CRM_Core_DAO::executeQuery($sql);
   }
 
+  /**
+   * @param $sqlColumns
+   *
+   * @return string
+   */
   static function createTempTable(&$sqlColumns) {
     //creating a temporary table for the search result that need be exported
     $exportTempTable = CRM_Core_DAO::createTempTableName('civicrm_export', TRUE);
@@ -1458,6 +1488,12 @@ CREATE TABLE {$exportTempTable} (
     return $exportTempTable;
   }
 
+  /**
+   * @param $tableName
+   * @param $headerRows
+   * @param $sqlColumns
+   * @param $exportParams
+   */
   static function mergeSameAddress($tableName, &$headerRows, &$sqlColumns, $exportParams) {
     // check if any records are present based on if they have used shared address feature,
     // and not based on if city / state .. matches.
@@ -1560,6 +1596,12 @@ WHERE  id IN ( $deleteIDString )
     }
   }
 
+  /**
+   * @param $contactId
+   * @param $exportParams
+   *
+   * @return array
+   */
   static function _replaceMergeTokens($contactId, $exportParams) {
     $greetings = array();
     $contact = NULL;
@@ -1616,6 +1658,13 @@ WHERE  id IN ( $deleteIDString )
     return $parsedString;
   }
 
+  /**
+   * @param $sql
+   * @param $exportParams
+   * @param bool $sharedAddress
+   *
+   * @return array
+   */
   static function _buildMasterCopyArray($sql, $exportParams, $sharedAddress = FALSE) {
     static $contactGreetingTokens = array();
 
@@ -1794,6 +1843,14 @@ GROUP BY civicrm_primary_id ";
     CRM_Core_DAO::executeQuery($query);
   }
 
+  /**
+   * @param $exportTempTable
+   * @param $headerRows
+   * @param $sqlColumns
+   * @param $exportMode
+   * @param null $saveFile
+   * @param string $batchItems
+   */
   static function writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $exportMode, $saveFile = null, $batchItems = '') {
     $writeHeader = TRUE;
     $offset      = 0;

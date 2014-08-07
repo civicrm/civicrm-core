@@ -42,52 +42,12 @@
 class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   /**
-   * Are we forced to run a search
-   *
-   * @var int
-   * @access protected
-   */
-  protected $_force;
-
-  /**
-   * name of search button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_searchButtonName;
-
-  /**
-   * name of action button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_actionButtonName;
-
-  /**
-   * form values that we will be using
-   *
-   * @var array
-   * @access protected
-   */
-  public $_formValues;
-
-  /**
    * the params that are sent to the query
    *
    * @var array
    * @access protected
    */
   protected $_queryParams;
-
-  /**
-   * have we already done this search
-   *
-   * @access protected
-   * @var boolean
-   */
-  protected $_done;
 
   /**
    * are we restricting ourselves to a single contact
@@ -104,14 +64,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    * @var boolean
    */
   protected $_limit = NULL;
-
-  /**
-   * what context are we being invoked from
-   *
-   * @access protected
-   * @var string
-   */
-  protected $_context = NULL;
 
   /**
    * prefix for the controller
@@ -228,43 +180,15 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
     CRM_Activity_BAO_Query::buildSearchForm($this);
 
-    /*
-     * add form checkboxes for each row. This is needed out here to conform to QF protocol
-     * of all elements being declared in builQuickForm
-     */
-
     $rows = $this->get('rows');
     if (is_array($rows)) {
       if (!$this->_single) {
-        $this->addElement('checkbox', 'toggleSelect', NULL, NULL,
-          array('onclick' => "toggleTaskAction( true );", 'class' => 'select-rows')
-        );
-        foreach ($rows as $row) {
-          $this->addElement('checkbox', $row['checkbox'],
-            NULL, NULL,
-            array('onclick' => "toggleTaskAction( true );", 'class' => 'select-row')
-          );
-        }
+        $this->addRowSelectors($rows);
       }
 
       $permission = CRM_Core_Permission::getPermission();
 
-      $tasks = array('' => ts('- actions -')) + CRM_Activity_Task::permissionedTaskTitles($permission);
-
-      $this->add('select', 'task', ts('Actions:') . ' ', $tasks);
-      $this->add('submit', $this->_actionButtonName, ts('Go'),
-        array(
-          'class' => 'form-submit',
-          'id' => 'Go',
-          'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 0);",
-        )
-      );
-
-      // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all',
-        array('class' => 'select-rows', 'onchange' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );")
-      );
+      $this->addTaskMenu(CRM_Activity_Task::permissionedTaskTitles($permission));
     }
 
   }
@@ -472,6 +396,9 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     }
   }
 
+  /**
+   * @return null
+   */
   function getFormValues() {
     return NULL;
   }

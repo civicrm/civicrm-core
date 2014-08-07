@@ -44,6 +44,12 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
 
   protected $_customGroupExtends = array( 'Contribution');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
     // Check if CiviCampaign is a) enabled and b) has active campaigns
@@ -238,6 +244,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'financial_type_id' => array('title' => ts('Financial Type')),
           'contribution_status_id' => array('title' => ts('Contribution Status')),
           'payment_instrument_id' => array('title' => ts('Payment Instrument')),
+          'receive_date' => array('title' => ts('Receive Date')),
         ),
         'grouping' => 'contri-fields',
       ),
@@ -384,6 +391,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param bool $softcredit
+   */
   function from($softcredit = FALSE) {
     $this->_from = "
         FROM  civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
@@ -457,6 +467,11 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_contribution']}.id ";
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -620,6 +635,9 @@ UNION ALL
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $checkList          = array();

@@ -29,10 +29,11 @@
         {ts}Use this form to configure the location and optional contact information for the event. This information will be displayed on the Event Information page. It will also be included in online registration pages and confirmation emails if these features are enabled.{/ts}
     </div>
 {/if}
-<div class="crm-block crm-form-block crm-event-manage-location-form-block">
+
 {if $addBlock}
 {include file="CRM/Contact/Form/Edit/$blockName.tpl"}
 {else}
+<div class="crm-block crm-form-block crm-event-manage-location-form-block">
 <div class="crm-submit-buttons">
    {include file="CRM/common/formButtons.tpl" location="top"}
 </div>
@@ -95,6 +96,9 @@
 {* Include Javascript to hide and display the appropriate blocks as directed by the php code *}
 {*include file="CRM/common/showHide.tpl"*}
 {if $locEvents}
+  {* include common additional blocks tpl *}
+  {include file="CRM/common/additionalBlocks.tpl"}
+
 <script type="text/javascript">
 {literal}
 var locUsedMsgTxt = {/literal}"{$locUsedMsgTxt}"{literal};
@@ -105,6 +109,25 @@ if ( {/literal}"{$locUsed}"{literal} ) {
 }
 
 cj(document).ready(function() {
+  //FIX ME: by default load 2 blocks and hide add and delete links
+  //we should make additional block function more flexible to set max block limit
+  buildBlocks('Email');
+  buildBlocks('Phone');
+
+  // build blocks only if it is not built
+  function buildBlocks(element) {
+    if (!cj('[id='+ element +'_Block_2]').length) {
+      buildAdditionalBlocks(element, 'CRM_Event_Form_ManageEvent_Location');
+    }
+  }
+
+  hideAddDeleteLinks('Email');
+  hideAddDeleteLinks('Phone');
+  function hideAddDeleteLinks(element) {
+    cj('#add'+ element).hide();
+    cj('[id='+ element +'_Block_2] a:last').hide();
+  }
+
   cj('#loc_event_id').change(function() {
     cj.ajax({
       url: CRM.url('civicrm/ajax/locBlock', 'reset=1'),
@@ -122,7 +145,12 @@ cj(document).ready(function() {
               displayMessage( false );
             }
           } else {
-            cj('#'+i).val(data[i]);
+            if (i == 'phone_1_phone_type_id' || i == 'phone_2_phone_type_id') {
+              cj('#'+i).select2('val', data[i]);
+            }
+            else {
+              cj('#'+i).val(data[i]);
+            }
           }
         }
       }
@@ -162,8 +190,5 @@ showLocFields( );
 {/literal}
 </script>
 {/if}
-
-{* include common additional blocks tpl *}
-{include file="CRM/common/additionalBlocks.tpl"}
 
 {/if} {* add block if end*}

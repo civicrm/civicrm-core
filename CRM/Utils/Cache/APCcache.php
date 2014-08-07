@@ -70,6 +70,12 @@ class CRM_Utils_Cache_APCcache {
     }
   }
 
+  /**
+   * @param $key
+   * @param $value
+   *
+   * @return bool
+   */
   function set($key, &$value) {
     if (!apc_store($this->_prefix . $key, $value, $this->_timeout)) {
       return FALSE;
@@ -77,10 +83,20 @@ class CRM_Utils_Cache_APCcache {
     return TRUE;
   }
 
+  /**
+   * @param $key
+   *
+   * @return mixed
+   */
   function &get($key) {
     return apc_fetch($this->_prefix . $key);
   }
 
+  /**
+   * @param $key
+   *
+   * @return bool|string[]
+   */
   function delete($key) {
     return apc_delete($this->_prefix . $key);
   }

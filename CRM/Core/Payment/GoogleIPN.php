@@ -35,6 +35,10 @@
 
 
 define('GOOGLE_DEBUG_PP', 0);
+
+/**
+ * Class CRM_Core_Payment_GoogleIPN
+ */
 class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
@@ -53,6 +57,14 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
    */
   protected $_mode = NULL;
 
+  /**
+   * @param $name
+   * @param $type
+   * @param $object
+   * @param bool $abort
+   *
+   * @return mixed
+   */
   static function retrieve($name, $type, $object, $abort = TRUE) {
     $value = CRM_Utils_Array::value($name, $object);
     if ($abort && $value === NULL) {
@@ -328,6 +340,11 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
     $this->completeRecur($input, $ids, $objects);
   }
 
+  /**
+   * @param $input
+   * @param $ids
+   * @param $objects
+   */
   function completeRecur($input, $ids, $objects) {
     if ($ids['contributionRecur']) {
       $recur               = &$objects['contributionRecur'];
@@ -632,6 +649,13 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
     }
   }
 
+  /**
+   * @param $input
+   * @param $ids
+   * @param $dataRoot
+   *
+   * @return bool
+   */
   function getInput(&$input, &$ids, $dataRoot) {
     if (!$this->getBillingID($ids)) {
       return FALSE;

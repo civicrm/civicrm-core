@@ -79,12 +79,10 @@ function _civicrm_api3_action_schedule_create_spec(&$params) {
 /**
  * delete an existing action_schedule
  *
+ * @param array $params array containing id of the action_schedule
+ * to be deleted
  *
- * @param array $params  (reference) array containing id of the action_schedule
- *                       to be deleted
- *
- * @return array  (referance) returns flag true if successfull, error
- *                message otherwise
+ * @return array API result array
  *
  * @access public
  */

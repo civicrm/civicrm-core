@@ -53,6 +53,9 @@ class CRM_Core_TemporaryErrorScope {
     return new CRM_Core_TemporaryErrorScope($newFrame);
   }
 
+  /**
+   * @param $newFrame
+   */
   public function __construct($newFrame) {
     self::$oldFrames[] = self::getActive();
     self::setActive($newFrame);

@@ -186,6 +186,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->add('select', 'end_action', ts('Repetition Condition'), $condition, TRUE);
     $this->add('select', 'end_date', ts('Date Field'), $sel4, TRUE);
 
+    $this->add('text', 'from_name', ts('From Name'));
+    $this->add('text', 'from_email', ts('From Email'));    
+
     $recipient = 'activity_contacts';
     $recipientListingOptions = array();
 
@@ -196,7 +199,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       );
     }
 
-    $limitOptions = array(1 => ts('Limit to'), 0 => ts('Addition to'));
+    $limitOptions = array(1 => ts('Limit to'), 0 => ts('Also include'));
     $this->add('select', 'limit_to', ts('Limit Options'), $limitOptions);
 
     $this->add('select', 'recipient', ts('Recipients'), $sel5[$recipient],
@@ -244,10 +247,19 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    */
   static function formRule($fields) {
     $errors = array();
-    if ((array_key_exists(1, $fields['entity']) && $fields['entity'][1][0] == 0) ||
+    if ((array_key_exists(1, $fields['entity']) && $fields['entity'][1][0] === 0) ||
       (array_key_exists(2, $fields['entity']) && $fields['entity'][2][0] == 0)
     ) {
       $errors['entity'] = ts('Please select appropriate value');
+    }
+
+    if (array_key_exists(1, $fields['entity']) && !is_numeric($fields['entity'][1][0])) {
+      if (count($fields['entity'][1]) > 1) {
+        $errors['entity'] = ts('You may only select one contact field per reminder');
+      }
+      elseif (!(array_key_exists(2, $fields['entity']) && $fields['entity'][2][0] > 0)) {
+        $errors['entity'] = ts('Please select whether the reminder is sent each year.');
+      }
     }
 
     if (!empty($fields['is_active']) &&
@@ -273,6 +285,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * @return int
+   */
   function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['is_active'] = 1;
@@ -346,7 +361,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'record_activity',
       'limit_to',
       'mode',
-      'sms_provider_id'
+      'sms_provider_id',
+      'from_name',
+      'from_email',
     );
     foreach ($keys as $key) {
       $params[$key] = CRM_Utils_Array::value($key, $values);

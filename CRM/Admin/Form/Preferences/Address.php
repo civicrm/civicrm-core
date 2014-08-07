@@ -41,6 +41,9 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
 
     CRM_Utils_System::setTitle(ts('Settings - Addresses'));
 
+    // Address Standardization
+    $addrProviders = array(
+      '' => '- select -') + CRM_Core_SelectValues::addressProvider();
 
     $this->_varNames = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME =>
@@ -67,6 +70,8 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
       array(
         'address_standardization_provider' => array(
           'html_type' => 'select',
+          'title' => ts('Provider'),
+          'option_values' => $addrProviders,
           'weight' => 4,
         ),
         'address_standardization_userid' => array(
@@ -87,6 +92,9 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
     parent::preProcess();
   }
 
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults = array();
     $defaults['address_standardization_provider'] = $this->_config->address_standardization_provider;
@@ -138,15 +146,6 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
 
-    // Address Standardization
-    $addrProviders = CRM_Core_SelectValues::addressProvider();
-    $this->addElement('select',
-      'address_standardization_provider',
-      ts('Address Provider'),
-      array(
-        '' => '- select -') + $addrProviders
-    );
-
     $this->addFormRule(array('CRM_Admin_Form_Preferences_Address', 'formRule'));
 
     //get the tokens for Mailing Label field
@@ -156,6 +155,11 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
     parent::buildQuickForm();
   }
 
+  /**
+   * @param $fields
+   *
+   * @return bool
+   */
   static function formRule($fields) {
     $p = $fields['address_standardization_provider'];
     $u = $fields['address_standardization_userid'];

@@ -47,12 +47,20 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * API call (and passes some extra context -- eg Amy's contact_id).
  */
 class ChainSubscriber implements EventSubscriberInterface {
+  /**
+   * @return array
+   */
   public static function getSubscribedEvents() {
     return array(
       Events::RESPOND => array('onApiRespond', Events::W_EARLY),
     );
   }
 
+  /**
+   * @param \Civi\API\Event\RespondEvent $event
+   *
+   * @throws \Exception
+   */
   public function onApiRespond(\Civi\API\Event\RespondEvent $event) {
     $apiRequest = $event->getApiRequest();
     $result = $event->getResponse();

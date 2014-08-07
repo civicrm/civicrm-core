@@ -34,6 +34,12 @@
  *
  */
 class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
     $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
@@ -304,6 +310,13 @@ GROUP BY {$this->_aliases['civicrm_contact']}.id,
     parent::postProcess();
   }
 
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
   static function formRule($fields, $files, $self) {
     $errors = array();
     if (!empty($fields['group_bys']) &&
@@ -315,6 +328,9 @@ GROUP BY {$this->_aliases['civicrm_contact']}.id,
     return $errors;
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
 

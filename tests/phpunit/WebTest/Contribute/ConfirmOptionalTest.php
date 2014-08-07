@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_ConfirmOptionalTest
+ */
 class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
   protected $pageId = 0;
 
@@ -56,6 +60,9 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
     $this->assertFalse($this->isTextPresent("Your contribution will not be completed until"), "Loaded confirmation page");
   }
 
+  /**
+   * @param $isConfirmEnabled
+   */
   protected function _addContributionPage($isConfirmEnabled) {
     // log in
     $this->webtestLogin();
@@ -84,7 +91,7 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
       $isPcpApprovalNeeded = FALSE,
       $isSeparatePayment = FALSE,
       $honoreeSection = FALSE,
-      $allowOtherAmmount = TRUE,
+      $allowOtherAmount = TRUE,
       $isConfirmEnabled = $isConfirmEnabled
     );
   }

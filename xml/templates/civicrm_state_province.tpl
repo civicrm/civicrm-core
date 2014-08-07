@@ -733,7 +733,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (2097, 1044, "LL", "Los Lagos"),
 (2098, 1044, "MA", "Magallanes"),
 (2099, 1044, "ML", "Maule"),
-(2100, 1044, "RM", "Region Metropolitana de Santiago"),
+(2100, 1044, "SM", "Santiago Metropolitan"),
 (2101, 1044, "TA", "Tarapaca"),
 (2102, 1044, "VS", "Valparaiso"),
 (2103, 1038, "AD", "Adamaoua"),
@@ -2703,12 +2703,12 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4244, 1177, "BEL", "Belgorodskaya oblast\'"),
 (4245, 1177, "BRY", "Bryanskaya oblast\'"),
 (4246, 1177, "CHE", "Chelyabinskaya oblast\'"),
-(4247, 1177, "CHI", "Chitinskaya oblast\'"),
+(4247, 1177, "ZSK", "Zabaykalsky Krai\'"),
 (4248, 1177, "IRK", "Irkutskaya oblast\'"),
 (4249, 1177, "IVA", "Ivanovskaya oblast\'"),
 (4250, 1177, "KGD", "Kaliningradskaya oblast\'"),
 (4251, 1177, "KLU", "Kaluzhskaya oblast\'"),
-(4252, 1177, "KAM", "Kamchatskaya oblast\'"),
+(4252, 1177, "KAM", "Kamchatka Krai\'"),
 (4253, 1177, "KEM", "Kemerovskaya oblast\'"),
 (4254, 1177, "KIR", "Kirovskaya oblast\'"),
 (4255, 1177, "KOS", "Kostromskaya oblast\'"),
@@ -2726,7 +2726,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4267, 1177, "ORE", "Orenburgskaya oblast\'"),
 (4268, 1177, "ORL", "Orlovskaya oblast\'"),
 (4269, 1177, "PNZ", "Penzenskaya oblast\'"),
-(4270, 1177, "PER", "Permskaya oblast\'"),
+(4270, 1177, "PEK", "Perm krai\'"),
 (4271, 1177, "PSK", "Pskovskaya oblast\'"),
 (4272, 1177, "ROS", "Rostovskaya oblast\'"),
 (4273, 1177, "RYA", "Ryazanskaya oblast\'"),
@@ -2749,15 +2749,9 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4290, 1177, "MOW", "Moskva"),
 (4291, 1177, "SPE", "Sankt-Peterburg"),
 (4292, 1177, "YEV", "Yevreyskaya avtonomnaya oblast\'"),
-(4293, 1177, "AGB", "Aginskiy Buryatskiy avtonomnyy"),
 (4294, 1177, "CHU", "Chukotskiy avtonomnyy okrug"),
-(4295, 1177, "EVE", "Evenkiyskiy avtonomnyy okrug"),
 (4296, 1177, "KHM", "Khanty-Mansiyskiy avtonomnyy okrug"),
-(4297, 1177, "KOP", "Komi-Permyatskiy avtonomnyy okrug"),
-(4298, 1177, "KOR", "Koryakskiy avtonomnyy okrug"),
 (4299, 1177, "NEN", "Nenetskiy avtonomnyy okrug"),
-(4300, 1177, "TAY", "Taymyrskiy (Dolgano-Nenetskiy)"),
-(4301, 1177, "UOB", "Ust\'-Ordynskiy Buryatskiy"),
 (4302, 1177, "YAN", "Yamalo-Nenetskiy avtonomnyy okrug"),
 (4303, 1178, "C", "Butare"),
 (4304, 1178, "I", "Byumba"),
@@ -3910,4 +3904,11 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 
 
 -- CRM-14493 Added State for Greece
-(NULL, 1085, "61", "Pieria");
+(NULL, 1085, "61", "Pieria"),
+
+-- CRM-14843 Added States for Chile and Modify Santiago Metropolitan for consistency
+(NULL, 1044, "LR", "Los Rios"),
+(NULL, 1044, "AP", "Arica y Parinacota"),
+
+-- Add missing Peruvian State (Amazonas)
+(NULL, 1169, "AMA", "Amazonas");

@@ -26,6 +26,10 @@
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 require_once 'WebTest/Event/AddEventTest.php';
+
+/**
+ * Class WebTest_Event_PCPAddTest
+ */
 class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -112,6 +116,15 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->_testAddEventForPCP($processorName, $campaignType, NULL, $firstName, $lastName, $middleName, $email);
   }
 
+  /**
+   * @param $processorName
+   * @param $campaignType
+   * @param null $contributionPageId
+   * @param $firstName
+   * @param $lastName
+   * @param $middleName
+   * @param $email
+   */
   function _testAddEventForPCP($processorName, $campaignType, $contributionPageId = NULL, $firstName, $lastName, $middleName, $email) {
 
     $this->openCiviPage("event/add", "reset=1&action=add");
@@ -134,6 +147,10 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->_testOnlineRegistration($eventTitle, $pageId, $firstName, $lastName, $middleName, $email, '', $campaignType, TRUE);
   }
 
+  /**
+   * @param $eventTitle
+   * @param $eventDescription
+   */
   function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
@@ -159,6 +176,9 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_EventInfo_upload-bottom");
   }
 
+  /**
+   * @param $streetAddress
+   */
   function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -179,6 +199,11 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("'Event Location' information has been saved.");
   }
 
+  /**
+   * @param bool $discount
+   * @param bool $priceSet
+   * @param string $processorName
+   */
   function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName = "PP Pro") {
     // Go to Fees tab
     $this->click("link=Fees");
@@ -209,6 +234,10 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("'Fees' information has been saved.");
   }
 
+  /**
+   * @param $registerIntro
+   * @param bool $multipleRegistrations
+   */
   function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
     // Go to Online Registration tab
     $this->click("link=Online Registration");
@@ -222,6 +251,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
       $this->assertChecked("is_multiple_registrations");
     }
 
+    $this->click('intro_text-plain');
     $this->fillRichTextField("intro_text", $registerIntro);
 
     // enable confirmation email
@@ -234,6 +264,17 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("'Online Registration' information has been saved.");
   }
 
+  /**
+   * @param $eventTitle
+   * @param $pageId
+   * @param $firstName
+   * @param $lastName
+   * @param $middleName
+   * @param $email
+   * @param int $numberRegistrations
+   * @param $campaignType
+   * @param bool $anonymous
+   */
   function _testOnlineRegistration($eventTitle, $pageId, $firstName, $lastName, $middleName, $email, $numberRegistrations = 1, $campaignType, $anonymous = TRUE) {
     $hash = substr(sha1(rand()), 0, 7);
     $contributionAmount = 600;
@@ -393,6 +434,12 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $campaignType
+   * @param $contributionPageId
+   *
+   * @return null
+   */
   function _testEventPcpAdd($campaignType, $contributionPageId) {
     $hash = substr(sha1(rand()), 0, 7);
     $isPcpApprovalNeeded = TRUE;
@@ -430,6 +477,14 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     return $this->urlArg('id');
   }
 
+  /**
+   * @param $eventName
+   * @param $lastNameDonar
+   * @param $firstNameDonar
+   * @param $firstNameCreator
+   * @param $lastNameCreator
+   * @param $amount
+   */
   function _testParticipantSearchEventName($eventName, $lastNameDonar, $firstNameDonar, $firstNameCreator, $lastNameCreator, $amount) {
     $sortName = $lastNameDonar . ', ' . $firstNameDonar;
     $this->openCiviPage("event/search", "reset=1");
@@ -454,6 +509,13 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//div[@id='PCPView']/div[2]//table[@class='crm-info-panel']/tbody/tr[2]/td[2]", preg_quote($softCreditor), 'In line ' . __LINE__);
   }
 
+  /**
+   * @param $firstName
+   * @param $lastName
+   * @param $pcpCreatorFirstName
+   * @param $pcpCreatorLastName
+   * @param $amount
+   */
   function _testSearchTest($firstName, $lastName, $pcpCreatorFirstName, $pcpCreatorLastName, $amount) {
     $sortName = "$pcpCreatorLastName, $pcpCreatorFirstName";
     $displayName = "$firstName $lastName";

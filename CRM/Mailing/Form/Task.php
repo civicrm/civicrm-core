@@ -72,6 +72,10 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form {
     self::preProcessCommon($this);
   }
 
+  /**
+   * @param $form
+   * @param bool $useTable
+   */
   static function preProcessCommon(&$form, $useTable = FALSE) {
     $values = $form->controller->exportValues($form->get('searchFormName'));
 

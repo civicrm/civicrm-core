@@ -1556,6 +1556,12 @@ WHERE  id = %1";
     return self::$visibility[$column];
   }
 
+  /**
+   * @param $countryID
+   * @param string $field
+   *
+   * @return array
+   */
   public static function &stateProvinceForCountry($countryID, $field = 'name') {
     static $_cache = NULL;
 
@@ -1605,6 +1611,11 @@ ORDER BY name";
     return $result;
   }
 
+  /**
+   * @param $stateID
+   *
+   * @return array
+   */
   public static function &countyForState($stateID) {
     if (is_array($stateID)) {
       $states = implode(", ", $stateID);

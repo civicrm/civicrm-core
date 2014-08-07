@@ -32,6 +32,10 @@
    * Grateful acknowledgements go to Donald Lobo for invaluable assistance
    * in creating this payment processor module
    */
+
+/**
+ * Class CRM_Core_Payment_PaymentExpressIPN
+ */
 class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
@@ -50,6 +54,14 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    */
   protected $_mode = NULL;
 
+  /**
+   * @param $name
+   * @param $type
+   * @param $object
+   * @param bool $abort
+   *
+   * @return mixed
+   */
   static function retrieve($name, $type, $object, $abort = TRUE) {
     $value = CRM_Utils_Array::value($name, $object);
     if ($abort && $value === NULL) {

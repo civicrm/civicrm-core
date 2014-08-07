@@ -97,6 +97,18 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * @access public
    * @return void
    */
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array reference to the array of default values
+   *
+   */
+  /**
+   * @return array
+   */
   function setDefaultValues() {
     $defaults  = array();
     $params    = array();

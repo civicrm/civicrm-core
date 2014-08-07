@@ -38,5 +38,9 @@
  */
 
 require_once 'CRM/Core/Component/Config.php';
+
+/**
+ * Class CRM_Touchstone_Config
+ */
 class CRM_Touchstone_Config extends CRM_Core_Component_Config {}
 

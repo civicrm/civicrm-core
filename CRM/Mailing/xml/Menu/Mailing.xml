@@ -15,7 +15,7 @@
     <title>Mailer Settings</title>
     <page_callback>CRM_Admin_Form_Setting_Mail</page_callback>
     <desc>Configure spool period, throttling and other mailer settings.</desc>
-    <access_arguments>access CiviMail</access_arguments>
+    <access_arguments>access CiviCRM,access CiviMail</access_arguments>
     <adminGroup>CiviMail</adminGroup>
     <icon>admin/small/07.png</icon>
     <weight>400</weight>
@@ -25,7 +25,7 @@
     <title>Headers, Footers, and Automated Messages</title>
     <page_callback>CRM_Mailing_Page_Component</page_callback>
     <desc>Configure the header and footer used for mailings. Customize the content of automated Subscribe, Unsubscribe, Resubscribe and Opt-out messages.</desc>
-    <access_arguments>access CiviMail</access_arguments>
+    <access_arguments>access CiviCRM,access CiviMail</access_arguments>
     <adminGroup>CiviMail</adminGroup>
     <icon>admin/small/Profile.png</icon>
     <weight>410</weight>
@@ -44,7 +44,7 @@
     <title>Mail Accounts</title>
     <page_callback>CRM_Admin_Page_MailSettings</page_callback>
     <desc>Configure email account setting.</desc>
-    <access_arguments>access CiviMail</access_arguments>
+    <access_arguments>access CiviCRM,access CiviMail</access_arguments>
     <adminGroup>CiviMail</adminGroup>
     <icon>admin/small/07.png</icon>
     <weight>420</weight>

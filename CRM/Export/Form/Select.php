@@ -491,6 +491,9 @@ FROM   {$this->_componentTable}
     }
   }
 
+  /**
+   * @return array
+   */
   static function getGreetingOptions() {
     $options = array();
     $greetings = array(

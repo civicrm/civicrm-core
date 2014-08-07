@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_StandaloneAddTest
+ */
 class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -90,7 +94,8 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->select("payment_instrument_id", "value=4");
     $this->waitForElementPresent("check_number");
     $this->type("check_number", "check #1041");
-
+    $this->click("is_email_receipt");
+    $this->assertTrue($this->isChecked("is_email_receipt"), 'Send Receipt checkbox should be checked.');
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // soft credit
@@ -121,6 +126,9 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click("_qf_Contribution_upload");
+    // Ask for confirmation to send a receipt to the contributor on 'is_email_reciept' check
+    $this->assertTrue((bool)preg_match("/^Click OK to save this contribution record AND send a receipt to the contributor now./",$this->getConfirmation()));
+    $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
@@ -183,7 +191,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
       'is_reserved' => FALSE,
       'is_deductible' => FALSE,
     );
-    
+
     $this->addeditFinancialType($financialType);
     $this->addStandaloneContribution($financialType);
     $this->addStandaloneContribution($financialType);
@@ -194,11 +202,11 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Search_refresh");
     $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[1]", "2 Result");
     $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[2]", "Financial Type IN {$financialType['name']}");
-    
+
     $this->openCiviPage("contact/search/advanced", "reset=1", "_qf_Advanced_refresh-top");
     $this->click('CiviContribute');
     $this->waitForElementPresent("financial_type_id");
-    
+
     // select group
     $this->select("financial_type_id", "label={$financialType['name']}");
     $this->clickLink("_qf_Advanced_refresh-top");
@@ -206,8 +214,11 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("xpath=//div[@id='search-status']//table/tbody/tr[1]/td[2]", "Financial Type IN {$financialType['name']}");
   }
 
+  /**
+   * @param $financialType
+   */
   function addStandaloneContribution($financialType) {
-    
+
     $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
     // create new contact using dialog

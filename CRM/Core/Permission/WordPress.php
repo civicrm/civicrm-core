@@ -57,6 +57,8 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
       return TRUE;
     }
 
+    require_once ABSPATH . WPINC . '/pluggable.php';
+
     // for administrators give them all permissions
     if (!function_exists('current_user_can')) {
       return TRUE;
