@@ -35,6 +35,10 @@
  */
 
 require_once 'api/Wrapper.php';
+
+/**
+ * Class CRM_Utils_API_NullOutputCoder
+ */
 class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
 
   /**
@@ -64,6 +68,10 @@ class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
   public function encodeInput(&$values) {
   }
 
+  /**
+   * @param $values
+   * @param bool $castToString
+   */
   public function decodeOutput(&$values, $castToString = FALSE) {
     if (is_array($values)) {
       foreach ($values as &$value) {
@@ -77,6 +85,15 @@ class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  /**
+   * @param $apiRequest
+   * @param $result
+   *
+   * @return modified
+   */
   public function toApiOutput($apiRequest, $result) {
     $lowerAction = strtolower($apiRequest['action']);
     if ($lowerAction === 'create') {

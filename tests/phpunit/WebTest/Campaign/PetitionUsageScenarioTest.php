@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Campaign_PetitionUsageScenarioTest
+ */
 class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
 
   protected function setUp() {

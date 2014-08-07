@@ -191,7 +191,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       }
       foreach (array(
         'first_name', 'last_name') as $name) {
-        if (!empty($$keys[$name]) &&
+        if (array_key_exists($name, $$keys) &&
           CRM_Utils_Array::value('is_required', CRM_Utils_Array::value($name, $$keys))
         ) {
           $$name = 1;
@@ -513,6 +513,12 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     return $errors;
   }
 
+  /**
+   * @param $self
+   * @param $fields
+   *
+   * @return bool
+   */
   function validatePaymentValues($self, $fields) {
 
     if (!empty($self->_params[0]['bypass_payment']) ||
@@ -725,6 +731,11 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     }
   }
 
+  /**
+   * @param $additionalParticipant
+   *
+   * @return array
+   */
   public static function &getPages($additionalParticipant) {
     $details = array();
     for ($i = 1; $i <= $additionalParticipant; $i++) {
@@ -812,6 +823,10 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     }
   }
 
+  /**
+   * @param $elementName
+   * @param array $optionIds
+   */
   function resetSubmittedValue($elementName, $optionIds = array(
     )) {
     if (empty($elementName) ||

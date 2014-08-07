@@ -37,6 +37,9 @@ class CRM_Contact_Form_Search_Custom_TagContributions implements CRM_Contact_For
   protected $_formValues;
   public $_permissionedComponent;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     $this->_formValues = $formValues;
     $this->_permissionedComponent = 'CiviContribute';
@@ -54,6 +57,9 @@ class CRM_Contact_Form_Search_Custom_TagContributions implements CRM_Contact_For
     );
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
 
     /**
@@ -116,26 +122,27 @@ SELECT $select
 FROM   $from
 WHERE  $where
 ";
-    //for only contact ids ignore order and group by.
-    if (!$onlyIDs) {
-      $sql .= " GROUP BY contact_a.id";
-      // Define ORDER BY for query in $sort, with default value
-      if (!empty($sort)) {
-        if (is_string($sort)) {
-          $sort = CRM_Utils_Type::escape($sort, 'String');
-          $sql .= " ORDER BY $sort ";
-        }
-        else {
-          $sql .= " ORDER BY " . trim($sort->orderBy());
-        }
+
+    $sql .= " GROUP BY contact_a.id";
+    // Define ORDER BY for query in $sort, with default value
+    if (!empty($sort)) {
+      if (is_string($sort)) {
+        $sort = CRM_Utils_Type::escape($sort, 'String');
+        $sql .= " ORDER BY $sort ";
       }
       else {
-        $sql .= "";
+        $sql .= " ORDER BY " . trim($sort->orderBy());
       }
+    }
+    else {
+      $sql .= "";
     }
     return $sql;
   }
 
+  /**
+   * @return string
+   */
   function from() {
     return "
       civicrm_contribution,
@@ -150,6 +157,11 @@ WHERE  $where
   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
   *
   */
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     $clauses = array();
 
@@ -197,6 +209,9 @@ WHERE  $where
   /*
      * Functions below generally don't need to be modified
      */
+  /**
+   * @return mixed
+   */
   function count() {
     $sql = $this->all();
 
@@ -206,14 +221,27 @@ WHERE  $where
     return $dao->N;
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   *
+   * @return string
+   */
   function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
+  /**
+   * @return array
+   */
   function &columns() {
     return $this->_columns;
   }
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
@@ -223,6 +251,9 @@ WHERE  $where
     }
   }
 
+  /**
+   * @return null
+   */
   function summary() {
     return NULL;
   }

@@ -3,7 +3,14 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Custom.php';
+
+/**
+ * Class CRM_Core_BAO_CustomValueTableMultipleTest
+ */
 class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Custom Value Table BAOs (multipe value)',

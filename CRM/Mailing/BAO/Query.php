@@ -35,6 +35,9 @@ class CRM_Mailing_BAO_Query {
 
   static $_mailingFields = NULL;
 
+  /**
+   * @return array|null
+   */
   static function &getFields() {
     if (!self::$_mailingFields) {
       self::$_mailingFields = array();
@@ -122,6 +125,9 @@ class CRM_Mailing_BAO_Query {
     }
   }
 
+  /**
+   * @param $query
+   */
   static function where(&$query) {
     $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
@@ -138,6 +144,13 @@ class CRM_Mailing_BAO_Query {
     }
   }
 
+  /**
+   * @param $name
+   * @param $mode
+   * @param $side
+   *
+   * @return null|string
+   */
   static function from($name, $mode, $side) {
     $from = NULL;
 
@@ -179,6 +192,12 @@ class CRM_Mailing_BAO_Query {
     return $from;
   }
 
+  /**
+   * @param $mode
+   * @param bool $includeCustomFields
+   *
+   * @return array|null
+   */
   static function defaultReturnProperties($mode,
     $includeCustomFields = TRUE
   ) {
@@ -203,6 +222,10 @@ class CRM_Mailing_BAO_Query {
     return $properties;
   }
 
+  /**
+   * @param $values
+   * @param $query
+   */
   static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
@@ -402,8 +425,15 @@ class CRM_Mailing_BAO_Query {
     $form->assign('validCiviMailing', TRUE);
   }
 
+  /**
+   * @param $row
+   * @param $id
+   */
   static function searchAction(&$row, $id) {}
 
+  /**
+   * @param $tables
+   */
   static function tableNames(&$tables) {
   }
 

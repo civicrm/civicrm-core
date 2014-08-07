@@ -625,6 +625,14 @@ SELECT label, value
     );
   }
 
+  /**
+   * @param $id
+   * @param $label
+   * @param $type
+   * @param $fieldName
+   * @param $value
+   * @param $grouping
+   */
   function searchRange(&$id, &$label, $type, $fieldName, &$value, &$grouping) {
     $qill = array();
 

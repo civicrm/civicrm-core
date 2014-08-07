@@ -109,10 +109,16 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
     }
   }
 
+  /**
+   * @param $parent
+   */
   public function setParent($parent) {
     $this->_parent = $parent;
   }
 
+  /**
+   * @return mixed
+   */
   public function getTemplateFileName() {
     // there is only one form here, so should be quite easy
     $actionName = $this->getActionName();

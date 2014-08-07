@@ -108,6 +108,19 @@ abstract class CRM_Utils_Hook {
     $fnSuffix
   );
 
+  /**
+   * @param $numParams
+   * @param $arg1
+   * @param $arg2
+   * @param $arg3
+   * @param $arg4
+   * @param $arg5
+   * @param $arg6
+   * @param $fnSuffix
+   * @param $fnPrefix
+   *
+   * @return array|bool
+   */
   function commonInvoke($numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix, $fnPrefix
@@ -216,6 +229,9 @@ abstract class CRM_Utils_Hook {
     return empty($result) ? TRUE : $result;
   }
 
+  /**
+   * @param $moduleList
+   */
   function requireCiviModules(&$moduleList) {
     $civiModules = CRM_Core_PseudoConstant::getModuleExtensions();
     foreach ($civiModules as $civiModule) {
@@ -237,12 +253,15 @@ abstract class CRM_Utils_Hook {
    *
    * @param string $op         the type of operation being performed
    * @param string $objectName the name of the object
-   * @param object $id         the object id if available
+   * @param int $id         the object id if available
    * @param array  $params     the parameters used for object creation / editing
    *
    * @return null the return value is ignored
    */
   static function pre($op, $objectName, $id, &$params) {
+    $event = new \Civi\Core\Event\PreEvent($op, $objectName, $id, $params);
+    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_pre", $event);
+    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_pre::$objectName", $event);
     return self::singleton()->invoke(4, $op, $objectName, $id, $params, self::$_nullObject, self::$_nullObject, 'civicrm_pre');
   }
 
@@ -259,6 +278,9 @@ abstract class CRM_Utils_Hook {
    * @access public
    */
   static function post($op, $objectName, $objectId, &$objectRef) {
+    $event = new \Civi\Core\Event\PostEvent($op, $objectName, $objectId, $objectRef);
+    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_post", $event);
+    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_post::$objectName", $event);
     return self::singleton()->invoke(4, $op, $objectName, $objectId, $objectRef, self::$_nullObject, self::$_nullObject, 'civicrm_post');
   }
 
@@ -453,6 +475,23 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(1, $recentArray,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_recent'
+    );
+  }
+
+  /**
+   * Determine how many other records refer to a given record
+   *
+   * @param CRM_Core_DAO $dao the item for which we want a reference count
+   * @param array $refCounts each item in the array is an array with keys:
+   *   - name: string, eg "sql:civicrm_email:contact_id"
+   *   - type: string, eg "sql"
+   *   - count: int, eg "5" if there are 5 email addresses that refer to $dao
+   * @return void
+   */
+  static function referenceCounts($dao, &$refCounts) {
+    return self::singleton()->invoke(2, $dao, $refCounts,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_referenceCounts'
     );
   }
 
@@ -867,6 +906,13 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * @param $recordBAO
+   * @param $recordID
+   * @param $isActive
+   *
+   * @return mixed
+   */
   static function enableDisable($recordBAO, $recordID, $isActive) {
     return self::singleton()->invoke(3, $recordBAO, $recordID, $isActive,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
@@ -1030,6 +1076,11 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * @param $dao
+   *
+   * @return mixed
+   */
   static function postSave(&$dao) {
     $hookName = 'civicrm_postSave_' . $dao->getTableName();
     return self::singleton()->invoke(1, $dao,
@@ -1273,6 +1324,13 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * @param $varType
+   * @param $var
+   * @param $object
+   *
+   * @return mixed
+   */
   static function alterReportVar($varType, &$var, &$object) {
     return self::singleton()->invoke(3, $varType, $var, $object,
       self::$_nullObject,
@@ -1555,31 +1613,31 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called before a case merge (or a case reassign)
    *
-   * @param type $mainContactId
-   * @param type $mainCaseId
-   * @param type $otherContactId
-   * @param type $otherCaseId
-   * @param bool|\type $changeClient
+   * @param integer $mainContactId
+   * @param integer $mainCaseId
+   * @param integer $otherContactId
+   * @param integer $otherCaseId
+   * @param bool $changeClient
    *
    * @return void
    */
   static function pre_case_merge($mainContactId, $mainCaseId = NULL, $otherContactId = NULL, $otherCaseId = NULL, $changeClient = FALSE) {
-    return self::singleton()->invoke(5, $mainContactId, $mainCaseId, $otherContactId, $otherCaseId, $changeClient, 'civicrm_pre_case_merge');
+    return self::singleton()->invoke(5, $mainContactId, $mainCaseId, $otherContactId, $otherCaseId, $changeClient, self::$_nullObject, 'civicrm_pre_case_merge');
   }
 
   /**
    * This hook is called after a case merge (or a case reassign)
    *
-   * @param type $mainContactId
-   * @param type $mainCaseId
-   * @param type $otherContactId
-   * @param type $otherCaseId
-   * @param bool|\type $changeClient
+   * @param integer $mainContactId
+   * @param integer $mainCaseId
+   * @param integer $otherContactId
+   * @param integer $otherCaseId
+   * @param bool $changeClient
    *
    * @return void
    */
   static function post_case_merge($mainContactId, $mainCaseId = NULL, $otherContactId = NULL, $otherCaseId = NULL, $changeClient = FALSE) {
-    return self::singleton()->invoke(5, $mainContactId, $mainCaseId, $otherContactId, $otherCaseId, $changeClient, 'civicrm_post_case_merge');
+    return self::singleton()->invoke(5, $mainContactId, $mainCaseId, $otherContactId, $otherCaseId, $changeClient, self::$_nullObject, 'civicrm_post_case_merge');
   }
 
   /**
@@ -1598,6 +1656,76 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(3,
       $displayName, $contactId, $dao, self::$_nullObject, self::$_nullObject,
       self::$_nullObject, 'civicrm_contact_get_displayname'
+    );
+  }
+
+  /**
+   * EXPERIMENTAL: This hook allows one to register additional Angular modules
+   *
+   * @param array $angularModules list of modules
+   * @return null the return value is ignored
+   * @access public
+   *
+   * @code
+   * function mymod_civicrm_angularModules(&$angularModules) {
+   *   $angularModules['myAngularModule'] = array('ext' => 'org.example.mymod', 'js' => array('js/myAngularModule.js'));
+   *   $angularModules['myBigAngularModule'] = array('ext' => 'org.example.mymod', 'js' => array('js/part1.js', 'js/part2.js'), 'css' => array('css/myAngularModule.css'));
+   * }
+   * @endcode
+   */
+  static function angularModules(&$angularModules) {
+    return self::singleton()->invoke(1, $angularModules,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_angularModules'
+    );
+  }
+
+  /**
+   * This hook fires whenever a record in a case changes.
+   *
+   * @param \Civi\CCase\Analyzer $analyzer
+   */
+  static function caseChange(\Civi\CCase\Analyzer $analyzer) {
+    $event = new \Civi\CCase\Event\CaseChangeEvent($analyzer);
+    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_caseChange", $event);
+
+    return self::singleton()->invoke(1, $angularModules,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_caseChange'
+    );
+  }
+
+  /**
+   * Generate a default CRUD URL for an entity
+   *
+   * @param array $spec with keys:
+   *   - action: int, eg CRM_Core_Action::VIEW or CRM_Core_Action::UPDATE
+   *   - entity_table: string
+   *   - entity_id: int
+   * @param CRM_Core_DAO $bao
+   * @param array $link to define the link, add these keys to $link:
+   *  - title: string
+   *  - path: string
+   *  - query: array
+   *  - url: string (used in lieu of "path"/"query")
+   *      Note: if making "url" CRM_Utils_System::url(), set $htmlize=false
+   * @return mixed
+   */
+  static function crudLink($spec, $bao, &$link) {
+    return self::singleton()->invoke(3, $spec, $bao, $link,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_crudLink'
+    );
+  }
+
+  /**
+   * @param array<CRM_Core_FileSearchInterface> $fileSearches
+   * @return mixed
+   */
+  static function fileSearches(&$fileSearches) {
+    return self::singleton()->invoke(1, $fileSearches,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_fileSearches'
     );
   }
 }

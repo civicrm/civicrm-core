@@ -17,9 +17,9 @@
  */
 
 /* This class is used to create a Google Checkout result for merchant
-  * as a response to merchant-calculations feedback structure 
+  * as a response to merchant-calculations feedback structure
   * Refer demo/responsehandlerdemo.php for usage of this code
-  * 
+  *
   * Methods are provided to set the shipping, tax, coupons and gift certificate
   * options
   */
@@ -35,10 +35,20 @@ class GoogleResult {
 
   var $coupon_arr = array();
   var $giftcert_arr = array();
+
+  /**
+   * @param $address_id
+   */
   function GoogleResult($address_id) {
     $this->address_id = $address_id;
   }
 
+  /**
+   * @param $name
+   * @param $price
+   * @param string $money
+   * @param string $shippable
+   */
   function SetShippingDetails($name, $price, $money = "USD",
     $shippable = "true"
   ) {
@@ -48,15 +58,25 @@ class GoogleResult {
     $this->shippable     = $shippable;
   }
 
+  /**
+   * @param $amount
+   * @param string $currency
+   */
   function SetTaxDetails($amount, $currency = "USD") {
     $this->tax_amount = $amount;
     $this->tax_currency = $currency;
   }
 
+  /**
+   * @param $coupon
+   */
   function AddCoupons($coupon) {
     $this->coupon_arr[] = $coupon;
   }
 
+  /**
+   * @param $gift
+   */
   function AddGiftCertificates($gift) {
     $this->giftcert_arr[] = $gift;
   }
@@ -65,12 +85,24 @@ class GoogleResult {
 /* This is a class used to return the results of coupons
   * that the buyer entered code for on the place order page
   */
+
+/**
+ * Class GoogleCoupons
+ */
 class GoogleCoupons {
   var $coupon_valid;
   var $coupon_code;
   var $coupon_currency;
   var $coupon_amount;
   var $coupon_message;
+
+  /**
+   * @param $valid
+   * @param $code
+   * @param $amount
+   * @param $currency
+   * @param $message
+   */
   function googlecoupons($valid, $code, $amount, $currency, $message) {
     $this->coupon_valid = $valid;
     $this->coupon_code = $code;
@@ -83,12 +115,24 @@ class GoogleCoupons {
 /* This is a class used to return the results of gift certificates
   * that the buyer entered code for on the place order page
   */
+
+/**
+ * Class GoogleGiftcerts
+ */
 class GoogleGiftcerts {
   var $gift_valid;
   var $gift_code;
   var $gift_currency;
   var $gift_amount;
   var $gift_message;
+
+  /**
+   * @param $valid
+   * @param $code
+   * @param $amount
+   * @param $currency
+   * @param $message
+   */
   function googlegiftcerts($valid, $code, $amount, $currency, $message) {
     $this->gift_valid    = $valid;
     $this->gift_code     = $code;

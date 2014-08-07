@@ -34,6 +34,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  *  @package   CiviCRM
  */
 class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'PCP BAOs',

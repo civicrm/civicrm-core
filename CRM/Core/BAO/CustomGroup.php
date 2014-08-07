@@ -160,6 +160,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       }
     }
 
+    if (array_key_exists('is_reserved', $params)) {
+      $group->is_reserved = $params['is_reserved'] ? 1 : 0;
+    }
+    $op = isset($params['id']) ? 'edit' : 'create';
+    CRM_Utils_Hook::pre($op, 'CustomGroup', CRM_Utils_Array::value('id', $params), $params);
+
     // enclose the below in a transaction
     $transaction = new CRM_Core_Transaction();
 
@@ -995,6 +1001,13 @@ ORDER BY civicrm_custom_group.weight,
     return $groupTree;
   }
 
+  /**
+   * @param $entityType
+   * @param $path
+   * @param string $cidToken
+   *
+   * @return array
+   */
   public static function &getActiveGroups($entityType, $path, $cidToken = '%%cid%%') {
     // for Group's
     $customGroupDAO = new CRM_Core_DAO_CustomGroup();
@@ -1039,11 +1052,12 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return string $tableName
    *
-   * @access private
+   * @access public
    * @static
    *
+   * @see _apachesolr_civiAttachments_dereference_file_parent
    */
-  private static function _getTableName($entityType) {
+  public static function getTableNameByEntityName($entityType) {
     $tableName = '';
     switch ($entityType) {
       case 'Contact':
@@ -1144,6 +1158,7 @@ ORDER BY civicrm_custom_group.weight,
         }
         break;
 
+      case 'Case':
       case 'Location':
       case 'Address':
       case 'Activity':
@@ -1211,6 +1226,13 @@ ORDER BY civicrm_custom_group.weight,
     return TRUE;
   }
 
+  /**
+   * @param $groupTree
+   * @param $defaults
+   * @param bool $viewMode
+   * @param bool $inactiveNeeded
+   * @param int $action
+   */
   static function setDefaults(&$groupTree, &$defaults, $viewMode = FALSE, $inactiveNeeded = FALSE, $action = CRM_Core_Action::NONE) {
     foreach ($groupTree as $id => $group) {
       if (!isset($group['fields'])) {
@@ -1234,7 +1256,9 @@ ORDER BY civicrm_custom_group.weight,
         }
 
         $fieldId = $field['id'];
-        $elementName = $field['element_name'];
+        if (!empty($field['element_name'])) {
+          $elementName = $field['element_name'];
+        }
         switch ($field['html_type']) {
           case 'Multi-Select':
           case 'AdvMulti-Select':
@@ -1348,6 +1372,11 @@ ORDER BY civicrm_custom_group.weight,
     }
   }
 
+  /**
+   * @param $groupTree
+   * @param $params
+   * @param bool $skipFile
+   */
   static function postProcess(&$groupTree, &$params, $skipFile = FALSE) {
     // Get the Custom form values and groupTree
     // first reset all checkbox and radio data
@@ -1625,6 +1654,12 @@ ORDER BY civicrm_custom_group.weight,
     return TRUE;
   }
 
+  /**
+   * @param $table
+   *
+   * @return string
+   * @throws Exception
+   */
   static function mapTableName($table) {
     switch ($table) {
       case 'Contact':
@@ -1688,6 +1723,9 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
     }
   }
 
+  /**
+   * @param $group
+   */
   static function createTable($group) {
     $params = array(
       'name' => $group->table_name,
@@ -2201,6 +2239,12 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     return $objTypes;
   }
 
+  /**
+   * @param $customGroupId
+   * @param $entityId
+   *
+   * @return bool
+   */
   static function hasReachedMaxLimit($customGroupId, $entityId) {
     //check whether the group is multiple
     $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'is_multiple');
@@ -2225,6 +2269,9 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     return $hasReachedMax;
   }
 
+  /**
+   * @return array
+   */
   static function getMultipleFieldGroup() {
     $multipleGroup = array();
     $dao = new CRM_Core_DAO_CustomGroup();

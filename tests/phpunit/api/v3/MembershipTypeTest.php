@@ -27,6 +27,10 @@
  */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_MembershipTypeTest
+ */
 class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   protected $_contactID;
   protected $_contributionTypeID;
@@ -34,6 +38,9 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   protected $_entity = 'MembershipType';
 
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'MembershipType Create',

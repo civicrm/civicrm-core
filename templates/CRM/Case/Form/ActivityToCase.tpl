@@ -49,6 +49,13 @@
       $('input[name=file_on_case_unclosed_case_id]', '#fileOnCaseDialog').crmSelect2({
         placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
         minimumInputLength: 1,
+        formatResult: CRM.utils.formatSelect2Result,
+        formatSelection: function(row) {
+          return row.label;
+        },
+        initSelection: function($el, callback) {
+          callback($el.data('value'));
+        },
         ajax: {
           url: {/literal}"{crmURL p='civicrm/case/ajax/unclosed' h=0}"{literal},
           data: function(term) {

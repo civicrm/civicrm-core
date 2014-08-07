@@ -34,6 +34,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * permissions specified in Civi\API\Annotation\Permission.
  */
 class PermissionCheck implements EventSubscriberInterface {
+  /**
+   * @return array
+   */
   public static function getSubscribedEvents() {
     return array(
       Events::AUTHORIZE => array(
@@ -42,6 +45,11 @@ class PermissionCheck implements EventSubscriberInterface {
     );
   }
 
+  /**
+   * @param \Civi\API\Event\AuthorizeEvent $event
+   *
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
   public function onApiAuthorize(\Civi\API\Event\AuthorizeEvent $event) {
     $apiRequest = $event->getApiRequest();
     if ($apiRequest['version'] < 4) {

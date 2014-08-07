@@ -27,7 +27,7 @@
 
 {if $searchtype eq 'ts_sel'}
 <div id="popupContainer">
-  <table id="selectedRecords" class="display crm-copy-fields">
+  <table id="selectedRecords-{$group.id}" class="display crm-copy-fields">
     <thead>
     <tr class="columnheader">
       <th class="contact_details">{ts}Name{/ts}</th>
@@ -71,7 +71,7 @@
     });
 
     var count = 0; var columns = ''; var sortColumn = '';
-    $('#selectedRecords th').each(function() {
+    $('#selectedRecords-{/literal}{$group.id}{literal} th').each(function() {
       if ($(this).attr('class') == 'contact_details') {
         sortColumn += '[' + count + ', "asc" ],';
         columns += '{"sClass": "contact_details"},';
@@ -88,7 +88,7 @@
     eval('columns =[' + columns + ']');
 
     //load jQuery data table.
-    $('#selectedRecords').dataTable( {
+    $('#selectedRecords-{/literal}{$group.id}{literal}').dataTable( {
       "sPaginationType": "full_numbers",
       "bJQueryUI"  : true,
       "aaSorting"  : sortColumn,

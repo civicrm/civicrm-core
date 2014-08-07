@@ -172,6 +172,9 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     return $defaults;
   }
 
+  /**
+   * @return array|null
+   */
   function &links() {
     if (!(self::$_links)) {
       self::$_links = array(

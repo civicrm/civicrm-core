@@ -1,7 +1,14 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
+
+/**
+ * Class CRM_Activity_BAO_ActivityTest
+ */
 class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Activity BAOs',

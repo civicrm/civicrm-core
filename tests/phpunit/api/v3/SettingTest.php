@@ -48,11 +48,17 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   protected $_domainID2;
   protected $_domainID3;
 
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
 
   }
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Settings Tests',
@@ -404,7 +410,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     CRM_Core_BAO_Domain::resetDomain();
     $this->assertTrue($config->debug == 1);
     // this should NOT be stored in the settings table now - only in config
-    $sql = " SELECT count(*) as c FROM civicrm_setting WHERE name LIKE '%debug%'";
+    $sql = " SELECT count(*) as c FROM civicrm_setting WHERE name LIKE '%maxFileSize%'";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $dao->fetch();
     $this->assertEquals($dao->c, 0);

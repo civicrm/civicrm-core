@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_TaskActionSendSMS
+ */
 class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
 
   protected function setUp() {

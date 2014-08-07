@@ -37,7 +37,16 @@
  * WordPress specific stuff goes here
  */
 class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
+  /**
+   *
+   */
   function __construct() {
+    /**
+     * deprecated property to check if this is a drupal install. The correct method is to have functions on the UF classes for all UF specific
+     * functions and leave the codebase oblivious to the type of CMS
+     * @deprecated
+     * @var bool
+     */
     $this->is_drupal = FALSE;
   }
 
@@ -326,6 +335,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     return $base . '?' . implode($separator, $queryParts) . $fragment;
   }
 
+  /**
+   * @param $absolute
+   * @param $frontend
+   * @param $forceBackend
+   *
+   * @return mixed|null|string
+   */
   private function getBaseUrl($absolute, $frontend, $forceBackend) {
     $config    = CRM_Core_Config::singleton();
 
@@ -399,6 +415,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   function setMessage($message) {
   }
 
+  /**
+   * @param $user
+   *
+   * @return bool
+   */
   function loadUser( $user ) {
     return true;
   }
@@ -460,9 +481,24 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       date_default_timezone_set($wpUserTimezone);
       CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
     }
+    require_once ($cmsRootPath . DIRECTORY_SEPARATOR . 'wp-includes/pluggable.php');
+    $uid = CRM_Utils_Array::value('uid', $name);
+    if ($uid) {
+      $account = wp_set_current_user($uid);
+      if ($account && $account->data->ID) {
+        global $user;
+        $user = $account;
+        return TRUE;
+      }
+    }
     return true;
   }
 
+  /**
+   * @param $dir
+   *
+   * @return bool
+   */
   function validInstallDir($dir) {
     $includePath = "$dir/wp-includes";
     if (
@@ -474,6 +510,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     return FALSE;
   }
 
+  /**
+   * Determine the location of the CMS root.
+   *
+   * @return string|NULL local file system path to CMS root, or NULL if it cannot be determined
+   */
+  /**
+   * @return NULL|string
+   */
   function cmsRootPath() {
     $cmsRoot = $valid = NULL;
     if (defined('CIVICRM_CMSDIR')) {
@@ -505,6 +549,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     return ($valid) ? $cmsRoot : NULL;
   }
 
+  /**
+   * @param $params
+   * @param $mail
+   *
+   * @return mixed
+   */
   function createUser(&$params, $mail) {
     $user_data = array(
       'ID' => '',
@@ -557,6 +607,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     }
   }
 
+  /**
+   * @param $params
+   * @param $errors
+   * @param string $emailName
+   */
   function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
 
@@ -600,6 +655,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     return $isloggedIn;
   }
 
+  /**
+   * @return mixed
+   */
   function getLoggedInUserObject() {
     if (function_exists('is_user_logged_in') &&
     is_user_logged_in()) {
@@ -662,6 +720,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     return $loginURL;
   }
 
+  /**
+   * @param $form
+   */
   public function getLoginDestination(&$form) {
     return;
   }
@@ -687,6 +748,19 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   function getTimeZoneString() {
     return get_option('timezone_string');
+  }
+
+  /**
+   * Get Url to view user record
+   * @param integer $contactID Contact ID
+   *
+   * @return string
+   */
+  function getUserRecordUrl($contactID) {
+    $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
+    if (CRM_Core_Session::singleton()->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(array('cms:administer users'))) {
+      return CRM_Core_Config::singleton()->userFrameworkBaseURL . "wp-admin/user-edit.php?user_id=" . $uid;
+    }
   }
 }
 

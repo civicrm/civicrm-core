@@ -637,6 +637,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     return $clause;
   }
 
+  /**
+   * @return string
+   */
   public function __toString() {
     return $this->title;
   }
@@ -1099,6 +1102,11 @@ WHERE  id IN $groupIdString
     return $groupsReturn;
   }
 
+  /**
+   * @param $params
+   *
+   * @return null|string
+   */
   static function getGroupCount(&$params) {
     $whereClause = self::whereClause($params, FALSE);
     $query = "SELECT COUNT(*) FROM civicrm_group groups";
@@ -1246,6 +1254,12 @@ WHERE {$whereClause}";
     return $links;
   }
 
+  /**
+   * @param $whereClause
+   * @param $whereParams
+   *
+   * @return string
+   */
   function pagerAtoZ($whereClause, $whereParams) {
     $query = "
         SELECT DISTINCT UPPER(LEFT(groups.title, 1)) as sort_name

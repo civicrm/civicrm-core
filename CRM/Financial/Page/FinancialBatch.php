@@ -134,6 +134,11 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
     return 'civicrm';
   }
 
+  /**
+   * @param null $mode
+   *
+   * @return string
+   */
   function userContextParams($mode = NULL) {
     $context = $this->get("context");
     if ($mode == CRM_Core_Action::UPDATE || ($mode = CRM_Core_Action::ADD & isset($context))) {

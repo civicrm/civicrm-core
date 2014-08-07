@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Mailing_MailingTest
+ */
 class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -489,6 +493,10 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     $this->criteriaCheck($criteriaCheck, $mailingReportUrl);
   }
 
+  /**
+   * @param $criteriaCheck
+   * @param $mailingReportUrl
+   */
   function criteriaCheck($criteriaCheck, $mailingReportUrl) {
     foreach($criteriaCheck as $key => $infoFilter) {
       foreach($infoFilter as $entity => $dataToCheck) {
@@ -503,6 +511,11 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     }
   }
 
+  /**
+   * @param $summaryInfo
+   * @param $dataToCheck
+   * @param $entity
+   */
   function _verifyCriteria($summaryInfo, $dataToCheck, $entity) {
     foreach($dataToCheck as $key => $value) {
       if ($entity == 'report') {

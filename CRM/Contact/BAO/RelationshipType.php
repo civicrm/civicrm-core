@@ -126,7 +126,12 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
 
     $relationshipType->id = CRM_Utils_Array::value('relationshipType', $ids);
 
-    return $relationshipType->save();
+    $result = $relationshipType->save();
+
+    CRM_Core_PseudoConstant::relationshipType('label', TRUE);
+    CRM_Core_PseudoConstant::relationshipType('name', TRUE);
+    CRM_Case_XMLProcessor::flushStaticCaches();
+    return $result;
   }
 
   /**

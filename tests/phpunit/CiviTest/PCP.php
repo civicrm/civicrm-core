@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class PCPBlock
+ */
 class PCPBlock extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to create a PCP Block for Contribution Page

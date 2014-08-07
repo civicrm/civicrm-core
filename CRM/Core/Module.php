@@ -47,6 +47,10 @@ class CRM_Core_Module {
    */
   public $is_active;
 
+  /**
+   * @param $name
+   * @param $is_active
+   */
   public function __construct($name, $is_active) {
     $this->name = $name;
     $this->is_active = $is_active;
@@ -59,6 +63,7 @@ class CRM_Core_Module {
     static $result;
     if ($fresh || !is_array($result)) {
       $result = CRM_Extension_System::singleton()->getMapper()->getModules();
+      $result[] = new CRM_Core_Module('civicrm', TRUE); // pseudo-module for core
 
       $config = CRM_Core_Config::singleton();
       if (is_callable(array($config->userSystem, 'getModules'))) {

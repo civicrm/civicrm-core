@@ -45,6 +45,9 @@ class CRM_Contact_Form_Task_EmailCommon {
   public $_allContactDetails = array();
   public $_toContactEmails = array();
 
+  /**
+   * @param $form
+   */
   static function preProcessFromAddress(&$form) {
     $form->_single = FALSE;
     $className = CRM_Utils_System::getClassName($form);
@@ -130,7 +133,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     //here we are getting logged in user id as array but we need target contact id. CRM-5988
     $cid = $form->get('cid');
     if ($cid) {
-      $form->_contactIds = explode(',',$cid);
+      $form->_contactIds = explode(',', $cid);
     }
     if (count($form->_contactIds) > 1) {
       $form->_single = FALSE;
@@ -225,6 +228,10 @@ class CRM_Contact_Form_Task_EmailCommon {
           // build array's which are used to setdefaults
           if (in_array($contactId, $form->_toContactIds)) {
             $form->_toContactDetails[$contactId] = $form->_contactDetails[$contactId];
+            // If a particular address has been specified as the default, use that instead of contact's primary email
+            if (!empty($form->_toEmail) && $form->_toEmail['contact_id'] == $contactId) {
+              $email = $form->_toEmail['email'];
+            }
             $toArray[] = array(
               'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
               'id' => "$contactId::{$email}",

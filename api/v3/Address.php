@@ -127,10 +127,10 @@ function _civicrm_api3_address_get_spec(&$params) {
  * {@getfields address_delete}
  * {@example AddressDelete.php 0}
  *
- * @return boolean | error  true if successfull, error otherwise
+ * @return array api result array
  * @access public
  */
-function civicrm_api3_address_delete(&$params) {
+function civicrm_api3_address_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 

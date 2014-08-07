@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_MultipleRelationshipTest
+ */
 class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
@@ -48,6 +52,9 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
    * Helper function to provide data for multiple relationship import
    * for Individuals.
 
+   */
+  /**
+   * @return array
    */
   function _individualRelationshipCSVData() {
 

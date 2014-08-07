@@ -92,6 +92,9 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
     $this->addRule('weight', ts('Weight must be integer'), 'integer');
   }
 
+  /**
+   * @return int
+   */
   function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['weight'] = CRM_Utils_Array::value('weight', CRM_Core_BAO_PdfFormat::getDefaultValues(), 0);

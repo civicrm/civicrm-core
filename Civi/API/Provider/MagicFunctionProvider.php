@@ -34,6 +34,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * conventions.
  */
 class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterface {
+  /**
+   * @return array
+   */
   public static function getSubscribedEvents() {
     return array(
       Events::RESOLVE => array(
@@ -47,10 +50,16 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
    */
   private $cache;
 
+  /**
+   *
+   */
   function __construct() {
     $this->cache = array();
   }
 
+  /**
+   * @param \Civi\API\Event\ResolveEvent $event
+   */
   public function onApiResolve(\Civi\API\Event\ResolveEvent $event) {
     $apiRequest = $event->getApiRequest();
     $resolved = $this->resolve($apiRequest);
@@ -130,7 +139,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
 
     $functions = get_defined_functions();
     $actions = array();
-    $prefix = 'civicrm_api' . $version . '_' . strtolower($entity) . '_';
+    $prefix = 'civicrm_api' . $version . '_' . _civicrm_api_get_entity_name_from_camel($entity) . '_';
     $prefixGeneric = 'civicrm_api' . $version . '_generic_';
     foreach ($functions['user'] as $fct) {
       if (strpos($fct, $prefix) === 0) {

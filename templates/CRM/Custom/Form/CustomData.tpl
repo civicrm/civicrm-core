@@ -37,7 +37,7 @@
   {if $cd_edit.help_post}
     <div class="messages help">{$cd_edit.help_post}</div>
   {/if}
-  {if $cd_edit.is_multiple and ( ( $cd_edit.max_multiple eq '' )  or ( $cd_edit.max_multiple > 0 and $cd_edit.max_multiple >= $cgCount ) ) }
+  {if $cd_edit.is_multiple and ( ( $cd_edit.max_multiple eq '' )  or ( $cd_edit.max_multiple > 0 and $cd_edit.max_multiple > $cgCount ) ) }
     <div id="add-more-link-{$cgCount}" class="add-more-link-{$group_id}-{$cgCount}"><a href="#" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">{ts 1=$cd_edit.title}Add another %1 record{/ts}</a></div>
   {/if}
 {else}
@@ -79,7 +79,7 @@
         {/if}
       </div>
      </div>
-     {if $cd_edit.is_multiple and ( ( $cd_edit.max_multiple eq '' )  or ( $cd_edit.max_multiple > 0 and $cd_edit.max_multiple >= $cgCount ) ) }
+     {if $cd_edit.is_multiple and ( ( $cd_edit.max_multiple eq '' )  or ( $cd_edit.max_multiple > 0 and $cd_edit.max_multiple > $cgCount ) ) }
       {if $skipTitle}
         {* We don't yet support adding new records in inline-edit forms *}
         <div class="messages help">

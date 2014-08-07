@@ -86,8 +86,8 @@ div.crm-container fieldset label{
 }
 
 /* Styles for Sorting Header */
-.crm-container table.display thead th.sorting_asc,
-.crm-container table.display thead th.sorting_desc,
+.crm-container table thead th.sorting_asc,
+.crm-container table thead th.sorting_desc,
 .crm-container table .sticky th a.sort-ascending,
 .crm-container table .sticky th a.sort-descending,
 .crm-container table.caseSelector tr.columnheader th a.sort-ascending,
@@ -107,7 +107,7 @@ div.crm-container fieldset label{
 
 .crm-container tr {
   font-size: .95em;
-  background: none;
+  background: none !important;
 }
 
 .crm-container td {
@@ -225,9 +225,36 @@ input.crm-form-entityref {
   color: #3E3E3E;
 }
 
+.crm-container .replace-plain,
 .crm-container textarea,
 .crm-container select.crm-form-multiselect {
   border: 1px solid #999;
+}
+
+.crm-container .replace-plain {
+  cursor: pointer;
+  background: rgba(255,255,255,0.6);
+  min-height: 2em;
+  position: relative;
+  padding: 2px;
+}
+
+.crm-container .replace-plain:focus,
+.crm-container .replace-plain:hover {
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
+  background: rgba(255,255,255,0.8);
+}
+
+.crm-container .replace-plain .icon.edit-icon {
+  position: absolute;
+  top: .5em;
+  right: .5em;
+}
+
+.crm-container .replace-plain a:active .icon.edit-icon,
+.crm-container .replace-plain:focus .icon.edit-icon,
+.crm-container .replace-plain:hover .icon.edit-icon {
+  background-image: url("../i/icons/jquery-ui-2786C2.png");
 }
 
 /*
@@ -303,6 +330,9 @@ input.crm-form-entityref {
   background-image: -moz-linear-gradient(center bottom, #eee 0%, #fff 50%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ffffff', endColorstr = '#eeeeee', GradientType = 0);
   background-image: linear-gradient(top, #fff 0%, #eee 50%);
+}
+.crm-container input.crm-form-text.ng-invalid {
+    border: 1px solid #FF0000;
 }
 .crm-container input.crm-form-text,
 .crm-container input.dateplugin {
@@ -1702,7 +1732,7 @@ editor specific classes
 }
 .crm-container a.crm-hover-button.action-item,
 .crm-container .crm-hover-button.btn-slide {
-  font-size: .9em;
+  font-size: .95em;
   padding: 3px 5px;
   opacity: 1;
 }
@@ -1728,6 +1758,7 @@ editor specific classes
   color: #2786C2;
 }
 .crm-container .crm-hover-button .icon {
+  cursor: pointer;
   margin-left: 3px;
   position: relative;
   top: 2px;
@@ -1897,7 +1928,7 @@ div.grippie {
 
 #crm-container .ui-tabs-panel {
   padding: 4px;
-  font-size: 13px;
+  min-height: 12em;
 }
 
 #crm-container div.contact_details {
@@ -2365,6 +2396,14 @@ div.grippie {
   border: 1px solid #3e3e3e;
 }
 
+.crm-container input.form-submit[disabled],
+.crm-container .crm-button[disabled],
+#crm-container input[type=button][disabled],
+#crm-container input.form-submit-inline[disabled],
+#crm-container .crm-button[disabled] {
+    color: #999;
+}
+
 .crm-container .crm-button,
 #crm-container .crm-button {
   padding: 1px;
@@ -2549,7 +2588,8 @@ div.grippie {
   text-indent: -10000px;
 }
 
-.crm-container span.icon {
+.crm-container span.icon,
+.crm-container a.ui-icon {
   float: none;
   display: inline-block;
 }
@@ -2572,7 +2612,7 @@ div.grippie {
 }
 
 .crm-container .dark-icon {
-  background-image: url("../packages/jquery/jquery-ui/css/theme/images/ui-icons_222222_256x240.png")
+  background-image: url("../packages/jquery/jquery-ui/images/ui-icons_222222_256x240.png")
 }
 .crm-container .edit-icon {
   background-position: -64px -112px;
@@ -2856,26 +2896,32 @@ div.grippie {
 
 /* civicrm admin menu */
 #civicrm-menu .ui-autocomplete-input,
-.crm-container .ui-autocomplete-input,
-.crm-container .ac_input {
+.crm-container .ui-autocomplete-input {
   background: white url("../packages/jquery/plugins/select2/select2.png") no-repeat scroll right -23px;
   padding-right: 16px;
   /* so that text doesn't flow on top of icon */
 }
-#crm-container .ac_input {
-  width: 20em;
-}
 
 #civicrm-menu #crm-qsearch {
   padding: 1px 3px 1px 2px;
-  height: 20px;
+  background-color: #000 !important;
 }
 
 #civicrm-menu #crm-qsearch input {
-  background-color: #ffffff;
+  background-color: #eaeaea;
   border: 1px solid black;
   margin: 0px;
   padding: 2px 16px 3px 2px;
+  height: 16px;
+}
+#civicrm-menu #crm-qsearch input:hover,
+#civicrm-menu #crm-qsearch input:focus,
+#civicrm-menu #crm-qsearch.activetarget input {
+  background-color: #ffffff;
+}
+/* This ensures the drop-down menus appear at the right height */
+#civicrm-menu > li.menumain {
+  height: 19px !important;
 }
 
 /* Status message box */
@@ -2887,7 +2933,7 @@ div.grippie {
 }
 
 .crm-status-box-outer.status-start {
-  background: #F8FF03 url("../packages/jquery/jquery-ui/css/theme/images/animated-overlay.gif");
+  background: #F8FF03 url("../packages/jquery/jquery-ui/images/animated-overlay.gif");
 }
 
 .crm-status-box-outer .crm-status-box-inner {
@@ -3354,168 +3400,6 @@ div#crm-container form {
   background-color: #9FAFD1;
 }
 
-/*
- * Sorting classes for columns
- */
-/* For the standard odd/even */
-.crm-container tr.odd td.sorting_1 {
-  background-color: #D3D6FF;
-}
-
-.crm-container tr.odd td.sorting_2 {
-  background-color: #DADCFF;
-}
-
-.crm-container tr.odd td.sorting_3 {
-  background-color: #E0E2FF;
-}
-
-.crm-container tr.even td.sorting_1 {
-  background-color: #EAEBFF;
-}
-
-.crm-container tr.even td.sorting_2 {
-  background-color: #F2F3FF;
-}
-
-.crm-container tr.even td.sorting_3 {
-  background-color: #F9F9FF;
-}
-
-
-/* For the Conditional-CSS grading rows */
-/*
-  Colour calculations (based off the main row colours)
-  Level 1:
-    dd > c4
-    ee > d5
-  Level 2:
-    dd > d1
-    ee > e2
- */
-.crm-container tr.odd.gradeA td.sorting_1 {
-  background-color: #c4ffc4;
-}
-
-.crm-container tr.odd.gradeA td.sorting_2 {
-  background-color: #d1ffd1;
-}
-
-.crm-container tr.odd.gradeA td.sorting_3 {
-  background-color: #d1ffd1;
-}
-
-.crm-container tr.even.gradeA td.sorting_1 {
-  background-color: #d5ffd5;
-}
-
-.crm-container tr.even.gradeA td.sorting_2 {
-  background-color: #e2ffe2;
-}
-
-.crm-container tr.even.gradeA td.sorting_3 {
-  background-color: #e2ffe2;
-}
-
-.crm-container tr.odd.gradeC td.sorting_1 {
-  background-color: #c4c4ff;
-}
-
-.crm-container tr.odd.gradeC td.sorting_2 {
-  background-color: #d1d1ff;
-}
-
-.crm-container tr.odd.gradeC td.sorting_3 {
-  background-color: #d1d1ff;
-}
-
-.crm-container tr.even.gradeC td.sorting_1 {
-  background-color: #d5d5ff;
-}
-
-.crm-container tr.even.gradeC td.sorting_2 {
-  background-color: #e2e2ff;
-}
-
-.crm-container tr.even.gradeC td.sorting_3 {
-  background-color: #e2e2ff;
-}
-
-.crm-container tr.odd.gradeX td.sorting_1 {
-  background-color: #ffc4c4;
-}
-
-.crm-container tr.odd.gradeX td.sorting_2 {
-  background-color: #ffd1d1;
-}
-
-.crm-container tr.odd.gradeX td.sorting_3 {
-  background-color: #ffd1d1;
-}
-
-.crm-container tr.even.gradeX td.sorting_1 {
-  background-color: #ffd5d5;
-}
-
-.crm-container tr.even.gradeX td.sorting_2 {
-  background-color: #ffe2e2;
-}
-
-.crm-container tr.even.gradeX td.sorting_3 {
-  background-color: #ffe2e2;
-}
-
-.crm-container tr.odd.gradeU td.sorting_1 {
-  background-color: #c4c4c4;
-}
-
-.crm-container tr.odd.gradeU td.sorting_2 {
-  background-color: #d1d1d1;
-}
-
-.crm-container tr.odd.gradeU td.sorting_3 {
-  background-color: #d1d1d1;
-}
-
-.crm-container tr.even.gradeU td.sorting_1 {
-  background-color: #d5d5d5;
-}
-
-.crm-container tr.even.gradeU td.sorting_2 {
-  background-color: #e2e2e2;
-}
-
-.crm-container tr.even.gradeU td.sorting_3 {
-  background-color: #e2e2e2;
-}
-
-/*
- * KeyTable
- */
-.crm-container table.KeyTable td {
-  border: 3px solid transparent;
-}
-
-.crm-container table.KeyTable td.focus {
-  border: 3px solid #3366FF;
-}
-
-.crm-container table.display tr.gradeA {
-  background-color: #eeffee;
-}
-
-.crm-container table.display tr.gradeC {
-  background-color: #ddddff;
-}
-
-.crm-container table.display tr.gradeX {
-  background-color: #ffdddd;
-}
-
-.crm-container table.display tr.gradeU {
-  background-color: #ddd;
-}
-
 /*  DataTables fixes */
 .crm-container .crm-datatable-pager-top {
   padding-top: 5px;
@@ -3614,8 +3498,12 @@ tbody.scrollContent tr.alternateRow {
   color: #a7a7a7;
 }
 
-.crm-container a.sorting {
+.crm-container a.sorting,
+.crm-container a.sorting_desc,
+.crm-container a.sorting_asc {
   color: #A7A7A7;
+  background: url("../packages/jquery/plugins/DataTables/media/images/sort_both.png") no-repeat left center;
+  padding-left: 20px;
 }
 .crm-container a.sorting_desc,
 .crm-container a.sorting_asc {
@@ -3627,6 +3515,25 @@ tbody.scrollContent tr.alternateRow {
 .crm-container tr a.sorting_desc {
   color: #52534D;
 }
+
+.crm-container table thead a.sorting_asc {
+  background: url("../packages/jquery/plugins/DataTables/media/images/sort_asc.png") no-repeat left center;
+}
+.crm-container table thead a.sorting_desc {
+  background: url("../packages/jquery/plugins/DataTables/media/images/sort_desc.png") no-repeat left center;
+}
+.crm-container table thead a.sorting_asc_disabled {
+  background: url("../packages/jquery/plugins/DataTables/media/images/sort_asc_disabled.png") no-repeat left center;
+}
+.crm-container table thead a.sorting_desc_disabled {
+  background: url("../packages/jquery/plugins/DataTables/media/images/sort_desc_disabled.png") no-repeat left center;
+}
+
+/* Otherwise for some reason we have 2 sort icons */
+.crm-container th.sorting .DataTables_sort_icon {
+  display: none;
+}
+
 
 /*contact summary page */
 #crm-container div.contact_details,
@@ -3779,7 +3686,7 @@ div.m ul#civicrm-menu,
   border-radius: 4px;
 }
 
-/* autocomplete */
+/* deprecated autocomplete styles */
 
 .ac_results {
   background: transparent url(../i/dropdown-pointer.gif) no-repeat 25px 1px;
@@ -3801,20 +3708,10 @@ div.m ul#civicrm-menu,
   width: 160px!important;
 }
 
-.ac_even {
-  background-color: transparent;
-}
-.ac_odd {
-  background-color: #4F4F4F;
-}
-
 .ac_results li a {
   display: block;
 }
 
-.ac_results li,
-.ac_results li a,
-.ac_results li a:visited,
 .crm-container .ac_results li,
 .crm-container .ac_results li a,
 .crm-container .ac_results li a:visited {
@@ -3827,41 +3724,30 @@ div.m ul#civicrm-menu,
   font-weight: normal;
 }
 
-.ac_results li .icon,
-.ac_results li a .icon,
-.ac_results li a:visited .icon,
 .crm-container .ac_results li .icon,
 .crm-container .ac_results li a .icon,
 .crm-container .ac_results li a:visited .icon {
   background-image: url(../i/icons/jquery-ui-FFFFFF.png);
 }
 
-.ac_results li a:hover .icon,
-.ac_results li.ac_over a .icon,
 .crm-container .ac_results li a:hover .icon {
   background-image: url(../i/icons/jquery-ui-3E3E3E.png);
 }
 
-.ac_results li.ac_over,
 .ac_results li:hover,
 .ac_results li:hover a,
-.ac_results li.ac_over a,
-.ac_results li a:hover,
-.ac_results li.ac_over a:visited {
+.ac_results li a:hover {
   background-color: #F5F6F1;
   color: #666;
 }
-.ac_results li.ac_over strong,
-.ac_results li:hover strong,
-.crm-container .ac_results li.ac_over strong {
+.crm-container .ac_results li:hover strong {
   color: #000;
 }
 
 /* loader autocomplete */
 
 #civicrm-menu .ui-autocomplete-loading,
-.crm-container .ui-autocomplete-loading,
-.crm-container .ac_loading {
+.crm-container .ui-autocomplete-loading {
   background: white url('../i/loading.gif') no-repeat right center;
 }
 
@@ -3987,6 +3873,11 @@ div.m ul#civicrm-menu,
 #crm-container span.crm-button_qf_Main_upload input,
 #crm-container span.crm-button_qf_Confirm_next input,
 #crm-container span.crm-button_qf_Register_upload input {
+  font-size: 1.2em;
+}
+
+/* Match font size on 'Continue' button on event participant form (no specific class) */
+#crm-container .crm-event-additionalparticipant-form-block span.crm-button input.form-submit.default {
   font-size: 1.2em;
 }
 
@@ -4607,12 +4498,12 @@ span.crm-status-icon {
   color: #444444;
 }
 
-#crm-container.crm-public .price-set-row.highlight label {
+#crm-container.crm-public .price-set-row .highlight label {
   color: #000000;
   font-weight: bold;
 }
 
-#crm-container.crm-public .price-set-row.highlight .crm-price-amount-label {
+#crm-container.crm-public .price-set-row .highlight .crm-price-amount-label {
   color: #222222;
 }
 
@@ -4680,10 +4571,30 @@ span.crm-status-icon {
   background-position: -101px -222px;background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
 }
 
-.crm-container .survey-completed {
+.crm-container .survey-completed,
+.crm-container .strikethrough {
   text-decoration: line-through;
 }
 
 .crm-printButton {
   float: right;
+}
+
+.crm-container input.ng-invalid.ng-dirty,
+.crm-container select.ng-invalid.ng-dirty,
+.crm-container textarea.ng-invalid.ng-dirty {
+    border: 1px solid red;
+}
+.crm-container input.ng-valid,
+.crm-container input.ng-pristine,
+.crm-container textarea.ng-valid,
+.crm-container textarea.ng-pristine,
+.crm-container select.ng-valid,
+.crm-container select.ng-pristine{
+    border: 1px solid #666;
+}
+
+/* block-ui */
+.crm-container .blockUI.blockOverlay {
+  background: url("../i/loading-overlay.gif") center center no-repeat black;
 }

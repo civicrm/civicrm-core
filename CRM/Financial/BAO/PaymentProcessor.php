@@ -48,6 +48,12 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *
    * @params array parameters for Processor entity
    */
+  /**
+   * @param $params
+   *
+   * @return CRM_Financial_DAO_PaymentProcessor
+   * @throws Exception
+   */
   static function create($params) {
     // FIXME Reconcile with CRM_Admin_Form_PaymentProcessor::updatePaymentProcessor
     $processor = new CRM_Financial_DAO_PaymentProcessor();
@@ -211,6 +217,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     }
   }
 
+  /**
+   * @param $paymentProcessorIDs
+   * @param $mode
+   *
+   * @return array
+   * @throws Exception
+   */
   static function getPayments($paymentProcessorIDs, $mode) {
     if (!$paymentProcessorIDs) {
       CRM_Core_Error::fatal(ts('Invalid value passed to getPayment function'));

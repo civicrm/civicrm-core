@@ -33,6 +33,10 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
+
+/**
+ * Class CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue
+ */
 class CRM_Upgrade_Snapshot_V4p2_Price_DAO_FieldValue extends CRM_Core_DAO
 {
     /**

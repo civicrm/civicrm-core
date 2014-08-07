@@ -27,6 +27,10 @@
 */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_ParticipantStatusTypeTest
+ */
 class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $params;

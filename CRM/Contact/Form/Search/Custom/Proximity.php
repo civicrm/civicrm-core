@@ -38,6 +38,11 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
   protected $_longitude = NULL;
   protected $_distance = NULL;
 
+  /**
+   * @param $formValues
+   *
+   * @throws Exception
+   */
   function __construct(&$formValues) {
     parent::__construct($formValues);
 
@@ -91,6 +96,9 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     );
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
 
     $config = CRM_Core_Config::singleton();
@@ -166,6 +174,15 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
       ));
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return string
+   */
   function all($offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
@@ -190,6 +207,9 @@ country.name           as country
     );
   }
 
+  /**
+   * @return string
+   */
   function from() {
     $f = "
 FROM      civicrm_contact contact_a
@@ -214,6 +234,11 @@ LEFT JOIN civicrm_group_contact cgc ON ( cgc.contact_id = contact_a.id AND cgc.s
     return $f;
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     $params = array();
     $clause = array();
@@ -240,10 +265,16 @@ AND cgc.group_id = {$this->_group}
     return $this->whereClause($where, $params);
   }
 
+  /**
+   * @return string
+   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Custom/Proximity.tpl';
   }
 
+  /**
+   * @return array|null
+   */
   function setDefaultValues() {
     $config = CRM_Core_Config::singleton();
     $countryDefault = $config->defaultContactCountry;
@@ -266,8 +297,14 @@ AND cgc.group_id = {$this->_group}
     return NULL;
   }
 
+  /**
+   * @param $row
+   */
   function alterRow(&$row) {}
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);

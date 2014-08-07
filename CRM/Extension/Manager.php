@@ -190,6 +190,7 @@ class CRM_Extension_Manager {
     }
 
     $this->refresh();
+    CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
   }
 
   /**
@@ -455,6 +456,11 @@ class CRM_Extension_Manager {
     }
   }
 
+  /**
+   * @param CRM_Extension_Info $info
+   *
+   * @return bool
+   */
   private function _createExtensionEntry(CRM_Extension_Info $info) {
     $dao = new CRM_Core_DAO_Extension();
     $dao->label = $info->label;
@@ -466,6 +472,11 @@ class CRM_Extension_Manager {
     return (bool) ($dao->insert());
   }
 
+  /**
+   * @param CRM_Extension_Info $info
+   *
+   * @return bool
+   */
   private function _updateExtensionEntry(CRM_Extension_Info $info) {
     $dao = new CRM_Core_DAO_Extension();
     $dao->full_name = $info->key;
@@ -482,6 +493,11 @@ class CRM_Extension_Manager {
     }
   }
 
+  /**
+   * @param CRM_Extension_Info $info
+   *
+   * @throws CRM_Extension_Exception
+   */
   private function _removeExtensionEntry(CRM_Extension_Info $info) {
     $dao = new CRM_Core_DAO_Extension();
     $dao->full_name = $info->key;
@@ -494,6 +510,10 @@ class CRM_Extension_Manager {
     } // else: post-condition already satisified
   }
 
+  /**
+   * @param CRM_Extension_Info $info
+   * @param $isActive
+   */
   private function _setExtensionActive(CRM_Extension_Info $info, $isActive) {
     CRM_Core_DAO::executeQuery('UPDATE civicrm_extension SET is_active = %1 where full_name = %2', array(
       1 => array($isActive, 'Integer'),

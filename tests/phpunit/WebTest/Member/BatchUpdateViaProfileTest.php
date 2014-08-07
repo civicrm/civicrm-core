@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_BatchUpdateViaProfileTest
+ */
 class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -149,6 +153,9 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($verifyData);
   }
 
+  /**
+   * @param $memTypeParams
+   */
   function _addMembership($memTypeParams) {
     // click through to the membership view screen
     $this->click("css=li#tab_member a");
@@ -183,6 +190,10 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent($sourceText);
   }
 
+  /**
+   * @param $profileTitle
+   * @param $customDataParams
+   */
   function _addProfile($profileTitle, $customDataParams) {
 
     $this->openCiviPage("admin/uf/group", "reset=1");
@@ -218,6 +229,9 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Membership Status' has been saved to '{$profileTitle}'.");
   }
 
+  /**
+   * @return array
+   */
   function _addCustomData() {
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 4);
 

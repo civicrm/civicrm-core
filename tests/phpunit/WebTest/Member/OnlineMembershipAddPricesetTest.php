@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_OnlineMembershipAddPricesetTest
+ */
 class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -183,6 +187,12 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
 
   }
 
+  /**
+   * @param $setTitle
+   * @param $usedFor
+   * @param null $contributionType
+   * @param $setHelp
+   */
   function _testAddSet($setTitle, $usedFor, $contributionType = NULL, $setHelp) {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
@@ -207,6 +217,16 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->waitForText('crm-notification-container', "Your Set '{$setTitle}' has been added. You can add fields to this set now.");
   }
 
+  /**
+   * @param $fields
+   * @param $validateString
+   * @param bool $dateSpecificFields
+   * @param $title
+   * @param $sid
+   * @param $contributionType
+   *
+   * @return array
+   */
   function _testAddPriceFields(&$fields, &$validateString, $dateSpecificFields = FALSE, $title, $sid, $contributionType) {
     $memTypeParams1 = $this->webtestAddMembershipType();
     $memTypeTitle1 = $memTypeParams1['membership_type'];
@@ -267,6 +287,10 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     return array($memTypeTitle1, $memTypeTitle2);
   }
 
+  /**
+   * @param $validateStrings
+   * @param $sid
+   */
   function _testVerifyPriceSet($validateStrings, $sid) {
     // verify Price Set at Preview page
     // start at Manage Price Sets listing
@@ -279,6 +303,13 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     $this->assertStringsPresent($validateStrings);
   }
 
+  /**
+   * @param $pageId
+   * @param $contactParams
+   * @param $memTypeTitle1
+   * @param $memTypeTitle2
+   * @param bool $renew
+   */
   function _testSignUpOrRenewMembership($pageId, $contactParams, $memTypeTitle1, $memTypeTitle2, $renew = FALSE) {
     $this->webtestLogout();
 
@@ -382,6 +413,13 @@ class WebTest_Member_OnlineMembershipAddPricesetTest extends CiviSeleniumTestCas
     }
   }
 
+  /**
+   * @param $pageId
+   * @param $contactParams
+   * @param $memTypeTitle1
+   * @param $term
+   * @param bool $renew
+   */
   function _testMultilpeTermsMembershipRegistration($pageId, $contactParams, $memTypeTitle1, $term, $renew = FALSE){
     if($renew){
       $this->openCiviPage('member/search', 'reset=1', 'member_end_date_high');

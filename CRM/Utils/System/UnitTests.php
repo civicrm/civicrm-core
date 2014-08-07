@@ -37,20 +37,73 @@
  * Helper authentication class for unit tests
  */
 class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
+  /**
+   *
+   */
   function __construct() {
     $this->is_drupal = FALSE;
     $this->supports_form_extensions = False;
   }
 
+  /**
+   * sets the title of the page
+   *
+   * @param string $title
+   * @param null $pageTitle
+   *
+   * @paqram string $pageTitle
+   *
+   * @return void
+   * @access public
+   */
+  /**
+   * @param string $title
+   * @param null $pageTitle
+   */
   function setTitle($title, $pageTitle = NULL) {
     return;
   }
 
+  /**
+   * Authenticate the user against the drupal db
+   *
+   * @param string $name     the user name
+   * @param string $password the password for the above user name
+   * @param boolean $loadCMSBootstrap load cms bootstrap?
+   * @param NULL|string $realPath filename of script
+   *
+   * @return mixed false if no auth
+   *               array(
+   *  contactID, ufID, unique string ) if success
+   * @access public
+   */
+  /**
+   * @param string $name
+   * @param string $password
+   * @param bool $loadCMSBootstrap
+   * @param null|string $realPath
+   *
+   * @return mixed
+   */
   static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $retVal = array(1, 1, 12345);
     return $retVal;
   }
 
+  /**
+   * Append an additional breadcrumb tag to the existing breadcrumb
+   *
+   * @param $breadCrumbs
+   *
+   * @internal param string $title
+   * @internal param string $url
+   *
+   * @return void
+   * @access public
+   */
+  /**
+   * @param $breadCrumbs
+   */
   function appendBreadCrumb($breadCrumbs) {
     return;
   }
@@ -59,6 +112,17 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
     return;
   }
 
+  /**
+   * Append a string to the head of the html file
+   *
+   * @param string $header the new string to be appended
+   *
+   * @return void
+   * @access public
+   */
+  /**
+   * @param string $head
+   */
   function addHTMLHead($head) {
     return;
   }
@@ -68,10 +132,51 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
     $base_url = str_replace('http://', 'https://', $base_url);
   }
 
+  /**
+   * figure out the post url for the form
+   *
+   * @param mix $action the default action if one is pre-specified
+   *
+   * @return string the url to post the form
+   * @access public
+   */
+  /**
+   * @param mix $action
+   *
+   * @return string
+   */
   function postURL($action) {
     return;
   }
 
+  /**
+   * Generate an internal CiviCRM URL (copied from DRUPAL/includes/common.inc#url)
+   *
+   * @param $path     string   The path being linked to, such as "civicrm/add"
+   * @param $query    string   A query string to append to the link.
+   * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
+   *                           Useful for links that will be displayed outside the site, such as in an
+   *                           RSS feed.
+   * @param $fragment string   A fragment identifier (named anchor) to append to the link.
+   * @param $htmlize  boolean  whether to convert to html eqivalant
+   * @param $frontend boolean  a gross joomla hack
+   * @param $forceBackend boolean  a gross joomla hack
+   *
+   * @return string an HTML string containing a link to the given path.
+   * @access public
+   *
+   */
+  /**
+   * @param null|string $path
+   * @param null|string $query
+   * @param bool $absolute
+   * @param null|string $fragment
+   * @param bool $htmlize
+   * @param bool $frontend
+   * @param bool $forceBackend
+   *
+   * @return string
+   */
   function url($path = NULL, $query = NULL, $absolute = FALSE,
     $fragment = NULL, $htmlize = TRUE,
     $frontend = FALSE, $forceBackend = FALSE
@@ -129,6 +234,9 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
     }
   }
 
+  /**
+   * @param $user
+   */
   function getUserID($user) {
     //FIXME: look here a bit closer when testing UFMatch
 
@@ -137,10 +245,25 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
     CRM_Core_BAO_UFMatch::synchronize($user, TRUE, 'Standalone', 'Individual');
   }
 
+  /**
+   * @param $user
+   *
+   * @return bool
+   */
   function getAllowedToLogin($user) {
     return TRUE;
   }
 
+  /**
+   * Set a message in the UF to display to a user
+   *
+   * @param string $message the message to set
+   *
+   * @access public
+   */
+  /**
+   * @param string $message
+   */
   function setMessage($message) {
     return;
   }
@@ -154,10 +277,26 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
     header("Location:index.php");
   }
 
+  /**
+   * Get the locale set in the hosting CMS
+   *
+   * @return string  with the locale or null for none
+   */
+  /**
+   * @return string
+   */
   function getUFLocale() {
     return NULL;
   }
 
+  /**
+   * Get a list of all installed modules, including enabled and disabled ones
+   *
+   * @return array CRM_Core_Module
+   */
+  /**
+   * @return array
+   */
   function getModules() {
     return array();
   }

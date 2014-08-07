@@ -37,6 +37,10 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params;
+
+  /**
+   * @var CRM_Utils_Hook_UnitTests
+   */
   protected $hookClass = NULL;
   public $DBResetRequired = FALSE;
 
@@ -97,7 +101,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * Function tests that deleted contacts are not returned
    */
   function testContactGetPermissionHookNoDeleted() {
-    $result = $this->callAPISuccess('contact', 'create', array('id' => 2, 'is_deleted' => 1));
+    $this->callAPISuccess('contact', 'create', array('id' => 2, 'is_deleted' => 1));
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
     $result = $this->callAPISuccess('contact', 'get', array(
       'check_permissions' => 1,
@@ -185,7 +189,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    */
   function testContactGetPledgeIDNotReturned() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
-    $fullresult = $this->callAPISuccess('contact', 'get', array(
+    $this->callAPISuccess('contact', 'get', array(
       'sequential' => 1,
     ));
     $result = $this->callAPISuccess('contact', 'get', array(
@@ -201,7 +205,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    */
   function testContactGetPledgeIDNotFiltered() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
-    $fullresult = $this->callAPISuccess('contact', 'get', array(
+    $this->callAPISuccess('contact', 'get', array(
       'sequential' => 1,
     ));
     $result = $this->callAPISuccess('contact', 'get', array(
@@ -217,10 +221,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    */
   function testContactGetPledgeNotChainable() {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereOnlySecond'));
-    $fullresult = $this->callAPISuccess('contact', 'get', array(
+    $this->callAPISuccess('contact', 'get', array(
       'sequential' => 1,
     ));
-    $result = $this->callAPIFailure('contact', 'get', array(
+    $this->callAPIFailure('contact', 'get', array(
         'check_permissions' => 1,
         'api.pledge.get' => 1,
         'sequential' => 1,
@@ -237,6 +241,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   /**
    * all results returned
+   * @implements CRM_Utils_Hook::aclWhereClause
    */
   function aclWhereHookAllResults($type, &$tables, &$whereTables, &$contactID, &$where) {
     $where = " (1) ";
@@ -244,11 +249,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   /**
    * full results returned
+   * @implements CRM_Utils_Hook::aclWhereClause
    */
   function aclWhereOnlySecond($type, &$tables, &$whereTables, &$contactID, &$where) {
     $where = " contact_a.id > 1";
   }
-
-
 }
 

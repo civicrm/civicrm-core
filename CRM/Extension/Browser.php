@@ -67,6 +67,9 @@ class CRM_Extension_Browser {
     return (FALSE !== $this->getRepositoryUrl());
   }
 
+  /**
+   * @return string
+   */
   public function getRepositoryUrl() {
     return $this->repoUrl;
   }
@@ -147,6 +150,10 @@ class CRM_Extension_Browser {
     }
   }
 
+  /**
+   * @return array
+   * @throws CRM_Extension_Exception_ParseException
+   */
   private function _discoverRemote() {
     $tsPath    = $this->getTsPath();
     $timestamp = FALSE;
@@ -183,6 +190,9 @@ class CRM_Extension_Browser {
     return $this->_remotesDiscovered;
   }
 
+  /**
+   * @return array
+   */
   private function grabCachedKeyList() {
     $result     = array();
     $cachedPath = $this->cacheDir . DIRECTORY_SEPARATOR;
@@ -291,6 +301,9 @@ class CRM_Extension_Browser {
     }
   }
 
+  /**
+   * @return string
+   */
   private function getTsPath() {
       return $this->cacheDir . DIRECTORY_SEPARATOR . 'timestamp.txt';
   }

@@ -71,6 +71,14 @@
         </table>
      </td>
     </tr>
+    <tr>
+      <td class="label" width="20%">{$form.from_name.label}</td>
+      <td>{$form.from_name.html}&nbsp;&nbsp;{help id="id-from_name_email"}</td>
+    </tr>
+    <tr>
+      <td class="label" width="20%">{$form.from_email.label}</td>
+      <td>{$form.from_email.html}&nbsp;&nbsp;</td>
+    </tr>
     <tr class="crm-scheduleReminder-form-block-recipient">
       <td id="recipientLabel" class="right">{$form.recipient.label}</td><td colspan="3">{$form.limit_to.html}&nbsp;&nbsp;{$form.recipient.html}&nbsp;&nbsp;{help id="recipient" title=$form.recipient.label}</td>
     </tr>
@@ -223,69 +231,63 @@
     });
   });
 
-     function populateRecipient( ) {
-         var recipient = cj("#recipient option:selected").val();
+  function populateRecipient( ) {
+    var recipient = cj("#recipient option:selected").val();
     var entity = cj("#entity_0 option:selected").val();
     var postUrl = "{/literal}{crmURL p='civicrm/ajax/populateRecipient' h=0}{literal}";
 
-    if(recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role') {
-          var elementID = '#recipient_listing';
-             cj( elementID ).html('');
-          cj.post(postUrl, {recipient: recipientMapping[recipient]},
-            function ( response ) {
-          response = eval( response );
-          for (i = 0; i < response.length; i++) {
-                         cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
-                    }
-    });
-          cj("#recipientList").show();
-                cj('#is_recipient_listing').val(1);
+    if (recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role') {
+      var elementID = '#recipient_listing';
+      cj( elementID ).html('');
+      cj.post(postUrl, {recipient: recipientMapping[recipient]},
+      function ( response ) {
+        response = eval( response );
+        for (i = 0; i < response.length; i++) {
+          cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
+        }
+      });
+      cj("#recipientList").show();
+      cj('#is_recipient_listing').val(1);
     } else {
-       cj("#recipientList").hide();
-       cj('#is_recipient_listing').val('');
+      cj("#recipientList").hide();
+      cj('#is_recipient_listing').val('');
     }
-
-    if (entityMapping[entity] == 'civicrm_activity') {
-       cj("#recipientLabel").text("Recipient(s)");
-    } else {
-        cj("#recipientLabel").text("Limit Recipients");
+  }
+  
+  function buildSelect( selectID ) {
+    var elementID = '#' +  selectID;
+    cj( elementID ).html('');
+    var mappingID = cj('#entity_0').val();
+    var postUrl = "{/literal}{crmURL p='civicrm/ajax/mapping' h=0}{literal}";
+    cj.post( postUrl, { mappingID: mappingID},
+    function ( response ) {
+      response = eval( response );
+      for (i = 0; i < response.length; i++) {
+        cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
+      }
     }
-     }
-     function buildSelect( selectID ) {
-         var elementID = '#' +  selectID;
-         cj( elementID ).html('');
-   var mappingID = cj('#entity_0').val();
-         var postUrl = "{/literal}{crmURL p='civicrm/ajax/mapping' h=0}{literal}";
-         cj.post( postUrl, { mappingID: mappingID},
-             function ( response ) {
-                 response = eval( response );
-                 for (i = 0; i < response.length; i++) {
-                     cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
-                 }
-             }
-         );
+    );
+  }
 
-     }
+  function buildSelect1( selectID ) {
+    var elementID = '#' +  selectID;
+    cj( elementID ).html('');
+    var mappingID = cj('#entity_0').val();
+    var postUrl1 = "{/literal}{crmURL p='civicrm/ajax/mapping1' h=0}{literal}";
 
- function buildSelect1( selectID ) {
-         var elementID = '#' +  selectID;
-         cj( elementID ).html('');
-   var mappingID = cj('#entity_0').val();
-         var postUrl1 = "{/literal}{crmURL p='civicrm/ajax/mapping1' h=0}{literal}";
-
-   cj('#is_recipient_listing').val('');
-         cj.post( postUrl1, { mappingID: mappingID},
-             function ( result ) {
-                 var responseResult = cj.parseJSON(result);
-                 var response       = eval(responseResult.sel5);
-                 recipientMapping   = eval(responseResult.recipientMapping);
-                 for (i = 0; i < response.length; i++) {
-                     cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
-                 }
-     populateRecipient();
-             }
-         );
-     }
+    cj('#is_recipient_listing').val('');
+    cj.post( postUrl1, { mappingID: mappingID},
+    function ( result ) {
+      var responseResult = cj.parseJSON(result);
+      var response       = eval(responseResult.sel5);
+      recipientMapping   = eval(responseResult.recipientMapping);
+      for (i = 0; i < response.length; i++) {
+        cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
+      }
+      populateRecipient();
+    }
+    );
+  }
 
  </script>
  {/literal}

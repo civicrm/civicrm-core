@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class Event
+ */
 class Event extends PHPUnit_Framework_Testcase {
   /**
    * Helper function to create

@@ -38,6 +38,9 @@
  * For initial version, this page only contains static links - so this class is empty for now.
  */
 class CRM_Admin_Page_Access extends CRM_Core_Page {
+  /**
+   * @return string
+   */
   function run() {
     $config = CRM_Core_Config::singleton();
 

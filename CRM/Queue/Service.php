@@ -40,10 +40,12 @@
  *
  * // Some time later...
  * $item = $queue->claimItem();
- * if (my_process($item->data)) {
- *   $myMessage->deleteItem();
- * } else {
- *   $myMessage->releaseItem();
+ * if ($item) {
+ *   if (my_process($item->data)) {
+ *     $queue->deleteItem($item);
+ *   } else {
+ *     $queue->releaseItem($item);
+ *   }
  * }
  * @endcode
  */
@@ -70,6 +72,10 @@ class CRM_Queue_Service {
    * @var array(queueName => CRM_Queue_Queue)
    */
   var $queues;
+
+  /**
+   *
+   */
   function __construct() {
     $this->queues = array();
   }

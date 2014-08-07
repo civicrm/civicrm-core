@@ -706,9 +706,9 @@ class CRM_Utils_Array {
       $node = &$result;
       foreach ($keys as $key) {
         if (is_array($record)) {
-          $keyvalue = $record[$key];
+          $keyvalue = isset($record[$key]) ? $record[$key] : NULL;
         } else {
-          $keyvalue = $record->{$key};
+          $keyvalue = isset($record->{$key}) ? $record->{$key} : NULL;
         }
         if (isset($node[$keyvalue]) && !is_array($node[$keyvalue])) {
           $node[$keyvalue] = array();
@@ -737,11 +737,13 @@ class CRM_Utils_Array {
    */
   static function collect($prop, $records) {
     $result = array();
-    foreach ($records as $key => $record) {
-      if (is_object($record)) {
-        $result[$key] = $record->{$prop};
-      } else {
-        $result[$key] = $record[$prop];
+    if (is_array($records)) {
+      foreach ($records as $key => $record) {
+        if (is_object($record)) {
+          $result[$key] = $record->{$prop};
+        } else {
+          $result[$key] = $record[$prop];
+        }
       }
     }
     return $result;
@@ -878,6 +880,13 @@ class CRM_Utils_Array {
    * @return mixed
    *   The value found.
    */
+  /**
+   * @param $regexKey
+   * @param $list
+   * @param null $default
+   *
+   * @return null
+   */
   static function valueByRegexKey($regexKey, $list, $default = NULL) {
     if (is_array($list) && $regexKey) {
       $matches = preg_grep($regexKey, array_keys($list));
@@ -933,6 +942,19 @@ class CRM_Utils_Array {
     }
 
     return $results;
+  }
+
+  /**
+   * Get the first elemnet of an array
+   *
+   * @param array $array
+   * @return mixed|NULL
+   */
+  static function first($array) {
+    foreach ($array as $value) {
+      return $value;
+    }
+    return NULL;
   }
 }
 

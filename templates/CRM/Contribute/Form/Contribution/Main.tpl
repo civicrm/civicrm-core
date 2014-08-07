@@ -453,11 +453,24 @@
   CRM.$(function($) {
     // highlight price sets
     function updatePriceSetHighlight() {
-      cj('#priceset .price-set-row').removeClass('highlight');
-      cj('#priceset .price-set-row input:checked').parent().parent().addClass('highlight');
+      cj('#priceset .price-set-row span').removeClass('highlight');
+      cj('#priceset .price-set-row input:checked').parent().addClass('highlight');
     }
     cj('#priceset input[type="radio"]').change(updatePriceSetHighlight);
     updatePriceSetHighlight();
+
+    function toggleBillingBlockIfFree(){
+      var total_amount_tmp =  $(this).data('raw-total'); 
+      // Hide billing questions if this is free
+      if (total_amount_tmp == 0){
+        cj("#billing-payment-block").hide(); 
+      } 
+      else {
+        cj("#billing-payment-block").show(); 
+      }
+    }
+
+    $('#pricevalue').each(toggleBillingBlockIfFree).on('change', toggleBillingBlockIfFree);
   });
   {/literal}
 </script>

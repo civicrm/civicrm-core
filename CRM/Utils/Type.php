@@ -158,8 +158,7 @@ class CRM_Utils_Type {
         break;
 
       case 'Positive':
-        // the below 2 are for custom fields of this type
-        // CRM-8925
+      // CRM-8925 the 3 below are for custom fields of this type
       case 'Country':
       case 'StateProvince':
         // Checked for multi valued state/country value
@@ -181,6 +180,12 @@ class CRM_Utils_Type {
           return $data;
         }
         elseif (CRM_Utils_Rule::positiveInteger($data)) {
+          return $data;
+        }
+        break;
+
+      case 'File':
+        if (CRM_Utils_Rule::positiveInteger($data)) {
           return $data;
         }
         break;

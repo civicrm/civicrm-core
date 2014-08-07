@@ -1,5 +1,0 @@
-name = Extdir
-description = Export an extensions directory for use by CiviCRM
-package = Other
-core = 7.x
-php = 5.2

@@ -36,6 +36,10 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_EntityTagTest
+ */
 class api_v3_EntityTagTest extends CiviUnitTestCase {
 
   protected $_individualID;

@@ -34,10 +34,17 @@
  */
 
 require_once 'CRM/Contact/Form/Search/Custom/Base.php';
+
+/**
+ * Class org_civicrm_search_basic
+ */
 class org_civicrm_search_basic extends CRM_Contact_Form_Search_Custom_BaseimplementsCRM_Contact_Form_Search_Interface {
 
   protected $_query;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     parent::__construct($formValues);
 
@@ -95,6 +102,9 @@ class org_civicrm_search_basic extends CRM_Contact_Form_Search_Custom_Baseimplem
     return;
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
 
     //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
@@ -117,10 +127,21 @@ class org_civicrm_search_basic extends CRM_Contact_Form_Search_Custom_Baseimplem
     $form->assign('elements', array('sort_name', 'contact_type', 'group', 'tag'));
   }
 
+  /**
+   * @return CRM_Contact_DAO_Contact
+   */
   function count() {
     return $this->_query->searchQuery(0, 0, NULL, TRUE);
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowCount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   *
+   * @return CRM_Contact_DAO_Contact
+   */
   function all($offset = 0, $rowCount = 0, $sort = NULL,
     $includeContactIDs = FALSE
   ) {
@@ -130,10 +151,18 @@ class org_civicrm_search_basic extends CRM_Contact_Form_Search_Custom_Baseimplem
     );
   }
 
+  /**
+   * @return string
+   */
   function from() {
     return $this->_query->_fromClause;
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     if ($whereClause = $this->_query->whereClause()) {
       return $whereClause;
@@ -141,6 +170,9 @@ class org_civicrm_search_basic extends CRM_Contact_Form_Search_Custom_Baseimplem
     return ' (1) ';
   }
 
+  /**
+   * @return string
+   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Basic.tpl';
   }

@@ -1,10 +1,19 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_BAO_Cart
+ */
 class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   public $associations_loaded = FALSE;
     /* event_in_cart_id => $event_in_cart */
   public $events_in_carts = array(
     );
 
+  /**
+   * @param $params
+   *
+   * @return $this
+   */
   public static function add(&$params) {
     $cart = new CRM_Event_Cart_BAO_Cart();
     $cart->copyValues($params);
@@ -12,6 +21,11 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     return $result;
   }
 
+  /**
+   * @param $event_id
+   *
+   * @return mixed
+   */
   public function add_event($event_id) {
     $this->load_associations();
     $event_in_cart = $this->get_event_in_cart_by_event_id($event_id);
@@ -29,6 +43,9 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     return $this->events_in_carts[$event_in_cart->event_id];
   }
 
+  /**
+   * @param $participant
+   */
   function add_participant_to_cart($participant) {
     $event_in_cart = $this->get_event_in_cart_by_event_id($participant->event_id);
     if (!$event_in_cart) {
@@ -38,6 +55,12 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     $event_in_cart->save();
   }
 
+  /**
+   * @param $params
+   *
+   * @return $this
+   * @throws Exception
+   */
   public static function create($params) {
     $transaction = new CRM_Core_Transaction();
 
@@ -53,10 +76,20 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     return $cart;
   }
 
+  /**
+   * @param $id
+   *
+   * @return bool|CRM_Event_Cart_BAO_Cart
+   */
   public static function find_by_id($id) {
     return self::find_by_params(array('id' => $id));
   }
 
+  /**
+   * @param $params
+   *
+   * @return bool|CRM_Event_Cart_BAO_Cart
+   */
   public static function find_by_params($params) {
     $cart = new CRM_Event_Cart_BAO_Cart();
     $cart->copyValues($params);
@@ -68,6 +101,9 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     }
   }
 
+  /**
+   * @return $this|bool|CRM_Event_Cart_BAO_Cart
+   */
   public static function find_or_create_for_current_session() {
     $session       = CRM_Core_Session::singleton();
     $event_cart_id = $session->get('event_cart_id');
@@ -105,14 +141,27 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     return $cart;
   }
 
+  /**
+   * @param $id
+   *
+   * @return bool|CRM_Event_Cart_BAO_Cart
+   */
   public static function find_uncompleted_by_id($id) {
     return self::find_by_params(array('id' => $id, 'completed' => 0));
   }
 
+  /**
+   * @param $user_id
+   *
+   * @return bool|CRM_Event_Cart_BAO_Cart
+   */
   public static function find_uncompleted_by_user_id($user_id) {
     return self::find_by_params(array('user_id' => $user_id, 'completed' => 0));
   }
 
+  /**
+   * @return array
+   */
   public function get_main_events_in_carts() {
     //return CRM_Event_Cart_BAO_EventInCart::find_all_by_params( array('main_conference_event_id'
     $all = array();
@@ -124,6 +173,11 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     return $all;
   }
 
+  /**
+   * @param $main_conference_event_id
+   *
+   * @return array
+   */
   public function get_events_in_carts_by_main_event_id($main_conference_event_id) {
     $all = array();
     if (!$main_conference_event_id) {
@@ -138,6 +192,12 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     return $all;
   }
 
+  /**
+   * @param $event_in_cart_1
+   * @param $event_in_cart_2
+   *
+   * @return int
+   */
   static function compare_event_dates($event_in_cart_1, $event_in_cart_2) {
     $date_1 = CRM_Utils_Date::unixTime($event_in_cart_1->event->start_date);
     $date_2 = CRM_Utils_Date::unixTime($event_in_cart_2->event->start_date);
@@ -150,6 +210,11 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     return ($date_1 < $date_2) ? -1 : 1;
   }
 
+  /**
+   * @param $main_participant
+   *
+   * @return array
+   */
   public function get_subparticipants($main_participant) {
     $subparticipants = array();
     foreach ($this->events_in_carts as $event_in_cart) {
@@ -165,10 +230,20 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     return $subparticipants;
   }
 
+  /**
+   * @param $event_id
+   *
+   * @return mixed
+   */
   public function get_event_in_cart_by_event_id($event_id) {
     return CRM_Utils_Array::value($event_id, $this->events_in_carts);
   }
 
+  /**
+   * @param $event_in_cart_id
+   *
+   * @return null
+   */
   public function &get_event_in_cart_by_id($event_in_cart_id) {
     foreach ($this->events_in_carts as $event_in_cart) {
       if ($event_in_cart->id == $event_in_cart_id) {
@@ -178,6 +253,9 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     return NULL;
   }
 
+  /**
+   * @return array
+   */
   public function get_main_event_participants() {
     $participants = array();
     foreach ($this->get_main_events_in_carts() as $event_in_cart) {
@@ -198,6 +276,11 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     $this->save();
   }
 
+  /**
+   * @param $event_in_cart_id
+   *
+   * @return bool|CRM_Event_Cart_BAO_EventInCart
+   */
   public function remove_event_in_cart($event_in_cart_id) {
     $event_in_cart = CRM_Event_Cart_BAO_EventInCart::find_by_id($event_in_cart_id);
     if ($event_in_cart) {
@@ -211,6 +294,11 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     return $event_in_cart;
   }
 
+  /**
+   * @param $participant_id
+   *
+   * @return int
+   */
   function get_participant_index_from_id($participant_id) {
     foreach ($this->events_in_carts as $event_in_cart) {
       $index = 0;
@@ -224,6 +312,13 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     return - 1;
   }
 
+  /**
+   * @param $params
+   * @param $values
+   *
+   * @return mixed
+   * @throws Exception
+   */
   public static function retrieve(&$params, &$values) {
     $cart = self::find_by_params($params);
     if ($cart === FALSE) {
@@ -234,6 +329,9 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
 
+  /**
+   * @param $from_cart_id
+   */
   public function adopt_participants($from_cart_id) {
     $params = array(
       1 => array($this->id, 'Integer'),

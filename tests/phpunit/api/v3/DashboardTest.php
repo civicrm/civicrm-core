@@ -78,6 +78,10 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
     $this->DashboardDelete($dashboard['id'], $oldCount);
   }
 
+  /**
+   * @param $id
+   * @param $oldCount
+   */
   function DashboardDelete($id, $oldCount) {
     $params = array(
       'version' => 3,

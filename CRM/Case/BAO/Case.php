@@ -47,6 +47,9 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    */
   static $_exportableFields = NULL;
 
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
@@ -324,7 +327,7 @@ WHERE civicrm_case.id = %1";
    *
    * @param bool $moveToTrash
    *
-   * @return void
+   * @return bool is successful
    * @access public
    * @static
    */
@@ -550,6 +553,14 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
     return $caseArray;
   }
 
+  /**
+   * @param string $type
+   * @param null $userID
+   * @param null $condition
+   * @param int $isDeleted
+   *
+   * @return string
+   */
   static function getCaseActivityQuery($type = 'upcoming', $userID = NULL, $condition = NULL, $isDeleted = 0) {
     if (!$userID) {
       $session = CRM_Core_Session::singleton();
@@ -1358,7 +1369,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param int $caseID case id
    * @param boolean $skipDetails if true include details of contacts
    *
-   * @return returns $searchRows array of returnproperties
+   * @return array $searchRows array of return properties
    *
    * @static
    */
@@ -1757,6 +1768,16 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     return TRUE;
   }
 
+  /**
+   * @param $groupInfo
+   * @param null $sort
+   * @param null $showLinks
+   * @param bool $returnOnlyCount
+   * @param int $offset
+   * @param int $rowCount
+   *
+   * @return array
+   */
   static function getGlobalContacts(&$groupInfo, $sort = NULL, $showLinks = NULL, $returnOnlyCount = FALSE, $offset = 0, $rowCount = 25) {
     $globalContacts = array();
 
@@ -1792,6 +1813,11 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
   /*
    * Convenience function to get both case contacts and global in one array
+   */
+  /**
+   * @param $caseId
+   *
+   * @return array
    */
   static function getRelatedAndGlobalContacts($caseId) {
     $relatedContacts = self::getRelatedContacts($caseId);
@@ -2012,9 +2038,9 @@ SELECT civicrm_contact.id as casemanager_id,
    *
    * @return array of case and related data keyed on case id
    */
-  static function getUnclosedCases($params = array(), $excludeCaseIds = array(), $excludeDeleted = TRUE) {
+  static function getUnclosedCases($params = array(), $excludeCaseIds = array(), $excludeDeleted = TRUE, $includeClosed = FALSE) {
     //params from ajax call.
-    $where = array('( ca.end_date is null )');
+    $where = array($includeClosed ? '(1)' : '(ca.end_date is null)');
     if ($caseType = CRM_Utils_Array::value('case_type', $params)) {
       $where[] = "( civicrm_case_type.title LIKE '%$caseType%' )";
     }
@@ -2022,6 +2048,9 @@ SELECT civicrm_contact.id as casemanager_id,
       $config = CRM_Core_Config::singleton();
       $search = ($config->includeWildCardInName) ? "%$sortName%" : "$sortName%";
       $where[] = "( sort_name LIKE '$search' )";
+    }
+    if ($cid = CRM_Utils_Array::value('contact_id', $params)) {
+      $where[] = " c.id = $cid ";
     }
     if (is_array($excludeCaseIds) &&
       !CRM_Utils_System::isNull($excludeCaseIds)
@@ -2053,15 +2082,18 @@ SELECT civicrm_contact.id as casemanager_id,
             ca.id,
             ca.subject as case_subject,
             civicrm_case_type.title as case_type,
-            ca.start_date as start_date
+            ca.start_date as start_date,
+            ca.end_date as end_date,
+            ca.status_id
       FROM  civicrm_case ca INNER JOIN civicrm_case_contact cc ON ca.id=cc.case_id
  INNER JOIN  civicrm_contact c ON cc.contact_id=c.id
  INNER JOIN  civicrm_case_type ON ca.case_type_id = civicrm_case_type.id
      WHERE  {$whereClause}
-  ORDER BY  c.sort_name
+  ORDER BY  c.sort_name, ca.end_date
             {$limitClause}
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
+    $statuses = CRM_Case_PseudoConstant::caseStatus();
     $unclosedCases = array();
     while ($dao->fetch()) {
       if ($doFilterCases && !array_key_exists($dao->id, $filterCases)) {
@@ -2072,7 +2104,9 @@ SELECT civicrm_contact.id as casemanager_id,
         'case_type' => $dao->case_type,
         'contact_id' => $dao->contact_id,
         'start_date' => $dao->start_date,
+        'end_date' => $dao->end_date,
         'case_subject' => $dao->case_subject,
+        'case_status' => $statuses[$dao->status_id],
       );
     }
     $dao->free();
@@ -2080,6 +2114,12 @@ SELECT civicrm_contact.id as casemanager_id,
     return $unclosedCases;
   }
 
+  /**
+   * @param null $contactId
+   * @param bool $excludeDeleted
+   *
+   * @return null|string
+   */
   static function caseCount($contactId = NULL, $excludeDeleted = TRUE) {
     $whereConditions = array();
     if ($excludeDeleted) {
@@ -2289,7 +2329,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    *
    * @param bool $changeClient
    *
-   * @return void.
+   * @return integer|NULL
    * @static
    */
   static function mergeCases($mainContactId, $mainCaseId = NULL, $otherContactId = NULL,

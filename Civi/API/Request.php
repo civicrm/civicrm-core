@@ -26,6 +26,10 @@
 */
 namespace Civi\API;
 
+/**
+ * Class Request
+ * @package Civi\API
+ */
 class Request {
   private static $nextId = 1;
 

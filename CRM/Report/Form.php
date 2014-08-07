@@ -632,6 +632,11 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @param bool $freeze
+   *
+   * @return array
+   */
   function setDefaultValues($freeze = TRUE) {
     $freezeGroup = array();
 
@@ -762,6 +767,12 @@ class CRM_Report_Form extends CRM_Core_Form {
     return $this->_defaults;
   }
 
+  /**
+   * @param $group
+   * @param $grpFieldName
+   *
+   * @return bool
+   */
   function getElementFromGroup($group, $grpFieldName) {
     $eleObj = $this->getElement($group);
     foreach ($eleObj->_elements as $index => $obj) {
@@ -956,6 +967,14 @@ class CRM_Report_Form extends CRM_Core_Form {
         }
       }
     }
+
+    $stateCountryMap[] = array(
+      'country' => 'country_id_value',
+      'state_province' => 'state_province_id_value',
+      'county' => 'county_id_value'
+    );
+    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
+
     $this->assign('filters', $filters);
   }
 
@@ -1131,6 +1150,12 @@ class CRM_Report_Form extends CRM_Core_Form {
   // a formrule function to ensure that fields selected in group_by
   // (if any) should only be the ones present in display/select fields criteria;
   // note: works if and only if any custom field selected in group_by.
+  /**
+   * @param $fields
+   * @param array $ignoreFields
+   *
+   * @return array
+   */
   function customDataFormRule($fields, $ignoreFields = array( )) {
     $errors = array();
     if (!empty($this->_customGroupExtends) && $this->_customGroupGroupBy && !empty($fields['group_bys'])) {
@@ -1158,6 +1183,12 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   // Note: $fieldName param allows inheriting class to build operationPairs
   // specific to a field.
+  /**
+   * @param string $type
+   * @param null $fieldName
+   *
+   * @return array
+   */
   function getOperationPair($type = "string", $fieldName = NULL) {
     // FIXME: At some point we should move these key-val pairs
     // to option_group and option_value table.
@@ -1263,6 +1294,11 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @param string $operator
+   *
+   * @return string
+   */
   function getSQLOperator($operator = "like") {
     switch ($operator) {
       case 'eq':
@@ -1305,6 +1341,15 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
   }
 
+  /**
+   * @param $field
+   * @param $op
+   * @param $value
+   * @param $min
+   * @param $max
+   *
+   * @return null|string
+   */
   function whereClause(&$field, $op,
     $value, $min, $max
   ) {
@@ -1458,10 +1503,26 @@ class CRM_Report_Form extends CRM_Core_Form {
       // entries.
       $clause = $this->whereTagClause($field, $value, $op);
     }
-
+    elseif (!empty($field['membership_org']) && $clause) {
+      $clause = $this->whereMembershipOrgClause($field, $value, $op);
+    }
+    elseif (!empty($field['membership_type']) && $clause) {
+      $clause = $this->whereMembershipTypeClause($field, $value, $op);
+    }
     return $clause;
   }
 
+  /**
+   * @param $fieldName
+   * @param $relative
+   * @param $from
+   * @param $to
+   * @param null $type
+   * @param null $fromTime
+   * @param null $toTime
+   *
+   * @return null|string
+   */
   function dateClause($fieldName,
     $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
   ) {
@@ -1520,6 +1581,15 @@ class CRM_Report_Form extends CRM_Core_Form {
     return NULL;
   }
 
+  /**
+   * @param $relative
+   * @param $from
+   * @param $to
+   * @param null $fromtime
+   * @param null $totime
+   *
+   * @return array
+   */
   function getFromTo($relative, $from, $to, $fromtime = NULL, $totime = NULL) {
     if (empty($totime)) {
       $totime = '235959';
@@ -1537,10 +1607,16 @@ class CRM_Report_Form extends CRM_Core_Form {
     return array($from, $to);
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
   }
 
+  /**
+   * @param $rows
+   */
   function alterCustomDataDisplay(&$rows) {
     // custom code to alter rows having custom values
     if (empty($this->_customGroupExtends)) {
@@ -1601,6 +1677,13 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
   }
 
+  /**
+   * @param $value
+   * @param $customField
+   * @param $fieldValueMap
+   *
+   * @return float|string
+   */
   function formatCustomValues($value, $customField, $fieldValueMap) {
     if (CRM_Utils_System::isNull($value)) {
       return;
@@ -1721,6 +1804,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     return $retValue;
   }
 
+  /**
+   * @param $rows
+   */
   function removeDuplicates(&$rows) {
     if (empty($this->_noRepeats)) {
       return;
@@ -1740,6 +1826,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
   }
 
+  /**
+   * @param $row
+   * @param $fields
+   * @param bool $subtotal
+   */
   function fixSubTotalDisplay(&$row, $fields, $subtotal = TRUE) {
     foreach ($row as $colName => $colVal) {
       if (in_array($colName, $fields)) {
@@ -1757,6 +1848,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
   }
 
+  /**
+   * @param $rows
+   *
+   * @return bool
+   */
   function grandTotal(&$rows) {
     if (!$this->_rollup || ($this->_rollup == '') ||
       ($this->_limit && count($rows) >= self::ROW_COUNT_LIMIT)
@@ -1781,6 +1877,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     return TRUE;
   }
 
+  /**
+   * @param $rows
+   * @param bool $pager
+   */
   function formatDisplay(&$rows, $pager = TRUE) {
     // set pager based on if any limit was applied in the query.
     if ($pager) {
@@ -1825,6 +1925,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->alterCustomDataDisplay($rows);
   }
 
+  /**
+   * @param $rows
+   */
   function buildChart(&$rows) {
     // override this method for building charts.
   }
@@ -1986,6 +2089,14 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * @param $tableName
+   * @param $tableKey
+   * @param $fieldName
+   * @param $field
+   *
+   * @return bool
+   */
   function selectClause(&$tableName, $tableKey, &$fieldName, &$field) {
     return FALSE;
   }
@@ -2169,6 +2280,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   }
 
+  /**
+   * @param bool $applyLimit
+   *
+   * @return string
+   */
   function buildQuery($applyLimit = TRUE) {
     $this->select();
     $this->from();
@@ -2278,6 +2394,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->assign('sections', $this->_sections);
   }
 
+  /**
+   * @return array
+   */
   function unselectedSectionColumns() {
     $selectColumns = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -2299,6 +2418,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
   }
 
+  /**
+   * @param $sql
+   * @param $rows
+   */
   function buildRows($sql, &$rows) {
     $dao = CRM_Core_DAO::executeQuery($sql);
     if (!is_array($rows)) {
@@ -2397,6 +2520,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     // use this method to modify $this->_columnHeaders
   }
 
+  /**
+   * @param $rows
+   */
   function doTemplateAssignment(&$rows) {
     $this->assign_by_ref('columnHeaders', $this->_columnHeaders);
     $this->assign_by_ref('rows', $rows);
@@ -2404,6 +2530,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   // override this method to build your own statistics
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = array();
 
@@ -2422,6 +2553,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     return $statistics;
   }
 
+  /**
+   * @param $statistics
+   * @param $count
+   */
   function countStat(&$statistics, $count) {
     $statistics['counts']['rowCount'] = array('title' => ts('Row(s) Listed'),
                                         'value' => $count,
@@ -2434,6 +2569,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
   }
 
+  /**
+   * @param $statistics
+   */
   function groupByStat(&$statistics) {
     if (!empty($this->_params['group_bys']) &&
       is_array($this->_params['group_bys']) &&
@@ -2454,6 +2592,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
   }
 
+  /**
+   * @param $statistics
+   */
   function filterStat(&$statistics) {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -2538,6 +2679,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
   }
 
+  /**
+   * @param null $rows
+   */
   function endPostProcess(&$rows = NULL) {
     if ( $this->_storeResultSet ) {
       $this->_resultSet = $rows;
@@ -2644,6 +2788,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->_storeResultSet = TRUE;
   }
 
+  /**
+   * @return bool
+   */
   function getResultSet() {
     return $this->_resultSet;
   }
@@ -2651,6 +2798,15 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   /*
    * Get Template file name - use default form template if a specific one has not been set up for this report
    *
+   */
+  /**
+   * Use the form name to create the tpl file name
+   *
+   * @return string
+   * @access public
+   */
+  /**
+   * @return string
    */
   function getTemplateFileName(){
     $defaultTpl = parent::getTemplateFileName();
@@ -2665,6 +2821,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * Compile the report content
    *
    *  Although this function is super-short it is useful to keep separate so it can be over-ridden by report classes.
+   */
+  /**
+   * @return string
    */
   function compileContent(){
     $templateFile = $this->getHookedTemplateFileName();
@@ -2694,6 +2853,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->endPostProcess($rows);
   }
 
+  /**
+   * @param int $rowCount
+   */
   function limit($rowCount = self::ROW_COUNT_LIMIT) {
     // lets do the pager if in html mode
     $this->_limit = NULL;
@@ -2737,6 +2899,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
   }
 
+  /**
+   * @param int $rowCount
+   */
   function setPager($rowCount = self::ROW_COUNT_LIMIT) {
 
     // CRM-14115, over-ride row count if rowCount is specified in URL
@@ -2762,6 +2927,13 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
   }
 
+  /**
+   * @param $field
+   * @param $value
+   * @param $op
+   *
+   * @return string
+   */
   function whereGroupClause($field, $value, $op) {
 
     $smartGroupQuery = "";
@@ -2800,6 +2972,13 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                           {$smartGroupQuery} ) ";
   }
 
+  /**
+   * @param $field
+   * @param $value
+   * @param $op
+   *
+   * @return string
+   */
   function whereTagClause($field, $value, $op) {
     // not using left join in query because if any contact
     // belongs to more than one tag, results duplicate
@@ -2816,10 +2995,53 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                           WHERE entity_table = 'civicrm_contact' AND {$clause} ) ";
   }
 
+  function whereMembershipOrgClause($field, $value, $op) {
+    $sqlOp = $this->getSQLOperator($op);
+    if (!is_array($value)) {
+      $value = array($value);
+    }
+
+    $tmp_membership_org_sql_list = implode(', ', $value);
+    return " {$this->_aliases['civicrm_contact']}.id {$sqlOp} (
+                          SELECT DISTINCT mem.contact_id
+                          FROM civicrm_membership mem
+                          LEFT JOIN civicrm_membership_status mem_status ON mem.status_id = mem_status.id
+                          LEFT JOIN civicrm_membership_type mt ON mem.membership_type_id = mt.id
+                          WHERE mt.member_of_contact_id IN (".$tmp_membership_org_sql_list.")
+                          AND mt.is_active = '1'
+                          AND mem_status.is_current_member = '1'
+                          AND mem_status.is_active = '1' )  ";
+    }
+
+  function whereMembershipTypeClause($field, $value, $op) {
+    $sqlOp = $this->getSQLOperator($op);
+    if (!is_array($value)) {
+      $value = array($value);
+    }
+
+    $tmp_membership_sql_list  = implode(', ', $value);
+    return " {$this->_aliases['civicrm_contact']}.id {$sqlOp} (
+                          SELECT DISTINCT mem.contact_id
+                          FROM civicrm_membership mem
+                          LEFT JOIN civicrm_membership_status mem_status ON mem.status_id = mem_status.id
+                          LEFT JOIN civicrm_membership_type mt ON mem.membership_type_id = mt.id
+                          WHERE mem.membership_type_id IN (".$tmp_membership_sql_list.")
+                          AND mt.is_active = '1'
+                          AND mem_status.is_current_member = '1'
+                          AND mem_status.is_active = '1' ) ";
+  }
+
+  /**
+   * @param string $tableAlias
+   */
   function buildACLClause($tableAlias = 'contact_a') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 
+  /**
+   * @param bool $addFields
+   * @param array $permCustomGroupIds
+   */
   function addCustomDataToColumns($addFields = TRUE, $permCustomGroupIds = array()) {
     if (empty($this->_customGroupExtends)) {
       return;
@@ -3026,6 +3248,11 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     }
   }
 
+  /**
+   * @param $prop
+   *
+   * @return bool
+   */
   function isFieldSelected($prop) {
     if (empty($prop)) {
       return FALSE;
@@ -3353,6 +3580,15 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   /*
    * Do AlterDisplay processing on Address Fields
    */
+  /**
+   * @param $row
+   * @param $rows
+   * @param $rowNum
+   * @param $baseUrl
+   * @param $urltxt
+   *
+   * @return bool
+   */
   function alterDisplayAddressFields(&$row, &$rows, &$rowNum, $baseUrl, $urltxt) {
     $criteriaQueryParams = CRM_Report_Utils_Report::getPreviewCriteriaQueryParams($this->_defaults, $this->_params);
     $entryFound = FALSE;
@@ -3410,6 +3646,11 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
 
   /*
    *  Adjusts dates passed in to YEAR() for fiscal year.
+   */
+  /**
+   * @param $fieldName
+   *
+   * @return string
    */
   function fiscalYearOffset($fieldName) {
     $config = CRM_Core_Config::singleton();
@@ -3509,6 +3750,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
 
   }
 
+  /**
+   * @param $groupID
+   */
   function add2group($groupID) {
     if (is_numeric($groupID) && isset($this->_aliases['civicrm_contact'])) {
       $select = "SELECT DISTINCT {$this->_aliases['civicrm_contact']}.id AS addtogroup_contact_id, ";

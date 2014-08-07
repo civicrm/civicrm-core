@@ -126,21 +126,21 @@ INSERT INTO `civicrm_contact_type`
     INSERT INTO `civicrm_navigation`
         ( domain_id, url, label, name,permission, permission_operator, parent_id, is_active, has_separator, weight )
     VALUES
-        (  @domain_id, 'civicrm/contact/add&ct=Individual&cst=Student&reset=1'  , 'New Student', 'New Student', 'add contacts', '', @nav_indi, '1', NULL, 1 ),
-        (  @domain_id, 'civicrm/contact/add&ct=Individual&cst=Parent&reset=1'   , 'New Parent' , 'New Parent' , 'add contacts', '', @nav_indi, '1', NULL, 2 ),
-        (  @domain_id, 'civicrm/contact/add&ct=Individual&cst=Staff&reset=1'    , 'New Staff'  , 'New Staff'  , 'add contacts', '', @nav_indi, '1', NULL, 3 ),
-        (  @domain_id, 'civicrm/contact/add&ct=Organization&cst=Team&reset=1'   , 'New Team'   , 'New Team'   , 'add contacts', '', @nav_org , '1', NULL, 1 ),
-        (  @domain_id, 'civicrm/contact/add&ct=Organization&cst=Sponsor&reset=1', 'New Sponsor', 'New Sponsor', 'add contacts', '', @nav_org , '1', NULL, 2 );
+        (  @domain_id, 'civicrm/contact/add?ct=Individual&cst=Student&reset=1'  , 'New Student', 'New Student', 'add contacts', '', @nav_indi, '1', NULL, 1 ),
+        (  @domain_id, 'civicrm/contact/add?ct=Individual&cst=Parent&reset=1'   , 'New Parent' , 'New Parent' , 'add contacts', '', @nav_indi, '1', NULL, 2 ),
+        (  @domain_id, 'civicrm/contact/add?ct=Individual&cst=Staff&reset=1'    , 'New Staff'  , 'New Staff'  , 'add contacts', '', @nav_indi, '1', NULL, 3 ),
+        (  @domain_id, 'civicrm/contact/add?ct=Organization&cst=Team&reset=1'   , 'New Team'   , 'New Team'   , 'add contacts', '', @nav_org , '1', NULL, 1 ),
+        (  @domain_id, 'civicrm/contact/add?ct=Organization&cst=Sponsor&reset=1', 'New Sponsor', 'New Sponsor', 'add contacts', '', @nav_org , '1', NULL, 2 );
 
 -- Add sample dashlets
 
 INSERT INTO `civicrm_dashboard`
     ( `domain_id`, `name`, `label`, `url`, `permission`, `permission_operator`, `column_no`, `is_minimized`, `is_active`, `weight`, `is_fullscreen`, `fullscreen_url`)
     VALUES
-    ( @domain_id, 'report/6', '{ts escape="sql"}Donor Summary{/ts}'       , 'civicrm/report/instance/6&reset=1&section=1&snippet=5&charts=barChart',  'access CiviContribute', 'AND', 0, 0,'1', 4, '1', 'civicrm/report/instance/6&reset=1&section=1&snippet=5&charts=barChart&context=dashletFullscreen'),
-    ( @domain_id, 'report/13', '{ts escape="sql"}Top Donors{/ts}'            , 'civicrm/report/instance/13&reset=1&section=2&snippet=5',                 'access CiviContribute', 'AND', 0, 0,'1', 5, '1', 'civicrm/report/instance/13&reset=1&section=2&snippet=5&context=dashletFullscreen'),
-    ( @domain_id, 'report/25', '{ts escape="sql"}Event Income Summary{/ts}', 'civicrm/report/instance/25&reset=1&section=1&snippet=5&charts=pieChart', 'access CiviEvent'     , 'AND', 0, 0,'1', 6, '1', 'civicrm/report/instance/25&reset=1&section=1&snippet=5&charts=pieChart&context=dashletFullscreen'),
-    ( @domain_id, 'report/20', '{ts escape="sql"}Membership Summary{/ts}'  , 'civicrm/report/instance/20&reset=1&section=2&snippet=5',                 'access CiviMember'    , 'AND', 0, 0,'1', 7, '1', 'civicrm/report/instance/20&reset=1&section=2&snippet=5&context=dashletFullscreen');
+    ( @domain_id, 'report/6', '{ts escape="sql"}Donor Summary{/ts}'       , 'civicrm/report/instance/6?reset=1&section=1&snippet=5&charts=barChart',  'access CiviContribute', 'AND', 0, 0,'1', 4, '1', 'civicrm/report/instance/6?reset=1&section=1&snippet=5&charts=barChart&context=dashletFullscreen'),
+    ( @domain_id, 'report/13', '{ts escape="sql"}Top Donors{/ts}'            , 'civicrm/report/instance/13?reset=1&section=2&snippet=5',                 'access CiviContribute', 'AND', 0, 0,'1', 5, '1', 'civicrm/report/instance/13?reset=1&section=2&snippet=5&context=dashletFullscreen'),
+    ( @domain_id, 'report/25', '{ts escape="sql"}Event Income Summary{/ts}', 'civicrm/report/instance/25?reset=1&section=1&snippet=5&charts=pieChart', 'access CiviEvent'     , 'AND', 0, 0,'1', 6, '1', 'civicrm/report/instance/25?reset=1&section=1&snippet=5&charts=pieChart&context=dashletFullscreen'),
+    ( @domain_id, 'report/20', '{ts escape="sql"}Membership Summary{/ts}'  , 'civicrm/report/instance/20?reset=1&section=2&snippet=5',                 'access CiviMember'    , 'AND', 0, 0,'1', 7, '1', 'civicrm/report/instance/20?reset=1&section=2&snippet=5&context=dashletFullscreen');
 
 -- INSERT sample data for membership
 

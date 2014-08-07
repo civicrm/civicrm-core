@@ -339,6 +339,12 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   }
   //end of function
 
+  /**
+   * @param $participantId
+   * @param $statusId
+   *
+   * @return Ambigous|void
+   */
   static function updatePendingOnlineContribution($participantId, $statusId) {
     if (!$participantId || !$statusId) {
       return;

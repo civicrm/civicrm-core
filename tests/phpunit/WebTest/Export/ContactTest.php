@@ -25,6 +25,10 @@
 */
 
 require_once 'WebTest/Export/ExportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Export_ContactTest
+ */
 class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
   protected function setUp() {
@@ -411,6 +415,10 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->reviewCSV($csvFile, $checkHeaders, $checkRows, 2);
   }
 
+  /**
+   * @param string $groupName
+   * @param string $parentGroupName
+   */
   function addContactGroup($groupName = 'New Group', $parentGroupName = "- select group -") {
     $this->openCiviPage("group/add", "reset=1", "_qf_Edit_upload");
 
@@ -440,6 +448,14 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "The Group '$groupName' has been saved.");
   }
 
+  /**
+   * @param string $fname
+   * @param string $lname
+   * @param null $email
+   * @param null $contactSubtype
+   *
+   * @return array
+   */
   function webtestAddContactWithGenderPrefixSuffix($fname = 'Anthony', $lname = 'Anderson', $email = NULL, $contactSubtype = NULL) {
     $url = $this->sboxPath . 'civicrm/contact/add?reset=1&ct=Individual';
     if ($contactSubtype) {
@@ -479,6 +495,12 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     return array($email,$prefixLabel,$suffixLabel,$genderLabel);
   }
 
+  /**
+   * @param $optionGroupName
+   * @param $optionValue
+   *
+   * @return array|int
+   */
   function getOptionLabel($optionGroupName,$optionValue){
     $params = array(
       'version' => 3,

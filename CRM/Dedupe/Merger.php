@@ -37,6 +37,9 @@ class CRM_Dedupe_Merger {
   // FIXME: consider creating a common structure with cidRefs() and eidRefs()
   // FIXME: the sub-pages references by the URLs should
   // be loaded dynamically on the merge form instead
+  /**
+   * @return array
+   */
   static function relTables() {
     static $relTables;
 
@@ -205,6 +208,9 @@ WHERE
       while ($dao->fetch()) {
         $cidRefs[$dao->table_name][] = $dao->column_name;
       }
+
+      // FixME for time being adding below line statically as no Foreign key constraint defined for table 'civicrm_entity_tag'
+      $cidRefs['civicrm_entity_tag'][] = 'entity_id';
       $dao->free();
 
       // Allow hook_civicrm_merge() to adjust $cidRefs
@@ -342,6 +348,15 @@ INNER JOIN  civicrm_participant participant ON ( participant.id = payment.partic
     return $sqls;
   }
 
+  /**
+   * @param $mainId
+   * @param $otherId
+   * @param $tableName
+   * @param array $tableOperations
+   * @param string $mode
+   *
+   * @return array
+   */
   static function operationSql($mainId, $otherId, $tableName, $tableOperations = array(), $mode = 'add') {
     $sqls = array();
     if (!$tableName || !$mainId || !$otherId) {
@@ -444,11 +459,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         foreach ($cidRefs[$table] as $field) {
           // carry related contributions CRM-5359
           if (in_array($table, $paymentTables)) {
-            $payOprSqls = self::operationSql($mainId, $otherId, $table, $tableOperations, 'payment');
-            $sqls = array_merge($sqls, $payOprSqls);
-
             $paymentSqls = self::paymentSql($table, $mainId, $otherId);
             $sqls = array_merge($sqls, $paymentSqls);
+
+            if (!empty($tables) && !in_array('civicrm_contribution', $tables)) {
+              $payOprSqls = self::operationSql($mainId, $otherId, $table, $tableOperations, 'payment');
+              $sqls = array_merge($sqls, $payOprSqls);
+            }
           }
 
           $preOperationSqls = self::operationSql($mainId, $otherId, $table, $tableOperations);
@@ -799,6 +816,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       CRM_Core_DAO::freeResult();
     }
 
+    // get all contact subtypes
+    $contactSubTypes = CRM_Contact_BAO_ContactType::subTypePairs(NULL, TRUE, '');
+
     // FIXME: there must be a better way
     foreach (array('main', 'other') as $moniker) {
       $contact = &$$moniker;
@@ -806,6 +826,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $value = empty($preferred_communication_method) ? array() : $preferred_communication_method;
       $specialValues[$moniker] = array(
         'preferred_communication_method' => $value,
+        'contact_sub_type' => $value,
+        'communication_style_id' => $value,
       );
 
       if (!empty($contact['preferred_communication_method'])){
@@ -823,6 +845,21 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         ),
       );
       CRM_Core_OptionGroup::lookupValues($specialValues[$moniker], $names);
+
+      if (!empty($contact['contact_sub_type'])) {
+        $specialValues[$moniker]['contact_sub_type'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $contact['contact_sub_type']);
+
+        // fix contact sub type label for contact with sub type
+        $subtypes = array();
+        foreach ($contact['contact_sub_type'] as $key => $value) {
+          $subtypes[] = CRM_Utils_Array::retrieveValueRecursive($contactSubTypes, $value);
+        }
+        $contact['contact_sub_type_display'] = $specialValues[$moniker]['contact_sub_type_display'] = implode(', ', $subtypes);
+      }
+
+      if (!empty($contact['communication_style'])) {
+        $specialValues[$moniker]['communication_style_id_display'] = $contact['communication_style'];
+      }
     }
 
     static $optionValueFields = array();
@@ -1329,6 +1366,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     foreach ($submitted as $key => $value) {
       if (substr($key, 0, 7) == 'custom_') {
         $fid = (int) substr($key, 7);
+        if (empty($cFields[$fid])) {
+          continue;
+        }
         $htmlType = $cFields[$fid]['attributes']['html_type'];
         switch ($htmlType) {
           case 'File':
@@ -1571,4 +1611,3 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
   }
 }
-

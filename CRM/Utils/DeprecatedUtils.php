@@ -1188,7 +1188,7 @@ function _civicrm_api3_deprecated_validate_formatted_contact(&$params) {
           $valid = CRM_Core_BAO_CustomValue::typecheck(CRM_Utils_Array::value('type', $value),
             CRM_Utils_Array::value('value', $value)
           );
-          if (!$valid) {
+          if (!$valid && $value['is_required']) {
             return civicrm_api3_create_error('Invalid value for custom field \'' .
               CRM_Utils_Array::value('name', $custom) . '\''
             );
@@ -1325,6 +1325,15 @@ function _civicrm_api3_deprecated_contact_check_custom_params($params, $csType =
   }
 }
 
+/**
+ * @param $params
+ * @param bool $dupeCheck
+ * @param bool $dupeErrorArray
+ * @param bool $requiredCheck
+ * @param null $dedupeRuleGroupID
+ *
+ * @return array|null
+ */
 function _civicrm_api3_deprecated_contact_check_params(
   &$params,
   $dupeCheck = TRUE,

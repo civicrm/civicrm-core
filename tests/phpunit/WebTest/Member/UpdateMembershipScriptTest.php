@@ -25,6 +25,10 @@
 */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_UpdateMembershipScriptTest
+ */
 class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
@@ -80,6 +84,9 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
     );
   }
 
+  /**
+   * @return array
+   */
   function addMembershipType() {
     $membershipTitle = substr(sha1(rand()), 0, 7);
     $membershipOrg = $membershipTitle . ' memorg';

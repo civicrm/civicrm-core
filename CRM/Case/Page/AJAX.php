@@ -50,12 +50,14 @@ class CRM_Case_Page_AJAX {
     if (!empty($_GET['excludeCaseIds'])) {
       $excludeCaseIds = explode(',', CRM_Utils_Type::escape($_GET['excludeCaseIds'], 'String'));
     }
-    $unclosedCases = CRM_Case_BAO_Case::getUnclosedCases($params, $excludeCaseIds);
+    $unclosedCases = CRM_Case_BAO_Case::getUnclosedCases($params, $excludeCaseIds, TRUE, TRUE);
     $results = array();
     foreach ($unclosedCases as $caseId => $details) {
       $results[] = array(
         'id' => $caseId,
-        'text' => $details['sort_name'] . ' (' . $details['case_type'] . ': ' . $details['case_subject'] . ')',
+        'label' => $details['sort_name'] . ' - ' . $details['case_type'] . ($details['end_date'] ? ' (' . ts('closed') . ')' : ''),
+        'label_class' => $details['end_date'] ? 'strikethrough' : '',
+        'description' => array($details['case_subject'] . ' (' . $details['case_status'] . ')'),
         'extra' => $details,
       );
     }

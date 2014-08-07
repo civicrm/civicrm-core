@@ -180,6 +180,9 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     self::commonProcess($params);
   }
 
+  /**
+   * @param $params
+   */
   public function commonProcess(&$params) {
 
     // save autocomplete search options

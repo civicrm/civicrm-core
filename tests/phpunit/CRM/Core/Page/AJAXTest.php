@@ -2,6 +2,9 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Core_Page_AJAXTest
+ */
 class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
   public function testCheckAuthz() {
     $cases = array();

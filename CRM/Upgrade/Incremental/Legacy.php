@@ -110,8 +110,27 @@ SELECT  id
         ));
       }
     }
+
+    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME, 'enable_innodb_fts', NULL, FALSE)) {
+      // The FTS indexing feature dynamically manipulates the schema which could
+      // cause conflicts with other layers that manipulate the schema. The
+      // simplest thing is to turn it off and back on.
+
+      // It may not always be necessary to do this -- but I doubt we're going to test
+      // systematically in future releases.  When it is necessary, one could probably
+      // ignore the matter and simply run CRM_Core_InnoDBIndexer::fixSchemaDifferences
+      // after the upgrade.  But that's speculative.  For now, we'll leave this
+      // advanced feature in the hands of the sysadmin.
+      $preUpgradeMessage .= '<br />' . ts('This database uses InnoDB Full Text Search for optimized searching. The upgrade procedure has not been tested with this feature. You should disable (and later re-enable) the feature by navigating to "Administer => System Settings => Miscellaneous".');
+    }
   }
 
+  /**
+   * @param $template
+   * @param $message
+   * @param $latestVer
+   * @param $currentVer
+   */
   static function checkMessageTemplate(&$template, &$message, $latestVer, $currentVer) {
     if (version_compare($currentVer, '3.1.alpha1') < 0) {
       return;

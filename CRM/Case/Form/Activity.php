@@ -100,6 +100,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     if ($this->_caseId) {
       $this->assign('caseId', $this->_caseId);
       $this->assign('countId', count($this->_caseId));
+      $this->assign('caseID', CRM_Utils_Array::first($this->_caseId));
     }
 
     if (!$this->_caseId ||
@@ -135,8 +136,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
     }
 
-    foreach ($this->_caseId as $key => $val) {
-      $this->_caseType[] = CRM_Case_BAO_Case::getCaseType($val, 'name');
+    foreach ($this->_caseId as $casePos => $caseId) {
+      $this->_caseType[$casePos] = CRM_Case_BAO_Case::getCaseType($caseId, 'name');
     }
     $this->assign('caseType', $this->_caseType);
 
@@ -144,8 +145,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     $isMultiClient = $xmlProcessorProcess->getAllowMultipleCaseClients();
     $this->assign('multiClient', $isMultiClient);
 
-    foreach ($this->_caseId as $key => $val) {
-      $clients[] = CRM_Case_BAO_Case::getContactNames($val);
+    foreach ($this->_caseId as $casePos => $caseId) {
+      $clients[] = CRM_Case_BAO_Case::getContactNames($caseId);
     }
     $this->assign('client_names', $clients);
 
@@ -180,23 +181,24 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
       // check if activity count is within the limit
       $xmlProcessor = new CRM_Case_XMLProcessor_Process();
-      foreach ($this->_caseType as $key => $val) {
-        $activityInst = $xmlProcessor->getMaxInstance($val);
+      foreach ($this->_caseId as $casePos => $caseId) {
+        $caseType = $this->_caseType[$casePos];
+        $activityInst = $xmlProcessor->getMaxInstance($caseType);
 
-      // If not bounce back and also provide activity edit link
+        // If not bounce back and also provide activity edit link
         if (isset($activityInst[$this->_activityTypeName])) {
-          $activityCount = CRM_Case_BAO_Case::getCaseActivityCount($val, $this->_activityTypeId);
+          $activityCount = CRM_Case_BAO_Case::getCaseActivityCount($caseId, $this->_activityTypeId);
           if ($activityCount >= $activityInst[$this->_activityTypeName]) {
             if ($activityInst[$this->_activityTypeName] == 1) {
               $atArray = array('activity_type_id' => $this->_activityTypeId);
-              $activities = CRM_Case_BAO_Case::getCaseActivity($val,
+              $activities = CRM_Case_BAO_Case::getCaseActivity($caseId,
               $atArray,
               $this->_currentUserId
               );
               $activities = array_keys($activities);
               $activities = $activities[0];
               $editUrl = CRM_Utils_System::url('civicrm/case/activity',
-                "reset=1&cid={$this->_currentlyViewedContactId}&caseid={$val}&action=update&id={$activities}"
+                "reset=1&cid={$this->_currentlyViewedContactId}&caseid={$caseId}&action=update&id={$activities}"
               );
             }
             CRM_Core_Error::statusBounce(ts("You can not add another '%1' activity to this case. %2",
@@ -441,8 +443,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     $params['activity_type_id'] = $this->_activityTypeId;
 
     // format with contact (target contact) values
-    if (isset($params['contact'][1])) {
-      $params['target_contact_id'] = explode(',', $params['contact'][1]);
+    if (isset($params['target_contact_id'])) {
+      $params['target_contact_id'] = explode(',', $params['target_contact_id']);
     }
     else {
       $params['target_contact_id'] = array();

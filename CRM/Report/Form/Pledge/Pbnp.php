@@ -43,6 +43,12 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
   protected $_customGroupExtends = array(
     'Pledge');
 
+  /**
+   *
+   */
+  /**
+   *
+   */
   function __construct() {
 
     // Check if CiviCampaign is a) enabled and b) has active campaigns
@@ -294,6 +300,9 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     parent::PostProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound   = FALSE;

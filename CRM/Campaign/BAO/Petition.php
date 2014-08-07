@@ -33,6 +33,9 @@
  *
  */
 class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
     // expire cookie in one day
@@ -225,6 +228,13 @@ SELECT  petition.id                         as id,
     return $activity;
   }
 
+  /**
+   * @param $activity_id
+   * @param $contact_id
+   * @param $petition_id
+   *
+   * @return bool
+   */
   function confirmSignature($activity_id, $contact_id, $petition_id) {
     // change activity status to completed (status_id = 2)
     // I wonder why do we need contact_id when we have activity_id anyway? [chastell]
@@ -345,6 +355,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
 
+  /**
+   * @param null $surveyId
+   *
+   * @return array
+   */
   public static function getSurveyInfo($surveyId = NULL) {
     $surveyInfo = array();
 

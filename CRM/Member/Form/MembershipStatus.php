@@ -48,7 +48,6 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form {
    * @return void
    */
   public function setDefaultValues() {
-    $defaults = array();
     $defaults = parent::setDefaultValues();
 
     //finding default weight to be put

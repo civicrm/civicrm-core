@@ -24,6 +24,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 */
+
+/**
+ * Class CRM_Upgrade_Page_Cleanup
+ */
 class CRM_Upgrade_Page_Cleanup  extends CRM_Core_Page {
   public function cleanup425() {
     $rows     = CRM_Upgrade_Incremental_php_FourTwo::deleteInvalidPairs();

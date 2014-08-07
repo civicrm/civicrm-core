@@ -112,6 +112,9 @@ class CRM_Queue_Runner {
     $this->qrid = $this->queue->getName();
   }
 
+  /**
+   * @return array
+   */
   function __sleep() {
     // exclude taskCtx
     return array('title', 'queue', 'errorMode', 'isMinimal', 'onEnd', 'onEndUrl', 'pathPrefix', 'qrid', 'buttons');
@@ -234,6 +237,9 @@ class CRM_Queue_Runner {
     }
   }
 
+  /**
+   * @param $item
+   */
   protected function releaseErrorItem($item) {
     switch ($this->errorMode) {
       case self::ERROR_CONTINUE:
@@ -303,6 +309,9 @@ class CRM_Queue_Runner {
     return $result;
   }
 
+  /**
+   * @return CRM_Queue_TaskContext
+   */
   protected function getTaskContext() {
     if (!is_object($this->taskCtx)) {
       $this->taskCtx = new CRM_Queue_TaskContext();

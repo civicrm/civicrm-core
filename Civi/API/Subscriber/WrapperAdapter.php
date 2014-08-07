@@ -36,6 +36,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class WrapperAdapter implements EventSubscriberInterface {
 
+  /**
+   * @return array
+   */
   public static function getSubscribedEvents() {
     return array(
       Events::PREPARE => array('onApiPrepare', Events::W_MIDDLE),
@@ -48,10 +51,16 @@ class WrapperAdapter implements EventSubscriberInterface {
    */
   protected $defaults;
 
+  /**
+   * @param array $defaults
+   */
   function __construct($defaults = array()) {
     $this->defaults = $defaults;
   }
 
+  /**
+   * @param \Civi\API\Event\PrepareEvent $event
+   */
   public function onApiPrepare(\Civi\API\Event\PrepareEvent $event) {
     $apiRequest = $event->getApiRequest();
 
@@ -63,6 +72,9 @@ class WrapperAdapter implements EventSubscriberInterface {
     $event->setApiRequest($apiRequest);
   }
 
+  /**
+   * @param \Civi\API\Event\RespondEvent $event
+   */
   public function onApiRespond(\Civi\API\Event\RespondEvent $event) {
     $apiRequest = $event->getApiRequest();
     $result = $event->getResponse();

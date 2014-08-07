@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_Page_AddToCart
+ */
 class CRM_Event_Cart_Page_AddToCart extends CRM_Core_Page {
   function run() {
     $transaction = new CRM_Core_Transaction();

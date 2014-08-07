@@ -37,7 +37,16 @@
  * Joomla specific stuff goes here
  */
 class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
+  /**
+   *
+   */
   function __construct() {
+    /**
+     * deprecated property to check if this is a drupal install. The correct method is to have functions on the UF classes for all UF specific
+     * functions and leave the codebase oblivious to the type of CMS
+     * @deprecated
+     * @var bool
+     */
     $this->is_drupal = FALSE;
   }
 
@@ -102,7 +111,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $ufName = CRM_Utils_Type::escape($ufName, 'String');
 
     $values = array();
-    $user = &JUser::getInstance($ufID);
+    $user = JUser::getInstance($ufID);
 
     $values['email'] = $ufName;
     $user->bind($values);
@@ -575,6 +584,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     return;
   }
 
+  /**
+   * @param $user
+   *
+   * @return bool
+   */
   function loadUser($user) {
     return TRUE;
   }
@@ -602,6 +616,9 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     return NULL;
   }
 
+  /**
+   * @return string
+   */
   function getVersion() {
     if (class_exists('JVersion')) {
       $version = new JVersion;
@@ -753,11 +770,47 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $loginURL = $config->userFrameworkBaseURL;
     $loginURL = str_replace('administrator/', '', $loginURL);
     $loginURL .= 'index.php?option=com_users&view=login';
+
+    //CRM-14872 append destination
+    if ( !empty($destination) ) {
+      $loginURL .= '&return='.urlencode(base64_encode($destination));
+    }
     return $loginURL;
   }
 
+  /**
+   * @param $form
+   */
   public function getLoginDestination(&$form) {
-    return;
+    $args = NULL;
+
+    $id = $form->get('id');
+    if ($id) {
+      $args .= "&id=$id";
+    }
+    else {
+      $gid = $form->get('gid');
+      if ($gid) {
+        $args .= "&gid=$gid";
+      }
+      else {
+        // Setup Personal Campaign Page link uses pageId
+        $pageId = $form->get('pageId');
+        if ($pageId) {
+          $component = $form->get('component');
+          $args .= "&pageId=$pageId&component=$component&action=add";
+        }
+      }
+    }
+
+    $destination = NULL;
+    if ($args) {
+      // append destination so user is returned to form they came from after login
+      $args = 'reset=1'.$args;
+      $destination = CRM_Utils_System::url(CRM_Utils_System::currentPath(), $args, TRUE, NULL, TRUE, TRUE);
+    }
+
+    return $destination;
   }
 
   /**
@@ -783,6 +836,51 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $config->imageUploadDir
     );
     return array($url, NULL, $siteRoot);
+  }
+
+  /**
+   * Get Url to view user record
+   * @param integer $contactID Contact ID
+   *
+   * @return string
+   */
+  function getUserRecordUrl($contactID) {
+    $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
+    $userRecordUrl = NULL;
+    // if logged in user is super user, then he can view other users joomla profile
+    if (JFactory::getUser()->authorise('core.admin')) {
+      return CRM_Core_Config::singleton()->userFrameworkBaseURL . "index.php?option=com_users&view=user&task=user.edit&id=" . $uid;
+    }
+    elseif (CRM_Core_Session::singleton()->get('userID') == $contactID) {
+      return CRM_Core_Config::singleton()->userFrameworkBaseURL . "index.php?option=com_admin&view=profile&layout=edit&id=" . $uid;
+    }
+  }
+
+  /**
+   * Is the current user permitted to add a user
+   * @return bool
+   */
+  function checkPermissionAddUser() {
+    if (JFactory::getUser()->authorise('core.create', 'com_users')) {
+      return TRUE;
+    }
+  }
+
+  /**
+   * output code from error function
+   * @param string $content
+   */
+  function outputError($content) {
+    if (class_exists('JErrorPage')) {
+      $error = new Exception($content);
+      JErrorPage::render($error);
+    }
+    else if (class_exists('JError')) {
+      JError::raiseError('CiviCRM-001', $content);
+    }
+    else {
+      parent::outputError($content);
+    }
   }
 }
 

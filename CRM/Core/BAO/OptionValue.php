@@ -58,7 +58,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $ids = array('optionValue' => $params['id']);
     }
     return  CRM_Core_BAO_OptionValue::add($params, $ids);
-    ;
   }
   /**
    * Set default Parameters
@@ -168,7 +167,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @access public
    * @static
    *
-   * @return object
+   * @return CRM_Core_DAO_OptionValue
    */
   static function add(&$params, &$ids) {
     // CRM-10921: do not reset attributes to default if this is an update
@@ -292,7 +291,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param Integer $optionValueId     the option value id.
    * @param int     $action            the action describing whether prefix/suffix was UPDATED or DELETED
    *
-   * @return void
+   * @return bool
    */
   static function updateRecords(&$optionValueId, $action) {
     //finding group name

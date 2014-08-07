@@ -63,13 +63,15 @@ function civicrm_api3_generic_setValue($apiRequest) {
       return civicrm_api3_create_error("Param '$field' is of a type not managed yet (".$def['type']."). Join the API team and help us implement it", array('error_code' => 'NOT_IMPLEMENTED'));
   }
 
-  if (CRM_Core_DAO::setFieldValue(_civicrm_api3_get_DAO($entity), $id, $field, $value)) {
-    $entity = array('id' => $id, $field => $value);
-    CRM_Utils_Hook::post('edit', $entity, $id, $entity);
-    return civicrm_api3_create_success($entity);
+  $dao_name = _civicrm_api3_get_DAO($entity);
+  if (CRM_Core_DAO::setFieldValue($dao_name, $id, $field, $value)) {
+    $params = array('id' => $id, $field => $value);
+    $entityDAO = new $dao_name();
+    $entityDAO->copyValues($params);
+    CRM_Utils_Hook::post('edit', $entity, $entityDAO->id, $entityDAO);
+    return civicrm_api3_create_success($params);
   }
   else {
     return civicrm_api3_create_error("error assigning $field=$value for $entity (id=$id)");
   }
 }
-

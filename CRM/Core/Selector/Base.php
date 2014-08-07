@@ -168,14 +168,23 @@ class CRM_Core_Selector_Base {
     return NULL;
   }
 
+  /**
+   * @return null
+   */
   public function getSummary() {
     return NULL;
   }
 
+  /**
+   * @param $key
+   */
   public function setKey($key) {
     $this->_key = $key;
   }
 
+  /**
+   * @return string
+   */
   public function getKey() {
     return $this->_key;
   }

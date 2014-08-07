@@ -38,10 +38,16 @@
  *  via a form post) and asynchronously (i.e. by the workflow system)
  */
 class CRM_Contact_Import_Importer {
+  /**
+   *
+   */
   public function __construct() {
     // may not need this
   }
 
+  /**
+   * @param int $timeout
+   */
   public function runIncompleteImportJobs($timeout = 55) {
     $startTime = time();
     $incompleteImportTables = CRM_Contact_Import_ImportJob::getIncompleteImportTables();

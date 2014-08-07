@@ -130,9 +130,14 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
     return $result;
   }
 
+  /**
+   * @param $id
+   *
+   * @return array
+   */
   static function getSearchParams($id) {
     $fv = self::getFormValues($id);
-    //check if the saved seach has mapping id
+    //check if the saved search has mapping id
     if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $id, 'mapping_id')) {
       return CRM_Core_BAO_Mapping::formattedFields($fv);
     }
@@ -167,6 +172,11 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
     return NULL;
   }
 
+  /**
+   * @param $id
+   *
+   * @return string
+   */
   static function contactIDsSQL($id) {
     $params = self::getSearchParams($id);
     if ($params && !empty($params['customSearchID'])) {
@@ -186,6 +196,11 @@ WHERE  $where";
     }
   }
 
+  /**
+   * @param $id
+   *
+   * @return array
+   */
   static function fromWhereEmail($id) {
     $params = self::getSearchParams($id);
 

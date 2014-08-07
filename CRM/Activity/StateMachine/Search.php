@@ -97,6 +97,18 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
     return CRM_Utils_String::getClassName($this->_task);
   }
 
+  /**
+   * Should the controller reset the session
+   * In some cases, specifically search we want to remember
+   * state across various actions and want to go back to the
+   * beginning from the final state, but retain the same session
+   * values
+   *
+   * @return boolean
+   */
+  /**
+   * @return bool
+   */
   function shouldReset() {
     return FALSE;
   }

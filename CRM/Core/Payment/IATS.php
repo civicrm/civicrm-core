@@ -74,6 +74,12 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     }
   }
 
+  /**
+   * @param string $mode
+   * @param array $paymentProcessor
+   *
+   * @return mixed
+   */
   static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
@@ -82,6 +88,15 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     return self::$_singleton[$processorName];
   }
 
+  /**
+   * This function collects all the information from a web/api form and invokes
+   * the relevant payment processor specific functions to perform the transaction
+   *
+   * @param  array $params assoc array of input parameters for this transaction
+   *
+   * @return array the result in an nice formatted array (or an error object)
+   * @abstract
+   */
   function doDirectPayment(&$params) {
     // $result = '';
     //       foreach($params as $key => $value) {
@@ -246,6 +261,11 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     }
   }
 
+  /**
+   * @param null $error
+   *
+   * @return object
+   */
   function &error($error = NULL) {
     $e = CRM_Core_Error::singleton();
     if (is_object($error)) {
@@ -272,6 +292,11 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     return $e;
   }
 
+  /**
+   * @param $error_id
+   *
+   * @return string
+   */
   function errorString($error_id) {
     $errors = array(
       1 => 'Agent Code has not been set up on the authorization system.',

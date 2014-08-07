@@ -139,7 +139,7 @@ class CRM_Badge_BAO_Badge {
     }
     if (!empty($layout['data']['alignment_participant_image'])) {
       $formattedRow['alignment_participant_image'] = $layout['data']['alignment_participant_image'];
-    }    
+    }
 
     if (!empty($layout['data']['add_barcode'])) {
       $formattedRow['barcode'] = array(
@@ -154,6 +154,9 @@ class CRM_Badge_BAO_Badge {
     return $formattedRow;
   }
 
+  /**
+   * @param $formattedRow
+   */
   public function generateLabel($formattedRow) {
     switch ($formattedRow['labelFormat']) {
       case 'A6 Badge Portrait 150x106':
@@ -167,6 +170,10 @@ class CRM_Badge_BAO_Badge {
     }
   }
 
+  /**
+   * @param $formattedRow
+   * @param int $cellspacing
+   */
   public function labelCreator(&$formattedRow, $cellspacing = 0) {
     $this->lMarginLogo = 18;
     $this->tMarginName = 20;
@@ -228,8 +235,8 @@ class CRM_Badge_BAO_Badge {
         $value = '';
         if ($formattedRow['token'][$i]['token'] != 'spacer') {
           $value = $formattedRow['token'][$i]['value'];
-        }        
-        
+        }
+
         $xAlign = $x;
         $rowWidth = $this->pdf->width;
         if (!empty($formattedRow['participant_image']) && !empty($formattedRow['width_participant_image'])) {
@@ -370,6 +377,14 @@ class CRM_Badge_BAO_Badge {
     $this->pdf->SetXY($x, $y);
   }
 
+  /**
+   * @param $img
+   * @param int $imgRes
+   * @param null $w
+   * @param null $h
+   *
+   * @return array
+   */
   static function getImageProperties($img, $imgRes = 300, $w = NULL, $h = NULL) {
     $imgsize = getimagesize($img);
     $f = $imgRes / 25.4;

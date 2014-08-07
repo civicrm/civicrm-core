@@ -98,27 +98,27 @@
           // hide and display the appropriate blocks as directed by the php code
           on_load_init_blocks( showRows, hideBlocks, '' );
 
-          if (cj("#order_bys_2_column").val()){
-            cj("#optionField_2").show();
+          if (CRM.$("#order_bys_2_column").val()){
+            CRM.$("#optionField_2").show();
           }
-          if (cj("#order_bys_3_column").val()){
-            cj("#optionField_3").show();
+          if (CRM.$("#order_bys_3_column").val()){
+            CRM.$("#optionField_3").show();
           }
-          if (cj("#order_bys_4_column").val()){
-            cj("#optionField_4").show();
+          if (CRM.$("#order_bys_4_column").val()){
+            CRM.$("#optionField_4").show();
           }
 
           function hideRow(i) {
             showHideRow(i);
             // clear values on hidden field, so they're not saved
-            cj('select#order_by_column_'+ i).val('');
-            cj('select#order_by_order_'+ i).val('ASC');
+            CRM.$('select#order_by_column_'+ i).val('');
+            CRM.$('select#order_by_order_'+ i).val('ASC');
           }
           {/literal}
       </script>
     </div>
 
-    <table id="voterRecords" class="display crm-copy-fields">
+    <table id="voterRecords-{$instanceId}" class="display crm-copy-fields">
       <thead>
       <tr class="columnheader">
         {foreach from=$readOnlyFields item=fTitle key=fName}
@@ -204,7 +204,6 @@
   </fieldset>
 </div>
 
-
 {literal}
 <script type="text/javascript">
 var updateVote = "{/literal}{ts escape='js'}Update Response{/ts}{literal}";
@@ -212,8 +211,8 @@ var updateVoteforall = "{/literal}{ts escape='js'}Update Responses for All{/ts}{
 CRM.$(function($) {
   var count = 0; var columns='';
 
-  cj('#voterRecords th').each( function( ) {
-    if ( cj(this).attr('class') == 'contact_details' ) {
+  CRM.$('#voterRecords-{/literal}{$instanceId}{literal} th').each( function( ) {
+    if ( CRM.$(this).attr('class') == 'contact_details' ) {
       columns += '{"sClass": "contact_details"},';
     }
     else {
@@ -226,7 +225,7 @@ CRM.$(function($) {
   eval('columns =[' + columns + ']');
 
   //load jQuery data table.
-  cj('#voterRecords').dataTable( {
+  CRM.$('table#voterRecords-{/literal}{$instanceId}{literal}').dataTable( {
     "sPaginationType": "full_numbers",
     "bJQueryUI"  : true,
     "aoColumns"  : columns
@@ -236,7 +235,7 @@ CRM.$(function($) {
 
 function registerInterview( voterId ) {
   //reset all errors.
-  cj( '#responseErrors' ).hide( ).html( '' );
+  CRM.$( '#responseErrors' ).hide( ).html( '' );
 
   //collect all submitted data.
   var data = new Object;
@@ -244,17 +243,17 @@ function registerInterview( voterId ) {
   //get the values for common elements.
   var fieldName = 'field_' + voterId + '_custom_';
   var specialFieldType = new Array( 'radio', 'checkbox', 'select' );
-  cj( '[id^="'+ fieldName +'"]' ).each( function( ) {
-    fieldType = cj( this ).attr( 'type' );
+  CRM.$( '[id^="'+ fieldName +'"]' ).each( function( ) {
+    fieldType = CRM.$( this ).attr( 'type' );
     if ( specialFieldType.indexOf( fieldType ) == -1 ) {
-      data[cj(this).attr( 'id' )] = cj( this ).val( );
+      data[CRM.$(this).attr( 'id' )] = CRM.$( this ).val( );
     }
   });
 
   //get the values for select.
-  cj('select[id^="'+ fieldName +'"]').each( function( ) {
-    value = cj(this).val( );
-    if (cj(this).attr( 'multiple')) {
+  CRM.$('select[id^="'+ fieldName +'"]').each( function( ) {
+    value = CRM.$(this).val( );
+    if (CRM.$(this).attr( 'multiple')) {
       values = value;
       value = '';
       if ( values ) {
@@ -266,22 +265,22 @@ function registerInterview( voterId ) {
         }
       }
     }
-    data[cj(this).attr('id')] = value;
+    data[CRM.$(this).attr('id')] = value;
   });
 
   var checkBoxField = 'field['+ voterId +'][custom_';
-  cj('input:checkbox[name^="'+ checkBoxField +'"]').each( function( ) {
+  CRM.$('input:checkbox[name^="'+ checkBoxField +'"]').each( function( ) {
     value = '';
-    if (cj(this).is(':checked') == true) value = 1;
-    data[cj(this).attr( 'name' )] = value;
+    if (CRM.$(this).is(':checked') == true) value = 1;
+    data[CRM.$(this).attr( 'name' )] = value;
   });
 
   var allRadios   = new Object;
   var radioField = 'field['+ voterId +'][custom_';
-  cj('input:radio[name^="'+ radioField +'"]').each( function( ) {
-    radioName = cj(this).attr( 'name' );
-    if (cj(this).is(':checked') == true) {
-      data[radioName] = cj(this).val();
+  CRM.$('input:radio[name^="'+ radioField +'"]').each( function( ) {
+    radioName = CRM.$(this).attr( 'name' );
+    if (CRM.$(this).is(':checked') == true) {
+      data[radioName] = CRM.$(this).val();
     }
     allRadios[radioName] = radioName;
   });
@@ -292,12 +291,12 @@ function registerInterview( voterId ) {
   //carry contact related profile field data.
   var fieldName = 'field_' + voterId;
   var checkBoxFieldName = 'field[' + voterId + ']';
-  cj('[id^="'+ fieldName +'"], [id^="'+ checkBoxFieldName +'"]').each(function( ) {
-    fldId = cj(this).attr('id');
+  CRM.$('[id^="'+ fieldName +'"], [id^="'+ checkBoxFieldName +'"]').each(function( ) {
+    fldId = CRM.$(this).attr('id');
     if (fldId.indexOf('_custom_') == -1 &&
       fldId.indexOf('_result') == -1  &&
       fldId.indexOf('_note') == -1 ) {
-      data[fldId] = cj(this).val( );
+      data[fldId] = CRM.$(this).val( );
     }
   });
 
@@ -309,20 +308,20 @@ var surveyActivityIds = {/literal}{$surveyActivityIds}{literal};
   data['interviewer_id']   = {/literal}{$interviewerId}{literal};
   data['activity_type_id'] = {/literal}{$surveyTypeId}{literal};
   data['activity_id']      = activityId;
-  data['result']           = cj( '#field_' + voterId + '_result' ).val( );
-  data['note']             = cj( '#field_' + voterId + '_note' ).val( );
+  data['result']           = CRM.$( '#field_' + voterId + '_result' ).val( );
+  data['note']             = CRM.$( '#field_' + voterId + '_note' ).val( );
   data['surveyTitle']      = {/literal}'{$surveyValues.title|escape:javascript}'{literal};
   data['survey_id']        = {/literal}'{$surveyValues.id}'{literal};
 
   var dataUrl = {/literal}"{crmURL p='civicrm/campaign/registerInterview' h=0}"{literal}
 
   //post data to create interview.
-  cj.post(dataUrl, data, function(interview) {
+  CRM.$.post(dataUrl, data, function(interview) {
     if ( interview.status == 'success' ) {
-      cj("#row_"+voterId+' td.name').attr('class', 'name survey-completed' );
-      cj('#restmsg_vote_' + voterId).fadeIn("slow").fadeOut("slow");
-      cj('#interview_voter_button_' + voterId).html(updateVote);
-      cj('#release_voter_button_' + voterId).hide( );
+      CRM.$("#row_"+voterId+' td.name').attr('class', 'name survey-completed' );
+      CRM.$('#restmsg_vote_' + voterId).fadeIn("slow").fadeOut("slow");
+      CRM.$('#interview_voter_button_' + voterId).html(updateVote);
+      CRM.$('#release_voter_button_' + voterId).hide( );
     }
     else if (interview.status == 'fail' && interview.errors) {
       var errorList = '';
@@ -331,7 +330,7 @@ var surveyActivityIds = {/literal}{$surveyActivityIds}{literal};
       }
       if ( errorList ) {
         var allErrors = '<div class = "icon red-icon alert-icon"></div>Please correct the following errors in the survey fields below:' + '<ul>' + errorList + '</ul>';
-        cj('#responseErrors').show( ).html(allErrors);
+        CRM.$('#responseErrors').show( ).html(allErrors);
       }
     }
   }, 'json');
@@ -345,7 +344,7 @@ function releaseOrReserveVoter(voterId) {
   if ( !activityId ) return;
 
   var operation  = 'release';
-  var isReleaseOrReserve = cj('#field_' + voterId + '_is_release_or_reserve').val( );
+  var isReleaseOrReserve = CRM.$('#field_' + voterId + '_is_release_or_reserve').val( );
   if (isReleaseOrReserve == 1) {
     operation = 'reserve';
     isReleaseOrReserve = 0;
@@ -364,25 +363,25 @@ function releaseOrReserveVoter(voterId) {
   {literal};
 
     //post data to release / reserve voter.
-    cj.post( actUrl,
+    CRM.$.post( actUrl,
     data,
     function( response ) {
       if (response.status == 'success') {
         if ( operation == 'release' ) {
-          cj( '#interview_voter_button_' + voterId ).hide( );
-          cj( '#restmsg_release_or_reserve' + voterId ).fadeIn( 'slow' ).fadeOut( 'slow' );
-          cj( '#row_' + voterId + ' td.name' ).addClass( 'disabled' );
-          cj( '#release_voter_button_'+ voterId ).html( "{/literal}{ts escape='js'}reserve{/ts}{literal}"  );
-          cj( '#release_voter_button_' + voterId ).attr('title',"{/literal}{ts escape='js'}Reserve{/ts}{literal}");
+          CRM.$( '#interview_voter_button_' + voterId ).hide( );
+          CRM.$( '#restmsg_release_or_reserve' + voterId ).fadeIn( 'slow' ).fadeOut( 'slow' );
+          CRM.$( '#row_' + voterId + ' td.name' ).addClass( 'disabled' );
+          CRM.$( '#release_voter_button_'+ voterId ).html( "{/literal}{ts escape='js'}reserve{/ts}{literal}"  );
+          CRM.$( '#release_voter_button_' + voterId ).attr('title',"{/literal}{ts escape='js'}Reserve{/ts}{literal}");
         }
         else {
-          cj( '#interview_voter_button_' + voterId ).show( );
-          cj( '#restmsg_release_or_reserve' + voterId ).fadeIn( 'slow' ).fadeOut( 'slow' );
-          cj( '#row_' + voterId + ' td.name' ).removeClass( 'disabled' );
-          cj( '#release_voter_button_'+ voterId ).html( "{/literal}{ts escape='js'}release{/ts}{literal}"  );
-          cj( '#release_voter_button_' + voterId ).attr('title',"{/literal}{ts escape='js'}Release{/ts}{literal}");
+          CRM.$( '#interview_voter_button_' + voterId ).show( );
+          CRM.$( '#restmsg_release_or_reserve' + voterId ).fadeIn( 'slow' ).fadeOut( 'slow' );
+          CRM.$( '#row_' + voterId + ' td.name' ).removeClass( 'disabled' );
+          CRM.$( '#release_voter_button_'+ voterId ).html( "{/literal}{ts escape='js'}release{/ts}{literal}"  );
+          CRM.$( '#release_voter_button_' + voterId ).attr('title',"{/literal}{ts escape='js'}Release{/ts}{literal}");
         }
-        cj( '#field_' + voterId + '_is_release_or_reserve' ).val( isReleaseOrReserve );
+        CRM.$( '#field_' + voterId + '_is_release_or_reserve' ).val( isReleaseOrReserve );
       }
     },
   'json');
@@ -391,9 +390,9 @@ function releaseOrReserveVoter(voterId) {
 function registerInterviewforall( ) {
   var Ids = {/literal}{$componentIdsJson}{literal};
   for (var contactid in Ids) {
-    if (cj('#field_'+ Ids[contactid] +'_result').val()) {
+    if (CRM.$('#field_'+ Ids[contactid] +'_result').val()) {
       registerInterview(Ids[contactid]);
-      cj('#interview_voter_button').html(updateVoteforall);
+      CRM.$('#interview_voter_button').html(updateVoteforall);
     }
   }
 }

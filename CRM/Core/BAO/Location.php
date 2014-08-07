@@ -310,6 +310,12 @@ WHERE e.id = %1";
    * @param  int  $updateLocBlockId update location block id
    * @return int  newly created/updated location block id.
    */
+  /**
+   * @param $locBlockId
+   * @param null $updateLocBlockId
+   *
+   * @return mixed
+   */
   static function copyLocBlock($locBlockId, $updateLocBlockId = NULL) {
     //get the location info.
     $defaults = $updateValues = array();

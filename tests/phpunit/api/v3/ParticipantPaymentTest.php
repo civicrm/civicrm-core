@@ -46,6 +46,9 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   protected $_contributionTypeId;
 
 
+  /**
+   * @return array
+   */
   function get_info() {
     return array(
       'name' => 'Participant Create',
@@ -342,6 +345,10 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$result['id']]['contribution_id'], $contributionID, 'Check Contribution Id');
   }
 
+  /**
+   * @param $params
+   * @param $context
+   */
   function _checkFinancialRecords($params, $context) {
     $entityParams = array(
       'entity_id' => $params['id'],

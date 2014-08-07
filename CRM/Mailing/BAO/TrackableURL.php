@@ -102,6 +102,12 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
     return $returnUrl;
   }
 
+  /**
+   * @param $msg
+   * @param $mailing_id
+   * @param $queue_id
+   * @param bool $onlyHrefs
+   */
   public static function scan_and_replace(&$msg, $mailing_id, $queue_id, $onlyHrefs = FALSE) {
     if (!$mailing_id) {
       return;

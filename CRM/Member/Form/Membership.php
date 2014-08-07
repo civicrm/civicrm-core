@@ -227,43 +227,26 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
               $mem['status_id'],
               'label', 'id'
             );
-            if ($this->_mode) {
-              $mem['renewUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership',
-                "reset=1&action=renew&cid={$this->_contactID}&id={$mem['id']}&context=membership&selectedChild=member&mode=live"
-              );
-            }
-            else {
-              $mem['renewUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership',
-                "reset=1&action=renew&cid={$this->_contactID}&id={$mem['id']}&context=membership&selectedChild=member"
-              );
-            }
+            $mem['renewUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership',
+              "reset=1&action=renew&cid={$this->_contactID}&id={$mem['id']}&context=membership&selectedChild=member"
+              . ($this->_mode ? '&mode=live' : '')
+            );
             $mem['membershipTab'] = CRM_Utils_System::url('civicrm/contact/view',
               "reset=1&force=1&cid={$this->_contactID}&selectedChild=member"
             );
             $mems_by_org[$mem['member_of_contact_id']] = $mem;
           }
-          $resources = CRM_Core_Resources::singleton();
-          $resources->addSetting(array('existingMems' => array('memberorgs' => $mems_by_org)));
-          $resources->addScriptFile('civicrm', 'templates/CRM/Member/Form/Membership.js');
+          $this->assign('existingContactMemberships', $mems_by_org);
         }
       }
       else {
+        // In standalone mode we don't have a contact id yet so lookup will be done client-side with this script:
         $resources = CRM_Core_Resources::singleton();
         $resources->addScriptFile('civicrm', 'templates/CRM/Member/Form/MembershipStandalone.js');
-        $statuses = array();
-        $membershipStatus = new CRM_Member_DAO_MembershipStatus();
-        $membershipStatus->is_current_member = 1;
-        $membershipStatus->find();
-        $membershipStatus->selectAdd();
-        $membershipStatus->selectAdd('id');
-        while ($membershipStatus->fetch()) {
-          $statuses[$membershipStatus->id] = $membershipStatus->label;
-        }
-        $membershipStatus->free();
         $passthru = array(
           'typeorgs' => CRM_Member_BAO_MembershipType::getMembershipTypeOrganization(),
-          'memtypes' => CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE),
-          'statuses' => $statuses,
+          'memtypes' => CRM_Core_PseudoConstant::get('CRM_Member_BAO_Membership', 'membership_type_id'),
+          'statuses' => CRM_Core_PseudoConstant::get('CRM_Member_BAO_Membership', 'status_id'),
         );
         $resources->addSetting(array('existingMems' => $passthru));
       }
@@ -551,7 +534,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     if ($this->_context == 'standalone') {
-      $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE), TRUE);
+      $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE, 'api' => array('extra' => array('email'))), TRUE);
     }
 
     $selOrgMemType[0][0] = $selMemTypeOrg[0] = ts('- select -');
@@ -1092,6 +1075,13 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       return;
     }
 
+    $isTest = ($this->_mode == 'test') ? 1 : 0;
+
+    $lineItems = NULL;
+    if (!empty($this->_lineItem)) {
+      $lineItems = $this->_lineItem;
+    }
+
     $config = CRM_Core_Config::singleton();
     // get the submitted form values.
     $this->_params = $formValues = $this->controller->exportValues($this->_name);
@@ -1404,7 +1394,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         );
       }
 
-      // add all the additioanl payment params we need
+      // add all the additional payment params we need
       $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
       $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
 
@@ -1453,9 +1443,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $result,
           $this->_contributorContactID,
           $contributionType,
-          FALSE,
           TRUE,
-          FALSE
+          FALSE,
+          $isTest,
+          $lineItems
         );
 
         //create new soft-credit record, CRM-13981
@@ -1464,7 +1455,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $softParams['amount'] = $contribution->total_amount;
         CRM_Contribute_BAO_ContributionSoft::add($softParams);
 
-        $paymentParams['contactID'] = $contactID;
+        $paymentParams['contactID'] = $this->_contactID;
         $paymentParams['contributionID'] = $contribution->id;
         $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
         $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
@@ -1581,16 +1572,17 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $lineItems[$itemId]['line_total'] = $params['total_amount'];
           $lineItems[$itemId]['id'] = $itemId;
           $lineItem[$priceSetId] = $lineItems;
-          CRM_Price_BAO_LineItem::processPriceSet($params['contribution_id'], $lineItem);
+          $contributionBAO = new CRM_Contribute_BAO_Contribution();
+          $contributionBAO->id = $params['contribution_id'];
+          $contributionBAO->find();
+          CRM_Price_BAO_LineItem::processPriceSet($params['contribution_id'], $lineItem, $contributionBAO, 'civicrm_membership');
 
           //create new soft-credit record, CRM-13981
           $softParams['contribution_id'] = $params['contribution_id'];
-          $dao = new CRM_Contribute_DAO_Contribution();
-          $dao->id = $params['contribution_id'];
-          $dao->find();
-          while ($dao->fetch()) {
-            $softParams['currency'] = $dao->currency;
-            $softParams['amount'] = $dao->total_amount;
+
+          while ($contributionBAO->fetch()) {
+            $softParams['currency'] = $contributionBAO->currency;
+            $softParams['amount'] = $contributionBAO->total_amount;
           }
           CRM_Contribute_BAO_ContributionSoft::add($softParams);
         }
@@ -1700,6 +1692,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       $formValues['contact_id'] = $this->_contactID;
 
+      $formValues['contribution_id'] = CRM_Member_BAO_Membership::getMembershipContributionId($membership->id);
       // send email receipt
       $mailSend = self::emailReceipt($this, $formValues, $membership);
     }

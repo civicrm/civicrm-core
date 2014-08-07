@@ -289,9 +289,9 @@ Order By  camp.title";
     return $validCampaigns[$cacheKey];
   }
 
-  /*
+  /**
    * Is CiviCampaign enabled.
-   *
+   * @return bool
    */
   public static function isCampaignEnable() {
     static $isEnable = NULL;
@@ -512,6 +512,9 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
     return CRM_Core_DAO::setFieldValue('CRM_Campaign_DAO_Campaign', $id, 'is_active', $is_active);
   }
 
+  /**
+   * @return bool
+   */
   static function accessCampaign() {
     static $allow = NULL;
 
@@ -531,6 +534,10 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
    * Add select element for campaign
    * and assign needful info to templates.
    *
+   */
+  /**
+   * @param $form
+   * @param null $connectedCampaignId
    */
   public static function addCampaign(&$form, $connectedCampaignId = NULL) {
     //some forms do set default and freeze.
@@ -608,10 +615,12 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
     $form->assign('campaignInfo', $campaignInfo);
   }
 
-  /*
+  /**
    * Add campaign in compoent search.
    * and assign needful info to templates.
    *
+   * @param $form
+   * @param string $elementName
    */
   public static function addCampaignInComponentSearch(&$form, $elementName = 'campaign_id') {
     $campaignInfo    = array();

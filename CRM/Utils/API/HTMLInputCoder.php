@@ -130,6 +130,12 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
     }
   }
 
+  /**
+   * @param $values
+   * @param bool $castToString
+   *
+   * @return mixed|void
+   */
   public function decodeOutput(&$values, $castToString = FALSE) {
     if (is_array($values)) {
       foreach ($values as &$value) {

@@ -85,6 +85,13 @@ class CRM_Member_Import_Field {
    */
   public $_value;
 
+  /**
+   * @param $name
+   * @param $title
+   * @param int $type
+   * @param string $headerPattern
+   * @param string $dataPattern
+   */
   function __construct($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
     $this->_name = $name;
     $this->_title = $title;
@@ -107,6 +114,9 @@ class CRM_Member_Import_Field {
     $this->_value = $value;
   }
 
+  /**
+   * @return bool
+   */
   function validate() {
 
     if (CRM_Utils_System::isNull($this->_value)) {

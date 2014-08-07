@@ -47,6 +47,9 @@ class CRM_Contact_Page_CustomSearch extends CRM_Core_Page {
    */
   static $_links = NULL;
 
+  /**
+   * @return array
+   */
   public static function &info() {
     $sql = "
 SELECT v.value, v.label, v.description

@@ -38,6 +38,15 @@
  */
 class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
 
+  /**
+   * class constructor
+   *
+   * @access public
+   * @return \CRM_Core_DAO_WordReplacement
+   */
+  /**
+   *
+   */
   function __construct() {
     parent::__construct();
   }
@@ -198,6 +207,8 @@ WHERE  domain_id = %1
       CRM_Core_BAO_Navigation::resetNavigation();
       // Clear js string cache
       CRM_Core_Resources::singleton()->flushStrings();
+      // Clear dynamic js files which may contain localization
+      CRM_Utils_File::flushDynamicResources();
 
       return TRUE;
     }

@@ -34,8 +34,6 @@
  * @copyright CiviCRM LLC (c) 2004-2014
  */
 
-require_once 'api/v3/utils.php';
-
 /**
  * create/update participant_status
  *
@@ -80,8 +78,7 @@ function civicrm_api3_participant_status_type_get($params) {
  * @param array $params  (reference) array containing id of the group
  *                       to be deleted
  *
- * @return array  (referance) returns flag true if successfull, error
- *                message otherwise
+ * @return array api result array
  * {@getfields ParticipantStatusType_delete}
  * @example ParticipantStatusTypeDelete.php
  * @access public
