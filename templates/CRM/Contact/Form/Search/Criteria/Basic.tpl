@@ -52,7 +52,10 @@
         {include file="CRM/common/formButtons.tpl" location="top" buttonStyle="width:80px; text-align:center;"}
       </div>
       <div class="crm-submit-buttons reset-advanced-search">
-        <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="button no-popup" style="width:70px; text-align:center;"><span>{ts}Reset Form{/ts}</span></a>
+        <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button" title="{ts}Clear all search criteria{/ts}">
+          <span class="icon ui-icon-circle-close"></span>
+          {ts}Reset Form{/ts}
+        </a>
       </div>
     </td>
   </tr>
