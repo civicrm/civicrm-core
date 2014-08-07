@@ -87,7 +87,8 @@ VALUES
   ( @domainID, NULL, 1, 'URL Preferences', 'userFrameworkResourceURL' , NULL ),
   ( @domainID, NULL, 1, 'URL Preferences', 'imageUploadURL'           , NULL ),
   ( @domainID, NULL, 1, 'URL Preferences', 'customCSSURL'             , NULL ),
-  ( @domainID, NULL, 1, 'URL Preferences', 'extensionsURL'            , NULL );
+  ( @domainID, NULL, 1, 'URL Preferences', 'extensionsURL'            , NULL ),
+  ( @domainID, NULL, 1, 'Contribute Preferences', 'contribution_invoice_settings', '{literal}a:7:{s:14:"invoice_prefix";s:4:"INV_";s:19:"credit_notes_prefix";s:3:"CN_";s:8:"due_date";s:2:"10";s:15:"due_date_period";s:4:"days";s:5:"notes";s:0:"";s:8:"tax_term";s:3:"Sales Tax";s:20:"tax_display_settings";s:9:"Inclusive";}{/literal}');
 
 -- mail settings
 
@@ -516,7 +517,7 @@ VALUES
     ( @domainID, 'civicrm/admin/price?reset=1&action=add',                  '{ts escape="sql" skip="true"}New Price Set{/ts}',              'New Price Set',             'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 15 ),
     ( @domainID, 'civicrm/admin/price?reset=1',                             '{ts escape="sql" skip="true"}Manage Price Sets{/ts}',          'Manage Price Sets',         'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 16 ),
     ( @domainID, 'civicrm/admin/paymentProcessor?reset=1',                  '{ts escape="sql" skip="true"}Payment Processors{/ts}',         'Payment Processors',        'administer CiviCRM', '',                          @adminContributelastID, '1', NULL, 17  ),
-    ( @domainID, 'civicrm/admin/setting/preferences/contribute',                  '{ts escape="sql" skip="true"}CiviContribute Component Settings{/ts}',         'CiviContribute Component Settings',        'administer CiviCRM', '',                          @adminContributelastID, '1', NULL, 18  ) ;
+    ( @domainID, 'civicrm/admin/setting/preferences/contribute?reset=1',                  '{ts escape="sql" skip="true"}CiviContribute Component Settings{/ts}',         'CiviContribute Component Settings',        'administer CiviCRM', '',                          @adminContributelastID, '1', NULL, 18  ) ;
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
