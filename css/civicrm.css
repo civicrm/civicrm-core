@@ -5,6 +5,10 @@
  * Other civi blocks outside the main container also have the class crm-container (but not the id)
  * All styles should start with .crm-container unless they are specific to the main div only
  */
+.crm-container input,
+#civicrm-menu input {
+  box-sizing: content-box;
+}
 
 div.crm-container label {
   font-weight: normal;
@@ -105,11 +109,6 @@ div.crm-container fieldset label{
   border-top: none;
 }
 
-.crm-container tr {
-  font-size: .95em;
-  background: none !important;
-}
-
 .crm-container td {
   padding: 4px;
   vertical-align: top;
@@ -122,25 +121,11 @@ div.crm-container fieldset label{
   border-collapse: collapse;
 }
 
-.crm-container .crm-row-selected {
-  margin: 0px;
-  padding: 3px 0px 3px 0px;
-  clear: none;
-  background-color: #FFFFCC !important;
-}
-
 .crm-container .crm-row-child {
   margin: 0px;
   padding: 3px 0px 3px 0px;
   clear: none;
-  background-color: #F1F8EB !important;
-}
-
-.crm-container .row-highlighted {
-  margin: 0px;
-  padding: 3px 0px 3px 0px;
-  clear: none;
-  background-color: #FFFFCC;
+  background-color: #F1F8EB;
 }
 
 /*
@@ -3936,7 +3921,8 @@ div.m ul#civicrm-menu,
 }
 
 /* table row highlightng */
-.crm-container table.row-highlight tr:hover {
+.crm-container table.row-highlight tr:hover,
+.crm-container .crm-row-selected {
   background-color: #FFFFCC !important;
 }
 #crm-container .civicrm-drupal-wysiwyg .collapsed {
