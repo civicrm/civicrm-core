@@ -980,8 +980,6 @@ WHERE  id = %1";
   }
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
-   *
    * Get all permissioned groups from database
    *
    * The static array group is returned, and if it's
@@ -991,7 +989,7 @@ WHERE  id = %1";
    * Note: any database errors will be trapped by the DAO.
    *
    * @param string $groupType type of group(Access/Mailing)
-   * @param bool|\boolen $excludeHidden exclude hidden groups.
+   * @param bool $excludeHidden exclude hidden groups.
    *
    * @access public
    * @static
@@ -1000,6 +998,18 @@ WHERE  id = %1";
    */
   public static function group($groupType = NULL, $excludeHidden = TRUE) {
     return CRM_Core_Permission::group($groupType, $excludeHidden);
+  }
+
+  /**
+   * Fetch groups in a nested format suitable for use in select form element
+   * @param bool $checkPermissions
+   * @param string|null $groupType
+   * @param bool $excludeHidden
+   * @return array
+   */
+  public static function nestedGroup($checkPermissions = TRUE, $groupType = NULL, $excludeHidden = TRUE) {
+    $groups = $checkPermissions ? self::group($groupType, $excludeHidden) : self::allGroup($groupType, $excludeHidden);
+    return CRM_Contact_BAO_Group::getGroupsHierarchy($groups, NULL, '&nbsp;&nbsp;', TRUE);
   }
 
   /**

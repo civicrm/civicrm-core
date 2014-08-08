@@ -191,7 +191,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       )
     );
 
-    $this->_group = CRM_Core_PseudoConstant::group();
+    $this->_group = CRM_Core_PseudoConstant::nestedGroup();
 
     // multiselect for groups
     if ($this->_group) {
