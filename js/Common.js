@@ -773,7 +773,7 @@ CRM.strings = CRM.strings || {};
    */
   CRM.confirm = function (options) {
     var dialog, settings = {
-      title: ts('Confirm Action'),
+      title: ts('Confirm'),
       message: ts('Are you sure you want to continue?'),
       width: 'auto',
       modal: true,
