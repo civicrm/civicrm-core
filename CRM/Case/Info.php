@@ -215,8 +215,9 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       &&
       (!$oldValue || !in_array('CiviCase', $oldValue))
     ) {
+      $pathToCaseSampleTpl =  __DIR__ . '/xml/configuration.sample/';
       $config = CRM_Core_Config::singleton();
-      CRM_Admin_Form_Setting_Component::loadCaseSampleData($config->dsn, $config->sqlDir . 'case_sample.mysql');
+      CRM_Admin_Form_Setting_Component::loadCaseSampleData($config->dsn, $pathToCaseSampleTpl . 'case_sample.mysql.tpl');
       if (!CRM_Case_BAO_Case::createCaseViews()) {
         $msg = ts("Could not create the MySQL views for CiviCase. Your mysql user needs to have the 'CREATE VIEW' permission");
         CRM_Core_Error::fatal($msg);
