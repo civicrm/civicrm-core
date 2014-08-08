@@ -154,13 +154,13 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
       preg_quote("$lastName, $firstName")
     );
 
-    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/span/a[1]",
+    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/span",
       preg_quote("$lastName1, $firstName1")
     );
-    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/span/a[2]",
+    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/span",
       preg_quote("$lastName2, $firstName2")
     );
-    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/span/a[3]",
+    $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/span",
       preg_quote("$lastName3, $firstName3")
     );
 
