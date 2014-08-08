@@ -118,8 +118,10 @@
         {/if}
 
         {if $ppID}{ts}<a href='#' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
-        <br /><span class="description">{ts}Total amount of this contribution.{/ts}{if $hasPriceSets} {ts}Alternatively, you can use a price set.{/ts}{/if}</span>
-        <br /><span id="totalTaxAmount" class="label"></span>
+        <div id="totalAmountBlock">
+          <br /><span class="description">{ts}Total amount of this contribution.{/ts}{if $hasPriceSets} {ts}Alternatively, you can use a price set.{/ts}{/if}</span>
+          <br /><span id="totalTaxAmount" class="label"></span>
+        </div>
       </td>
     </tr>
 
@@ -372,7 +374,6 @@
       cj('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function(index) {
         loadPanes(cj(this).attr('id'));
       });
-      cj('#total_amount').trigger("change");
     });
     // load panes function calls for snippet based on id of crm-accordion-header
     function loadPanes( id ) {
@@ -632,6 +633,7 @@ cj("#currency").on("change",function(){
   cj('#total_amount').trigger("change");
 })
 
+{/literal}{if $taxRates && $invoicing}{literal}
 cj('#total_amount').on("change",function(event) {
   if (event.handled !== true) {
     var financialType = cj('#financial_type_id').val();
@@ -651,10 +653,26 @@ cj('#total_amount').on("change",function(event) {
     }  
     var totalAmount = cj('#total_amount').val();
     var totalTaxAmount = parseFloat(Number((taxRate/100)*totalAmount)+Number(totalAmount)).toFixed(2);
-    cj( "#totalTaxAmount" ).html('Total Amount : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
+    cj( "#totalTaxAmount" ).html('Amount with tax : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
     event.handled = true;
   }
   return false;
+});
+ 
+CRM.$(function($) {
+  cj('#total_amount').trigger("change");
+});
+{/literal}{/if}{literal}
+
+cj(function() {
+  cj('#price_set_id').click(function() {
+    if( cj('#price_set_id').val() ) { 
+      cj('#totalAmountBlock').hide();
+    }
+    else {
+      cj('#totalAmountBlock').show();
+    }
+  });
 });
 </script>
 {/literal}
