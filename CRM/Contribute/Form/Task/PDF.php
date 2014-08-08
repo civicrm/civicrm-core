@@ -241,8 +241,10 @@ AND    {$this->_componentClause}";
    *
    * @return array array of common elements
    *
+   * @access public
+   * @static
    */
-  public function getElements($contribIds, $params, $contactIds) {
+  static public function getElements($contribIds, $params, $contactIds) {
     $pdfElements = array();
 
     $pdfElements['contribIDs'] = implode(',', $contribIds);
