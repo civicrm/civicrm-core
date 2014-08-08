@@ -634,43 +634,43 @@ cj("#currency").on("change",function(){
 })
 
 {/literal}{if $taxRates && $invoicing}{literal}
-cj('#total_amount').on("change",function(event) {
-  if (event.handled !== true) {
-    var financialType = cj('#financial_type_id').val();
-    var taxRates = '{/literal}{$taxRates}{literal}';
-    var taxRates = JSON.parse(taxRates);
-    var currencies = '{/literal}{$currencies}{literal}';
-    var currencies = JSON.parse(currencies);
-    var currencySelect = cj('#currency').val();
-    var currencySymbol = currencies[currencySelect];
-    var re= /\((.*?)\)/g;
-    for(m = re.exec(currencySymbol); m; m = re.exec(currencySymbol)){
-      var currencySymbol = m[1];
-    }
-    var taxRate = taxRates[financialType]; 
-    if (!taxRate) {
-      taxRate = 0;
-    }  
-    var totalAmount = cj('#total_amount').val();
-    var totalTaxAmount = parseFloat(Number((taxRate/100)*totalAmount)+Number(totalAmount)).toFixed(2);
-    cj( "#totalTaxAmount" ).html('Amount with tax : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
-    event.handled = true;
-  }
-  return false;
-});
- 
 CRM.$(function($) {
-  cj('#total_amount').trigger("change");
+  $('#total_amount').on("change",function(event) {
+    if (event.handled !== true) {
+      var financialType = $('#financial_type_id').val();
+      var taxRates = '{/literal}{$taxRates}{literal}';
+      var taxRates = JSON.parse(taxRates);
+      var currencies = '{/literal}{$currencies}{literal}';
+      var currencies = JSON.parse(currencies);
+      var currencySelect = $('#currency').val();
+      var currencySymbol = currencies[currencySelect];
+      var re= /\((.*?)\)/g;
+      for(m = re.exec(currencySymbol); m; m = re.exec(currencySymbol)){
+        var currencySymbol = m[1];
+      }
+      var taxRate = taxRates[financialType]; 
+      if (!taxRate) {
+        taxRate = 0;
+      }  
+      var totalAmount = $('#total_amount').val();
+      var totalTaxAmount = parseFloat(Number((taxRate/100)*totalAmount)+Number(totalAmount)).toFixed(2);
+      $("#totalTaxAmount" ).html('Amount with tax : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
+      event.handled = true;
+    }
+    return false;
+  });
+
+  $('#total_amount').trigger("change");
 });
 {/literal}{/if}{literal}
 
-cj(function() {
-  cj('#price_set_id').click(function() {
-    if( cj('#price_set_id').val() ) { 
-      cj('#totalAmountBlock').hide();
+CRM.$(function($) {
+  $('#price_set_id').click(function() {
+    if( $('#price_set_id').val() ) { 
+      $('#totalAmountBlock').hide();
     }
     else {
-      cj('#totalAmountBlock').show();
+      $('#totalAmountBlock').show();
     }
   });
 });
