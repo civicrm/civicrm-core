@@ -1397,6 +1397,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('line_item', 'create', array(
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
+      'contribution_id' => $contribution['id'],
       'price_field_id' => $this->_ids['price_field'][0],
       'qty' => 1,
       'unit_price' => 20,
