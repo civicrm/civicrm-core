@@ -85,9 +85,6 @@
       <td class="font-size12pt label"><strong><strong>{ts}Contributor{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
     </tr>
     {else}
-      {if !$contributionMode and !$email and $outBound_option != 2}
-        {assign var='profileCreateCallback' value=1 }
-      {/if}
       <td class="label">{$form.contact_id.label}</td>
       <td>{$form.contact_id.html}</td>
     {/if}
@@ -399,38 +396,26 @@
     {if $context eq 'standalone' and $outBound_option != 2 }
       {literal}
       CRM.$(function($) {
-        cj("#contact_id").change( function( ) {
-          checkEmail( );
-        });
+
+        var $form = $("#{/literal}{$form.formName}{literal}");
+        $("#contact_id", $form).change(checkEmail);
         checkEmail( );
+
+        function checkEmail( ) {
+          var data = $("#contact_id", $form).select2('data');
+          if (data && data.extra && data.extra.email && data.extra.email.length) {
+            $("#email-receipt", $form).show();
+            $("#email-address", $form).html(data.extra.email);
+          }
+          else {
+            $("#email-receipt", $form).hide();
+          }
+        }
+
         showHideByValue( 'is_email_receipt', '', 'receiptDate', 'table-row', 'radio', true);
         showHideByValue( 'is_email_receipt', '', 'fromEmail', 'table-row', 'radio', false );
       });
 
-      function checkEmail( ) {
-        var contactID = cj("#contact_id").val();
-        if (contactID) {
-          var postUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' h=0}{literal}";
-          cj.post( postUrl, {contact_id: contactID},
-            function (response) {
-              if (response) {
-                cj("#email-receipt").show( );
-                cj("#email-address").html(response);
-              }
-              else {
-                cj("#email-receipt").hide( );
-              }
-            }
-          );
-        }
-        else {
-          cj("#email-receipt").hide( );
-        }
-      }
-
-      function profileCreateCallback( blockNo ) {
-        checkEmail( );
-      }
     {/literal}
     {/if}
   </script>

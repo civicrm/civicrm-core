@@ -231,7 +231,7 @@
                 <script type="text/javascript">
                 {literal}
                     CRM.$(function($) {
-                        cj('#discounted_label_1').focus( );
+                        $('#discounted_label_1').focus( );
                     });
                 {/literal}
                 </script>

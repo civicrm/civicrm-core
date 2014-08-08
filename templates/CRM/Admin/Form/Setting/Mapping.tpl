@@ -55,14 +55,15 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
-  showHideMapAPIkey( cj('#mapProvider').val( ) );
-});
-function showHideMapAPIkey( mapProvider ) {
-  if ( mapProvider && ( mapProvider == 'OpenStreetMaps' ) ) {
-    cj('#Mapping tr.crm-map-form-block-mapAPIKey').hide( );
-  } else {
-    cj('#Mapping tr.crm-map-form-block-mapAPIKey').show( );
+  function showHideMapAPIkey() {
+    var mapProvider = $(this).val();
+    if ( !mapProvider || ( mapProvider === 'OpenStreetMaps' ) ) {
+      $('#Mapping tr.crm-map-form-block-mapAPIKey').hide( );
+    } else {
+      $('#Mapping tr.crm-map-form-block-mapAPIKey').show( );
+    }
   }
-}
+  $('#mapProvider').each(showHideMapAPIkey).change(showHideMapAPIkey);
+});
 </script>
 {/literal}

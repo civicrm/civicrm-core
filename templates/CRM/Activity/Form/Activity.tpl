@@ -239,10 +239,10 @@
       {literal}
         <script type="text/javascript">
           CRM.$(function($) {
-            cj('.crm-accordion-body').each( function() {
+            $('.crm-accordion-body').each( function() {
               //open tab if form rule throws error
-              if ( cj(this).children( ).find('span.crm-error').text( ).length > 0 ) {
-                cj(this).parent('.collapsed').crmAccordionToggle();
+              if ( $(this).children( ).find('span.crm-error').text( ).length > 0 ) {
+                $(this).parent('.collapsed').crmAccordionToggle();
               }
             });
             $('#swap_target_assignee').click(function() {

@@ -253,7 +253,7 @@ if ( isMailing ) {
   {literal}
     CRM.$(function($) {
       if ( isMailing ) {
-        cj('div.html').hover(
+        $('div.html').hover(
           function( ) {
             if ( tinyMCE.get(html_message) ) {
               tinyMCE.get(html_message).onKeyUp.add(function() {
@@ -276,7 +276,7 @@ if ( isMailing ) {
   {literal}
     CRM.$(function($) {
       if ( isMailing ) {
-        cj('div.html').hover(
+        $('div.html').hover(
           verify,
           verify
         );
@@ -347,7 +347,7 @@ CRM.$(function($) {
       }
     }
     else {
-      cj( "#"+ html_message ).replaceSelection( token );
+      $( "#"+ html_message ).replaceSelection( token );
     }
   }
 
@@ -361,29 +361,29 @@ CRM.$(function($) {
       placeholder: '{/literal}{ts escape='js'}Insert Token{/ts}{literal}'
     });
 
-  cj('.accordion .head').addClass( "ui-accordion-header ui-helper-reset ui-state-default ui-corner-all ");
-  cj('.resizable-textarea textarea').css( 'width', '99%' );
-  cj('.grippie').css( 'margin-right', '3px');
-  cj('.accordion .head').hover( function() { cj(this).addClass( "ui-state-hover");
-  }, function() { cj(this).removeClass( "ui-state-hover");
+  $('.accordion .head').addClass( "ui-accordion-header ui-helper-reset ui-state-default ui-corner-all ");
+  $('.resizable-textarea textarea').css( 'width', '99%' );
+  $('.grippie').css( 'margin-right', '3px');
+  $('.accordion .head').hover( function() { $(this).addClass( "ui-state-hover");
+  }, function() { $(this).removeClass( "ui-state-hover");
   }).bind('click', function() {
-    var checkClass = cj(this).find('span').attr( 'class' );
+    var checkClass = $(this).find('span').attr( 'class' );
     var len        = checkClass.length;
     if ( checkClass.substring( len - 1, len ) == 's' ) {
-      cj(this).find('span').removeClass().addClass('ui-icon ui-icon-triangle-1-e');
-      cj("span#help"+cj(this).find('span').attr('id')).hide();
+      $(this).find('span').removeClass().addClass('ui-icon ui-icon-triangle-1-e');
+      $("span#help"+$(this).find('span').attr('id')).hide();
     }
     else {
-      cj(this).find('span').removeClass().addClass('ui-icon ui-icon-triangle-1-s');
-      cj("span#help"+cj(this).find('span').attr('id')).show();
+      $(this).find('span').removeClass().addClass('ui-icon ui-icon-triangle-1-s');
+      $("span#help"+$(this).find('span').attr('id')).show();
     }
-    cj(this).next().toggle(); return false;
+    $(this).next().toggle(); return false;
   }).next().hide();
-  cj('span#html').removeClass().addClass('ui-icon ui-icon-triangle-1-s');
-  cj("div.html").show();
+  $('span#html').removeClass().addClass('ui-icon ui-icon-triangle-1-s');
+  $("div.html").show();
 
   if ( !isMailing ) {
-    cj("div.text").show();
+    $("div.text").show();
   }
 
   function setSignature() {
@@ -433,12 +433,12 @@ CRM.$(function($) {
       }, 'json');
     }
   }
-  if (!cj().find('div.crm-error').text()) {
-    cj(window).load(function () {
+  if (!$().find('div.crm-error').text()) {
+    $(window).load(function () {
       setSignature();
     });
   }
-  cj("#fromEmailAddress").change( function( ) {
+  $("#fromEmailAddress").change( function( ) {
     setSignature( );
   });
 });

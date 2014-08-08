@@ -161,25 +161,25 @@
 <script type="text/javascript">
 CRM.$(function($) {
   showHidePeriodSettings();
-  cj('#duration_unit').change(function(){
+  $('#duration_unit').change(function(){
     showHidePeriodSettings();
   });
 
-  cj('#period_type').change(function(){
+  $('#period_type').change(function(){
     showHidePeriodSettings();
   });
 
   {/literal}
   {if $action eq 2}
   {literal}
-    showHideMaxRelated(cj('#relationship_type_id').val());
-    cj('#relationship_type_id').change(function(){
-      showHideMaxRelated(cj('#relationship_type_id').val());
+    showHideMaxRelated($('#relationship_type_id').val());
+    $('#relationship_type_id').change(function(){
+      showHideMaxRelated($('#relationship_type_id').val());
     });
   {/literal}{else}{literal}
-    showHideMaxRelated(cj('#relationship_type_id :selected').val());
-    cj('#relationship_type_id').change(function(){
-      showHideMaxRelated(cj('#relationship_type_id :selected').val());
+    showHideMaxRelated($('#relationship_type_id :selected').val());
+    $('#relationship_type_id').change(function(){
+      showHideMaxRelated($('#relationship_type_id :selected').val());
     });
   {/literal}{/if}{literal}
 });

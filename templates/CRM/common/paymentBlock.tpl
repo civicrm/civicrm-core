@@ -59,10 +59,10 @@ function buildPaymentBlock( type ) {
 }
 
 CRM.$(function($) {
-    cj('.crm-group.payment_options-group').show();
+    $('.crm-group.payment_options-group').show();
 
-    cj('input[name="payment_processor"]').change( function() {
-        buildPaymentBlock( cj(this).val() );
+    $('input[name="payment_processor"]').change( function() {
+        buildPaymentBlock( $(this).val() );
     });
 });
 

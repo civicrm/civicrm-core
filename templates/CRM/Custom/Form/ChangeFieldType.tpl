@@ -42,10 +42,10 @@
 </div>
 {literal}
 <script type="text/Javascript">
-  var srcHtmlType = '{/literal}{$srcHtmlType}{literal}';
-  var singleValOps = new Array('Text', 'Select', 'Radio', 'Autocomplete-Select');
-  var multiValOps  = new Array('CheckBox', 'Multi-Select', 'AdvMulti-Select');
   function checkCustomDataField( ) {
+    var srcHtmlType = '{/literal}{$srcHtmlType}{literal}';
+    var singleValOps = ['Text', 'Select', 'Radio', 'Autocomplete-Select'];
+    var multiValOps  = ['CheckBox', 'Multi-Select', 'AdvMulti-Select'];
     var dstHtmlType = cj('#dst_html_type').val( );
     if ( !dstHtmlType ) {
       return true;

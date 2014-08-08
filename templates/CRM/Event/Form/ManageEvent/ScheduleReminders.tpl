@@ -150,7 +150,7 @@
     <script type='text/javascript'>
       CRM.$(function($) {
         populateRecipient();
-        cj('#recipient').click( function( ) {
+        $('#recipient').click( function( ) {
           populateRecipient();
         });
       });

@@ -76,23 +76,23 @@
         <script type="text/javascript">
         CRM.$(function($) {
           function showGroupSearch(){
-            cj('#grouptypeselect').hide();
-            cj('#groupselect').show();
-            cj('#group_type').select2('val', '');
+            $('#grouptypeselect').hide();
+            $('#groupselect').show();
+            $('#group_type').select2('val', '');
           }
           function showGroupTypeSearch(){
-            cj('#groupselect').hide();
-            cj('#grouptypeselect').show();
-            cj('#group').select2('val', '');
+            $('#groupselect').hide();
+            $('#grouptypeselect').show();
+            $('#group').select2('val', '');
           }
-          cj('#searchbygrouptype').click(function() {
+          $('#searchbygrouptype').click(function() {
               showGroupTypeSearch();
           });
-          cj('#searchbygroup').click(function() {
+          $('#searchbygroup').click(function() {
               showGroupSearch();
           });
 
-          if (cj('#group_type').val() ) {
+          if ($('#group_type').val() ) {
             showGroupTypeSearch();
           }
           else {

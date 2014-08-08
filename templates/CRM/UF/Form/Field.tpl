@@ -91,12 +91,9 @@
 
 {literal}
 <script type="text/javascript">
-var otherModule = new Array( );
-{/literal}{foreach from=$otherModules item="mval" key="mkey"}{literal}
-otherModule[{/literal}{$mkey}{literal}] = '{/literal}{$mval}{literal}';
-{/literal}{/foreach}{literal}
 
 CRM.$(function($) {
+  var otherModule = {/literal}{$otherModules|@json_encode}{literal};
   if ( $.inArray( "Profile", otherModule ) > -1 && $.inArray( "Search Profile", otherModule ) == -1 ){
     $('#profile_visibility').show();
   }
