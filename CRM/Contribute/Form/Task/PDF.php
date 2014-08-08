@@ -256,7 +256,8 @@ AND    {$this->_componentClause}";
     $pdfElements['params'] = $params;
 
     $pdfElements['createPdf'] = FALSE;
-    if ($pdfElements['params']['output'] == "pdf_invoice" || $pdfElements['params']['output'] == "pdf_receipt") {
+    if (!empty($pdfElements['params']['output']) &&
+      ($pdfElements['params']['output'] == "pdf_invoice" || $pdfElements['params']['output'] == "pdf_receipt")) {
       $pdfElements['createPdf'] = TRUE;
     }
 
@@ -271,6 +272,7 @@ AND    {$this->_componentClause}";
 
       list($contactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, $returnProperties, FALSE, FALSE);
       $pdfElements['suppressedEmails'] = 0;
+      $suppressedEmails = 0;
       foreach ($contactDetails as $id => $values) {
         if (empty($values['email']) || !empty($values['do_not_email']) ||
             CRM_Utils_Array::value('is_deceased', $values) || !empty($values['on_hold'])) {
