@@ -118,8 +118,10 @@
         {/if}
 
         {if $ppID}{ts}<a href='#' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
-        <br /><span class="description">{ts}Total amount of this contribution.{/ts}{if $hasPriceSets} {ts}Alternatively, you can use a price set.{/ts}{/if}</span>
-        <br /><span id="totalTaxAmount" class="label"></span>
+        <div id="totalAmountBlock">
+          <br /><span class="description">{ts}Total amount of this contribution.{/ts}{if $hasPriceSets} {ts}Alternatively, you can use a price set.{/ts}{/if}</span>
+          <br /><span id="totalTaxAmount" class="label"></span>
+        </div>
       </td>
     </tr>
 
@@ -372,7 +374,6 @@
       cj('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function(index) {
         loadPanes(cj(this).attr('id'));
       });
-      cj('#total_amount').trigger("change");
     });
     // load panes function calls for snippet based on id of crm-accordion-header
     function loadPanes( id ) {
@@ -632,29 +633,46 @@ cj("#currency").on("change",function(){
   cj('#total_amount').trigger("change");
 })
 
-cj('#total_amount').on("change",function(event) {
-  if (event.handled !== true) {
-    var financialType = cj('#financial_type_id').val();
-    var taxRates = '{/literal}{$taxRates}{literal}';
-    var taxRates = JSON.parse(taxRates);
-    var currencies = '{/literal}{$currencies}{literal}';
-    var currencies = JSON.parse(currencies);
-    var currencySelect = cj('#currency').val();
-    var currencySymbol = currencies[currencySelect];
-    var re= /\((.*?)\)/g;
-    for(m = re.exec(currencySymbol); m; m = re.exec(currencySymbol)){
-      var currencySymbol = m[1];
+{/literal}{if $taxRates && $invoicing}{literal}
+CRM.$(function($) {
+  $('#total_amount').on("change",function(event) {
+    if (event.handled !== true) {
+      var financialType = $('#financial_type_id').val();
+      var taxRates = '{/literal}{$taxRates}{literal}';
+      var taxRates = JSON.parse(taxRates);
+      var currencies = '{/literal}{$currencies}{literal}';
+      var currencies = JSON.parse(currencies);
+      var currencySelect = $('#currency').val();
+      var currencySymbol = currencies[currencySelect];
+      var re= /\((.*?)\)/g;
+      for(m = re.exec(currencySymbol); m; m = re.exec(currencySymbol)){
+        var currencySymbol = m[1];
+      }
+      var taxRate = taxRates[financialType]; 
+      if (!taxRate) {
+        taxRate = 0;
+      }  
+      var totalAmount = $('#total_amount').val();
+      var totalTaxAmount = parseFloat(Number((taxRate/100)*totalAmount)+Number(totalAmount)).toFixed(2);
+      $("#totalTaxAmount" ).html('Amount with tax : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
+      event.handled = true;
     }
-    var taxRate = taxRates[financialType]; 
-    if (!taxRate) {
-      taxRate = 0;
-    }  
-    var totalAmount = cj('#total_amount').val();
-    var totalTaxAmount = parseFloat(Number((taxRate/100)*totalAmount)+Number(totalAmount)).toFixed(2);
-    cj( "#totalTaxAmount" ).html('Total Amount : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
-    event.handled = true;
-  }
-  return false;
+    return false;
+  });
+
+  $('#total_amount').trigger("change");
+});
+{/literal}{/if}{literal}
+
+CRM.$(function($) {
+  $('#price_set_id').click(function() {
+    if( $('#price_set_id').val() ) { 
+      $('#totalAmountBlock').hide();
+    }
+    else {
+      $('#totalAmountBlock').show();
+    }
+  });
 });
 </script>
 {/literal}
