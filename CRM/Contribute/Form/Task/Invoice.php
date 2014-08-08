@@ -67,6 +67,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   public $_invoiceTemplate;
 
   /**
+   * selected output
+   */
+  public $_selectedOutput;
+
+  /**
    * build all the data structures needed to build the form
    *
    * @return void
@@ -119,7 +124,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     );
 
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
-    if (in_array("email", $this->urlPath)) {
+
+    $this->_selectedOutput = CRM_Utils_Request::retrieve('select', 'String', $this);
+    $this->assign('selectedOutput', $this->_selectedOutput);
+
+    if ($this->_selectedOutput == 'email') {
       CRM_Utils_System::setTitle(ts('Email Invoice'));
     }
     else {
@@ -163,11 +172,17 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $fromEmailAddress[$key] = htmlspecialchars($fromEmailAddress[$key]);
     }
     $fromEmail = CRM_Utils_Array::crmArrayMerge($emails, $fromEmailAddress);
-
-    $this->addElement('radio', 'output', NULL, ts('Email Invoice'), 'email_invoice');
-    $this->addElement('radio', 'output', NULL, ts('PDF Invoice'), 'pdf_invoice');
     $this->add('select', 'from_email_address', ts('From Email Address'), array('' => '- select -') + $fromEmail);
-    $this->addFormRule(array('CRM_Contribute_Form_Task_Invoice', 'formRule'));
+    if ($this->_selectedOutput != 'email') {
+      $this->addElement('radio', 'output', NULL, ts('Email Invoice'), 'email_invoice');
+      $this->addElement('radio', 'output', NULL, ts('PDF Invoice'), 'pdf_invoice');
+      $this->addRule('output', ts('Selection required'), 'required');
+      $this->addFormRule(array('CRM_Contribute_Form_Task_Invoice', 'formRule'));
+    }
+    else {
+      $this->addRule('from_email_address', ts('From Email Address is required'), 'required');
+    }
+
     $this->addWysiwyg('email_comment', ts('If you would like to add personal message to email please add it here. (If sending to more then one receipient the same message will be sent to each contact.)'), array(
       'rows' => 2,
       'cols' => 40
@@ -216,19 +231,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    */
   static function formRule($values) {
     $errors = array();
-    if (!$values['from_email_address']) {
-      if (in_array("Email Invoice", $values)) {
-        $errors['from_email_address'] = ts("From Email Address is required");
-      }
-      else {
-        if (in_array("email_invoice", $values)) {
-          $errors['from_email_address'] = ts("From Email Address is required");
-        }
-        else {
-          $errors['output'] = ts("Selection required");
-        }
-      }
+
+    if ($values['output'] == 'email_invoice' && empty($values['from_email_address'])) {
+      $errors['from_email_address'] = ts("From Email Address is required");
     }
+
     return $errors;
   }
 
