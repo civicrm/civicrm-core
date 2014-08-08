@@ -304,8 +304,8 @@
 {literal}
   <script type="text/javascript">
     CRM.$(function($) {
-      cj('#membershipOrgType').hide();
-      cj('#changeNumTerms').hide();
+      $('#membershipOrgType').hide();
+      $('#changeNumTerms').hide();
       {/literal}
       CRM.buildCustomData('{$customDataType}');
       {if $customDataSubType}

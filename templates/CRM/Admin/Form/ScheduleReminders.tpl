@@ -155,42 +155,43 @@
     var entityMapping = eval({/literal}{$entityMapping}{literal});
     var recipientMapping = eval({/literal}{$recipientMapping}{literal});
 
-    cj('#absolute_date_display').change( function() {
-        if(cj('#absolute_date_display').val()) {
-            cj('#relativeDate').hide();
-            cj('#relativeDateRepeat').hide();
-            cj('#repeatFields').hide();
-        } else {
-            cj('#relativeDate').show();
-            cj('#relativeDateRepeat').show();
-        }
-    });
 
     CRM.$(function($) {
-        if (cj('#absolute_date_display').val()) {
-            cj('#relativeDate').hide();
-            cj('#relativeDateRepeat').hide();
-            cj('#repeatFields').hide();
-         }
+      $('#absolute_date_display').change(function() {
+        if($('#absolute_date_display').val()) {
+          $('#relativeDate').hide();
+          $('#relativeDateRepeat').hide();
+          $('#repeatFields').hide();
+        } else {
+          $('#relativeDate').show();
+          $('#relativeDateRepeat').show();
+        }
+      });
+      
+      if ($('#absolute_date_display').val()) {
+        $('#relativeDate, #relativeDateRepeat, #repeatFields').hide();
+      }
 
-         cj('#entity_0').change( function( ) {
-              buildSelect("start_action_date");
+      $('#entity_0').change( function( ) {
+        buildSelect("start_action_date");
         buildSelect("end_date");
         buildSelect1("recipient");
-         });
-     });
+        showHideLimitTo();
+      });
 
-  CRM.$(function($) {
-    loadMsgBox();
-    cj('#mode').change(function () {
       loadMsgBox();
-    });
+      $('#mode').change(loadMsgBox);
 
-    showHideLimitTo();
-    cj('#entity_0').change(function () {
       showHideLimitTo();
+
+      if ($('#is_recipient_listing').val()) {
+        $('#recipientList').show();
+      }
+      else {
+        $('#recipientList').hide();
+      }
+      $('#recipient').change(populateRecipient);
     });
-  });
 
   function loadMsgBox() {
     if (cj('#mode').val() == 'Email' || cj('#mode').val() == 0){
@@ -218,18 +219,6 @@
       cj('#limit_to').show();
     }
   }
-
-  CRM.$(function($) {
-    if (cj('#is_recipient_listing').val()) {
-      cj('#recipientList').show();
-    }
-    else {
-      cj('#recipientList').hide();
-    }
-    cj('#recipient').change(function () {
-      populateRecipient();
-    });
-  });
 
   function populateRecipient( ) {
     var recipient = cj("#recipient option:selected").val();

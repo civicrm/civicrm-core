@@ -177,7 +177,7 @@ function clearFirstBlock( blockName , blockId ) {
 }
 
 function getAddressBlock( position ) {
-   var addressBlockIds = new Array();
+   var addressBlockIds = [];
    var i = 0;
    switch ( position ) {
         case 'last':

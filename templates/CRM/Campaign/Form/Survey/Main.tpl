@@ -97,12 +97,12 @@
     //show edit profile field links
     CRM.$(function($) {
         // show edit for profile
-        cj('select[id="profile_id"]').change( function( ) {
-            buildLinks( cj(this), cj(this).val());
+        $('select[id="profile_id"]').change( function( ) {
+            buildLinks( $(this), $(this).val());
         });
 
         // show edit links on form loads
-        var profileField =  cj('select[id="profile_id"]');
+        var profileField =  $('select[id="profile_id"]');
         buildLinks( profileField, profileField.val());
     });
 </script>
@@ -111,7 +111,7 @@
 {include file="CRM/common/customData.tpl" includeWysiwygEditor=true}
 {literal}
   <script type="text/javascript">
-    cj(document).ready(function() {
+    CRM.$(function($) {
       {/literal}
         CRM.buildCustomData( 'Survey' );
       {literal}

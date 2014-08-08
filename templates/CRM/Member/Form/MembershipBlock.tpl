@@ -145,13 +145,13 @@
     CRM.$(function($) {
         //show/hide membership block
         showHideMembershipBlock();
-        cj('#member_is_active').click( function() {
+        $('#member_is_active').click( function() {
             showHideMembershipBlock();
         });
 
         //show/ hide blocks if price set is selected
         checkIfPriceSetIsSelected( );
-        cj('#member_price_set_id').change( function(){
+        $('#member_price_set_id').change( function(){
             checkIfPriceSetIsSelected( );
         });
     });
