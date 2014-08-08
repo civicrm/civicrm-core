@@ -7,7 +7,7 @@
   <body>
     <table style = "margin-top:2px;padding-left:7px;">
       <tr>
-        <td><img src = "{$imageUploadURL}/logo.png" height = "60" width = "108"></td>
+        <td><img src = "{$resourceBase}/i/civi99.png" height = "34px" width = "99px"></td>
       </tr>
     </table>
     <center>
@@ -170,7 +170,7 @@
       </table>
       <table style = "margin-top:5px;padding-right:45px;">
         <tr>
-          <td><img src = "{$imageUploadURL}/img.png" height = "15" width = "630"></td>
+          <td><img src = "{$resourceBase}/i/contribute/cut_line.png" height = "15" width = "630"></td>
         </tr>
       </table>
 	<table style = "margin-top:6px;padding-right:20px;font-family: Arial, Verdana, sans-serif" width = "480" border = "0"cellpadding = "-5" cellspacing="19" id = "desc">
@@ -228,7 +228,7 @@
       {if $contribution_status_id == $refundedStatusId}
     <table style = "margin-top:2px;padding-left:7px;page-break-before: always;">
       <tr>
-        <td><img src = "{$imageUploadURL}/logo.png" height = "60" width = "108"></td>
+        <td><img src = "{$resourceBase}/i/civi99.png" height = "34px" width = "99px"></td>
       </tr>
     </table>
     <center>
@@ -398,7 +398,7 @@
 
       <table style = "margin-top:5px;padding-right:45px;">
         <tr>
-          <td><img src = "{$imageUploadURL}/img.png" height = "15" width = "630"></td>
+          <td><img src = "{$resourceBase}/i/contribute/cut_line.png" height = "15" width = "630"></td>
         </tr>
       </table>
 
