@@ -566,7 +566,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         ));
         // functions call for adding activity with attachment
         $fileName = self::putFile($html);
-        self::addActivities($subject, $contactIds, $fileName, $params['output']);
+        self::addActivities($subject, $contactIds, $fileName, $params);
 
         CRM_Utils_System::civiExit();
       }
@@ -594,28 +594,30 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @param string $subject Activity subject
    * @param array $contactIds Contact Id
    * @param string $fileName gives the location with name of the file
-   * @param array $output for invoices
+   * @param array $params for invoices
    *
    * @access public
    * @static
    */
-  static public function addActivities($subject, $contactIds, $fileName, $output) {
+  static public function addActivities($subject, $contactIds, $fileName, $params) {
     $session = CRM_Core_Session::singleton();
     $userID = $session->get('userID');
     $config = CRM_Core_Config::singleton();
     $config->doNotAttachPDFReceipt = 1;
-    if ($output['output'] == 'email_invoice' || (is_array($output) && array_key_exists("from_email_address", $output))) {
-      $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
-        'Emailed Invoice',
-        'name'
-      );
-    }
-    else {
+
+    if (!empty($params['output']) && $params['output'] == 'pdf_invoice') {
       $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
         'Downloaded Invoice',
         'name'
       );
     }
+    else{
+      $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
+        'Emailed Invoice',
+        'name'
+      );
+    }
+
     $activityParams = array(
       'subject' => $subject,
       'source_contact_id' => $userID,
