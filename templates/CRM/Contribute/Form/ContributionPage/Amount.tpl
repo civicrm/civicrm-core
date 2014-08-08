@@ -195,7 +195,7 @@
 
 {literal}
 <script type="text/javascript">
-   var paymentProcessorMapper = new Array( );
+   var paymentProcessorMapper = [];
      {/literal}
        {if $recurringPaymentProcessor}
            {foreach from=$recurringPaymentProcessor item="paymentProcessor" key="index"}{literal}

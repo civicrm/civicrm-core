@@ -101,7 +101,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
       )
     );
 
-    $this->_group = CRM_Core_PseudoConstant::group();
+    $this->_group = CRM_Core_PseudoConstant::nestedGroup();
 
     // multiselect for groups
     if ($this->_group) {

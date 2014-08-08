@@ -108,15 +108,15 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
     // this is loaded onto then replace with something like '__' & test
     $separator = CRM_Core_DAO::VALUE_SEPARATOR;
     $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, $separator);
-    $form->add('select', 'contact_type', ts('Find...'), $contactTypes);
+    $form->add('select', 'contact_type', ts('Find...'), $contactTypes, array('class' => 'crm-select2 huge'));
 
     // add select for groups
     $group = array('' => ts('- any group -')) + CRM_Core_PseudoConstant::group();
-    $form->addElement('select', 'group', ts('in'), $group);
+    $form->addElement('select', 'group', ts('in'), $group, array('class' => 'crm-select2 huge'));
 
     // add select for tags
     $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
-    $form->addElement('select', 'tag', ts('Tagged'), $tag);
+    $form->addElement('select', 'tag', ts('Tagged'), $tag, array('class' => 'crm-select2 huge'));
 
     if (empty($this->_groupTree)) {
       CRM_Core_Error::statusBounce(ts("Atleast one Custom Group must be present, for Custom Group search."),

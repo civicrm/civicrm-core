@@ -38,7 +38,7 @@
   {literal}
   <script type="text/javascript">
   CRM.$(function($) {
-    var membershipValues = new Array;
+    var membershipValues = [];
     {/literal}{foreach from=$optionsMembershipTypes item=memType key=opId}{literal}
       membershipValues[{/literal}{$opId}{literal}] = {/literal}{$memType}{literal};
     {/literal}{/foreach}{literal}
@@ -85,9 +85,6 @@
             <td class="font-size12pt label"><strong>{ts}Member{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
           </tr>
         {else}
-          {if !$membershipMode and !$emailExists and $outBound_option != 2}
-            {assign var='profileCreateCallback' value=1 }
-          {/if}
           <td class="label">{$form.contact_id.label}</td>
           <td>{$form.contact_id.html}</td>
         {/if}
@@ -730,12 +727,12 @@
       }
     }
 
-    var lastMembershipTypes = new Array;
-    var optionsMembershipTypes = new Array;
+    var lastMembershipTypes = [];
+    var optionsMembershipTypes = [];
 
     // function to load custom data for selected membership types through priceset
     function processMembershipPriceset( membershipValues, autoRenewOption, reload ) {
-      var currentMembershipType = new Array;
+      var currentMembershipType = [];
       var count = 0;
       var loadCustomData = 0;
       if ( membershipValues ) {
@@ -743,7 +740,7 @@
       }
 
       if ( reload ) {
-        lastMembershipTypes = new Array;
+        lastMembershipTypes = [];
         {/literal}{if $allowAutoRenew}{literal}
         cj('#autoRenew').hide();
         var autoRenew = cj("#auto_renew");

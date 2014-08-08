@@ -32,14 +32,14 @@
     {literal}
     <script type="text/javascript">
 
-    var fieldOptionsFull = new Array( );
+    var fieldOptionsFull = [];
     {/literal}
     {foreach from=$priceSet.fields item=fldElement key=fldId}
       {if $fldElement.options}
         {foreach from=$fldElement.options item=fldOptions key=opId}
           {if $fldOptions.is_full}
             {literal}
-              fieldOptionsFull[{/literal}{$fldId}{literal}] = new Array( );
+              fieldOptionsFull[{/literal}{$fldId}{literal}] = [];
             fieldOptionsFull[{/literal}{$fldId}{literal}][{/literal}{$opId}{literal}] = 1;
           {/literal}
           {/if}
@@ -50,23 +50,23 @@
 
     if ( fieldOptionsFull.length > 0 ) {
       CRM.$(function($) {
-        cj("input,#priceset select,#priceset").each(function () {
-          if ( cj(this).attr('price') ) {
-            switch( cj(this).attr('type') ) {
+        $("input,#priceset select,#priceset").each(function () {
+          if ( $(this).attr('price') ) {
+            switch( $(this).attr('type') ) {
               case 'checkbox':
               case 'radio':
-                cj(this).click( function() {
+                $(this).click( function() {
                   validatePriceField(this);
                 });
                 break;
 
               case 'select-one':
-                cj(this).change( function() {
+                $(this).change( function() {
                   validatePriceField(this);
                 });
                 break;
               case 'text':
-                cj(this).bind( 'keyup', function() { validatePriceField(this) });
+                $(this).bind( 'keyup', function() { validatePriceField(this) });
                 break;
             }
           }
@@ -223,9 +223,6 @@
               <td class="font-size12pt view-value">{$displayName}&nbsp;</td>
             </tr>
             {else}
-            {if !$participantMode and !$email and $outBound_option != 2 }
-              {assign var='profileCreateCallback' value=1}
-            {/if}
             <tr class="crm-participant-form-contact-id">
               <td class="label">{$form.contact_id.label}</td>
               <td>{$form.contact_id.html}</td>
@@ -490,15 +487,6 @@
   }
 
   {/literal}
-  {if $profileCreateCallback}
-    {literal}
-    function profileCreateCallback( blockNo ) {
-      if( cj('#event_id').val( ) &&  cj('#email-receipt').length > 0 ) {
-        checkEmail( );
-      }
-    }
-    {/literal}
-  {/if}
 </script>
 
 {/if} {* end of main event block*}
