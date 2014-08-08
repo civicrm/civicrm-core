@@ -142,9 +142,9 @@ function processAddressFields( name, loadData ) {
 }
 
 CRM.$(function($) {
-  if (  cj('#street_name').val( ).length > 0 ||
-        cj('#street_unit').val( ).length > 0 ||
-        cj('#street_number').val( ).length > 0 ) {
+  if (  $('#street_name').val( ).length > 0 ||
+        $('#street_unit').val( ).length > 0 ||
+        $('#street_number').val( ).length > 0 ) {
     processAddressFields( 'addressElements', 1 );
   }
 }

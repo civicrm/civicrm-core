@@ -59,9 +59,6 @@
    {else}
       <table class="form-layout-compressed">
         {if $context eq 'standalone'}
-          {if !$email and $outBound_option != 2}
-            {assign var='profileCreateCallback' value=1 }
-          {/if}
           <tr class="crm-pledge-form-contact-id">
             <td class="label">{$form.contact_id.label}</td>
             <td>{$form.contact_id.html}</td>
@@ -245,35 +242,25 @@ function loadPanes( id ) {
     {if $context eq 'standalone' and $outBound_option != 2 }
     {literal}
     CRM.$(function($) {
-        cj("#contact_1").blur( function( ) {
-            checkEmail( );
-        });
-        checkEmail( );
-  showHideByValue( 'is_acknowledge', '', 'acknowledgeDate', 'table-row', 'radio', true);
-  showHideByValue( 'is_acknowledge', '', 'fromEmail', 'table-row', 'radio', false );
-    });
-    function checkEmail( ) {
-        var contactID = cj("input[name='contact_select_id[1]']").val();
-        if ( contactID ) {
-            var postUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' h=0}{literal}";
-            cj.post( postUrl, {contact_id: contactID},
-                function ( response ) {
-                    if ( response ) {
-                        cj("#acknowledgment-receipt").show( );
-                        cj("#email-address").html( response );
-                    } else {
-                        cj("#acknowledgment-receipt").hide( );
-                    }
-                }
-            );
-        } else {
-    cj("#acknowledgment-receipt").hide( );
-  }
-    }
+      var $form = $("#{/literal}{$form.formName}{literal}");
+      $("#contact_id", $form).change(checkEmail);
+      checkEmail( );
 
-    function profileCreateCallback( blockNo ) {
-        checkEmail( );
-    }
+      function checkEmail( ) {
+        var data = $("#contact_id", $form).select2('data');
+        if (data && data.extra && data.extra.email && data.extra.email.length) {
+          $("#acknowledgment-receipt", $form).show();
+          $("#email-address", $form).html(data.extra.email);
+        }
+        else {
+          $("#acknowledgment-receipt", $form).hide();
+        }
+      }
+
+      showHideByValue( 'is_acknowledge', '', 'acknowledgeDate', 'table-row', 'radio', true);
+      showHideByValue( 'is_acknowledge', '', 'fromEmail', 'table-row', 'radio', false );
+    });
+
     {/literal}
     {/if}
 </script>

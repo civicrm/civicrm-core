@@ -1108,13 +1108,13 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     if (CRM_Core_Permission::check('administer Reports') && $this->_add2groupSupported) {
       $this->addElement('select', 'groups', ts('Group'),
-        array('' => ts('- select group -')) + CRM_Core_PseudoConstant::staticGroup()
+        array('' => ts('Add Contacts to Group')) + CRM_Core_PseudoConstant::nestedGroup(),
+        array('class' => 'crm-select2 crm-action-menu action-icon-plus huge')
       );
       $this->assign('group', TRUE);
     }
 
-    $label = ts('Add These Contacts to Group');
-    $this->addElement('submit', $this->_groupButtonName, $label, array('onclick' => 'return checkGroup();'));
+    $this->addElement('submit', $this->_groupButtonName, '', array('style' => 'display: none;'));
 
     $this->addChartOptions();
     $this->addButtons(array(

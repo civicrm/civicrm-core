@@ -83,7 +83,7 @@
        <td class="left"><h5 class='editPayment'></h5>
 {literal}
 <script type="text/javascript">
-cj(document).ready(function(){
+CRM.$(function($) {
   cj(document).on('blur', '.distribute', function() {
    var totalAmount = 0;
    cj('.distribute').each(function (){

@@ -86,7 +86,7 @@ function populatebalanceFee(updatedAmt, onlyStatusUpdate) {
 }
 
 CRM.$(function($) {
-  var updatedFeeUnFormatted = cj('#pricevalue').text();
+  var updatedFeeUnFormatted = $('#pricevalue').text();
   var updatedAmt = parseFloat(updatedFeeUnFormatted.replace(/[^0-9-.]/g, ''));
 
   populatebalanceFee(updatedAmt, true);

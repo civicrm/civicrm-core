@@ -156,8 +156,8 @@
 {literal}
   <script type="text/javascript">
     CRM.$(function($) {
-      cj('#selector tr:even').addClass('odd-row ');
-      cj('#selector tr:odd ').addClass('even-row');
+      $('#selector tr:even').addClass('odd-row ');
+      $('#selector tr:odd ').addClass('even-row');
     });
   </script>
 {/literal}

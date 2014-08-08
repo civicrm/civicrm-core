@@ -255,10 +255,8 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
           '' => ts('- select Parent -')) + $campaigns
       );
     }
-
+$groups = CRM_Core_PseudoConstant::nestedGroup();
     //get the campaign groups.
-    $groups = CRM_Core_PseudoConstant::group();
-
     $this->add('select', 'includeGroups',
       ts('Include Group(s)'),
       $groups,

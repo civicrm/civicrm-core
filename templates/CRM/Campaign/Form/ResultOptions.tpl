@@ -88,8 +88,8 @@
 </tr>
 
 <script type="text/javascript">
-    var showRows   = new Array({$showBlocks});
-    var hideBlocks = new Array({$hideBlocks});
+    var showRows   = [{$showBlocks}];
+    var hideBlocks = [{$hideBlocks}];
     var rowcounter = 0;
     var surveyId   = {if $surveyId}{$surveyId}{else}''{/if};
 

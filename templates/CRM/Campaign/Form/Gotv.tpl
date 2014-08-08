@@ -137,7 +137,7 @@ function loadVoterList( )
       var dataLength = aoData.length;
 
       var count = 1;
-      var searchCriteria = new Array( 'campaign_search_voter_for' );
+      var searchCriteria = ['campaign_search_voter_for'];
 
       //get the search criteria.
                         var searchParams = {/literal}{$searchParams}{literal};

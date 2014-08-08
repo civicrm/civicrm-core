@@ -88,7 +88,7 @@
 CRM.$(function($) {
 
   showHideStyle();
-  cj('#extends_0').change(function() {
+  $('#extends_0').change(function() {
     showHideStyle();
   });
 
@@ -96,64 +96,64 @@ CRM.$(function($) {
   if (isGroupEmpty) {
     showRange(true);
   }
-  cj('#is_multiple').click(function() {
+  $('#is_multiple').click(function() {
     showRange();
   });
 
   function showHideStyle() {
     var isShow  = false;
-    var extend  = cj('#extends_0').val();
+    var extend  = $('#extends_0').val();
 
     var contactTypes    = {/literal}{$contactTypes}{literal};
     var showStyle       = "{/literal}{$showStyle}{literal}";
     var showMultiple    = "{/literal}{$showMultiple}{literal}";
     var showMaxMultiple = "{/literal}{$showMaxMultiple}{literal}";
 
-    if (cj.inArray(extend, contactTypes) >= 0) {
+    if ($.inArray(extend, contactTypes) >= 0) {
       isShow  = true;
     }
 
     if (isShow) {
-      cj("tr#style").show();
-      cj("tr#is_multiple").show();
-      if (cj('#is_multiple :checked').length) {
-        cj("tr#multiple").show();
+      $("tr#style").show();
+      $("tr#is_multiple").show();
+      if ($('#is_multiple :checked').length) {
+        $("tr#multiple").show();
       }
     }
     else {
-      cj("tr#style").hide();
-      cj("tr#is_multiple").hide();
-      cj("tr#multiple").hide();
+      $("tr#style").hide();
+      $("tr#is_multiple").hide();
+      $("tr#multiple").hide();
     }
 
     if (showStyle) {
-      cj("tr#style").show();
+      $("tr#style").show();
     }
 
     if (showMultiple) {
-      cj("tr#style").show();
-      cj("tr#is_multiple").show();
+      $("tr#style").show();
+      $("tr#is_multiple").show();
     }
 
     if (!showMaxMultiple) {
-      cj("tr#multiple").hide();
+      $("tr#multiple").hide();
     }
-    else if(cj( '#is_multiple').prop('checked')) {
-      cj("tr#multiple").show();
+    else if($( '#is_multiple').prop('checked')) {
+      $("tr#multiple").show();
     }
   }
 
   function showRange(onFormLoad) {
-    if(cj("#is_multiple :checked").length) {
-      cj("tr#multiple").show();
-      cj('#collapse_display').prop('checked', '');
-      cj("select#style option[value='Tab with table']").prop("selected", true);
+    if($("#is_multiple :checked").length) {
+      $("tr#multiple").show();
+      $('#collapse_display').prop('checked', '');
+      $("select#style option[value='Tab with table']").prop("selected", true);
     }
     else {
-      cj('#collapse_display').prop('checked', 'checked');
-      cj("tr#multiple").hide();
+      $('#collapse_display').prop('checked', 'checked');
+      $("tr#multiple").hide();
       if (!onFormLoad) {
-        cj("select#style option[value='Inline']").prop("selected", true);
+        $("select#style option[value='Inline']").prop("selected", true);
       }
     }
   }

@@ -143,10 +143,10 @@ You will need to manually delete that user (click on the link to open Drupal Use
 {literal}
 <script type="text/javascript">
 
-cj(document).ready(function(){
-    cj('table td input.form-checkbox').each(function() {
+  CRM.$(function($) {
+    $('table td input.form-checkbox').each(function() {
        var ele = null;
-       var element = cj(this).attr('id').split('_',3);
+       var element = $(this).attr('id').split('_',3);
 
        switch ( element['1'] ) {
            case 'addressee':
@@ -160,13 +160,13 @@ cj(document).ready(function(){
        }
 
        if( ele ) {
-          cj(this).on('click', function() {
-            var val = cj(this).prop('checked');
-            cj('input' + ele + ', input' + ele + '_custom').prop('checked', val);
+          $(this).on('click', function() {
+            var val = $(this).prop('checked');
+            $('input' + ele + ', input' + ele + '_custom').prop('checked', val);
           });
        }
     });
-});
+  });
 
 </script>
 {/literal}
