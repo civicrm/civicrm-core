@@ -86,7 +86,7 @@ function civicrm_api3_contribution_recur_get($params) {
 
 function civicrm_api3_contribution_recur_cancel($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('id'));
-  return call_user_func_array(array(_civicrm_api3_get_BAO(__FUNCTION__), 'cancelRecurContribution'), array($params['id'], CRM_Core_DAO::$_nullObject));
+  return CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution($params['id'], CRM_Core_DAO::$_nullObject) ? civicrm_api3_create_success() : civicrm_api3_create_error(ts('Error while cancelling recurring contribution'));
 }
 
 /**
