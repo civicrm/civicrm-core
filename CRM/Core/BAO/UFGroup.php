@@ -2318,6 +2318,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
               }
             }
           }
+          elseif ($name == 'contact_sub_type') {
+            $defaults[$fldName] = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($details[$name], CRM_Core_DAO::VALUE_SEPARATOR));
+          }
           elseif ($name == 'world_region') {
             $defaults[$fldName] = $details['worldregion_id'];
           }
