@@ -2964,6 +2964,7 @@ WHERE  contribution_id = %1 ";
           if ($params['contribution']->currency) {
             $currency = $params['contribution']->currency;
           }
+          $diff = 1;
           if (!empty($params['is_quick_config'])) {
             $amount = $itemAmount;
             if (!$amount) {
@@ -2971,7 +2972,6 @@ WHERE  contribution_id = %1 ";
             }
           }
           else {
-            $diff = 1;
             if ($context == 'changeFinancialType' || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)
               || $params['contribution']->contribution_status_id == array_search('Refunded', $contributionStatus)) {
              $diff = -1;

@@ -424,7 +424,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
                          'id' => $contribution->id,
                          'source' => $source,
                          'invoice_id' => $invoiceId,
-                         'imageUploadURL' => $config->imageUploadURL,
+                         'resourceBase' => $config->resourceBase,
                          'defaultCurrency' => $config->defaultCurrency,
                          'amount' => $contribution->total_amount,
                          'amountDue' => $amountDue,
