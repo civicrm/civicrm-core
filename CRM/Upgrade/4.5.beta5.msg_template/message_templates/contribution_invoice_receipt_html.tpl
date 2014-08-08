@@ -7,7 +7,7 @@
   <body>
     <table style = "margin-top:2px;padding-left:29px;">
       <tr>
-        <td><img src = "{$imageUploadURL}/logo.png" height = "39" width = "108"></td>
+        <td><img src = "{$resourceBase}/i/civi99.png" height = "34px" width = "99px"></td>
       </tr>
     </table>
     <center>
@@ -149,7 +149,7 @@
 
       <table style = "margin-top:5px;padding-right:45px;">
         <tr>
-          <td><img src = "{$imageUploadURL}/img.png" height = "15" width = "630"></td>
+          <td><img src = "{$resourceBase}/i/contribute/cut_line.png" height = "15" width = "630"></td>
         </tr>
       </table>
 	<table style = "margin-top:6px;padding-right:30px;" width = "585" border = "0"cellpadding = "-10" cellspacing="19" id = "desc">
@@ -169,7 +169,7 @@
 		  <td><font size = "1" align = "right" style="font-weight:bold;">Invoice Number: </font></td>
 		  <td><font size = "1" align = "right">{$invoice_id}</font></td>   
 		</tr>
-		<tr><td  colspan = "5"style = "color:#F5F5F5;"><hr></hr></td></tr>
+		<tr><td  colspan = "5" style = "color:#F5F5F5;"><hr></hr></td></tr>
 		{if $is_pay_later == 1}       
 		<tr>
                   <td colspan = "2"></td>
@@ -200,7 +200,7 @@
       {if $contribution_status_id == $refundedStatusId}
     <table style = "margin-top:2px;padding-left:29px;page-break-before: always;">
       <tr>
-        <td><img src = "{$imageUploadURL}/logo.png" height = "39" width = "108"></td>
+        <td><img src = "{$resourceBase}/i/civi99.png" height = "34px" width = "99px"></td>
       </tr>
     </table>
     <center>
@@ -344,7 +344,7 @@
 
       <table style = "margin-top:5px;padding-right:45px;">
         <tr>
-          <td><img src = "{$imageUploadURL}/img.png" height = "15" width = "630"></td>
+          <td><img src = "{$resourceBase}/i/contribute/cut_line.png" height = "15" width = "630"></td>
         </tr>
       </table>
 
