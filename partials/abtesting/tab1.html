@@ -1,15 +1,27 @@
+<form name="tab1Form" unsaved-warning-form>
+  <div class="crm-block crm-form-block crmABTesting">
+    <h3> What would you like to name the Test?</h3><br>
+    <input type="text" ng-model="currentABTest.name" class="big crm-form-text" required><br><br><br>
 
-<form name="myForm">
-  <h3> What would you like to Name the Test ?</h3><br>
-  <input type="text" ng-model="currentABTest.name" class="big crm-form-text" required><br><br><br>
-  <h3> What would you like to test ?</h3><br><br>
-  &nbsp <input type="radio" ng-model="template" ng-value="templates[0]" ng-click="init(2)" ng-checked="template.val==1">
-  Subject Lines <br/><br>
-  &nbsp <input type="radio" ng-model="template" ng-value="templates[1]" ng-click="init(3)" ng-checked="template.val==2">
-  From Names <br/><br>
-  &nbsp <input type="radio" ng-model="template" ng-value="templates[2]" ng-click="init(1)" ng-checked="template.val==3">
-  Two different Emails <br/><br>
-  &nbsp
-  <div style="position:relative; left:220px; top: 30px;" nextbutton></div>
-  <div style="position:relative; left:300px; top:-1px;" cancelbutton></div>
+    <h3> What would you like to test?</h3><br><br>
+    &nbsp <input type="radio" ng-model="template" ng-value="templates[0]" ng-click="init(2)"
+                 ng-checked="template.val==1">
+    Subject Lines <br/><br>
+    &nbsp <input type="radio" ng-model="template" ng-value="templates[1]" ng-click="init(3)"
+                 ng-checked="template.val==2">
+    From Names <br/><br>
+    &nbsp <input type="radio" ng-model="template" ng-value="templates[2]" ng-click="init(1)"
+                 ng-checked="template.val==3">
+    Two different Emails <br/><br>
+    &nbsp
+
+    <div class="crm-submit-buttons">
+    <span class="crm-button">
+      <input type="submit" ng-click="tab1Form.$setPristine(); create_abtest();" ng-disabled="tab1Form.$invalid" value="Next" nexttab="{{tab_val}}"/>
+    </span>
+    <span class="crm-button">
+      <input type="submit" ng-click="tab1Form.$setPristine(); goto('mailing/abtesting');" value="Cancel"/>
+    </span>
+    </div>
+  </div>
 </form>

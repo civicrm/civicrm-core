@@ -42,6 +42,8 @@ div#frag1 {
   height:500px;
   width:800px;
   overflow: auto;
+  position: relative;
+
 }
 
 div#frag2 {

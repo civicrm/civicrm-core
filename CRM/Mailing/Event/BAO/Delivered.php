@@ -92,7 +92,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    * @access public
    * @static
    */
-  public static function getTotalCount($mailing_id, $job_id = NULL, $is_distinct = FALSE) {
+  public static function getTotalCount($mailing_id, $job_id = NULL, $is_distinct = FALSE, $toDate = NULL) {
     $dao = new CRM_Core_DAO();
 
     $delivered = self::getTableName();
@@ -115,6 +115,10 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
                     ON  $job.mailing_id = $mailing.id
             WHERE       $bounce.id IS null
                 AND     $mailing.id = " . CRM_Utils_Type::escape($mailing_id, 'Integer');
+
+    if (!empty($toDate)) {
+      $query .= " AND $delivered.time_stamp <= $toDate";
+    }
 
     if (!empty($job_id)) {
       $query .= " AND $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer');
@@ -149,7 +153,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    * @static
    */
   public static function &getRows($mailing_id, $job_id = NULL,
-    $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL, $is_test = 0
+    $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL, $is_test = FALSE
   ) {
 
     $dao = new CRM_Core_Dao();

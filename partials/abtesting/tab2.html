@@ -1,11 +1,16 @@
-
-
-  <form>
-    <div  ng-include="template.url">
-
+<form name="tab2Form" unsaved-warning-form>
+  <div class="crm-block crm-form-block crmABTesting">
+    <div ng-include="template.url"></div>
+    <div class="crm-submit-buttons">
+      <span class="crm-button">
+        <input type="submit" ng-click="tab2Form.$setPristine();" value="Previous" submitform prevtab/>
+      </span>
+      <span class="crm-button">
+        <input type="submit" ng-click="tab2Form.$setPristine();" value="Next" submitform nexttab="{{tab_val}}"/>
+      </span>
+      <span class="crm-button">
+        <input type="submit" ng-click="tab2Form.$setPristine(); goto('mailing/abtesting');" value="Cancel"/>
+      </span>
     </div>
-    <div style="position:relative; left:200px; top:61px;" prevbutton></div>
-    <div style="position:relative; left:300px; top: 30px;" submitform nextbutton></div>
-    <div style="position:relative; left:375px; top:-1px;" cancelbutton></div>
-
-  </form >
+  </div>
+</form>

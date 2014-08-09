@@ -1,0 +1,29 @@
+<!--
+Controller: crmABTestingTabsCtrl
+Required vars: headerfooter
+-->
+<div class="crm-accordion-wrapper collapsed">
+  <div class="crm-accordion-header">Header and Footer</div>
+  <div class="crm-accordion-body">
+    <body>
+    <table>
+      <tr>
+        <td class="label">Mailing Header</td>
+        <td>
+          <select ng-model="mailA.header_id" ng-options="hf.id as hf.name for hf in headerfooter| filter:isHeader">
+            <option value="">-none-</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td class="label">Mailing Footer</td>
+        <td>
+          <select ng-model="mailA.footer_id" ng-options="f.id as f.name for f in headerfooter| filter:isFooter">
+            <option value="">-none-</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+    </body>
+  </div>
+</div>

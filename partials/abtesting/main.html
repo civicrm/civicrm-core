@@ -1,28 +1,22 @@
-<div>
-  {{tab_val}}<br>
+{{tab_val}}
+<div ui-jq="tabs" class="crmABTestingAllTabs" ui-options="{show: true, hide: true, collapsible: true}">
+  <ul>
+    <li><a href="#tabs-1" ng-click="campaign_clicked();">Campaign</a></li>
+    <li><a href="#tabs-2" ng-click="compose_clicked();">Compose</a></li>
+    <li><a href="#tabs-3" ng-click="rec_clicked();">Recipients and Winner Criteria</a></li>
+    <li><a href="#tabs-4" ng-click="preview_clicked();">Preview and Send</a></li>
+  </ul>
 
-
-  <div ui-jq="tabs" id="alltabs">
-    <ul>
-
-      <li><a href="#tabs-1" ng-click="campaign_clicked()">Campaign</a></li>
-      <li><a href="#tabs-2" ng-click="compose_clicked()">Compose</a></li>
-      <li><a href="#tabs-3" ng-click="rec_clicked()">Recipients and Winner Criteria</a></li>
-      <li><a href="#tabs-4" ng-click="preview_clicked()">Preview and Send</a></li>
-    </ul>
-
-    <div id="tabs-1">
-    <div ng-include = "partialUrl('tab1.html')"></div>
-    </div>
-    <div id="tabs-2">
-     <div ng-include = "partialUrl('tab2.html')"></div>
-     </div>
-    <div id="tabs-3">
-    <div ng-include = "partialUrl('tab3.html')"></div>
-    </div>
-    <div id="tabs-4">
-    <div ng-include = "partialUrl('tab4.html')"></div>
-    </div>
-
+  <div id="tabs-1">
+    <div ng-include="partialUrl('tab1.html')"></div>
+  </div>
+  <div id="tabs-2">
+    <div ng-include="partialUrl('tab2.html')"></div>
+  </div>
+  <div id="tabs-3">
+    <div ng-include="partialUrl('tab3.html')"></div>
+  </div>
+  <div id="tabs-4">
+    <div ng-include="partialUrl('tab4.html')"></div>
   </div>
 </div>

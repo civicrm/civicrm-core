@@ -1709,13 +1709,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return $result['id'];
   }
 
-  /**
-   * Function to add contact(s) to a Group
+
+ /**
+   * Function to add a Group
    *
-   * @params int  $groupID Group ID
-   * @params int  $totalCount of contacts to be added
+   * @params array to add group
    *
-   * @return array $result
+   * @param array $params
+   * @return int groupId of created group
    */
   function groupContactCreate($groupID, $totalCount = 10) {
     $params = array('group_id' => $groupID);
@@ -1729,6 +1730,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       }
     }
     $result = $this->callAPISuccess('GroupContact', 'create', $params);
+
     return $result;
   }
 
