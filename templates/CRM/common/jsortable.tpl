@@ -66,8 +66,7 @@
     });
 
     //remove last comma
-    tableId = tableId.substring(0, tableId.length - 1 );
-    eval('tableId =[' + tableId + ']');
+    tableId = [tableId.substring(0, tableId.length - 1 )];
 
     $.each(tableId, function(i,n){
       tabId = '#option' + tcount + n;
@@ -112,10 +111,8 @@
         }
         count++;
       });
-      columns    = columns.substring(0, columns.length - 1 );
-      sortColumn = sortColumn.substring(0, sortColumn.length - 1 );
-      eval('sortColumn =[' + sortColumn + ']');
-      eval('columns =[' + columns + ']');
+      columns = [columns.substring(0, columns.length - 1 )];
+      sortColumn = [sortColumn.substring(0, sortColumn.length - 1 )];
 
       var currTable = $(tabId);
       if (currTable) {
@@ -148,12 +145,10 @@
           "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
           "bServerSide": true,
           "sAjaxSource": sourceUrl,
-          "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
-            "sZeroRecords" : noRecordFoundMsg },
-
-          {/literal}{if !empty($callBack)}{literal}
-          "fnDrawCallback": function() { checkSelected(); },
-          {/literal}{/if}{literal}
+          "oLanguage":{
+            "sEmptyTable"  : noRecordFoundMsg,
+            "sZeroRecords" : noRecordFoundMsg
+          },
 
           "fnServerData": function ( sSource, aoData, fnCallback ) {
             $.ajax( {
@@ -176,12 +171,12 @@
           "bAutoWidth"   : false,
           "aoColumns"   : columns,
           "bSort" : true,
-          "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
-            "sZeroRecords" : noRecordFoundMsg }
+          "oLanguage":{
+            "sEmptyTable"  : noRecordFoundMsg,
+            "sZeroRecords" : noRecordFoundMsg
+          }
         });
       }
-      var object;
-
     });
   });
 
