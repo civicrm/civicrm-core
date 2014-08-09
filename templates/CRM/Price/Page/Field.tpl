@@ -57,34 +57,31 @@
   {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
    {include file="CRM/common/crmeditable.tpl"}
-    {include file="CRM/common/jsortable.tpl"}
-         <table id="options" class="display">
+         <table id="options" class="row-highlight">
          <thead>
          <tr>
             <th>{ts}Field Label{/ts}</th>
             <th>{ts}Field Type{/ts}</th>
-            <th id="order" class="sortable">{ts}Order{/ts}</th>
+            <th>{ts}Order{/ts}</th>
             <th>{ts}Req?{/ts}</th>
             <th>{ts}Enabled?{/ts}</th>
             <th>{ts}Active On{/ts}</th>
             <th>{ts}Expire On{/ts}</th>
-            <th id="nosort">{ts}Price{/ts}</th>
+            <th>{ts}Price{/ts}</th>
             <th></th>
-            <th class="hiddenElement"></th>
         </tr>
         </thead>
         {foreach from=$priceField key=fid item=row}
       <tr id="price_field-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
             <td class="crm-editable" data-field="label">{$row.label}</td>
             <td>{$row.html_type}</td>
-            <td class="nowrap">{$row.order}</td>
+            <td class="nowrap">{$row.weight}</td>
             <td>{if $row.is_required eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td>{if $row.active_on}{$row.active_on|date_format:"%Y-%m-%d %T"}{/if}</td>
             <td>{if $row.expire_on}{$row.expire_on|date_format:"%Y-%m-%d %T"}{/if}</td>
             <td>{if $row.html_type eq "Text / Numeric Quantity"}{$row.price|crmMoney}{else}<a href="{crmURL p="civicrm/admin/price/field/option" q="action=browse&reset=1&sid=$sid&fid=$fid"}">{if $isReserved}{ts}View Price Options{/ts}{else}{ts}Edit Price Options{/ts}{/if}</a>{/if}</td>
             <td class="field-action">{$row.action|replace:'xx':$row.id}</td>
-            <td class="order hiddenElement">{$row.weight}</td>
         </tr>
         {/foreach}
         </table>

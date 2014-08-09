@@ -44,7 +44,6 @@
     
     // for date sorting see http://wiki.civicrm.org/confluence/display/CRMDOC/Sorting+Date+Fields+in+dataTables+Widget
     var useAjax = {/literal}{if $useAjax}1{else}0{/if}{literal};
-    var sortEnabled = true;
     var sourceUrl = '';
     var useClass  = 'display';
 
@@ -67,8 +66,7 @@
     });
 
     //remove last comma
-    tableId = tableId.substring(0, tableId.length - 1 );
-    eval('tableId =[' + tableId + ']');
+    tableId = [tableId.substring(0, tableId.length - 1 )];
 
     $.each(tableId, function(i,n){
       tabId = '#option' + tcount + n;
@@ -92,7 +90,6 @@
               sortColumn += '[' + count + ', "asc" ],';
             }
             sortId   = getRowId(tdObject, $(this).attr('id') +' hiddenElement' );
-            sortEnabled = true;
             columns += '{ "render": function ( data, type, row ) { return "<div style=\'display:none\'>"+ data +"</div>" + row[sortId] ; }, "targets": sortColumn,"bUseRendered": false},';
             break;
           case 'nosort':
@@ -114,10 +111,8 @@
         }
         count++;
       });
-      columns    = columns.substring(0, columns.length - 1 );
-      sortColumn = sortColumn.substring(0, sortColumn.length - 1 );
-      eval('sortColumn =[' + sortColumn + ']');
-      eval('columns =[' + columns + ']');
+      columns = [columns.substring(0, columns.length - 1 )];
+      sortColumn = [sortColumn.substring(0, sortColumn.length - 1 )];
 
       var currTable = $(tabId);
       if (currTable) {
@@ -150,12 +145,10 @@
           "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
           "bServerSide": true,
           "sAjaxSource": sourceUrl,
-          "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
-            "sZeroRecords" : noRecordFoundMsg },
-
-          {/literal}{if !empty($callBack)}{literal}
-          "fnDrawCallback": function() { checkSelected(); },
-          {/literal}{/if}{literal}
+          "oLanguage":{
+            "sEmptyTable"  : noRecordFoundMsg,
+            "sZeroRecords" : noRecordFoundMsg
+          },
 
           "fnServerData": function ( sSource, aoData, fnCallback ) {
             $.ajax( {
@@ -177,13 +170,13 @@
           "asStripClasses" : [ "odd-row", "even-row" ],
           "bAutoWidth"   : false,
           "aoColumns"   : columns,
-          "bSort" : sortEnabled,
-          "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
-            "sZeroRecords" : noRecordFoundMsg }
+          "bSort" : true,
+          "oLanguage":{
+            "sEmptyTable"  : noRecordFoundMsg,
+            "sZeroRecords" : noRecordFoundMsg
+          }
         });
       }
-      var object;
-
     });
   });
 
