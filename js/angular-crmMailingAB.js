@@ -515,14 +515,14 @@
                 test_email : $scope.emailadd
               })
               console.log($scope.emailadd);
-              scope.sendtest = false;
+              $scope.sendtest = false;
               $('#sendtest').dialog("close");
 
             }
           },
           close: function () {
             console.log("close");
-            scope.sendtest = false;
+            $scope.sendtest = false;
             $scope.$apply()
           }
         });
