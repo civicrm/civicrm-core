@@ -2,12 +2,21 @@
 Controller: MailCtrl
 -->
 
-<br>
+<!--<br>
+{{preview}}
+<h3 ng-click= "settrue()"> Preview </h3> 
 
-<div class="crm-accordion-wrapper collapsed" >
-  <div class="crm-accordion-header">Preview Mailing</div>
+  <previewmail>
+        <div>
+				{{previewa}}
+        </div>
+      </previewmail><br>-->
+<br>     
+<div class="crm-accordion-wrapper collapsed" ng-click = "preview_update()" >
+  <div class="crm-accordion-header">Preview</div>
   <div class="crm-accordion-body" ng-include="partialUrl('previewMailing.html')"></div>
-</div>
+</div>      
+      
 
 <div class="crm-accordion-wrapper collapsed" >
   <div class="crm-accordion-header">Test</div>

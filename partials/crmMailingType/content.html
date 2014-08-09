@@ -25,13 +25,19 @@ Required Variables: cool_api and currentMailing and eMailing
   <tr>
     <td class="label">Mailing Subject</td>
      <td>
-      <input placeholder="Enter Subject" required name="subject" type="text" ng-model="currentMailing.subject"/>
+      <input id= "sub" placeholder="Enter Subject" required name="subject" type="text" ng-model="currentMailing.subject"/>
     </td>
   </tr>
   <tr>
     <td class="label"  style= "color:red" ng-show="mailing_form.subject.$invalid">
 					Mailing subject required.
 		</td>
+  </tr>
+   <tr>
+    <td class="label">Mailing Subject Token</td>
+     <td>
+			<input type="hidden" groupselect id= "subgroup" ng-model="token" ></input>
+    </td>
   </tr>
   <tr>
     <td class="label">Use Template</td>
