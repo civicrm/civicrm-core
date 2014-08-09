@@ -105,7 +105,8 @@
 
   })
   crmMailingAB.controller('TabsDemoCtrl', function ($scope, crmApi,selectedABTest,$sce) {
-    $scope.abId="";
+    $scope.partialUrl = partialUrl;
+    $scope.abId = "";
     $scope.whatnext=2;
     $scope.currentABTest=selectedABTest
     $scope.groups = CRM.crmMailing.groupNames;
@@ -120,6 +121,7 @@
       $scope.currentABTest.time=$scope.ans[1];
 
     }
+
 
       if($scope.currentABTest.just_created != 1){
         console.log("Prithvi");
@@ -328,7 +330,15 @@
 
       $scope.whatnext = par.toString()
     };
+    $scope.tab_upd = function(){
+      $scope.tab_val = $scope.tab_val + 1;
+      $scope.max_tab=Math.max($scope.tab_val, $scope.max_tab);
 
+    };
+    $scope.tab_upd_dec = function(){
+      $scope.tab_val = $scope.tab_val - 1;
+
+    }
     $scope.setdate = function (par) {
       console.log("called")
       console.log("av " + par)
@@ -512,9 +522,9 @@
       // responsible for registering DOM listeners as well as updating the DOM
       link: function (scope, element, attrs) {
 
-        $(element).parent().parent().parent().parent().parent().tabs(scope.$eval(attrs.nexttab));
+        $(element).parent().parent().parent().parent().parent().parent().tabs(scope.$eval(attrs.nexttab));
         var myarr = new Array(1, 2, 3)
-        $(element).parent().parent().parent().parent().parent().tabs({disabled: myarr});
+        $(element).parent().parent().parent().parent().parent().parent().tabs({disabled: myarr});
 
         $(element).on("click", function () {
           if(scope.tab_val==0){
@@ -537,15 +547,16 @@
 
           }
 
-          scope.tab_val = scope.tab_val + 1;
+          scope.tab_upd();
 
-          scope.max_tab = Math.max(scope.tab_val, scope.max_tab);
+          console.log("kurund "+scope.tab_val);
+         
           var myArray1 = new Array();
           for (var i = scope.max_tab + 1; i < 4; i++) {
             myArray1.push(i);
           }
-          $(element).parent().parent().parent().parent().parent().tabs("option", "disabled", myArray1);
-          $(element).parent().parent().parent().parent().parent().tabs("option", "active", scope.tab_val);
+          $(element).parent().parent().parent().parent().parent().parent().tabs("option", "disabled", myArray1);
+          $(element).parent().parent().parent().parent().parent().parent().tabs("option", "active", scope.tab_val);
           scope.$apply();
           console.log("Adir");
         });
@@ -564,14 +575,14 @@
 
         $(element).on("click", function () {
           var temp = scope.tab_val - 1;
-          scope.tab_val = scope.tab_val - 1;
-
+          scope.tab_upd_dec();
+          scope.$apply();
           console.log(temp);
           if (temp == 3) {
 
           }
           else {
-            $(element).parent().parent().parent().parent().parent().tabs("option", "active", temp);
+            $(element).parent().parent().parent().parent().parent().parent().tabs("option", "active", temp);
           }
 
           scope.$apply();
