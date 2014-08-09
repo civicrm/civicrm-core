@@ -21,7 +21,7 @@
     function ($routeProvider) {
       $routeProvider.when('/mailing/abtesting', {
         templateUrl: partialUrl('list.html'),
-        controller: 'ListingCtrl',
+        controller: 'ABListingCtrl',
         resolve: {
           mailingList: function ($route, crmApi) {
             return crmApi('Mailing', 'get', {});
@@ -63,12 +63,12 @@
 //-----------------------------------------
   // Add a new record by name.
   // Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
-  crmMailingAB.controller('ListingCtrl', function ($scope, crmApi) {
+  crmMailingAB.controller('ABListingCtrl', function ($scope, crmApi) {
     $scope.abmailList = CRM.crmMailing.mailingabNames;
     console.log($scope.abmailList);
 
 
-  })
+  });
   crmMailingAB.controller('ReportCtrl', function ($scope, crmApi,selectedABTest) {
 
 
@@ -156,6 +156,7 @@
         $scope.mailC = {};
       }
 
+    $scope.sendtest=false;
     if(typeof $scope.mailA == 'undefined')$scope.mailA={};
     if(typeof $scope.mailB == 'undefined')$scope.mailB={};
     if(typeof $scope.mailB == 'undefined')$scope.mailC={};
@@ -246,7 +247,9 @@
         return false;
     }
 
-
+    $scope.sen = function(){
+      $scope.sendtest=true;
+    }
 
     $scope.isHeader= function(hf){
       return hf.component_type == "Header";
@@ -333,7 +336,7 @@
       $scope.apply();
     };
 
-
+    $scope.testmailid ="";
     $scope.incGroup = [];
     $scope.excGroup = [];
     $scope.incGroupids =[];
@@ -746,11 +749,6 @@
       // responsible for registering DOM listeners as well as updating the DOM
       link: function (scope, element, attrs) {
 
-
-
-/*
-        $(element).children().tabs( "enable", 2 );*/
-
         scope.$watch('preview', function () {
           if(scope.preview == true){
 
@@ -767,6 +765,48 @@
 
 
           });}
+
+        });
+
+
+        $(element).find("#closebutton").on("click", function () {
+          console.log("close");
+          scope.preview = false;
+          $(element).dialog("close");
+        });
+      }
+    };
+  });
+
+  crmMailingAB.directive('sendmailtest', function () {
+    return {
+      // Restrict it to be an attribute in this case
+      restrict: 'AE',
+
+      link: function (scope, element, attrs) {
+
+        scope.$watch('sendtest', function () {
+          if(scope.sendtest == true){
+
+            $(element).dialog({
+              title: 'Send Test Mails',
+              width: 1080,
+              height: 800,
+              closed: false,
+              cache: false,
+              modal: true,
+              button:{
+                'Send': function() {
+                  /* Do stuff */
+                  $(this).dialog('close');
+                }
+              },
+              close :function(){console.log("close");
+                scope.sendtest = false;scope.$apply()}
+
+
+            });
+          }
 
         });
 

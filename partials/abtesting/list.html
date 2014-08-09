@@ -1,32 +1,41 @@
 <!--
-Controller: CaseTypeListsCtrl
-Required vars: caseTypes
+Controller: ABListingCtrl
+Required vars: abmailList
 -->
 <div id="help">
-  A/B Testing
+  A/B Testing list
 </div>
 
-<table class="display">
-  <thead>
-  <tr>
-    <th>Title</th>
-    <th>Id</th>
-    <th></th>
+<div ng-show="abmailList.length > 0">
+  <table class="display">
+    <thead>
+    <tr>
+      <th>Title</th>
+      <th>Id</th>
+      <th></th>
 
-    <th></th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr ng-repeat="ab in abmailList">
-    <td>{{ab.name}}</td>
-    <td>{{ab.id}}</td>
-    <td><a class="action-item crm-hover-button" ng-href="#/mailing/abtesting/{{ab.id}}">Edit</a>&nbsp
-    <a class="action-item crm-hover-button" ng-href="#/mailing/abtesting/report/{{ab.id}}">Results</a></td>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="ab in abmailList">
+      <td>{{ab.name}}</td>
+      <td>{{ab.id}}</td>
+      <td><a class="action-item crm-hover-button" ng-href="#/mailing/abtesting/{{ab.id}}">Edit</a>&nbsp
+      <a class="action-item crm-hover-button" ng-href="#/mailing/abtesting/report/{{ab.id}}">Results</a></td>
 
-  </tr>
-  </tbody>
-</table>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div ng-show="abmailList.length == 0" class="messages status no-popup">
+  <div class="icon inform-icon"></div>
+  You have no A/B mailings
+</div>
+
 
 <div class="crm-submit-buttons">
+  <br>
   <a ng-href="#/mailing/abtesting/new" class="button"><span><div class="icon add-icon"></div>New A/B Test</span></a>
 </div>
