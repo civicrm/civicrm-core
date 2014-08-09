@@ -79,8 +79,7 @@
         {strip}
   {* handle enable/disable actions*}
   {include file="CRM/common/enableDisableApi.tpl"}
-    {include file="CRM/common/jsortable.tpl"}
-        <table id="options" class="display">
+        <table id="options" class="row-highlight">
          <thead>
          <tr>
             {if $showComponent}
@@ -111,11 +110,10 @@
             {if $showCounted}<th>{ts}Counted?{/ts}</th>{/if}
             {if $showVisibility}<th>{ts}Visibility{/ts}</th>{/if}
             <th id="nosort">{ts}Description{/ts}</th>
-            <th id="order">{ts}Order{/ts}</th>
+            <th>{ts}Order{/ts}</th>
             {if $showIsDefault}<th>{ts}Default{/ts}</th>{/if}
             <th>{ts}Reserved{/ts}</th>
             <th>{ts}Enabled?{/ts}</th>
-            <th class="hiddenElement"></th>
             <th></th>
           </tr>
           </thead>
@@ -138,14 +136,13 @@
             {/if}
             {if $showVisibility}<td class="crm-admin-visibility_label">{$row.visibility_label}</td>{/if}
             <td class="crm-admin-options-description crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
-            <td class="nowrap crm-admin-options-order">{$row.order}</td>
+            <td class="nowrap crm-admin-options-order">{$row.weight}</td>
             {if $showIsDefault}
               <td class="crm-admin-options-is_default" align="center">{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>
             {/if}
             <td class="crm-admin-options-is_reserved">{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td class="crm-admin-options-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td>{$row.action|replace:'xx':$row.id}</td>
-            <td class="order hiddenElement">{$row.weight}</td>
           </tr>
         {/foreach}
         </tbody>

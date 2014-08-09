@@ -52,18 +52,16 @@
   {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
    {include file="CRM/common/crmeditable.tpl"}
-   {include file="CRM/common/jsortable.tpl"}
-        <table id="options" class="display">
+        <table id="options" class="row-highlight">
         <thead>
          <tr>
             <th>{ts}Option Label{/ts}</th>
             <th>{ts}Option Amount{/ts}</th>
           <th>{ts}Default{/ts}</th>
           <th>{ts}Financial Type{/ts}</th>
-            <th id="order" class="sortable">{ts}Order{/ts}</th>
+            <th>{ts}Order{/ts}</th>
           <th>{ts}Enabled?{/ts}</th>
             <th></th>
-            <th class="hiddenElement"></th>
          </tr>
         </thead>
         {foreach from=$customOption item=row}
@@ -75,7 +73,6 @@
             <td class="nowrap crm-price-option-order">{$row.weight}</td>
             <td id="row_{$row.id}_status" class="crm-price-option-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td>{$row.action|replace:'xx':$row.id}</td>
-            <td class="order hiddenElement">{$row.weight}</td>
         </tr>
         {/foreach}
         </tbody>
