@@ -331,8 +331,9 @@ function civicrm_api3_mailing_preview($params) {
   $mime = &$mailing->compose(NULL, NULL, NULL, $session->get('userID'), $fromEmail, $fromEmail,
     TRUE, $details[0][$session->get('userID')], $attachments
   );
-  return array('html' => $mime->getHTMLBody(), 'text' => $mime->getTXTBody());
+  return civicrm_api3_create_success(array('html' => $mime->getHTMLBody(), 'text' => $mime->getTXTBody()));
 }
+
 function civicrm_api3_mailing_send_test($params) {
   if (!array_key_exists('test_group', $params) && !array_key_exists('test_email', $params)) {
     throw new API_Exception("Mandatory key(s) missing from params array: test_group and/or test_email field are required" );
