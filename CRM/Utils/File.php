@@ -728,7 +728,7 @@ HTACCESS;
   static function dynamicResourceUrl($fileName) {
     $config = CRM_Core_Config::singleton();
     // FIXME: Need a better way of getting the url of the baseFilePath
-    return self::addTrailingSlash(str_replace('/persist/contribute', '', $config->imageUploadURL)) . 'dynamic/' . $fileName;
+    return self::addTrailingSlash(str_replace('/persist/contribute', '', $config->imageUploadURL), '/') . 'dynamic/' . $fileName;
   }
 
   /**
