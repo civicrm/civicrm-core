@@ -77,6 +77,70 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->getAndCheck($this->_params, $result['id'], 'mailing');
   }
 
+  public function testMailerPreview() {
+    $contactID =  $this->individualCreate();
+    $displayName = $this->callAPISuccess('contact', 'get', array('id' => $contactID));
+    $displayName = $displayName['values'][$contactID]['display_name'];
+    $result = $this->callAPISuccess('mailing', 'create', $this->_params);
+    $params = array('id' => $result['id'], 'contact_id' => $contactID);
+    $result = $this->callAPISuccess('mailing', 'preview', $params);
+    $text = $result['values']['text'];
+    print_r($result  );
+    print_r($text  );
+    $this->assertEquals("This is $displayName", $text); // verify the text returned is correct, with replaced token
+    $this->deleteMailing($result['id']);
+  }
+  public function testMailerSendTestMail() {
+    $contactID =  $this->individualCreate();
+    $result = $this->callAPISuccess('contact', 'get', array('id' => $contactID));
+    $email = $result['values'][$contactID]['email'];
+    $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
+    $params = array('mailing_id' => $mail['id'], 'test_email' => $email, 'test_group' => NULL);
+    $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', $params);
+    $this->assertEquals(1, $deliveredInfo['count'], "in line " . __LINE__); // verify mail has been sent to user by count
+    $this->assertEquals($contactID, $deliveredInfo['values'][$deliveredInfo['id']]['contact_id'], "in line " . __LINE__); //verify the contact_id of the recipient
+    $this->deleteMailing($mail['id']);
+  }
+  public function testMailerStats() {
+    $result = $this->groupContactCreate($this->_groupID, 100);
+    $this->assertEquals(100, $result['added']); //verify if 100 contacts are added for group
+    $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
+    $params = array('mailing_id' => $mail['id'], 'test_email' => NULL, 'test_group' => $this->_groupID, 'is_test' => 0);
+    $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', $params);
+    $deliveredIds  = implode(',', array_keys($deliveredInfo['values']));
+    foreach (array('bounce', 'unsubscribe', 'opened') as $type) {
+      $sql = "CREATE TEMPORARY TABLE mail_{$type}_temp
+(event_queue_id int, time_stamp datetime, delivered_id int)
+SELECT event_queue_id, time_stamp, id
+ FROM civicrm_mailing_event_delivered
+ WHERE id IN ($deliveredIds)
+ ORDER BY RAND() LIMIT 0,20;";
+      print_r($sql  );
+      CRM_Core_DAO::executeQuery($sql);
+      $sql = "DELETE FROM civicrm_mailing_event_delivered WHERE id IN (SELECT delivered_id FROM mail_{$type}_temp);";
+      CRM_Core_DAO::executeQuery($sql);
+      if ($type == 'unsubscribe') {
+        $sql = "INSERT INTO civicrm_mailing_event_{$type} (event_queue_id, time_stamp, org_unsubscribe)
+SELECT event_queue_id, time_stamp, 1 FROM mail_{$type}_temp";
+      }
+      else {
+        $sql = "INSERT INTO civicrm_mailing_event_{$type} (event_queue_id, time_stamp)
+SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
+      }
+      CRM_Core_DAO::executeQuery($sql);
+    }
+    $result = $this->callAPISuccess('mailing', 'stats', array('mailing_id' => $mail['id']));
+    $expectedResult = array(
+      'Delivered' => 80, //since among 100 mails 20 has been bounced
+      'Bounces' => 20,
+      'Opened' => 20,
+      'Unique Clicks' => 0,
+      'Unsubscribers' => 20
+    );
+
+    $this->checkArrayEquals($expectedResult, $result['values'][$mail['id']]);
+  }
+
   /**
    * Test civicrm_mailing_delete
    */

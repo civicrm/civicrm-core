@@ -1,1 +1,51 @@
+div#settings {
+  position: relative;
+  padding-left: 200px;
+}
 
+div#settings > div {
+  min-height: 300px;
+}
+
+div#settings .ui-tabs-nav {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  bottom: 0px;
+  width: 120px;
+  padding: 5px 0px 5px 5px;
+}
+
+div#settings .ui-tabs-nav li {
+  left: 0px;
+  width: 115px;
+  border-right: none;
+  overflow: hidden;
+  margin-bottom: 2px;
+}
+
+div#settings .ui-tabs-nav li a {
+  float: right;
+  width: 100%;
+  text-align: right;
+}
+
+div#settings .ui-tabs-nav li.ui-tabs-selected {
+  border: none;
+  border-right: solid 1px #fff;
+  background: none;
+  background-color: #fff;
+  width: 120px;
+}
+
+div#frag1 {
+  height:500px;
+  width:800px;
+  overflow: auto;
+}
+
+div#frag2 {
+  height:500px;
+  width:800px;
+  overflow: auto;
+}

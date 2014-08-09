@@ -84,5 +84,34 @@ WHERE  mailing_id = %1
 
     return CRM_Core_DAO::executeQuery($sql, $params);
   }
+
+  static function updateRandomRecipients($mailingIdC, $newMailingID, $totalLimit = NULL) {
+    $limitString = NULL;
+    if ($totalLimit) {
+      $limitString = "LIMIT 0, $totalLimit";
+    }
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS  mail_C_$mailingIdC");
+    $sql = "
+CREATE TEMPORARY TABLE mail_C_$mailingIdC
+            (mailing_recipient_id int, id int PRIMARY KEY AUTO_INCREMENT, INDEX(mailing_recipient_id))
+            ENGINE=HEAP";
+    CRM_Core_DAO::executeQuery($sql);
+    $sql = "
+INSERT INTO mail_C_$mailingIdC (mailing_recipient_id)
+SELECT mr.id
+FROM   civicrm_mailing_recipients mr
+WHERE  mr.mailing_id = $mailingIdC
+ORDER BY RAND()
+$limitString
+    ";
+    CRM_Core_DAO::executeQuery($sql);
+    $sql = "
+UPDATE civicrm_mailing_recipients mr
+INNER JOIN mail_C_$mailingIdC temp_mr ON temp_mr.mailing_recipient_id = mr.id
+SET mr.mailing_id = $newMailingID
+     ";
+    CRM_Core_DAO::executeQuery($sql);
+  }
+
 }
 

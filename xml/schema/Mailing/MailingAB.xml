@@ -16,6 +16,13 @@
     <autoincrement>true</autoincrement>
   </primaryKey>
   <field>
+    <name>name</name>
+    <type>varchar</type>
+    <length>25</length>
+    <comment>name of abtesting</comment>
+    <add>4.5</add>
+  </field>
+  <field>
     <name>mailing_id_a</name>
     <type>int unsigned</type>
     <comment>Id of mailing A</comment>
