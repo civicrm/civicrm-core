@@ -104,7 +104,7 @@
 
 
   })
-  crmMailingAB.controller('TabsDemoCtrl', function ($scope, crmApi,selectedABTest) {
+  crmMailingAB.controller('TabsDemoCtrl', function ($scope, crmApi,selectedABTest,$sce) {
     $scope.abId="";
     $scope.whatnext=2;
     $scope.currentABTest=selectedABTest
@@ -179,6 +179,13 @@
     }
 
     mltokens = CRM.crmMailing.mailTokens;
+    $scope.deliberatelyTrustDangerousSnippeta = function() {
+      return $sce.trustAsHtml($scope.previewa);
+    };
+
+    $scope.deliberatelyTrustDangerousSnippetb = function() {
+      return $sce.trustAsHtml($scope.previewb);
+    };
 
     $scope.tab_val = 0;
     $scope.max_tab = 0;
@@ -381,12 +388,6 @@
 
           $scope.previewa=data.values.html;
 
-          $scope.prea='I am an <code>HTML</code>string with ' +
-            '<a href="#">links!</a> and other <em>stuff</em>';
-
-          //$scope.previewa1=$scope.previewa.substring(3935);
-          //$scope.previewa1='<style>'+$scope.previewa.substring(0,3935)+'</style>'+$scope.previewa.substring(3935);
-          $scope.previewa1= '<style type="text/css">color: blue;</style><div>gfgfdgdfgdgdf</div>'
 
 
         }
@@ -400,9 +401,6 @@
           console.log(data.values.html);
           $scope.previewb=data.values.html;
 
-          $scope.previewb1=$scope.previewb.substring(3935);
-
-          $scope.$apply();
 
         }
       });
