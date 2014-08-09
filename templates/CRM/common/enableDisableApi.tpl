@@ -41,7 +41,7 @@
 
     function save() {
       $row.closest('table').block();
-      CRM.api3(info.entity, 'setvalue', {id: info.id, field: 'is_active', value: enabled ? 0 : 1}, {success: successMsg}).done(refresh);
+      CRM.api3(info.entity, info.action, {id: info.id, field: 'is_active', value: enabled ? 0 : 1}, {success: successMsg}).done(refresh);
       if (enabled) {
         $(this).dialog('close');
       }
@@ -53,8 +53,8 @@
         conf.html(response.content);
         if (!response.illegal) {
           conf.dialog('option', 'buttons', [
-            {text: {/literal}'{ts escape="js"}Disable{/ts}'{literal}, click: save},
-            {text: {/literal}'{ts escape="js"}Cancel{/ts}'{literal}, click: function() {$(this).dialog('close');}}
+            {text: {/literal}'{ts escape="js"}Yes{/ts}'{literal}, click: save},
+            {text: {/literal}'{ts escape="js"}No{/ts}'{literal}, click: function() {$(this).dialog('close');}}
           ]);
         }
       });
