@@ -713,7 +713,7 @@ HTACCESS;
   static function dynamicResourcePath($fileName = NULL) {
     $config = CRM_Core_Config::singleton();
     // FIXME: Use self::baseFilePath once url issue has been resolved
-    $path = self::addTrailingSlash(str_replace('/persist/contribute', '', $config->imageUploadDir)) . 'dynamic';
+    $path = self::addTrailingSlash(str_replace(array('/persist/contribute', '\persist\contribute'), '', $config->imageUploadDir)) . 'dynamic';
     if ($fileName !== NULL) {
       $path .= "/$fileName";
     }
