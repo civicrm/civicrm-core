@@ -362,22 +362,6 @@ SELECT r.payment_processor_id
   }
 
   /**
-   * update the is_active flag in the db
-   *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
-   *
-   * @return Object             DAO object on success, null otherwise
-   * @static
-   */
-  static function setIsActive($id, $is_active) {
-    if (!$is_active) {
-      return self::cancelRecurContribution($id, CRM_Core_DAO::$_nullObject);
-    }
-    return FALSE;
-  }
-
-  /**
    * @param $entityID
    * @param string $entity
    *
@@ -477,4 +461,3 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     }
   }
 }
-

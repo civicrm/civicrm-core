@@ -10,8 +10,10 @@
       el = this[0],
       ret = {},
       $row = this.first().closest('.crm-entity');
-    ret.entity = $row.data('entity') || $row[0].id.split('-')[0];
-    ret.id = $row.data('id') || $row[0].id.split('-')[1];
+      ret.entity = $row.data('entity') || $row[0].id.split('-')[0];
+      ret.id = $row.data('id') || $row[0].id.split('-')[1];
+      ret.action = $row.attr('data-entity-action') || 'setvalue';
+
     if (!ret.entity || !ret.id) {
       return false;
     }

@@ -41,7 +41,7 @@
 
     function save() {
       $row.closest('table').block();
-      CRM.api3(info.entity, 'setvalue', {id: info.id, field: 'is_active', value: enabled ? 0 : 1}, {success: successMsg}).done(refresh);
+      CRM.api3(info.entity, info.action, {id: info.id, field: 'is_active', value: enabled ? 0 : 1}, {success: successMsg}).done(refresh);
       if (enabled) {
         $(this).dialog('close');
       }

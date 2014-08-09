@@ -77,6 +77,19 @@ function civicrm_api3_contribution_recur_get($params) {
 }
 
 /**
+ * Cancel a recurring contribution of existing contribution_recur.id
+ *
+ * @param array    $params (reference) array containing id of the recurring contribution
+ *
+ * @return boolean  returns true is successfully cancelled
+ */
+
+function civicrm_api3_contribution_recur_cancel($params) {
+  civicrm_api3_verify_one_mandatory($params, NULL, array('id'));
+  return CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution($params['id'], CRM_Core_DAO::$_nullObject) ? civicrm_api3_create_success() : civicrm_api3_create_error(ts('Error while cancelling recurring contribution'));
+}
+
+/**
  * delete an existing contribution_recur
  *
  * This method is used to delete any existing contribution_recur. id of the group
@@ -93,4 +106,3 @@ function civicrm_api3_contribution_recur_get($params) {
 function civicrm_api3_contribution_recur_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-
