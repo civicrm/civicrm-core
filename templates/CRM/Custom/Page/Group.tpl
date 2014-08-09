@@ -42,18 +42,16 @@
    {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
    {include file="CRM/common/crmeditable.tpl"}
-   {include file="CRM/common/jsortable.tpl"}
-      <table id="options" class="display">
+      <table id="options" class="row-highlight">
         <thead>
           <tr>
             <th>{ts}Set{/ts}</th>
             <th>{ts}Enabled?{/ts}</th>
             <th>{ts}Used For{/ts}</th>
             <th>{ts}Type{/ts}</th>
-            <th id="order" class="sortable">{ts}Order{/ts}</th>
+            <th>{ts}Order{/ts}</th>
             <th>{ts}Style{/ts}</th>
             <th></th>
-            <th class='hiddenElement'></th>
           </tr>
         </thead>
         <tbody>
@@ -63,10 +61,9 @@
           <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td>{if $row.extends eq 'Contact'}{ts}All Contact Types{/ts}{else}{$row.extends_display}{/if}</td>
           <td>{$row.extends_entity_column_value}</td>
-          <td class="nowrap">{$row.order}</td>
+          <td class="nowrap">{$row.weight}</td>
           <td>{$row.style_display}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>
-          <td class="order hiddenElement">{$row.weight}</td>
         </tr>
         {/foreach}
         </tbody>
