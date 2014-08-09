@@ -550,7 +550,7 @@
           scope.tab_upd();
 
           console.log("kurund "+scope.tab_val);
-         
+
           var myArray1 = new Array();
           for (var i = scope.max_tab + 1; i < 4; i++) {
             myArray1.push(i);
@@ -658,7 +658,7 @@
           if (e.val.split(" ")[2] == "exclude") {
             var index = scope.excGroup.indexOf(e.val.split(" ")[3]);
             scope.excGroup.splice(index, 1);
-            scope.incGroup.splice(index,1);
+            scope.excGroupids.splice(index,1);
             scope.$apply();
           }
           else {
