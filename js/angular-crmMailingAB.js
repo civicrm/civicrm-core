@@ -113,6 +113,7 @@
     $scope.eMailing = CRM.crmMailing.emailAdd;
     $scope.tmpList = CRM.crmMailing.mesTemplate;
     $scope.headerfooter = CRM.crmMailing.headerfooterList;
+
     if($scope.currentABTest.declare_winning_time != null){
       $scope.ans= $scope.currentABTest.declare_winning_time.split(" ");
       $scope.currentABTest.date=$scope.ans[0];
@@ -511,9 +512,9 @@
       // responsible for registering DOM listeners as well as updating the DOM
       link: function (scope, element, attrs) {
 
-        $(element).parent().parent().parent().parent().tabs(scope.$eval(attrs.nexttab));
+        $(element).parent().parent().parent().parent().parent().tabs(scope.$eval(attrs.nexttab));
         var myarr = new Array(1, 2, 3)
-        $(element).parent().parent().parent().parent().tabs({disabled: myarr});
+        $(element).parent().parent().parent().parent().parent().tabs({disabled: myarr});
 
         $(element).on("click", function () {
           if(scope.tab_val==0){
