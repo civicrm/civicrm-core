@@ -9,7 +9,7 @@
     return CRM.resourceUrls['civicrm'] + '/partials/abtesting/' + relPath;
   };
 
-  var crmMailingAB = angular.module('crmMailingAB', ['ngRoute', 'ui.utils']);
+  var crmMailingAB = angular.module('crmMailingAB', ['ngRoute', 'ui.utils','ngSanitize']);
   var mltokens = [];
   crmMailingAB.run(function ($rootScope, $templateCache) {
     $rootScope.$on('$viewContentLoaded', function () {
@@ -128,6 +128,7 @@
         $scope.abId = $scope.currentABTest.id;
         var abmailA = crmApi('Mailing','getsingle',{id:$scope.currentABTest.mailing_id_a});
         var abmailB= crmApi('Mailing','getsingle',{id:$scope.currentABTest.mailing_id_b});
+        var abmailC = crmApi('Mailing','getsingle',{id:$scope.currentABTest.mailing_id_c});
         abmailA.success(function (data) {
           if (data.is_error == 0) {
             $scope.mailA = data;
@@ -140,16 +141,24 @@
 
           };
         });
+        abmailC.success(function(data) {
+          if (data.is_error == 0) {
+            $scope.mailC = data;
+
+          };
+        });
       }
       else{
         console.log("Prithvila");
         console.log($scope.currentABTest);
         $scope.mailA = {};
         $scope.mailB = {};
+        $scope.mailC = {};
       }
 
     if(typeof $scope.mailA == 'undefined')$scope.mailA={};
     if(typeof $scope.mailB == 'undefined')$scope.mailB={};
+    if(typeof $scope.mailB == 'undefined')$scope.mailC={};
 
     $scope.templates =
       [
@@ -195,7 +204,7 @@
         $scope.tab_val = 3;
       }
     };
-
+    $scope.preview = false;
     $scope.slide_value = 0;
 
     $scope.setifyes = function (val) {
@@ -252,13 +261,15 @@
       result.success(function(data) {
         if (data.is_error == 0) {
           $scope.mailA.id = data.id;
+          $scope.currentABTest.mailing_id_a=$scope.mailA.id;
           console.log("Mail a Id "+ $scope.mailA.id);
         }
       });
     };
 
     $scope.append_mails = function(){
-      crmApi('MailingAB','create',{id:$scope.abId,mailing_id_a:$scope.mailA.id,mailing_id_b:$scope.mailB.id});
+      crmApi('MailingAB','create',{id:$scope.abId,mailing_id_a:$scope.mailA.id,mailing_id_b:$scope.mailB.id,mailing_id_c:$scope.mailC.id});
+      $scope.currentABTest.id= $scope.abId;
     };
 
     $scope.saveb = function (dat) {
@@ -269,6 +280,8 @@
         if (data.is_error == 0) {
           $scope.mailB.id = data.id;
           console.log("Mail b Id "+ $scope.mailB.id);
+          $scope.currentABTest.mailing_id_b=$scope.mailB.id;
+
           $scope.append_mails();
 
 
@@ -277,6 +290,29 @@
 
     };
 
+    $scope.savec = function (dat) {
+      var flag =0;
+      console.log("C is called");
+      var result = crmApi('Mailing', 'create', dat, true);
+      console.log(result);
+      result.success(function(data) {
+        if (data.is_error == 0) {
+          $scope.mailC.id = data.id;
+          console.log("Mail C Id "+ $scope.mailC.id);
+          $scope.currentABTest.mailing_id_c=$scope.mailC.id;
+
+          $scope.append_mails();
+
+
+        }
+      });
+
+    };
+    $scope.previewa="";
+    $scope.pre= function(){
+      $scope.preview=true;
+
+    }
     $scope.init = function (par) {
 
       $scope.whatnext = par.toString()
@@ -293,13 +329,15 @@
 
     $scope.incGroup = [];
     $scope.excGroup = [];
-
+    $scope.incGroupids =[];
+    $scope.excGroupids =[];
+    $scope.tp1 = {};
     $scope.create_abtest = function(){
       var result;
       $scope.currentABTest.testing_criteria_id=$scope.template.val;
 
       if($scope.abId =="" )
-      result= crmApi('MailingAB','create',{testing_criteria_id: $scope.template.val});
+      result= crmApi('MailingAB','create',{name: $scope.currentABTest.name,testing_criteria_id: $scope.template.val});
       else{
         if (typeof $scope.currentABTest.mailing_id_a == 'undefined')
       result= crmApi('MailingAB','create',{id:$scope.abId,testing_criteria_id: $scope.template.val});
@@ -319,6 +357,56 @@
       });
     };
 
+
+
+    $scope.a_b_update = function(){
+
+      $scope.tp1.include =$scope.incGroupids;
+      $scope.tp1.exclude=$scope.excGroupids;
+
+      console.log($scope.tp1);
+      console.log($scope.currentABTest.id);
+
+      console.log("--------");
+      var result= crmApi('Mailing','a_b_recipients_update',{
+        id:$scope.currentABTest.id,
+        groups: $scope.tp1
+      });
+
+      var resulta =crmApi('Mailing','preview',{id:$scope.currentABTest.mailing_id_a});
+
+      resulta.success(function(data) {
+        if (data.is_error == 0) {
+          console.log("came");
+
+          $scope.previewa=data.values.html;
+
+          $scope.prea='I am an <code>HTML</code>string with ' +
+            '<a href="#">links!</a> and other <em>stuff</em>';
+
+          //$scope.previewa1=$scope.previewa.substring(3935);
+          //$scope.previewa1='<style>'+$scope.previewa.substring(0,3935)+'</style>'+$scope.previewa.substring(3935);
+          $scope.previewa1= '<style type="text/css">color: blue;</style><div>gfgfdgdfgdgdf</div>'
+
+
+        }
+      });
+
+      resulta =crmApi('Mailing','preview',{id:$scope.currentABTest.mailing_id_b});
+
+      resulta.success(function(data) {
+        if (data.is_error == 0) {
+          console.log("came");
+          console.log(data.values.html);
+          $scope.previewb=data.values.html;
+
+          $scope.previewb1=$scope.previewb.substring(3935);
+
+          $scope.$apply();
+
+        }
+      });
+    }
     $scope.update_abtest = function(){
 
       $scope.currentABTest.declare_winning_time= $scope.currentABTest.date + " " + $scope.currentABTest.time ;
@@ -327,6 +415,7 @@
                       testing_criteria_id: $scope.template.val,
                       mailing_id_a:$scope.currentABTest.mailing_id_a,
                       mailing_id_b:$scope.currentABTest.mailing_id_b,
+                      mailing_id_c:$scope.currentABTest.mailing_id_c,
                       winner_criteria_id : $scope.currentABTest.winner_criteria_id,
                       group_percentage: $scope.currentABTest.group_percentage,
                       declare_winning_time: $scope.currentABTest.declare_winning_time
@@ -440,6 +529,10 @@
             else if(scope.currentABTest.winner_criteria_id==3){
                 scope.winner_criteria="Total Clicks on a particular link";
               }
+
+
+            scope.a_b_update();
+
           }
 
           scope.tab_val = scope.tab_val + 1;
@@ -531,6 +624,7 @@
               str += " ";
             }
             scope.incGroup.push(str);
+            scope.incGroupids.push(a[0]);
             scope.$apply();
           }
 
@@ -542,6 +636,7 @@
             }
 
             scope.excGroup.push(str);
+            scope.excGroupids.push(a[0]);
             scope.$apply();
           }
 
@@ -550,11 +645,13 @@
           if (e.val.split(" ")[2] == "exclude") {
             var index = scope.excGroup.indexOf(e.val.split(" ")[3]);
             scope.excGroup.splice(index, 1);
+            scope.incGroup.splice(index,1);
             scope.$apply();
           }
           else {
             var index = scope.incGroup.indexOf(e.val.split(" ")[3]);
             scope.incGroup.splice(index, 1);
+            scope.incGroupids.splice(index,1);
             scope.$apply();
           }
         });
@@ -636,6 +733,49 @@
         });
 
         $(element).find("#closebutton").on("click", function () {
+          $(element).dialog("close");
+        });
+      }
+    };
+  });
+
+  crmMailingAB.directive('previewmail', function () {
+    return {
+      // Restrict it to be an attribute in this case
+      restrict: 'AE',
+
+      priority: 500,
+      // responsible for registering DOM listeners as well as updating the DOM
+      link: function (scope, element, attrs) {
+
+
+
+/*
+        $(element).children().tabs( "enable", 2 );*/
+
+        scope.$watch('preview', function () {
+          if(scope.preview == true){
+
+          $(element).dialog({
+            title: 'Preview Mailing',
+            width: 1080,
+            height: 800,
+            closed: false,
+            cache: false,
+            modal: true,
+
+            close :function(){console.log("close");
+                            scope.preview = false;scope.$apply()}
+
+
+          });}
+
+        });
+
+
+        $(element).find("#closebutton").on("click", function () {
+          console.log("close");
+          scope.preview = false;
           $(element).dialog("close");
         });
       }
@@ -765,7 +905,7 @@
 
             }
           }
-
+          console.log("call B");
           scope.saveb({
 
             id: scope.mailB.id,
@@ -794,7 +934,31 @@
             is_completed: scope.mailA.is_completed
 
           });
+          console.log("call C");
+          scope.savec({
+            id: scope.mailC.id,
+            name: "Aditya Nambiar",
+            visibility:  scope.mailB.visibility,
+            created_id: 1,
+            subject: scope.mailB.subject,
+            msg_template_id: scope.mailB.msg_template_id==null ? "" : scope.mailB.msg_template_id,
+            open_tracking: scope.mailB.open_tracking,
+            url_tracking: scope.mailB.url_tracking,
+            forward_replies: scope.mailB.forward_replies,
+            auto_responder: scope.mailB.auto_responder,
+            from_name: scope.mailB.from_name,
+            from_email: scope.mailB.from_email,
+            replyto_email: scope.mailB.replyto_email,
+            unsubscribe_id: scope.mailB.unsubscribe_id,
+            resubscribe_id: scope.mailB.resubscribe_id,
+            body_html: scope.mailB.body_html,
+            body_text: scope.mailB.body_text,
+            campaign_id:	scope.mailB.campaign_id==null ? "" : scope.mailB.campaign_id,
+            header_id:	scope.mailB.header_id,
+            footer_id:	scope.mailB.footer_id,
 
+            is_completed: scope.mailA.is_completed
+          });
 
 
         });

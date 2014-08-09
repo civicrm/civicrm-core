@@ -1,6 +1,9 @@
 <div>
   {{tab_val}}<br>
+  {{currentABTest.mailing_id_b}}<br>
+  {{currentABTest.mailing_id_a}}<br>
 
+{{previewa1}}<br>
   <div ui-jq="tabs" id="alltabs">
     <ul>
 
@@ -13,6 +16,8 @@
     <div id="tabs-1">
 
       <form name="myForm">
+        <h3> What would you like to Name the Test ?</h3><br>
+        <input type="text" ng-model="currentABTest.name"><br><br><br>
 
         <h3> What would you like to test ?</h3><br><br>
 
@@ -55,7 +60,8 @@
           <option ng-repeat="ml in mailList" value="{{ml.id}} mail exclude {{ml.title}}"> {{ml.name}}</option>
         </select>
         <br> <br><br><br>
-        {{incGroup}}<br>{{excGroup}}
+        {{incGroup}}<br>{{excGroup}}<br>
+        {{incGroupids}}<br>{{excGroupids}}<br>
 
         <h3>Select the size of your test group</h3><br>
         &nbsp Percentage Selected - {{currentABTest.group_percentage}}%
@@ -88,7 +94,7 @@
                            <div nextbutton></div>
 
                        </tpmax>
-       -->
+-       -->
         <h3>Declare the winner by when?</h3><br>
         <table>
           <tbody>
@@ -160,8 +166,31 @@
           <td>{{currentABTest.date}} Date &nbsp {{currentABTest.time}} Time</td>
         </tr>
       </table>
+      <h3 ng-click="pre()">Preview Mail</h3>
+      <previewmail ng-show ="preview">
 
-      <h3><a href="#">Preview Mailing</a></h3><br>
+        <div  ui-jq="tabs" id="settings">
+          <ul>
+            <li>
+              <a href="#frag1"><span>Mail A</span></a>
+            </li>
+            <li>
+              <a href="#frag2"><span>Mail B</span></a>
+            </li>
+
+          </ul>
+          <div id="frag1" ng-bind-html="previewa1" >
+
+          </div>
+          <div id="frag2" ng-bind-html="previewb1">
+
+          </div>
+
+
+        </div>
+      </previewmail><br>
+      <h3>Send Test Mails</h3>
+
 
       <h3>When to Start</h3><br>
 

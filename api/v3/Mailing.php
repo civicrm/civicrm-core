@@ -78,27 +78,67 @@ function civicrm_api3_mailing_stats($params) {
     FALSE
   );
   $stats[$params['mailing_id']] = array();
+  if (empty($params['job_id'])) {
+    $params['job_id'] = NULL;
+  }
   foreach (array('Delivered', 'Bounces', 'Unsubscribers', 'Unique Clicks', 'Opened') as $detail) {
     switch ($detail) {
       case 'Delivered':
-        $stats[$params['mailing_id']] += array($detail => CRM_Mailing_Event_BAO_Delivered::getTotalCount($params['mailing_id']));
+        $stats[$params['mailing_id']] += array(
+          $detail =>  CRM_Mailing_Event_BAO_Delivered::getTotalCount($params['mailing_id'], $params['job_id'])
+        );
         break;
       case 'Bounces':
-        $stats[$params['mailing_id']] += array($detail => CRM_Mailing_Event_BAO_Bounce::getTotalCount($params['mailing_id']));
+        $stats[$params['mailing_id']] += array(
+          $detail =>  CRM_Mailing_Event_BAO_Bounce::getTotalCount($params['mailing_id'], $params['job_id'])
+        );
         break;
       case 'Unsubscribers':
-        $stats[$params['mailing_id']] += array($detail => CRM_Mailing_Event_BAO_Unsubscribe::getTotalCount($params['mailing_id']));
+        $stats[$params['mailing_id']] += array(
+          $detail =>  CRM_Mailing_Event_BAO_Unsubscribe::getTotalCount($params['mailing_id'], $params['job_id'])
+        );
         break;
       case 'Unique Clicks':
-        $stats[$params['mailing_id']] += array($detail => CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id']));
+        $stats[$params['mailing_id']] += array(
+          $detail =>  CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], $params['job_id'])
+        );
         break;
       case 'Opened':
-        $stats[$params['mailing_id']] += array($detail => CRM_Mailing_Event_BAO_Opened::getTotalCount($params['mailing_id']));
+        $stats[$params['mailing_id']] += array(
+          $detail =>  CRM_Mailing_Event_BAO_Opened::getTotalCount($params['mailing_id'], $params['job_id'])
+        );
         break;
     }
   }
   return civicrm_api3_create_success($stats);
 }
+
+
+
+function civicrm_api3_mailing_a_b_recipients_update($params) {
+  civicrm_api3_verify_mandatory($params,
+    'CRM_Mailing_DAO_MailingAB',
+    array('id'),
+    FALSE
+  );
+
+
+  $mailingAB = civicrm_api3('MailingAB', 'get', $params);
+  $mailingAB = $mailingAB['values'][$params['id']];
+
+  //update mailingC with include/exclude group id(s) provided
+  civicrm_api3('Mailing', 'create', array('id' => $mailingAB['mailing_id_c'], 'groups' =>  $params['groups']));
+  //update recipients for mailing_id_c
+  CRM_Mailing_BAO_Mailing::getRecipients($mailingAB['mailing_id_c'], $mailingAB['mailing_id_c'], NULL, NULL, TRUE);
+  //calulate total number of random recipients for mail C from group_percentage selected
+  $totalCount =  civicrm_api3('MailingRecipients', 'getcount', array('mailing_id' => $mailingAB['mailing_id_c']));
+  $totalSelected = round(($totalCount * $mailingAB['group_percentage'])/100);
+  foreach (array('mailing_id_a', 'mailing_id_b') as $columnName) {
+    CRM_Mailing_BAO_Recipients::updateRandomRecipients($mailingAB['mailing_id_c'], $mailingAB[$columnName], $totalSelected);
+  }
+  return civicrm_api3_create_success();
+}
+
 
 
 /**
@@ -109,6 +149,38 @@ function civicrm_api3_mailing_stats($params) {
  *
  * @return array API Success Array
  */
+
+function civicrm_api3_mailing_preview($params) {
+  civicrm_api3_verify_mandatory($params,
+    'CRM_Mailing_DAO_Mailing',
+    array('id'),
+    FALSE
+  );
+  $fromEmail = NULL;
+  if (!empty($params['from_email'])) {
+    $fromEmail = $params['from_email'];
+  }
+  $session = CRM_Core_Session::singleton();
+  $mailing = new CRM_Mailing_BAO_Mailing();
+  $mailing->id = $params['id'];
+  $mailing->find(TRUE);
+  CRM_Mailing_BAO_Mailing::tokenReplace($mailing);
+  // get and format attachments
+  $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_mailing', $mailing->id);
+  $returnProperties = $mailing->getReturnProperties();
+  $contactID = CRM_Utils_Array::value('contact_id', $params);
+  if (!$contactID) {
+    $contactID = $session->get('userID');
+  }
+  $mailingParams = array('contact_id' => $contactID);
+  $details = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedToken());
+  $mime = &$mailing->compose(NULL, NULL, NULL, $session->get('userID'), $fromEmail, $fromEmail,
+    TRUE, $details[0][$contactID], $attachments
+  );
+  return civicrm_api3_create_success(array('html' => $mime->getHTMLBody(), 'text' => $mime->getTXTBody()));
+}
+
+
 function civicrm_api3_mailing_delete($params, $ids = array()) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }

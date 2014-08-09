@@ -1710,6 +1710,29 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Function to add contact(s) to a Group
+   *
+   * @params int  $groupID Group ID
+   * @params int  $totalCount of contacts to be added
+   *
+   * @return array $result
+   */
+  function groupContactCreate($groupID, $totalCount = 10) {
+    $params = array('group_id' => $groupID);
+    for ($i=1; $i <= $totalCount; $i++) {
+      $contactID = $this->individualCreate();
+      if ($i == 1) {
+        $params += array('contact_id' => $contactID);
+      }
+      else {
+        $params += array("contact_id.$i" => $contactID);
+      }
+    }
+    $result = $this->callAPISuccess('GroupContact', 'create', $params);
+    return $result;
+  }
+
+  /**
    * Function to delete a Group
    *
    * @param $gid
