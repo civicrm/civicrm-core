@@ -1,7 +1,6 @@
 <div>
   {{tab_val}}<br>
-  {{currentABTest.mailing_id_b}}<br>
-  {{currentABTest.mailing_id_a}}<br>
+
 
   <div ui-jq="tabs" id="alltabs">
     <ul>
@@ -13,211 +12,17 @@
     </ul>
 
     <div id="tabs-1">
-
-      <form name="myForm">
-        <h3> What would you like to Name the Test ?</h3><br>
-        <input type="text" ng-model="currentABTest.name"><br><br><br>
-
-        <h3> What would you like to test ?</h3><br><br>
-
-        &nbsp <input type="radio" ng-model="template" ng-value="templates[0]" ng-click="init(2)" ng-checked="template.val==1"> Subject Lines <br/><br>
-        &nbsp <input type="radio" ng-model="template" ng-value="templates[1]" ng-click="init(3)" ng-checked="template.val==2"> From Names <br/><br>
-        &nbsp <input type="radio" ng-model="template" ng-value="templates[2]" ng-click="init(1)" ng-checked="template.val==3"> Two different Emails <br/><br>
-        &nbsp
-        <div style="position:relative; left:220px; top: 30px;"  nextbutton></div>
-        <div style="position:relative; left:300px; top:-1px;" cancelbutton></div>
-
-
-      </form>
+    <div ng-include = "partialUrl('tab1.html')"></div>
     </div>
-
     <div id="tabs-2">
-
-      <form>
-        <div  ng-include="template.url">
-
-        </div>
-        <div style="position:relative; left:200px; top:61px;" prevbutton></div>
-        <div style="position:relative; left:300px; top: 30px;" submitform nextbutton></div>
-        <div style="position:relative; left:375px; top:-1px;" cancelbutton></div>
-
-      </form >
-    </div>
-
+     <div ng-include = "partialUrl('tab2.html')"></div>
+     </div>
     <div id="tabs-3">
-
-      <form name="impform" novalidate>
-        <h3>Select the groups you would like to add</h3><br>
-
-
-        &nbsp<br>
-        <select multiple chsgroup>
-          <option id="1" ng-repeat="grp in groups" value="{{grp.id}} group include {{grp.title}}"> {{grp.title}}
-          </option>
-          <option ng-repeat="grp in groups" value="{{grp.id}} group exclude {{grp.title}}"> {{grp.title}}</option>
-          <option ng-repeat="ml in mailList" value="{{ml.id}} mail include {{ml.title}}"> {{ml.name}}</option>
-          <option ng-repeat="ml in mailList" value="{{ml.id}} mail exclude {{ml.title}}"> {{ml.name}}</option>
-        </select>
-        <br> <br><br><br>
-        {{incGroup}}<br>{{excGroup}}<br>
-        {{incGroupids}}<br>{{excGroupids}}<br>
-
-        <h3>Select the size of your test group</h3><br>
-        &nbsp Percentage Selected - {{currentABTest.group_percentage}}%
-
-        <div sliderbar id="trial" style="margin: 10px;" ></div>
-
-        <h3>How will the winner be decided</h3><br>
-        &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=1 name="cri" required> Open <br/><br>
-        &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=2 name="cri" checked="checked">
-        Total Unique Clicks <br/><br>
-        &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=3 name="cri"> Total
-        Clicks on a particular link <br/><br>
-        <!-- Remove automated
-                       <h3>Do you want the A/B test to be automated </h3>
-                       &nbsp<input type="radio" ng-model="automated" value="Yes" ng-click="setifyes(1)" name="auto" required>Yes &nbsp
-                       &nbsp<input type="radio" ng-model="automated" value="No" ng-click="setifyes(2)" name="auto" checked="checked"> No <br/><br>
-
-                       <tpmax ng-show="ifyes">
-
-                           <h3> Please enter the confidence level at which a decision can be made</h3>
-                           &nbsp &nbsp <input type="text" style="height: 20px; width: 25px;" ng-model="conf" numbar=99 ><br><br>
-                           <div ng-show="conf==null || conf ==0 || conf>99" style="color: red;">&nbsp Please Enter a Valid Number</div>
-
-                           <h3>If the confidence level is not reached what do you want us to do?</h3>
-                           &nbsp <input type="radio" ng-model="ifnot" value="Inform me" name="ifnot"/> Inform me <br/><br>
-                           &nbsp <input type="radio" checked="checked" ng-model="ifnot" value="Send Version A" name="ifnot" /> Send Version A <br/><br>
-                           &nbsp <input type="radio" ng-model="ifnot" value="Send Version B" name="ifnot"/> Send Version B <br/><br>
-
-
-                           <div nextbutton></div>
-
-                       </tpmax>
--       -->
-        <h3>Declare the winner by when?</h3><br>
-        <table>
-          <tbody>
-
-        <tr >
-          <td class="label">Date</td>
-          <td>
-            <input type="text" chsdate ng-model="currentABTest.date" >
-          </td>
-          <td class="label" >Time</td>
-          <td>
-            <input type="text" placeholder="hh:mm:ss" ng-model="currentABTest.time">
-          </td>
-        </tr>
-
-        </tbody>
-        </table>
-
-        <div id="help" >
-          Enter the time in the 12:32:45 format where 12 is the hour, 32 the minutes and 45 the seconds.
-        </div>
-        <br>
-        <br>
-
-
-        <div style="position:relative; left:200px; top:30px;" prevbutton></div>
-        <div style="position:relative; left:300px; top: 00px;" nextbutton></div>
-        <div style="position:relative; left:375px; top: -31px;" cancelbutton></div>
-
-      </form>
+    <div ng-include = "partialUrl('tab3.html')"></div>
     </div>
-
     <div id="tabs-4">
-
-      <h3>Details</h3><br>
-      <table>
-        <tr>
-          <td>Test Criteria</td>
-          <td>{{template.name}}</td>
-        </tr>
-        <tr>
-          <td>Groups Included</td>
-          <td>{{incGroup}}</td>
-        </tr>
-        <tr>
-          <td>Groups Excluded</td>
-          <td>{{excGroup}}</td>
-        </tr>
-        <tr>
-          <td>Size of Test Group</td>
-          <td>{{currentABTest.group_percentage}}</td>
-        </tr>
-        <tr>
-          <td>Winner Criteria</td>
-          <td>{{winner_criteria}}</td>
-        </tr>
-<!--
-        <tr ng-show="automated=='Yes'">
-          <td>Minum Confidence Level</td>
-          <td>{{conf}}%</td>
-        </tr>
-        <tr ng-show="automated=='Yes'">
-          <td>If Level not Achieved</td>
-          <td>{{ifnot}}</td>
-        </tr>
--->
-        <tr>
-          <td>Declare Winner By</td>
-          <td>{{currentABTest.date}} Date &nbsp {{currentABTest.time}} Time</td>
-        </tr>
-      </table>
-      <h3 ng-click="pre()">Preview Mail</h3>
-      <previewmail ng-show ="preview">
-
-        <div  ui-jq="tabs" id="settings">
-          <ul>
-            <li>
-              <a href="#frag1"><span>Mail A</span></a>
-            </li>
-            <li>
-              <a href="#frag2"><span>Mail B</span></a>
-            </li>
-
-          </ul>
-          <div id="frag1" ng-bind-html="deliberatelyTrustDangerousSnippeta()" >
-
-          </div>
-          <div id="frag2" ng-bind-html="deliberatelyTrustDangerousSnippetb()">
-
-          </div>
-
-
-        </div>
-      </previewmail>
-      <h3 ng-click="sen()">Send Test Mails</h3>
-      <sendmailtest ng-show="sendtest">
-        <input type="text" ng-model="testmailid">
-      </sendmailtest>
-
-      <h3>When to Start</h3><br>
-
-      <div>
-        <input type="radio" name="Start" ng-model="start" value="now"> Now &nbsp
-        <input type="radio" name="Start" ng-model="start" value="later"> Later
-
-        &nbsp &nbsp <input type="text" class="dateplugin" ng-show="start=='later'" ng-model="send_date" datepick>
-      </div>
-
-
-      <br><br>
-
-      <div>
-
-        <div style="position:relative; left:200px; top:60px;" prevbutton></div>
-        <div class="crm-submit-buttons" style="position:relative; left:295px; top: 30px;">
-          <div class="crm-button crm-button-type-upload crm-button_qf_Contact_upload_view">
-            <input type="submit" value="Submit & Send" id="campaignbutton _qf_Contact_upload_view-top"
-                   class="btn btn-primary" nexttab={{tab_val}}>
-          </div>
-        </div>
-        <div style="position:relative; left:430px; top:-1px;" cancelbutton></div>
-
-      </div>
-
+    <div ng-include = "partialUrl('tab4.html')"></div>
     </div>
+
   </div>
 </div>
