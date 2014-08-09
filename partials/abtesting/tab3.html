@@ -1,11 +1,8 @@
-
-
-  <form name="impform" novalidate>
+<form name="tab3Form" unsaved-warning-form>
+  <div class="crm-block crm-form-block crmABTesting">
     <h3>Select the groups you would like to add</h3><br>
-
-
     &nbsp<br>
-    <select multiple chsgroup>
+    <select multiple chsgroup required>
       <option id="1" ng-repeat="grp in groups" value="{{grp.id}} group include {{grp.title}}"> {{grp.title}}
       </option>
       <option ng-repeat="grp in groups" value="{{grp.id}} group exclude {{grp.title}}"> {{grp.title}}</option>
@@ -14,11 +11,10 @@
     </select>
     <br> <br><br><br>
 
-
     <h3>Select the size of your test group</h3><br>
     &nbsp Percentage Selected - {{currentABTest.group_percentage}}%
 
-    <div sliderbar id="trial" style="margin: 10px;" ></div>
+    <div sliderbar id="trial" style="margin: 10px;"></div>
 
     <h3>How will the winner be decided</h3><br>
     &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=1 name="cri" required> Open <br/><br>
@@ -26,54 +22,38 @@
     Total Unique Clicks <br/><br>
     &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=3 name="cri"> Total
     Clicks on a particular link <br/><br>
-    <!-- Remove automated
-                   <h3>Do you want the A/B test to be automated </h3>
-                   &nbsp<input type="radio" ng-model="automated" value="Yes" ng-click="setifyes(1)" name="auto" required>Yes &nbsp
-                   &nbsp<input type="radio" ng-model="automated" value="No" ng-click="setifyes(2)" name="auto" checked="checked"> No <br/><br>
 
-                   <tpmax ng-show="ifyes">
-
-                       <h3> Please enter the confidence level at which a decision can be made</h3>
-                       &nbsp &nbsp <input type="text" style="height: 20px; width: 25px;" ng-model="conf" numbar=99 ><br><br>
-                       <div ng-show="conf==null || conf ==0 || conf>99" style="color: red;">&nbsp Please Enter a Valid Number</div>
-
-                       <h3>If the confidence level is not reached what do you want us to do?</h3>
-                       &nbsp <input type="radio" ng-model="ifnot" value="Inform me" name="ifnot"/> Inform me <br/><br>
-                       &nbsp <input type="radio" checked="checked" ng-model="ifnot" value="Send Version A" name="ifnot" /> Send Version A <br/><br>
-                       &nbsp <input type="radio" ng-model="ifnot" value="Send Version B" name="ifnot"/> Send Version B <br/><br>
-
-
-                       <div nextbutton></div>
-
-                   </tpmax>
--       -->
     <h3>Declare the winner by when?</h3><br>
     <table>
       <tbody>
-
-      <tr >
+      <tr>
         <td class="label">Date</td>
         <td>
-          <input type="text" chsdate ng-model="currentABTest.date" >
+          <input type="text" chsdate ng-model="currentABTest.date">
         </td>
-        <td class="label" >Time</td>
+        <td class="label">Time</td>
         <td>
           <input type="text" placeholder="hh:mm:ss" ng-model="currentABTest.time">
         </td>
       </tr>
-
       </tbody>
     </table>
 
-    <div id="help" >
+    <div id="help">
       Enter the time in the 12:32:45 format where 12 is the hour, 32 the minutes and 45 the seconds.
     </div>
     <br>
     <br>
-
-
-    <div style="position:relative; left:200px; top:30px;" prevbutton></div>
-    <div style="position:relative; left:300px; top: 00px;" nextbutton></div>
-    <div style="position:relative; left:375px; top: -31px;" cancelbutton></div>
-
-  </form>
+    <div class="crm-submit-buttons">
+      <span class="crm-button">
+        <input type="submit" ng-click="tab3Form.$setPristine();update_abtest();" value="Previous" prevtab/>
+      </span>
+      <span class="crm-button">
+        <input type="submit" ng-click="tab3Form.$setPristine();update_abtest();" value="Next" nexttab="{{tab_val}}"/>
+      </span>
+      <span class="crm-button">
+        <input type="submit" ng-click="tab3Form.$setPristine(); goto('mailing/abtesting');" value="Cancel"/>
+      </span>
+    </div>
+  </div>
+</form>

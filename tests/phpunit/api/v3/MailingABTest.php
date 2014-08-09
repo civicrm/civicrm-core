@@ -56,6 +56,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     $this->_mailingID_A = $this->createMailing();
     $this->_mailingID_B = $this->createMailing();
     $this->_mailingID_C = $this->createMailing();
+    $this->_groupID = $this->groupCreate();
 
     $this->_params = array(
       'mailing_id_a' => $this->_mailingID_A,
@@ -72,6 +73,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     $this->deleteMailing($this->_mailingID_A);
     $this->deleteMailing($this->_mailingID_B);
     $this->deleteMailing($this->_mailingID_C);
+    $this->groupDelete($this->_groupID);
   }
 
   /**
@@ -91,17 +93,20 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result['id']));
   }
 
-
   public function testMailingABRecipientsUpdate() {
     //create 100 contacts for group $this->_groupID
     $totalGroupContacts = 100;
+
     $result = $this->groupContactCreate($this->_groupID, $totalGroupContacts);
     //check if 100 group contacts are included on desired group
     $this->assertEquals($totalGroupContacts, $result['added'], "in line " . __LINE__);
+
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $totalSelectedContacts = round(($totalGroupContacts * $result['values'][$result['id']]['group_percentage'])/100);
+
     $params = array('id' => $result['id'], 'groups' => array('include' => array($this->_groupID)));
-    $this->callAPISuccess('Mailing', 'a_b_recipients_update', $params);
+    $this->callAPISuccess('MailingAB', 'recipients_update', $params);
+
     //check total number of A/B mail recipients is what selected percentage of Mail C
     $countA = $this->callAPISuccess('MailingRecipients', 'getcount', array('mailing_id' =>  $this->_mailingID_A));
     $this->assertEquals($countA, $totalSelectedContacts, "in line " . __LINE__);
@@ -110,4 +115,3 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   }
 
 }
-

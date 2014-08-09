@@ -1,91 +1,74 @@
-
-  <h3>Details</h3><br>
-  <table>
-    <tr>
-      <td>Test Criteria</td>
-      <td>{{template.name}}</td>
-    </tr>
-    <tr>
-      <td>Groups Included</td>
-      <td>{{incGroup}}</td>
-    </tr>
-    <tr>
-      <td>Groups Excluded</td>
-      <td>{{excGroup}}</td>
-    </tr>
-    <tr>
-      <td>Size of Test Group</td>
-      <td>{{currentABTest.group_percentage}}</td>
-    </tr>
-    <tr>
-      <td>Winner Criteria</td>
-      <td>{{winner_criteria}}</td>
-    </tr>
-    <!--
-            <tr ng-show="automated=='Yes'">
-              <td>Minum Confidence Level</td>
-              <td>{{conf}}%</td>
-            </tr>
-            <tr ng-show="automated=='Yes'">
-              <td>If Level not Achieved</td>
-              <td>{{ifnot}}</td>
-            </tr>
-    -->
-    <tr>
-      <td>Declare Winner By</td>
-      <td>{{currentABTest.date}} Date &nbsp {{currentABTest.time}} Time</td>
-    </tr>
-  </table>
-  <h3 ng-click="pre()">Preview Mail</h3>
-  <previewmail ng-show ="preview">
-
-    <div  ui-jq="tabs" id="settings">
-      <ul>
-        <li>
-          <a href="#frag1"><span>Mail A</span></a>
-        </li>
-        <li>
-          <a href="#frag2"><span>Mail B</span></a>
-        </li>
-
-      </ul>
-      <div id="frag1" ng-bind-html="deliberatelyTrustDangerousSnippeta()" >
-
-      </div>
-      <div id="frag2" ng-bind-html="deliberatelyTrustDangerousSnippetb()">
-
-      </div>
-
-
-    </div>
-  </previewmail>
-  <h3 ng-click="sen()">Send Test Mails</h3>
-  <sendmailtest ng-show="sendtest">
-    <input type="text" ng-model="testmailid">
-  </sendmailtest>
-
-  <h3>When to Start</h3><br>
-
-  <div>
-    <input type="radio" name="Start" ng-model="start" value="now"> Now &nbsp
-    <input type="radio" name="Start" ng-model="start" value="later"> Later
-
-    &nbsp &nbsp <input type="text" class="dateplugin" ng-show="start=='later'" ng-model="send_date" datepick>
-  </div>
-
-
-  <br><br>
-
-  <div>
-
-    <div style="position:relative; left:200px; top:60px;" prevbutton></div>
-    <div class="crm-submit-buttons" style="position:relative; left:295px; top: 30px;">
-      <div class="crm-button crm-button-type-upload crm-button_qf_Contact_upload_view">
-        <input type="submit" value="Submit & Send" id="campaignbutton _qf_Contact_upload_view-top"
-               class="btn btn-primary" nexttab={{tab_val}}>
+<form name="tab4Form" unsaved-warning-form>
+  <div class="crm-block crm-form-block crmABTesting">
+    <h3>Details</h3><br>
+    <table>
+      <tr>
+        <td>Test Criteria</td>
+        <td>{{template.name}}</td>
+      </tr>
+      <tr>
+        <td>Groups Included</td>
+        <td>{{incGroup}}</td>
+      </tr>
+      <tr>
+        <td>Groups Excluded</td>
+        <td>{{excGroup}}</td>
+      </tr>
+      <tr>
+        <td>Size of Test Group</td>
+        <td>{{currentABTest.group_percentage}}</td>
+      </tr>
+      <tr>
+        <td>Winner Criteria</td>
+        <td>{{winner_criteria}}</td>
+      </tr>
+      <tr>
+        <td>Declare Winner By</td>
+        <td>{{currentABTest.date}} Date &nbsp {{currentABTest.time}} Time</td>
+      </tr>
+    </table>
+    <h3 ng-click="pre()">Preview Mail</h3>
+    <div ng-show="preview" id="prevmail">
+      <div ui-jq="tabs" id="settings">
+        <ul>
+          <li>
+            <a href="#frag1"><span>Mail A</span></a>
+          </li>
+          <li>
+            <a href="#frag2"><span>Mail B</span></a>
+          </li>
+        </ul>
+        <div id="frag1" ng-bind-html="deliberatelyTrustDangerousSnippeta();"></div>
+        <div id="frag2" ng-bind-html="deliberatelyTrustDangerousSnippetb();"></div>
       </div>
     </div>
-    <div style="position:relative; left:430px; top:-1px;" cancelbutton></div>
+    <h3 ng-click="sendTestMailing();">Send Test Emails</h3>
 
+    <div ng-show="sendtest" id="sendtest">
+      <input type="text" ng-model="emailadd">
+    </div>
+
+    <h3>When to Start</h3><br>
+
+    <div>
+      <input type="radio" name="Start" ng-model="start" value="now"> Now &nbsp
+      <input type="radio" name="Start" ng-model="start" value="later"> Later
+      &nbsp &nbsp <input type="text" class="dateplugin" ng-show="start=='later'" ng-model="send_date" datepick>
+    </div>
+
+    <br><br>
+
+    <div class="crm-submit-buttons">
+      <span class="crm-button">
+        <input type="submit" ng-click="tab4Form.$setPristine();" value="Previous" prevtab/>
+      </span>
+      <span class="crm-button">
+        <input type="submit" ng-click="tab4Form.$setPristine();" value="Submit & Send"/>
+      </span>
+      <span class="crm-button">
+        <input type="submit" ng-click="tab4Form.$setPristine(); goto('mailing/abtesting');" value="Cancel"/>
+      </span>
+    </div>
   </div>
+</form>
 
