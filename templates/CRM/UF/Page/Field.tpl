@@ -45,8 +45,7 @@
         {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
    {include file="CRM/common/crmeditable.tpl"}
-   {include file="CRM/common/jsortable.tpl"}
-        <table id="options" class="display">
+        <table id="options" class="row-highlight">
             <thead>
             <tr>
                 <th>{ts}Field Name{/ts}</th>
@@ -55,12 +54,11 @@
                 <th>{ts}Searchable?{/ts}</th>
                 <th>{ts}In Selector?{/ts}</th>
                 {/if}
-                <th id="order" class="sortable">{ts}Order{/ts}</th>
+                <th>{ts}Order{/ts}</th>
                 <th>{ts}Required{/ts}</th>
                 <th>{ts}View Only{/ts}</th>
                 <th>{ts}Reserved{/ts}</th>
                 <th></th>
-                <th class="hiddenElement"></th>
             </tr>
             </thead>
             {foreach from=$ufField item=row}
@@ -71,12 +69,11 @@
                 <td class="crmf-is_searchable">{if $row.is_searchable   eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                 <td class="crmf-in_selector">{if $row.in_selector     eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                 {/if}
-                <td class="nowrap">{$row.order}</td>
+                <td class="nowrap">{$row.weight}</td>
                 <td class="crmf-is_required">{if $row.is_required     eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                 <td>{if $row.is_view         eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                 <td>{if $row.is_reserved     eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                 <td>{$row.action|replace:'xx':$row.id}</td>
-                <td class="order hiddenElement">{$row.weight}</td>
             </tr>
             {/foreach}
         </table>
