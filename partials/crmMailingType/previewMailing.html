@@ -9,7 +9,7 @@ The editor has to be added. Currently just a simple text editor
   <div class="crm-accordion-body" ng-include="partialUrl('preview_ht.html')"></div>
 </div>
 
-<div class="crm-accordion-wrapper collapsed">
+<div class="crm-accordion-wrapper collapsed" ng-show = "isBody_text()">
   <div class="crm-accordion-header">Plain Text Preview</div>
   <div class="crm-accordion-body" ng-include="partialUrl('preview_plaintext.html')"></div>
 </div>

@@ -6,7 +6,7 @@ Required vars: mailingList
   All partially completed and completed mail are listed here
 </div>
 
-<table class="form-layout">
+<table class="display">
   <thead>
   <tr>
     <th>Mailing Name</th>
@@ -14,19 +14,23 @@ Required vars: mailingList
     <th>Created By</th>
     <th>Created Date</th>
     <th>Sent By</th>
+    <th>Scheduled</th>
+	<th></th>
 	<th></th>
   </tr>
   </thead>
-  <tr ng-repeat="mail in mailingList">
+  <tr ng-repeat="mail in mailingList"  ng-class-even="'even-row even'" ng-class-odd="'odd-row odd'">
     <td>{{mail.name}}</td>
 <!--    <td>{{mailStatus[{{$index}}]}}</td>  -->
     <td>{{mail.from_email}}</td>
     <td>{{mail.created_date}}</td>
     <td>{{mail.from_email}}</td>
-    <td><a ng-href="#/mailing/{{mail.id}}">Edit</a</td>
+    <td>{{mail.scheduled_date}}</td>
+    <td><a class="action-item crm-hover-button" ng-href="#/mailing/{{mail.id}}">Edit</a</td>
+    <td><a class="action-item crm-hover-button" crm-confirm="{type: 'delete', obj: mail}" on-yes="deleteMail(mail)">Delete</a></td>
   </tr>
 </table>
-
 <div class="action-link">
-  <a ng-href="#/mailing/new" class="button"><span>New Mailing</span></a>
+  <a ng-href="#/mailing/new" class="button"><span><div class="icon add-icon"></div>New Mailing</span></a>
 </div>
+

@@ -59,7 +59,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $result = array();
     $result['crmMailing'] = array(
       'ext' => 'civicrm',
-      'js' => array('js/angular-newMailing.js'),
+      'js' => array('js/angular-newMailing.js' , 'js/angularsanitize.js'),
     );
 
     $civiMails = civicrm_api3('Mailing', 'get', array());
@@ -73,8 +73,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 				'contact_id' => 202,
 				));
 		$mesTemplate = civicrm_api3('MessageTemplate', 'get', array(  'sequential' => 1,
-			'return' => array("msg_html", "id", "msg_title"),
-			'id' => array('>' => 58),
+			'return' => array("msg_html", "id", "msg_title", "msg_subject"),
+			'workflow_id' => array('IS NULL' => ""),
 			));
 		$mailGrp = civicrm_api3('MailingGroup','get', array());
 		$mailTokens = civicrm_api3('Mailing', 'get_token', array( 'usage' => 'Mailing'));
