@@ -187,9 +187,11 @@
 
 
         </div>
-      </previewmail><br>
-      <h3>Send Test Mails</h3>
-
+      </previewmail>
+      <h3 ng-click="sen()">Send Test Mails</h3>
+      <sendmailtest ng-show="sendtest">
+        <input type="text" ng-model="testmailid">
+      </sendmailtest>
 
       <h3>When to Start</h3><br>
 
