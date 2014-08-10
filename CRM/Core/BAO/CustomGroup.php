@@ -1238,7 +1238,6 @@ ORDER BY civicrm_custom_group.weight,
       if (!isset($group['fields'])) {
         continue;
       }
-      $groupId = CRM_Utils_Array::value('id', $group);
       foreach ($group['fields'] as $field) {
         if (CRM_Utils_Array::value('element_value', $field) !== NULL) {
           $value = $field['element_value'];
@@ -1255,7 +1254,6 @@ ORDER BY civicrm_custom_group.weight,
           continue;
         }
 
-        $fieldId = $field['id'];
         if (!empty($field['element_name'])) {
           $elementName = $field['element_name'];
         }
