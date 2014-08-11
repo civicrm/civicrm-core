@@ -84,6 +84,14 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $this->_componentClause = " civicrm_contribution.id IN ( $id ) ";
       $this->_single = TRUE;
       $this->assign('totalSelectedContributions', 1);
+
+      // set the redirection after actions
+      $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE);
+      $url = CRM_Utils_System::url('civicrm/contact/view/contribution',
+        "action=view&reset=1&id={$id}&cid={$contactId}&context=contribution&selectedChild=contribute"
+      );
+
+      CRM_Core_Session::singleton()->pushUserContext($url);
     }
     else {
       parent::preProcess();
@@ -188,15 +196,15 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       'cols' => 40
     ));
 
-    if (in_array("email", $this->urlPath)) {
+    if ($this->_selectedOutput == 'email') {
       $this->addButtons(array(
           array(
-            'type' => 'next',
+            'type' => 'upload',
             'name' => ts('Email Invoice'),
             'isDefault' => TRUE,
           ),
           array(
-            'type' => 'back',
+            'type' => 'cancel',
             'name' => ts('Cancel'),
           ),
         )
@@ -205,12 +213,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     else {
       $this->addButtons(array(
           array(
-            'type' => 'next',
+            'type' => 'upload',
             'name' => ts('Process Invoice(s)'),
             'isDefault' => TRUE,
           ),
           array(
-            'type' => 'back',
+            'type' => 'cancel',
             'name' => ts('Cancel'),
           ),
         )
@@ -248,7 +256,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-    $this->printPDF($this->_contributionIds, $params, $this->_contactIds);
+    $this->printPDF($this->_contributionIds, $params, $this->_contactIds, $this);
   }
 
   /**
@@ -257,12 +265,13 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * on click of Print Invoices
    *
    * @param array $contribIDs Contribution Id
-   * @param array $params for pdf or email invoices
+   * @param array $params associated array of submitted values
    * @param array $contactIds Contact Id
+   * @param object $form form object
    * @static
    *
    */
-  static function printPDF($contribIDs, $params, $contactIds) {
+  static function printPDF($contribIDs, &$params, $contactIds, &$form) {
     // get all the details needed to generate a invoice
     $messageInvoice = array();
     $invoiceTemplate = CRM_Core_Smarty::singleton();
@@ -658,6 +667,17 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $fileName = $config->uploadDir . 'Invoice.pdf';
     file_put_contents($fileName, $html);
     return $fileName;
+  }
+
+  /**
+   * Callback to perform action on Print Invoice button.
+   */
+  static function getPrintPDF() {
+    $contributionId = CRM_Utils_Request::retrieve('id', 'Positive', CRM_Core_DAO::$_nullObject, FALSE);
+    $contributionIDs = array($contributionId);
+    $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, FALSE);
+    $params = array('output' => 'pdf_invoice');
+    CRM_Contribute_Form_Task_Invoice::printPDF($contributionIDs, $params, $contactId, CRM_Core_DAO::$_nullObject);
   }
 }
 
