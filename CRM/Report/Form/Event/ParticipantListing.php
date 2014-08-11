@@ -641,7 +641,7 @@ GROUP BY  cv.label
       // convert display name to links
       if (array_key_exists('civicrm_participant_event_id', $row)) {
         $eventId = $row['civicrm_participant_event_id'];
-        if ($eventId]) {
+        if ($eventId) {
           $rows[$rowNum]['civicrm_participant_event_id'] = CRM_Event_PseudoConstant::event($eventId, FALSE);
 
           $url = CRM_Report_Utils_Report::getNextUrl('event/income',
@@ -655,7 +655,7 @@ GROUP BY  cv.label
       }
 
       // handle event type id
-      $this->_initBasicRow(&$rows, &$entryFound, $row, 'civicrm_event_event_type_id', $rowNum, $eventType);
+      $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_event_event_type_id', $rowNum, $eventType);
 
       // handle participant status id
       if (array_key_exists('civicrm_participant_status_id', $row)) {
