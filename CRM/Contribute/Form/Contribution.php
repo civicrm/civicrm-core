@@ -1117,10 +1117,20 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
         $lineItems[$itemId]['unit_price'] = $lineItems[$itemId]['line_total'] = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('total_amount', $submittedValues));
+
         // Update line total and total amount with tax on edit
-        if ($lineItems[$itemId]['tax_amount']) {
-          $lineItems[$itemId]['line_total'] = CRM_Utils_Rule::cleanMoney($lineItems[$itemId]['line_total'] + $lineItems[$itemId]['tax_amount']);
-          $submittedValues['total_amount'] = $lineItems[$itemId]['line_total'];
+        $financialItemsId = CRM_Core_PseudoConstant::getTaxRates();
+        if (array_key_exists($submittedValues['financial_type_id'], $financialItemsId)) {
+          $lineItems[$itemId]['tax_rate'] = $financialItemsId[$submittedValues['financial_type_id']];
+        }
+        else {
+          $lineItems[$itemId]['tax_rate'] = $lineItems[$itemId]['tax_amount'] = "" ;
+          $submittedValues['tax_amount'] = 'null';
+        }
+        if ($lineItems[$itemId]['tax_rate']) {
+          $lineItems[$itemId]['tax_amount'] = ($lineItems[$itemId]['tax_rate']/100) * $lineItems[$itemId]['line_total'];
+          $submittedValues['total_amount'] = $lineItems[$itemId]['line_total'] + $lineItems[$itemId]['tax_amount'];
+          $submittedValues['tax_amount'] = $lineItems[$itemId]['tax_amount'];
         }
       }
       // 10117 update th line items for participants
