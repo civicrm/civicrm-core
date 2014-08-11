@@ -303,7 +303,7 @@
   <item>
     <path>civicrm/contribute/invoice</path>
     <title>CiviContributePdf</title>
-    <page_callback>CRM_Financial_Page_AJAX::getPrintPDF</page_callback>
+    <page_callback>CRM_Contribute_Form_Task_Invoice::getPrintPDF</page_callback>
     <access_arguments>access CiviContribute</access_arguments>
     <page_type>1</page_type>
     <weight>620</weight>
