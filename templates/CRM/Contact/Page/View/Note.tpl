@@ -38,7 +38,9 @@
                {include file="CRM/Form/attachment.tpl"}
             {/if}
           </table>
-          <div class="crm-submit-buttons"><input type="submit" class='cancel crm-form-submit' value="{ts}Done{/ts}"/></div>
+          <div class="crm-submit-buttons">
+            <a class="button cancel" href="{crmURL p='civicrm/contact/view' q="selectedChild=note&reset=1&cid=`$contactId`"}">{ts}Done{/ts}</a>
+          </div>
 
         {if $comments}
         <fieldset>
@@ -262,7 +264,7 @@
                 {* Include '(more)' link to view entire note if it has been truncated *}
                 {assign var="noteSize" value=$note.note|count_characters:true}
                 {if $noteSize GT 80}
-            <a href="{crmURL p='civicrm/contact/view/note' q="action=view&selectedChild=note&reset=1&cid=`$contactId`&id=`$note.id`"}">{ts}(more){/ts}</a>
+                  <a class="crm-popup" href="{crmURL p='civicrm/contact/view/note' q="action=view&selectedChild=note&reset=1&cid=`$contactId`&id=`$note.id`"}">{ts}(more){/ts}</a>
                 {/if}
             </td>
             <td class="crm-note-subject">{$note.subject}</td>
