@@ -45,7 +45,7 @@ Required vars: activitySet
       <input
         class="number"
         type="text"
-        ng-pattern="/^[0-9]*$/"
+        ng-pattern="/^-?[0-9]*$/"
         ng-model="activity.reference_offset"
         ng-hide="activity.name == 'Open Case'"
         ng-required="activity.name != 'Open Case'"
