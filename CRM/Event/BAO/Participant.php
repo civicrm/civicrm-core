@@ -969,10 +969,9 @@ WHERE  civicrm_participant.id = {$participantId}
     if ((substr($eventLevel, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR) &&
       (substr($eventLevel, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)
     ) {
-      $eventLevel = implode(', ', explode(CRM_Core_DAO::VALUE_SEPARATOR,
-          substr($eventLevel, 1, -1)
-        ));
-      if ($pos = strrpos($eventLevel, '(multiple participants)', 0)) {
+      $eventLevel = implode(', ', explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($eventLevel, 1, -1)));
+      $pos = strrpos($eventLevel, '(multiple participants)', 0);
+      if ($pos) {
         $eventLevel = substr_replace($eventLevel, "", $pos - 3, 1);
       }
     }
@@ -1465,8 +1464,8 @@ UPDATE  civicrm_participant
     ) {
       return $mailSent;
     }
-
-    if ($toEmail = CRM_Utils_Array::value('email', $contactDetails)) {
+    $toEmail = CRM_Utils_Array::value('email', $contactDetails);
+    if ($toEmail) {
 
       $contactId = $participantValues['contact_id'];
       $participantName = $contactDetails['display_name'];
@@ -1475,7 +1474,8 @@ UPDATE  civicrm_participant
       $checksumValue = NULL;
       if ($mailType == 'Confirm' && !$participantValues['registered_by_id']) {
         $checksumLife = 'inf';
-        if ($endDate = CRM_Utils_Array::value('end_date', $eventDetails)) {
+        $endDate = CRM_Utils_Array::value('end_date', $eventDetails);
+        if ($endDate) {
           $checksumLife = (CRM_Utils_Date::unixTime($endDate) - time()) / (60 * 60);
         }
         $checksumValue = CRM_Contact_BAO_Contact_Utils::generateChecksum($contactId, NULL, $checksumLife);
