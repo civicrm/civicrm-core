@@ -760,9 +760,19 @@ GROUP BY  participant.event_id
           'name' => 'participant_role',
         ));
 
+      //CRM-13595 add event id to participant export
+      $eventid = array(
+        'event_id' => array('title' => 'Event ID',
+          'name' => 'event_id',
+        ));
+      $eventtitle = array(
+        'event_title' => array('title' => 'Event Title',
+          'name' => 'event_title',
+        ));
+
       $discountFields  = CRM_Core_DAO_Discount::export();
 
-      $fields = array_merge($participantFields, $participantStatus, $participantRole, $noteField, $discountFields);
+      $fields = array_merge($participantFields, $participantStatus, $participantRole, $eventid, $eventtitle, $noteField, $discountFields);
 
       // add custom data
       $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Participant'));
