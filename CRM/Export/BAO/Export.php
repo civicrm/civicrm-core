@@ -222,8 +222,9 @@ class CRM_Export_BAO_Export {
         }
         else {
           //hack to fix component fields
+          //revert mix of event_id and title
           if ($fieldName == 'event_id') {
-            $returnProperties['event_title'] = 1;
+            $returnProperties['event_id'] = 1;
           }
           else if (
             $exportMode == CRM_Export_Form_Select::EVENT_EXPORT &&
