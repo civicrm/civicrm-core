@@ -113,8 +113,8 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant){
       FROM  civicrm_price_set_entity cpse
       LEFT JOIN civicrm_price_set ps ON cpse.price_set_id = ps.id AND cpse.entity_id = {$params['event_id']} AND cpse.entity_table = 'civicrm_event'
       LEFT JOIN   civicrm_price_field pf ON pf.`price_set_id` = ps.id
-      LEFT JOIN   civicrm_price_field_value pfv ON pfv.price_field_id = pf.id and pfv.label = '{$label}'
-      where ps.id is not null
+      LEFT JOIN   civicrm_price_field_value pfv ON pfv.price_field_id = pf.id
+      where ps.id is not null and pfv.label = '{$label}'
     ";
 
     $dao = CRM_Core_DAO::executeQuery($sql);
