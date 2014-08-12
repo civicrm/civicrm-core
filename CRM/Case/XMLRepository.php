@@ -84,16 +84,21 @@ class CRM_Case_XMLRepository {
       return simplexml_load_string($definition);
     }
 
-    if (!CRM_Case_BAO_CaseType::isValidName($caseType)) {
-      // perhaps caller provider a the label instead of the name?
-      throw new CRM_Core_Exception("Cannot load caseType with malformed name [$caseType]");
-    }
+    // TODO In 4.6 or 5.0, remove support for weird machine-names
+    //if (!CRM_Case_BAO_CaseType::isValidName($caseType)) {
+    //  // perhaps caller provider a the label instead of the name?
+    //  throw new CRM_Core_Exception("Cannot load caseType with malformed name [$caseType]");
+    //}
 
     if (!CRM_Utils_Array::value($caseType, $this->xml)) {
-      // Search for a file based directly on the $caseType name
-      $fileName = $this->findXmlFile($caseType);
+      $fileName = NULL;
 
-      // For backward compatibility, also search for double-mungd file names
+      if (CRM_Case_BAO_CaseType::isValidName($caseType)) {
+        // Search for a file based directly on the $caseType name
+        $fileName = $this->findXmlFile($caseType);
+      }
+
+      // For backward compatibility, also search for double-munged file names
       // TODO In 4.6 or 5.0, remove support for loading double-munged file names
       if (!$fileName || !file_exists($fileName)) {
         $fileName = $this->findXmlFile(CRM_Case_XMLProcessor::mungeCaseType($caseType));
