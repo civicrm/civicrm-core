@@ -1050,21 +1050,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    // assign dataArray for contribution receipts
-    $dataArray = array();
-    foreach ($this->_lineItems as $key => $value) {
-      foreach ($value as $v) {
-        if (isset($dataArray[(string)$v['tax_rate']])) {
-          $dataArray[(string)$v['tax_rate']] = $dataArray[(string)$v['tax_rate']] + CRM_Utils_Array::value('tax_amount', $v);
-        }
-        else {
-          $dataArray[(string)$v['tax_rate']] = CRM_Utils_Array::value('tax_amount', $v);
-        }
-      }
-    }
-    $smarty = CRM_Core_Smarty::singleton();
-    $smarty->assign('dataArray', $dataArray);
-
     // process price set and get total amount and line items.
     $lineItem = array();
     $priceSetId = CRM_Utils_Array::value('price_set_id', $submittedValues);
@@ -1355,6 +1340,27 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $this->_premiumID, $this->_options
         );
       }
+
+      // assign tax calculation for contribution receipts
+      $taxRate = array();
+      if ($this->_action & CRM_Core_Action::UPDATE) {
+        foreach ($this->_lineItems as $key => $value) {
+          foreach ($value as $v) {
+            if (isset($taxRate[(string) $v['tax_rate']])) {
+              $taxRate[(string) $v['tax_rate']] = $taxRate[(string) $v['tax_rate']] + CRM_Utils_Array::value('tax_amount', $v);
+            }
+            else {
+              $taxRate[(string) $v['tax_rate']] = CRM_Utils_Array::value('tax_amount', $v);
+            }
+          }
+        }
+      }
+      else {
+        $taxRate = array($submittedValues['tax_amount']);
+      }
+
+      $smarty = CRM_Core_Smarty::singleton();
+      $smarty->assign('dataArray', $taxRate);
 
       //send receipt mail.
       if ($contribution->id && !empty($formValues['is_email_receipt'])) {
