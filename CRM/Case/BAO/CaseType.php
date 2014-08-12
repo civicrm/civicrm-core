@@ -99,6 +99,10 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     $xmlFile = '<?xml version="1.0" encoding="iso-8859-1" ?>' . "\n\n<CaseType>\n";
     $xmlFile .= "<name>{$name}</name>\n";
 
+    if (array_key_exists('forkable', $definition)) {
+      $xmlFile .= "<forkable>" . ((int) $definition['forkable']) . "</forkable>\n";
+    }
+
     if (isset($definition['activityTypes'])) {
       $xmlFile .= "<ActivityTypes>\n";
       foreach ($definition['activityTypes'] as $values) {
@@ -174,6 +178,10 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   static function convertXmlToDefinition($xml) {
     // build PHP array based on definition
     $definition = array();
+
+    if (isset($xml->forkable)) {
+      $definition['forkable'] = (int) $xml->forkable;
+    }
 
     // set activity types
     if (isset($xml->ActivityTypes)) {
