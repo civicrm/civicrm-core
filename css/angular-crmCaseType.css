@@ -32,3 +32,7 @@
 .crmCaseType table td select {
     width: 10em;
 }
+
+tr.forked {
+    font-weight: bold;
+}
