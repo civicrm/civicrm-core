@@ -51,12 +51,20 @@
  */
 function civicrm_api3_case_type_create($params) {
   civicrm_api3_verify_mandatory($params, _civicrm_api3_get_DAO(__FUNCTION__));
+  unset($params['is_forkable']); // computed property
+  unset($params['is_forked']); // computed property
 
   if (!array_key_exists('is_active', $params) && empty($params['id'])) {
     $params['is_active'] = TRUE;
   }
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'CaseType');
-
+  if (!empty($params['id']) // this is an existing case-type
+    && !CRM_Case_BAO_CaseType::isForked($params['id']) // which is not yet forked
+    && !CRM_Case_BAO_CaseType::isForkable($params['id']) // for which new forks are prohibited
+  ) {
+    unset($params['definition']);
+  }
+  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'CaseType');
+  return _civicrm_api3_case_type_get_formatResult($result);
 }
 
 /**
@@ -83,12 +91,15 @@ function civicrm_api3_case_type_get($params) {
  */
 function _civicrm_api3_case_type_get_formatResult(&$result) {
   foreach ($result['values'] as $key => $caseType) {
-    $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseType['name']);
+    $caseTypeName = (isset($caseType['name'])) ? $caseType['name'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseType['id'], 'name', 'id', TRUE);
+    $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseTypeName);
     if ($xml) {
       $result['values'][$key]['definition'] = CRM_Case_BAO_CaseType::convertXmlToDefinition($xml);
     } else {
       $result['values'][$key]['definition'] = array();
     }
+    $result['values'][$key]['is_forkable'] = CRM_Case_BAO_CaseType::isForkable($result['values'][$key]['id']);
+    $result['values'][$key]['is_forked'] = CRM_Case_BAO_CaseType::isForked($result['values'][$key]['id']);
   }
   return $result;
 }
