@@ -70,8 +70,10 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     if (!$nameParam && empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
-    if (!empty($params['name']) && !CRM_Case_BAO_CaseType::isValidName($params['name'])) {
-      throw new CRM_Core_Exception("Cannot create caseType with malformed name [{$params['name']}]");
+
+    // Old case-types (pre-4.5) may keep their ucky names, but new case-types must satisfy isValidName()
+    if (empty($params['id']) && !empty($params['name']) && !CRM_Case_BAO_CaseType::isValidName($params['name'])) {
+      throw new CRM_Core_Exception("Cannot create new case-type with malformed name [{$params['name']}]");
     }
 
     // function to format definition column
