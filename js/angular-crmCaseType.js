@@ -228,6 +228,10 @@
       }
     };
 
+    $scope.isValidName = function(name) {
+      return !name || name.match(/^[a-zA-Z0-9_]+$/);
+    };
+
     $scope.getWorkflowName = function(activitySet) {
       var result = 'Unknown';
       _.each($scope.workflows, function(value, key) {
