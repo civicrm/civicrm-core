@@ -187,9 +187,12 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
     // set activity types
     if (isset($xml->ActivityTypes)) {
+      $allTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
       $definition['activityTypes'] = array();
       foreach ($xml->ActivityTypes->ActivityType as $activityTypeXML) {
-        $definition['activityTypes'][] = json_decode(json_encode($activityTypeXML), TRUE);
+        $act = json_decode(json_encode($activityTypeXML), TRUE);
+        $act['activity_type_id'] = CRM_Utils_Array::key($act['name'], $allTypes);
+        $definition['activityTypes'][] = $act;
       }
     }
 
