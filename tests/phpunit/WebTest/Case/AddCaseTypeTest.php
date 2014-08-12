@@ -35,7 +35,7 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddCaseType() {
+  function testAddEditCaseType() {
     $caseRoles = array(1 => 'Parent of', 2 => 'Spouse of', 3 => 'Partner of');
     $activityTypes = array(1 => 'Meeting',2 => 'Contribution',3 => 'Event Registration');
     $timelineActivityTypes = array(1 => 'Meeting',2 => 'Phone Call',3 => 'Email');
