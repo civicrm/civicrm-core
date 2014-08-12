@@ -328,7 +328,7 @@
   {include file="CRM/common/formButtons.tpl" location="bottom"}
   {if $invoicing && $cancelledStatus}
     <div class="crm-printButton">
-      <a class="button" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
+      <a class="button no-popup" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
       {if $contribution_status != 'Refunded'}
         {ts}Print Invoice{/ts}</a>
       {else}
