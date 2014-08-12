@@ -142,6 +142,16 @@
             })
           };
         },
+        'revert': function (options) {
+          return {
+            message: ts('Are you sure you want to revert this?'),
+            options: {no: ts('Cancel'), yes: ts('Revert')},
+            width: 300,
+            title: ts('Revert %1?', {
+              1: options.obj.title || options.obj.label || options.obj.name || ts('the record')
+            })
+          };
+        },
         'delete': function (options) {
           return {
             message: ts('Are you sure you want to delete this?'),

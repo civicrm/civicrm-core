@@ -315,6 +315,17 @@
           }
         });
     };
+    $scope.revertCaseType = function (caseType) {
+      caseType.definition = 'null';
+      caseType.is_forked = '0';
+      crmApi('CaseType', 'create', caseType, true)
+        .then(function (data) {
+          if (data.is_error) {
+            caseType.is_forked = '1'; // restore
+            $scope.$digest();
+          }
+        });
+    };
   });
 
 })(angular, CRM.$, CRM._);
