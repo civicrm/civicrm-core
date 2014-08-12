@@ -910,7 +910,8 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
       'output' => 'pdf_invoice',
       'forPage' => 'confirmpage'
     );
-    $pdfHtml = CRM_Contribute_Form_Task_Invoice::printPDF($contributionID, $pdfParams, $contactId);
+    $pdfHtml = CRM_Contribute_Form_Task_Invoice::printPDF($contributionID,
+      $pdfParams, $contactId, CRM_Core_DAO::$_nullObject);
     return $pdfHtml;
   }
 
