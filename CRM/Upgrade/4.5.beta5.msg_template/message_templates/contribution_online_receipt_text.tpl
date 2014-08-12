@@ -121,7 +121,7 @@
 {/if}
 
 {if !( $contributeMode eq 'notify' OR $contributeMode eq 'directIPN' ) and $is_monetary}
-{if $is_pay_later}
+{if $is_pay_later && !$isBillingAddressRequiredForPayLater}
 ===========================================================
 {ts}Registered Email{/ts}
 
