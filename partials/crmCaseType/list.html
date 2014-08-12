@@ -21,7 +21,7 @@ Required vars: caseTypes
       class="crm-entity"
       ng-class-even="'even-row even'"
       ng-class-odd="'odd-row odd'"
-      ng-class="{disabled: 0==caseType.is_active}">
+      ng-class="{disabled: 0==caseType.is_active, forked: 1==caseType.is_forked}">
     <td>{{caseType.title}}</td>
     <td>{{caseType.name}}</td>
     <td>{{caseType.description}}</td>
@@ -44,6 +44,13 @@ Required vars: caseTypes
                  crm-confirm="{type: 'disable', obj: caseType}"
                  on-yes="toggleCaseType(caseType)">
                 Disable
+              </a>
+            </li>
+            <li ng-show="caseType.is_forked">
+              <a class="action-item crm-hover-button"
+                 crm-confirm="{type: 'revert', obj: caseType}"
+                 on-yes="revertCaseType(caseType)">
+                Revert
               </a>
             </li>
             <li>
