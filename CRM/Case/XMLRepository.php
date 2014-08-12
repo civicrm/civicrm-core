@@ -91,30 +91,44 @@ class CRM_Case_XMLRepository {
     //}
 
     if (!CRM_Utils_Array::value($caseType, $this->xml)) {
-      $fileName = NULL;
-
-      if (CRM_Case_BAO_CaseType::isValidName($caseType)) {
-        // Search for a file based directly on the $caseType name
-        $fileName = $this->findXmlFile($caseType);
-      }
-
-      // For backward compatibility, also search for double-munged file names
-      // TODO In 4.6 or 5.0, remove support for loading double-munged file names
-      if (!$fileName || !file_exists($fileName)) {
-        $fileName = $this->findXmlFile(CRM_Case_XMLProcessor::mungeCaseType($caseType));
-      }
-
-      if (!$fileName || !file_exists($fileName)) {
+      $fileXml = $this->retrieveFile($caseType);
+      if ($fileXml) {
+        $this->xml[$caseType] = $fileXml;
+      } else {
         return FALSE;
       }
+    }
+    return $this->xml[$caseType];
+  }
 
+  /**
+   * @param string $caseType
+   * @return SimpleXMLElement|FALSE
+   */
+  public function retrieveFile($caseType) {
+    $fileName = NULL;
+    $fileXml = NULL;
+
+    if (CRM_Case_BAO_CaseType::isValidName($caseType)) {
+      // Search for a file based directly on the $caseType name
+      $fileName = $this->findXmlFile($caseType);
+    }
+
+    // For backward compatibility, also search for double-munged file names
+    // TODO In 4.6 or 5.0, remove support for loading double-munged file names
+    if (!$fileName || !file_exists($fileName)) {
+      $fileName = $this->findXmlFile(CRM_Case_XMLProcessor::mungeCaseType($caseType));
+    }
+
+    if ($fileName && file_exists($fileName)) {
       // read xml file
       $dom = new DomDocument();
       $dom->load($fileName);
       $dom->xinclude();
-      $this->xml[$caseType] = simplexml_import_dom($dom);
+      $fileXml = simplexml_import_dom($dom);
     }
-    return $this->xml[$caseType];
+
+    return $fileXml;
   }
 
   /**
