@@ -70,7 +70,7 @@
        </td>
       </tr>
       {/if}
-      {if $formValues.total_amount}
+      {if $formValues.total_amount OR $formValues.total_amount eq 0 }
        <tr>
         <th {$headerStyle}>
          {ts}Membership Fee{/ts}
