@@ -216,6 +216,10 @@
       }
     };
 
+    $scope.isForkable = function() {
+      return !$scope.caseType.id || $scope.caseType.is_forkable
+    };
+
     $scope.isNewActivitySetAllowed = function(workflow) {
       switch (workflow) {
         case 'timeline':
@@ -280,6 +284,10 @@
     };
     $scope.$watch('locks.caseTypeName', updateCaseTypeName);
     $scope.$watch('caseType.title', updateCaseTypeName);
+
+    if (!$scope.isForkable()) {
+      CRM.alert(ts('The CiviCase XML file for this case-type prohibits editing the definition.'));
+    }
   });
 
   crmCaseType.controller('CaseTypeListCtrl', function($scope, crmApi, caseTypes) {
