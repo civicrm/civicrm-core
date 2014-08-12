@@ -51,7 +51,7 @@
     {assign var='emailUrlParams' value="reset=1&id=$id&cid=$contact_id&select=email"}
     {if $invoicing && $cancelledStatus}
       <div class="crm-printButton">
-        <a class="button" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
+        <a class="button no-popup" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
         {if $contribution_status != 'Refunded'}
           {ts}Print Invoice{/ts}</a>
         {else}
