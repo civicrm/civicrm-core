@@ -56,7 +56,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->_email = 'test@test.test';
     $this->_params = array(
       'subject' => 'maild',
-      'body_text' => 'bdkfhdskfhduew',
+			'body_text' => "This is {contact.display_name}",
       'name' => 'mailing name',
       'created_id' => 1,
     );
@@ -85,6 +85,34 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $jobs = $this->callAPIAndDocument($this->_entity, 'delete', array('id' => $result['id']), __FUNCTION__, __FILE__);
     $this->assertAPIDeleted($this->_entity, $result['id']);
   }
+  
+	public function testMailerPreview() {
+	 $contactID = $this->individualCreate();
+	 $displayName = $this->callAPISuccess('contact', 'get', array('id' => $contactID));
+	 $displayName = $displayName['values'][$contactID]['display_name'];
+
+	 $result = $this->callAPISuccess('mailing', 'create', $this->_params);
+
+	 $params = array('id' => $result['id'], 'contact_id' => $contactID);
+	 $result = $this->callAPISuccess('mailing', 'preview', $params);
+	 $text = $result['values']['text'];
+	 $this->assertEquals("This is $displayName", $text); // verify the text returned is correct, with replaced token
+	 $this->deleteMailing($result['id']);
+	 }
+
+	 public function testMailerSendTestMail() {
+	 $contactID = $this->individualCreate();
+	 $result = $this->callAPISuccess('contact', 'get', array('id' => $contactID));
+	 $email = $result['values'][$contactID]['email'];
+
+	 $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
+
+	 $params = array('mailing_id' => $mail['id'], 'test_email' => $email, 'test_group' => NULL);
+	 $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', $params);
+	 $this->assertEquals(1, $deliveredInfo['count'], "in line " . __LINE__); // verify mail has been sent to user by count
+	 $this->assertEquals($contactID, $deliveredInfo['values'][$deliveredInfo['id']]['contact_id'], "in line " . __LINE__); //verify the contact_id of the recipient
+	 $this->deleteMailing($mail['id']);
+	}
 
   //@ todo tests below here are all failure tests which are not hugely useful - need success tests
 

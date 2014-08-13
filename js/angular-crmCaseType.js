@@ -302,6 +302,7 @@
       })
         .then(function (data) {
           if (!data.is_error) {
+						console.log(caseTypes.values[caseType.id]);
             delete caseTypes.values[caseType.id];
             $scope.$digest();
           }

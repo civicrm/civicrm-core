@@ -8,6 +8,7 @@
   var chck = []; //to fill the group variable $scope.incGroup
   var chck2= []; // to get id and text in the required format
 	var mltokens = [];
+	var global = 0;
 //-------------------------------------------------------------------------------------------------------
  crmMailing.config(['$routeProvider',
     function($routeProvider) {
@@ -34,7 +35,7 @@
             }
             else {
             //created_id has been set to my id. Does not save without created_id. Needs to made generic based on the user
-              return {visibility: "Public Pages", url_tracking:"1", forward_replies:"0", created_id: "202", auto_responder:"0", open_tracking:"1",
+              return {visibility: "Public Pages", url_tracking:"1", forward_replies:"0", auto_responder:"0", open_tracking:"1",
                  };
             }
           }
@@ -71,28 +72,28 @@
 		$scope.eMailing = CRM.crmMailing.emailAdd;
 		$scope.tmpList = CRM.crmMailing.mesTemplate;
 		$scope.mailingGrp = CRM.crmMailing.mailGrp;
+		$scope.user_id = CRM.crmMailing.contactid;
 		$scope.currentMailing = selectedMail;
+		$scope.currentMailing.created_id = $scope.user_id;
 		mltokens = CRM.crmMailing.mailTokens;
-		$scope.preview = false;
-		$scope.settrue = function() {
-			$scope.preview = true;
-			console.log($scope.preview);
-		};
-		$scope.seepreview = function() {
-			if($scope.preview == true)
-				return true;
-			else
-				return false;
-			console.log($scope.preview);
-		};
-
-		console.log(mltokens);
-		$scope.testGroup = "";
+		$scope.pre = false;
+	//	$scope.sendtest = false;
+	/*	$scope.set_sendtest = function(){
+			$scope.sendtest = true;
+			};*/
+		$scope.watchVariable = false;
+		$scope.setwatchVariable = function(){
+			$scope.watchVariable = false;
+			};
+		$scope.noOfRecipients = 0;
+		$scope.testMailing = {};
+		$scope.testMailing.name = "";
+		$scope.testMailing.group = "";
 		window.ct = $scope.currentMailing;
 		$scope.previewbody_html = "";
 		$scope.previewbody_text = "";
+		$scope.preview_subject = "";
 		$scope.param = {};
-		$scope.tst="";
 		$scope.token = "";
 		chck = [];
 		chck2 = [];
@@ -106,21 +107,12 @@
 			}
 		}
 		
-		for(var a = 0; a<chck.length; a++){
-					var b = chck[a];
-					for(var c= a+1; c<chck.length; c++){
-							if(b==chck[c]){
-								chck.splice(c,1);
-								}
-					}
-				}
 		console.log(chck);
 		console.log($scope.mailid);			
 		if($scope.currentMailing.msg_template_id!=null){
-				$scope.tst=$scope.currentMailing.msg_template_id;
-				}
+			$scope.tst=$scope.currentMailing.msg_template_id;
+		}
 		console.log($scope.tst);
-		
 		//Making the object for data
 		
 		for(var a in chck)
@@ -160,7 +152,6 @@
 		
 		$scope.back = function (){
 			$location.path( "mailing" );
-			$route.reload();
 		};
 
 		$scope.tmp = function (tst){
@@ -182,12 +173,6 @@
 					}
 				}	
 		};
-		
-		$scope.testing = function (testGroup){
-			console.log(testGroup);
-		};
-		
- 
 	//initializing variables we will use for checkboxes, or for purpose of ng-show
 		$scope.acttab=0;
 		$scope.composeS="1";
@@ -197,8 +182,10 @@
 		else {
 				$scope.trackreplies="1";
 		}
-		
-		$scope.now="1";
+		if($scope.currentMailing.scheduled_date == null || $scope.currentMailing.scheduled_date == "")
+			$scope.now="1";
+		else
+			$scope.now="0";
 		
 		$scope.reply = function(){
 			if($scope.trackreplies==0){
@@ -210,7 +197,8 @@
 					$scope.currentMailing.auto_responder=0;
 				}
 			}
-			
+		
+
 		$scope.recclicked = function(){
       if($scope.acttab >=0){
         $scope.acttab =0;
@@ -234,7 +222,21 @@
 		$scope.scheddate.date = ""; 
 		$scope.scheddate.time = ""; 
 		$scope.ans="";
-
+		
+		$scope.checkNow = function(){
+			if($scope.now == 1 ){
+				$scope.now = 0;
+			}
+			else{
+				$scope.now = 1;
+				$scope.currentMailing.scheduled_date = null;
+				$scope.currentMailing.scheduled_id = null;
+				console.log($scope.currentMailing.scheduled_date);
+				$scope.scheddate.date = ""; 
+				$scope.scheddate.time = ""; 			
+			}
+		}
+			
 	// To split the scheduled_date into date and time. The date format is not accepting 
 		if(selectedMail.scheduled_date != null){
 				$scope.ans= selectedMail.scheduled_date.split(" ");
@@ -300,19 +302,21 @@
 		};
 				
 		$scope.preview_update = function(){
-		console.log("Opened");
-
-		var resulta =crmApi('Mailing','preview',{id:$scope.currentMailing.id});
+			var resulta =crmApi('Mailing','preview',{id:$scope.currentMailing.id});
       resulta.success(function(data) {
         if (data.is_error == 0) {
           console.log("came");
-          console.log(data);
+          console.log(data.values);
           $scope.previewbody_html=data.values.html;
           $scope.previewbody_text=data.values.text;
+          $scope.preview_subject=data.values.subject;
+          console.log($scope.preview_subject);
+          $scope.pre = true;
+          $scope.$digest();
+          $scope.$apply();
         }
-      });
+      });           
 		};
-		
 		
 		$scope.isBody_text = function(){
 			if($scope.currentMailing.body_text == null || $scope.currentMailing.body_text == "" )
@@ -328,11 +332,79 @@
     $scope.deliberatelyTrustDangerousSnippet2 = function() {
           return $sce.trustAsHtml($scope.previewbody_text);
         };
+        
+    $scope.deliberatelyTrustDangerousSnippet3 = function() {
+          return $sce.trustAsHtml($scope.preview_subject);
+        };
+        
+    $scope.$watch('watchVariable', function () {
+			if($scope.watchVariable == true){
+					console.log("eafnfasnkafn");
+					$scope.mailing_recipients();
+			}
+		},true);
+		
+		$scope.mailing_recipients= function() { 
+			console.log("the id is " + $scope.currentMailing.id);
+			var resulta =crmApi('MailingRecipients', 'get', {mailing_id: $scope.currentMailing.id,  options: {limit:1000}});
+      resulta.success(function(data) {
+        if (data.is_error == 0) {
+          console.log("Entered Mailing Recipients");
+          console.log(data);
+          $scope.noOfRecipients=data.count;
+          console.log($scope.noOfRecipients);
+					$scope.$digest();
+          $scope.$apply();
+        }
+      });
+		}
+		
+		$scope.mailingGroup = function() {
+			var resulta =crmApi('MailingGroup', 'get', {mailing_id: $scope.currentMailing.id,  options: {limit:1000}})
+      resulta.success(function(data) {
+				console.log("I am awesome " );
+				console.log(data.values);
+				$scope.mailid = [];
+				chck = [];
+				angular.forEach(data.values, function(value,key){
+					var b = value.entity_id + " " + value.entity_table +" " + value.group_type;
+					var c = value.id;
+					chck.push(b);
+					$scope.mailid.push(c);		
+				});
+				console.log(chck);
+				console.log($scope.mailid);		
+				for(var a in chck)
+				{	var b ={}
+					b.id = chck[a];
+					var splt = chck[a].split(" ");
+					
+					if(splt[1] == "civicrm_group"){
+								for(var c in $scope.groupNamesList){
+									if($scope.groupNamesList[c].id==splt[0]){
+										b.text = $scope.groupNamesList[c].title;
+									}
+								}
+							}
+					if(splt[1] == "civicrm_mailing"){
+								for(var c in $scope.mailList){
+									if($scope.mailList[c].id==splt[0]){
+										b.text = $scope.mailList[c].name;
+									}
+								}
+							}
+					chck2.push(b);
+				}
+		
+				console.log(chck2);	
+				$scope.incGroup = chck2;
+					
+			});
+    }
 			
-
 		$scope.save_next = function() {
-				console.log($scope.currentMailing.msg_template_id);
-				console.log($scope.scheddate.date);
+				console.log($scope.testMailing.name + "THIS IS THE TEST MAILING");
+				console.log($scope.testMailing.group + "THIS IS THE TEST MAILING GROUP");
 				$scope.incGrp=[];
 				$scope.excGrp=[];
 				$scope.incMail=[];
@@ -361,34 +433,26 @@
 				console.log($scope.incGrp + " inc group");
 				console.log($scope.excGrp + " exc group");
 				
-				for(a in $scope.incMail){
-					for(b in $scope.excMail){
-						if($scope.excMail[b]==$scope.incMail[a]){
-							console.log("should not happen same mail with id " + $scope.incMail[a] + " excluded and included");
-						}
-					}
+
+				if ($scope.currentMailing.scheduled_date == $scope.currentMailing.approval_date 
+						&& $scope.currentMailing.scheduled_date != null) {
+					console.log("Do Nothing");
 				}
-				
-				for(a in $scope.incGrp){
-					for(b in $scope.excGrp){
-						if($scope.excGrp[b]==$scope.incGrp[a]){
-							console.log("should not happen same group with id " + $scope.incGrp[a] + " excluded and included");
-						}
+				else {	
+					$scope.currentMailing.scheduled_date= $scope.scheddate.date + " " + $scope.scheddate.time ;
+					if ($scope.currentMailing.scheduled_date!=" ") {
+						$scope.currentMailing.scheduled_id= $scope.user_id;
 					}
-				}
-				
-				$scope.currentMailing.scheduled_date= $scope.scheddate.date + " " + $scope.scheddate.time ;
-				if($scope.currentMailing.scheduled_date!=" "){
-						$scope.currentMailing.scheduled_id= "202";
-					}
-				else {
+					else {
 						$scope.currentMailing.scheduled_date= null;
+					}
 				}
-				if($scope.mailid != null){
-					for(var a in $scope.mailid){
+				console.log($scope.mailid + "coolio")
+				if ($scope.mailid != null) {
+					for (var a in $scope.mailid) {
 						var result_2= crmApi('MailingGroup', 'delete', {
-								"id": $scope.mailid[a]
-							})
+								id: $scope.mailid[a]
+							});
 					}
 				}
 				
@@ -410,8 +474,8 @@
 					resubscribe_id: $scope.currentMailing.resubscribe_id,
 					body_html: $scope.currentMailing.body_html,
 					body_text: $scope.currentMailing.body_text,
-					scheduled_date: $scope.currentMailing.scheduled_date,
-					scheduled_id: $scope.currentMailing.scheduled_id,
+					scheduled_date: $scope.currentMailing.scheduled_date==null ? "" : $scope.currentMailing.scheduled_date,
+					scheduled_id: $scope.currentMailing.scheduled_id==null ? "" : $scope.currentMailing.scheduled_id,
 					campaign_id:	$scope.currentMailing.campaign_id==null ? "" : $scope.currentMailing.campaign_id,
 					header_id:	$scope.currentMailing.header_id,
 					footer_id:	$scope.currentMailing.footer_id,
@@ -433,6 +497,68 @@
 						$scope.currentMailing.id = data.id;
 						console.log("the id is " +	$scope.currentMailing.id );
 						console.log("OK");
+						console.log(data);
+						$scope.mailingGroup();
+						$scope.watchVariable = true;
+						
+					}
+					console.log("OK2");
+				});
+		 };
+		 
+		 $scope.save_next_page2 = function() {
+				if ($scope.currentMailing.scheduled_date == $scope.currentMailing.approval_date 
+						&& $scope.currentMailing.scheduled_date != null) {
+					console.log("Do Nothing");
+				}
+				else {	
+					$scope.currentMailing.scheduled_date= $scope.scheddate.date + " " + $scope.scheddate.time ;
+					if ($scope.currentMailing.scheduled_date!=" ") {
+						$scope.currentMailing.scheduled_id= $scope.user_id;
+					}
+					else {
+						$scope.currentMailing.scheduled_date= null;
+					}
+				}
+
+				var result = crmApi('Mailing', 'create', {
+					id: $scope.currentMailing.id,
+					name: $scope.currentMailing.name, 
+					visibility:  $scope.currentMailing.visibility, 
+					created_id: $scope.currentMailing.created_id, 
+					subject: $scope.currentMailing.subject, 
+					msg_template_id: $scope.currentMailing.msg_template_id==null ? "" : $scope.currentMailing.msg_template_id,
+					open_tracking: $scope.currentMailing.open_tracking,
+					url_tracking: $scope.currentMailing.url_tracking,
+					forward_replies: $scope.currentMailing.forward_replies,
+					auto_responder: $scope.currentMailing.auto_responder,
+					from_name: $scope.currentMailing.from_name,
+					from_email: $scope.currentMailing.from_email,
+					replyto_email: $scope.currentMailing.replyto_email,
+					unsubscribe_id: $scope.currentMailing.unsubscribe_id,
+					resubscribe_id: $scope.currentMailing.resubscribe_id,
+					body_html: $scope.currentMailing.body_html,
+					body_text: $scope.currentMailing.body_text,
+					scheduled_date: $scope.currentMailing.scheduled_date==null ? "" : $scope.currentMailing.scheduled_date,
+					scheduled_id: $scope.currentMailing.scheduled_id==null ? "" : $scope.currentMailing.scheduled_id,
+					campaign_id:	$scope.currentMailing.campaign_id==null ? "" : $scope.currentMailing.campaign_id,
+					header_id:	$scope.currentMailing.header_id,
+					footer_id:	$scope.currentMailing.footer_id,
+					is_completed: $scope.currentMailing.is_completed,
+					approver_id: $scope.currentMailing.approver_id,
+					approval_status_id: $scope.currentMailing.approval_status_id,
+					approval_date: $scope.currentMailing.approval_date,
+					}, 
+				true);			
+				//var result = crmApi('Mailing', 'create', $scope.currentMailing, true);
+				result.success(function(data) {
+					if (data.is_error == 0) {
+						$scope.currentMailing.id = data.id;
+						console.log("the id is " +	$scope.currentMailing.id );
+						console.log("OK");
+						console.log(data);
+						$scope.watchVariable = true;
+						
 					}
 					console.log("OK2");
 				});
@@ -440,14 +566,29 @@
 		 
 		 
  		$scope.save = function() {
-				$scope.save_next();
+				$scope.save_next_page2();
 				$scope.back();
 		 };
 		 
+		 $scope.save_page1 = function() {
+				$scope.save_next_page1();
+				$scope.back();
+		 };
+		 
+		$scope.save_next_page1 = function() {
+				if($scope.currentMailing.id == null){
+					$scope.currentMailing.subject = $scope.currentMailing.name;
+					$scope.save_next();
+				}
+				else {
+					$scope.save_next();
+				}
+				
+		};
 		 
 		 $scope.submitButton= function(){
 				$scope.currentMailing.approval_status_id = "1";
-				$scope.currentMailing.approver_id = "202";
+				$scope.currentMailing.approver_id = $scope.user_id;
 				var currentdate = new Date();
 				var yyyy = currentdate.getFullYear();
 				var mm = currentdate.getMonth() + 1;
@@ -464,9 +605,40 @@
 				+ "/" + dd + " " 
 				+ hh + ":" 
 				+ min + ":" + sec;
+				console.log($scope.now + "sched immediately");
+				if($scope.now == 1){
+					$scope.currentMailing.scheduled_date = $scope.currentMailing.approval_date;
+				}
 				console.log($scope.currentMailing.approval_date);
 				$scope.save();
 		 };
+		 
+		 $scope.$watch('pre',function(){
+			console.log("dsfdfsfds");
+			 if($scope.pre==true){
+			 $('#prevmail').dialog({
+				 title: 'Preview Mailing',
+				 width: 1080,
+				 height: 800,
+				 closed: false,
+				 cache: false,
+				 modal: true,
+				 close :function(){console.log("close");
+					 $scope.pre = false; $scope.$apply();}
+			 });
+			 }
+		 },true);
+
+		$scope.sendTest = function(){
+		console.log("Opened send Test");
+
+		var resulta =crmApi('Mailing','send_test',{test_email:$scope.testMailing.name, test_group:$scope.testMailing.group, 
+			mailing_id:$scope.currentMailing.id});
+      resulta.success(function(data) {
+        console.log("worked");
+      });     
+      console.log("didnt work");      
+		};
 	});
 	 
 
@@ -574,99 +746,66 @@
 		};
 	}); 
 	
-	    crmMailing.directive('groupselect',function(){
-       return {
-           restrict : 'AE',
-           link: function(scope,element, attrs){
-               $(element).select2({width:"200px", data: mltokens, placeholder:"Insert Token"});
-
-               
-               $(element).on('select2-selecting', function(e) { 
-								scope.$evalAsync('_resetSelection()');console.log(mltokens);
-								var a = $(element).attr('id');
-								if(a=="htgroup"){
-									var msg = document.getElementById("body_html").value;
-									var cursorlen = document.getElementById("body_html").selectionStart;
-									console.log(cursorlen);
-									var textlen   = msg.length;
-									document.getElementById("body_html").value = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
-									scope.currentMailing.body_html = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
-									console.log(document.getElementById("body_html").value);
-									console.log(scope.currentMailing.body_html);
-									var cursorPos = (cursorlen + e.val.length);
-									document.getElementById("body_html").selectionStart = cursorPos;
-									document.getElementById("body_html").selectionEnd   = cursorPos;
-									document.getElementById("body_html").focus();  
-								}
-								else if(a=="subgroup"){
-									var msg = document.getElementById("sub").value;							
-									var cursorlen = document.getElementById("sub").selectionStart;
-									console.log(cursorlen);
-									var textlen   = msg.length;
-									document.getElementById("sub").value = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
-									scope.currentMailing.subject = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
-									console.log(document.getElementById("sub").value);
-									console.log(scope.currentMailing.subject);
-									var cursorPos = (cursorlen + e.val.length);
-									document.getElementById("sub").selectionStart = cursorPos;
-									document.getElementById("sub").selectionEnd   = cursorPos;
-									document.getElementById("sub").focus();  
-								}		
-								else if(a=="textgroup"){
-									var msg = document.getElementById("body_text").value;
-									var cursorlen = document.getElementById("body_text").selectionStart;
-									console.log(cursorlen);
-									var textlen   = msg.length;
-									document.getElementById("body_text").value = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
-									scope.currentMailing.body_text = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
-									console.log(document.getElementById("body_text").value);
-									console.log(scope.currentMailing.body_text);
-									var cursorPos = (cursorlen + e.val.length);
-									document.getElementById("body_text").selectionStart = cursorPos;
-									document.getElementById("body_text").selectionEnd   = cursorPos;
-									document.getElementById("body_text").focus();  
-								}					
-								scope.$apply();
-								e.preventDefault();
-								})
-           }
-       };
-
-    });
-    
-  /*crmMailing.directive('previewmail', function () {
-    return {
-      // Restrict it to be an attribute in this case
-      restrict: 'AE',
-      priority: 500,
-      // responsible for registering DOM listeners as well as updating the DOM
-      link: function (scope, element, attrs) {
-    //    $(element).children(id= 'tabs')
-      //    .tabs()
-        //  .addClass('ui-tabs-vertical ui-helper-clearfix');
-        scope.$watch('preview', function () {
-          console.log("asdas");
-          if(scope.preview == true){
-          $(element).dialog({
-            title: 'Preview Mailing',
-            width: 800,
-            height: 500,
-            closed: false,
-            cache: false,
-            modal: true,
-            close :function(){console.log("close");
-                            scope.preview = false;scope.$apply()}
-          });}
-        });
-        $(element).on("click", function () {
-					scope.preview_update();
+	crmMailing.directive('groupselect',function(){
+		return {
+			restrict : 'AE',
+			link: function(scope,element, attrs){
+				$(element).select2({width:"200px", data: mltokens, placeholder:"Insert Token"});
+				$(element).on('select2-selecting', function(e) {
+									 
+					scope.$evalAsync('_resetSelection()');console.log(mltokens);
+					var a = $(element).attr('id');
+					if(a=="htgroup"){
+						var msg = document.getElementById("body_html").value;
+						var cursorlen = document.getElementById("body_html").selectionStart;
+						console.log(cursorlen);
+						var textlen   = msg.length;
+						document.getElementById("body_html").value = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
+						scope.currentMailing.body_html = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
+						console.log(document.getElementById("body_html").value);
+						console.log(scope.currentMailing.body_html);
+						var cursorPos = (cursorlen + e.val.length);
+						document.getElementById("body_html").selectionStart = cursorPos;
+						document.getElementById("body_html").selectionEnd   = cursorPos;
+						document.getElementById("body_html").focus();  
+					}
+					else if(a=="subgroup"){
+						var msg = document.getElementById("sub").value;							
+						var cursorlen = document.getElementById("sub").selectionStart;
+						console.log(cursorlen);
+						var textlen   = msg.length;
+						document.getElementById("sub").value = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
+						scope.currentMailing.subject = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
+						console.log(document.getElementById("sub").value);
+						console.log(scope.currentMailing.subject);
+						var cursorPos = (cursorlen + e.val.length);
+						document.getElementById("sub").selectionStart = cursorPos;
+						document.getElementById("sub").selectionEnd   = cursorPos;
+						document.getElementById("sub").focus();  
+					}		
+					else if(a=="textgroup"){
+						var msg = document.getElementById("body_text").value;
+						var cursorlen = document.getElementById("body_text").selectionStart;
+						console.log(cursorlen);
+						var textlen   = msg.length;
+						document.getElementById("body_text").value = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
+						scope.currentMailing.body_text = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
+						console.log(document.getElementById("body_text").value);
+						console.log(scope.currentMailing.body_text);
+						var cursorPos = (cursorlen + e.val.length);
+						document.getElementById("body_text").selectionStart = cursorPos;
+						document.getElementById("body_text").selectionEnd   = cursorPos;
+						document.getElementById("body_text").focus();  
+					}					
 					scope.$apply();
-        });
-      }
-    };
-  });*/
+					e.preventDefault();
+				})
+			}
+		};
+	});
+    
 
-	
+
 	// Used for the select date option. This is used for giving scheduled_date its date value
 	crmMailing.directive('chsdate',function(){
 		return {
@@ -702,9 +841,12 @@
 			};
 	});
 
-			
-	 //This controller is used for creating the mailing list. Simply gets all the mailing data from civiAPI   
-	crmMailing.controller('mailingListCtrl', function($scope, crmApi, mailingList,$route) {
+		//This controller is used for creating the mailing list. Simply gets all the mailing data from civiAPI   
+	crmMailing.controller('mailingListCtrl', function($scope, crmApi, mailingList, $route, $location) {
+		if (global == 0) { 
+			global = global + 1;
+			$route.reload();
+		}
 		$scope.mailingList = mailingList.values;
     $scope.deleteMail = function (mail) {
       crmApi('Mailing', 'delete', {id: mail.id}, {
@@ -714,13 +856,25 @@
       })
         .then(function (data) {
           if (!data.is_error) {
-            delete mail.values[mail.id];
+						console.log(mailingList.values);
+            console.log(mailingList.values[mail.id]);
+            delete mailingList.values[mail.id];
             $scope.$digest();
+            $route.reload();
           }
         });
-      $route.reload();
+
     };
-	
+    
+    $scope.back = function (){
+			global = global - 1;
+			$location.path( 'mailing/new' );
+		};
+		
+		$scope.back = function (){
+			global = global - 1;
+			$location.path( 'mailing/' + mail.id );
+		};
 	});
 
 })(angular, CRM.$, CRM._);

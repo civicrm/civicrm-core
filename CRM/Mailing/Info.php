@@ -61,7 +61,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'ext' => 'civicrm',
       'js' => array('js/angular-newMailing.js' , 'js/angularsanitize.js'),
     );
-
+		$session = CRM_Core_Session::singleton();
+		$contactID = $session->get('userID');
     $civiMails = civicrm_api3('Mailing', 'get', array());
     $campNames = civicrm_api3('Campaign', 'get', array());
     $mailStatus = civicrm_api3('MailingJob', 'get', array());
@@ -70,7 +71,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 		$emailAdd = civicrm_api3('Email', 'get', array(
 				'sequential' => 1,
 				'return' => "email",
-				'contact_id' => 202,
+				'contact_id' => $contactID,
 				));
 		$mesTemplate = civicrm_api3('MessageTemplate', 'get', array(  'sequential' => 1,
 			'return' => array("msg_html", "id", "msg_title", "msg_subject"),
@@ -92,6 +93,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'emailAdd' => array_values($emailAdd['values']),
         'mailGrp' => array_values($mailGrp['values']),
         'mailTokens' => array_values($mailTokens),
+        'contactid' => $contactID
         ),
       ));
     return $result;

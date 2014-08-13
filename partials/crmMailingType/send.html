@@ -1,21 +1,30 @@
 <!--
 Controller: MailCtrl
 -->
+<br>
+<h3 style="background-color: #5d677b; color: #f5f6f1;border-radius: 4px; background-image: url('../../sites/all/modules/civicrm/i/TreePlusWhite.gif'); background-repeat: no-repeat; padding: 4px 8px 4px 20px; background-position: 2px center; cursor: pointer; font-weight: normal; font-family: Georgia; font-size: 1em; line-height: 135%;" ng-click="preview_update()">Preview</h3>
+<div id="prevmail" ng-show = "pre">
+<div ui-jq="tabs" id="settings">
+<ul>
+<li>
+<a href="#frag1"><span>HTML Version</span></a>
+</li>
+<li>
+<a href="#frag2"><span>Plain Text Version</span></a>
+</li>
+</ul>
+<div id="frag1" ng-bind-html="deliberatelyTrustDangerousSnippet()" >
+</div>
+<div id="frag2" ng-bind-html="deliberatelyTrustDangerousSnippet2()">
+</div>
+</div>
+</div>
+    
 
-<!--<br>
-{{preview}}
-<h3 ng-click= "settrue()"> Preview </h3> 
-
-  <previewmail>
-        <div>
-				{{previewa}}
-        </div>
-      </previewmail><br>-->
-<br>     
-<div class="crm-accordion-wrapper collapsed" ng-click = "preview_update()" >
+<!--<div class="crm-accordion-wrapper collapsed" ng-click = "preview_update()" >
   <div class="crm-accordion-header">Preview</div>
   <div class="crm-accordion-body" ng-include="partialUrl('previewMailing.html')"></div>
-</div>      
+</div>-->      
       
 
 <div class="crm-accordion-wrapper collapsed" >
