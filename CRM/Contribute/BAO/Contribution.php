@@ -140,7 +140,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     // contribution status is missing, choose Completed as default status
     // do this for create mode only
-    if (!CRM_Utils_Array::value('contribution', $ids) && !CRM_Utils_Array::value('contribution_status_id', $params)) {
+    if (!$contributionID && !CRM_Utils_Array::value('contribution_status_id', $params)) {
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     }
 
@@ -173,7 +173,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     //add Account details
     $params['contribution'] = $contribution;
-    self::recordFinancialAccounts($params, $ids);
+    self::recordFinancialAccounts($params);
 
     // reset the group contact cache for this group
     CRM_Contact_BAO_GroupContactCache::remove();
