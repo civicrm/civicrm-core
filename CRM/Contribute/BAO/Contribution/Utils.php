@@ -875,7 +875,7 @@ LIMIT 1
    */
   public static function calculateTaxAmount($amount, $taxRate) {
     $taxAmount = array();
-    $taxAmount['tax_amount'] = ($taxRate/100) * $amount;
+    $taxAmount['tax_amount'] = ($taxRate/100) * CRM_Utils_Rule::cleanMoney($amount);
 
     return $taxAmount;
   }
