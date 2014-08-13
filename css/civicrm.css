@@ -1327,11 +1327,11 @@ input.crm-form-entityref {
 
 #crm-container input.submit-link {
   color: #285286;
-  background-color: transparent;
+  background: none transparent;
   border: none;
   cursor: pointer;
-  cursor: hand;
   margin: 0em -0.5em 0em -0.5em;
+  text-shadow: none;
 }
 
 .crm-container .underline-effect {
