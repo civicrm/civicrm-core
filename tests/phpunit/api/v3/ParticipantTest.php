@@ -489,12 +489,16 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     // Check quantity, label and unit price of lines.
     // TODO: These assertions depend on the order of the line items, which is 
     // technically incorrect.
-    $this->assertEquals(2, array_values($lineItems['values'])[0]['qty']);
-    $this->assertEquals(20, array_values($lineItems['values'])[0]['unit_price']);
-    $this->assertEquals('pricefieldvalue1', array_values($lineItems['values'])[0]['label']);
-    $this->assertEquals(2, array_values($lineItems['values'])[1]['qty']);
-    $this->assertEquals(5, array_values($lineItems['values'])[1]['unit_price']);
-    $this->assertEquals('pricefieldvalue2', array_values($lineItems['values'])[1]['label']);
+
+    $lineItem = array_pop($lineItems['values']);
+    $this->assertEquals(2, $lineItem['qty']);
+    $this->assertEquals(5, $lineItem['unit_price']);
+    $this->assertEquals('pricefieldvalue2', $lineItem['label']);
+
+    $lineItem = array_pop($lineItems['values']);
+    $this->assertEquals(2, $lineItem['qty']);
+    $this->assertEquals(20, $lineItem['unit_price']);
+    $this->assertEquals('pricefieldvalue1', $lineItem['label']);
 
     // Cleanup
     $this->callAPISuccess('participant', 'delete', array('id' => $participant['id']));
