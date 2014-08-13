@@ -9,7 +9,7 @@ Required vars: currentMailing
   <tr>
     <td class="label">Send Immediately</td>
     <td>
-      <input type="checkbox" ng-model="now" ng-true-value="1" ng-false-value="0"/>
+      <input type="checkbox" ng-model="now" ng-change= "checkNow()" ng-true-value="1" ng-false-value="0"/>
     </td>
   <tr ng-show="now==0">
 		<td class="label">OR</td>

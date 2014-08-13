@@ -4,12 +4,12 @@ Required vars: currentMailing
 The editor has to be added. Currently just a simple text editor
 -->
 <br>
-<div class="crm-accordion-wrapper collapsed">
+<div class="crm-accordion-wrapper collapsed" ng-click = "preview_update()">
   <div class="crm-accordion-header">HTML Preview</div>
   <div class="crm-accordion-body" ng-include="partialUrl('preview_ht.html')"></div>
 </div>
 
-<div class="crm-accordion-wrapper collapsed" ng-show = "isBody_text()">
+<div class="crm-accordion-wrapper collapsed" ng-show = "isBody_text()" ng-click = "preview_update()">
   <div class="crm-accordion-header">Plain Text Preview</div>
   <div class="crm-accordion-body" ng-include="partialUrl('preview_plaintext.html')"></div>
 </div>
