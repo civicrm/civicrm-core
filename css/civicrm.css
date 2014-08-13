@@ -2996,8 +2996,10 @@ div a.helpicon:focus {
 }
 #crm-container .crm-tooltip table,
 #crm-container .crm-tooltip table tr td {
+  background-color: #2f2f2e;
   border: none;
   color: #FFF;
+  word-wrap: break-word;
 }
 .crm-container .crm-tooltip .crm-summary-group {
   width: 700px;
@@ -3032,6 +3034,16 @@ div a.helpicon:focus {
 #crm-container .crm-summary-group .crm-section .content,
 .crm-container .crm-summary-group .crm-section .content {
   margin-left: 41%;
+}
+
+#crm-container .crm-tooltip table .crm-summary-col-1,
+.crm-container .crm-tooltip table .crm-summary-col-1 {
+  width: 350px;
+}
+
+#crm-container .crm-tooltip table .crm-summary-col-1 div,
+.crm-container .crm-tooltip table .crm-summary-col-1 div {
+  width: auto;
 }
 
 /* Class for tokens and helpicon */
