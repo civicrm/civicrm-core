@@ -653,7 +653,16 @@ CRM.$(function($) {
         taxRate = 0;
       }  
       var totalAmount = $('#total_amount').val();
-      var totalTaxAmount = parseFloat(Number((taxRate/100)*totalAmount)+Number(totalAmount)).toFixed(2);
+      var totalTaxAmount = '{/literal}{$totalTaxAmount}{literal}';
+      var taxAmount = (taxRate/100)*totalAmount.replace(/,/g,'');
+      taxAmount = isNaN (taxAmount) ? 0:taxAmount;
+      if (totalTaxAmount) {
+        var totalTaxAmount = (parseFloat(Number(totalTaxAmount) + Number(totalAmount.replace(/,/g,''))).toFixed(2)).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+      }
+      else {
+      	var totalTaxAmount = (parseFloat(taxAmount + Number(totalAmount.replace(/,/g,''))).toFixed(2)).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+      }
+
       $("#totalTaxAmount" ).html('Amount with tax : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
       event.handled = true;
     }
