@@ -84,14 +84,10 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant){
   // it is possible that a fee level contains information about multiple
   // price field values.
 
-  $priceFieldValueDetails = explode(
-    CRM_Core_DAO::VALUE_SEPARATOR,
+  $priceFieldValueDetails = CRM_Utils_Array::explodePadded(
     $params["fee_level"]);
 
   foreach($priceFieldValueDetails as $detail) {
-    if (empty($detail)) continue;
-
-
     if (preg_match('/- ([0-9]+)$/', $detail, $matches)) {
       // it is possible that a price field value is payd for multiple times.
       // (FIXME: if the price field value ends in minus followed by whitespace
@@ -106,18 +102,21 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant){
       $qty = 1;
     }
 
-    // TODO: I think we might have troubles with SQL injection below.
-
     $sql = "
       SELECT      ps.id AS setID, pf.id AS priceFieldID, pfv.id AS priceFieldValueID, pfv.amount AS amount
       FROM  civicrm_price_set_entity cpse
-      LEFT JOIN civicrm_price_set ps ON cpse.price_set_id = ps.id AND cpse.entity_id = {$params['event_id']} AND cpse.entity_table = 'civicrm_event'
+      LEFT JOIN civicrm_price_set ps ON cpse.price_set_id = ps.id AND cpse.entity_id = %1 AND cpse.entity_table = 'civicrm_event'
       LEFT JOIN   civicrm_price_field pf ON pf.`price_set_id` = ps.id
       LEFT JOIN   civicrm_price_field_value pfv ON pfv.price_field_id = pf.id
-      where ps.id is not null and pfv.label = '{$label}'
+      where ps.id is not null and pfv.label = %2
     ";
 
-    $dao = CRM_Core_DAO::executeQuery($sql);
+    $qParams = array(
+      1 => array($params['event_id'], 'Integer'),
+      2 => array($label, 'String'),
+    );
+
+    $dao = CRM_Core_DAO::executeQuery($sql, $qParams);
     if ($dao->fetch()) {
       $lineItemparams = array(
         'price_field_id' => $dao->priceFieldID,
