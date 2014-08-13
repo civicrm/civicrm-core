@@ -482,7 +482,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('EFT', $contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
-    $contribution = $this->callAPISuccess('contribution', 'update', array('id' => $contribution['id'], 'payment_instrument' => 'Credit Card'));
+    $contribution = $this->callAPISuccess('contribution', 'create', array('id' => $contribution['id'], 'payment_instrument' => 'Credit Card'));
     $contribution = $this->callAPISuccess('contribution','get',array( 'sequential' => 1, 'id' => $contribution['id'], ));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('Credit Card',$contribution['values'][0]['payment_instrument']);
@@ -843,7 +843,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
       'id' => $contribution['id'],
       'total_amount' => '125');
-    $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
 
     $lineItems = $this->callAPISuccess('line_item','getvalue',array(
 
@@ -881,7 +881,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contribution['id'],
       'contribution_status_id' => 1,)
     );
-    $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $contribution = $contribution['values'][$contribution['id']];
     $this->assertEquals($contribution['contribution_status_id'],'1');
     $this->_checkFinancialItem($contribution['id'], 'paylater');
@@ -907,7 +907,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
      'id' => $contribution['id'],
      'payment_instrument_id' => $instrumentId,)
     );
-    $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->assertAPISuccess($contribution);
     $this->_checkFinancialTrxn($contribution, 'paymentInstrument', $instrumentId);
   }
@@ -932,7 +932,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       )
     );
 
-    $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->_checkFinancialTrxn($contribution, 'refund');
     $this->_checkFinancialItem($contribution['id'], 'refund');
   }
@@ -955,7 +955,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
      'contribution_status_id' => 2,
       )
     );
-    $contribution = $this->callAPIFailure('contribution', 'update', $newParams,
+    $contribution = $this->callAPIFailure('contribution', 'create', $newParams,
       ts('Cannot change contribution status from Completed to Pending.')
     );
 
@@ -981,7 +981,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
      'contribution_status_id' => 3,
       )
     );
-    $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->_checkFinancialTrxn($contribution, 'cancelPending');
     $this->_checkFinancialItem($contribution['id'], 'cancelPending');
   }
@@ -1005,11 +1005,20 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
      'financial_type_id' => 3,
       )
     );
-    $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->_checkFinancialTrxn($contribution, 'changeFinancial');
     $this->_checkFinancialItem($contribution['id'], 'changeFinancial');
   }
 
+  /**
+   * test that update does not change status id CRM-15105
+   */
+  function testCreateUpdateWithoutChangingPendingStatus() {
+    $contribution = $this->callAPISuccess('contribution', 'create', array_merge($this->_params, array('contribution_status_id' => 2)));
+    $this->callAPISuccess('contribution', 'create', array('id' => $contribution['id'], 'source' => 'new source'));
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $contribution['id'], 'api.contribution.delete' => 1));
+    $this->assertEquals(2, $contribution['contribution_status_id']);
+  }
   //To Update Contribution
   //CHANGE: we require the API to do an incremental update
   function testCreateUpdateContribution() {
