@@ -1905,6 +1905,17 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $form->_receiptContactId = $formValues['contact_id'];
       }
     }
+    $template = CRM_Core_Smarty::singleton( );
+    $taxAmt = $template->get_template_vars('dataArray');
+    $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
+    $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
+    if ((count($taxAmt) > 0 || !empty($eventTaxAmt)) && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
+      $isEmailPdf = True;
+    }
+    else {
+      $isEmailPdf = '';
+    }
 
     list($mailSend, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       array(
@@ -1914,6 +1925,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         'from' => $receiptFrom,
         'toName' => $form->_contributorDisplayName,
         'toEmail' => $form->_contributorEmail,
+        'PDFFilename' => ts('receipt').'.pdf',
+        'isEmailPdf' => $isEmailPdf,
+        'contributionId' => $formValues['contribution_id'],
         'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW)
       )
     );
