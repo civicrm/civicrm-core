@@ -285,9 +285,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     // make sure all values are present in the object for further processing
     $customField->find(TRUE);
 
+    $triggerRebuild = CRM_Utils_Array::value('triggerRebuild', $params, TRUE);
     //create/drop the index when we toggle the is_searchable flag
     if (!empty($params['id'])) {
-      self::createField($customField, 'modify', $indexExist);
+      self::createField($customField, 'modify', $indexExist, $triggerRebuild);
     }
     else {
       if (!isset($origParams['column_name'])) {
@@ -299,7 +300,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       // make sure all values are present in the object
       $customField->find(TRUE);
 
-      self::createField($customField, 'add');
+      $indexExist = FALSE;
+      self::createField($customField, 'add', $indexExist, $triggerRebuild);
     }
 
     // complete transaction
