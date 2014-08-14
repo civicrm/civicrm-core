@@ -84,7 +84,7 @@ class CRM_Group_Page_AJAX {
 
       $iFilteredTotal = $iTotal = $params['total'];
       $selectorElements = array(
-        'group_name', 'group_id', 'created_by', 'group_description',
+        'group_name', 'members', 'created_by', 'group_description',
         'group_type', 'visibility', 'org_info', 'links', 'class',
       );
 
