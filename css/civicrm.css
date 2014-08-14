@@ -2942,6 +2942,7 @@ div.grippie {
   opacity: .7;
   position: relative;
   top: 2px;
+  padding: 0;
 }
 
 div.crm-accordion-header a.helpicon {
