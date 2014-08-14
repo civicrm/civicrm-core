@@ -1914,7 +1914,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $isEmailPdf = True;
     }
     else {
-      $isEmailPdf = '';
+      $isEmailPdf = False;
     }
 
     list($mailSend, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
