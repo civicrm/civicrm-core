@@ -20,6 +20,10 @@ while [ -n "$1" ]; do
     --civi)
       MODE=civi
       ;;
+    --civibuild-restore)
+      CIVIBUILD_RESTORE="$1"
+      shift
+      ;;
     --test-dir)
       TESTSUITE="$1"
       shift
@@ -43,13 +47,19 @@ done
 
 if [ -z "$TESTSUITE" ]; then
   echo "summary: Executes all tests in a suite (individually)"
-  echo "usage: $0 --test-dir <dir> [--json-dir <dir>] [--xml-dir <dir>] [--civi]"
+  echo "usage: $0 --test-dir <dir> [--json-dir <dir>] [--xml-dir <dir>] [--civi] [--civibuild-restore <build-name>]"
   exit 1
 fi
 
 
 #phpunit-ls "$TESTSUITE"
 $BINDIR/phpunit-ls "$TESTSUITE" | while read FILE CLASS METHOD ; do
+  ## Optionally reset DBs
+  if [ -n "$CIVIBUILD_RESTORE" ]; then
+    civibuild restore "$CIVIBUILD_RESTORE"
+  fi
+
+  ## Prepare test command
   PHPUNITARGS="--tap"
   if [ -n "$JSONDIR" ]; then
     PHPUNITARGS="$PHPUNITARGS --log-json $JSONDIR/$CLASS-$METHOD.json"
@@ -58,7 +68,7 @@ $BINDIR/phpunit-ls "$TESTSUITE" | while read FILE CLASS METHOD ; do
     PHPUNITARGS="$PHPUNITARGS --log-junit $XMLDIR/$CLASS-$METHOD.xml"
   fi
 
-
+  ## Run the test!
   if [ "$MODE" == "civi" ]; then
     $PHP ./scripts/phpunit $PHPUNITARGS --filter $METHOD'( with.*)?$' "$CLASS"
   fi
