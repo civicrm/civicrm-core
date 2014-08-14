@@ -240,8 +240,8 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     // add campaign status
     $this->addSelect('status_id');
 
-    // add External Identifire Element
-    $this->add('text', 'external_identifier', ts('External Id'),
+    // add External Identifier Element
+    $this->add('text', 'external_identifier', ts('External ID'),
       CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Campaign', 'external_identifier'), FALSE
     );
 

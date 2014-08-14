@@ -415,7 +415,9 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
               $contact->external_identifier = $externalId;
               $errorMsg = NULL;
               if (!$contact->find(TRUE)) {
-                $errorMsg = $contactId ? ts("Soft Credit ContactID - $contactId doesn't exist. Row was skipped.") : ts("Provided Soft Credit External Identifier - $externalIddoesn't exist. Row was skipped.");
+                $field = $contactId ? ts('Contact ID') : ts('External ID');
+                $errorMsg = ts("Soft Credit %1 - %2 doesn't exist. Row was skipped.",
+                  array(1 => $field, 2 => $contactId ? $contactId : $externalId));
               }
 
               if ($errorMsg) {

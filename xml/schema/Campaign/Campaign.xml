@@ -131,7 +131,7 @@
   <field>
        <name>external_identifier</name>
        <type>varchar</type>
-       <title>Campaign External Identifier</title>
+       <title>Campaign External ID</title>
        <length>32</length>
        <headerPattern>/external\s?id/i</headerPattern>
        <dataPattern>/^\d{11,}$/</dataPattern>
