@@ -68,7 +68,7 @@ class CRM_Contact_Form_Edit_Household {
     }
 
     if ( !$inlineEditMode ) {
-      $form->add('text', 'external_identifier', ts('External Id'), $attributes['external_identifier'], FALSE);
+      $form->add('text', 'external_identifier', ts('External ID'), $attributes['external_identifier'], FALSE);
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),
         'objectExists',

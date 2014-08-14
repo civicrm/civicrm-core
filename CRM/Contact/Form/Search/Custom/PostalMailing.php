@@ -40,7 +40,7 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
     parent::__construct($formValues);
 
     $this->_columns = array(
-      ts('Contact Id') => 'contact_id',
+      ts('Contact ID') => 'contact_id',
       ts('Address') => 'address',
       ts('Contact Type') => 'contact_type',
       ts('Name') => 'sort_name',

@@ -200,7 +200,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
 
     $softCreditFields['contact_id'] = ts('Contact ID');
-    $softCreditFields['external_identifier'] = ts('External Identifier');
+    $softCreditFields['external_identifier'] = ts('External ID');
     $softCreditFields['email'] = ts('Email');
 
     $sel2['soft_credit'] = $softCreditFields;

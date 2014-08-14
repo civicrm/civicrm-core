@@ -380,7 +380,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       /* If it's a dupe,external Identifier  */
 
       if ($externalDupe = CRM_Utils_Array::value($externalID, $this->_allExternalIdentifiers)) {
-        $errorMessage = ts('External Identifier conflicts with record %1', array(1 => $externalDupe));
+        $errorMessage = ts('External ID conflicts with record %1', array(1 => $externalDupe));
         array_unshift($values, $errorMessage);
         $importRecordParams = array(
           $statusFieldName => 'ERROR',
@@ -487,7 +487,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
       if ($internalCid = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params['external_identifier'], 'id', 'external_identifier')) {
         if ($internalCid != CRM_Utils_Array::value('id', $params)) {
-          $errorMessage = ts('External Identifier already exists in database.');
+          $errorMessage = ts('External ID already exists in Database.');
           array_unshift($values, $errorMessage);
           $importRecordParams = array(
             $statusFieldName => 'ERROR',
