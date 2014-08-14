@@ -1,4 +1,11 @@
 #!/bin/bash
+function absdirname() {
+  pushd $(dirname $0) >> /dev/null
+    pwd
+  popd >> /dev/null
+}
+
+BINDIR=$(absdirname "$0")
 PHP=${PHP:-php}
 PHPUNIT=${PHPUNIT:-phpunit}
 MODE=standalone
@@ -42,7 +49,7 @@ fi
 
 
 #phpunit-ls "$TESTSUITE"
-phpunit-ls "$TESTSUITE" | while read FILE CLASS METHOD ; do
+$BINDIR/phpunit-ls "$TESTSUITE" | while read FILE CLASS METHOD ; do
   PHPUNITARGS="--tap"
   if [ -n "$JSONDIR" ]; then
     PHPUNITARGS="$PHPUNITARGS --log-json $JSONDIR/$CLASS-$METHOD.json"
