@@ -29,7 +29,7 @@ require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 /**
  * Class WebTest_Import_SavedMapping
  */
-class WebTest_Import_SavedMapping extends ImportCiviSeleniumTestCase {
+class WebTest_Import_SavedMappingTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
