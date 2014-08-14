@@ -1,0 +1,33 @@
+#!/bin/bash
+PHP=${PHP:-php}
+PHPUNIT=${PHPUNIT:-phpunit}
+MODE=standalone
+
+if [ "$1" == "--civi" ]; then
+  MODE=civi
+  shift
+fi
+
+TESTSUITE="$1"
+shift
+
+OUTDIR="$1"
+shift
+
+if [ -z "$TESTSUITE" -o -z "$OUTDIR" ]; then
+  echo "summary: Executes all tests in a suite (individually)"
+  echo "usage: $0 <test-suite-path> <output-dir>"
+  exit 1
+fi
+
+[ ! -d "$OUTDIR" ] && mkdir -p "$OUTDIR"
+
+#phpunit-ls "$TESTSUITE"
+phpunit-ls "$TESTSUITE" | while read FILE CLASS METHOD ; do
+  if [ "$MODE" == "civi" ]; then
+    $PHP ./scripts/phpunit --tap --log-json "$OUTDIR/$CLASS-$METHOD.json" --filter $METHOD'( with.*)?$' "$CLASS"
+  fi
+  if [ "$MODE" == "standalone" ]; then
+    $PHP $(which $PHPUNIT) --tap --log-json "$OUTDIR/$CLASS-$METHOD.json" --filter $METHOD'( with.*)?$' "$FILE"
+  fi
+done
