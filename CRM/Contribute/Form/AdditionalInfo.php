@@ -496,7 +496,7 @@ class CRM_Contribute_Form_AdditionalInfo {
        $isEmailPdf = True;
      }
      else {
-       $isEmailPdf = '';
+       $isEmailPdf = False;
      }
      
     list($sendReceipt, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
