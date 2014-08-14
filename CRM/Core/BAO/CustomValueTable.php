@@ -553,6 +553,10 @@ AND    cf.id IN ( $fieldIDList )
           'is_multiple' => $dao->is_multiple,
         );
 
+        if ($cvParam['type'] == 'File') {
+          $cvParam['file_id'] = $fieldValue['value'];
+        }
+
         if (!array_key_exists($dao->table_name, $cvParams)) {
           $cvParams[$dao->table_name] = array();
         }

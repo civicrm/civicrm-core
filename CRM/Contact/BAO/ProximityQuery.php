@@ -275,7 +275,7 @@ ACOS(
     if (!isset($proximityAddress['country_id'])) {
       // get it from state if state is present
       if (isset($proximityAddress['state_province_id'])) {
-        $proximityAddress['country_id'] = CRM_Core_PseudoConstant::countryForState($proximityAddress['state_province_id']);
+        $proximityAddress['country_id'] = CRM_Core_PseudoConstant::countryIDForStateID($proximityAddress['state_province_id']);
       }
       elseif (isset($config->defaultContactCountry)) {
         $proximityAddress['country_id'] = $config->defaultContactCountry;

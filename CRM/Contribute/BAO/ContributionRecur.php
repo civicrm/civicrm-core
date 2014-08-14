@@ -249,7 +249,7 @@ SELECT r.payment_processor_id
       $recur->save();
 
       $dao = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recurId);
-      if ($dao->recur_id) {
+      if ($dao && $dao->recur_id) {
         $details = CRM_Utils_Array::value('details', $activityParams);
         if ($dao->auto_renew && $dao->membership_id) {
           // its auto-renewal membership mode

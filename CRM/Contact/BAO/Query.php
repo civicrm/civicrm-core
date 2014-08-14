@@ -1967,7 +1967,9 @@ class CRM_Contact_BAO_Query {
         $name, $op, $value, $grouping,
         CRM_Core_PseudoConstant::worldRegion(),
         $field,
-        ts('World Region')
+        ts('World Region'),
+        'Positive',
+        TRUE
       );
     }
     elseif ($name === 'birth_date') {
@@ -5175,6 +5177,9 @@ AND   displayRelType.is_active = 1
       list($tableName, $fieldName) = explode('.', $field['where'], 2);
       if ($tableName == 'civicrm_contact') {
         $wc = "contact_a.$fieldName";
+      }
+      else {
+        $wc = "$tableName.id";
       }
     }
     else {
