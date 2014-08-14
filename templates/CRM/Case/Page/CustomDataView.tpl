@@ -81,36 +81,3 @@
   {/foreach}
 {/foreach}
 <div id="case_custom_edit"></div>
-
-{*currently delete is available only for tab custom data*}
-{if $groupId}
-<script type="text/javascript">
-  {literal}
-  function hideStatus(valueID, groupID) {
-    cj('#statusmessg_' + groupID + '_' + valueID).hide( );
-  }
-
-  function showDelete(valueID, elementID, groupID, contactID) {
-    var confirmMsg = '{/literal}{ts escape='js'}Are you sure you want to delete this record?{/ts}{literal} &nbsp; <a href="#" onclick="deleteCustomValue( ' + valueID + ',\'' + elementID + '\',' + groupID + ',' + contactID + ' ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}Yes{/ts}{literal}</a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="hideStatus( ' + valueID + ', ' +  groupID + ' ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}No{/ts}{literal}</a>';
-    cj('tr#statusmessg_' + groupID + '_' + valueID).show( ).children().find('span').html( confirmMsg );
-  }
-
-  function deleteCustomValue( valueID, elementID, groupID, contactID ) {
-    var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0 }"{literal};
-    var request = cj.ajax({
-      type: "POST",
-      data:  "valueID=" + valueID + "&groupID=" + groupID +"&contactId=" + contactID + "&key={/literal}{crmKey name='civicrm/ajax/customvalue'}{literal}",
-      url: postUrl,
-      success: function(html){
-        cj('#'+ elementID).hide();
-        hideStatus(valueID, groupID);
-        var element = cj( '.ui-tabs-nav #tab_custom_' + groupID + ' a' );
-        cj(element).html(cj(element).attr('title') + ' ('+ html+') ');
-      }
-    });
-    CRM.status({success: '{/literal}{ts escape="js"}Record Deleted{/ts}{literal}'}, request);
-  }
-  {/literal}
-</script>
-{/if}
-
