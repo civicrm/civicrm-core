@@ -136,7 +136,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return array
    */
   function setDefaultValues() {
     $defaults = $this->_values;
@@ -240,22 +240,20 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     // add campaign status
     $this->addSelect('status_id');
 
-    // add External Identifire Element
-    $this->add('text', 'external_identifier', ts('External Id'),
+    // add External Identifier Element
+    $this->add('text', 'external_identifier', ts('External ID'),
       CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Campaign', 'external_identifier'), FALSE
     );
 
     // add Campaign Parent Id
-    $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value('parent_id', $this->_values),
-      $this->_campaignId
-    );
+    $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value('parent_id', $this->_values), $this->_campaignId);
     if (!empty($campaigns)) {
-      $this->addElement('select', 'parent_id', ts('Parent Id'),
-        array(
-          '' => ts('- select Parent -')) + $campaigns
+      $this->addElement('select', 'parent_id', ts('Parent ID'),
+        array('' => ts('- select Parent -')) + $campaigns,
+        array('class' => 'crm-select2')
       );
     }
-$groups = CRM_Core_PseudoConstant::nestedGroup();
+    $groups = CRM_Core_PseudoConstant::nestedGroup();
     //get the campaign groups.
     $this->add('select', 'includeGroups',
       ts('Include Group(s)'),
@@ -304,7 +302,7 @@ $groups = CRM_Core_PseudoConstant::nestedGroup();
    * @param $files
    * @param $errors
    *
-   * @return void
+   * @return bool|array
    * @access public
    * @see valid_date
    */
