@@ -67,7 +67,7 @@ while [ -n "$1" ]; do
       reset_dir "$OUTDIR/bundled-indiv"
 
       pushd "$CIVI/tools"
-        phpunit-indiv --civi "../$TESTPATH" "$OUTDIR/bundled-indiv"
+        ./scripts/phpunit-indiv --civi --test-dir "../$TESTPATH" --json-dir "$OUTDIR/bundled-indiv"
       popd
 
       cat "$OUTDIR"/bundled-indiv/*-*.json > "$OUTDIR/bundled-indiv/all.json"
@@ -90,7 +90,7 @@ while [ -n "$1" ]; do
 
       pushd "$CIVI"
         [ -d "packages/PHPUnit" ] && mv "packages/PHPUnit" "packages/PHPUnit.bak"
-        phpunit-indiv "$TESTPATH" "$OUTDIR/standalone-indiv"
+        ./tools/scripts/phpunit-indiv --test-dir "$TESTPATH" --json-dir "$OUTDIR/standalone-indiv"
         [ -d "packages/PHPUnit.bak" ] && mv "packages/PHPUnit.bak" "packages/PHPUnit"
       popd
 
