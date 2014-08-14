@@ -47,7 +47,7 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contac
      */
 
     $this->_columns = array(
-      ts('Contact Id') => 'contact_id',
+      ts('Contact ID') => 'contact_id',
       ts('Name') => 'sort_name',
       ts('Donation Count') => 'donation_count',
       ts('Donation Amount') => 'donation_amount',
