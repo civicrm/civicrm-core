@@ -108,6 +108,7 @@
 
   <script type="text/javascript" >
   CRM.$(function($) {
+    var $form = $("#{/literal}{$form.formName}{literal}");
     var action = "{/literal}{$action}{literal}";
 
     $('.crm-accordion-body').each( function() {
@@ -235,6 +236,22 @@
       return true;
     });
     {/literal}{/if}{literal}
+
+    // Handle delete of multi-record custom data
+    $form.on('click', '.crm-custom-value-del', function(e) {
+      e.preventDefault();
+      var $el = $(this),
+        msg = '{/literal}{ts escape="js"}The record will be deleted immediately. This action cannot be undone.{/ts}{literal}';
+      CRM.confirm({title: $el.attr('title'), message: msg})
+        .on('crmConfirm:yes', function() {
+          var url = CRM.url('civicrm/ajax/customvalue');
+          var request = $.post(url, $el.data('post'));
+          CRM.status({success: '{/literal}{ts escape="js"}Record Deleted{/ts}{literal}'}, request);
+          var addClass = '.add-more-link-' + $el.data('post').groupID;
+          $el.closest('div.crm-custom-accordion').remove();
+          $('div' + addClass).last().show();
+        });
+    });
   });
 
 </script>
