@@ -29,6 +29,12 @@
   #tagtree .highlighted > label {
     background-color: #FEFD7B;
   }
+  #tagtree .helpicon ins {
+    display: none;
+  }
+  #tagtree ins.jstree-icon {
+    cursor: pointer;
+  }
 </style>
 <script type="text/javascript">
   (function($, _){{/literal}
@@ -65,8 +71,13 @@
 
       //load js tree.
       $("#tagtree").jstree({
-        "plugins" : ["themes", "html_data"],
-        "themes": {"url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/default/style.css'}
+        plugins : ["themes", "html_data"],
+        themes: {
+          "theme": 'classic',
+          "dots": false,
+          "icons": false,
+          "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
+        }
       });
 
       {/literal}
