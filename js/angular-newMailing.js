@@ -47,7 +47,7 @@
  
 
 //This controller is used in creating new mail and editing current mails
-	crmMailing.controller('mailingCtrl', function($scope, crmApi, selectedMail, $location,$route, $sce) {
+	crmMailing.controller('mailingCtrl', function($scope, crmApi, selectedMail, $location,$route, $sce, $window) {
 			
 	//Making some dummy api to see if my from email, reply to email works. To see if all options come in select box
 		$scope.cool_api= [
@@ -81,10 +81,6 @@
 	/*	$scope.set_sendtest = function(){
 			$scope.sendtest = true;
 			};*/
-		$scope.watchVariable = false;
-		$scope.setwatchVariable = function(){
-			$scope.watchVariable = false;
-			};
 		$scope.noOfRecipients = 0;
 		$scope.testMailing = {};
 		$scope.testMailing.name = "";
@@ -151,7 +147,8 @@
 		};
 		
 		$scope.back = function (){
-			$location.path( "mailing" );
+			$window.location.href = "#/mailing" ;
+			$route.reload();
 		};
 
 		$scope.tmp = function (tst){
@@ -336,14 +333,7 @@
     $scope.deliberatelyTrustDangerousSnippet3 = function() {
           return $sce.trustAsHtml($scope.preview_subject);
         };
-        
-    $scope.$watch('watchVariable', function () {
-			if($scope.watchVariable == true){
-					console.log("eafnfasnkafn");
-					$scope.mailing_recipients();
-			}
-		},true);
-		
+
 		$scope.mailing_recipients= function() { 
 			console.log("the id is " + $scope.currentMailing.id);
 			var resulta =crmApi('MailingRecipients', 'get', {mailing_id: $scope.currentMailing.id,  options: {limit:1000}});
@@ -398,7 +388,7 @@
 		
 				console.log(chck2);	
 				$scope.incGroup = chck2;
-					
+				$scope.mailing_recipients();
 			});
     }
 			
@@ -498,9 +488,7 @@
 						console.log("the id is " +	$scope.currentMailing.id );
 						console.log("OK");
 						console.log(data);
-						$scope.mailingGroup();
-						$scope.watchVariable = true;
-						
+						$scope.mailingGroup();						
 					}
 					console.log("OK2");
 				});
@@ -556,9 +544,7 @@
 						$scope.currentMailing.id = data.id;
 						console.log("the id is " +	$scope.currentMailing.id );
 						console.log("OK");
-						console.log(data);
-						$scope.watchVariable = true;
-						
+						console.log(data);						
 					}
 					console.log("OK2");
 				});
@@ -842,7 +828,7 @@
 	});
 
 		//This controller is used for creating the mailing list. Simply gets all the mailing data from civiAPI   
-	crmMailing.controller('mailingListCtrl', function($scope, crmApi, mailingList, $route, $location) {
+	crmMailing.controller('mailingListCtrl', function($scope, crmApi, mailingList, $route) {
 		if (global == 0) { 
 			global = global + 1;
 			$route.reload();
@@ -866,15 +852,10 @@
 
     };
     
-    $scope.back = function (){
+    $scope.edit = function (){
 			global = global - 1;
-			$location.path( 'mailing/new' );
 		};
 		
-		$scope.back = function (){
-			global = global - 1;
-			$location.path( 'mailing/' + mail.id );
-		};
 	});
 
 })(angular, CRM.$, CRM._);

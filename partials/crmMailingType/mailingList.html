@@ -26,13 +26,12 @@ Required vars: mailingList
     <td>{{mail.created_date}}</td>
     <td>{{mail.from_email}}</td>
     <td>{{mail.scheduled_date}}</td>
-    <td><a class="action-item crm-hover-button" ng-click= "edit()">Edit</a</td>
+    <td><a class="action-item crm-hover-button" ng-href="#/mailing/{{mail.id}}" ng-click= "edit()">Edit</a</td>
     <td><a class="action-item crm-hover-button" crm-confirm="{type: 'delete', obj: mail}" on-yes="deleteMail(mail)">Delete</a></td>
   </tr>
 </table>
 <div class="action-link">
-  <a ng-click= "new()" class="button"><span><div class="icon add-icon"></div>New Mailing</span></a>
+  <a ng-href="#/mailing/new" ng-click= "edit()" class="button"><span><div class="icon add-icon"></div>New Mailing</span></a>
 </div>
 
-ng-href="#/mailing/new"
-ng-href="#/mailing/{{mail.id}}"
+
