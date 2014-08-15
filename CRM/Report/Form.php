@@ -3429,6 +3429,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    */
   function addAddressFields($groupBy = TRUE, $orderBy = FALSE, $filters = TRUE, $defaults = array(
       'country_id' => TRUE)) {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Report/Form/SetCountyOptions.js');
     $addressFields = array(
       'civicrm_address' =>
       array(
