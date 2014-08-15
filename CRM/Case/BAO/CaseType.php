@@ -370,8 +370,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     if ($caseTypeName) {
       // if file-based definition explicitly disables "forkable" option, then don't allow changes to definition
       $fileDefinition = CRM_Case_XMLRepository::singleton()->retrieveFile($caseTypeName);
-      if ($fileDefinition && isset($fileDefinition->forkable) && $fileDefinition->forkable == 0) {
-        return FALSE;
+      if ($fileDefinition && isset($fileDefinition->forkable)) {
+        return CRM_Utils_String::strtobool((string)$fileDefinition->forkable);
       }
     }
     return TRUE;
