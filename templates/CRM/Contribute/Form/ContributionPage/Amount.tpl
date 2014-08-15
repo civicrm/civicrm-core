@@ -199,7 +199,6 @@
        {/if}
      {literal}
      CRM.$(function($) {
-       $("#popupContainer").hide();
        function checked_payment_processors() {
          var ids = [];
          $('.crm-contribution-contributionpage-amount-form-block-payment_processor input[type="checkbox"]').each(function(){
