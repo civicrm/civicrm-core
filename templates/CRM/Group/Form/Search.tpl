@@ -67,7 +67,7 @@
 </table>
 </div>
 <div class="css_right">
-  <a class="crm-hover-button" href="{crmURL q="reset=1&update_smart_groups=1"}">{ts}Update Smart Group Counts{/ts}</a> {help id="update_smart_groups"}
+  <a class="crm-hover-button action-item" href="{crmURL q="reset=1&update_smart_groups=1"}">{ts}Update Smart Group Counts{/ts}</a> {help id="update_smart_groups"}
 </div>
 <table class="crm-group-selector">
   <thead>
