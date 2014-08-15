@@ -77,14 +77,13 @@
 {if $action eq 1  or $action eq 2}
 <script type="text/javascript" >
 {literal}
-    function reload(refresh) {
-        var provider = document.getElementById("name");
-        var url = {/literal}"{$refreshURL}"{literal}
-        var post = url + "&key=" + provider.value;
-        if( refresh ) {
-            window.location.href = post;
-        }
-    }
+  CRM.$(function($) {
+    var $form = $("#{/literal}{$form.formName}{literal}");
+    $('select[name=name]', $form).change(function() {
+      var url = {/literal}"{$refreshURL}"{literal} + "&key=" + this.value;
+      $(this).closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet({url: url}).crmSnippet('refresh');
+    });
+  });
 {/literal}
 </script>
 {/if}
