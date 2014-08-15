@@ -145,6 +145,11 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
     }
     $this->assign('showOrgInfo', $showOrgInfo);
 
+    // Refresh smart group cache
+    if (!empty($_GET['update_smart_groups'])) {
+      CRM_Contact_BAO_GroupContactCache::loadAll();
+    }
+
     $this->search();
   }
 
