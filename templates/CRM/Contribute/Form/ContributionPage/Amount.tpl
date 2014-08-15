@@ -25,11 +25,6 @@
 *}
 {capture assign="adminPriceSets"}{crmURL p='civicrm/admin/price' q="reset=1"}{/capture}
 <div class="crm-block crm-form-block crm-contribution-contributionpage-amount-form-block">
-{if $isQuick}
-    <div id="popupContainer">
-    {ts}Once you switch to using a Price Set, you won't be able to switch back to your existing settings below except by re-entering them. Are you sure you want to switch to a Price Set?{/ts}
-    </div>
-{/if}
 <div id="help">
     {ts}Use this form to configure Contribution Amount options. You can give contributors the ability to enter their own contribution amounts - and/or provide a fixed list of amounts. For fixed amounts, you can enter a label for each 'level' of contribution (e.g. Friend, Sustainer, etc.). If you allow people to enter their own dollar amounts, you can also set minimum and maximum values. Depending on your choice of Payment Processor, you may be able to offer a recurring contribution option.{/ts} {docURL page="user/contributions/payment-processors"}
 </div>
@@ -203,24 +198,23 @@
            {/literal}{/foreach}
        {/if}
      {literal}
-    cj( document ).ready( function( ) {
-    cj("#popupContainer").hide();
-        function checked_payment_processors() {
-            var ids = [];
-            cj('.crm-contribution-contributionpage-amount-form-block-payment_processor input[type="checkbox"]').each(function(){
-                if(cj(this).prop('checked')) {
-                    var id = cj(this).attr('id').split('_')[2];
-        ids.push(id);
-                }
-            });
-            return ids;
-        }
+     CRM.$(function($) {
+       function checked_payment_processors() {
+         var ids = [];
+         $('.crm-contribution-contributionpage-amount-form-block-payment_processor input[type="checkbox"]').each(function(){
+           if($(this).prop('checked')) {
+             var id = $(this).attr('id').split('_')[2];
+             ids.push(id);
+           }
+         });
+         return ids;
+       }
 
         // show/hide recurring block
-        cj('.crm-contribution-contributionpage-amount-form-block-payment_processor input[type="checkbox"]').change(function(){
-            showRecurring( checked_payment_processors() )
+        $('.crm-contribution-contributionpage-amount-form-block-payment_processor input[type="checkbox"]').change(function(){
+            showRecurring( checked_payment_processors() );
         });
-        showRecurring( checked_payment_processors() )
+        showRecurring( checked_payment_processors() );
     });
   var element_other_amount = document.getElementsByName('is_allow_other_amount');
     if (! element_other_amount[0].checked) {
@@ -355,39 +349,20 @@
 {if $isQuick}
 {literal}
 <script type="text/javascript">
-cj("#quickconfig").click(function(){
-cj("#popupContainer").dialog({
-  title: "Selected Price Set",
-  width:400,
-  height:220,
-  modal: true,
-  overlay: {
-                 opacity: 0.5,
-                  background: "black"
-        },
-        buttons: {
-                   "Ok": function() {
-       var dataUrl  = {/literal}'{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Core_Page_AJAX&fnName=setIsQuickConfig&context=civicrm_contribution_page&id=$contributionPageID" }';
-        var redirectUrl = '{crmURL p="civicrm/admin/price/field" h=0 q="reset=1&action=browse&sid=" }';
-       {literal}
-       cj.ajax({
-      url: dataUrl,
-      async: false,
-      global: false,
-      success: function ( result ) {
-        if (result) {
-          window.location= redirectUrl+eval(result);
-        }
-      }
-       });
-                   },
-       "Close": function() {
-                     cj(this).dialog("close");
-                   }
-  }
-});
-return false;
-});
+  CRM.$(function($) {
+    $("#quickconfig").click(function(e) {
+      e.preventDefault();
+      CRM.confirm({
+        width: 400,
+        message: {/literal}"{ts escape='js'}Once you switch to using a Price Set, you won't be able to switch back to your existing settings below except by re-entering them. Are you sure you want to switch to a Price Set?{/ts}"{literal}
+      }).on('crmConfirm:yes', function() {
+        {/literal}
+        var dataUrl = '{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Core_Page_AJAX&fnName=setIsQuickConfig&context=civicrm_contribution_page&id=$contributionPageID" }';
+        {literal}
+        $.getJSON(dataUrl).done(function(result) {window.location = CRM.url("civicrm/admin/price/field", {reset: 1, action: 'browse', sid: result});});
+      });
+    });
+  });
 </script>
 {/literal}
 {/if}

@@ -156,7 +156,7 @@
   {include file="CRM/common/customData.tpl"}
   {literal}
     <script type="text/javascript">
-      cj(document).ready(function() {
+      CRM.$(function($) {
         {/literal}
         {if $customDataSubType}
           CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
