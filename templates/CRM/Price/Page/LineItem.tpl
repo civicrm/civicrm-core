@@ -108,7 +108,7 @@
 {/if}
 {literal}
 <script type="text/javascript">
-cj(document).ready(function($) {
+CRM.$(function($) {
   {/literal}
     var comma = '{$config->monetaryThousandSeparator}';
     var dot = '{$config->monetaryDecimalPoint}';

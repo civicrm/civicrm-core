@@ -131,11 +131,9 @@
 
 {literal}
 <script type="text/javascript">
-  cj(document).ready(function() {
-    cj('#title').data('initial_value', cj('#title').val());
-  });
   CRM.$(function($) {
       var formName = {/literal}"{$form.formName}"{literal};
+      $('#title').data('initial_value', $('#title').val());
       $('#_qf_' + formName + '_submit_save').click (
           function(){
               if ( $('#is_navigation').prop('checked') && $('#parent_id').val() == '') {

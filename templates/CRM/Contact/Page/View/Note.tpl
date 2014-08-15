@@ -216,18 +216,18 @@
 
     <script type="text/javascript">
     {literal}
-        cj(document).ready( function() {
-            var tabId = cj.fn.dataTableSettings[0].sInstance;
+      CRM.$(function($) {
+        var tabId = $.fn.dataTableSettings[0].sInstance;
 
-            cj('table#'+ tabId).dataTable().fnSettings().aoDrawCallback.push( {
-                    "fn": function () {
-                        cj('#'+ tabId +' tr').each( function() {
-                            drawCommentRows(this.id)
-                        });
-                    },
-                    "sName": "user"
-            } );
-        });
+        $('table#'+ tabId).dataTable().fnSettings().aoDrawCallback.push( {
+          "fn": function () {
+            $('#'+ tabId +' tr').each( function() {
+              drawCommentRows(this.id)
+            });
+          },
+          "sName": "user"
+        } );
+      });
 
     {/literal}
     </script>
