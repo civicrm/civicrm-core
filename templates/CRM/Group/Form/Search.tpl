@@ -107,8 +107,8 @@ CRM.$(function($) {
     .on('click', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', CRM.popup)
     .on('crmPopupFormSuccess', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', function() {
         // Refresh datatable when form completes
-	var $context = $('#crm-main-content-wrapper');
-        $('table.crm-group-selector',$context ).dataTable().fnDraw();
+      	var $context = $('#crm-main-content-wrapper');
+        $('table.crm-group-selector', $context).dataTable().fnDraw();
     });
 
   function buildGroupSelector( filterSearch, parentsOnlyArg ) {
@@ -297,9 +297,9 @@ CRM.$(function($) {
               appendHTML += '<td><span class="crm-editable crmf-description" data-type="textarea">' + (val.group_description || '') + "</span></td>";
               appendHTML += "<td>" + val.group_type + "</td>";
               appendHTML += "<td>" + val.visibility + "</td>";
-	      if (showOrgInfo) {
-	        appendHTML += "<td>" + val.org_info + "</td>";
-	      }
+              if (showOrgInfo) {
+                appendHTML += "<td>" + val.org_info + "</td>";
+              }
               appendHTML += "<td>" + val.links + "</td>";
               appendHTML += "</tr>";
             });
