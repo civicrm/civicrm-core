@@ -54,7 +54,7 @@
     $("#popupContainer").hide();
     $("#button").click(function() {
       $("#popupContainer").dialog({
-        title: "Selected Contacts",
+        title: {/literal}"{ts escape='js'}Selected Contacts{/ts}"{literal},
         width:700,
         height:500,
         modal: true
