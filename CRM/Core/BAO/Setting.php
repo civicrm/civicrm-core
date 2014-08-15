@@ -288,9 +288,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
             continue;
           }
           $configKey = CRM_Utils_Array::value('config_key', $fields['values'][$name],  $name);
-          if(isset($config->$configKey)){
-            $setting = $config->$configKey;
-          }
+          $setting = isset($config->$configKey) ? $config->$configKey : NULL;
         }
         else {
           $setting =

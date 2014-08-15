@@ -555,5 +555,42 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('extensionsDir', $result['values'][$dom['id']]);
     $this->assertEquals('Unconfirmed', $result['values'][$dom['id']]['tag_unconfirmed']);
   }
+
+  function testGetNullValue() {
+    $this->setMockSettingsMetaData(array(
+      'nullExample' => array(
+        'group_name' => 'Developer Preferences',
+        'group' => 'developer',
+        'name' => 'nullExample',
+        'type' => 'String',
+        'quick_form_type' => 'Element',
+        'html_type' => 'text',
+        'default' => NULL,
+        'add' => '4.5',
+        'title' => 'Null Example',
+        'is_domain' => 1,
+        'is_contact' => 0,
+        'description' => "A pre-fetch field with a default value of null",
+        'prefetch' => 1,
+      ),
+    ));
+
+    $this->callAPISuccess('setting', 'fill', array());
+
+    $getValueResult = $this->callAPISuccess('setting', 'getvalue', array(
+      'name' => 'nullExample',
+      'group' => 'Developer Preferences',
+    ));
+    $this->assertEquals(NULL, $getValueResult);
+
+    $getResult = $this->callAPISuccess('setting', 'get', array());
+    $this->assertEquals(1, count($getResult['values']));
+    $values = CRM_Utils_Array::first($getResult['values']);
+    // For null values, the existing/intended behavior appears to be omitting the return value.
+    $this->assertTrue(!array_key_exists('nullExample', $values), "nullExample should not be returned");
+    // $this->assertTrue(array_key_exists('nullExample', $values), "nullExample should be returned");
+    // $this->assertEquals(NULL, $values['nullExample'], "nullExample should be null");
+  }
+
 }
 
