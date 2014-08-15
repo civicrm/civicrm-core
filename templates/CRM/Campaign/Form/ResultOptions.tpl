@@ -163,7 +163,7 @@
       }, "json" );
   }
 
-    cj(document).ready( function( ) {
+    CRM.$(function($) {
         showOptionSelect( );
     });
 

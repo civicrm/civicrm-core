@@ -45,13 +45,12 @@
 </div>
 {literal}
 <script type="text/javascript">
-cj(document).ready( function() {
-    cj('#adjust-option-type').hide();
-});
-function adjustPayment( ) {
-cj('#adjust-option-type').show();
-cj("#scheduled_amount").removeAttr("READONLY");
-cj("#scheduled_amount").css('background-color', '#ffffff');
-}
+  CRM.$(function($) {
+    $('#adjust-option-type').hide();
+  });
+  function adjustPayment( ) {
+    cj('#adjust-option-type').show();
+    cj("#scheduled_amount").removeAttr("READONLY").css('background-color', '#ffffff');
+  }
 </script>
 {/literal}

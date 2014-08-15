@@ -172,11 +172,13 @@
         <td class="label">{$form.wysiwyg_input_format.label}</td>
         <td>
           {$form.wysiwyg_input_format.html}{literal}
-            <script type="text/javascript">cj(document).ready(function () {
-                if (cj('#editor_id').val() == 4) {
-                  cj('#crm-preferences-display-form-block-wysiwyg_input_format').show();
+            <script type="text/javascript">
+              CRM.$(function($) {
+                if ($('#editor_id').val() == 4) {
+                  $('#crm-preferences-display-form-block-wysiwyg_input_format').show();
                 }
-              });</script>
+              });
+            </script>
           {/literal}
           <br/>
           <span class="description">

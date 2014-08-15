@@ -84,17 +84,17 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
-  cj(document).on('blur', '.distribute', function() {
+  $(document).on('blur', '.distribute', function() {
    var totalAmount = 0;
-   cj('.distribute').each(function (){
-   if(cj(this).val( ).length > 0){
-    totalAmount     = parseFloat( totalAmount ) + parseFloat( cj(this).val( ) );
+   $('.distribute').each(function (){
+   if($(this).val( ).length > 0){
+    totalAmount     = parseFloat( totalAmount ) + parseFloat( $(this).val( ) );
     }
    });
 
-    cj('.editPayment').text('$ '+totalAmount);
+    $('.editPayment').text('$ '+totalAmount);
       var unlocateAmount = '{/literal}{$total}{literal}';
-      cj('.unlocateAmount').text('$ '+(unlocateAmount - totalAmount));
+      $('.unlocateAmount').text('$ '+(unlocateAmount - totalAmount));
    });
 });
 </script>
