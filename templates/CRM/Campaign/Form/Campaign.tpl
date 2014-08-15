@@ -112,14 +112,14 @@
 
 {literal}
 <script type="text/javascript">
-cj( document ).ready( function( ) {
+  CRM.$(function($) {
     {/literal}{if $customDataSubType}
-     CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-        {else}
-     CRM.buildCustomData( '{$customDataType}' );
-        {/if}
+      CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
+    {else}
+      CRM.buildCustomData( '{$customDataType}' );
+    {/if}
     {literal}
-});
+  });
 </script>
 {/literal}
 
