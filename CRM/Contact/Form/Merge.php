@@ -71,6 +71,11 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->_gid     = $gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE);
     $this->_mergeId = CRM_Utils_Request::retrieve('mergeId', 'Positive', $this, FALSE);
 
+    // Sanity check
+    if ($cid == $oid) {
+      CRM_Core_Error::statusBounce(ts('Cannot merge a contact with itself.'));
+    }
+
     if (!CRM_Dedupe_BAO_Rule::validateContacts($cid, $oid)) {
       CRM_Core_Error::statusBounce(ts('The selected pair of contacts are marked as non duplicates. If these records should be merged, you can remove this exception on the <a href=\'%1\'>Dedupe Exceptions</a> page.', array(1 => CRM_Utils_System::url('civicrm/dedupe/exception', 'reset=1'))));
     }
