@@ -49,6 +49,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   CONST
     ADDRESS_STANDARDIZATION_PREFERENCES_NAME = 'Address Standardization Preferences',
     CAMPAIGN_PREFERENCES_NAME = 'Campaign Preferences',
+    DEVELOPER_PREFERENCES_NAME = 'Developer Preferences',
     DIRECTORY_PREFERENCES_NAME = 'Directory Preferences',
     EVENT_PREFERENCES_NAME = 'Event Preferences',
     MAILING_PREFERENCES_NAME = 'Mailing Preferences',
