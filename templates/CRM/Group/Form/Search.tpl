@@ -293,7 +293,7 @@ CRM.$(function($) {
               else {
                 appendHTML += '<td class="crm-group-name ' + levelClass + '"><span class="crm-no-children"></span><span class="crm-editable crmf-title">' + val.group_name + '</span></td>';
               }
-              appendHTML += "<td>" + val.count + "</td>";
+              appendHTML += '<td class="right">' + val.count + "</td>";
               appendHTML += "<td>" + val.created_by + "</td>";
               appendHTML += '<td><span class="crm-editable crmf-description" data-type="textarea">' + (val.group_description || '') + "</span></td>";
               appendHTML += "<td>" + val.group_type + "</td>";
