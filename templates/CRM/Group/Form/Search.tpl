@@ -66,12 +66,14 @@
   </tr>
 </table>
 </div>
-<br/>
+<div class="css_right">
+  <a class="crm-hover-button" href="{crmURL q="reset=1&update_smart_groups=1"}">{ts}Update Smart Group Counts{/ts}</a> {help id="update_smart_groups"}
+</div>
 <table class="crm-group-selector">
   <thead>
     <tr>
       <th class='crm-group-name'>{ts}Name{/ts}</th>
-      <th class='crm-group-members'>{ts}Members{/ts}</th>
+      <th class='crm-group-count'>{ts}Count{/ts}</th>
       <th class='crm-group-created_by'>{ts}Created By{/ts}</th>
       <th class='crm-group-description'>{ts}Description{/ts}</th>
       <th class='crm-group-group_type'>{ts}Group Type{/ts}</th>
@@ -137,7 +139,7 @@ CRM.$(function($) {
         "aaSorting"  : [],
         "aoColumns"  : [
                         {sClass:'crm-group-name'},
-                        {sClass:'crm-group-members'},
+                        {sClass:'crm-group-count'},
                         {sClass:'crm-group-created_by'},
                         {sClass:'crm-group-description', bSortable:false},
                         {sClass:'crm-group-group_type'},
@@ -290,7 +292,7 @@ CRM.$(function($) {
               else {
                 appendHTML += '<td class="crm-group-name ' + levelClass + '"><span class="crm-no-children"></span><span class="crm-editable crmf-title">' + val.group_name + '</span></td>';
               }
-              appendHTML += "<td>" + val.members + "</td>";
+              appendHTML += "<td>" + val.count + "</td>";
               appendHTML += "<td>" + val.created_by + "</td>";
               appendHTML += '<td><span class="crm-editable crmf-description" data-type="textarea">' + (val.group_description || '') + "</span></td>";
               appendHTML += "<td>" + val.group_type + "</td>";
