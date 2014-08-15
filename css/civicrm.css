@@ -1627,10 +1627,6 @@ editor specific classes
   cursor: pointer;
 }
 
-#crm-container table.nestedActivitySelector tr a {
-  color: #0066CC;
-}
-
 #crm-container #activities-selector tr:hover td,
 #crm-container #activities-selector tr:hover td.sorted,
 #crm-container #activities-selector tr.trOver td.sorted,
@@ -1709,6 +1705,7 @@ editor specific classes
   display: inline-block;
   white-space: nowrap;
   border: 1px solid transparent;
+  border-radius: 4px;
   text-decoration: none;
   font-size: .8em;
   color: #000;
@@ -1738,7 +1735,6 @@ editor specific classes
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#cccccc', endColorstr = '#eeeeee', GradientType = 0);
   background-image: linear-gradient(top, #eee 0%, #ccc 100%);
   border: 1px solid #AAAAAA;
-  border-radius: 4px;
   opacity: 1;
   color: #2786C2;
 }
@@ -3433,22 +3429,22 @@ tbody.scrollContent tr.alternateRow {
   text-decoration: none !important;
 }
 
-#crm-container table.selector td {
+.crm-container table.selector td {
   border-right: 1px dotted #DDDDDD;
 }
-#crm-container #customFields div.contact_panel td {
+.crm-container #customFields div.contact_panel td {
   border-bottom: 1px solid #FFFFFF;
   padding: 4px;
   vertical-align: top;
 }
 
-#crm-container div.contact_panel td,
+.crm-container div.contact_panel td,
 .crm-container table.crm-info-panel td {
   background-color: #f4f4ed;
 }
 
-#crm-container div.contact_panel td.label,
-#crm-container #customFields div.contact_panel td.label,
+.crm-container div.contact_panel td.label,
+.crm-container #customFields div.contact_panel td.label,
 .crm-container table.crm-info-panel td.label {
   background-color: #fafafa;
   width: 120px;
@@ -3459,21 +3455,21 @@ tbody.scrollContent tr.alternateRow {
   width: 150px;
 }
 
-#crm-container .form-layout td.label,
-#crm-container .form-layout-compressed td.label {
+.crm-container .form-layout td.label,
+.crm-container .form-layout-compressed td.label {
   width: 150px;
   text-align: right;
   color: #7a7a60;
 }
 
-#crm-container .form-layout td.label,
-#crm-container form table.report .label,
-#crm-container form table label,
-#crm-container form table.report label {
+.crm-container .form-layout td.label,
+.crm-container form table.report .label,
+.crm-container form table label,
+.crm-container form table.report label {
   color: #3e3e3e;
 }
 
-#crm-container div.contact_panel td.grouplabel {
+.crm-container div.contact_panel td.grouplabel {
   border-bottom: 2px solid #D7D7D0 !important;
 }
 
