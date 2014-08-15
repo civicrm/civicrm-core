@@ -177,6 +177,7 @@ CRM.$(function($) {
           var cl = $('td:last', nRow).text().split(',')[1];
           $(nRow).addClass(cl).attr({id: 'row_' + id, 'data-id': id, 'data-entity': 'group'});
           $('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-title" />');
+          $('td:eq(1)', nRow).addClass('right');
           $('td:eq(3)', nRow).wrapInner('<span class="crm-editable crmf-description" data-type="textarea" />');
           if (parentsOnly) {
             if ($(nRow).hasClass('crm-group-parent')) {
