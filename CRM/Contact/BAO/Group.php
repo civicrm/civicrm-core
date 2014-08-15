@@ -750,7 +750,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     if (!empty($groups)) {
       foreach ($groups as $id => $value) {
         $groupList[$id]['group_id'] = $value['id'];
-        $groupList[$id]['members'] = $value['members'];
+        $groupList[$id]['count'] = $value['count'];
         $groupList[$id]['group_name'] = $value['title'];
 
         // append parent names if in search mode
@@ -831,12 +831,12 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     }
 
     $query = "
-        SELECT groups.*, createdBy.sort_name as created_by, IF(groups.saved_search_id, COUNT(smart_members.id), COUNT(members.id)) as members {$select}
+        SELECT groups.*, createdBy.sort_name as created_by, IF(groups.saved_search_id, COUNT(smart_contacts.id), COUNT(contacts.id)) as `count` {$select}
         FROM  civicrm_group groups
-        LEFT JOIN civicrm_group_contact members
-          ON members.group_id = groups.id AND members.status = 'Added'
-        LEFT JOIN civicrm_group_contact_cache smart_members
-          ON smart_members.group_id = groups.id
+        LEFT JOIN civicrm_group_contact contacts
+          ON contacts.group_id = groups.id AND contacts.status = 'Added'
+        LEFT JOIN civicrm_group_contact_cache smart_contacts
+          ON smart_contacts.group_id = groups.id
         LEFT JOIN civicrm_contact createdBy
           ON createdBy.id = groups.created_id
         {$from}
@@ -917,7 +917,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
         $values[$object->id]['visibility'] = $visibility[$values[$object->id]['visibility']];
 
-        $values[$object->id]['members'] = $object->members;
+        $values[$object->id]['count'] = $object->count;
 
         if (isset($values[$object->id]['group_type'])) {
           $groupTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR,
