@@ -37,6 +37,8 @@
  * Helper authentication class for unit tests
  */
 class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
+  public $redirected_url = NULL;
+
   function __construct() {
     $this->is_drupal = FALSE;
     $this->supports_form_extensions = False;
@@ -171,8 +173,20 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    * @static
    */
   public function getLoginURL($destination = '') {
-    throw new Exception("Method not implemented: getLoginURL");
+    return "/login";
   }
   
+  public function civiExit($status) {
+    throw new CRM_Utils_System_UnitTests_CiviExitException("civiExit with status $status", $status);
+  }
+
+  public function redirect($url = NULL) {
+    $this->redirected_url = $url;
+    CRM_Utils_System::civiExit();
+  }
+
+  public function statusBounce($status, $redirect = NULL) {
+    throw new CRM_Utils_System_UnitTests_StatusBounceException($status);
+  }
 }
 

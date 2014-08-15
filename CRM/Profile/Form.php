@@ -67,6 +67,11 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_gid;
 
   /**
+    * @var array details of the UFGroup used on this page
+   */
+  protected $_ufGroup = array('name' => 'unknown');
+
+  /**
    * The group id that we are passing in url
    *
    * @var int
@@ -263,9 +268,17 @@ class CRM_Profile_Form extends CRM_Core_Form {
       if ($dao->find(TRUE)) {
         $this->_isUpdateDupe = $dao->is_update_dupe;
         $this->_isAddCaptcha = $dao->add_captcha;
+        $this->_ufGroup = (array) $dao;
       }
       $dao->free();
+
+      if (!CRM_Utils_Array::value('is_active', $this->_ufGroup)) {
+        CRM_Core_Error::fatal(ts('The requested profile (gid=%1) is inactive or does not exist.', array(
+          1 => $this->_gid,
+        )));
+      }
     }
+    $this->assign('ufGroupName', $this->_ufGroup['name']);
 
     $gids = empty($this->_profileIds) ? $this->_gid : $this->_profileIds;
 
@@ -779,8 +792,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     if ($this->_mode != self::MODE_SEARCH) {
       if (isset($addToGroupId)) {
-        $this->add('hidden', "add_to_group", $addToGroupId);
-        $this->_addToGroupID = $addToGroupId;
+        $this->_ufGroup['add_to_group_id'] = $addToGroupId;
       }
     }
 
@@ -1165,10 +1177,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
 
-    $addToGroupId = NULL;
-    if (CRM_Utils_Array::value('add_to_group', $params)) {
-      $addToGroupId = $params['add_to_group'];
-
+    $addToGroupId = $addToGroupId = CRM_Utils_Array::value('add_to_group_id', $this->_ufGroup);
+    if ($addToGroupId) {
       //run same check whether group is a mailing list
       $groupTypes = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',
         $addToGroupId, 'group_type', 'id'
