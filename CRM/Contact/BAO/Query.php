@@ -3943,24 +3943,24 @@ WHERE  id IN ( $groupIDs )
     }
 
     $toggleValues = $this->getWhereValues('privacy_toggle', $grouping);
-    $compareOP = '!=';
+    $compareOP = '!';
     if ($toggleValues &&
       $toggleValues[2] == 2
     ) {
-      $compareOP = '=';
+      $compareOP = '';
     }
 
     $clauses = array();
     $qill = array();
     foreach ($value as $dontCare => $pOption) {
-      $clauses[] = " ( contact_a.{$pOption} $compareOP 1 ) ";
+      $clauses[] = " ( contact_a.{$pOption} = 1 ) ";
       $field = CRM_Utils_Array::value($pOption, $this->_fields);
       $title = $field ? $field['title'] : $pOption;
-      $qill[] = " $title $compareOP 1 ";
+      $qill[] = " $title = 1 ";
     }
 
-    $this->_where[$grouping][] = '( ' . implode($operator, $clauses) . ' )';
-    $this->_qill[$grouping][] = implode($operator, $qill);
+    $this->_where[$grouping][] = $compareOP . '( ' . implode($operator, $clauses) . ' )';
+    $this->_qill[$grouping][] = $compareOP . '( ' . implode($operator, $qill) . ' )';
   }
 
   /**
