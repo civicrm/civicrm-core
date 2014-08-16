@@ -844,7 +844,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
             if (CRM_Utils_Array::value('options', $value)) {
               foreach ($value['options'] as $val) {
-                if (CRM_Utils_Array::value('membership_type_id', $val)) {
+                if (CRM_Utils_Array::value('membership_type_id', $val) && $fields['price_' . $priceId] == $val['id']) {
                   $priceFieldMemTypes[] = $val['membership_type_id'];
                 }
               }
@@ -1384,4 +1384,3 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $form->assign('ppType', $form->_ppType);
   }
 }
-

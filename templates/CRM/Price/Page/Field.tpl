@@ -81,7 +81,7 @@
             <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td>{if $row.active_on}{$row.active_on|date_format:"%Y-%m-%d %T"}{/if}</td>
             <td>{if $row.expire_on}{$row.expire_on|date_format:"%Y-%m-%d %T"}{/if}</td>
-            <td>{if $row.html_type eq "Text / Numeric Quantity"}{$row.price|crmMoney}{else}<a href="{crmURL p="civicrm/admin/price/field/option" q="action=browse&reset=1&sid=$sid&fid=$fid"}">{if $isReserved}{ts}View Price Options{/ts}{else}{ts}Edit Price Options{/ts}{/if}</a>{/if}</td>
+            <td>{if $row.html_type eq "Text / Numeric Quantity"|ts}{$row.price|crmMoney}{else}<a href="{crmURL p="civicrm/admin/price/field/option" q="action=browse&reset=1&sid=$sid&fid=$fid"}">{if $isReserved}{ts}View Price Options{/ts}{else}{ts}Edit Price Options{/ts}{/if}</a>{/if}</td>
             <td class="field-action">{$row.action|replace:'xx':$row.id}</td>
             <td class="order hiddenElement">{$row.weight}</td>
         </tr>
