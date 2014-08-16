@@ -705,8 +705,9 @@
       if ((memType > 0) && (allMemberships[memType]['has_related'])) {
         if (setDefault) cj('#max_related').val(allMemberships[memType]['max_related']);
         cj('#maxRelated').show();
-        if(CRM.ids.contact > 0) {
-          CRM.api('relationship', 'getcount', {'contact_id' : CRM.ids.contact, 'membership_type_id' : memType}, {
+        var cid = {/literal}{if $contactID}{$contactID}{else}null{/if}{literal};
+        if (cid) {
+          CRM.api('relationship', 'getcount', {contact_id: cid, membership_type_id: memType}, {
             success: function(result) {
               var relatable = ' ' + result.result + ts(' contacts are ');
               if(result.result === 0) {
