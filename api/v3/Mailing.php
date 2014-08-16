@@ -383,6 +383,30 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
   return civicrm_api3_create_success($mailDelivered);
 }
 
+function civicrm_api3_mailing_get_token($params) {
+  if (!array_key_exists("usage", $params)) {
+    throw new API_Exception('Mandatory keys missing from params array: entity');
+  }
+
+  $tokens = CRM_Core_SelectValues::contactTokens();
+  switch ($params['usage']) {
+    case 'Mailing' :
+      $tokens = array_merge(CRM_Core_SelectValues::mailingTokens(), $tokens);
+      break;
+    case 'ScheduleEventReminder' :
+      $tokens = array_merge(CRM_Core_SelectValues::activityTokens(), $tokens);
+      $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
+      $tokens = array_merge(CRM_Core_SelectValues::membershipTokens(), $tokens);
+      break;
+    case 'ManageEventScheduleReminder' :
+      $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
+      break;
+  }
+
+  return CRM_Utils_Token::formatTokensForDisplay($tokens);
+
+}
+
 /**
  * Adjust Metadata for send_mail action
  *

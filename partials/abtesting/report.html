@@ -6,36 +6,56 @@
     }
     .axis path, .axis line {
       fill: none;
-      stroke: #000;
+      stroke:#000;
       shape-rendering: crispEdges;
     }
   </style>
   <div id="grph" ></div>
   <div linegraph></div>
+  {{r5}}
   <table  style ="position: relative;  right :-425px; top:-250px; width :250px;">
     <tr  >
       <th>Details</th>
       <th style="width :90px;">Version A</th>
       <th style="width :90px;">Version B</th>
     </tr>
-    <tr ng-repeat="d in data">
-      <td></td>
-      <td></td>
-      <td></td>
+    <tr>
+      <td>Delivered</td>
+      <td>{{r[0]}}</td>
+      <td>{{d[0]}}</td>
     </tr>
-
+    <tr>
+      <td>Bounces</td>
+      <td>{{r[1]}}</td>
+      <td>{{d[1]}}</td>
+    </tr>
+    <tr>
+      <td>Unsuscribers</td>
+      <td>{{r[2]}}</td>
+      <td>{{d[2]}}</td>
+    </tr>
+    <tr>
+      <td>Opened</td>
+      <td>{{r[3]}}</td>
+      <td>{{d[3]}}</td>
+    </tr>
+    <tr>
+      <td>Unique Clicks</td>
+      <td>{{r[4]}}</td>
+      <td>{{d[4]}}</td>
+    </tr>
 
   </table>
   <br><br>
    <hr>
 
-  <table style="position: relative; left :40px;">
+  <table>
     <tbody>
 
     <tr >
 
       <td>
-        <input type="radio" name="stop">  Stop Test and Send Version A
+        <input type="radio" name="stop" >  Stop Test and Send Version A
       </td>
 
       <td>

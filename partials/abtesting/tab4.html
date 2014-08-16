@@ -4,15 +4,15 @@
     <table>
       <tr>
         <td>Test Criteria</td>
-        <td>{{template.name}}</td>
+        <td>{{sparestuff.template.name}}</td>
       </tr>
       <tr>
         <td>Groups Included</td>
-        <td>{{incGroup}}</td>
+        <td>{{sparestuff.ingrps}}</td>
       </tr>
       <tr>
         <td>Groups Excluded</td>
-        <td>{{excGroup}}</td>
+        <td>{{sparestuff.excgrps}}</td>
       </tr>
       <tr>
         <td>Size of Test Group</td>
@@ -20,7 +20,7 @@
       </tr>
       <tr>
         <td>Winner Criteria</td>
-        <td>{{winner_criteria}}</td>
+        <td>{{sparestuff.winnercriteria}}</td>
       </tr>
       <tr>
         <td>Declare Winner By</td>
@@ -45,7 +45,7 @@
     <h3 ng-click="sendTestMailing();">Send Test Emails</h3>
 
     <div ng-show="sendtest" id="sendtest">
-      <input type="text" ng-model="emailadd">
+      Email-id : &nbsp<input placeholder = "abcd@civicrm.org" type="text" ng-model="sparestuff.emailadd">
     </div>
 
     <h3>When to Start</h3><br>
@@ -53,7 +53,10 @@
     <div>
       <input type="radio" name="Start" ng-model="start" value="now"> Now &nbsp
       <input type="radio" name="Start" ng-model="start" value="later"> Later
-      &nbsp &nbsp <input type="text" class="dateplugin" ng-show="start=='later'" ng-model="send_date" datepick>
+      <div ng-show="start=='later'">
+      &nbsp &nbsp <input type="text" class="dateplugin"  ng-model="send_date" datepick>
+      &nbsp &nbsp Time :<input type="text" placeholder="hh:mm" ng-model="currentABTest.latertime"  checktimeentry >
+      </div>
     </div>
 
     <br><br>
@@ -63,7 +66,7 @@
         <input type="submit" ng-click="tab4Form.$setPristine();" value="Previous" prevtab/>
       </span>
       <span class="crm-button">
-        <input type="submit" ng-click="tab4Form.$setPristine();" value="Submit & Send"/>
+        <input type="submit" ng-click="tab4Form.$setPristine();  startabtest(); goto('mailing/abtesting');" value="Submit & Send"/>
       </span>
       <span class="crm-button">
         <input type="submit" ng-click="tab4Form.$setPristine(); goto('mailing/abtesting');" value="Cancel"/>

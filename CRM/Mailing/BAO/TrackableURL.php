@@ -103,6 +103,23 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
   }
 
   /**
+   * @param $url
+   * @param $mailing_id
+   *
+   * return int Url id of the given url and mail
+   */
+  public static function getTrackerURLId($url, $mailing_id) {
+    $tracker = new CRM_Mailing_BAO_TrackableURL();
+    $tracker->url = $url;
+    $tracker->mailing_id = $mailing_id;
+    if ($tracker->find(TRUE)) {
+      return $tracker->id;
+    }
+
+    return NULL;
+  }
+
+  /**
    * @param $msg
    * @param $mailing_id
    * @param $queue_id

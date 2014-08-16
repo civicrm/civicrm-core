@@ -1,12 +1,12 @@
 <form name="tab2Form" unsaved-warning-form>
   <div class="crm-block crm-form-block crmABTesting">
-    <div ng-include="template.url"></div>
+    <div ng-include="sparestuff.template.url"></div>
     <div class="crm-submit-buttons">
       <span class="crm-button">
         <input type="submit" ng-click="tab2Form.$setPristine();" value="Previous" submitform prevtab/>
       </span>
       <span class="crm-button">
-        <input type="submit" ng-click="tab2Form.$setPristine();" value="Next" submitform nexttab="{{tab_val}}"/>
+        <input type="submit" ng-click="tab2Form.$setPristine();" value="Next" ng-disabled="tab2Form.$invalid" submitform nexttab="{{tab_val}}"/>
       </span>
       <span class="crm-button">
         <input type="submit" ng-click="tab2Form.$setPristine(); goto('mailing/abtesting');" value="Cancel"/>

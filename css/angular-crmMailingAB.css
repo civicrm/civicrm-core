@@ -39,7 +39,7 @@ div#settings .ui-tabs-nav li.ui-tabs-selected {
 }
 
 div#frag1 {
-  height:500px;
+  height:600px;
   width:800px;
   overflow: auto;
   position: relative;
@@ -47,7 +47,7 @@ div#frag1 {
 }
 
 div#frag2 {
-  height:500px;
+  height:600px;
   width:800px;
   overflow: auto;
 }

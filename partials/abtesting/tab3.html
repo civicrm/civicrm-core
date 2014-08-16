@@ -14,14 +14,16 @@
     <h3>Select the size of your test group</h3><br>
     &nbsp Percentage Selected - {{currentABTest.group_percentage}}%
 
-    <div sliderbar id="trial" style="margin: 10px;"></div>
+    <div sliderbar id="trial" style="margin: 10px;" required></div>
 
     <h3>How will the winner be decided</h3><br>
     &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=1 name="cri" required> Open <br/><br>
     &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=2 name="cri" checked="checked">
     Total Unique Clicks <br/><br>
     &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=3 name="cri"> Total
-    Clicks on a particular link <br/><br>
+    Clicks on a particular link <br/>
+    &nbsp &nbsp &nbsp &nbsp<input type="text"  ng-show="currentABTest.winner_criteria_id==3" ng-model="currentABTest.acturl">
+    <br>
 
     <h3>Declare the winner by when?</h3><br>
     <table>
@@ -29,11 +31,11 @@
       <tr>
         <td class="label">Date</td>
         <td>
-          <input type="text" chsdate ng-model="currentABTest.date">
+          <input type="text" chsdate ng-model="currentABTest.date" required>
         </td>
         <td class="label">Time</td>
         <td>
-          <input type="text" placeholder="hh:mm:ss" ng-model="currentABTest.time">
+          <input type="text" placeholder="hh:mm" ng-model="currentABTest.time"  checktimeentry required>
         </td>
       </tr>
       </tbody>
@@ -49,7 +51,7 @@
         <input type="submit" ng-click="tab3Form.$setPristine();update_abtest();" value="Previous" prevtab/>
       </span>
       <span class="crm-button">
-        <input type="submit" ng-click="tab3Form.$setPristine();update_abtest();" value="Next" nexttab="{{tab_val}}"/>
+        <input type="submit" ng-click="tab3Form.$setPristine();update_abtest();" ng-disabled="tab3Form.$invalid" value="Next" nexttab="{{tab_val}}"/>
       </span>
       <span class="crm-button">
         <input type="submit" ng-click="tab3Form.$setPristine(); goto('mailing/abtesting');" value="Cancel"/>
