@@ -12,7 +12,7 @@
         <td class="label">From E-mail Address</td>
         <td>
           <select style="width: 200px" ng-model="mailA.from_email"
-                  ng-options="frm.email as frm.email for frm in eMailing">
+                  ng-options="frm.email as frm.email for frm in eMailing" >
             <option value="">-none-</option>
           </select>
         </td>
@@ -29,9 +29,16 @@
       <tr>
         <td class="label">Mailing Subject</td>
         <td>
-          <input placeholder="Enter Subject" name="subject" type="text" ng-model="mailA.subject"/>
+          <input placeholder="Enter Subject" name="subject" id="twomaila" type="text" ng-model="mailA.subject" required>
         </td>
       </tr>
+      <tr>
+        <td class="label">Mailing Subject Token</td>
+        <td>
+          <input type="hidden" groupselect id= "subgrouptwoa"  ></input>
+        </td>
+      </tr>
+
       <tr>
         <td class="label" style="color:red" ng-show="mailing_form.subject.$invalid">
           Mailing subject required.
@@ -51,23 +58,18 @@
 
     <br>
 
-    <div class="crm-accordion-wrapper collapsed">
-      <div class="crm-accordion-wrapper collapsed">
+    <div class="crm-accordion-wrapper ">
+      <div class="crm-accordion-wrapper ">
         <div class="crm-accordion-header">HTML Format</div>
         <div class="crm-accordion-body">
           <br>
-          &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
-          &nbsp
-          &nbsp &nbsp &nbsp &nbsp &nbsp
-          &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
-          &nbsp
-          &nbsp &nbsp &nbsp &nbsp &nbsp
+          &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+          &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
           &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
-          ss
-          <!--  <input type="hidden" groupselect ng-model="token" ></input>-->
-          <br> <br>
+          <input type="hidden" groupselect id= "htgroupcomposetwoa"  ></input><br><br>
+
           &nbsp &nbsp &nbsp &nbsp
-          <textarea id="body_html" ng-model="mailA.body_html" style="width: 600px; height: 300px;"></textarea>
+          <textarea  ng-model="mailA.body_html" id="twomailabody_html" style="width: 600px; height: 300px;" required></textarea>
           <br> <br>
 
         </div>
@@ -76,10 +78,14 @@
       <div class="crm-accordion-wrapper collapsed">
         <div class="crm-accordion-header">Plain Text</div>
         <div class="crm-accordion-body">
-
           <br>
+          &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+          &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+          &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+          <input type="hidden" groupselect id= "textgroupcomposetwoa"  ></input><br><br>
+
           &nbsp &nbsp &nbsp &nbsp
-          <textarea ng-model="mailA.body_text" style="width: 600px; height: 300px;"></textarea>
+          <textarea ng-model="mailA.body_text" id="twomailabody_text" style="width: 600px; height: 300px;"></textarea>
           <br>
         </div>
       </div>
@@ -144,10 +150,15 @@
       <tr>
         <td class="label">Mailing Subject</td>
         <td>
-          <input placeholder="Enter Subject" name="subject" type="text" ng-model="mailB.subject"/>
+          <input placeholder="Enter Subject" id = "twomailb" name="subject" type="text" ng-model="mailB.subject"/>
         </td>
       </tr>
-
+      <tr>
+        <td class="label">Mailing Subject Token</td>
+        <td>
+          <input type="hidden" groupselect id= "subgrouptwob"  ></input>
+        </td>
+      </tr>
       <tr>
         <td class="label" style="color:red" ng-show="mailing_form.subject.$invalid">
           Mailing subject required.
@@ -166,14 +177,17 @@
     </table>
     <br>
 
-    <div class="crm-accordion-wrapper collapsed">
-      <div class="crm-accordion-wrapper collapsed">
+    <div class="crm-accordion-wrapper ">
+      <div class="crm-accordion-wrapper ">
         <div class="crm-accordion-header">HTML Format</div>
         <div class="crm-accordion-body">
           <br>
-          <br> <br>
+          &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+          &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+          &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+          <input type="hidden" groupselect id= "htgroupcomposetwob"  ></input><br><br>
           &nbsp &nbsp &nbsp &nbsp
-          <textarea id="body_html" ng-model="mailB.body_html" style="width: 600px; height: 300px;"></textarea>
+          <textarea id="twomailbbody_html"   ng-model="mailB.body_html" style="width: 600px; height: 300px;"></textarea>
           <br> <br>
         </div>
       </div>
@@ -182,8 +196,12 @@
         <div class="crm-accordion-header">Plain Text</div>
         <div class="crm-accordion-body">
           <br>
+          &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+          &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+          &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+          <input type="hidden" groupselect id= "textgroupcomposetwob"  ></input><br><br>
           &nbsp &nbsp &nbsp &nbsp
-          <textarea ng-model="mailB.body_text" style="width: 600px; height: 300px;"></textarea>
+          <textarea ng-model="mailB.body_text" id = "twomailbbody_text" style="width: 600px; height: 300px;"></textarea>
           <br>
         </div>
       </div>

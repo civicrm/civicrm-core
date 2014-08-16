@@ -75,6 +75,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'return' => array("msg_html", "id", "msg_title"),
       'id' => array('>' => 58),
     ));
+    $mailTokens = civicrm_api3('Mailing', 'get_token', array( 'usage' => 'Mailing'));
 
     CRM_Core_Resources::singleton()->addSetting(array(
       'crmMailing' => array(
@@ -86,6 +87,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'headerfooterList' => array_values($headerfooterList['values']),
         'mesTemplate' => array_values($mesTemplate['values']),
         'emailAdd' => array_values($emailAdd['values']),
+        'mailTokens' => array_values($mailTokens),
       ),
     ));
 
