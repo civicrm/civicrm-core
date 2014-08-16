@@ -602,11 +602,8 @@ ORDER BY title asc
     }
 
     $campaignIds = $this->getCampaignIds();
-    if (count($campaignIds) > 1) {
+    if (count($campaignIds) >= 1) {
       $clauses[] = '( campaign_id IN ( ' . implode(' , ', $campaignIds) . ' ) )';
-    }
-    elseif (count($campaignIds) > 1) {
-      $clauses[] = '( campaign_id = ' . $campaignIds[0] . ')';
     }
 
     if (empty($clauses)) {
