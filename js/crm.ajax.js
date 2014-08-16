@@ -301,18 +301,33 @@
         settings.dialog.height = parseInt($(window).height() * (parseFloat(settings.dialog.height)/100), 10);
       }
       $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
-      $(settings.target).on('dialogclose', function() {
-        if ($(this).attr('data-unsaved-changes') !== 'true') {
-          $(this).crmSnippet('destroy').dialog('destroy').remove();
-        }
-      });
-    }
-    if (settings.dialog && !settings.dialog.title) {
-      $(settings.target).on('crmLoad', function(e, data) {
-        if (e.target === $(settings.target)[0] && data && data.title) {
-          $(this).dialog('option', 'title', data.title);
-        }
-      });
+      $(settings.target)
+        .on('dialogclose', function() {
+          if ($(this).attr('data-unsaved-changes') !== 'true') {
+            $(this).crmSnippet('destroy').dialog('destroy').remove();
+          }
+        })
+        .on('crmLoad', function(e, data) {
+          // Set title
+          if (e.target === $(settings.target)[0] && data && !settings.dialog.title && data.title) {
+            $(this).dialog('option', 'title', data.title);
+          }
+          // Adjust height to fit content (small delay to allow elements to render)
+          window.setTimeout(function() {
+            var currentHeight = $(settings.target).parent().height(),
+              padding = currentHeight - $(settings.target).height(),
+              newHeight = $(settings.target).prop('scrollHeight') + padding,
+              menuHeight = $('#civicrm-menu').height(),
+              maxHeight = $(window).height() - menuHeight;
+            newHeight = newHeight > maxHeight ? maxHeight : newHeight;
+            if (newHeight > (currentHeight + 15)) {
+              $(settings.target).dialog('option', {
+                position: {my: 'center', at: 'center center+' + (menuHeight / 2), of: window},
+                height: newHeight
+              });
+            }
+          }, 500);
+        });
     }
     $(settings.target).crmSnippet(settings).crmSnippet('refresh');
     return $(settings.target);
