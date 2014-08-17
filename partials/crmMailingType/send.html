@@ -1,6 +1,8 @@
 <!--
 Controller: MailCtrl
 -->
+<form name="editMailingFormStep3" unsaved-warning-form>
+  <div class="crm-block crm-form-block crmMailing">
 <br>
 <h3 style="background-color: #5d677b; color: #f5f6f1;border-radius: 4px; background-image: url('../../sites/all/modules/civicrm/i/TreePlusWhite.gif'); background-repeat: no-repeat; padding: 4px 8px 4px 20px; background-position: 2px center; cursor: pointer; font-weight: normal; font-family: Georgia; font-size: 1em; line-height: 135%;" ng-click="preview_update()">Preview</h3>
 <div id="prevmail" ng-show = "pre">
@@ -37,3 +39,12 @@ Controller: MailCtrl
 	<div class="crm-accordion-header">Schedule and Send</div>
 	<div class="crm-accordion-body" ng-include="partialUrl('sched.html')"></div>
 </div>
+
+<br>
+<button class="crm-button" prevtab type="button" ><span>Previous</span></button>
+<button class="crm-button" ng-click="save()" type= "submit"><span>Save and Continue Later</span></button>
+<button class="crm-button" ng-click="submitButton()" type= "submit"> <span>Submit Mailing</span></button>
+<button class="crm-button" ng-click="back()" ><span>Cancel</span></button>
+<br><br>
+    </div>
+  </form>

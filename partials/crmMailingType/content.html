@@ -2,7 +2,8 @@
 Controller: MailCtrl
 Required Variables: cool_api and currentMailing and fromAddress
 -->
-
+<form name="editMailingFormStep2" unsaved-warning-form>
+  <div class="crm-block crm-form-block crmMailing">
 <br>
 <table class="form-layout-compressed">
 	<tbody>
@@ -75,3 +76,10 @@ Required Variables: cool_api and currentMailing and fromAddress
 	<div class="crm-accordion-header">Track and Respond</div>
 	<div class="crm-accordion-body" ng-include="partialUrl('trackandRespond.html')"></div>
 </div>
+
+<button prevtab class="crm-button" type= "button" ng-click= "setwatchVariable()"><span>Previous</span></button>
+<button nexttab class="crm-button" type= "button" ng-click = "save_next_page2()" ><span>Next</span></button>
+<button class="crm-button" ng-click="save()" type="submit"><span>Save and Continue Later</span></button>
+<button class="crm-button" ng-click="back()" ><span>Cancel</span></button>
+    </div>
+  </form>

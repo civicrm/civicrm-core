@@ -4,6 +4,8 @@ Required vars: currentMailing
 Remove duplicates not functional
 -->
 
+<form name="editMailingFormStep1" unsaved-warning-form>
+  <div class="crm-block crm-form-block crmMailing">
 <br>
 <table class="form-layout-compressed">
 	<tbody>
@@ -11,11 +13,6 @@ Remove duplicates not functional
 		<td class="label">Name your Mailing *</td>
 		<td>
 			<input placeholder="New Mail" name = "name" type="text" required ng-model="currentMailing.name"/>
-		</td>
-	</tr>
-	<tr>
-		<td class="label"  style= "color:red" ng-show="mailing_form.name.$invalid">
-			Your name is required.
 		</td>
 	</tr>
 	<tr>
@@ -42,5 +39,10 @@ Remove duplicates not functional
 </div>
 
 
-<br> 
- 
+<br>
+
+<button nexttab class="crm-button" ng-click="save_next_page1()" type= "button"><span>Next</span></button>
+<button class="crm-button" ng-click="save_page1()" type= "submit"><span>Save and Continue Later</span></button>
+<button class="crm-button" ng-click="back()"><span>Cancel</span></button>
+</div>
+</form>
