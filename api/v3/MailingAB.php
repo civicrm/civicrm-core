@@ -138,12 +138,12 @@ function civicrm_api3_mailing_a_b_send_mail($params) {
     $params['scheduled_date'] = CRM_Utils_Date::processDate($params['scheduled_date'] . ' ' . $params['scheduled_date_time']);
   }
 
-
   $mailingAB = civicrm_api3('MailingAB', 'get', array('id' => $params['id']));
   $mailingAB = $mailingAB['values'][$params['id']];
 
-  foreach (array('mailing_id_a', 'mailing_id_b') as $columnName) {
-    civicrm_api3('Mailing', 'create', $params + array('id' => $mailingAB[$columnName]));
+ foreach (array('mailing_id_a', 'mailing_id_b') as $columnName) {
+    $params['id'] = $mailingAB[$columnName];
+    civicrm_api3('Mailing', 'create', $params);
   }
 
   return civicrm_api3_create_success();
