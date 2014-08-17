@@ -5,57 +5,57 @@ Required Variables: cool_api and currentMailing and eMailing
 
 <br>
 <table class="form-layout-compressed">
-  <tbody>
-  <tr>
-    <td class="label">From E-mail Address</td>
-    <td>
-      <select  style="width: 200px" ng-model="currentMailing.from_email" ng-options="frm.email as frm.email for frm in eMailing">
+	<tbody>
+	<tr>
+		<td class="label">From E-mail Address</td>
+		<td>
+			<select  style="width: 200px" ng-model="currentMailing.from_email" ng-options="frm.email as frm.email for frm in eMailing">
 				<option value="">-none-</option>
 			</select>
-    </td>
-  </tr>
-  <tr>
-    <td class="label">Reply to E-mail Address</td>
-     <td>
-      <select  style="width: 200px" ng-model="currentMailing.replyto_email" ng-options="frm.email as frm.email for frm in eMailing">
-				<option value="">-none-</option>      
-			</select>   
-    </td>
-  </tr>   
-  <tr>
-    <td class="label">Mailing Subject</td>
-     <td>
-      <input id= "sub" placeholder="Enter Subject" required name="subject" type="text" ng-model="currentMailing.subject"/>
-    </td>
-  </tr>
-  <tr>
-    <td class="label"  style= "color:red" ng-show="mailing_form.subject.$invalid">
-					Mailing subject required.
 		</td>
-  </tr>
-   <tr>
-    <td class="label">Mailing Subject Token</td>
-     <td>
-			<input type="hidden" groupselect id= "subgroup" ng-model="token" ></input>
-    </td>
-  </tr>
-  <tr>
-    <td class="label">Use Template</td>
-     <td>
-      <select ng-change="tmp(tst)" ng-model="tst" ng-options= "mstemp.id as mstemp.msg_title for mstemp in tmpList">
+	</tr>
+	<tr>
+		<td class="label">Reply to E-mail Address</td>
+		<td>
+			<select  style="width: 200px" ng-model="currentMailing.replyto_email" ng-options="frm.email as frm.email for frm in eMailing">
 				<option value="">-none-</option>
 			</select>
-    </td>
-  </tr>
-  <tr ng-show= "false">
+		</td>
+	</tr>
+	<tr>
+		<td class="label">Mailing Subject</td>
+		<td>
+			<input id= "sub" placeholder="Enter Subject" required name="subject" type="text" ng-model="currentMailing.subject"/>
+		</td>
+	</tr>
+	<tr>
+		<td class="label"  style= "color:red" ng-show="mailing_form.subject.$invalid">
+			Mailing subject required.
+		</td>
+	</tr>
+	<tr>
+		<td class="label">Mailing Subject Token</td>
+		<td>
+			<input type="hidden" groupselect id= "subgroup" ng-model="token" ></input>
+		</td>
+	</tr>
+	<tr>
+		<td class="label">Use Template</td>
+		<td>
+			<select ng-change="tmp(tst)" ng-model="tst" ng-options= "mstemp.id as mstemp.msg_title for mstemp in tmpList">
+				<option value="">-none-</option>
+			</select>
+		</td>
+	</tr>
+	<tr ng-show= "false">
 		<td class="label">I want to</td>
 		<td class="label">Compose on screen</td>
-    <td><input type="radio" ng-model="composeS" value="1" /></td>
-    <td class="label">Upload Content</td>
-    <td><input type="radio" ng-model="composeS" value="0" /></td>
-  </tr>  
-  </tbody>
-</table>  
+		<td><input type="radio" ng-model="composeS" value="1" /></td>
+		<td class="label">Upload Content</td>
+		<td><input type="radio" ng-model="composeS" value="0" /></td>
+	</tr>
+	</tbody>
+</table>
 <br>
 <!--<div class="crm-accordion-wrapper collapsed" ng-show= "upldChange(composeS)">
   <div class="crm-accordion-header">Compose on Screen</div>
@@ -64,35 +64,35 @@ Required Variables: cool_api and currentMailing and eMailing
 
 <br>
 <div class="crm-accordion-wrapper ">
-  <div class="crm-accordion-header">HTML Format</div>
-  <div class="crm-accordion-body" ng-include="partialUrl('ht.html')"></div>
+	<div class="crm-accordion-header">HTML Format</div>
+	<div class="crm-accordion-body" ng-include="partialUrl('ht.html')"></div>
 </div>
 
 <div class="crm-accordion-wrapper collapsed">
-  <div class="crm-accordion-header">Plain Text</div>
-  <div class="crm-accordion-body" ng-include="partialUrl('plainText.html')"></div>
+	<div class="crm-accordion-header">Plain Text</div>
+	<div class="crm-accordion-body" ng-include="partialUrl('plainText.html')"></div>
 </div>
 
 <table ng-show="false">
-  <tr>
-    <td>
-      <input type="checkbox">&nbsp Save Template</input>
-  </tr>
+	<tr>
+		<td>
+			<input type="checkbox">&nbsp Save Template</input>
+	</tr>
 </table>
 
 <div class="crm-accordion-wrapper collapsed" ng-show= "!(upldChange(composeS))">
-  <div class="crm-accordion-header">Upload Content</div>
-  <div class="crm-accordion-body" ng-include="partialUrl('uploadContent.html')"></div>
+	<div class="crm-accordion-header">Upload Content</div>
+	<div class="crm-accordion-body" ng-include="partialUrl('uploadContent.html')"></div>
 </div>
 <div class="crm-accordion-wrapper collapsed" ng-show= "false">
-  <div class="crm-accordion-header">Attachments</div>
-  <div class="crm-accordion-body" ng-include="partialUrl('attachments.html')"></div>
+	<div class="crm-accordion-header">Attachments</div>
+	<div class="crm-accordion-body" ng-include="partialUrl('attachments.html')"></div>
 </div>
 <div class="crm-accordion-wrapper collapsed">
-  <div class="crm-accordion-header">Header and Footer</div>
-  <div class="crm-accordion-body" ng-include="partialUrl('headerandFooter.html')"></div>
+	<div class="crm-accordion-header">Header and Footer</div>
+	<div class="crm-accordion-body" ng-include="partialUrl('headerandFooter.html')"></div>
 </div>
 <div class="crm-accordion-wrapper collapsed">
-  <div class="crm-accordion-header">Track and Respond</div>
-  <div class="crm-accordion-body" ng-include="partialUrl('trackandRespond.html')"></div>
+	<div class="crm-accordion-header">Track and Respond</div>
+	<div class="crm-accordion-body" ng-include="partialUrl('trackandRespond.html')"></div>
 </div>

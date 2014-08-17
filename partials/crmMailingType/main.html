@@ -2,49 +2,49 @@
 Controller: MailCtrl
 Submit Mailing is not functional yet
 -->
- <style>
-.crm-container .ng-invalid {
-    border: 1px solid black;
-}
+<style>
+	.crm-container .ng-invalid {
+		border: 1px solid black;
+	}
 </style>
 
 <form name="mailing_form" novalidate ng-submit="mailingForm()">
-  <div ui-jq="tabs" id="alltabs">
-    <ul>
-      <li><a href="#acttab-0" ng-click= "recclicked()">Recipients</a></li>
-      <li><a href="#acttab-1" ng-click= "conclicked()">Content</a></li>
-      <li><a href="#acttab-2" ng-click= "schedclicked()">Schedule and Send</a></li>
-    </ul>
+	<div ui-jq="tabs" id="alltabs">
+		<ul>
+			<li><a href="#acttab-0" ng-click= "recclicked()">Recipients</a></li>
+			<li><a href="#acttab-1" ng-click= "conclicked()">Content</a></li>
+			<li><a href="#acttab-2" ng-click= "schedclicked()">Schedule and Send</a></li>
+		</ul>
 
 
-    <div id="acttab-0">
-      <div ng-include="partialUrl('recipient.html')"></div>
-      <button nexttab class="crm-button" ng-click="save_next_page1()" type= "button"><span>Next</span></button>
-      <button class="crm-button" ng-click="save_page1()" type= "submit"><span>Save and Continue Later</span></button>
-      <button class="crm-button" ng-click="back()"><span>Cancel</span></button>
-      <br><br>       
-	</div>
-    
-    <div id="acttab-1">
-      <div ng-include="partialUrl('content.html')"></div>
-      <br>
-      <button prevtab class="crm-button" type= "button" ng-click= "setwatchVariable()"><span>Previous</span></button>         
-      <button nexttab class="crm-button" type= "button" ng-click = "save_next_page2()" ><span>Next</span></button>
-      <button class="crm-button" ng-click="save()" type="submit"><span>Save and Continue Later</span></button>
-      <button class="crm-button" ng-click="back()" ><span>Cancel</span></button>
-      <br><br> 
-	</div>
-    
-    <div id="acttab-2">
-      <div ng-include="partialUrl('send.html')"></div>
-      <br>
-      <button class="crm-button" prevtab type="button" ><span>Previous</span></button>         
-      <button class="crm-button" ng-click="save()" type= "submit"><span>Save and Continue Later</span></button>
-      <button class="crm-button" ng-click="submitButton()" type= "submit"> <span>Submit Mailing</span></button>      
-      <button class="crm-button" ng-click="back()" ><span>Cancel</span></button>  
+		<div id="acttab-0">
+			<div ng-include="partialUrl('recipient.html')"></div>
+			<button nexttab class="crm-button" ng-click="save_next_page1()" type= "button"><span>Next</span></button>
+			<button class="crm-button" ng-click="save_page1()" type= "submit"><span>Save and Continue Later</span></button>
+			<button class="crm-button" ng-click="back()"><span>Cancel</span></button>
 			<br><br>
-    </div>
-  </div>   
+		</div>
+
+		<div id="acttab-1">
+			<div ng-include="partialUrl('content.html')"></div>
+			<br>
+			<button prevtab class="crm-button" type= "button" ng-click= "setwatchVariable()"><span>Previous</span></button>
+			<button nexttab class="crm-button" type= "button" ng-click = "save_next_page2()" ><span>Next</span></button>
+			<button class="crm-button" ng-click="save()" type="submit"><span>Save and Continue Later</span></button>
+			<button class="crm-button" ng-click="back()" ><span>Cancel</span></button>
+			<br><br>
+		</div>
+
+		<div id="acttab-2">
+			<div ng-include="partialUrl('send.html')"></div>
+			<br>
+			<button class="crm-button" prevtab type="button" ><span>Previous</span></button>
+			<button class="crm-button" ng-click="save()" type= "submit"><span>Save and Continue Later</span></button>
+			<button class="crm-button" ng-click="submitButton()" type= "submit"> <span>Submit Mailing</span></button>
+			<button class="crm-button" ng-click="back()" ><span>Cancel</span></button>
+			<br><br>
+		</div>
+	</div>
 </form>
-   <!--   <button class="crm-button" ng-click="save()" ng-disabled="mailing_form.$invalid" type= "submit"><span>Save and Continue Later</span></button>
+<!--   <button class="crm-button" ng-click="save()" ng-disabled="mailing_form.$invalid" type= "submit"><span>Save and Continue Later</span></button>
 -->
