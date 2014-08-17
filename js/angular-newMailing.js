@@ -35,7 +35,7 @@
 						}
 						else {
 							//created_id has been set to my id. Does not save without created_id. Needs to made generic based on the user
-							return {visibility: "Public Pages", url_tracking:"1", forward_replies:"0", auto_responder:"0", open_tracking:"1",
+							return {visibility: "Public Pages", url_tracking:"1",dedupe_email:"1", forward_replies:"0", auto_responder:"0", open_tracking:"1"
 							};
 						}
 					}
@@ -57,7 +57,8 @@
 		$scope.mailNameList = _.pluck(CRM.crmCaseType.civiMails, 'name');
 		$scope.groupNamesList = CRM.crmMailing.groupNames;
 		$scope.headerfooter = CRM.crmMailing.headerfooterList;
-		$scope.eMailing = CRM.crmMailing.emailAdd;
+		$scope.fromAddress = CRM.crmMailing.fromAddress;
+    console.log($scope.fromAddress);
 		$scope.tmpList = CRM.crmMailing.mesTemplate;
 		$scope.mailingGrp = CRM.crmMailing.mailGrp;
 		$scope.user_id = CRM.crmMailing.contactid;
@@ -468,6 +469,7 @@
 					approver_id: $scope.currentMailing.approver_id,
 					approval_status_id: $scope.currentMailing.approval_status_id,
 					approval_date: $scope.currentMailing.approval_date,
+          dedupe_email: $scope.currentMailing.dedupe_email
 				},
 				true);
 			//var result = crmApi('Mailing', 'create', $scope.currentMailing, true);
@@ -525,7 +527,8 @@
 					approver_id: $scope.currentMailing.approver_id,
 					approval_status_id: $scope.currentMailing.approval_status_id,
 					approval_date: $scope.currentMailing.approval_date,
-				},
+          dedupe_email: $scope.currentMailing.dedupe_email
+        },
 				true);
 			//var result = crmApi('Mailing', 'create', $scope.currentMailing, true);
 			result.success(function(data) {
