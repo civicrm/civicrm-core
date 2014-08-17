@@ -21,8 +21,11 @@ Required vars: currentMailing
 		</td>
 		<td class="label" >Time</td>
 		<td>
-			<input type="text" ng-model="scheddate.time">
+			<input type="text" placeholder="hh:mm" ng-model="scheddate.time" checktimeentry required>
 		</td>
+		<!--<td>
+			<input type="text" ng-model="scheddate.time">
+		</td>-->
 	</tr>
 
 	</tbody>

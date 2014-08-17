@@ -815,6 +815,16 @@
 		};
 	});
 
+
+	crmMailing.directive('checktimeentry',function(){
+		return {
+			restrict :'AE',
+			link: function (scope, element, attrs) {
+				$(element).timeEntry({show24Hours:true});
+			}
+		}
+	});
+
 	//This controller is used for creating the mailing list. Simply gets all the mailing data from civiAPI
 	crmMailing.controller('mailingListCtrl', function($scope, crmApi, mailingList, $route) {
 		if (global == 0) {
