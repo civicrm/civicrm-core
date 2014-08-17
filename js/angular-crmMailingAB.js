@@ -425,11 +425,7 @@
       $scope.tp1.include = $scope.incGroupids;
       $scope.tp1.exclude = $scope.excGroupids;
 
-      console.log($scope.tp1);
-      console.log($scope.currentABTest.id);
-
-      console.log("--------");
-      var result = crmApi('Mailing', 'a_b_recipients_update', {
+      var result = crmApi('MailingAB', 'recipients_update', {
         id: $scope.currentABTest.id,
         groups: $scope.tp1
       });
@@ -453,7 +449,9 @@
       });
 
       $scope.startabtest = function(){
-        console.log("yo");
+        if (typeof $scope.sparestuff.date == 'undefined') {
+          $scope.sparestuff.date = 'now';
+        }
         var result = crmApi('MailingAB', 'send_mail', {id: $scope.abId,
           scheduled_date : $scope.sparestuff.date , scheduled_date_time: $scope.currentABTest.latertime});
 
@@ -475,7 +473,8 @@
     }
     $scope.update_abtest = function () {
       $scope.currentABTest.declare_winning_time = $scope.currentABTest.date + " " + $scope.currentABTest.time;
-      result = crmApi('MailingAB', 'create', {id: $scope.abId,
+      result = crmApi('MailingAB', 'create', {
+        id: $scope.abId,
         testing_criteria_id: $scope.sparestuff.template.val,
         mailing_id_a: $scope.currentABTest.mailing_id_a,
         mailing_id_b: $scope.currentABTest.mailing_id_b,
@@ -490,7 +489,6 @@
     $scope.tmp = function (tst, aorb) {
       if (aorb == 1) {
         $scope.mailA.msg_template_id = tst;
-        console.log($scope.mailA.msg_template_id + "sasas");
         if ($scope.mailA.msg_template_id == null) {
           $scope.mailA.body_html = "";
         }
@@ -505,7 +503,6 @@
       else {
         if (aorb == 2) {
           $scope.mailB.msg_template_id = tst;
-          console.log($scope.mailB.msg_template_id + "sasas");
           if ($scope.mailB.msg_template_id == null) {
             $scope.mailB.body_html = "";
           }
@@ -519,7 +516,6 @@
         }
         else {
           $scope.mailA.msg_template_id = tst;
-          console.log($scope.mailA.msg_template_id + "sasas");
           if ($scope.mailA.msg_template_id == null) {
             $scope.mailA.body_html = "";
           }
@@ -532,7 +528,6 @@
           }
 
           $scope.mailB.msg_template_id = tst;
-          console.log($scope.mailB.msg_template_id + "sasas");
           if ($scope.mailB.msg_template_id == null) {
             $scope.mailB.body_html = "";
           }
@@ -561,8 +556,6 @@
             my: 'left',
             at: 'top',
             of: $(".crmABTestingAllTabs")
-
-
           },
 
           close: function () {
@@ -578,7 +571,6 @@
     }, true);
 
     $scope.call = function(){
-      console.log($scope.emailadd);
       $scope.$apply();
       var result = crmApi('Mailing','send_test',{
         mailing_id : $scope.currentABTest.mailing_id_a,
@@ -589,11 +581,9 @@
         mailing_id : $scope.currentABTest.mailing_id_b,
         test_email : $scope.sparestuff.emailadd
       })
-      console.log($scope.sparestuff.emailadd);
-
     }
-    $scope.$watch('sendtest', function () {
 
+    $scope.$watch('sendtest', function () {
       if ($scope.sendtest == true) {
         $('#sendtest').dialog({
           title: 'Send Test Mails',
@@ -605,7 +595,6 @@
           buttons: {
             'Send': function () {
               $scope.call();
-
               $scope.sendtest = false;
               $('#sendtest').dialog("close");
 
@@ -619,7 +608,6 @@
         });
       }
     });
-
   });
 
   crmMailingAB.directive('nexttab', function () {

@@ -153,7 +153,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    * @static
    */
   public static function &getRows($mailing_id, $job_id = NULL,
-    $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL, $is_test = FALSE
+    $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL, $is_test = 0
   ) {
 
     $dao = new CRM_Core_Dao();
