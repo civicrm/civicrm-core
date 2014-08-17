@@ -187,21 +187,21 @@
 
 
 		$scope.recclicked = function(){
-			if($scope.acttab >=0){
+			//if($scope.acttab >=0){
 				$scope.acttab =0;
-			}
+			//}
 		};
 
 		$scope.conclicked = function(){
-			if($scope.acttab >=1){
+		//	if($scope.acttab >=1){
 				$scope.acttab =1;
-			}
+			//}
 		};
 
 		$scope.schedclicked = function(){
-			if($scope.acttab >=2){
+			//if($scope.acttab >=2){
 				$scope.acttab =2;
-			}
+			//}
 		};
 
 		//to split the value of selectedMail.scheduled_date into the date and time separately
@@ -624,9 +624,10 @@
 		return {
 			restrict: 'A',
 			link: function(scope, element, attrs) {
-				$(element).parent().parent().tabs();
+				$(element).parent().parent().parent().parent().parent().tabs();
+        console.log($(element).parent().parent().parent().parent().parent());
 				var myarr = new Array(1,2);
-				$(element).parent().parent().tabs({disabled:myarr});
+				//$(element).parent().parent().parent().parent().parent().tabs({disabled:myarr});
 				$(element).on("click",function() {
 					scope.acttab=scope.acttab +1;
 					var myArray1 = new Array( );
@@ -634,8 +635,8 @@
 						if(scope.acttab!=i)
 							myArray1.push(i);
 					}
-					$(element).parent().parent().tabs( "option", "disabled", myArray1 );
-					$(element).parent().parent().tabs({active:scope.acttab});
+					//$(element).parent().parent().parent().parent().parent().tabs( "option", "disabled", myArray1 );
+					$(element).parent().parent().parent().parent().parent().tabs({active:scope.acttab});
 					console.log("sid");
 				});
 			}
@@ -647,9 +648,9 @@
 		return {
 			restrict: 'A',
 			link: function(scope, element, attrs) {
-				$(element).parent().parent().tabs();
+				$(element).parent().parent().parent().parent().parent().tabs();
 				var myarr = new Array(1,2);
-				$(element).parent().parent().tabs({disabled:myarr});
+				//$(element).parent().parent().parent().parent().parent().tabs({disabled:myarr});
 				$(element).on("click",function() {
 					scope.acttab=scope.acttab -1;
 					var myArray1 = new Array( );
@@ -657,8 +658,8 @@
 						if(scope.acttab!=i)
 							myArray1.push(i);
 					}
-					$(element).parent().parent().tabs( "option", "disabled", myArray1 );
-					$(element).parent().parent().tabs({active:scope.acttab});
+			//		$(element).parent().parent().parent().parent().parent().tabs( "option", "disabled", myArray1 );
+					$(element).parent().parent().parent().parent().parent().tabs({active:scope.acttab});
 					console.log("sid");
 				});
 			}
