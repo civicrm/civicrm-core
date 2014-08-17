@@ -2,12 +2,12 @@
   <div class="crm-block crm-form-block crmABTesting">
     <h3>Select the groups you would like to add</h3><br>
     &nbsp<br>
-    <select multiple chsgroup required>
-      <option id="1" ng-repeat="grp in groups" value="{{grp.id}} group include {{grp.title}}"> {{grp.title}}
+    <select multiple chsgroup ng-model="sparestuff.allgroups" required>
+      <option id="1" ng-repeat="grp in groups" value="{{grp.id}} civicrm_group include {{grp.title}}"> {{grp.title}}
       </option>
-      <option ng-repeat="grp in groups" value="{{grp.id}} group exclude {{grp.title}}"> {{grp.title}}</option>
-      <option ng-repeat="ml in mailList" value="{{ml.id}} mail include {{ml.title}}"> {{ml.name}}</option>
-      <option ng-repeat="ml in mailList" value="{{ml.id}} mail exclude {{ml.title}}"> {{ml.name}}</option>
+      <option ng-repeat="grp in groups" value="{{grp.id}} civicrm_group exclude {{grp.title}}"> {{grp.title}}</option>
+      <option ng-repeat="ml in mailList" value="{{ml.id}} civicrm_mailing include {{ml.title}}"> {{ml.name}}</option>
+      <option ng-repeat="ml in mailList" value="{{ml.id}} civicrm_mailing exclude {{ml.title}}"> {{ml.name}}</option>
     </select>
     <br> <br><br><br>
 
@@ -48,10 +48,10 @@
     <br>
     <div class="crm-submit-buttons">
       <span class="crm-button">
-        <input type="submit" ng-click="tab3Form.$setPristine();update_abtest();" value="Previous" prevtab/>
+        <input type="submit" ng-click="tab3Form.$setPristine();" value="Previous" prevtab/>
       </span>
       <span class="crm-button">
-        <input type="submit" ng-click="tab3Form.$setPristine();update_abtest();" ng-disabled="tab3Form.$invalid" value="Next" nexttab="{{tab_val}}"/>
+        <input type="submit" ng-click="tab3Form.$setPristine();" ng-disabled="tab3Form.$invalid" value="Next" nexttab="{{tab_val}}"/>
       </span>
       <span class="crm-button">
         <input type="submit" ng-click="tab3Form.$setPristine(); goto('mailing/abtesting');" value="Cancel"/>
