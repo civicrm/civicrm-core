@@ -612,7 +612,6 @@
 			resulta.success(function(data) {
 				console.log("worked");
 			});
-			console.log("didnt work");
 		};
 	});
 

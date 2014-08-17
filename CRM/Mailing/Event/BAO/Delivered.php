@@ -149,7 +149,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    * @static
    */
   public static function &getRows($mailing_id, $job_id = NULL,
-    $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL
+		$is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL, $is_test = FALSE
   ) {
 
     $dao = new CRM_Core_Dao();
@@ -178,7 +178,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
                     ON  $bounce.event_queue_id = $queue.id
             INNER JOIN  $job
                     ON  $queue.job_id = $job.id
-                    AND $job.is_test = 0
+                    AND $job.is_test = $is_test
             INNER JOIN  $mailing
                     ON  $job.mailing_id = $mailing.id
             WHERE       $bounce.id IS null

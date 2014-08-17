@@ -347,7 +347,6 @@ function civicrm_api3_mailing_send_test($params) {
 	$testEmailParams = _civicrm_api3_generic_replace_base_params($params);
 	$testEmailParams['is_test'] = 1;
 	$job = civicrm_api3('MailingJob', 'create', $testEmailParams);
-	print_r($job);
 	$testEmailParams['job_id'] = $job['id'];
 	$testEmailParams['emails'] = explode(',', $testEmailParams['test_email']);
 	if (!empty($params['test_email'])) {
@@ -406,8 +405,7 @@ ORDER BY e.is_bulkmail DESC, e.is_primary DESC
 	}
 
 	//return delivered mail info
-	$mailDelivered = CRM_Mailing_Event_BAO_Delivered::getRows($params['mailing_id'], $job['id'], TRUE, NULL, NULL, NULL);
-	print_r($mailDelivered);
+	$mailDelivered = CRM_Mailing_Event_BAO_Delivered::getRows($params['mailing_id'], $job['id'], TRUE, NULL, NULL, NULL, TRUE);
 	return civicrm_api3_create_success($mailDelivered);
 }
 
