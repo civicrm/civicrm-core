@@ -51,10 +51,10 @@
     <h3>When to Start</h3><br>
 
     <div>
-      <input type="radio" name="Start" ng-model="start" value="now"> Now &nbsp
+      <input type="radio" name="Start" ng-model="start" value="now" ng-checked="true"> Now &nbsp
       <input type="radio" name="Start" ng-model="start" value="later"> Later
       <div ng-show="start=='later'">
-      &nbsp &nbsp <input type="text" class="dateplugin"  ng-model="send_date" datepick>
+      &nbsp &nbsp <input type="text" class="dateplugin"  ng-model="send_date" datepick >
       &nbsp &nbsp Time :<input type="text" placeholder="hh:mm" ng-model="currentABTest.latertime"  checktimeentry >
       </div>
     </div>

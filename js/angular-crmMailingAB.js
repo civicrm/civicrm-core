@@ -151,6 +151,7 @@
     $scope.sparestuff ={};
     $scope.sparestuff.emailadd = "";
     $scope.sparestuff.winnercriteria = "";
+    $scope.sparestuff.isnew = false;
     mltokens = CRM.crmMailing.mailTokens;
     if ($scope.currentABTest.declare_winning_time != null) {
       $scope.ans = $scope.currentABTest.declare_winning_time.split(" ");
@@ -161,6 +162,7 @@
 
     if ($scope.currentABTest.just_created != 1) {
       $scope.abId = $scope.currentABTest.id;
+      $scope.sparestuff.isnew = false;
       var abmailA = crmApi('Mailing', 'getsingle', {id: $scope.currentABTest.mailing_id_a});
       var abmailB = crmApi('Mailing', 'getsingle', {id: $scope.currentABTest.mailing_id_b});
       var abmailC = crmApi('Mailing', 'getsingle', {id: $scope.currentABTest.mailing_id_c});
@@ -181,6 +183,7 @@
       });
     }
     else {
+      $scope.sparestuff.isnew = true;
       $scope.mailA = {};
       $scope.mailB = {};
       $scope.mailC = {};
@@ -389,9 +392,11 @@
       $scope.currentABTest.testing_criteria_id = $scope.sparestuff.template.val;
 
       if ($scope.abId == "") {
+        console.log("bb");
         result = crmApi('MailingAB', 'create', {name: $scope.currentABTest.name, testing_criteria_id: $scope.sparestuff.template.val});
       }
       else {
+        console.log("aa");
         if (typeof $scope.currentABTest.mailing_id_a == 'undefined') {
           result = crmApi('MailingAB', 'create', {id: $scope.abId, testing_criteria_id: $scope.sparestuff.template.val});
         }
@@ -471,6 +476,7 @@
       }
 
     }
+
     $scope.update_abtest = function () {
       $scope.currentABTest.declare_winning_time = $scope.currentABTest.date + " " + $scope.currentABTest.time;
       result = crmApi('MailingAB', 'create', {
@@ -491,11 +497,13 @@
         $scope.mailA.msg_template_id = tst;
         if ($scope.mailA.msg_template_id == null) {
           $scope.mailA.body_html = "";
+          $scope.mailA.subject="";
         }
         else {
           for (var a in $scope.tmpList) {
             if ($scope.tmpList[a].id == $scope.mailA.msg_template_id) {
               $scope.mailA.body_html = $scope.tmpList[a].msg_html;
+              $scope.mailA.subject=$scope.tmpList[a].msg_subject;
             }
           }
         }
@@ -505,11 +513,14 @@
           $scope.mailB.msg_template_id = tst;
           if ($scope.mailB.msg_template_id == null) {
             $scope.mailB.body_html = "";
+            $scope.mailB.subject="";
           }
           else {
             for (var a in $scope.tmpList) {
               if ($scope.tmpList[a].id == $scope.mailB.msg_template_id) {
                 $scope.mailB.body_html = $scope.tmpList[a].msg_html;
+                $scope.mailB.subject=$scope.tmpList[a].msg_subject;
+
               }
             }
           }
@@ -518,11 +529,13 @@
           $scope.mailA.msg_template_id = tst;
           if ($scope.mailA.msg_template_id == null) {
             $scope.mailA.body_html = "";
+            $scope.mailA.subject="";
           }
           else {
             for (var a in $scope.tmpList) {
               if ($scope.tmpList[a].id == $scope.mailA.msg_template_id) {
                 $scope.mailA.body_html = $scope.tmpList[a].msg_html;
+                $scope.mailA.subject=$scope.tmpList[a].msg_subject;
               }
             }
           }
@@ -530,17 +543,41 @@
           $scope.mailB.msg_template_id = tst;
           if ($scope.mailB.msg_template_id == null) {
             $scope.mailB.body_html = "";
+            $scope.mailB.subject="";
+
           }
           else {
             for (var a in $scope.tmpList) {
               if ($scope.tmpList[a].id == $scope.mailB.msg_template_id) {
                 $scope.mailB.body_html = $scope.tmpList[a].msg_html;
+                $scope.mailB.subject=$scope.tmpList[a].msg_subject;
+
               }
             }
           }
         }
       }
     }
+
+    /*$scope.tmp = function (tst){
+      $scope.currentMailing.msg_template_id=tst;
+      console.log($scope.currentMailing.msg_template_id+ "sasas");
+      if($scope.currentMailing.msg_template_id == null){
+        $scope.currentMailing.body_html="";
+        $scope.currentMailing.subject="";
+      }
+      else{
+        for(var a in $scope.tmpList){
+
+          if($scope.tmpList[a].id==$scope.currentMailing.msg_template_id){
+            $scope.currentMailing.body_html=$scope.tmpList[a].msg_html;
+            console.log($scope.tmpList[a].msg_subject);
+            $scope.currentMailing.subject=$scope.tmpList[a].msg_subject;
+            console.log($scope.currentMailing.subject);
+          }
+        }
+      }
+    };*/
 
     $scope.$watch('preview', function () {
       console.log("dsfdfsfds");
@@ -623,11 +660,15 @@
         var myarr = new Array(1, 2, 3)
 
         // disable remaining tabs
+        if(scope.sparestuff.isnew == true)
         tabselector.tabs({disabled: myarr});
 
         $(element).on("click", function () {
           if (scope.tab_val == 0) {
+            console.log("att");
             scope.create_abtest();
+
+            console.log("tt");
           }
           else {
             if (scope.tab_val == 2) {

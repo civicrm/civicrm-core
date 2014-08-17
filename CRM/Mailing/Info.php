@@ -72,7 +72,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $emailAdd = civicrm_api3('Email', 'get', array());
     $mesTemplate = civicrm_api3('MessageTemplate', 'get', array(
       'sequential' => 1,
-      'return' => array("msg_html", "id", "msg_title"),
+      'return' => array("msg_html", "id", "msg_title","msg_subject"),
       'id' => array('>' => 58),
     ));
     $mailTokens = civicrm_api3('Mailing', 'get_token', array( 'usage' => 'Mailing'));
