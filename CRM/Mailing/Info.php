@@ -79,7 +79,11 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 		));
 		$mailGrp = civicrm_api3('MailingGroup','get', array());
 		$mailTokens = civicrm_api3('Mailing', 'get_token', array( 'usage' => 'Mailing'));
-
+    $fromAddress = civicrm_api3('OptionGroup', 'get', array(
+      'sequential' => 1,
+      'name' => "from_email_address",
+      'api.OptionValue.get' => array(),
+    ));
 
 
 		CRM_Core_Resources::singleton()->addSetting(array(
@@ -93,7 +97,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 				'emailAdd' => array_values($emailAdd['values']),
 				'mailGrp' => array_values($mailGrp['values']),
 				'mailTokens' => array_values($mailTokens),
-				'contactid' => $contactID
+				'contactid' => $contactID,
+        'fromAddress' => array_values($fromAddress['values'][0]['api.OptionValue.get']['values'])
 			),
 		));
 		return $result;
