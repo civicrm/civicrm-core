@@ -6,39 +6,39 @@ Remove duplicates not functional
 
 <br>
 <table class="form-layout-compressed">
-  <tbody>
-  <tr>
-    <td class="label">Name your Mailing *</td>
-    <td>
-      <input placeholder="New Mail" name = "name" type="text" required ng-model="currentMailing.name"/>
-    </td>
-  </tr>
-  <tr> 
-    <td class="label"  style= "color:red" ng-show="mailing_form.name.$invalid">
-					Your name is required.
+	<tbody>
+	<tr>
+		<td class="label">Name your Mailing *</td>
+		<td>
+			<input placeholder="New Mail" name = "name" type="text" required ng-model="currentMailing.name"/>
 		</td>
 	</tr>
-  <tr>
-    <td class="label">Campaign</td>
-    <td class="addRow">
-      <select ng-model="currentMailing.campaign_id" ng-options="camp.id as camp.name for camp in campaignList|orderBy:'name'">
-        <option value="">Please select a campaign</option>
-      </select>
-    </td>
-  </tr>
-  <tr>
-    <td class="label">Remove Duplicates?</td>
-    <td>
-      <input type="checkbox" />
-    </td>
-  </tr>
-  </tbody>
+	<tr>
+		<td class="label"  style= "color:red" ng-show="mailing_form.name.$invalid">
+			Your name is required.
+		</td>
+	</tr>
+	<tr>
+		<td class="label">Campaign</td>
+		<td class="addRow">
+			<select ng-model="currentMailing.campaign_id" ng-options="camp.id as camp.name for camp in campaignList|orderBy:'name'">
+				<option value="">Please select a campaign</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td class="label">Remove Duplicates?</td>
+		<td>
+			<input type="checkbox" />
+		</td>
+	</tr>
+	</tbody>
 </table>
-<br>  
-    
+<br>
+
 <div class="crm-accordion-wrapper">
-  <div class="crm-accordion-header">Mailing Recipients</div>
-  <div class="crm-accordion-body" ng-include="partialUrl('mailingGroup.html')"></div>
+	<div class="crm-accordion-header">Mailing Recipients</div>
+	<div class="crm-accordion-body" ng-include="partialUrl('mailingGroup.html')"></div>
 </div>
 
 

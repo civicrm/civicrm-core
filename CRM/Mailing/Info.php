@@ -37,172 +37,172 @@
  */
 class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
-  // docs inherited from interface
-  protected $keyword = 'mailing';
+	// docs inherited from interface
+	protected $keyword = 'mailing';
 
 
-  // docs inherited from interface
-  /**
-   * @return array
-   */
-  public function getInfo() {
-    return array(
-      'name' => 'CiviMail',
-      'translatedName' => ts('CiviMail'),
-      'title' => 'CiviCRM Mailing Engine',
-      'search' => 1,
-      'showActivitiesInCore' => 1,
-    );
-  }
+	// docs inherited from interface
+	/**
+	 * @return array
+	 */
+	public function getInfo() {
+		return array(
+			'name' => 'CiviMail',
+			'translatedName' => ts('CiviMail'),
+			'title' => 'CiviCRM Mailing Engine',
+			'search' => 1,
+			'showActivitiesInCore' => 1,
+		);
+	}
 
-  public function getAngularModules() {
-    $result = array();
-    $result['crmMailing'] = array(
-      'ext' => 'civicrm',
-      'js' => array('js/angular-newMailing.js' , 'js/angularsanitize.js'),
-    );
+	public function getAngularModules() {
+		$result = array();
+		$result['crmMailing'] = array(
+			'ext' => 'civicrm',
+			'js' => array('js/angular-newMailing.js' , 'js/angularsanitize.js'),
+		);
 		$session = CRM_Core_Session::singleton();
 		$contactID = $session->get('userID');
-    $civiMails = civicrm_api3('Mailing', 'get', array());
-    $campNames = civicrm_api3('Campaign', 'get', array());
-    $mailStatus = civicrm_api3('MailingJob', 'get', array());
+		$civiMails = civicrm_api3('Mailing', 'get', array());
+		$campNames = civicrm_api3('Campaign', 'get', array());
+		$mailStatus = civicrm_api3('MailingJob', 'get', array());
 		$groupNames = civicrm_api3('Group', 'get', array());
 		$headerfooterList = civicrm_api3('MailingComponent', 'get', array());
 		$emailAdd = civicrm_api3('Email', 'get', array(
-				'sequential' => 1,
-				'return' => "email",
-				'contact_id' => $contactID,
-				));
+			'sequential' => 1,
+			'return' => "email",
+			'contact_id' => $contactID,
+		));
 		$mesTemplate = civicrm_api3('MessageTemplate', 'get', array(  'sequential' => 1,
 			'return' => array("msg_html", "id", "msg_title", "msg_subject"),
 			'workflow_id' => array('IS NULL' => ""),
-			));
+		));
 		$mailGrp = civicrm_api3('MailingGroup','get', array());
 		$mailTokens = civicrm_api3('Mailing', 'get_token', array( 'usage' => 'Mailing'));
-			
-		
-				
-    CRM_Core_Resources::singleton()->addSetting(array(
-      'crmMailing' => array(
-        'civiMails' => array_values($civiMails['values']),
-        'campNames' => array_values($campNames['values']),
-        'mailStatus' => array_values($mailStatus['values']),
-        'groupNames' => array_values($groupNames['values']),
-        'headerfooterList' => array_values($headerfooterList['values']),
-        'mesTemplate' => array_values($mesTemplate['values']),
-        'emailAdd' => array_values($emailAdd['values']),
-        'mailGrp' => array_values($mailGrp['values']),
-        'mailTokens' => array_values($mailTokens),
-        'contactid' => $contactID
-        ),
-      ));
-    return $result;
-  }
-
-  /**
-   * @return bool
-   */
-  static function workflowEnabled() {
-    $config = CRM_Core_Config::singleton();
-
-    // early exit, since not true for most
-    if (!$config->userSystem->is_drupal ||
-      !function_exists('module_exists')
-    ) {
-      return FALSE;
-    }
-
-    if (!module_exists('rules')) {
-      return FALSE;
-    }
-
-    $enableWorkflow = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-      'civimail_workflow',
-      NULL,
-      FALSE
-    );
-
-    return ($enableWorkflow &&
-      $config->userSystem->is_drupal
-    ) ? TRUE : FALSE;
-  }
-
-  // docs inherited from interface
-  /**
-   * @param bool $getAllUnconditionally
-   *
-   * @return array
-   */
-  public function getPermissions($getAllUnconditionally = FALSE) {
-    $permissions = array(
-      'access CiviMail',
-      'access CiviMail subscribe/unsubscribe pages',
-      'delete in CiviMail',
-      'view public CiviMail content',
-    );
-
-    if (self::workflowEnabled() || $getAllUnconditionally) {
-      $permissions[] = 'create mailings';
-      $permissions[] = 'schedule mailings';
-      $permissions[] = 'approve mailings';
-    }
-
-    return $permissions;
-  }
 
 
-  // docs inherited from interface
-  /**
-   * @return null
-   */
-  public function getUserDashboardElement() {
-    // no dashboard element for this component
-    return NULL;
-  }
 
-  /**
-   * @return null
-   */
-  public function getUserDashboardObject() {
-    // no dashboard element for this component
-    return NULL;
-  }
+		CRM_Core_Resources::singleton()->addSetting(array(
+			'crmMailing' => array(
+				'civiMails' => array_values($civiMails['values']),
+				'campNames' => array_values($campNames['values']),
+				'mailStatus' => array_values($mailStatus['values']),
+				'groupNames' => array_values($groupNames['values']),
+				'headerfooterList' => array_values($headerfooterList['values']),
+				'mesTemplate' => array_values($mesTemplate['values']),
+				'emailAdd' => array_values($emailAdd['values']),
+				'mailGrp' => array_values($mailGrp['values']),
+				'mailTokens' => array_values($mailTokens),
+				'contactid' => $contactID
+			),
+		));
+		return $result;
+	}
 
-  // docs inherited from interface
-  /**
-   * @return array
-   */
-  public function registerTab() {
-    return array(
-      'title' => ts('Mailings'),
-      'id' => 'mailing',
-      'url' => 'mailing',
-      'weight' => 45,
-    );
-  }
+	/**
+	 * @return bool
+	 */
+	static function workflowEnabled() {
+		$config = CRM_Core_Config::singleton();
 
-  // docs inherited from interface
-  /**
-   * @return array
-   */
-  public function registerAdvancedSearchPane() {
-    return array('title' => ts('Mailings'),
-      'weight' => 20,
-    );
-  }
+		// early exit, since not true for most
+		if (!$config->userSystem->is_drupal ||
+			!function_exists('module_exists')
+		) {
+			return FALSE;
+		}
 
-  // docs inherited from interface
-  /**
-   * @return null
-   */
-  public function getActivityTypes() {
-    return NULL;
-  }
+		if (!module_exists('rules')) {
+			return FALSE;
+		}
 
-  // add shortcut to Create New
-  /**
-   * @param $shortCuts
-   */
-  public function creatNewShortcut(&$shortCuts) {}
+		$enableWorkflow = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+			'civimail_workflow',
+			NULL,
+			FALSE
+		);
+
+		return ($enableWorkflow &&
+			$config->userSystem->is_drupal
+		) ? TRUE : FALSE;
+	}
+
+	// docs inherited from interface
+	/**
+	 * @param bool $getAllUnconditionally
+	 *
+	 * @return array
+	 */
+	public function getPermissions($getAllUnconditionally = FALSE) {
+		$permissions = array(
+			'access CiviMail',
+			'access CiviMail subscribe/unsubscribe pages',
+			'delete in CiviMail',
+			'view public CiviMail content',
+		);
+
+		if (self::workflowEnabled() || $getAllUnconditionally) {
+			$permissions[] = 'create mailings';
+			$permissions[] = 'schedule mailings';
+			$permissions[] = 'approve mailings';
+		}
+
+		return $permissions;
+	}
+
+
+	// docs inherited from interface
+	/**
+	 * @return null
+	 */
+	public function getUserDashboardElement() {
+		// no dashboard element for this component
+		return NULL;
+	}
+
+	/**
+	 * @return null
+	 */
+	public function getUserDashboardObject() {
+		// no dashboard element for this component
+		return NULL;
+	}
+
+	// docs inherited from interface
+	/**
+	 * @return array
+	 */
+	public function registerTab() {
+		return array(
+			'title' => ts('Mailings'),
+			'id' => 'mailing',
+			'url' => 'mailing',
+			'weight' => 45,
+		);
+	}
+
+	// docs inherited from interface
+	/**
+	 * @return array
+	 */
+	public function registerAdvancedSearchPane() {
+		return array('title' => ts('Mailings'),
+			'weight' => 20,
+		);
+	}
+
+	// docs inherited from interface
+	/**
+	 * @return null
+	 */
+	public function getActivityTypes() {
+		return NULL;
+	}
+
+	// add shortcut to Create New
+	/**
+	 * @param $shortCuts
+	 */
+	public function creatNewShortcut(&$shortCuts) {}
 }
 
