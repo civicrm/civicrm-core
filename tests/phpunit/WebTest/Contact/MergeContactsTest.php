@@ -199,6 +199,57 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertChecked("check_3");
   }
 
+  function testMergeContactSubType() {
+    $this->webtestLogin();
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
+    $this->waitForElementPresent('_qf_Contact_cancel-bottom');
+    //fill in first name
+    $firstName = "Anderson".substr(sha1(rand()), 0, 4);
+    $this->type('first_name', $firstName);
+    
+    //fill in last name
+    $lastName = substr(sha1(rand()), 0, 4);
+    $this->type('last_name', $lastName);
+
+    //fill in email id
+    $this->waitForElementPresent('email_1_email');
+    $this->type('email_1_email', "{$firstName}.{$lastName}@example.com");
+    $this->waitForElementPresent('contact_sub_type');
+    $this->select('contact_sub_type', "Staff");
+
+    // Clicking save.
+    $this->click("_qf_Contact_upload_view");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText('crm-notification-container', "Contact Saved");
+
+    // contact2: contact with same email id as contact 1.
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
+    $this->waitForElementPresent('_qf_Contact_cancel-bottom');
+
+    $fName = "John".substr(sha1(rand()), 0, 4);
+    $this->type('first_name', $fName);
+    $lName = substr(sha1(rand()), 0, 4);
+    $this->type('last_name', $lName);
+    $this->type('email_1_email', "{$firstName}.{$lastName}@example.com");
+    $this->waitForElementPresent('contact_sub_type');
+    $this->select('contact_sub_type', "Parent");
+    $this->click("_qf_Contact_upload_view");
+    $this->waitForText('crm-notification-container', "Contact Saved");
+    $this->openCiviPage("contact/deduperules", "reset=1");
+    $this->click("xpath=//*[@id='option12']/tbody/tr[3]/td[3]/span/a[1][contains(text(),'Use Rule')]");
+    $this->waitForElementPresent('_qf_DedupeFind_submit-bottom');
+    $this->click("_qf_DedupeFind_next-bottom");
+
+    $this->waitForElementPresent("xpath=//table[@id='option51']/tbody/tr[1]/td[4]/a[text()='merge']");
+    $this->waitForElementPresent("xpath=//*[@id='DedupeFind']/a[3]/span[contains(text(),'Done')]");
+    $this->isElementPresent("xpath=//table[@id='option51']/tbody/tr/td[1]/a[text()='{$firstName} {$lastName}']/../td[2]/a[text()='{$fName} {$lName}']");
+    $this->click("xpath=//table[@id='option51']/tbody/tr[1]/td[4]/a[text()='merge']");
+    $this->waitForElementPresent('_qf_Merge_cancel-bottom');
+    $this->click('toggleSelect');
+    $this->click('_qf_Merge_next-bottom');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->assertTrue($this->isTextPresent("Parent"));
+  }
   /**
    * @param $firstName
    * @param $lastName
