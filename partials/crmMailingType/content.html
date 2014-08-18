@@ -10,7 +10,7 @@ Required Variables: cool_api and currentMailing and fromAddress
 	<tr>
 		<td class="label">From E-mail Address</td>
 		<td>
-			<select  style="width: 200px" ng-model="currentMailing.from_email" ng-options="frm.label as frm.label for frm in fromAddress">
+			<select  style="width: 200px" ng-model="from.total" ng-options="frm.label as frm.label for frm in fromAddress">
 				<option value="">-none-</option>
 			</select>
 		</td>
@@ -18,7 +18,7 @@ Required Variables: cool_api and currentMailing and fromAddress
 	<tr>
 		<td class="label">Reply to E-mail Address</td>
 		<td>
-			<select  style="width: 200px" ng-model="currentMailing.replyto_email" ng-options="frm.label as frm.label for frm in fromAddress">
+			<select  style="width: 200px" ng-model="currentMailing.replyto_email" ng-options="frm.email as frm.email for frm in replyaddress">
 				<option value="">-none-</option>
 			</select>
 		</td>
