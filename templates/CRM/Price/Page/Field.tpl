@@ -98,8 +98,10 @@
         {if $action eq 16}
         <div class="messages status no-popup">
             <div class="icon inform-icon"></div>
-            {capture assign=crmURL}{crmURL p='civicrm/admin/price/field q="action=add&reset=1&sid=$sid"}{/capture}
-            {ts 1=$groupTitle 2=$crmURL}There are no fields for price set '%1', <a href='%2'>add one</a>.{/ts}
+            {ts 1=$groupTitle 2=$crmURL}There are no fields for price set '%1'.{/ts}
+        </div>
+        <div class="action-link">
+          <a href="{crmURL q="reset=1&action=add&sid=$sid"}" id="newPriceField" class="button"><span><div class="icon add-icon"></div>{ts}Add Price Field{/ts}</span></a>
         </div>
         {/if}
   {/if}
