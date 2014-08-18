@@ -103,6 +103,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
         CRM_Core_Action::EXPORT => array(
           'name' => ts('Move'),
           'url' => 'civicrm/admin/custom/group/field/move',
+          'class' => 'small-popup',
           'qs' => 'reset=1&fid=%%id%%',
           'title' => ts('Move Custom Field'),
         ),

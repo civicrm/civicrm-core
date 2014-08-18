@@ -90,8 +90,11 @@
         {if $action eq 16}
         {capture assign=crmURL}{crmURL p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid"}{/capture}
         <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>
-       {ts 1=$groupTitle 2=$crmURL}There are no CiviCRM Profile Fields for '%1', you can <a href='%2'>add one now</a>.{/ts}
+          <div class="icon inform-icon"></div>
+          {ts 1=$groupTitle 2=$crmURL}There are no CiviCRM Profile Fields for '%1'</a>.{/ts}
+        </div>
+        <div class="action-link">
+          <a href="{crmURL p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid"}" class="button"><span><div class="icon add-icon"></div>{ts}Add Field{/ts}</span></a>
         </div>
         {/if}
     {/if}

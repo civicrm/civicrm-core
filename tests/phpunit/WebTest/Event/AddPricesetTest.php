@@ -722,12 +722,6 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     //check the delete for price field
     $this->openCiviPage("admin/price/field", "reset=1&action=browse&sid={$sid}");
     $this->click("xpath=//table[@id='option11']/tbody/tr/td[9]/span[2]/ul/li[2]/a");
-    // Check confirmation alert.
-    $this->assertTrue((bool)preg_match("/^Are you sure you want to delete this price field?/",
-      $this->getConfirmation()
-    ));
-    $this->chooseOkOnNextConfirmation();
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     //assert the message
     $this->waitForText('price_set_used_by',
       "it is currently in use by one or more active events or contribution pages or contributions or event templates.");
