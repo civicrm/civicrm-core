@@ -287,7 +287,9 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
       CRM_Core_Session::setStatus(ts('The Set \'%1\' has been saved.', array(1 => $set->title)), ts('Saved'), 'success');
     }
     else {
-      $url = CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&action=add&sid=' . $set->id);
+      // Jump directly to adding a field if popups are disabled
+      $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? 'browse' : 'add';
+      $url = CRM_Utils_System::url('civicrm/admin/price/field', array('reset' => 1, 'action' => $action, 'sid' => $set->id));
       CRM_Core_Session::setStatus(ts("Your Set '%1' has been added. You can add fields to this set now.",
           array(1 => $set->title)
         ), ts('Saved'), 'success');

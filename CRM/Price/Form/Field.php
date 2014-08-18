@@ -86,9 +86,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $this->_sid = CRM_Utils_Request::retrieve('sid', 'Positive', $this, FALSE, NULL, 'REQUEST');
     $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE, NULL, 'REQUEST');
     $url        = CRM_Utils_System::url('civicrm/admin/price/field', "reset=1&action=browse&sid={$this->_sid}");
-    $breadCrumb = array(array('title' => ts('Price Set Fields'),
-        'url' => $url,
-      ));
+    $breadCrumb = array(array('title' => ts('Price Set Fields'), 'url' => $url));
 
     $this->_extendComponentId = array();
     $extendComponentId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'extends', 'id');
@@ -97,6 +95,18 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     }
 
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
+
+    switch ($this->_action) {
+      case CRM_Core_Action::ADD:
+        CRM_Utils_System::setTitle(ts('Add Price Field'));
+        break;
+      case CRM_Core_Action::UPDATE:
+        CRM_Utils_System::setTitle(ts('Edit Price Field'));
+        break;
+      case CRM_Core_Action::DELETE:
+        CRM_Utils_System::setTitle(ts('Delete Price Field'));
+        break;
+    }
   }
 
   /**
