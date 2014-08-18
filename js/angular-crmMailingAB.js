@@ -9,9 +9,7 @@
   var mltokens = [];
   var crmMailingAB = angular.module('crmMailingAB', ['ngRoute', 'ui.utils', 'ngSanitize']);
   var mltokens = [];
-  var chck = []; //to fill the group variable $scope.incGroup
-  var chck2= []; // to get id and text in the required format
-  var chck3= [];
+
   crmMailingAB.run(function ($rootScope, $templateCache) {
     $rootScope.$on('$viewContentLoaded', function () {
       $templateCache.removeAll();
@@ -24,8 +22,8 @@
         templateUrl: partialUrl('list.html'),
         controller: 'ABListingCtrl',
         resolve: {
-          mailingList: function ($route, crmApi) {
-            return crmApi('Mailing', 'get', {});
+          mailingABList: function ($route, crmApi) {
+            return crmApi('MailingAB', 'get', {});
           }
         }
       });
@@ -62,8 +60,8 @@
 //-----------------------------------------
   // Add a new record by name.
   // Ex: <crmAddName crm-options="['Alpha','Beta','Gamma']" crm-var="newItem" crm-on-add="callMyCreateFunction(newItem)" />
-  crmMailingAB.controller('ABListingCtrl', function ($scope, crmApi) {
-    $scope.abmailList = CRM.crmMailing.mailingabNames;
+  crmMailingAB.controller('ABListingCtrl', function ($scope, crmApi,mailingABList) {
+    $scope.mailingABList = mailingABList.values;
   });
 
   crmMailingAB.controller('ReportCtrl', function ($scope, crmApi, selectedABTest) {
@@ -165,9 +163,7 @@
       $scope.currentABTest.time = $scope.ans[1];
     }
     $scope.token = [];
-    chck = [];
-    chck2 = [];
-    chck3=[];
+
     if ($scope.currentABTest.just_created != 1) {
       $scope.abId = $scope.currentABTest.id;
       $scope.sparestuff.isnew = false;
@@ -188,47 +184,7 @@
       abmailC.success(function (data) {
         if (data.is_error == 0) {
           $scope.mailC = data;
-          for(var a in $scope.mailingGrp){
-            console.log("youuo");
-            if($scope.mailingGrp[a].mailing_id==$scope.mailC.id){
-              console.log($scope.mailingGrp[a]);
-              var b = $scope.mailingGrp[a].entity_id + " " + $scope.mailingGrp[a].entity_table +" " + $scope.mailingGrp[a].group_type;
-              var c = $scope.mailingGrp[a].id;
-              chck.push(b);
-              $scope.mailid.push(c);
-            }
-          }
-          for(var a in chck)
-          {	var b ={}
-            b.id = chck[a];
-            var splt = chck[a].split(" ");
 
-            if(splt[1] == "civicrm_group"){
-              for(var c in $scope.groups){
-                if($scope.groups[c].id==splt[0]){
-                  b.text = $scope.groups[c].title;
-                }
-              }
-            }
-            if(splt[1] == "civicrm_mailing"){
-              for(var c in $scope.mailList){
-                if($scope.mailList[c].id==splt[0]){
-                  b.text = $scope.mailList[c].name;
-                }
-              }
-            }
-            chck2.push(b);
-          }
-          for(var a in chck2){
-            var b =chck2[a];
-
-            chck3.push(b.id+" "+ b.text);
-          }
-          console.log("yooyo");
-          console.log(chck);
-          console.log(chck2);
-          console.log(chck3);
-          $scope.sparestuff.allgroups = chck3;
 
         }
       });
@@ -817,12 +773,6 @@
           }
         }).select2("data", scope.sparestuff.allgroups);
 
-        $(element).on("select2-opening", function()
-        { 	scope.sparestuff.allgroups=chck3;
-
-          scope.$apply();
-
-        });
 
         $(element).on('select2-selecting', function (e) {
           var a = e.val.split(" ");
@@ -850,8 +800,7 @@
             scope.excGroupids.push(a[0]);
             scope.$apply();
           }
-          chck3.push(e.val);
-          scope.sparestuff.allgroups=chck3;
+
           scope.$apply();
          // console.log(scope.incGroup);
 
@@ -869,9 +818,7 @@
             scope.incGroupids.splice(index, 1);
             scope.$apply();
           }
-          var index = chck3.indexOf(e.val);
-          chck3.splice(index, 1);
-          scope.sparestuff.allgroups=chck3;
+
          // console.log(scope.incGroup);
           scope.$apply();
         });

@@ -1,12 +1,12 @@
 <!--
 Controller: ABListingCtrl
-Required vars: abmailList
+Required vars: mailingABList
 -->
 <div id="help">
   A/B Testing list
 </div>
 
-<div ng-show="abmailList.length > 0">
+<div ng-show="!$.isEmptyObject(mailingABList)">
   <table class="display">
     <thead>
     <tr>
@@ -18,7 +18,7 @@ Required vars: abmailList
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="ab in abmailList">
+    <tr ng-repeat="ab in mailingABList">
       <td>{{ab.name}}</td>
       <td>{{ab.id}}</td>
       <td><a class="action-item crm-hover-button" ng-href="#/mailing/abtesting/{{ab.id}}">Edit</a>&nbsp
@@ -29,7 +29,7 @@ Required vars: abmailList
   </table>
 </div>
 
-<div ng-show="abmailList.length == 0" class="messages status no-popup">
+<div ng-show="$.isEmptyObject(mailingABList)" class="messages status no-popup">
   <div class="icon inform-icon"></div>
   You have no A/B mailings
 </div>
