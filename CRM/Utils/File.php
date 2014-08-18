@@ -527,8 +527,9 @@ HTACCESS;
    * @return string
    */
   static function absoluteDirectory($directory) {
-    // Do nothing on windows - config will need to specify absolute path
-    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    // check if directory is already absolute, if so return immediately
+    // Note: Windows PHP accepts any mix of "/" or "\", so "C:\htdocs" or "C:/htdocs" would be a valid absolute path
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && preg_match(';^[a-zA-Z]:[/\\\\];', $directory)) {
       return $directory;
     }
 
@@ -713,7 +714,9 @@ HTACCESS;
   static function dynamicResourcePath($fileName = NULL) {
     $config = CRM_Core_Config::singleton();
     // FIXME: Use self::baseFilePath once url issue has been resolved
-    $path = self::addTrailingSlash(str_replace(array('/persist/contribute', '\persist\contribute'), '', $config->imageUploadDir)) . 'dynamic';
+    // Windows PHP accepts any mix of "/" or "\"; simpler if we only deal with one of those
+    $imageUploadDir = str_replace('\\', '/', $config->imageUploadDir);
+    $path = self::addTrailingSlash(str_replace('/persist/contribute', '', $imageUploadDir)) . 'dynamic';
     if ($fileName !== NULL) {
       $path .= "/$fileName";
     }
