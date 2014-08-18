@@ -35,14 +35,14 @@
 
 {foreach from=$dataArray item=value key=priceset}
 {if $priceset ||  $priceset == 0 || $value != ''}
-{$taxTerm} {$priceset}% : {$value|crmMoney:$currency}
+{$taxTerm} {$priceset|string_format:"%.2f"}% : {$value|crmMoney:$currency}
 {else}
 {ts}No{/ts} {$taxTerm} : {$value|crmMoney:$currency}
 {/if}
 {/foreach}
 {/if}
 
-{if $getTaxDetails && $totalTaxAmount}
+{if $getTaxDetails && $totalTaxAmount !== 'null'}
 {ts}Total Tax Amount{/ts} : {$totalTaxAmount|crmMoney:$currency}
 {/if}
 {ts}Total Amount{/ts} : {$formValues.total_amount|crmMoney:$currency}

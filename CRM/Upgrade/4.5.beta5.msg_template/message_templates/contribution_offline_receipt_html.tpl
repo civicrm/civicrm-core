@@ -115,7 +115,7 @@
       {foreach from=$dataArray item=value key=priceset}
         <tr>
         {if $priceset ||  $priceset == 0 || $value != ''}
-          <td>&nbsp;{$taxTerm} {$priceset}%</td>    
+          <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>    
           <td>&nbsp;{$value|crmMoney:$currency}</td>
         {else}
           <td>&nbsp;{ts}No{/ts} {$taxTerm}</td>
@@ -125,7 +125,7 @@
       {/foreach}
      {/if}
 
-     {if $getTaxDetails && $totalTaxAmount}
+     {if $getTaxDetails && $totalTaxAmount !== 'null'}
       <tr>
         <td {$labelStyle}>
           {ts}Total Tax Amount{/ts}
