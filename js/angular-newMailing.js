@@ -400,18 +400,37 @@
         $scope.mailing_recipients();
       });
     }
-    
-    $scope.save_next = function() {
+
+    $scope.save_repeat = function(){
       if ($scope.from.total != "") {
-          var splt = $scope.from.total.split(" ");
-          var splta = splt[1].substring(1,(splt[1].length-1));
-          var spltb = splt[0];
-          console.log(splta);
-          console.log(spltb);
-          $scope.currentMailing.from_email = splta;
-          $scope.currentMailing.from_name = spltb;
+        var splt = $scope.from.total.split(" ");
+        var splta = splt[1].substring(1,(splt[1].length-1));
+        var spltb = splt[0];
+        console.log(splta);
+        console.log(spltb);
+        $scope.currentMailing.from_email = splta;
+        $scope.currentMailing.from_name = spltb;
       }
 
+      if ($scope.currentMailing.scheduled_date == $scope.currentMailing.approval_date
+        && $scope.currentMailing.scheduled_date != null) {
+        console.log("Do Nothing");
+      }
+      else {
+        $scope.currentMailing.scheduled_date= $scope.scheddate.date + " " + $scope.scheddate.time ;
+        if ($scope.currentMailing.scheduled_date!=" ") {
+          $scope.currentMailing.scheduled_id= $scope.user_id;
+        }
+        else {
+          $scope.currentMailing.scheduled_date= null;
+        }
+      }
+
+
+    }
+
+    $scope.save_next = function() {
+      $scope.save_repeat();
       $scope.incGrp=[];
       $scope.excGrp=[];
       $scope.incMail=[];
@@ -440,20 +459,6 @@
       console.log($scope.incGrp + " inc group");
       console.log($scope.excGrp + " exc group");
 
-
-      if ($scope.currentMailing.scheduled_date == $scope.currentMailing.approval_date
-        && $scope.currentMailing.scheduled_date != null) {
-        console.log("Do Nothing");
-      }
-      else {
-        $scope.currentMailing.scheduled_date= $scope.scheddate.date + " " + $scope.scheddate.time ;
-        if ($scope.currentMailing.scheduled_date!=" ") {
-          $scope.currentMailing.scheduled_id= $scope.user_id;
-        }
-        else {
-          $scope.currentMailing.scheduled_date= null;
-        }
-      }
       console.log($scope.mailid + "coolio")
       if ($scope.mailid != null) {
         for (var a in $scope.mailid) {
@@ -513,31 +518,7 @@
     };
 
     $scope.save_next_page2 = function() {
-
-      if ($scope.from.total != "") {
-        var splt = $scope.from.total.split(" ");
-        var splta = splt[1].substring(1,(splt[1].length-1));
-        var spltb = splt[0];
-        console.log(splta);
-        console.log(spltb);
-        $scope.currentMailing.from_email = splta;
-        $scope.currentMailing.from_name = spltb;
-      }
-
-      if ($scope.currentMailing.scheduled_date == $scope.currentMailing.approval_date
-        && $scope.currentMailing.scheduled_date != null) {
-        console.log("Do Nothing");
-      }
-      else {
-        $scope.currentMailing.scheduled_date= $scope.scheddate.date + " " + $scope.scheddate.time ;
-        if ($scope.currentMailing.scheduled_date!=" ") {
-          $scope.currentMailing.scheduled_id= $scope.user_id;
-        }
-        else {
-          $scope.currentMailing.scheduled_date= null;
-        }
-      }
-
+      $scope.save_repeat();
       var result = crmApi('Mailing', 'create', {
           id: $scope.currentMailing.id,
           name: $scope.currentMailing.name,
@@ -664,15 +645,15 @@
       link: function(scope, element, attrs) {
         $(element).parent().parent().parent().parent().parent().tabs();
         console.log($(element).parent().parent().parent().parent().parent());
-        var myarr = new Array(1,2);
+       // var myarr = new Array(1,2);
         //$(element).parent().parent().parent().parent().parent().tabs({disabled:myarr});
         $(element).on("click",function() {
           scope.acttab=scope.acttab +1;
-          var myArray1 = new Array( );
+        /*  var myArray1 = new Array( );
           for ( var i = 0; i < 3; i++ ) {
             if(scope.acttab!=i)
               myArray1.push(i);
-          }
+          }*/
           //$(element).parent().parent().parent().parent().parent().tabs( "option", "disabled", myArray1 );
           $(element).parent().parent().parent().parent().parent().tabs({active:scope.acttab});
           console.log("sid");
@@ -687,15 +668,15 @@
       restrict: 'A',
       link: function(scope, element, attrs) {
         $(element).parent().parent().parent().parent().parent().tabs();
-        var myarr = new Array(1,2);
+        //var myarr = new Array(1,2);
         //$(element).parent().parent().parent().parent().parent().tabs({disabled:myarr});
         $(element).on("click",function() {
           scope.acttab=scope.acttab -1;
-          var myArray1 = new Array( );
+        /*  var myArray1 = new Array( );
           for ( var i = 0; i < 3; i++ ) {
             if(scope.acttab!=i)
               myArray1.push(i);
-          }
+          }*/
           //		$(element).parent().parent().parent().parent().parent().tabs( "option", "disabled", myArray1 );
           $(element).parent().parent().parent().parent().parent().tabs({active:scope.acttab});
           console.log("sid");
@@ -703,6 +684,80 @@
       }
     };
   });
+
+
+/*  crmMailing.directive('prevtab', function () {
+    return {
+// Restrict it to be an attribute in this case
+      restrict: 'A',
+      priority: 500,
+// responsible for registering DOM listeners as well as updating the DOM
+      link: function (scope, element, attrs) {
+        $(element).on("click", function () {
+          var temp = scope.tab_val - 1;
+          scope.tab_upd_dec();
+          scope.$apply();
+          if (temp != 3) {
+            $(".crmABTestingAllTabs").tabs("option", "active", temp);
+          }
+          scope.$apply();
+        });
+      }
+    };
+  });
+
+  crmMailing.directive('nexttab', function () {
+    return {
+// Restrict it to be an attribute in this case
+      restrict: 'A',
+      priority: 500,
+// responsible for registering DOM listeners as well as updating the DOM
+      link: function (scope, element, attrs) {
+        var tabselector = $(".crmABTestingAllTabs");
+        tabselector.tabs(scope.$eval(attrs.nexttab));
+        var myarr = new Array(1, 2, 3)
+// disable remaining tabs
+        if(scope.sparestuff.isnew == true)
+          tabselector.tabs({disabled: myarr});
+        $(element).on("click", function () {
+          if (scope.tab_val == 0) {
+            scope.create_abtest();
+          }
+          else {
+            if (scope.tab_val == 2) {
+              scope.update_abtest();
+              if (scope.currentABTest.winner_criteria_id == 1) {
+                scope.sparestuff.winnercriteria = "Open";
+                scope.$apply();
+              }
+              else {
+                if (scope.currentABTest.winner_criteria_id == 2) {
+                  scope.sparestuff.winnercriteria = " Total Unique Clicks";
+                  scope.$apply();
+                }
+                else {
+                  if (scope.currentABTest.winner_criteria_id == 3) {
+                    scope.sparestuff.winnercriteria = "Total Clicks on a particular link";
+                    scope.$apply();
+                  }
+                }
+              }
+              scope.a_b_update();
+            }
+          }
+          scope.tab_upd();
+          var myArray1 = new Array();
+          for (var i = scope.max_tab + 1; i < 4; i++) {
+            myArray1.push(i);
+          }
+          tabselector.tabs("option", "disabled", myArray1);
+          tabselector.tabs("option", "active", scope.tab_val);
+          scope.$apply();
+        });
+      }
+    };
+  });
+*/
 
   // Select 2 Widget for selecting the included group
   crmMailing.directive('chsgroup',function(){
@@ -874,6 +929,13 @@
       $route.reload();
     }
     $scope.mailingList = mailingList.values;
+    $scope.checkEmpty = function(){
+    if($scope.mailingList == "")
+    return true;
+    else
+    return false;
+    }
+    console.log($scope.mailingList + "sdadsa");
     $scope.deleteMail = function (mail) {
       crmApi('Mailing', 'delete', {id: mail.id}, {
         error: function (data) {
