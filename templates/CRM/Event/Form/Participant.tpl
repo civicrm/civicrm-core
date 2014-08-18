@@ -181,7 +181,6 @@
     {elseif $participantMode == 'live'}
     {assign var=registerMode value="LIVE"}
   {/if}
-  <h3>{if $action eq 1}{ts}New Event Registration{/ts}{elseif $action eq 8}{ts}Delete Event Registration{/ts}{else}{ts}Edit Event Registration{/ts}{/if}</h3>
   <div class="crm-block crm-form-block crm-participant-form-block">
     <div class="view-content">
       {if $participantMode}
@@ -199,7 +198,6 @@
       {/if}
 
       {if $action eq 8} {* If action is Delete *}
-        <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <div class="crm-participant-form-block-delete messages status no-popup">
           <div class="crm-content">
             <div class="icon inform-icon"></div> &nbsp;
