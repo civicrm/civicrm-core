@@ -76,10 +76,23 @@ Required Variables: cool_api and currentMailing and fromAddress
 	<div class="crm-accordion-header">Track and Respond</div>
 	<div class="crm-accordion-body" ng-include="partialUrl('trackandRespond.html')"></div>
 </div>
-
-<button prevtab class="crm-button" type= "button" ng-click= "setwatchVariable()"><span>Previous</span></button>
-<button nexttab class="crm-button" type= "button" ng-click = "save_next_page2()" ><span>Next</span></button>
-<button class="crm-button" ng-click="save()" type="submit"><span>Save and Continue Later</span></button>
-<button class="crm-button" ng-click="back()" ><span>Cancel</span></button>
+    <br>
+    <div class="crm-submit-buttons">
+      <span class="crm-button">
+        <input prevtab type="submit" class="crm-button" value = "Previous" />
+      </span>
+      <span class="crm-button">
+        <input nexttab type= "submit" ng-click="editMailingFormStep2.$setPristine(); save_next_page2()" value="Next" />
+      </span>
+      <span class="crm-button">
+        <input type= "submit" ng-click="editMailingFormStep2.$setPristine(); save()" value="Save and Continue Later" />
+      </span>
+      <span class="crm-button">
+        <input type= "submit" ng-click="back()" value="Cancel" />
+      </span>
     </div>
-  </form>
+  </div>
+</form>
+
+
+
