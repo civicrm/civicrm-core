@@ -46,7 +46,6 @@
               return crmApi('MailingAB', 'getsingle', {id: $route.current.params.id});
             }
             else {
-              console.log("created");
               //created_id has been set to my id. Does not save without created_id. Needs to made generic based on the user
               return { just_created: "1"
               };
@@ -87,7 +86,6 @@
         y: 11
       }
     ]
-    console.log(selectedABTest);
     if (selectedABTest.winner_criteria_id == 1) {
       $scope.winnercriteria = "Open";
     }
@@ -113,7 +111,6 @@
       $scope.r.push(data.values[selectedABTest.mailing_id_a]["Unique Clicks"].toString());
      $scope.$apply();
     });
-    console.log($scope.rtt)
 
     $scope.d=[];
     result = crmApi('Mailing','stats',{mailing_id : selectedABTest.mailing_id_b});
@@ -125,14 +122,12 @@
       $scope.d.push(data.values[selectedABTest.mailing_id_b]["Unique Clicks"].toString());
       $scope.$apply();
     });
-    console.log($scope.d);
 
     var numdiv = 5;
 
     for (i = 0; i < numdiv; i++) {
       var result = crmApi('MailingAB', 'graph_stats',{id : selectedABTest.id, stats_count : numdiv, stat_count_select : i});
       result.success(function (data) {
-       console.log(data);
       });
     }
 
@@ -221,6 +216,7 @@
     }
     else {
       $scope.sparestuff.template = $scope.templates[0];
+      $scope.currentABTest.testing_criteria_id=1;
     }
 
 
@@ -233,7 +229,10 @@
     };
 
     $scope.tab_val = 0;
+    if($scope.sparestuff.isnew==true)
     $scope.max_tab = 0;
+    else $scope.max_tab = 4;
+
     $scope.campaign_clicked = function () {
       if ($scope.max_tab >= 0) {
         $scope.tab_val = 0;
@@ -310,12 +309,10 @@
     $scope.savea = function (dat) {
 
       var result = crmApi('Mailing', 'create', dat, true);
-      console.log(result);
       result.success(function (data) {
         if (data.is_error == 0) {
           $scope.mailA.id = data.id;
           $scope.currentABTest.mailing_id_a = $scope.mailA.id;
-          console.log("Mail a Id " + $scope.mailA.id);
         }
       });
     };
@@ -331,7 +328,6 @@
       result.success(function (data) {
         if (data.is_error == 0) {
           $scope.mailB.id = data.id;
-          console.log("Mail b Id " + $scope.mailB.id);
           $scope.currentABTest.mailing_id_b = $scope.mailB.id;
           $scope.append_mails();
         }
@@ -340,13 +336,10 @@
 
     $scope.savec = function (dat) {
       var flag = 0;
-      console.log("C is called");
       var result = crmApi('Mailing', 'create', dat, true);
-      console.log(result);
       result.success(function (data) {
         if (data.is_error == 0) {
           $scope.mailC.id = data.id;
-          console.log("Mail C Id " + $scope.mailC.id);
           $scope.currentABTest.mailing_id_c = $scope.mailC.id;
           $scope.append_mails();
         }
@@ -383,8 +376,6 @@
     }
 
     $scope.setdate = function (par) {
-      console.log("called")
-      console.log("av " + par)
       $scope.send_date = par;
       $scope.dt = par;
       $scope.apply();
@@ -401,11 +392,9 @@
       $scope.currentABTest.testing_criteria_id = $scope.sparestuff.template.val;
 
       if ($scope.abId == "") {
-        console.log("bb");
         result = crmApi('MailingAB', 'create', {name: $scope.currentABTest.name, testing_criteria_id: $scope.sparestuff.template.val});
       }
       else {
-        console.log("aa");
         if (typeof $scope.currentABTest.mailing_id_a == 'undefined') {
           result = crmApi('MailingAB', 'create', {name: $scope.currentABTest.name,id: $scope.abId, testing_criteria_id: $scope.sparestuff.template.val});
         }
@@ -417,7 +406,6 @@
       result.success(function (data) {
         if (data.is_error == 0) {
           $scope.abId = data.id;
-          console.log("ID " + $scope.abId);
         }
       });
     };
@@ -448,7 +436,6 @@
 
       resulta.success(function (data) {
         if (data.is_error == 0) {
-          console.log("came");
           $scope.sparestuff.previewa = data.values.html;
         }
       });
@@ -457,7 +444,6 @@
 
       resulta.success(function (data) {
         if (data.is_error == 0) {
-          console.log("came");
           $scope.sparestuff.previewb = data.values.html;
         }
       });
@@ -589,7 +575,6 @@
     };*/
 
     $scope.$watch('preview', function () {
-      console.log("dsfdfsfds");
       if ($scope.preview == true) {
         $('#prevmail').dialog({
           title: 'Preview Mailing',
@@ -605,7 +590,6 @@
           },
 
           close: function () {
-            console.log("close");
             $scope.preview = false;
             $scope.$apply();
           }
@@ -647,7 +631,6 @@
             }
           },
           close: function () {
-            console.log("close");
             $scope.sendtest = false;
             $scope.$apply()
           }
@@ -674,10 +657,10 @@
 
         $(element).on("click", function () {
           if (scope.tab_val == 0) {
-            console.log("att");
+
             scope.create_abtest();
 
-            console.log("tt");
+
           }
           else {
             if (scope.tab_val == 2) {
@@ -727,7 +710,6 @@
           var temp = scope.tab_val - 1;
           scope.tab_upd_dec();
           scope.$apply();
-          console.log(temp);
           if (temp != 3) {
             $(".crmABTestingAllTabs").tabs("option", "active", temp);
           }
@@ -776,7 +758,6 @@
 
         $(element).on('select2-selecting', function (e) {
           var a = e.val.split(" ");
-          console.log(e);
           var l = a.length;
           if (a[2] == "include") {
             var str = "";
@@ -802,7 +783,6 @@
           }
 
           scope.$apply();
-         // console.log(scope.incGroup);
 
         });
         $(element).on("select2-removed", function (e) {
@@ -819,7 +799,6 @@
             scope.$apply();
           }
 
-         // console.log(scope.incGroup);
           scope.$apply();
         });
       }
@@ -832,7 +811,6 @@
       restrict: 'AE',
       link: function (scope, element, attrs) {
         if (typeof scope.currentABTest.group_percentage != 'undefined') {
-          console.log("Yay");
           $(element).slider({value: scope.currentABTest.group_percentage});
         }
         $(element).slider({min: 1});
@@ -856,7 +834,6 @@
             $(".ui-datepicker a").removeAttr("href");
             scope.sparestuff.date = date.toString();
             scope.$apply();
-            console.log(scope.sparestuff.date);
           }
         });
       }
@@ -869,7 +846,6 @@
       priority: 1000,
       link: function (scope, element, attrs) {
         $(element).on("click", function () {
-          console.log("clicked");
           scope.savea({
             id: scope.mailA.id,
             name: "mailing a",
@@ -897,7 +873,6 @@
           });
 
           if (scope.whatnext == "3") {
-            console.log("sdf");
             scope.mailB.name = scope.mailA.name;
             scope.mailB.visibility = scope.mailA.visibility;
             scope.mailB.created_id = scope.mailA.created_id;
@@ -913,7 +888,6 @@
             scope.mailB.resubscribe_id = scope.mailA.resubscribe_id;
             scope.mailB.body_html = scope.mailA.body_html;
             scope.mailB.body_text = scope.mailA.body_text;
-            scope.mailB.scheduled_date = scope.mailA.scheduled_date;
             scope.mailB.scheduled_id = scope.mailA.scheduled_id;
             scope.mailB.campaign_id = scope.mailA.campaign_id == null ? "" : scope.mailA.campaign_id;
             scope.mailB.header_id = scope.mailA.header_id;
@@ -937,7 +911,6 @@
               scope.mailB.resubscribe_id = scope.mailA.resubscribe_id;
               scope.mailB.body_html = scope.mailA.body_html;
               scope.mailB.body_text = scope.mailA.body_text;
-              scope.mailB.scheduled_date = scope.mailA.scheduled_date;
               scope.mailB.scheduled_id = scope.mailA.scheduled_id;
               scope.mailB.campaign_id = scope.mailA.campaign_id == null ? "" : scope.mailA.campaign_id;
               scope.mailB.header_id = scope.mailA.header_id;
@@ -945,7 +918,6 @@
               scope.mailB.is_completed = scope.mailA.is_completed;
             }
           }
-          console.log("call B");
           scope.saveb({
             id: scope.mailB.id,
             name: "mailing b",
@@ -964,7 +936,6 @@
             resubscribe_id: scope.mailB.resubscribe_id,
             body_html: scope.mailB.body_html,
             body_text: scope.mailB.body_text,
-            scheduled_date: scope.mailB.scheduled_date,
             scheduled_id: scope.mailB.scheduled_id,
             campaign_id: scope.mailB.campaign_id == null ? "" : scope.mailB.campaign_id,
             header_id: scope.mailB.header_id,
@@ -972,7 +943,6 @@
             is_completed: scope.mailA.is_completed
           });
 
-          console.log("call C");
           scope.savec({
             id: scope.mailC.id,
             name: "mailing c",
@@ -1011,7 +981,6 @@
             $(".ui-datepicker a").removeAttr("href");
             scope.currentABTest.date = date.toString();
             scope.$apply();
-            console.log(scope.currentABTest.date);
           }
         });
       }
@@ -1040,7 +1009,6 @@
         // map one colour each to x, y and z
         // keys grabs the key value or heading of each key value pair in the json
         // but not time
-       // console.log("Key");
 
         //console.log(d3.keys(data[0]));
         color.domain(d3.keys(data[0]).filter(function (key) {
@@ -1180,7 +1148,7 @@
         $(element).select2({width:"200px", data: mltokens, placeholder:"Insert Token"});
         $(element).on('select2-selecting', function(e) {
 
-          scope.$evalAsync('_resetSelection()');console.log(mltokens);
+          scope.$evalAsync('_resetSelection()');
           var a = $(element).attr('id');
           if(a=="htgroupcompose"){scope.tokenfunc("body_html",e,scope.mailA.body_html);}
           else if(a=="htgroupcomposetwob"){scope.tokenfunc("twomailbbody_html",e,scope.mailB.body_html);}
