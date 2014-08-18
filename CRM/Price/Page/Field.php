@@ -78,8 +78,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @access public
    */ function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
-      // helper variable for nicer formatting
-      $deleteExtra = ts('Are you sure you want to delete this price field?');
       self::$_actionLinks = array(
         CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit Price Field'),
@@ -108,7 +106,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
           'url' => 'civicrm/admin/price/field',
           'qs' => 'action=delete&reset=1&sid=%%sid%%&fid=%%fid%%',
           'title' => ts('Delete Price'),
-          'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
         ),
       );
     }
