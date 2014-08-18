@@ -17,8 +17,8 @@
     <div sliderbar id="trial" style="margin: 10px;" required></div>
 
     <h3>How will the winner be decided</h3><br>
-    &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=1 name="cri" required> Open <br/><br>
-    &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=2 name="cri" checked="checked">
+    &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=1 name="cri" required ng-checked="true"> Open <br/><br>
+    &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=2 name="cri" >
     Total Unique Clicks <br/><br>
     &nbsp <input type="radio" ng-model="currentABTest.winner_criteria_id" value=3 name="cri"> Total
     Clicks on a particular link <br/>
