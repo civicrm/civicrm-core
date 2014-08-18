@@ -151,6 +151,9 @@
     $scope.sparestuff.isnew = false;
     $scope.sparestuff.allgroups = "";
     $scope.mailid = [];
+    $scope.preventsubmit = false;
+
+    
     mltokens = CRM.crmMailing.mailTokens;
     if ($scope.currentABTest.declare_winning_time != null) {
       $scope.ans = $scope.currentABTest.declare_winning_time.split(" ");
@@ -216,7 +219,6 @@
     }
     else {
       $scope.sparestuff.template = $scope.templates[0];
-      $scope.currentABTest.testing_criteria_id=1;
     }
 
 
@@ -329,7 +331,7 @@
         if (data.is_error == 0) {
           $scope.mailB.id = data.id;
           $scope.currentABTest.mailing_id_b = $scope.mailB.id;
-          $scope.append_mails();
+          //$scope.append_mails();
         }
       });
     };
@@ -337,6 +339,7 @@
     $scope.savec = function (dat) {
       var flag = 0;
       var result = crmApi('Mailing', 'create', dat, true);
+
       result.success(function (data) {
         if (data.is_error == 0) {
           $scope.mailC.id = data.id;
@@ -498,7 +501,8 @@
           for (var a in $scope.tmpList) {
             if ($scope.tmpList[a].id == $scope.mailA.msg_template_id) {
               $scope.mailA.body_html = $scope.tmpList[a].msg_html;
-              $scope.mailA.subject=$scope.tmpList[a].msg_subject;
+              if(typeof $scope.mailA.subject == 'undefined' || $scope.mailA.subject.length == 0)
+              {$scope.mailA.subject=$scope.tmpList[a].msg_subject;}
             }
           }
         }
@@ -514,7 +518,8 @@
             for (var a in $scope.tmpList) {
               if ($scope.tmpList[a].id == $scope.mailB.msg_template_id) {
                 $scope.mailB.body_html = $scope.tmpList[a].msg_html;
-                $scope.mailB.subject=$scope.tmpList[a].msg_subject;
+                if(typeof $scope.mailB.subject == 'undefined' || $scope.mailB.subject.length ==0)
+                { $scope.mailB.subject=$scope.tmpList[a].msg_subject;}
 
               }
             }
@@ -530,7 +535,8 @@
             for (var a in $scope.tmpList) {
               if ($scope.tmpList[a].id == $scope.mailA.msg_template_id) {
                 $scope.mailA.body_html = $scope.tmpList[a].msg_html;
-                $scope.mailA.subject=$scope.tmpList[a].msg_subject;
+                if(typeof $scope.mailA.subject == 'undefined' || $scope.mailA.subject.length == 0)
+                {$scope.mailA.subject=$scope.tmpList[a].msg_subject;}
               }
             }
           }
@@ -545,7 +551,8 @@
             for (var a in $scope.tmpList) {
               if ($scope.tmpList[a].id == $scope.mailB.msg_template_id) {
                 $scope.mailB.body_html = $scope.tmpList[a].msg_html;
-                $scope.mailB.subject=$scope.tmpList[a].msg_subject;
+                if(typeof $scope.mailB.subject == 'undefined' || $scope.mailB.subject.length == 0)
+                { $scope.mailB.subject=$scope.tmpList[a].msg_subject;}
 
               }
             }
@@ -638,6 +645,7 @@
       }
     });
   });
+
 
   crmMailingAB.directive('nexttab', function () {
     return {
@@ -964,7 +972,8 @@
             campaign_id: scope.mailB.campaign_id == null ? "" : scope.mailB.campaign_id,
             header_id: scope.mailB.header_id,
             footer_id: scope.mailB.footer_id,
-            is_completed: scope.mailA.is_completed
+            is_completed: scope.mailA.is_completed,
+//            api.mailing_job.create: 0
           });
         });
       }
