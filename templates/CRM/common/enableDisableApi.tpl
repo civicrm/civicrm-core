@@ -63,7 +63,7 @@
     function enableDisable() {
       $row = $(this).closest('.crm-entity');
       info = $(this).crmEditableEntity();
-      fieldLabel = info.label || info.title || info.name || {/literal}'{ts escape="js"}Record{/ts}'{literal};
+      fieldLabel = info.label || info.title || info.display_name || info.name || {/literal}'{ts escape="js"}Record{/ts}'{literal};
       enabled = !$row.hasClass('disabled');
       if (enabled) {
         CRM.confirm({{/literal}

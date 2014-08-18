@@ -68,12 +68,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
         $this->_isARFlag = TRUE;
         if ($this->_action & CRM_Core_Action::DELETE) {
           $msg = ts("The selected financial account cannot be deleted because at least one Accounts Receivable type account is required (to ensure that accounting transactions are in balance).");
-          if (CRM_Utils_Array::value('snippet', $_REQUEST) == 'json') {
-            CRM_Core_Page_AJAX::returnJsonResponse($msg);
-          }
-          CRM_Core_Session::setStatus($msg, '', 'error');
-          CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/financial/financialAccount',
-            "reset=1&action=browse"));
+          CRM_Core_Error::statusBounce($msg);
         }
       }
     }
@@ -87,6 +82,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    */
   public function buildQuickForm( ) {
     parent::buildQuickForm( );
+    $this->setPageTitle(ts('Financial Account'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -194,4 +190,5 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       CRM_Core_Session::setStatus(ts('The Financial Account \'%1\' has been saved.', array(1 => $contributionType->name)));
     }
   }
+
 }

@@ -35,18 +35,13 @@
         <p>{ts}You will not be able to send an acknowledgment for this pledge because there is no email address recorded for this contact. If you want a acknowledgment to be sent when this pledge is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the pledge.{/ts}</p>
 </div>
 {/if}
-{if $action EQ 1}
-    <h3>{ts}New Pledge{/ts}</h3>
-{elseif $action EQ 2}
-    <h3>{ts}Edit Pledge{/ts}</h3>
+{if $action EQ 2}
     {* Check if current Total Pledge Amount is different from original pledge amount. *}
     {math equation="x / y" x=$amount y=$installments format="%.2f" assign="currentInstallment"}
     {* Check if current Total Pledge Amount is different from original pledge amount. *}
     {if $currentInstallment NEQ $eachPaymentAmount}
       {assign var=originalPledgeAmount value=`$installments*$eachPaymentAmount`}
     {/if}
-{elseif $action EQ 8}
-    <h3>{ts}Delete Pledge{/ts}</h3>
 {/if}
 <div class="crm-block crm-form-block crm-pledge-form-block">
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>

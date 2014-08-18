@@ -197,6 +197,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
+
+    CRM_Utils_System::setTitle(ts('Renew Membership'));
+
     parent::preProcess();
   }
 

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* This template is used for adding/configuring SMS Providers  *}
-<h3>{if $action eq 1}{ts}New Provider{/ts}{elseif $action eq 2}{ts}Edit Provider{/ts}{else}{ts}Delete Provider{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-job-form-block">
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 

@@ -26,7 +26,6 @@
 <div class="view-content">
 {if $action eq 4}{* when action is view  *}
     {if $notes}
-        <h3>{ts}View Note{/ts}</h3>
         <div class="crm-block crm-content-block crm-note-view-block">
           <table class="crm-info-panel">
             <tr><td class="label">{ts}Subject{/ts}</td><td>{$note.subject}</td></tr>
@@ -59,13 +58,6 @@
         </div>
         {/if}
 {elseif $action eq 1 or $action eq 2} {* action is add or update *}
-    <h3>
-        {if $parentId}
-            {if $action eq 1}{ts}New Comment{/ts}{else}{ts}Edit Comment{/ts}{/if}
-        {else}
-            {if $action eq 1}{ts}New Note{/ts}{else}{ts}Edit Note{/ts}{/if}
-        {/if}
-    </h3>
   <div class="crm-block crm-form-block crm-note-form-block">
     <div class="content crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout">
@@ -101,10 +93,8 @@
     </div>
 {/if}
 {if ($action eq 8)}
-<fieldset><legend>{ts}Delete Note{/ts}</legend>
 <div class=status>{ts 1=$notes.$id.note}Are you sure you want to delete the note '%1'?{/ts}</div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
-</fieldset>
 
 {/if}
 

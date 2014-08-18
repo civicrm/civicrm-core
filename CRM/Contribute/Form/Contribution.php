@@ -331,16 +331,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('lineItem', empty($this->_lineItems) ? FALSE : $this->_lineItems);
 
     // Set title
-    if ($this->_contactID) {
-      $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactID);
-
-      // Check if this is default domain contact CRM-10482
-      if (CRM_Contact_BAO_Contact::checkDomainContact($this->_contactID)) {
-        $displayName .= ' (' . ts('default organization') . ')';
-      }
-
-      // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-      CRM_Utils_System::setTitle(ts('Contribution from') . ' ' . $displayName);
+    if ($this->_mode) {
+      $this->setPageTitle($this->_ppID ? ts('Credit Card Pledge Payment') : ts('Credit Card Contribution'));
+    }
+    else {
+      $this->setPageTitle($this->_ppID ? ts('Pledge Payment') : ts('Contribution'));
     }
 
     if ($this->_id) {
