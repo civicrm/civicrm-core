@@ -953,23 +953,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $softErrors = CRM_Contribute_Form_SoftCredit::formRule($fields, $errors, $self);
 
-    // If we have a net amount or fee amount that is NOT set to 0.00, then ensure
-    // that the net_amount + the fee_amount is equal to the total amount.
-    $total_amount = NULL;
-    if(!empty($fields['total_amount']) && $fields['total_amount'] != '0.00') {
-      $total_amount = $fields['total_amount'];
-    }
-    $fee_amount = NULL;
-    if(!empty($fields['fee_amount']) && $fields['fee_amount'] != '0.00') {
-      $fee_amount = $fields['fee_amount'];
-    }
-    $net_amount = NULL;
-    if(!empty($fields['net_amount']) && $fields['net_amount'] != '0.00') {
-      $net_amount = $fields['net_amount'];
-    }
-    if ($total_amount && ($net_amount || $fee_amount)) {
-      $sum = CRM_Utils_Rule::cleanMoney($net_amount) + CRM_Utils_Rule::cleanMoney($fee_amount);
-      if (CRM_Utils_Rule::cleanMoney($total_amount) != $sum) {
+    if (!empty($fields['total_amount']) && (!empty($fields['net_amount']) || !empty($fields['fee_amount']))) {
+      $sum = CRM_Utils_Rule::cleanMoney($fields['net_amount']) + CRM_Utils_Rule::cleanMoney($fields['fee_amount']);
+      if (CRM_Utils_Rule::cleanMoney($fields['total_amount']) != $sum) {
         $errors['total_amount'] = ts('The sum of fee amount and net amount must be equal to total amount');
       }
     }
