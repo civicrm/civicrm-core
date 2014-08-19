@@ -82,7 +82,7 @@
               </td>
               {if $line.tax_rate != "" || $line.tax_amount != ""}
                 <td>
-                  {$line.tax_rate}%
+                  {$line.tax_rate|string_format:"%.2f"}%
                 </td>
                 <td>
                   {$line.tax_amount|crmMoney:$currency}
@@ -125,7 +125,7 @@
       {/foreach}
      {/if}
 
-     {if $getTaxDetails && $totalTaxAmount !== 'null'}
+     {if isset($totalTaxAmount) && $totalTaxAmount !== 'null'}
       <tr>
         <td {$labelStyle}>
           {ts}Total Tax Amount{/ts}

@@ -63,7 +63,7 @@
 --------------------------------------------------------------------------------------------------
 {/if}
 
-{if $totalTaxAmount}
+{if isset($totalTaxAmount)}
 {ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
 {/if}
 
