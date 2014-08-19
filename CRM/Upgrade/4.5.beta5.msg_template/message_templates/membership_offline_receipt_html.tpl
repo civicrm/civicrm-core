@@ -165,7 +165,7 @@
        {/foreach}
       {/if}
       {/if}
-      {if $totalTaxAmount}
+      {if isset($totalTaxAmount)}
         <tr>
          <td {$labelStyle}>
           {ts}Total Tax Amount{/ts}

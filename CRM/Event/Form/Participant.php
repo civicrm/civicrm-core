@@ -1711,6 +1711,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
               }
             }
             $this->assign('totalTaxAmount', $totalTaxAmount);
+            $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
             $this->assign('dataArray', $dataArray);
           }
           if (!empty($additionalParticipantDetails)) {
