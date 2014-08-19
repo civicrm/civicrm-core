@@ -59,7 +59,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 		$result = array();
 		$result['crmMailing'] = array(
 			'ext' => 'civicrm',
-			'js' => array('js/angular-newMailing.js' , 'js/angularsanitize.js'),
+			'js' => array('js/angular-Mailing.js' , 'js/angularsanitize.js'),
 		);
 		$session = CRM_Core_Session::singleton();
 		$contactID = $session->get('userID');

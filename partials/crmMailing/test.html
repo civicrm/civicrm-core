@@ -1,0 +1,31 @@
+<!--
+Controller: MailCtrl
+Required vars: groupNamesList
+-->
+
+<table class="form-layout-compressed">
+	<tbody>
+	<tr>
+		<td class="label">Send to address</td>
+		<td>
+			<input type="text" ng-model="testMailing.name" />
+		</td>
+	</tr>
+	<tr>
+		<td class="label">Send to this Group</td>
+		<td>
+			<select  style="width: 200px" ng-model="testMailing.group">
+				<option value="">-none-</option>
+				<option ng-repeat="grp in groupNamesList| filter: isGrp" value="{{grp.id}}" > {{grp.title}} </option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<button id="testbutton" ng-click="sendTest()">Send a Test Mailing</button>
+		</td>
+	</tr>
+
+	</tbody>
+</table>
+
