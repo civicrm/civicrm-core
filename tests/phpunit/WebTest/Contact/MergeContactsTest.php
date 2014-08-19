@@ -215,7 +215,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('email_1_email');
     $this->type('email_1_email', "{$firstName}.{$lastName}@example.com");
     $this->waitForElementPresent('contact_sub_type');
-    $this->select('contact_sub_type', "Staff");
+    $this->select('contact_sub_type', "Parent");
 
     // Clicking save.
     $this->click("_qf_Contact_upload_view");
@@ -232,7 +232,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->type('last_name', $lName);
     $this->type('email_1_email', "{$firstName}.{$lastName}@example.com");
     $this->waitForElementPresent('contact_sub_type');
-    $this->select('contact_sub_type', "Parent");
+    $this->multiselect2('contact_sub_type', array("Student", "Staff"));
     $this->click("_qf_Contact_upload_view");
     $this->waitForText('crm-notification-container', "Contact Saved");
     $this->openCiviPage("contact/deduperules", "reset=1");
@@ -248,7 +248,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->click('toggleSelect');
     $this->click('_qf_Merge_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Parent"));
+    $this->assertTrue($this->isTextPresent("Staff, Student"));
   }
   /**
    * @param $firstName
