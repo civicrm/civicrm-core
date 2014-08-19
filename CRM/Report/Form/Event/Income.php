@@ -187,13 +187,15 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
         $roleRows[$roleDAO->event_id][$participantRole[$roleId]]['total'] += $roleDAO->participant;
         $roleRows[$roleDAO->event_id][$participantRole[$roleId]]['amount'] += $roleDAO->amount;
       }
-      $roleRows[$roleDAO->event_id][$participantRole[$roleId]]['amount'] = CRM_Utils_Money::format($roleRows[$roleDAO->event_id][$participantRole[$roleId]]['amount'], $currency[$roleDAO->event_id]);
     }
 
     foreach ($roleRows as $eventId => $roleInfo) {
       foreach ($participantRole as $roleName) {
         if (isset($roleInfo[$roleName])) {
           $roleRows[$eventId][$roleName]['round'] = round(($roleRows[$eventId][$roleName]['total'] / $count[$eventId]) * 100, 2);
+        }
+        if (!empty($roleRows[$eventId][$roleName])) {
+          $roleRows[$eventId][$roleName]['amount'] = CRM_Utils_Money::format($roleRows[$eventId][$roleName]['amount'], $currency[$eventId]);
         }
       }
     }
