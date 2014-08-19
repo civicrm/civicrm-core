@@ -518,7 +518,8 @@ function _civicrm_api3_get_query_object($params, $mode, $entity) {
 
   $newParams = CRM_Contact_BAO_Query::convertFormValues($inputParams);
   $query = new CRM_Contact_BAO_Query($newParams, $returnProperties, NULL,
-    FALSE, FALSE, $mode
+    FALSE, FALSE, $mode,
+    empty($params['check_permissions'])
   );
   list($select, $from, $where, $having) = $query->query();
 
