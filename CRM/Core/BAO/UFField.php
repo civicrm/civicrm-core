@@ -803,13 +803,15 @@ SELECT  id
    * @param array $profileAddressFields array of profile fields that relate to address fields
    * @param array $profileFilter filter to apply to profile fields - expected usage is to only fill based on
    * the bottom profile per CRM-13726
+   *
+   * @return bool Can the address block be hidden safe in the knowledge all fields are elsewhere collected (see CRM-15118)
    */
   static function assignAddressField($key, &$profileAddressFields, $profileFilter) {
     $billing_id = CRM_Core_BAO_LocationType::getBilling();
     list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
 
     $profileFields = civicrm_api3('uf_field', 'get', array_merge($profileFilter,
-      array('is_active' => 1, 'return' => 'field_name', 'options' => array(
+      array('is_active' => 1, 'return' => 'field_name, is_required', 'options' => array(
         'limit' => 0,
       ))
     ));
@@ -825,11 +827,16 @@ SELECT  id
       'postal_code',
       'country'
     );
+    $requiredBillingFields = array_diff($validBillingFields, array('middle_name','supplemental_address_1'));
     $validProfileFields = array();
+    $requiredProfileFields = array();
 
     foreach ($profileFields['values'] as $field) {
       if(in_array($field['field_name'], $validBillingFields)) {
         $validProfileFields[] = $field['field_name'];
+      }
+      if ($field['is_required']) {
+        $requiredProfileFields[] = $field['field_name'];
       }
     }
 
@@ -852,6 +859,9 @@ SELECT  id
     ) {
       $profileAddressFields[$prefixName] = $index;
     }
+    
+    $potentiallyMissingRequiredFields = array_diff($requiredBillingFields, $requiredProfileFields);    
+    CRM_Core_Resources::singleton()->addSetting(array('billing' => array('billingProfileIsHideable' => empty($potentiallyMissingRequiredFields))));
   }
 
   /**
