@@ -2562,8 +2562,8 @@ WHERE  contribution_id = %1 ";
         'check_number' => CRM_Utils_Array::value('check_number', $params),
       );
 
-      if (CRM_Utils_Array::value('payment_processor', $params)) {
-        $trxnParams['payment_processor_id'] = $params['payment_processor'];
+      if (CRM_Utils_Array::value('payment_processor_id', $params)) {
+        $trxnParams['payment_processor_id'] = $params['payment_processor_id'];
       }
       $params['trxnParams'] = $trxnParams;
 
