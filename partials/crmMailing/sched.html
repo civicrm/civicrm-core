@@ -1,0 +1,39 @@
+<!--
+Controller: MailCtrl
+Required vars: currentMailing
+-->
+<!--<script src="../../packages/jquery/plugins/jquery.validate.min.js"><script>-->
+<br>
+<table class="form-layout-compressed">
+	<tbody>
+	<tr>
+		<td class="label">Send Immediately</td>
+		<td>
+			<input type="checkbox" ng-model="now" ng-change= "checkNow()" ng-true-value="1" ng-false-value="0"/>
+		</td>
+	<tr ng-show="now==0">
+		<td class="label">OR</td>
+	</tr>
+	<tr ng-show="now==0">
+		<td class="label">Schedule Mailing</td>
+		<td>
+			<input type="text" chsdate ng-model="scheddate.date" >
+		</td>
+		<td class="label" >Time</td>
+		<td>
+			<input type="text" placeholder="hh:mm" ng-model="scheddate.time" checktimeentry required>
+		</td>
+		<!--<td>
+			<input type="text" ng-model="scheddate.time">
+		</td>-->
+	</tr>
+
+	</tbody>
+</table>
+
+<!--<div id="help" ng-show="now==0">
+	Enter the time in the 12:32:45 format where 12 is the hour, 32 the minutes and 45 the seconds.
+</div>-->
+<br>
+
+<!--ng-model="crmMailing.scheduled_date" -->

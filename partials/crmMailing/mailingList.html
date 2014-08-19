@@ -1,0 +1,46 @@
+<!--
+Controller: mailingListCtrl
+Required vars: mailingList
+-->
+<div id="help">
+  All partially completed and completed mail are listed here
+</div>
+
+<div ng-show="!(checkEmpty())">
+  <table class="display">
+    <thead>
+    <tr>
+      <th>Mailing Name</th>
+      <!--    <th>Status</th>  -->
+      <th>Created By</th>
+      <th>Created Date</th>
+      <th>Sent By</th>
+      <th>Scheduled</th>
+      <th></th>
+      <th></th>
+    </tr>
+    </thead>
+    <tr ng-repeat="mail in mailingList" ng-class-even="'even-row even'" ng-class-odd="'odd-row odd'">
+      <td>{{mail.name}}</td>
+      <!--    <td>{{mailStatus[{{$index}}]}}</td>  -->
+      <td>{{mail.from_email}}</td>
+      <td>{{mail.created_date}}</td>
+      <td>{{mail.from_email}}</td>
+      <td>{{mail.scheduled_date}}</td>
+      <td><a class="action-item crm-hover-button" ng-href="#/mailing/{{mail.id}}" ng-click="edit()">Edit</a</td>
+      <td><a class="action-item crm-hover-button" crm-confirm="{type: 'delete', obj: mail}" on-yes="deleteMail(mail)">Delete</a>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div ng-show="checkEmpty()" class="messages status no-popup">
+  <div class="icon inform-icon"></div>
+  You have no Mailings
+</div>
+
+<div class="action-link">
+  <a ng-href="#/mailing/new" ng-click="edit()" class="button"><span><div class="icon add-icon"></div>New Mailing</span></a>
+</div>
+</div>
+
