@@ -225,8 +225,10 @@ cj( function( ) {
     }
   }
   if(checked) {
-    cj('#billingcheckbox').attr('checked', 'checked');
-    cj('.billing_name_address-group').hide();
+    cj('#billingcheckbox').prop('checked', true);
+    if (CRM.billing.billingProfileIsHideable) {
+      cj('.billing_name_address-group').hide();
+    }
   }
 
   // onchange handlers for non-billing fields
@@ -264,7 +266,9 @@ cj( function( ) {
   // toggle show/hide
   cj('#billingcheckbox').click(function(){
     if(this.checked) {
-      cj('.billing_name_address-group').hide(200);
+      if (CRM.billing.billingProfileIsHideable) {
+        cj('.billing_name_address-group').hide(200);
+      }
 
       // copy all values
       for(var id in input_ids) {
