@@ -87,6 +87,10 @@ class CRM_Core_Payment_BaseIPN {
       return FALSE;
     }
 
+    if (!isset($input['net_amount'])) {
+      $input['net_amount'] = (float) $input['total_amount'] - (float) CRM_Utils_Array::value('fee_amount', $input);
+    }
+
     // make sure contribution exists and is valid
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $ids['contribution'];
