@@ -325,7 +325,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * Build a url for pager links
    */
   function makeURL($key, $value) {
-    $href = CRM_Utils_System::makeURL($key);
+    $href = CRM_Utils_System::makeURL($key, TRUE);
     // CRM-12212 Remove alpha sort param
     if (strpos($href, '&amp;sortByCharacter=')) {
       $href = preg_replace('#(.*)\&amp;sortByCharacter=[^&]*(.*)#', '\1\2', $href);
