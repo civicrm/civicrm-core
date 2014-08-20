@@ -195,6 +195,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Add one or more css classes to the form
+   * @param $className
+   */
+  public function addClass($className) {
+    $classes = $this->getAttribute('class');
+    $this->setAttribute('class', ($classes ? "$classes " : '') . $className);
+  }
+
+  /**
    * register all the standard rules that most forms potentially use
    *
    * @return void
