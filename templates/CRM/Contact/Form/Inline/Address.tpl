@@ -94,14 +94,14 @@
     }
   });
   {/literal}{* // Enforce unique is_primary fields *}{literal}
-  cj(':checkbox[id*="[is_primary"]', 'form#Address_{/literal}{$blockId}{literal}').change(function() {
+  cj(':checkbox[id*="[is_primary"]', 'form[name=Address_{/literal}{$blockId}{literal}]').change(function() {
     if (this.defaultChecked) {
       cj(this).crmError("{/literal} {ts escape='js'}Please choose another address to be primary before changing this one.{/ts}{literal}");
       cj(this).prop('checked', true);
     }
   });
   {/literal}{* // Reset location_type_id when cancel button pressed *}{literal}
-  cj(':submit[name$=cancel]', 'form#Address_{/literal}{$blockId}{literal}').click(function() {
+  cj(':submit[name$=cancel]', 'form[name=Address_{/literal}{$blockId}{literal}]').click(function() {
     var container = cj(this).closest('div.crm-inline-edit.address');
     var origValue = container.attr('data-location-type-id') || '';
     container.data('location-type-id', origValue);

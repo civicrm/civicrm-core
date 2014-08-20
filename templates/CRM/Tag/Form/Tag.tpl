@@ -38,8 +38,9 @@
 </style>
 <script type="text/javascript">
   (function($, _){{/literal}
-    var entityID={$entityID};
-    var entityTable='{$entityTable}';
+    var entityID={$entityID},
+      entityTable='{$entityTable}',
+      $form = $('form.{$form.formClass}');
     {literal}
     CRM.updateContactSummaryTags = function() {
       var tags = [];
@@ -51,7 +52,7 @@
         tags = tags.concat(setTags);
       });
       // contact summary tabs and search forms both listen for this event
-      $('#Tag').closest('.crm-ajax-container').trigger('crmFormSuccess', {tabCount: tags.length});
+      $($form).closest('.crm-ajax-container').trigger('crmFormSuccess', {tabCount: tags.length});
       // update summary tab
       $("#contact-summary #tags").html(tags.join(', '));
     };

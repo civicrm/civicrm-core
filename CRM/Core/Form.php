@@ -170,6 +170,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->_name = $name;
     }
     else {
+      // CRM-15153 - FIXME this name translates to a DOM id and is not always unique!
       $this->_name = CRM_Utils_String::getClassName(CRM_Utils_System::getClassName($this));
     }
 
@@ -187,6 +188,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!isset(self::$_template)) {
       self::$_template = CRM_Core_Smarty::singleton();
     }
+    // Workaround for CRM-15153 - give each form a reasonably unique css class
+    $this->addClass(CRM_Utils_System::getClassName($this));
 
     $this->assign('snippet', CRM_Utils_Array::value('snippet', $_GET));
   }
@@ -646,6 +649,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->accept($renderer);
     $content = $renderer->toArray();
     $content['formName'] = $this->getName();
+    // CRM-15153
+    $content['formClass'] = CRM_Utils_System::getClassName($this);
     return $content;
   }
 

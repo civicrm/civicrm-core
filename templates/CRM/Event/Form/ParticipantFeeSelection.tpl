@@ -199,9 +199,10 @@ CRM.$(function($) {
 {literal}
 <script type='text/javascript'>
 CRM.$(function($) {
+  var $form = $('form.{/literal}{$form.formClass}{literal}');
   cj('.total_amount-section').remove(); 
 
-  cj('#ParticipantFeeSelection').submit(function(e) {
+  cj($form).submit(function(e) {
     var partiallyPaid = {/literal}{$partiallyPaid}{literal};
     var pendingRefund = {/literal}{$pendingRefund}{literal};
     var statusId = cj('#status_id').val();

@@ -67,7 +67,7 @@
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
-    var $form = $("#{/literal}{$form.formName}{literal}");
+    var $form = $("form.{/literal}{$form.formClass}{literal}");
     $('#showPCP, #showSoftCredit').click(function(){
       return showHideSoftCreditAndPCP();
     });
