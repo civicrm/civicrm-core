@@ -77,7 +77,7 @@
 <script type="text/javascript" >
 {literal}
   CRM.$(function($) {
-    var $form = $("#{/literal}{$form.formName}{literal}");
+    var $form = $("form.{/literal}{$form.formClass}{literal}");
     $('select[name=name]', $form).change(function() {
       var url = {/literal}"{$refreshURL}"{literal} + "&key=" + this.value;
       $(this).closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet({url: url}).crmSnippet('refresh');

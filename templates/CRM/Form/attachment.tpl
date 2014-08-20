@@ -130,7 +130,7 @@
     {literal}
     <script type="text/javascript">
       CRM.$(function($) {
-        var $form = $("#{/literal}{$form.formName}{literal}");
+        var $form = $("form.{/literal}{$form.formClass}{literal}");
         $form
           .on('click', '.crm-clear-attachment', function(e) {
             e.preventDefault();

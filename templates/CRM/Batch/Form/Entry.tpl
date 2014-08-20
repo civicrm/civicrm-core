@@ -107,12 +107,13 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
+  var $form = $('form.{/literal}{$form.formClass}{literal}');
   $('.selector-rows').change(function () {
     var options = {
       'url': {/literal}"{crmURL p='civicrm/ajax/batch' h=0}"{literal}
     };
 
-    $("#Entry").ajaxSubmit(options);
+    $($form).ajaxSubmit(options);
   });
 
   $('#crm-container').on('keyup change', '*.selector-rows', function () {

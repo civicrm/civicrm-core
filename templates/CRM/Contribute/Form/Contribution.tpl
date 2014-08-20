@@ -391,7 +391,7 @@
       {literal}
       CRM.$(function($) {
 
-        var $form = $("#{/literal}{$form.formName}{literal}");
+        var $form = $("form.{/literal}{$form.formClass}{literal}");
         $("#contact_id", $form).change(checkEmail);
         checkEmail( );
 

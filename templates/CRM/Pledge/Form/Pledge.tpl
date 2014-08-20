@@ -237,7 +237,7 @@ function loadPanes( id ) {
     {if $context eq 'standalone' and $outBound_option != 2 }
     {literal}
     CRM.$(function($) {
-      var $form = $("#{/literal}{$form.formName}{literal}");
+      var $form = $("form.{/literal}{$form.formClass}{literal}");
       $("#contact_id", $form).change(checkEmail);
       checkEmail( );
 
