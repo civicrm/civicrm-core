@@ -453,7 +453,7 @@
           return false;
         });
       }
-      // Alow a button to prevent ajax submit
+      // Allow a button to prevent ajax submit
       $('input[data-no-ajax-submit=true]').click(function() {
         $(this).closest('form').ajaxFormUnbind();
       });
@@ -463,7 +463,7 @@
     return widget;
   };
   /**
-   * Handler for jQuery click event e.g. $('a').click(CRM.popup)
+   * Handler for jQuery click event e.g. $('a').click(CRM.popup);
    */
   CRM.popup = function(e) {
     var $el = $(this).first(),
@@ -503,14 +503,14 @@
   };
   /**
    * An event callback for CRM.popup or a standalone function to refresh the content around a given element
-   * @param e event|selector
+   * @param e {event|selector}
    */
   CRM.refreshParent = function(e) {
     // Use e.target if input smells like an event, otherwise assume it's a jQuery selector
     var $el = (e.stopPropagation && e.target) ? $(e.target) : $(e),
       $table = $el.closest('.dataTable');
     // Call native refresh method on ajax datatables
-    if ($table && $.fn.DataTable.fnIsDataTable($table[0]) && $table.dataTable().fnSettings().sAjaxSource) {
+    if ($table.length && $.fn.DataTable.fnIsDataTable($table[0]) && $table.dataTable().fnSettings().sAjaxSource) {
       // Refresh ALL datatables - needed for contact relationship tab
       $.each($.fn.dataTable.fnTables(), function() {
         $(this).dataTable().fnSettings().sAjaxSource && $(this).unblock().dataTable().fnDraw();
