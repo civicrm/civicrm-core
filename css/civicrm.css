@@ -331,6 +331,14 @@ input.crm-form-entityref {
   background-image: linear-gradient(top, #eee 1%, #fff 15%);
 }
 
+.crm-container input.crm-form-text[disabled],
+.crm-container input.crm-form-text[readonly] {
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #ddd), color-stop(15%, #f2f2f2));
+  background-image: -webkit-linear-gradient(top, #ddd 1%, #f2f2f2 15%);
+  background-image: -moz-linear-gradient(top, #ddd 1%, #f2f2f2 15%);
+  background-image: linear-gradient(top, #ddd 1%, #f2f2f2 15%);
+}
+
 .crm-container .crm-form-submit {
   margin: .25em 0.5em 0.25em 0;
 }
@@ -2105,11 +2113,6 @@ div.grippie {
   float: right;
   padding-right: 10px;
   padding-top: 5px;
-}
-
-#crm-container a.crm-link-action {
-  cursor: pointer;
-  cursor: hand;
 }
 
 #crm-container span.crm-custom-greeting {
