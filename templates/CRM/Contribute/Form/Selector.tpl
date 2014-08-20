@@ -23,9 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $context EQ 'Search'}
-    {include file="CRM/common/pager.tpl" location="top"}
-{/if}
+{include file="CRM/common/pager.tpl" location="top"}
 
 {strip}
 <table class="selector row-highlight">
@@ -93,23 +91,7 @@
   </tr>
   {/foreach}
 
-{* Link to "View all contributions" for Contact Summary selector display *}
-{if $limit and $pager->_totalItems GT $limit }
-  {if $context eq 'dashboard' }
-      <tr class="even-row">
-      <td colspan="10"><a href="{crmURL p='civicrm/contribute/search' q='reset=1'}">&raquo; {ts}Find more contributions{/ts}... </a></td>
-      </tr>
-  {elseif $context eq 'contribution' }
-      <tr class="even-row">
-      <td colspan="8"><a href="{crmURL p='civicrm/contribute/search' q="reset=1&force=1&cid=$contactId"}">&raquo; {ts}View all contributions from this contact{/ts}... </a></td>
-      </tr>
-  {/if}
-{/if}
 </table>
 {/strip}
 
-
-
-{if $context EQ 'Search'}
-    {include file="CRM/common/pager.tpl" location="bottom"}
-{/if}
+{include file="CRM/common/pager.tpl" location="bottom"}
