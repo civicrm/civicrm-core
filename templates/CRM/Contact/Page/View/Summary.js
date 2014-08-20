@@ -92,7 +92,7 @@
         CRM.status(ts('Saved'));
       }
       // Update changelog tab and contact footer
-      if (response.changeLog.count) {
+      if (response.changeLog && response.changeLog.count) {
         CRM.tabHeader.updateCount('#tab_log', response.changeLog.count);
       }
       $("#crm-record-log").replaceWith(response.changeLog.markup);
@@ -158,7 +158,7 @@
     $('.crm-inline-edit.form form').unblock();
   }
 
-  $('document').ready(function() {
+  $(function() {
     // don't perform inline edit during print mode
     if (CRM.summaryPrint.mode) {
       $('div').removeClass('crm-inline-edit');
