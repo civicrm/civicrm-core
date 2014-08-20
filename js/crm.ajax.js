@@ -333,7 +333,7 @@
     return $(settings.target);
   };
   CRM.loadForm = function(url, options) {
-    var settings = {
+    var formErrors = [], settings = {
       crmForm: {
         ajaxForm: {},
         autoClose: true,
@@ -423,9 +423,10 @@
             response.url = data.url;
             $el.html(response.content).trigger('crmLoad', response).trigger('crmFormLoad', response);
             if (response.status === 'form_error') {
+              formErrors = [];
               $el.trigger('crmFormError', response);
               $.each(response.errors || [], function(formElement, msg) {
-                $('[name="'+formElement+'"]', $el).crmError(msg);
+                formErrors.push($('[name="'+formElement+'"]', $el).crmError(msg));
               });
             }
           }
@@ -438,6 +439,9 @@
           }
         },
         beforeSubmit: function(submission) {
+          $.each(formErrors, function() {
+            this && this.close && this.close();
+          });
           $el.crmSnippet('option', 'block') && $el.block();
           $el.trigger('crmFormSubmit', submission);
         }
