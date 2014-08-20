@@ -815,7 +815,7 @@ SELECT  id
       'postal_code',
       'country'
     );
-    $requiredBillingFields = array_diff($validBillingFields, array('middle_name'));
+    $requiredBillingFields = array_diff($validBillingFields, array('middle_name','supplemental_address_1'));
     $validProfileFields = array();
     $requiredProfileFields = array();
 
@@ -847,7 +847,8 @@ SELECT  id
     ) {
       $profileAddressFields[$prefixName] = $index;
     }
-    $potentiallyMissingRequiredFields = array_diff($requiredBillingFields, array_flip($requiredProfileFields));
+
+    $potentiallyMissingRequiredFields = array_diff($requiredBillingFields, $requiredProfileFields);
     CRM_Core_Resources::singleton()->addSetting(array('billing' => array('billingProfileIsHideable' => empty($potentiallyMissingRequiredFields))));
   }
 
