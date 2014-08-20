@@ -277,10 +277,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @dataProvider entities
    * confirm that with check permissions we don't get entities
    */
-  function testEntitiesGetCoreACLLimitingHookCheck($entity) {
+  function testEntitiesGetCoreACLLimitingCheck($entity) {
+    $this->markTestIncomplete('this does not work in 4.4 but can be enabled in 4.5 or a security release of 4.4 including the important security fix CRM-14877');
     $this->setupCoreACL();
     $this->setUpEntities($entity);
-    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookNoResults'));
     $result = $this->callAPISuccess($entity, 'get', array(
       'check_permissions' => 1,
       'return' => 'contact_id',
