@@ -239,10 +239,10 @@
         }
       })
       // handle delete link within blocks
-      .on('click', '.crm-delete-inline', function() {
+      .on('click', '.crm-delete-inline', function(e) {
         var row = $(this).closest('tr');
         var form = $(this).closest('form');
-        row.addClass('hiddenElement');
+        row.hide();
         $('input', row).val('');
         //if the primary is checked for deleted block
         //unset and set first as primary
@@ -251,6 +251,7 @@
           $('[class$=is_primary] input:first', form).prop('checked', true );
         }
         $('.add-more-inline', form).show();
+        e.preventDefault();
       })
       // Delete an address
       .on('click', '.crm-inline-edit.address .delete-button', function() {
@@ -271,7 +272,7 @@
         return false;
       })
       // add more and set focus to new row
-      .on('click', '.add-more-inline', function() {
+      .on('click', '.add-more-inline', function(e) {
         var form = $(this).closest('form');
         var row = $('tr[class="hiddenElement"]:first', form);
         row.removeClass('hiddenElement');
@@ -280,6 +281,7 @@
         if ($('tr[class="hiddenElement"]').length < 1) {
           $(this).hide();
         }
+        e.preventDefault();
       });
     // Trigger cancel button on esc keypress
     $(document).keydown(function(key) {
