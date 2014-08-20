@@ -97,7 +97,7 @@
 
 {literal}
 CRM.$(function($) {
-  var $form = $("#{/literal}{$form.formName}{literal}");
+  var $form = $("form.{/literal}{$form.formClass}{literal}");
 
   $('.add-cc-link', $form).click(function(e) {
     e.preventDefault();

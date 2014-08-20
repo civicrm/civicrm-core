@@ -88,7 +88,8 @@
 {literal}
   <script type="text/javascript">
     CRM.$(function($) {
-      var roleId = $('input[name=activity_role]:checked', '#Search').val();
+      var $form = $('form.{/literal}{$form.formClass}{literal}'),
+        roleId = $('input[name=activity_role]:checked', $form).val();
       if (roleId) {
         $('.description .option-' + roleId).show();
       }

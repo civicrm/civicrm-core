@@ -464,7 +464,7 @@
     {if $context eq 'standalone' and $outBound_option != 2 }
     {literal}
     CRM.$(function($) {
-      var $form = $("#{/literal}{$form.formName}{literal}");
+      var $form = $("form.{/literal}{$form.formClass}{literal}");
       $("#contact_id", $form).change(checkEmail);
       checkEmail( );
 
@@ -489,7 +489,7 @@
     {literal}
     //keep read only always checked.
     CRM.$(function($) {
-      var $form = $("#{/literal}{$form.formName}{literal}");
+      var $form = $("form.{/literal}{$form.formClass}{literal}");
       var allowAutoRenew   = {/literal}'{$allowAutoRenew}'{literal};
       var alreadyAutoRenew = {/literal}'{$alreadyAutoRenew}'{literal};
       if ( allowAutoRenew || alreadyAutoRenew ) {

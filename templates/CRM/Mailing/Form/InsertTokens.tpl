@@ -29,7 +29,7 @@
 <script type="text/javascript" src="{$config->resourceBase}packages/jquery/plugins/jquery-fieldselection.js"></script>
 
 <script type="text/javascript">
-cj('form#{$form.formName}').data('tokens', {$tokens|@json_encode});
+cj('form.{$form.formClass}').data('tokens', {$tokens|@json_encode});
 var text_message = null;
 var html_message = null;
 var isPDF        = false;
@@ -352,7 +352,7 @@ CRM.$(function($) {
   }
 
   // Initialize token selector widgets
-  var form = $('#{/literal}{$form.formName}{literal}');
+  var form = $('form.{/literal}{$form.formClass}{literal}');
   $('input.crm-token-selector', form)
     .addClass('crm-action-menu')
     .change(insertToken)

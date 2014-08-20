@@ -151,7 +151,7 @@
     }
   );
 
-  cj('#Participant').on("click",'.validate',
+  cj('form[name=Participant]').on("click", '.validate',
     function(e) {
       var userSubmittedStatus = cj('#status_id').val();
       var statusLabel = cj('#status_id option:selected').text();
@@ -338,7 +338,7 @@
       {literal}
       CRM.$(function($) {
 
-        var $form = $('form#{/literal}{$form.formName}{literal}');
+        var $form = $('form.{/literal}{$form.formClass}{literal}');
 
         // don't show cart related statuses if it's disabled
         {/literal}{if !$enableCart}{literal}
