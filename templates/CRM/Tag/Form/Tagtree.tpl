@@ -24,17 +24,17 @@
  +--------------------------------------------------------------------+
 *}
 {* This tpl runs recursively to build each level of the tag tree *}
-<ul>
+<ul class="tree-level-{$level}">
   {foreach from=$tree item="node" key="id"}
     <li id="tag_{$id}">
       <input name="tagList[{$id}]" id="check_{$id}" type="checkbox" {if $tagged[$id]}checked="checked"{/if}/>
-      <label for="check_{$id}" id="tagLabel_{$id}">
-        {$node.name}
+      <span>
+        <label for="check_{$id}" id="tagLabel_{$id}">{$node.name}</label>
         {if $node.description}{help id=$id title=$node.name file="CRM/Tag/Form/Tagtree"}{/if}
-      </label>
+      </span>
       {if $node.children}
         {* Recurse... *}
-        {include file="CRM/Tag/Form/Tagtree.tpl" tree=$node.children}
+        {include file="CRM/Tag/Form/Tagtree.tpl" tree=$node.children level=$level+1}
       {/if}
     </li>
   {/foreach}
