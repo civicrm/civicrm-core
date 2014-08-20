@@ -2107,11 +2107,6 @@ div.grippie {
   padding-top: 5px;
 }
 
-#crm-container a.crm-link-action {
-  cursor: pointer;
-  cursor: hand;
-}
-
 #crm-container span.crm-custom-greeting {
   font-size: 9px;
 }
