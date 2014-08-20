@@ -178,10 +178,17 @@ class CRM_ACL_API {
     $contactID      = NULL,
     $tableName      = 'civicrm_saved_search',
     $allGroups      = NULL,
-    $includedGroups = NULL
+    $includedGroups = NULL,
+    $flush = FALSE
   ) {
-    static $cache = array();
 
+    static $cache = array();
+    //@todo this is pretty hacky!!!
+    //adding a way for unit tests to flush the cache
+    if ($flush) {
+      $cache = array();
+      return;
+    }
     if (!$contactID) {
       $session = CRM_Core_Session::singleton();
       $contactID = NULL;
