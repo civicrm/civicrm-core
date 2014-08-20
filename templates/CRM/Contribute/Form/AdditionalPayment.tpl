@@ -126,12 +126,12 @@
           {if $showCheckNumber || !$isOnline}
             <tr id="checkNumber" class="crm-payment-form-block-check_number">
               <td class="label">{$form.check_number.label}</td>
-              <td>{$form.check_number.html|crmReplace:class:six}</td>
+              <td>{$form.check_number.html}</td>
             </tr>
           {/if}
           <tr class="crm-payment-form-block-trxn_id">
             <td class="label">{$form.trxn_id.label}</td>
-            <td {$valueStyle}>{$form.trxn_id.html|crmReplace:class:twelve} {help id="id-trans_id"}</td>
+            <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
           </tr>
           {if $email and $outBound_option != 2}
             <tr class="crm-payment-form-block-is_email_receipt">

@@ -150,6 +150,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+    $this->setPageTitle(ts('%1 Option', array(1 => $this->_gLabel)));
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
@@ -437,4 +439,5 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       CRM_Core_Session::setStatus(ts('The %1 \'%2\' has been saved.', array(1 => $this->_gLabel, 2 => $optionValue->label)), ts('Saved'), 'success');
     }
   }
+
 }

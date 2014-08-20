@@ -269,18 +269,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->assign('onlinePendingContributionId', $this->_onlinePendingContributionId);
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
 
-    // Set title
-    if ($this->_contactID) {
-      $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactID);
+    $this->setPageTitle(ts('Membership'));
 
-      // Check if this is default domain contact CRM-10482
-      if (CRM_Contact_BAO_Contact::checkDomainContact($this->_contactID)) {
-        $displayName .= ' (' . ts('default organization') . ')';
-      }
-
-      // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-      CRM_Utils_System::setTitle(ts('Membership for') . ' ' . $displayName);
-    }
     parent::preProcess();
   }
 

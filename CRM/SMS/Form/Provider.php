@@ -43,7 +43,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
 
     $this->_id = $this->get('id');
 
-    CRM_Utils_System::setTitle(ts('Manage - SMS Providers'));
+    $this->setPageTitle(ts('SMS Provider'));
 
     if ($this->_id) {
       $refreshURL = CRM_Utils_System::url('civicrm/admin/sms/provider',

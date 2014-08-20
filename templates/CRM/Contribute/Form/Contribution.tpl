@@ -33,12 +33,6 @@
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 
-  {if $contributionMode}
-  <h3>{if $ppID}{ts}Credit Card Pledge Payment{/ts}{else}{ts}Credit Card Contribution{/ts}{/if}</h3>
-    {elseif $context NEQ 'standalone'}
-  <h3>{if $action eq 1 or $action eq 1024}{if $ppID}{ts}Pledge Payment{/ts}{else}{ts}New Contribution{/ts}{/if}{elseif $action eq 8}{ts}Delete Contribution{/ts}{else}{ts}Edit Contribution{/ts}{/if}</h3>
-  {/if}
-
   <div class="crm-block crm-form-block crm-contribution-form-block">
 
   {if $contributionMode == 'test' }
@@ -75,7 +69,7 @@
       {else}
         {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
       {/if}
-      <span class="action-link crm-link-credit-card-mode">&nbsp;<a class="open-inline crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card contribution{/ts}</a></span>
+      <span class="action-link crm-link-credit-card-mode">&nbsp;<a class="open-inline crm-hover-button action-item" href="{$ccModeLink}">&raquo; {ts}submit credit card contribution{/ts}</a></span>
     {/if}
   </div>
   {if $isOnline}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}
@@ -210,7 +204,7 @@
             </tr>
             <tr id="cancelReason">
               <td class="label" style="vertical-align: top;">{$form.cancel_reason.label}</td>
-              <td>{$form.cancel_reason.html|crmReplace:class:huge}</td>
+              <td>{$form.cancel_reason.html}</td>
             </tr>
           </table>
         </fieldset>
@@ -304,12 +298,12 @@
           {if $showCheckNumber || !$isOnline}
             <tr id="checkNumber" class="crm-contribution-form-block-check_number">
               <td class="label">{$form.check_number.label}</td>
-              <td>{$form.check_number.html|crmReplace:class:six}</td>
+              <td>{$form.check_number.html}</td>
             </tr>
           {/if}
           <tr class="crm-contribution-form-block-trxn_id">
             <td class="label">{$form.trxn_id.label}</td>
-            <td {$valueStyle}>{$form.trxn_id.html|crmReplace:class:twelve} {help id="id-trans_id"}</td>
+            <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
           </tr>
           {if $email and $outBound_option != 2}
             <tr class="crm-contribution-form-block-is_email_receipt">

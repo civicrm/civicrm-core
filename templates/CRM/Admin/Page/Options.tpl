@@ -70,7 +70,7 @@
 
 <div class="crm-content-block crm-block">
 {if $rows}
-{if $action ne 1 and $action ne 2 and $isLocked ne 1}
+{if $isLocked ne 1}
     <div class="action-link">
         <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
     </div>
@@ -150,18 +150,17 @@
         {include file="CRM/common/crmeditable.tpl"}
         {/strip}
 
-        {if $action ne 1 and $action ne 2 and $isLocked ne 1}
-            <div class="action-link">
-                <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
-            </div>
-        {/if}
 </div>
 {else}
     <div class="messages status no-popup">
-         <div class="icon inform-icon"></div>
-        {capture assign=link}class="action-item" href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}"{/capture}
-        {ts 1=$link}There are no option values entered. You can <a %1>add one</a>.{/ts}
+      <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+      {ts}None found.{/ts}
     </div>
 {/if}
+  {if $isLocked ne 1}
+    <div class="action-link">
+      <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
+    </div>
+  {/if}
 </div>
 {/if}

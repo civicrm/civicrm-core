@@ -105,13 +105,9 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         $this->userEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
       $this->assign('displayName', $this->userDisplayName);
-
-      // set title to "Pledge - "+Contact Name
-      $displayName = $this->userDisplayName;
-      $pageTitle = ts('Pledge by'). ' ' . $displayName;
-      $this->assign('pageTitle', $pageTitle);
-      CRM_Utils_System::setTitle($pageTitle);
     }
+
+    $this->setPageTitle(ts('Pledge'));
 
     //build custom data
     CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Pledge', $this->_id);

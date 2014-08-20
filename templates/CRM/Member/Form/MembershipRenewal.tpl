@@ -54,7 +54,6 @@
             if you want to cancel the automatic renewal option.{/ts}</p>
       </div>
     {/if}
-    <h3>{ts}Renew Membership{/ts}</h3>
   {/if}
   <div class="crm-block crm-form-block crm-member-membershiprenew-form-block">
     <div id="help" class="description">
