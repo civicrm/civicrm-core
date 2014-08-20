@@ -127,9 +127,10 @@
                 }
               }, 200);
             })
-            .on('click', 'a.crm-pager-link, #alpha-filter a', function() {
+            // Handle sorting, paging and alpha filtering links
+            .on('click', 'a.crm-pager-link, #alpha-filter a, th a.sorting, th a.sorting_desc, th a.sorting_asc', function(e) {
               refresh($(this).attr('href'));
-              return false;
+              e.preventDefault();
             });
         });
         {/literal}
