@@ -1674,5 +1674,27 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   function allowAjaxSubmit() {
     $this->removeAttribute('data-no-ajax-submit');
   }
+
+  /**
+   * Sets page title based on entity and action
+   * @param string $entityLabel
+   */
+  function setPageTitle($entityLabel) {
+    switch ($this->_action) {
+      case CRM_Core_Action::ADD:
+        CRM_Utils_System::setTitle(ts('New %1', array(1 => $entityLabel)));
+        break;
+      case CRM_Core_Action::UPDATE:
+        CRM_Utils_System::setTitle(ts('Edit %1', array(1 => $entityLabel)));
+        break;
+      case CRM_Core_Action::VIEW:
+      case CRM_Core_Action::PREVIEW:
+        CRM_Utils_System::setTitle(ts('View %1', array(1 => $entityLabel)));
+        break;
+      case CRM_Core_Action::DELETE:
+        CRM_Utils_System::setTitle(ts('Delete %1', array(1 => $entityLabel)));
+        break;
+    }
+  }
 }
 

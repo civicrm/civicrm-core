@@ -96,17 +96,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
-    switch ($this->_action) {
-      case CRM_Core_Action::ADD:
-        CRM_Utils_System::setTitle(ts('Add Price Field'));
-        break;
-      case CRM_Core_Action::UPDATE:
-        CRM_Utils_System::setTitle(ts('Edit Price Field'));
-        break;
-      case CRM_Core_Action::DELETE:
-        CRM_Utils_System::setTitle(ts('Delete Price Field'));
-        break;
-    }
+    $this->setPageTitle(ts('Price Field'));
   }
 
   /**

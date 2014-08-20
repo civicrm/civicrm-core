@@ -1717,6 +1717,7 @@ editor specific classes
   font-size: .95em;
   padding: 3px 5px;
   opacity: 1;
+  color: #2786c2;
 }
 .crm-container .btn-slide .action-item {
   white-space: normal;
@@ -1757,11 +1758,7 @@ editor specific classes
   background-color: #2F2F2E;
 }
 
-.crm-container .panel li a {
-  color: #DFDFDF;
-}
-
-.crm-container .panel li a:hover,
+.crm-container .btn-slide .panel li a:hover,
 .crm-container .crm-participant-list-inner li a:hover,
 .crm-container .crm-event-links-list-inner li a:hover,
 .crm-container .crm-contribpage-links-list-inner li a:hover {
@@ -1826,11 +1823,12 @@ editor specific classes
   z-index: 1;
 }
 
-.crm-container .panel li a {
+.crm-container .btn-slide .panel li a {
   text-decoration: none;
   padding: 4px;
   display: block;
   cursor: pointer;
+  color: #DFDFDF;
 }
 
 /*class for CMS user name check used in profile*/

@@ -24,10 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting membership type  *}
-<h3>{if $action eq 1}{ts}New Membership Type{/ts}{elseif $action eq 2}{ts}Edit Membership Type{/ts}{else}{ts}Delete Membership Type{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-membership-type-form-block">
 
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <div class="form-item" id="membership_type_form">
   {if $action eq 8}
     <div class="messages status no-popup">
@@ -35,6 +33,7 @@
     </div>
     <div> {include file="CRM/common/formButtons.tpl"}</div>
   {else}
+    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
       <tr class="crm-membership-type-form-block-name">
         <td class="label">{$form.name.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_membership_type' field='name' id=$membershipTypeId}{/if}
