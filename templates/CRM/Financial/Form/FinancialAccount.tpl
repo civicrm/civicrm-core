@@ -49,7 +49,7 @@
     </tr>
     <tr class="crm-contribution-form-block-financial_account_type_id">
       <td class="label">{$form.financial_account_type_id.label}</td>
-      <td class="html-adjust">{$form.financial_account_type_id.html|crmReplace:class:twenty}</td>
+      <td class="html-adjust">{$form.financial_account_type_id.html}</td>
     </tr>
     <tr class="crm-contribution-form-block-accounting_code">
       <td class="label">{$form.accounting_code.label}</td>

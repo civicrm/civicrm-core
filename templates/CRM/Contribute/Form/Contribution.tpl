@@ -204,7 +204,7 @@
             </tr>
             <tr id="cancelReason">
               <td class="label" style="vertical-align: top;">{$form.cancel_reason.label}</td>
-              <td>{$form.cancel_reason.html|crmReplace:class:huge}</td>
+              <td>{$form.cancel_reason.html}</td>
             </tr>
           </table>
         </fieldset>
@@ -298,12 +298,12 @@
           {if $showCheckNumber || !$isOnline}
             <tr id="checkNumber" class="crm-contribution-form-block-check_number">
               <td class="label">{$form.check_number.label}</td>
-              <td>{$form.check_number.html|crmReplace:class:six}</td>
+              <td>{$form.check_number.html}</td>
             </tr>
           {/if}
           <tr class="crm-contribution-form-block-trxn_id">
             <td class="label">{$form.trxn_id.label}</td>
-            <td {$valueStyle}>{$form.trxn_id.html|crmReplace:class:twelve} {help id="id-trans_id"}</td>
+            <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
           </tr>
           {if $email and $outBound_option != 2}
             <tr class="crm-contribution-form-block-is_email_receipt">
