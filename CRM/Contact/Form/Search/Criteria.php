@@ -337,11 +337,11 @@ class CRM_Contact_Form_Search_Criteria {
             //if not setdefault any country
             $selectElements = CRM_Core_PseudoConstant::$select();
           }
-          $element = $form->add('select', $name, $title, $selectElements, FALSE, array('class' => 'crm-select2'));
+          $element = $form->add('select', $name, $title, $selectElements);
         }
         elseif ($select == 'country') {
           $selectElements = array('' => ts('- any -')) + CRM_Core_PseudoConstant::$select();
-          $element = $form->add('select', $name, $title, $selectElements, FALSE, array('class' => 'crm-select2'));
+          $element = $form->add('select', $name, $title, $selectElements);
         }
         elseif ($select == 'county') {
           if ( array_key_exists('state_province', $formValues) && !CRM_Utils_System::isNull($formValues['state_province'])) {
@@ -350,7 +350,7 @@ class CRM_Contact_Form_Search_Criteria {
           else {
             $selectElements = array('' => ts('- any -'));
           }
-          $element = $form->add('select', $name, $title, $selectElements, FALSE, array('class' => 'crm-select2'));
+          $element = $form->add('select', $name, $title, $selectElements);
         }
         else {
           $selectElements = array('' => ts('- any -')) + CRM_Core_PseudoConstant::$select();
