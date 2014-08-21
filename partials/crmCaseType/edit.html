@@ -27,6 +27,7 @@ Required vars: caseType
       <li ng-repeat="activitySet in caseType.definition.activitySets">
         <a href="#acttab-{{$index}}">{{ activitySet.label }}</a>
         <span class="ui-icon ui-icon-trash" title="Remove"
+          ng-hide="activitySet.name == 'standard_timeline'"
           ng-click="removeItem(caseType.definition.activitySets, activitySet)">Remove</span>
         <!-- Weird spacing:
         <a class="crm-hover-button" ng-click="removeItem(caseType.definition.activitySets, activitySet)">
