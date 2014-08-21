@@ -139,8 +139,8 @@
         {foreach from=$allTabs key=tabName item=tabValue}
           <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all crm-count-{$tabValue.count}{if isset($tabValue.class)} {$tabValue.class}{/if}">
             <a href="{$tabValue.url}" title="{$tabValue.title}">
-              <span> </span> {$tabValue.title}
-              <em>{$tabValue.count}</em>
+              {$tabValue.title}
+              {if empty($tabValue.hideCount)}<em>{$tabValue.count}</em>{/if}
             </a>
           </li>
         {/foreach}

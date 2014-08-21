@@ -1037,6 +1037,7 @@ ORDER BY civicrm_custom_group.weight,
       $group['query']      = "reset=1&gid={$customGroupDAO->id}&cid={$cidToken}";
       $group['extra']      = array('gid' => $customGroupDAO->id);
       $group['table_name'] = $customGroupDAO->table_name;
+      $group['is_multiple'] = $customGroupDAO->is_multiple;
       $groups[]            = $group;
     }
 
