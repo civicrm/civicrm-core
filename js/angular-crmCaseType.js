@@ -232,6 +232,14 @@
       }
     };
 
+    $scope.isActivityRemovable = function(activitySet, activity) {
+      if (activitySet.name == 'standard_timeline' && activity.name == 'Open Case') {
+        return false;
+      } else {
+        return true;
+      }
+    };
+
     $scope.isValidName = function(name) {
       return !name || name.match(/^[a-zA-Z0-9_]+$/);
     };
