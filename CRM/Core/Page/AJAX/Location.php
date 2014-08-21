@@ -203,43 +203,62 @@ class CRM_Core_Page_AJAX_Location {
     if (empty($_GET['_value'])) {
       CRM_Utils_System::civiExit();
     }
+    $countries = (array) $_GET['_value'];
+    $elements = array();
+    $list = &$elements;
+    foreach ($countries as $val) {
+      $result = CRM_Core_PseudoConstant::stateProvinceForCountry($val);
 
-    $result = CRM_Core_PseudoConstant::stateProvinceForCountry($_GET['_value']);
-
-    $elements = array(array(
-      'name' => $result ? ts('- select a state -') : ts('- N/A -'),
-      'value' => '',
-    ));
-    foreach ($result as $id => $name) {
-      $elements[] = array(
-        'name' => $name,
-        'value' => $id,
-      );
+      // Option-groups for multiple countries
+      if ($result && count($countries) > 1) {
+        $elements[] = array(
+          'name' => CRM_Core_PseudoConstant::country($val, FALSE),
+          'children' => array(),
+        );
+        $list = &$elements[count($elements)-1]['children'];
+      }
+      foreach ($result as $id => $name) {
+        $list[] = array(
+          'name' => $name,
+          'value' => $id,
+        );
+      }
     }
-
-    echo json_encode($elements);
+    $placeholder = array(array('value' => '', 'name' => $elements ? ts('- select -') : ts('- N/A -')));
+    echo json_encode(array_merge($placeholder, $elements));
     CRM_Utils_System::civiExit();
   }
 
   static function jqCounty() {
+    $elements = array();
     if (!isset($_GET['_value']) || CRM_Utils_System::isNull($_GET['_value'])) {
       $elements = array(
         array('name' => ts('(choose state first)'), 'value' => '')
       );
     }
     else {
-      $result = CRM_Core_PseudoConstant::countyForState($_GET['_value']);
+      $states = (array) $_GET['_value'];
+      $list = &$elements;
+      foreach ($states as $val) {
+        $result = CRM_Core_PseudoConstant::countyForState($val);
 
-      $elements = array(array(
-        'name' => $result ? ts('- select -') : ts('- N/A -'),
-        'value' => '',
-      ));
-      foreach ($result as $id => $name) {
-        $elements[] = array(
-          'name' => $name,
-          'value' => $id,
-        );
+        // Option-groups for multiple countries
+        if ($result && count($states) > 1) {
+          $elements[] = array(
+            'name' => CRM_Core_PseudoConstant::stateProvince($val, FALSE),
+            'children' => array(),
+          );
+          $list = &$elements[count($elements)-1]['children'];
+        }
+        foreach ($result as $id => $name) {
+          $list[] = array(
+            'name' => $name,
+            'value' => $id,
+          );
+        }
       }
+      $placeholder = array(array('value' => '', 'name' => $elements ? ts('- select -') : ts('- N/A -')));
+      $elements = array_merge($placeholder, $elements);
     }
 
     echo json_encode($elements);
