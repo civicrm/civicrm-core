@@ -129,7 +129,7 @@
     $scope.activityTypes = apiCalls.actTypes.values;
     $scope.activityTypeNames = _.pluck(apiCalls.actTypes.values, 'name');
     $scope.relationshipTypeNames = _.pluck(apiCalls.relTypes.values, CRM.crmCaseType.REL_TYPE_CNAME); // CRM_Case_XMLProcessor::REL_TYPE_CNAME
-    $scope.locks = {caseTypeName: true};
+    $scope.locks = {caseTypeName: true, activitySetName: true};
 
     $scope.workflows = {
       'timeline': 'Timeline',
