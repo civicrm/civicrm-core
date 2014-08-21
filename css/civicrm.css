@@ -2368,7 +2368,7 @@ div.grippie {
   color: #FFF;
   font-size: 13px;
   font-weight: normal;
-  margin-right: 6px;
+  margin: 0 6px 0 0;
   padding: 2px 6px;
   text-decoration: none;
   cursor: pointer;
