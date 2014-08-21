@@ -60,11 +60,6 @@
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 
-{if $paymentType eq 'refund'}
-<h3>{ts}New Event Refund{/ts}</h3>
-{else}
-<h3>{if $component eq 'event'}{if $contributionMode}{ts}Credit Card Event Payment{/ts}{else}{ts}New Event Payment{/ts}{/if}{/if}</h3>
-{/if}
 <div class="crm-block crm-form-block crm-payment-form-block">
 
   {if $contributionMode == 'test'}
