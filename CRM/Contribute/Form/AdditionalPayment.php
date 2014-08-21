@@ -150,12 +150,9 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('paymentType', $this->_paymentType);
     $this->assign('paymentAmt', abs($paymentAmt));
 
-    $this->_paymentProcessor = array('billing_mode' => 1);
+    $this->setPageTitle($this->_refund ? ts('Refund') : ts('Payment'));
 
-    $title = ($this->_refund) ? "Refund for {$this->_contributorDisplayName}" : "Payment from {$this->_contributorDisplayName}";
-    if ($title) {
-      CRM_Utils_System::setTitle(ts('%1', array(1 => $title)));
-    }
+    $this->_paymentProcessor = array('billing_mode' => 1);
   }
 
   /**
