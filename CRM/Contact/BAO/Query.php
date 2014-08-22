@@ -3797,9 +3797,8 @@ WHERE  id IN ( $groupIDs )
       }
       $stateClause = "civicrm_address.state_province_id $op (" . implode(',', $value) . ')';
 
-      $stateProvince = CRM_Core_PseudoConstant::stateProvince();
       foreach ($value as $id) {
-        $names[] = CRM_Utils_Array::value($id, $stateProvince);
+        $names[] = CRM_Core_PseudoConstant::stateProvince($id, FALSE);
       }
     }
     else {
