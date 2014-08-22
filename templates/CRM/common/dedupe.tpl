@@ -43,6 +43,13 @@ function processDupes( cid, oid, oper, context, reloadURL ) {
                                      // redirect after a small delay
                                      setTimeout("window.location.href = '" + reloadURL + "'", 500);
         }
+        else {
+          //CRM-15113 this has the effect of causing the alert to display. Also, as they are already 'actioned' Civi sensibly returns the browser to the
+          //search screen
+          setTimeout(function(){
+            window.location.reload();
+          }, 500);
+        }
       }
     }
   });
