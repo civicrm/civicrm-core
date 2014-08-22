@@ -61,6 +61,7 @@ function _civicrm_api3_batch_create_spec(&$params) {
   // it is actually required)
   $params['entity_table']['api.default'] = "civicrm_batch";
   $params['entity_table']['type'] = CRM_Utils_Type::T_STRING;
+  $params['entity_table']['title'] = 'Batch Entity Table - remove?';
 
   $params['modified_date']['api.default'] = "now";
   $params['status_id']['api.required'] = 1;
