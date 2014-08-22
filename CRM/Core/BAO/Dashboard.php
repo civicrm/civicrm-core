@@ -37,6 +37,23 @@
  * Class contains Contact dashboard related functions
  */
 class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
+  /**
+   * function to add Dashboard
+   *
+   * @param array $params values
+   *
+   * @access public
+   * @static
+   *
+   * @return object
+   */
+  static function create($params) {
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'Dashboard', CRM_Utils_Array::value('id', $params), $params);
+    $dao = self::addDashlet($params);
+    CRM_Utils_Hook::post($hook, 'Dashboard', $dao->id, $dao);
+    return $dao;
+  }
 
   /**
    * Get the list of dashlets enabled by admin
@@ -407,6 +424,9 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         $dashlet->url = CRM_Utils_Array::value('url', $params);
         $dashlet->find(TRUE);
       }
+      if (empty($params['domain_id'])) {
+        $dashlet->domain_id = CRM_Core_Config::domainID();
+      }
     }
     else {
       $dashlet->id = $dashboardID;
@@ -416,9 +436,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       $params['permission'] = implode(',', $params['permission']);
     }
     $dashlet->copyValues($params);
-
-    $dashlet->domain_id = CRM_Core_Config::domainID();
-
     $dashlet->save();
 
     // now we need to make dashlet entries for each contact
