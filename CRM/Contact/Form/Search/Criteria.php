@@ -305,6 +305,7 @@ class CRM_Contact_Form_Search_Criteria {
 
     $parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', $addressOptions, 0);
     $form->assign('parseStreetAddress', $parseStreetAddress);
+    $stateCountryMap = NULL;
     foreach ($elements as $name => $v) {
       list($title, $attributes, $select, $multiSelect) = $v;
 
@@ -324,11 +325,11 @@ class CRM_Contact_Form_Search_Criteria {
       }
 
       if ($select) {
-        $stateCountryMap[] = array(
+        $stateCountryMap = array(array(
           'state_province' => 'state_province',
           'country' => 'country',
           'county' => 'county',
-        );
+        ));
         if ($select == 'stateProvince') {
           if (!empty($formValues['country'])) {
             $selectElements = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvinceForCountry($formValues['country']);
