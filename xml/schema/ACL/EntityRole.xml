@@ -28,6 +28,7 @@
   </field>
   <field>
     <name>entity_table</name>
+    <title>Entity Table</title>
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
@@ -36,6 +37,7 @@
   </field>
   <field>
     <name>entity_id</name>
+    <title>ACL Entity ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID of the group/contact object being joined</comment>
@@ -48,6 +50,7 @@
   </dynamicForeignKey>
   <field>
     <name>is_active</name>
+    <title>ACL Entity Role is Active</title>
     <type>boolean</type>
     <comment>Is this property active?</comment>
     <add>1.6</add>
