@@ -9,6 +9,7 @@
   <field>
     <name>id</name>
     <type>int unsigned</type>
+    <title>Entity Role</title>
     <required>true</required>
     <comment>Unique table ID</comment>
     <add>1.6</add>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>acl_role_id</name>
+    <title>ACL Role ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign Key to ACL Role (which is an option value pair and hence an implicit FK)</comment>
