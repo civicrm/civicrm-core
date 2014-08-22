@@ -3483,18 +3483,18 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
           array('title' => ts('Postal Code Suffix'),
             'default' => CRM_Utils_Array::value('postal_code_suffix', $defaults, FALSE),
           ),
-          'county_id' =>
-          array('title' => ts('County'),
-            'default' => CRM_Utils_Array::value('county_id', $defaults, FALSE),
-          ),
+          'country_id' =>
+            array('title' => ts('Country'),
+              'default' => CRM_Utils_Array::value('country_id', $defaults, FALSE),
+            ),
           'state_province_id' =>
           array('title' => ts('State/Province'),
             'default' => CRM_Utils_Array::value('state_province_id', $defaults, FALSE),
           ),
-          'country_id' =>
-          array('title' => ts('Country'),
-            'default' => CRM_Utils_Array::value('country_id', $defaults, FALSE),
-          ),
+          'county_id' =>
+            array('title' => ts('County'),
+              'default' => CRM_Utils_Array::value('county_id', $defaults, FALSE),
+            ),
         ),
         'grouping' => 'location-fields',
       ),
@@ -3518,6 +3518,24 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
                 'operator' => 'like',
                 'name' => 'city',
         ),
+        'country_id' => array(
+          'name' => 'country_id',
+          'title' => ts('Country'),
+          'type' => CRM_Utils_Type::T_INT,
+          'operatorType' =>
+            CRM_Report_Form::OP_MULTISELECT,
+          'options' =>
+            CRM_Core_PseudoConstant::country(),
+        ),
+        'state_province_id' => array(
+          'name' => 'state_province_id',
+          'title' => ts('State/Province'),
+          'type' => CRM_Utils_Type::T_INT,
+          'operatorType' =>
+            CRM_Report_Form::OP_MULTISELECT,
+          'options' =>
+            CRM_Core_PseudoConstant::stateProvince(),
+        ),
         'county_id' => array(
           'name' => 'county_id',
           'title' => ts('County'),
@@ -3526,24 +3544,6 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
           CRM_Report_Form::OP_MULTISELECT,
           'options' =>
           CRM_Core_PseudoConstant::county(),
-        ),
-        'state_province_id' => array(
-          'name' => 'state_province_id',
-          'title' => ts('State/Province'),
-          'type' => CRM_Utils_Type::T_INT,
-          'operatorType' =>
-          CRM_Report_Form::OP_MULTISELECT,
-          'options' =>
-          CRM_Core_PseudoConstant::stateProvince(),
-        ),
-        'country_id' => array(
-          'name' => 'country_id',
-          'title' => ts('Country'),
-          'type' => CRM_Utils_Type::T_INT,
-          'operatorType' =>
-          CRM_Report_Form::OP_MULTISELECT,
-          'options' =>
-          CRM_Core_PseudoConstant::country(),
         ),
       );
     }
