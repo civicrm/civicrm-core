@@ -23,69 +23,70 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     $case = $this->callAPISuccess('case', 'create', $this->_params);
 
     $analyzer = new \Civi\CCase\Analyzer($case['id']);
-    $this->assertEquals($caseStatuses['Open'], $analyzer->getCase()['status_id']);
-    $this->assertApproxTime('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
-    $this->assertEquals($actStatuses['Scheduled'], $analyzer->getSingleActivity('Medical evaluation')['status_id']);
+    $this->assertEquals($caseStatuses['Open'], self::ag($analyzer->getCase(), 'status_id'));
+    $this->assertApproxTime('2013-11-30 01:00:00', self::ag($analyzer->getSingleActivity('Medical evaluation'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Scheduled'], self::ag($analyzer->getSingleActivity('Medical evaluation'), 'status_id'));
     $this->assertFalse($analyzer->hasActivity('Mental health evaluation'));
     $this->assertFalse($analyzer->hasActivity('Secure temporary housing'));
 
     // Edit details of first activity -- but don't finish it yet!
     \CRM_Utils_Time::setTime('2013-11-30 01:30:00');
     $this->callApiSuccess('Activity', 'create', array(
-      'id' => $analyzer->getSingleActivity('Medical evaluation')['id'],
+      'id' => self::ag($analyzer->getSingleActivity('Medical evaluation'), 'id'),
       'subject' => 'This is the new subject',
     ));
 
     $analyzer = new \Civi\CCase\Analyzer($case['id']);
-    $this->assertEquals($caseStatuses['Open'], $analyzer->getCase()['status_id']);
-    $this->assertApproxTime('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
-    $this->assertEquals($actStatuses['Scheduled'], $analyzer->getSingleActivity('Medical evaluation')['status_id']);
+    $this->assertEquals($caseStatuses['Open'], self::ag($analyzer->getCase(), 'status_id'));
+    $this->assertApproxTime('2013-11-30 01:00:00', self::ag($analyzer->getSingleActivity('Medical evaluation'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Scheduled'], self::ag($analyzer->getSingleActivity('Medical evaluation'), 'status_id'));
     $this->assertFalse($analyzer->hasActivity('Mental health evaluation'));
     $this->assertFalse($analyzer->hasActivity('Secure temporary housing'));
 
     // Complete first activity; schedule second
     \CRM_Utils_Time::setTime('2013-11-30 02:00:00');
     $this->callApiSuccess('Activity', 'create', array(
-      'id' => $analyzer->getSingleActivity('Medical evaluation')['id'],
+      'id' => self::ag($analyzer->getSingleActivity('Medical evaluation'), 'id'),
       'status_id' => $actStatuses['Completed'],
     ));
     $analyzer->flush();
-    $this->assertEquals($caseStatuses['Open'], $analyzer->getCase()['status_id']);
-    $this->assertApproxTime('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
-    $this->assertEquals($actStatuses['Completed'], $analyzer->getSingleActivity('Medical evaluation')['status_id']);
-    $this->assertApproxTime('2013-11-30 02:00:00', $analyzer->getSingleActivity('Mental health evaluation')['activity_date_time']);
-    $this->assertEquals($actStatuses['Scheduled'], $analyzer->getSingleActivity('Mental health evaluation')['status_id']);
+    $this->assertEquals($caseStatuses['Open'], self::ag($analyzer->getCase(), 'status_id'));
+    $this->assertApproxTime('2013-11-30 01:00:00', self::ag($analyzer->getSingleActivity('Medical evaluation'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Medical evaluation'), 'status_id'));
+    $this->assertApproxTime('2013-11-30 02:00:00', self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Scheduled'], self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'status_id'));
     $this->assertFalse($analyzer->hasActivity('Secure temporary housing'));
 
     // Complete second activity; schedule third
     \CRM_Utils_Time::setTime('2013-11-30 03:00:00');
     $this->callApiSuccess('Activity', 'create', array(
-      'id' => $analyzer->getSingleActivity('Mental health evaluation')['id'],
+      'id' => self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'id'),
       'status_id' => $actStatuses['Completed'],
     ));
     $analyzer->flush();
-    $this->assertEquals($caseStatuses['Open'], $analyzer->getCase()['status_id']);
-    $this->assertApproxTime('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
-    $this->assertEquals($actStatuses['Completed'], $analyzer->getSingleActivity('Medical evaluation')['status_id']);
-    $this->assertApproxTime('2013-11-30 02:00:00', $analyzer->getSingleActivity('Mental health evaluation')['activity_date_time']);
-    $this->assertEquals($actStatuses['Completed'], $analyzer->getSingleActivity('Mental health evaluation')['status_id']);
-    $this->assertApproxTime('2013-11-30 03:00:00', $analyzer->getSingleActivity('Secure temporary housing')['activity_date_time']);
-    $this->assertEquals($actStatuses['Scheduled'], $analyzer->getSingleActivity('Secure temporary housing')['status_id']);
+    $this->assertEquals($caseStatuses['Open'], self::ag($analyzer->getCase(), 'status_id'));
+    $this->assertApproxTime('2013-11-30 01:00:00', self::ag($analyzer->getSingleActivity('Medical evaluation'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Medical evaluation'), 'status_id'));
+    $this->assertApproxTime('2013-11-30 02:00:00', self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'status_id'));
+    $this->assertApproxTime('2013-11-30 03:00:00', self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Scheduled'], self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'status_id'));
 
     // Complete third activity; close case
     \CRM_Utils_Time::setTime('2013-11-30 04:00:00');
     $this->callApiSuccess('Activity', 'create', array(
-      'id' => $analyzer->getSingleActivity('Secure temporary housing')['id'],
+      'id' => self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'id'),
       'status_id' => $actStatuses['Completed'],
     ));
     $analyzer->flush();
-    $this->assertApproxTime('2013-11-30 01:00:00', $analyzer->getSingleActivity('Medical evaluation')['activity_date_time']);
-    $this->assertEquals($actStatuses['Completed'], $analyzer->getSingleActivity('Medical evaluation')['status_id']);
-    $this->assertApproxTime('2013-11-30 02:00:00', $analyzer->getSingleActivity('Mental health evaluation')['activity_date_time']);
-    $this->assertEquals($actStatuses['Completed'], $analyzer->getSingleActivity('Mental health evaluation')['status_id']);
-    $this->assertApproxTime('2013-11-30 03:00:00', $analyzer->getSingleActivity('Secure temporary housing')['activity_date_time']);
-    $this->assertEquals($actStatuses['Completed'], $analyzer->getSingleActivity('Secure temporary housing')['status_id']);
-    $this->assertEquals($caseStatuses['Closed'], $analyzer->getCase()['status_id']);
+    $this->assertApproxTime('2013-11-30 01:00:00', self::ag($analyzer->getSingleActivity('Medical evaluation'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Medical evaluation'), 'status_id'));
+    $this->assertApproxTime('2013-11-30 02:00:00', self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'status_id'));
+    $this->assertApproxTime('2013-11-30 03:00:00', self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'activity_date_time'));
+    $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'status_id'));
+    $this->assertEquals($caseStatuses['Closed'], self::ag($analyzer->getCase(), 'status_id'));
+    // */
   }
 
   /**
@@ -105,5 +106,16 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     $this->assertTrue($diff <= $tolerance, sprintf("Check approx time equality. expected=[%s] actual=[%s] tolerance=[%s]",
       $expected, $actual, $tolerance
     ));
+  }
+
+  /**
+   * Get a value from an array. This is syntactic-sugar to work-around PHP 5.3's limited syntax.
+   *
+   * @param $array
+   * @param $key
+   * @return mixed
+   */
+  static function ag($array, $key) {
+    return $array[$key];
   }
 }
