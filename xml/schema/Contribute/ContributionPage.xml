@@ -117,6 +117,7 @@
   </field>
   <field>
     <name>is_confirm_enabled</name>
+    <title>Confirmation Page?</title>
     <type>boolean</type>
     <default>1</default>
     <comment>if false, the confirm page in contribution pages gets skipped</comment>
@@ -124,6 +125,7 @@
   </field>
   <field>
     <name>recur_frequency_unit</name>
+    <title>Recurring Frequency</title>
     <type>varchar</type>
     <length>128</length>
     <comment>Supported recurring frequency units.</comment>
@@ -131,6 +133,7 @@
   </field>
   <field>
     <name>is_recur_interval</name>
+    <title>Support Recurring Intervals</title>
     <type>boolean</type>
     <default>0</default>
     <comment>if true - supports recurring intervals</comment>
@@ -138,6 +141,7 @@
   </field>
   <field>
     <name>is_recur_installments</name>
+    <title>Recurring Installments?</title>
     <type>boolean</type>
     <default>0</default>
     <comment>if true - asks user for recurring installments</comment>
@@ -145,6 +149,7 @@
   </field>
   <field>
     <name>is_pay_later</name>
+    <title>Pay Later</title>
     <type>boolean</type>
     <default>0</default>
     <comment>if true - allows the user to send payment directly to the org later</comment>
@@ -152,6 +157,7 @@
   </field>
   <field>
     <name>pay_later_text</name>
+    <title>Pay Later Text</title>
     <type>text</type>
     <localizable>true</localizable>
     <comment>The text displayed to the user in the main form</comment>
@@ -159,6 +165,7 @@
   </field>
   <field>
     <name>pay_later_receipt</name>
+    <title>Pay Later Receipt</title>
     <type>text</type>
     <localizable>true</localizable>
     <comment>The receipt sent to the user instead of the normal receipt text</comment>
@@ -166,6 +173,7 @@
   </field>
   <field>
     <name>is_partial_payment</name>
+    <title>Allow Partial Payment</title>
     <type>boolean</type>
     <default>0</default>
     <comment>is partial payment enabled for this online contribution page</comment>
