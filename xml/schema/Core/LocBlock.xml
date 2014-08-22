@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Location Block ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique ID</comment>
@@ -20,6 +21,7 @@
   </primaryKey>
   <field>
     <name>address_id</name>
+    <title>Location Block Address</title>
     <type>int unsigned</type>
     <add>2.0</add>
   </field>
@@ -32,6 +34,7 @@
   </foreignKey>
   <field>
     <name>email_id</name>
+    <title>Location Block Email</title>
     <type>int unsigned</type>
     <add>2.0</add>
   </field>
@@ -44,6 +47,7 @@
   </foreignKey>
   <field>
     <name>phone_id</name>
+    <title>Location Block Phone</title>
     <type>int unsigned</type>
     <add>2.0</add>
   </field>
@@ -56,6 +60,7 @@
   </foreignKey>
   <field>
     <name>im_id</name>
+    <title>Location Block IM</title>
     <type>int unsigned</type>
     <add>2.0</add>
   </field>
@@ -68,6 +73,7 @@
   </foreignKey>
   <field>
     <name>address_2_id</name>
+    <title>Location Block IM 2</title>
     <type>int unsigned</type>
     <add>2.0</add>
   </field>
