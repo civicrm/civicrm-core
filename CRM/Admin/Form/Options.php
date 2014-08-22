@@ -261,7 +261,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       (($this->_action & CRM_Core_Action::ADD) || !$isReserved)
     ) {
       $caseID = CRM_Core_Component::getComponentID('CiviCase');
-      $components = array('' => ts('Contacts OR Cases'), $caseID => ts('Cases Only'));
+      $components = array('' => ts('Contacts AND Cases'), $caseID => ts('Cases Only'));
       $this->add('select',
         'component_id',
         ts('Component'),
