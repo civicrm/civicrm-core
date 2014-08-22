@@ -263,9 +263,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @todo add metadata for ALL these entities
    */
   public static function toBeSkipped_getfields($sequential = FALSE) {
-    $entitiesWithMetadataNotYetFixed = array('Acl', 'AclRole', 'ActionSchedule', 'ActivityType',
-      'ContributionPage',
-      'ContactType', 'ContributionSoft', 'Country', 'CustomField', 'CustomGroup', 'CustomValue','CustomSearch',
+    $entitiesWithMetadataNotYetFixed = array('ActionSchedule', 'ActivityType',
+      'ContactType', 'ContributionSoft', 'CustomField', 'CustomGroup', 'CustomValue','CustomSearch',
       'Domain',
       'Dashboard', 'DashboardContact', 'Extension', 'File', 'FinancialAccount', 'FinancialType',
       'GroupOrganization', 'GroupNesting',
