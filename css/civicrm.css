@@ -53,6 +53,10 @@ div.crm-container fieldset label{
   font-size: 13px;
 }
 
+.crm-container tr {
+  background: none transparent;
+}
+
 .crm-container table.criteria-group {
   margin-bottom: .1em;
 }
