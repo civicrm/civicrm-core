@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
       <name>id</name>
+      <title>Profile ID</title>
       <type>int unsigned</type>
       <required>true</required>
       <comment>Unique table ID</comment>
@@ -20,6 +21,7 @@
   </primaryKey>
   <field>
        <name>is_active</name>
+       <title>Profile Is Active</title>
        <type>boolean</type>
        <default>1</default>
        <comment>Is this form currently active? If false, hide all related fields for all sharing contexts.</comment>
@@ -27,6 +29,7 @@
   </field>
   <field>
        <name>group_type</name>
+       <title>Profile Group Type</title>
        <type>varchar</type>
        <length>255</length>
        <import>true</import>
@@ -83,6 +86,7 @@
   </field>
   <field>
      <name>help_post</name>
+      <title>Profile Post Text</title>
      <type>text</type>
      <localizable>true</localizable>
      <comment>Description and/or help text to display after fields in form.</comment>
@@ -95,6 +99,7 @@
   </field>
   <field>
       <name>weight</name>
+      <title>Profile Weight</title>
       <type>int</type>
       <required>true</required>
       <default>1</default>
@@ -104,6 +109,7 @@
   </field>
   <field>
        <name>limit_listings_group_id</name>
+       <title>Profile Search Limit Group</title>
        <type>int unsigned</type>
        <comment>Group id, foriegn key from civicrm_group</comment>
       <add>1.4</add>
@@ -124,6 +130,7 @@
   </field>
   <field>
       <name>add_to_group_id</name>
+      <title>Add Contact To Group</title>
       <type>int unsigned</type>
       <comment>foreign key to civicrm_group_id</comment>
   </field>
@@ -135,6 +142,7 @@
   </foreignKey>
    <field>
        <name>add_captcha</name>
+       <title>Show Captcha On Profile</title>
        <type>boolean</type>
        <default>0</default>
        <comment>Should a CAPTCHA widget be included this Profile form.</comment>
@@ -142,6 +150,7 @@
   </field>
   <field>
        <name>is_map</name>
+       <title>Map Profile</title>
        <type>boolean</type>
        <default>0</default>
        <comment>Do we want to map results from this profile.</comment>
@@ -149,6 +158,7 @@
   </field>
   <field>
        <name>is_edit_link</name>
+       <title>Show Edit Link?</title>
        <type>boolean</type>
        <default>0</default>
        <comment>Should edit link display in profile selector</comment>
@@ -156,6 +166,7 @@
   </field>
   <field>
        <name>is_uf_link</name>
+       <title>Show Link to CMS User</title>
        <type>boolean</type>
        <default>0</default>
        <comment>Should we display a link to the website profile in profile selector</comment>
@@ -163,6 +174,7 @@
   </field>
   <field>
        <name>is_update_dupe</name>
+       <title>Update on Duplicate</title>
        <type>boolean</type>
        <default>0</default>
        <comment>Should we update the contact record if we find a duplicate</comment>
@@ -170,6 +182,7 @@
   </field>
   <field>
        <name>cancel_URL</name>
+       <title>Profile Cancel URL</title>
        <type>varchar</type>
        <length>255</length>
        <comment>Redirect to URL when Cancle button clik .</comment>
@@ -177,6 +190,7 @@
   </field>
   <field>
        <name>is_cms_user</name>
+       <title>Create CMS User?</title>
        <type>boolean</type>
        <default>0</default>
        <comment>Should we create a cms user for this profile </comment>
@@ -184,17 +198,20 @@
   </field>
   <field>
        <name>notify</name>
+       <title>Notify on Profile Submit</title>
        <type>text</type>
        <add>1.8</add>
   </field>
   <field>
     <name>is_reserved</name>
+    <title>Profile Is Reserved</title>
     <type>boolean</type>
     <comment>Is this group reserved for use by some other CiviCRM functionality?</comment>
     <add>3.0</add>
   </field>
   <field>
     <name>name</name>
+    <title>Profile Name</title>
     <type>varchar</type>
     <length>64</length>
     <comment>Name of the UF group for directly addressing it in the codebase</comment>
@@ -202,6 +219,7 @@
   </field>
   <field>
     <name>created_id</name>
+    <title>Profile Created By</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who created this UF group</comment>
     <add>3.0</add>
@@ -221,10 +239,11 @@
     <add>3.0</add>
   </field>
   <field>
-       <name>is_proximity_search</name>
-       <type>boolean</type>
-       <default>0</default>
-       <comment>Should we include proximity search feature in this profile search form?</comment>
-       <add>3.2</add>
+    <name>is_proximity_search</name>
+    <title>Include Proximity Search?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Should we include proximity search feature in this profile search form?</comment>
+    <add>3.2</add>
   </field>
 </table>

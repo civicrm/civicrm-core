@@ -10,6 +10,7 @@
   <field>
       <name>id</name>
       <type>int unsigned</type>
+      <title>Address ID</title>
       <required>true</required>
       <comment>Unique Address ID</comment>
        <add>1.1</add>
@@ -20,6 +21,7 @@
   </primaryKey>
   <field>
       <name>contact_id</name>
+      <title>Contact ID</title>
       <type>int unsigned</type>
       <comment>FK to Contact ID</comment>
       <add>2.0</add>
@@ -66,6 +68,7 @@
   </index>
   <field>
        <name>is_billing</name>
+       <title>Is Billing Address</title>
        <type>boolean</type>
        <default>0</default>
        <comment>Is this the billing address.</comment>
@@ -89,6 +92,7 @@
   </field>
   <field>
        <name>street_number</name>
+       <title>Street Number</title>
        <type>int</type>
        <export>true</export>
        <comment>Numeric portion of address number on the street, e.g. For 112A Main St, the street_number = 112.</comment>
@@ -96,6 +100,7 @@
   </field>
   <field>
        <name>street_number_suffix</name>
+       <title>Street Number Suffix</title>
        <type>varchar</type>
        <length>8</length>
        <export>true</export>
@@ -104,6 +109,7 @@
   </field>
   <field>
        <name>street_number_predirectional</name>
+       <title>Street Direction Prefix</title>
        <type>varchar</type>
        <length>8</length>
        <comment>Directional prefix, e.g. SE Main St, SE is the prefix.</comment>
@@ -112,6 +118,7 @@
   <field>
        <name>street_name</name>
        <type>varchar</type>
+       <title>Street Name</title>
        <length>64</length>
        <export>true</export>
        <comment>Actual street name, excluding St, Dr, Rd, Ave, e.g. For 112 Main St, the street_name = Main.</comment>
@@ -124,6 +131,7 @@
   </index>
   <field>
        <name>street_type</name>
+       <title>Street Type</title>
        <type>varchar</type>
        <length>8</length>
        <comment>St, Rd, Dr, etc.</comment>
@@ -131,6 +139,7 @@
   </field>
   <field>
        <name>street_number_postdirectional</name>
+       <title>Street Direction Suffix</title>
        <type>varchar</type>
        <length>8</length>
        <comment>Directional prefix, e.g. Main St S, S is the suffix.</comment>
@@ -138,6 +147,7 @@
   </field>
   <field>
        <name>street_unit</name>
+       <title>Street Unit</title>
        <type>varchar</type>
        <length>16</length>
        <export>true</export>
@@ -168,6 +178,7 @@
   </field>
   <field>
        <name>supplemental_address_3</name>
+       <title>Supplemental Address 3</title>
        <type>varchar</type>
        <length>96</length>
        <comment>Supplemental Address Information, Line 3</comment>
@@ -192,6 +203,7 @@
   <field>
       <name>county_id</name>
       <type>int unsigned</type>
+      <title>County</title>
       <comment>Which County does this address belong to.</comment>
       <pseudoconstant>
         <table>civicrm_county</table>
@@ -262,6 +274,7 @@
   </field>
   <field>
        <name>usps_adc</name>
+       <title>USPS Code</title>
        <type>varchar</type>
        <length>32</length>
        <comment>USPS Bulk mailing code.</comment>
@@ -295,6 +308,7 @@
   </foreignKey>
   <field>
        <name>geo_code_1</name>
+       <title>Latitude</title>
        <type>float</type>
        <import>true</import>
        <headerPattern>/geo/i</headerPattern>
@@ -303,6 +317,7 @@
   </field>
   <field>
        <name>geo_code_2</name>
+       <title>Longitude</title>
        <type>float</type>
        <comment>Longitude</comment>
        <import>true</import>
@@ -311,6 +326,7 @@
   </field>
   <field>
        <name>manual_geo_code</name>
+       <title>Is manually geocoded</title>
        <type>boolean</type>
        <default>0</default>
        <comment>Is this a manually entered geo code</comment>
@@ -318,6 +334,7 @@
   </field>
   <field>
        <name>timezone</name>
+       <title>Timezone</title>
        <type>varchar</type>
        <length>8</length>
        <comment>Timezone expressed as a UTC offset - e.g. United States CST would be written as "UTC-6".</comment>
