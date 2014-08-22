@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
       <name>id</name>
+      <title>UF Match ID</title>
       <type>int unsigned</type>
       <required>true</required>
       <comment>System generated ID.</comment>
@@ -20,6 +21,7 @@
   </primaryKey>
   <field>
       <name>domain_id</name>
+      <title>UF Match Domain ID</title>
       <type>int unsigned</type>
       <required>true</required>
       <comment>Which Domain is this match entry for</comment>
@@ -38,6 +40,7 @@
   </foreignKey>
   <field>
        <name>uf_id</name>
+       <title>CMS ID</title>
        <type>int unsigned</type>
        <required>true</required>
        <comment>UF ID</comment>
@@ -50,13 +53,15 @@
   </index>
   <field>
        <name>uf_name</name>
+       <title>CMS Unique Identifier</title>
        <type>varchar</type>
        <length>128</length>
        <comment>UF Name</comment>
        <add>1.9.kabissa</add>
   </field>
   <field>
-       <name>contact_id</name>
+      <name>contact_id</name>
+      <title>CiviCRM Contact ID</title>
       <type>int unsigned</type>
       <comment>FK to Contact ID</comment>
       <add>1.1</add>
@@ -79,6 +84,7 @@
   </field>
   <field>
     <name>language</name>
+    <title>Preferred Language</title>
     <type>varchar</type>
     <length>5</length>
     <comment>UI language preferred by the given user/contact</comment>
