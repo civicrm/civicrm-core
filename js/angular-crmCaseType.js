@@ -14,7 +14,11 @@
     weight: "1",
     definition: {
       activityTypes: [
-        {name: 'Open Case', max_instances: 1 }
+        {name: 'Open Case', max_instances: 1},
+        {name: 'Email'},
+        {name: 'Follow up'},
+        {name: 'Meeting'},
+        {name: 'Phone Call'}
       ],
       activitySets: [
         {
