@@ -130,6 +130,7 @@
   </field>
   <field>
       <name>add_to_group_id</name>
+      <title>Add Contact To Group</title>
       <type>int unsigned</type>
       <comment>foreign key to civicrm_group_id</comment>
   </field>
@@ -141,6 +142,7 @@
   </foreignKey>
    <field>
        <name>add_captcha</name>
+       <title>Show Captcha On Profile</title>
        <type>boolean</type>
        <default>0</default>
        <comment>Should a CAPTCHA widget be included this Profile form.</comment>
@@ -148,6 +150,7 @@
   </field>
   <field>
        <name>is_map</name>
+       <title>Map Profile</title>
        <type>boolean</type>
        <default>0</default>
        <comment>Do we want to map results from this profile.</comment>
@@ -155,6 +158,7 @@
   </field>
   <field>
        <name>is_edit_link</name>
+       <title>Show Edit Link?</title>
        <type>boolean</type>
        <default>0</default>
        <comment>Should edit link display in profile selector</comment>
@@ -162,6 +166,7 @@
   </field>
   <field>
        <name>is_uf_link</name>
+       <title>Show Link to CMS User</title>
        <type>boolean</type>
        <default>0</default>
        <comment>Should we display a link to the website profile in profile selector</comment>
@@ -169,6 +174,7 @@
   </field>
   <field>
        <name>is_update_dupe</name>
+       <title>Update on Duplicate</title>
        <type>boolean</type>
        <default>0</default>
        <comment>Should we update the contact record if we find a duplicate</comment>
@@ -176,6 +182,7 @@
   </field>
   <field>
        <name>cancel_URL</name>
+       <title>Profile Cancel URL</title>
        <type>varchar</type>
        <length>255</length>
        <comment>Redirect to URL when Cancle button clik .</comment>
@@ -183,6 +190,7 @@
   </field>
   <field>
        <name>is_cms_user</name>
+       <title>Create CMS User?</title>
        <type>boolean</type>
        <default>0</default>
        <comment>Should we create a cms user for this profile </comment>
@@ -190,6 +198,7 @@
   </field>
   <field>
        <name>notify</name>
+       <title>Notify on Profile Submit</title>
        <type>text</type>
        <add>1.8</add>
   </field>
