@@ -81,6 +81,7 @@
   </index>
   <field>
     <name>mobile_provider_id</name>
+    <title>Mobile Provider</title>
     <type>int unsigned</type>
     <comment>Which Mobile Provider does this phone belong to.</comment>
     <add>1.1</add>

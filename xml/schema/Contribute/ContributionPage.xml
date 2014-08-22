@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Contribution Page ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Contribution Id</comment>

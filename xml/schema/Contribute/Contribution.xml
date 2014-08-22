@@ -403,6 +403,7 @@
   </index>
   <field>
     <name>address_id</name>
+    <title>Contribution Address</title>
     <type>int unsigned</type>
     <comment>Conditional foreign key to civicrm_address.id. We insert an address record for each contribution when we have associated billing name and address data.</comment>
     <add>2.2</add>
