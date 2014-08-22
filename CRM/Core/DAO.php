@@ -112,6 +112,163 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * @param $fieldName
+   * @param $fieldDef
+   * @param $params
+   * @param $dbName
+   * @param $daoName
+   * @param $object
+   */
+  protected static function assignTestFK($fieldName, $fieldDef, $params, $daoName, $object) {
+    $required = CRM_Utils_Array::value('required', $fieldDef);
+    $FKClassName = CRM_Utils_Array::value('FKClassName', $fieldDef);
+    $dbName = $fieldDef['name'];
+
+    // skip the FK if it is not required
+    // if it's contact id we should create even if not required
+    // we'll have a go @ fetching first though
+    // we WILL create campaigns though for so tests with a campaign pseudoconstant will complete
+    if ($FKClassName === 'CRM_Campaign_DAO_Campaign' && $daoName != $FKClassName) {
+      $required = TRUE;
+    }
+    if (!$required && $dbName != 'contact_id') {
+      $fkDAO = new $FKClassName;
+      if ($fkDAO->find(TRUE)) {
+        $object->$dbName = $fkDAO->id;
+      }
+      unset($fkDAO);
+    }
+
+    elseif (in_array($FKClassName, CRM_Core_DAO::$_testEntitiesToSkip)) {
+      $depObject = new $FKClassName();
+      $depObject->find(TRUE);
+      $object->$dbName = $depObject->id;
+      unset($depObject);
+    }
+    elseif ($daoName == 'CRM_Member_DAO_MembershipType' && $fieldName == 'member_of_contact_id') {
+      // FIXME: the fields() metadata is not specific enough
+      $depObject = CRM_Core_DAO::createTestObject($FKClassName, array('contact_type' => 'Organization'));
+      $object->$dbName = $depObject->id;
+      unset($depObject);
+    }
+    else {
+      //if it is required we need to generate the dependency object first
+      $depObject = CRM_Core_DAO::createTestObject($FKClassName, CRM_Utils_Array::value($dbName, $params, 1));
+      $object->$dbName = $depObject->id;
+      unset($depObject);
+    }
+  }
+
+  /**
+   * @param $fieldName
+   * @param $fieldDef
+   * @param $params
+   * @param $daoName
+   * @param $object
+   * @param $counter
+   * @param $dbName
+   */
+  protected static function assignTestValue($fieldName, &$fieldDef, &$params, $daoName, $object, $counter, $dbName) {
+    $handled = FALSE;
+
+    if (!$handled && $dbName == 'contact_sub_type' && empty($params['contact_sub_type'])) {
+      //coming up with a rule to set this is too complex let's not set it
+      $handled = TRUE;
+    }
+
+    // Pick an option value if needed
+    if (!$handled && $fieldDef['type'] !== CRM_Utils_Type::T_BOOLEAN) {
+      $options = $daoName::buildOptions($dbName, 'create');
+      if ($options) {
+        $object->$dbName = key($options);
+        $handled = TRUE;
+      }
+    }
+
+    if (!$handled) {
+      switch ($fieldDef['type']) {
+        case CRM_Utils_Type::T_INT:
+        case CRM_Utils_Type::T_FLOAT:
+        case CRM_Utils_Type::T_MONEY:
+          if (isset($fieldDef['precision'])) {
+            // $object->$dbName = CRM_Utils_Number::createRandomDecimal($value['precision']);
+            $object->$dbName = CRM_Utils_Number::createTruncatedDecimal($counter, $fieldDef['precision']);
+          }
+          else {
+            $object->$dbName = $counter;
+          }
+          break;
+
+        case CRM_Utils_Type::T_BOOLEAN:
+          if (isset($fieldDef['default'])) {
+            $object->$dbName = $fieldDef['default'];
+          }
+          elseif ($fieldDef['name'] == 'is_deleted' || $fieldDef['name'] == 'is_test') {
+            $object->$dbName = 0;
+          }
+          else {
+            $object->$dbName = 1;
+          }
+          break;
+
+        case CRM_Utils_Type::T_DATE:
+        case CRM_Utils_Type::T_TIMESTAMP:
+        case CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME:
+          $object->$dbName = '19700101';
+          if ($dbName == 'end_date') {
+            // put this in the future
+            $object->$dbName = '20200101';
+          }
+          break;
+
+        case CRM_Utils_Type::T_TIME:
+          CRM_Core_Error::fatal('T_TIME shouldnt be used.');
+        //$object->$dbName='000000';
+        //break;
+        case CRM_Utils_Type::T_CCNUM:
+          $object->$dbName = '4111 1111 1111 1111';
+          break;
+
+        case CRM_Utils_Type::T_URL:
+          $object->$dbName = 'http://www.civicrm.org';
+          break;
+
+        case CRM_Utils_Type::T_STRING:
+        case CRM_Utils_Type::T_BLOB:
+        case CRM_Utils_Type::T_MEDIUMBLOB:
+        case CRM_Utils_Type::T_TEXT:
+        case CRM_Utils_Type::T_LONGTEXT:
+        case CRM_Utils_Type::T_EMAIL:
+        default:
+          // WAS: if (isset($value['enumValues'])) {
+          // TODO: see if this works with all pseudoconstants
+          if (isset($fieldDef['pseudoconstant'], $fieldDef['pseudoconstant']['callback'])) {
+            if (isset($fieldDef['default'])) {
+              $object->$dbName = $fieldDef['default'];
+            }
+            else {
+              $options = CRM_Core_PseudoConstant::get($daoName, $fieldName);
+              if (is_array($options)) {
+                $object->$dbName = $options[0];
+              }
+              else {
+                $defaultValues = explode(',', $options);
+                $object->$dbName = $defaultValues[0];
+              }
+            }
+          }
+          else {
+            $object->$dbName = $dbName . '_' . $counter;
+            $maxlength = CRM_Utils_Array::value('maxlength', $fieldDef);
+            if ($maxlength > 0 && strlen($object->$dbName) > $maxlength) {
+              $object->$dbName = substr($object->$dbName, 0, $fieldDef['maxlength']);
+            }
+          }
+      }
+    }
+  }
+
+  /**
    * reset the DAO object. DAO is kinda crappy in that there is an unwritten
    * rule of one query per DAO. We attempt to get around this crappy restricrion
    * by resetting some of DAO's internal fields. Use this with caution
@@ -1360,137 +1517,20 @@ SELECT contact_id
       $object = new $daoName();
 
       $fields = &$object->fields();
-      foreach ($fields as $name => $value) {
-        $dbName = $value['name'];
-        if($dbName == 'contact_sub_type' && empty($params['contact_sub_type'])){
-          //coming up with a rule to set this is too complex let's not set it
-          continue;
-        }
-        $FKClassName = CRM_Utils_Array::value('FKClassName', $value);
-        $required = CRM_Utils_Array::value('required', $value);
+      foreach ($fields as $fieldName => $fieldDef) {
+        $dbName = $fieldDef['name'];
+        $required = CRM_Utils_Array::value('required', $fieldDef);
         if (CRM_Utils_Array::value($dbName, $params) !== NULL && !is_array($params[$dbName])) {
           $object->$dbName = $params[$dbName];
         }
 
         elseif ($dbName != 'id') {
-          if ($FKClassName != NULL) {
-            //skip the FK if it is not required
-            // if it's contact id we should create even if not required
-            // we'll have a go @ fetching first though
-            // we WILL create campaigns though for so tests with a campaign pseudoconstant will complete
-            if($FKClassName === 'CRM_Campaign_DAO_Campaign' && $daoName != $FKClassName) {
-              $required = TRUE;
-            }
-            if (!$required && $dbName != 'contact_id') {
-              $fkDAO = new $FKClassName;
-              if($fkDAO->find(TRUE)){
-                $object->$dbName = $fkDAO->id;
-              }
-              unset($fkDAO);
-              continue;
-            }
-            if(in_array($FKClassName, CRM_Core_DAO::$_testEntitiesToSkip)){
-              $depObject = new $FKClassName();
-              $depObject->find(TRUE);
-            } elseif ($daoName == 'CRM_Member_DAO_MembershipType' && $name == 'member_of_contact_id') {
-              // FIXME: the fields() metadata is not specific enough
-              $depObject = CRM_Core_DAO::createTestObject($FKClassName, array('contact_type' => 'Organization'));
-            }else{
-            //if it is required we need to generate the dependency object first
-              $depObject = CRM_Core_DAO::createTestObject($FKClassName, CRM_Utils_Array::value($dbName, $params, 1));
-            }
-            $object->$dbName = $depObject->id;
-            unset($depObject);
-
+          if (CRM_Utils_Array::value('FKClassName', $fieldDef) != NULL) {
+            self::assignTestFK($fieldName, $fieldDef, $params, $daoName, $object);
             continue;
           }
-          // Pick an option value if needed
-          if ($value['type'] !== CRM_Utils_Type::T_BOOLEAN) {
-            $options = $daoName::buildOptions($dbName, 'create');
-            if ($options) {
-              $object->$dbName = key($options);
-              continue;
-            }
-          }
 
-          switch ($value['type']) {
-            case CRM_Utils_Type::T_INT:
-            case CRM_Utils_Type::T_FLOAT:
-            case CRM_Utils_Type::T_MONEY:
-              if (isset($value['precision'])) {
-                // $object->$dbName = CRM_Utils_Number::createRandomDecimal($value['precision']);
-                $object->$dbName = CRM_Utils_Number::createTruncatedDecimal($counter, $value['precision']);
-              } else {
-                $object->$dbName = $counter;
-              }
-              break;
-
-            case CRM_Utils_Type::T_BOOLEAN:
-              if (isset($value['default'])) {
-                $object->$dbName = $value['default'];
-              }
-              elseif ($value['name'] == 'is_deleted' || $value['name'] == 'is_test') {
-                $object->$dbName = 0;
-              }
-              else {
-                $object->$dbName = 1;
-              }
-              break;
-
-            case CRM_Utils_Type::T_DATE:
-            case CRM_Utils_Type::T_TIMESTAMP:
-            case CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME:
-              $object->$dbName = '19700101';
-              if($dbName == 'end_date') {
-                // put this in the future
-                $object->$dbName = '20200101';
-              }
-              break;
-
-            case CRM_Utils_Type::T_TIME:
-              CRM_Core_Error::fatal('T_TIME shouldnt be used.');
-              //$object->$dbName='000000';
-              //break;
-            case CRM_Utils_Type::T_CCNUM:
-              $object->$dbName = '4111 1111 1111 1111';
-              break;
-
-            case CRM_Utils_Type::T_URL:
-              $object->$dbName = 'http://www.civicrm.org';
-              break;
-
-            case CRM_Utils_Type::T_STRING:
-            case CRM_Utils_Type::T_BLOB:
-            case CRM_Utils_Type::T_MEDIUMBLOB:
-            case CRM_Utils_Type::T_TEXT:
-            case CRM_Utils_Type::T_LONGTEXT:
-            case CRM_Utils_Type::T_EMAIL:
-            default:
-              // WAS: if (isset($value['enumValues'])) {
-              // TODO: see if this works with all pseudoconstants
-              if (isset($value['pseudoconstant'], $value['pseudoconstant']['callback'])) {
-                if (isset($value['default'])) {
-                  $object->$dbName = $value['default'];
-                }
-                else {
-                  $options = CRM_Core_PseudoConstant::get($daoName, $name);
-                  if (is_array($options)) {
-                    $object->$dbName = $options[0];
-                  }
-                  else {
-                    $defaultValues = explode(',', $options);
-                    $object->$dbName = $defaultValues[0];
-                  }
-                }
-              }
-              else {
-                $object->$dbName = $dbName . '_' . $counter;
-                $maxlength = CRM_Utils_Array::value('maxlength', $value);
-                if ($maxlength > 0 && strlen($object->$dbName) > $maxlength) {
-                  $object->$dbName = substr($object->$dbName, 0, $value['maxlength']);
-                }
-              }
-          }
+          self::assignTestValue($fieldName, $fieldDef, $params, $daoName, $object, $counter, $dbName);
         }
       }
       $object->save();
