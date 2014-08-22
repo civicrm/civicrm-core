@@ -74,14 +74,14 @@
         $('select[name="{$stateCountryMap.state_province}"], select#{$stateCountryMap.state_province}', $form).data('chainSelect', {ldelim}
           callback: CRM.url('civicrm/ajax/jqCounty'),
           target: initField('select[name="{$stateCountryMap.county}"], #{$stateCountryMap.county}'),
-          placeholder: "{ts escape='js'}(choose state first){/ts}"
+          placeholder: "{ts escape='js'}Choose state first{/ts}"
         {rdelim}).on('change',  chainSelect);
       {/if}
       {if $stateCountryMap.country && $stateCountryMap.state_province}
         initField('select[name="{$stateCountryMap.country}"], select#{$stateCountryMap.country}').data('chainSelect', {ldelim}
           callback: CRM.url('civicrm/ajax/jqState'),
           target: initField('select[name="{$stateCountryMap.state_province}"], #{$stateCountryMap.state_province}'),
-          placeholder: "{ts escape='js'}(choose country first){/ts}"
+          placeholder: "{ts escape='js'}Choose country first{/ts}"
         {rdelim}).on('change', chainSelect).change();
       {/if}
     {/foreach}
