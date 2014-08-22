@@ -387,13 +387,13 @@ class CRM_Contact_Form_Search_Criteria {
     $worldRegions = array('' => '') + CRM_Core_PseudoConstant::worldRegion();
     $form->addSelect('world_region', array('entity' => 'address', 'placeholder' => ts('- any -'), 'option_url' => NULL));
 
-    // checkboxes for location type
-    $location_type = array();
+    // select for location type
     $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-    foreach ($locationType as $locationTypeID => $locationTypeName) {
-      $location_type[] = $form->createElement('checkbox', $locationTypeID, NULL, $locationTypeName);
-    }
-    $form->addGroup($location_type, 'location_type', ts('Location Types'), '&nbsp;');
+    $form->add('select', 'location_type', ts('Address Location'), $locationType, FALSE, array(
+      'multiple' => TRUE,
+      'class' => 'crm-select2',
+      'placeholder' => ts('Primary'),
+    ));
 
     // custom data extending addresses -
     $extends = array('Address');
