@@ -3628,8 +3628,8 @@ div.m ul#civicrm-menu,
 .crm-select2 {
   width: 15em;
 }
-.crm-container .select2-container {
-  min-width: 6em !important;
+.crm-container div.select2-container {
+  min-width: 6em;
   font-size: 11px;
 }
 /* Add arrow icon to multi-selects */

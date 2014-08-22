@@ -305,6 +305,7 @@ class CRM_Contact_Form_Search_Criteria {
 
     $parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', $addressOptions, 0);
     $form->assign('parseStreetAddress', $parseStreetAddress);
+    $stateCountryMap = NULL;
     foreach ($elements as $name => $v) {
       list($title, $attributes, $select, $multiSelect) = $v;
 
@@ -324,11 +325,11 @@ class CRM_Contact_Form_Search_Criteria {
       }
 
       if ($select) {
-        $stateCountryMap[] = array(
+        $stateCountryMap = array(array(
           'state_province' => 'state_province',
           'country' => 'country',
           'county' => 'county',
-        );
+        ));
         if ($select == 'stateProvince') {
           if (!empty($formValues['country'])) {
             $selectElements = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvinceForCountry($formValues['country']);
@@ -337,11 +338,11 @@ class CRM_Contact_Form_Search_Criteria {
             //if not setdefault any country
             $selectElements = CRM_Core_PseudoConstant::$select();
           }
-          $element = $form->add('select', $name, $title, $selectElements, FALSE, array('class' => 'crm-select2'));
+          $element = $form->add('select', $name, $title, $selectElements);
         }
         elseif ($select == 'country') {
           $selectElements = array('' => ts('- any -')) + CRM_Core_PseudoConstant::$select();
-          $element = $form->add('select', $name, $title, $selectElements, FALSE, array('class' => 'crm-select2'));
+          $element = $form->add('select', $name, $title, $selectElements);
         }
         elseif ($select == 'county') {
           if ( array_key_exists('state_province', $formValues) && !CRM_Utils_System::isNull($formValues['state_province'])) {
@@ -350,7 +351,7 @@ class CRM_Contact_Form_Search_Criteria {
           else {
             $selectElements = array('' => ts('- any -'));
           }
-          $element = $form->add('select', $name, $title, $selectElements, FALSE, array('class' => 'crm-select2'));
+          $element = $form->add('select', $name, $title, $selectElements);
         }
         else {
           $selectElements = array('' => ts('- any -')) + CRM_Core_PseudoConstant::$select();
