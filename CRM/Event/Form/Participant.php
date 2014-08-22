@@ -1702,11 +1702,11 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
             foreach ($line as $key => $value) {
               if (isset($value['tax_amount'])) {
                 $totalTaxAmount += $value['tax_amount'];
-                if (isset($dataArray[$value['tax_rate']])) {
-                  $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
+                if (isset($dataArray[(string) $value['tax_rate']])) {
+                  $dataArray[(string) $value['tax_rate']] = $dataArray[(string) $value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
                 }
                 else {
-                  $dataArray[$value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
+                  $dataArray[(string) $value['tax_rate']] = CRM_Utils_Array::value('tax_amount', $value);
                 }
               }
             }
