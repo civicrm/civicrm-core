@@ -31,6 +31,7 @@
   </field>
   <field>
     <name>deny</name>
+    <title>Deny ACl?</title>
     <type>boolean</type>
     <default>0</default>
     <required>true</required>
@@ -42,6 +43,7 @@
   </field>
   <field>
     <name>entity_table</name>
+    <title>ACL Entity</title>
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
@@ -77,6 +79,7 @@
   </field>
   <field>
     <name>object_table</name>
+    <title>ACL Object</title>
     <type>varchar</type>
     <length>64</length>
     <comment>The table of the object controlled by this ACL entry</comment>
@@ -84,12 +87,14 @@
   </field>
   <field>
     <name>object_id</name>
+    <title>ACL Object ID</title>
     <type>int unsigned</type>
     <comment>The ID of the object controlled by this ACL entry</comment>
     <add>1.6</add>
   </field>
   <field>
     <name>acl_table</name>
+    <title>ACL Table</title>
     <type>varchar</type>
     <length>64</length>
     <comment>If this is a grant/revoke entry, what table are we granting?</comment>
@@ -97,6 +102,7 @@
   </field>
   <field>
     <name>acl_id</name>
+    <title>ACL Group ID</title>
     <type>int unsigned</type>
     <comment>ID of the ACL or ACL group being granted/revoked</comment>
     <add>1.6</add>
@@ -108,6 +114,7 @@
   </index>
   <field>
     <name>is_active</name>
+    <title>ACL Is Active?</title>
     <type>boolean</type>
     <comment>Is this property active?</comment>
     <add>1.6</add>
