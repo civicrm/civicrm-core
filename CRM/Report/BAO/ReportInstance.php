@@ -54,8 +54,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       return NULL;
     }
 
-    $config = CRM_Core_Config::singleton();
-    $params['domain_id'] = CRM_Core_Config::domainID();
+    $instanceID = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('instance_id', $params));
 
     // convert roles array to string
     if (isset($params['grouprole']) && is_array($params['grouprole'])) {
@@ -68,13 +67,9 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       );
     }
 
-    if (!isset($params['id'])) {
+    if (!$instanceID) {
       $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
-    }
-
-    $instanceID = CRM_Utils_Array::value('id', $params);
-    if (!empty($params['instance_id'])) {
-      $instanceID = CRM_Utils_Array::value('instance_id', $params);
+      $params['domain_id'] = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
     }
 
     if ($instanceID) {
@@ -87,7 +82,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     $instance = new CRM_Report_DAO_ReportInstance();
     $instance->copyValues($params);
 
-    if ($config->userFramework == 'Joomla') {
+    if (CRM_Core_Config::singleton()->userFramework == 'Joomla') {
       $instance->permission = 'null';
     }
 
