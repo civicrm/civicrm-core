@@ -1854,8 +1854,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     elseif (substr($fieldName, 0, 6) === 'county') {
       if ($addressOptions['county']) {
         $form->add('select', $name, $title,
-          array(
-            '' => ts('(choose state first)')), $required
+          array('' => ts('Choose state first')), $required
         );
       }
     }

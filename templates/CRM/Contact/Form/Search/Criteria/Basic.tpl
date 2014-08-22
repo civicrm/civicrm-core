@@ -69,31 +69,29 @@
   {/if}
   {if $form.group}
     <td>
-      <div id='groupselect'><label>{ts}Group(s){/ts} <span class="description">(<a id='searchbygrouptype'>{ts}search by group type{/ts}</a>)</span></label>
+      <div id='groupselect'><label>{ts}Group(s){/ts} <span class="description">(<a href="#" id='searchbygrouptype'>{ts}search by group type{/ts}</a>)</span></label>
         {$form.group.html}
     </div>
     <div id='grouptypeselect'>
-      <label>{ts}Group Type(s){/ts} <span class="description"> (<a id='searchbygroup'>{ts}search by group{/ts}</a>)</span></label>
+      <label>{ts}Group Type(s){/ts} <span class="description"> (<a href="#" id='searchbygroup'>{ts}search by group{/ts}</a>)</span></label>
       {$form.group_type.html}
         {literal}
         <script type="text/javascript">
         CRM.$(function($) {
-          function showGroupSearch(){
+          function showGroupSearch() {
             $('#grouptypeselect').hide();
             $('#groupselect').show();
             $('#group_type').select2('val', '');
+            return false;
           }
-          function showGroupTypeSearch(){
+          function showGroupTypeSearch() {
             $('#groupselect').hide();
             $('#grouptypeselect').show();
             $('#group').select2('val', '');
+            return false;
           }
-          $('#searchbygrouptype').click(function() {
-              showGroupTypeSearch();
-          });
-          $('#searchbygroup').click(function() {
-              showGroupSearch();
-          });
+          $('#searchbygrouptype').click(showGroupTypeSearch);
+          $('#searchbygroup').click(showGroupSearch);
 
           if ($('#group_type').val() ) {
             showGroupTypeSearch();

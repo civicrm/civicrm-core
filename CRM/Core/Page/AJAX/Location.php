@@ -233,7 +233,7 @@ class CRM_Core_Page_AJAX_Location {
     $elements = array();
     if (!isset($_GET['_value']) || CRM_Utils_System::isNull($_GET['_value'])) {
       $elements = array(
-        array('name' => ts('(choose state first)'), 'value' => '')
+        array('name' => ts('Choose state first'), 'value' => '')
       );
     }
     else {
