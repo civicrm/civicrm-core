@@ -921,13 +921,12 @@ class CRM_Report_Form extends CRM_Core_Form {
               if (count($operations) <= 1) {
                 $element->freeze();
               }
-              $select = $this->addElement('select', "{$fieldName}_value", NULL,
-                        $field['options'], array(
-                          'size' => 4,
-                          'style' => 'min-width:250px',
-                        )
-              );
-              $select->setMultiple(TRUE);
+              $this->addElement('select', "{$fieldName}_value", NULL, $field['options'], array(
+                'style' => 'min-width:250px',
+                'class' => 'crm-select2',
+                'multiple' => TRUE,
+                'placeholder' => ts('- select -'),
+              ));
             }
             break;
 
