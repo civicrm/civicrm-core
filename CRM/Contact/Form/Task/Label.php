@@ -135,7 +135,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     }
 
     //build the returnproperties
-    $returnProperties = array('display_name' => 1, 'contact_type' => 1);
+    $returnProperties = array('display_name' => 1, 'contact_type' => 1, 'prefix_id' => 1);
     $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'mailing_format'
     );
@@ -438,18 +438,32 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       else {
         $name = $rows[$rowID]['display_name'];
       }
+
+      // CRM-15120
+      $formatted = array(
+        'first_name' => $rows[$rowID]['first_name'],
+        'individual_prefix' => $rows[$rowID]['individual_prefix']
+      );
+      $format = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+        'display_name_format'
+      );
+      $firstNameWithPrefix = CRM_Utils_Address::format($formatted, $format,
+        FALSE, FALSE, TRUE
+      );
+      $firstNameWithPrefix = trim($firstNameWithPrefix);
+
       // fill uniqueAddress array with last/first name tree
       if (isset($uniqueAddress[$address])) {
-        $uniqueAddress[$address]['names'][$name][$rows[$rowID]['first_name']]['first_name'] = $rows[$rowID]['first_name'];
-        $uniqueAddress[$address]['names'][$name][$rows[$rowID]['first_name']]['addressee_display'] = $rows[$rowID]['addressee_display'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
         // drop unnecessary rows
         unset($rows[$rowID]);
         // this is the first listing at this address
       }
       else {
         $uniqueAddress[$address]['ID'] = $rowID;
-        $uniqueAddress[$address]['names'][$name][$rows[$rowID]['first_name']]['first_name'] = $rows[$rowID]['first_name'];
-        $uniqueAddress[$address]['names'][$name][$rows[$rowID]['first_name']]['addressee_display'] = $rows[$rowID]['addressee_display'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
       }
     }
     foreach ($uniqueAddress as $address => $data) {
