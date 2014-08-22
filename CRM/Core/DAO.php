@@ -1516,40 +1516,44 @@ SELECT contact_id
       /** @var CRM_Core_DAO $object */
       $object = new $daoName();
 
-      $fields = &$object->fields();
+      $fields = & $object->fields();
       foreach ($fields as $fieldName => $fieldDef) {
         $dbName = $fieldDef['name'];
+        $FKClassName = CRM_Utils_Array::value('FKClassName', $fieldDef);
         $required = CRM_Utils_Array::value('required', $fieldDef);
+
         if (CRM_Utils_Array::value($dbName, $params) !== NULL && !is_array($params[$dbName])) {
           $object->$dbName = $params[$dbName];
         }
 
         elseif ($dbName != 'id') {
-          if (CRM_Utils_Array::value('FKClassName', $fieldDef) != NULL) {
+          if ($FKClassName != NULL) {
             $object->assignTestFK($fieldName, $fieldDef, $params);
             continue;
+          } else {
+            $object->assignTestValue($fieldName, $fieldDef, $counter);
           }
-
-          $object->assignTestValue($fieldName, $fieldDef, $counter);
         }
       }
       $object->save();
 
       if (!$createOnly) {
-
         $objects[$i] = $object;
-
       }
-      else unset($object);
+      else {
+        unset($object);
+      }
     }
 
     if ($createOnly) {
-
       return;
-
     }
-    elseif ($numObjects == 1) {  return $objects[0];}
-    else return $objects;
+    elseif ($numObjects == 1) {
+      return $objects[0];
+    }
+    else {
+      return $objects;
+    }
   }
 
   /**
