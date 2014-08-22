@@ -659,7 +659,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    * @param $stateCountryMap
    * @param null $defaults
    */
-  static function addStateCountryMap(&$stateCountryMap, $defaults = NULL) {
+  static function addStateCountryMap($stateCountryMap, $defaults = NULL) {
     // first fix the statecountry map if needed
     if (empty($stateCountryMap)) {
       return;
