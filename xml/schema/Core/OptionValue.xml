@@ -8,6 +8,7 @@
   <log>true</log>
   <field>
       <name>id</name>
+    <title>Option Value ID</title>
       <type>int unsigned</type>
       <required>true</required>
       <comment>Option ID</comment>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
       <name>option_group_id</name>
+    <title>Option Group ID</title>
       <type>int unsigned</type>
       <required>true</required>
       <comment>Group which this option belongs to.</comment>
@@ -124,6 +126,7 @@
   </field>
   <field>
        <name>is_active</name>
+    <title>Option Is Active</title>
        <type>boolean</type>
        <default>1</default>
        <comment>Is this option active?</comment>
