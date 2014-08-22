@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
       <name>id</name>
+    <title>Membership Status ID</title>
       <type>int unsigned</type>
       <required>true</required>
       <comment>Membership Id</comment>
