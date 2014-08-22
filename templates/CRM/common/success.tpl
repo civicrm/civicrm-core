@@ -49,16 +49,16 @@
 
 {else}
     <div class="crm-container" style="margin-top: 2em; padding: 1em; background-color: #EEFFEE; border: 1px #070 solid; color: black;">
-      <p><span class="crm-status-icon success"> </span><strong>{$message}</strong></p>
       <div style="padding: 1em; background-color: rgba(255, 255, 255, 0.76);">
         <p>
           <img style="display:block; float:left; width:40px; margin-right:10px;" src="{$config->resourceBase}i/logo_lg.png">
-          {ts 1='http://civicrm.org/civicrm/profile/create?reset=1&gid=15'}This release was made possible by contributions from people like <strong>you</strong>. <a href="%1" target="_blank">Register your site</a> to join the community.{/ts}
+          {ts 1='https://civicrm.org/membership'}If you feel that CiviCRM is valuable to your organization, consider that thousands of organizations worldwide also feel the same way. Protect your investment, and theirs, by <a href="%1" target="_blank">ensuring that CiviCRM remains stable, sustainable and consistently improving through membership</a>. ~Donald Lobo {/ts}
         </p>
         <p>
-          {ts 1='http://civicrm.org/contribute' 2='http://civicrm.org/make-it-happen'}If CiviCRM is useful to your organization, consider making a <a href="%1" target="_blank">monthly contribution</a>, or helping to <a href="%2" target="_blank">fund a proposed improvement</a>.{/ts}
+          {ts 1='https://civicrm.org/register-site'}Not ready for a membership yet? You can still help us learn how to improve CiviCRM by <a href="%1" target="_blank">registering your site</a>.{/ts}
         </p>
       </div>
+      <p><span class="crm-status-icon success"> </span><strong>{$message}</strong></p>
       {if $afterUpgradeMessage}
         <h3>{ts}Important Notes{/ts}</h3>
         <p>{$afterUpgradeMessage}</p>
