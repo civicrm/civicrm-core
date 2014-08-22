@@ -414,6 +414,7 @@ input.crm-form-entityref {
 }
 
 .crm-container .crm-section,
+.crm-container div.crm-field-wrapper,
 .crm-container-snippet .crm-section {
   margin-bottom: 1em;
 }
@@ -3052,7 +3053,6 @@ div a.helpicon:focus {
   margin-right: 45px;
 }
 
-#crm-container ul.token-input-list-facebook, ul.token-input-list-facebook li.leaf,
 #crm-container ul li {
   list-style-image: none;
 }
@@ -3075,7 +3075,7 @@ div a.helpicon:focus {
 }
 
 /* Override Drupal .2em margin-bottom on forms (we don't want to give up that space) */
-div#crm-container form {
+div.crm-container form {
   margin-bottom: 0em;
 }
 

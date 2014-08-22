@@ -271,9 +271,10 @@ class CRM_Contact_Form_Search_Criteria {
 
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   static function location(&$form) {
+    $config = CRM_Core_Config::singleton();
     // Build location criteria based on _submitValues if
     // available; otherwise, use $form->_formValues.
     $formValues = $form->_submitValues;
@@ -366,34 +367,33 @@ class CRM_Contact_Form_Search_Criteria {
       }
 
       if ($addressOptions['postal_code']) {
-        $form->addElement('text', 'postal_code_low', ts('Range-From'),
-          CRM_Utils_Array::value('postal_code', $attributes)
-        );
-        $form->addElement('text', 'postal_code_high', ts('To'),
-          CRM_Utils_Array::value('postal_code', $attributes)
-        );
+        $attr = array('class' => 'six') + (array) CRM_Utils_Array::value('postal_code', $attributes);
+        $form->addElement('text', 'postal_code_low', NULL, $attr + array('placeholder' => ts('From')));
+        $form->addElement('text', 'postal_code_high', NULL, $attr + array('placeholder' => ts('To')));
       }
     }
 
     CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
 
     // extend addresses with proximity search
-    $form->addElement('text', 'prox_distance', ts('Find contacts within'), array('class' => 'six'));
-    $form->addElement('select', 'prox_distance_unit', NULL, array('miles' => ts('Miles'), 'kilos' => ts('Kilometers')));
+    if (!empty($config->geocodeMethod)) {
+      $form->addElement('text', 'prox_distance', ts('Find contacts within'), array('class' => 'six'));
+      $form->addElement('select', 'prox_distance_unit', NULL, array(
+        'miles' => ts('Miles'),
+        'kilos' => ts('Kilometers')
+      ));
+      $form->addRule('prox_distance', ts('Please enter positive number as a distance'), 'numeric');
+    }
 
-    // is there another form rule that does decimals besides money ? ...
-    $form->addRule('prox_distance', ts('Please enter positive number as a distance'), 'numeric');
-
-    $worldRegions = array('' => '') + CRM_Core_PseudoConstant::worldRegion();
     $form->addSelect('world_region', array('entity' => 'address', 'placeholder' => ts('- any -'), 'option_url' => NULL));
 
-    // checkboxes for location type
-    $location_type = array();
+    // select for location type
     $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-    foreach ($locationType as $locationTypeID => $locationTypeName) {
-      $location_type[] = $form->createElement('checkbox', $locationTypeID, NULL, $locationTypeName);
-    }
-    $form->addGroup($location_type, 'location_type', ts('Location Types'), '&nbsp;');
+    $form->add('select', 'location_type', ts('Address Location'), $locationType, FALSE, array(
+      'multiple' => TRUE,
+      'class' => 'crm-select2',
+      'placeholder' => ts('Primary'),
+    ));
 
     // custom data extending addresses -
     $extends = array('Address');
