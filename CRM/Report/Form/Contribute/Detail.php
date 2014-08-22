@@ -266,23 +266,6 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           ),
         ),
       ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_GroupContact',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-            'type' => CRM_Utils_Type::T_INT,
-          ),
-        ),
-      ),
       'civicrm_contribution_ordinality' =>
       array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
@@ -324,6 +307,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
       ),
     ) + $this->addAddressFields(FALSE);
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
     // Don't show Batch display column and filter unless batches are being used
