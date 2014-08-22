@@ -385,7 +385,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    */
   static function addDashlet(&$params) {
 
-    // special case to handle duplicate entires for report instances
+    // special case to handle duplicate entries for report instances
     $dashboardID = CRM_Utils_Array::value('id', $params);
 
     if (!empty($params['instanceURL'])) {
