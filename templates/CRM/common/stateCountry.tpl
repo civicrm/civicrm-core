@@ -65,8 +65,12 @@
         info.target.trigger('change');
       }
     }
-    function initField(selector) {
-      return $(selector, $form).css('min-width', '20em').crmSelect2();
+    function initField(selector, removePlaceholder) {
+      var $el = $(selector, $form);
+      if (removePlaceholder !== false) {
+        $el.removeAttr('placeholder');
+      }
+      return $el.css('min-width', '20em').crmSelect2();
     }
     {/literal}
     {foreach from=$config->stateCountryMap item=stateCountryMap}
@@ -78,7 +82,7 @@
         {rdelim}).on('change',  chainSelect);
       {/if}
       {if $stateCountryMap.country && $stateCountryMap.state_province}
-        initField('select[name="{$stateCountryMap.country}"], select#{$stateCountryMap.country}').data('chainSelect', {ldelim}
+        initField('select[name="{$stateCountryMap.country}"], select#{$stateCountryMap.country}', false).data('chainSelect', {ldelim}
           callback: CRM.url('civicrm/ajax/jqState'),
           target: initField('select[name="{$stateCountryMap.state_province}"], #{$stateCountryMap.state_province}'),
           placeholder: "{ts escape='js'}Choose country first{/ts}"
