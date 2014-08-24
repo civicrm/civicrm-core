@@ -274,7 +274,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailingRecipients', 'MailingJob', 'MailSettings',
       'MembershipBlock', 'MembershipPayment', 'MessageTemplate',
       'MembershipType', 'OptionGroup', 'OptionValue', 'MembershipStatus',
-      'ParticipantPayment', 'ParticipantStatusType', 'PledgePayment',
+      'ParticipantPayment', 'ParticipantStatusType',
       'Premium', 'PaymentProcessorType', 'PaymentProcessor',
       'PrintLabel', 'Product', 'ReportTemplate',
       'Setting',);
