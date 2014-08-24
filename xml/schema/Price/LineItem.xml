@@ -114,9 +114,9 @@
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Participant count for fiel
-    <html>
-      <type>Text</type>
-    </html>d</comment>
+      <html>
+        <type>Text</type>
+      </html>d</comment>
     <add>3.2</add>
 
   </field>
