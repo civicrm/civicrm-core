@@ -277,8 +277,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'ParticipantPayment', 'ParticipantStatusType', 'PledgePayment',
       'Premium', 'PriceSet', 'PriceFieldValue', 'PriceField', 'PaymentProcessorType', 'PaymentProcessor',
       'PrintLabel', 'Product', 'ReportTemplate',
-      'Setting',
-      'SmsProvider', 'UFField');
+      'Setting',);
     if ($sequential === TRUE) {
       return $entitiesWithMetadataNotYetFixed ;
     }
