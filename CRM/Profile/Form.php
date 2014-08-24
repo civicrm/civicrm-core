@@ -176,7 +176,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_currentUserID = NULL;
   protected $_session       = NULL;
 
-  public $_stateCountryMap = array();
   /**
    * pre processing work done here.
    *
@@ -742,10 +741,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $addCaptcha = array();
     $emailPresent = FALSE;
 
-    // cache the state country fields. based on the results, we could use our javascript solution
-    // in create or register mode
-    $stateCountryMap = array();
-
     // add the form elements
     foreach ($this->_fields as $name => $field) {
       // make sure that there is enough permission to expose this field
@@ -762,12 +757,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
 
       list($prefixName, $index) = CRM_Utils_System::explode('-', $name, 2);
-      if ($prefixName == 'state_province' || $prefixName == 'country' || $prefixName == 'county') {
-        if (!array_key_exists($index, $stateCountryMap)) {
-          $stateCountryMap[$index] = array();
-        }
-        $stateCountryMap[$index][$prefixName] = $name;
-      }
 
       CRM_Core_BAO_UFGroup::buildProfile($this, $field, $this->_mode);
 
@@ -825,12 +814,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
 
-    // lets do the defaults, so we can use it for the below state country routines
-    $this->setDefaultsValues();
-
-    // also do state country js
-    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap, $this->_defaults);
-
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, NULL);
     if ($this->_mode == self::MODE_CREATE) {
       CRM_Core_BAO_CMSUser::buildForm($this, $this->_gid, $emailPresent, $action);
@@ -840,9 +823,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     $this->assign('groupId', $this->_gid);
-
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
 
     // if view mode pls freeze it with the done button.
     if ($this->_action & CRM_Core_Action::VIEW) {

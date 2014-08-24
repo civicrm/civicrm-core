@@ -77,7 +77,7 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $proxSearch
    *
    * @return void
@@ -93,14 +93,7 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
 
     $form->add('text', 'prox_postal_code', ts('Postal Code'), NULL, FALSE);
 
-    $defaults = self::setDefaultValues($form);
-    if (!empty($defaults['prox_country_id'])) {
-      $stateProvince = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvinceForCountry($defaults['prox_country_id']);
-    }
-    else {
-      $stateProvince = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvince();
-    }
-    $form->add('select', 'prox_state_province_id', ts('State/Province'), $stateProvince, $proxRequired);
+    $form->addChainSelect('prox_state_province_id', array('required' => $proxRequired));
 
     $country = array('' => ts('- select -')) + CRM_Core_PseudoConstant::country();
     $form->add('select', 'prox_country_id', ts('Country'), $country, $proxRequired);
@@ -111,14 +104,6 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
     $form->add('select', 'prox_distance_unit', ts('Units'), $proxUnits, $proxRequired);
     // prox_distance_unit
 
-    // state country js, CRM-5233
-    $stateCountryMap = array();
-    $stateCountryMap[] = array(
-      'state_province' => 'prox_state_province_id',
-      'country' => 'prox_country_id',
-    );
-    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
     $form->addFormRule(array('CRM_Contact_Form_Task_ProximityCommon', 'formRule'), $form);
   }
 

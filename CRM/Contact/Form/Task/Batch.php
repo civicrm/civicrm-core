@@ -69,12 +69,6 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   protected $_preserveDefault = TRUE;
 
   /**
-   * the internal QF names for the state/country/county fields
-   */
-
-  protected $_stateCountryCountyFields = array();
-
-  /**
    * build all the data structures needed to build the form
    *
    * @return void
@@ -146,20 +140,10 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       'household_name',
     );
 
-    $stateCountryMap = array();
-
     foreach ($this->_contactIds as $contactId) {
       $profileFields = $this->_fields;
       CRM_Core_BAO_Address::checkContactSharedAddressFields($profileFields, $contactId);
       foreach ($profileFields as $name => $field) {
-
-        // Link state to country, county to state per location per contact
-        list($prefixName, $index) = CRM_Utils_System::explode('-', $name, 2);
-        if ($prefixName == 'state_province' || $prefixName == 'country' || $prefixName == 'county') {
-          $stateCountryMap["$index-$contactId"][$prefixName] = "field_{$contactId}_{$field['name']}";
-          $this->_stateCountryCountyFields["$index-$contactId"][$prefixName] = "field[{$contactId}][{$field['name']}]";
-        }
-
         CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $contactId);
 
         if (in_array($field['name'], $preserveDefaultsArray)) {
@@ -167,10 +151,6 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
         }
       }
     }
-
-    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
-
-
 
     $this->assign('fields', $this->_fields);
 
@@ -190,7 +170,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return void
+   * @return array
    */
   function setDefaultValues() {
     if (empty($this->_fields)) {
@@ -211,9 +191,6 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     }
 
     $this->assign('sortName', $sortName);
-
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults, $this->_stateCountryCountyFields);
 
     return $defaults;
   }

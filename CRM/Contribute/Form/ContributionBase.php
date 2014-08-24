@@ -679,8 +679,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @access public
    */
   function buildCustom($id, $name, $viewOnly = FALSE, $profileContactType = NULL, $fieldTypes = NULL) {
-    $stateCountryMap = array();
-
     if ($id) {
       $contactID = $this->getContactID();
 
@@ -741,11 +739,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
           list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
           if ($prefixName == 'state_province' || $prefixName == 'country' || $prefixName == 'county') {
-            if (!array_key_exists($index, $stateCountryMap)) {
-              $stateCountryMap[$index] = array();
-            }
-            $stateCountryMap[$index][$prefixName] = $key;
-
             if ($prefixName == "state_province") {
               if ($profileContactType == 'onbehalf') {
                 //CRM-11881: Bypass required-ness check for state/province on Contribution Confirm page
@@ -805,8 +798,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
 
         $this->assign($name, $fields);
-
-        CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
 
         if ($addCaptcha && !$viewOnly) {
           $captcha = CRM_Utils_ReCAPTCHA::singleton();

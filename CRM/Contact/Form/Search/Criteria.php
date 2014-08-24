@@ -295,9 +295,9 @@ class CRM_Contact_Form_Search_Criteria {
       'street_address' => array(ts('Street Address'), $attributes['street_address'], NULL, NULL),
       'city' => array(ts('City'), $attributes['city'], NULL, NULL),
       'postal_code' => array(ts('Zip / Postal Code'), $attributes['postal_code'], NULL, NULL),
-      'county' => array(ts('County'), $attributes['county_id'], 'county', TRUE),
-      'state_province' => array(ts('State / Province'), $attributes['state_province_id'], 'stateProvince', TRUE),
       'country' => array(ts('Country'), $attributes['country_id'], 'country', FALSE),
+      'state_province' => array(ts('State / Province'), $attributes['state_province_id'], 'stateProvince', TRUE),
+      'county' => array(ts('County'), $attributes['county_id'], 'county', TRUE),
       'address_name' => array(ts('Address Name'), $attributes['address_name'], NULL, NULL),
       'street_number' => array(ts('Street Number'), $attributes['street_number'], NULL, NULL),
       'street_name' => array(ts('Street Name'), $attributes['street_name'], NULL, NULL),
@@ -306,7 +306,6 @@ class CRM_Contact_Form_Search_Criteria {
 
     $parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', $addressOptions, 0);
     $form->assign('parseStreetAddress', $parseStreetAddress);
-    $stateCountryMap = NULL;
     foreach ($elements as $name => $v) {
       list($title, $attributes, $select, $multiSelect) = $v;
 
@@ -326,33 +325,8 @@ class CRM_Contact_Form_Search_Criteria {
       }
 
       if ($select) {
-        $stateCountryMap = array(array(
-          'state_province' => 'state_province',
-          'country' => 'country',
-          'county' => 'county',
-        ));
-        if ($select == 'stateProvince') {
-          if (!empty($formValues['country'])) {
-            $selectElements = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvinceForCountry($formValues['country']);
-          }
-          else {
-            //if not setdefault any country
-            $selectElements = CRM_Core_PseudoConstant::$select();
-          }
-          $element = $form->add('select', $name, $title, $selectElements);
-        }
-        elseif ($select == 'country') {
-          $selectElements = array('' => ts('- any -')) + CRM_Core_PseudoConstant::$select();
-          $element = $form->add('select', $name, $title, $selectElements);
-        }
-        elseif ($select == 'county') {
-          if ( array_key_exists('state_province', $formValues) && !CRM_Utils_System::isNull($formValues['state_province'])) {
-            $selectElements = array('' => ts('- select -')) + CRM_Core_PseudoConstant::countyForState($formValues['state_province']);
-          }
-          else {
-            $selectElements = array('' => ts('- any -'));
-          }
-          $element = $form->add('select', $name, $title, $selectElements);
+        if ($select == 'stateProvince' || $select == 'county') {
+          $element = $form->addChainSelect($name);
         }
         else {
           $selectElements = array('' => ts('- any -')) + CRM_Core_PseudoConstant::$select();
@@ -372,8 +346,6 @@ class CRM_Contact_Form_Search_Criteria {
         $form->addElement('text', 'postal_code_high', NULL, $attr + array('placeholder' => ts('To')));
       }
     }
-
-    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
 
     // extend addresses with proximity search
     if (!empty($config->geocodeMethod)) {

@@ -166,18 +166,10 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
       $fieldTypes = array_merge($fieldTypes, array('Contribution'));
     }
 
-    $stateCountryMap = array();
     foreach ($profileFields as $name => $field) {
       if (in_array($field['field_type'], $fieldTypes)) {
         list($prefixName, $index) = CRM_Utils_System::explode('-', $name, 2);
-        if (in_array($prefixName, array(
-          'state_province', 'country', 'county'))) {
-          if (!array_key_exists($index, $stateCountryMap)) {
-            $stateCountryMap[$index] = array();
-          }
-
-          $stateCountryMap[$index][$prefixName] = 'onbehalf[' . $name . ']';
-
+        if (in_array($prefixName, array('state_province', 'country', 'county'))) {
           if (count($form->_submitValues)) {
             $locationTypeId = $field['location_type_id'];
             if (!empty($form->_submitValues['onbehalf']["country-{$locationTypeId}"]) &&
@@ -186,20 +178,12 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
             }
           }
         }
-        elseif (in_array($prefixName, array(
-          'organization_name', 'email')) && empty($field['is_required'])) {
+        elseif (in_array($prefixName, array('organization_name', 'email')) && empty($field['is_required'])) {
           $field['is_required'] = 1;
         }
 
         CRM_Core_BAO_UFGroup::buildProfile($form, $field, NULL, NULL, FALSE, TRUE);
       }
-    }
-
-    if (!empty($stateCountryMap)) {
-      CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
-
-      // now fix all state country selectors
-      CRM_Core_BAO_Address::fixAllStateSelects($form, CRM_Core_DAO::$_nullArray);
     }
 
     $form->assign('onBehalfOfFields', $profileFields);
