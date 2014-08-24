@@ -214,25 +214,64 @@ CRM.strings = CRM.strings || {};
    * Populate a select list, overwriting the existing options except for the placeholder.
    * @param $el jquery collection - 1 or more select elements
    * @param options array in format returned by api.getoptions
-   * @param removePlaceholder bool
+   * @param placeholder string
    */
-  CRM.utils.setOptions = function($el, options, removePlaceholder) {
+  CRM.utils.setOptions = function($el, options, placeholder) {
     $el.each(function() {
       var
         $elect = $(this),
         val = $elect.val() || [],
-        opts = removePlaceholder ? '' : '[value!=""]';
+        multiple = $el.is('[multiple]'),
+        opts = placeholder || placeholder === '' ? '' : '[value!=""]',
+        newOptions = '',
+        theme = function(options) {
+          _.each(options, function(option) {
+            if (option.children) {
+              newOptions += '<optgroup label="' + option.value + '">';
+              theme(option.children);
+              newOptions += '</optgroup>';
+            } else {
+              var selected = ($.inArray('' + option.key, val) > -1) ? 'selected="selected"' : '';
+              newOptions += '<option value="' + option.key + '"' + selected + '>' + option.value + '</option>';
+            }
+          });
+        };
       if (!$.isArray(val)) {
         val = [val];
       }
       $elect.find('option' + opts).remove();
-      _.each(options, function(option) {
-        var selected = ($.inArray(''+option.key, val) > -1) ? 'selected="selected"' : '';
-        $elect.append('<option value="' + option.key + '"' + selected + '>' + option.value + '</option>');
-      });
+      theme(options);
+      if (typeof placeholder === 'string') {
+        if (multiple) {
+          $el.attr('placeholder', placeholder);
+        } else {
+          newOptions = '<option value="">' + placeholder + '</option>' + newOptions;
+        }
+      }
+      $elect.append(newOptions);
       $elect.trigger('crmOptionsUpdated', $.extend({}, options)).trigger('change');
     });
   };
+
+  function chainSelect() {
+    var $form = $(this).closest('form'),
+      $target = $('select[data-name="' + $(this).data('target') + '"]', $form),
+      data = $target.data(),
+      val = $(this).val();
+    $target.prop('disabled', true);
+    if ($target.is('select.crm-chain-select-control')) {
+      $('select[data-name="' + $target.data('target') + '"]', $form).prop('disabled', true).blur();
+    }
+    if (!(val && val.length)) {
+      CRM.utils.setOptions($target.blur(), [], data.emptyPrompt);
+    } else {
+      $target.addClass('loading');
+      $.getJSON(CRM.url(data.callback), {_value: val}, function(vals) {
+        $target.prop('disabled', false).removeClass('loading');
+        CRM.utils.setOptions($target, vals || [], (vals && vals.length ? data.selectPrompt : data.nonePrompt));
+      });
+    }
+  }
 
 /**
  * Compare Form Input values against cached initial value.
@@ -489,6 +528,7 @@ CRM.strings = CRM.strings || {};
       }
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
       $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
+      $('select.crm-chain-select-control', e.target).off('.chainSelect').on('change.chainSelect', chainSelect);
       // Cache Form Input initial values
       $('form[data-warn-changes] :input', e.target).each(function() {
         $(this).data('crm-initial-value', $(this).val());

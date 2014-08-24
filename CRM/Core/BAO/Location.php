@@ -397,5 +397,53 @@ WHERE e.id = %1";
       }
     }
   }
+
+  /**
+   * @param mixed $values
+   * @param string $valueType
+   * @param bool $flatten
+   *
+   * @return array
+   */
+  static function getChainSelectValues($values, $valueType, $flatten = FALSE) {
+    if (!$values) {
+      return array();
+    }
+    $values = (array) $values;
+    $elements = array();
+    $list = &$elements;
+    $method = $valueType == 'country' ? 'stateProvinceForCountry' : 'countyForState';
+    foreach ($values as $val) {
+      $result = CRM_Core_PseudoConstant::$method($val);
+
+      // Format for quickform
+      if ($flatten) {
+        // Option-groups for multiple categories
+        if ($result && count($values) > 1) {
+          $elements["crm_optgroup_$val"] = CRM_Core_PseudoConstant::$valueType($val, FALSE);
+        }
+        $elements += $result;
+      }
+
+      // Format for js
+      else {
+       // Option-groups for multiple categories
+        if ($result && count($values) > 1) {
+          $elements[] = array(
+            'value' => CRM_Core_PseudoConstant::$valueType($val, FALSE),
+            'children' => array(),
+          );
+          $list = & $elements[count($elements) - 1]['children'];
+        }
+        foreach ($result as $id => $name) {
+          $list[] = array(
+            'value' => $name,
+            'key' => $id,
+          );
+        }
+      }
+    }
+    return $elements;
+  }
 }
 
