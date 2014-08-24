@@ -8,6 +8,7 @@
   <add>4.4</add>
   <field>
     <name>id</name>
+    <title>Print Label ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <add>4.4</add>
