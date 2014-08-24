@@ -8,6 +8,7 @@
   <add>3.1</add>
   <field>
     <name>id</name>
+    <title>Contact Type ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Contact Type ID</comment>
@@ -32,6 +33,7 @@
   </index>
   <field>
     <name>label</name>
+    <title>Contact Type Label</title>
     <type>varchar</type>
     <length>64</length>
     <comment>localized Name of Contact Type.</comment>
@@ -40,6 +42,7 @@
   </field>
   <field>
     <name>description</name>
+    <title>Contact Type Description</title>
     <type>text</type>
     <html>
       <type>TextArea</type>
@@ -52,6 +55,7 @@
   </field>
   <field>
     <name>image_URL</name>
+    <title>Contact Type Image URL</title>
     <type>varchar</type>
     <length>255</length>
     <comment>URL of image if any.</comment>
@@ -59,6 +63,7 @@
   </field>
   <field>
     <name>parent_id</name>
+    <title>Contact Type Parent</title>
     <type>int unsigned</type>
     <comment>Optional FK to parent contact type.</comment>
     <add>3.1</add>
@@ -71,12 +76,14 @@
   </foreignKey>
   <field>
     <name>is_active</name>
+    <title>Contact Type Is Active?</title>
     <type>boolean</type>
     <comment>Is this entry active?</comment>
     <add>3.1</add>
   </field>
   <field>
     <name>is_reserved</name>
+    <title>Contact Type is Reserved?</title>
     <type>boolean</type>
     <comment>Is this contact type a predefined system type</comment>
     <add>3.1</add>

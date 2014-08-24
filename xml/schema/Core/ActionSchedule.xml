@@ -8,6 +8,7 @@
   <add>3.4</add>
   <field>
     <name>id</name>
+    <title>Action Schedule ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <add>3.4</add>
