@@ -106,13 +106,9 @@ class CRM_Core_Payment_Form {
     );
 
     $form->_paymentFields["billing_state_province_id-{$bltID}"] = array(
-      'htmlType' => 'select',
+      'htmlType' => 'chainSelect',
       'name' => "billing_state_province_id-{$bltID}",
-      'title' => ts('State / Province'),
       'cc_field' => TRUE,
-      'attributes' => array(
-        '' => ts('- select -')) +
-      CRM_Core_PseudoConstant::stateProvince(),
       'is_required' => self::checkRequiredStateProvince($form, "billing_country_id-{$bltID}"),
     );
 
@@ -253,15 +249,18 @@ class CRM_Core_Payment_Form {
     if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM) {
       self::setCreditCardFields($form);
       foreach ($form->_paymentFields as $name => $field) {
-        if (isset($field['cc_field']) &&
-          $field['cc_field']
-        ) {
-          $form->add($field['htmlType'],
-            $field['name'],
-            $field['title'],
-            $field['attributes'],
-            $useRequired ? $field['is_required'] : FALSE
-          );
+        if (!empty($field['cc_field'])) {
+          if ($field['htmlType'] == 'chainSelect') {
+            $form->addChainSelect($field['name'], array('required' => $useRequired && $field['is_required']));
+          }
+          else {
+            $form->add($field['htmlType'],
+              $field['name'],
+              $field['title'],
+              $field['attributes'],
+              $useRequired ? $field['is_required'] : FALSE
+            );
+          }
         }
       }
 
@@ -275,12 +274,6 @@ class CRM_Core_Payment_Form {
         'currentDate', TRUE
       );
 
-      // also take care of state country widget
-      $stateCountryMap = array(
-        1 => array('country' => "billing_country_id-{$form->_bltID}",
-          'state_province' => "billing_state_province_id-{$form->_bltID}",
-        ));
-      CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
     }
 
     if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON) {

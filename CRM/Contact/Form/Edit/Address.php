@@ -113,9 +113,9 @@ class CRM_Contact_Form_Edit_Address {
       'city' => array(ts('City'), $attributes['city'], NULL),
       'postal_code' => array(ts('Zip / Postal Code'), array_merge($attributes['postal_code'], array('class' => 'crm_postal_code')), NULL),
       'postal_code_suffix' => array(ts('Postal Code Suffix'), array('size' => 4, 'maxlength' => 12, 'class' => 'crm_postal_code_suffix'), NULL),
-      'county_id' => array(ts('County'), $attributes['county_id'], NULL),
+      'country_id' => array(ts('Country'), $attributes['country_id'], 'country'),
       'state_province_id' => array(ts('State / Province'), $attributes['state_province_id'], NULL),
-      'country_id' => array(ts('Country'), $attributes['country_id'], NULL),
+      'county_id' => array(ts('County'), $attributes['county_id'], NULL),
       'geo_code_1' => array(ts('Latitude'), array('size' => 9, 'maxlength' => 11), NULL),
       'geo_code_2' => array(ts('Longitude'), array('size' => 9, 'maxlength' => 11), NULL),
       'street_number' => array(ts('Street Number'), $attributes['street_number'], NULL),
@@ -123,7 +123,6 @@ class CRM_Contact_Form_Edit_Address {
       'street_unit' => array(ts('Apt/Unit/Suite'), $attributes['street_unit'], NULL),
     );
 
-    $stateCountryMap = array();
     foreach ($elements as $name => $v) {
       list($title, $attributes, $select) = $v;
 
@@ -139,47 +138,14 @@ class CRM_Contact_Form_Edit_Address {
         }
       }
 
-      if (!$attributes) {
-        $attributes = $attributes[$name];
-      }
-
       //build normal select if country is not present in address block
       if ($name == 'state_province_id' && !$addressOptions['country']) {
         $select = 'stateProvince';
       }
 
       if (!$select) {
-        if ($name == 'country_id' || $name == 'state_province_id' || $name == 'county_id') {
-          if ($name == 'country_id') {
-            $stateCountryMap[$blockId]['country'] = "address_{$blockId}_{$name}";
-            $selectOptions = array('' => ts('- select -')) + CRM_Core_PseudoConstant::country();
-          }
-          elseif ($name == 'state_province_id') {
-            $stateCountryMap[$blockId]['state_province'] = "address_{$blockId}_{$name}";
-            if ($countryDefault) {
-              $selectOptions = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvinceForCountry($countryDefault);
-            }
-            else {
-              $selectOptions = array('' => ts('- select a country -'));
-            }
-          }
-          elseif ($name == 'county_id') {
-            $stateCountryMap[$blockId]['county'] = "address_{$blockId}_{$name}";
-            if ($form->getSubmitValue("address[{$blockId}][state_province_id]")) {
-              $selectOptions = array('' => ts('- select -')) + CRM_Core_PseudoConstant::countyForState($form->getSubmitValue("address[{$blockId}][state_province_id]"));
-            }
-            elseif ($form->getSubmitValue("address[{$blockId}][county_id]")) {
-              $selectOptions = array('' => ts('- select -')) + CRM_Core_PseudoConstant::county();
-            }
-            else {
-              $selectOptions = array('' => ts('- select a state -'));
-            }
-          }
-          $form->addElement('select',
-            "address[$blockId][$name]",
-            $title,
-            $selectOptions
-          );
+        if ($name == 'state_province_id' || $name == 'county_id') {
+          $form->addChainSelect("address[$blockId][$name]");
         }
         else {
           if ($name == 'address_name') {
@@ -194,9 +160,6 @@ class CRM_Contact_Form_Edit_Address {
         }
       }
       else {
-        if ($name == 'state_province_id') {
-          $stateCountryMap[$blockId]['state_province'] = "address_{$blockId}_{$name}";
-        }
         $form->addElement('select',
           "address[$blockId][$name]",
           $title,
@@ -204,8 +167,6 @@ class CRM_Contact_Form_Edit_Address {
         );
       }
     }
-
-    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
 
     $entityId = NULL;
     if (!empty($form->_values['address']) && !empty($form->_values['address'][$blockId])) {
@@ -395,89 +356,6 @@ class CRM_Contact_Form_Edit_Address {
     }
 
     return empty($errors) ? TRUE : $errors;
-  }
-
-  /**
-   * @param $form
-   * @param $countryElementName
-   * @param $stateElementName
-   * @param $countyElementName
-   * @param $countryDefaultValue
-   * @param null $stateDefaultValue
-   */
-  static function fixStateSelect(&$form,
-    $countryElementName,
-    $stateElementName,
-    $countyElementName,
-    $countryDefaultValue,
-    $stateDefaultValue = NULL
-  ) {
-    $countryID = $stateID = NULL;
-    if (isset($form->_elementIndex[$countryElementName])) {
-      //get the country id to load states -
-      //first check for submitted value,
-      //then check for user passed value.
-      //finally check for element default val.
-      $submittedVal = $form->getSubmitValue($countryElementName);
-      if ($submittedVal) {
-        $countryID = $submittedVal;
-      }
-      elseif ($countryDefaultValue) {
-        $countryID = $countryDefaultValue;
-      }
-      else {
-        $countryID = CRM_Utils_Array::value(0, $form->getElementValue($countryElementName));
-      }
-    }
-    $stateTitle = ts('State/Province');
-    if (isset($form->_fields[$stateElementName]['title'])) {
-      $stateTitle = $form->_fields[$stateElementName]['title'];
-    }
-
-    if (isset($form->_elementIndex[$stateElementName])) {
-      $submittedValState = $form->getSubmitValue($stateElementName);
-      if ($submittedValState) {
-        $stateID = $submittedValState;
-      }
-      elseif ($stateDefaultValue) {
-        $stateID = $stateDefaultValue;
-      }
-      else {
-        $stateID = CRM_Utils_Array::value(0, $form->getElementValue($stateElementName));
-      }
-    }
-
-    if (isset($form->_elementIndex[$stateElementName])) {
-      if ($countryID) {
-        $stateProvinces = CRM_Core_PseudoConstant::stateProvinceForCountry($countryID);
-      }
-      else {
-        $stateProvinces = CRM_Core_PseudoConstant::stateProvince();
-      }
-
-      $stateSelect = & $form->addElement('select', $stateElementName, $stateTitle,
-        array('' => ts('- select -')) + $stateProvinces);
-    }
-
-    if (isset($form->_elementIndex[$stateElementName]) && isset($form->_elementIndex[$countyElementName])) {
-      if ($stateID) {
-        $counties = CRM_Core_PseudoConstant::countyForState($stateID);
-      }
-      else {
-        $counties = CRM_Core_PseudoConstant::county();
-      }
-
-      $form->addElement('select', $countyElementName, ts('County'), array('' => ts('- select -')) + $counties);
-    }
-
-    // CRM-7296 freeze the select for state if address is shared with household
-    // CRM-9070 freeze the select for state if it is view only
-    if (isset($form->_fields) && !empty($form->_fields[$stateElementName]) &&
-      (!empty($form->_fields[$stateElementName]['is_shared']) || !empty($form->_fields[$stateElementName]['is_view'])) &&
-      !empty($stateSelect)
-    ) {
-      $stateSelect->freeze();
-    }
   }
 
   /**
