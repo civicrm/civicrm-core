@@ -275,7 +275,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MembershipBlock', 'MembershipPayment', 'MessageTemplate',
       'MembershipType', 'OptionGroup', 'OptionValue', 'MembershipStatus',
       'ParticipantPayment', 'ParticipantStatusType', 'PledgePayment',
-      'Premium', 'PriceSet', 'PriceFieldValue', 'PriceField', 'PaymentProcessorType', 'PaymentProcessor',
+      'Premium', 'PaymentProcessorType', 'PaymentProcessor',
       'PrintLabel', 'Product', 'ReportTemplate',
       'Setting',);
     if ($sequential === TRUE) {
