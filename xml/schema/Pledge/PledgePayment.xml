@@ -22,6 +22,7 @@
   </primaryKey>
   <field>
     <name>pledge_id</name>
+    <title>Pledge</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to Pledge table</comment>
@@ -36,6 +37,7 @@
   </foreignKey>
   <field>
     <name>contribution_id</name>
+    <title>Contribution</title>
     <type>int unsigned</type>
     <comment>FK to contribution table.</comment>
     <add>2.1</add>
@@ -74,6 +76,7 @@
   </field>
   <field>
     <name>currency</name>
+    <title>Currency</title>
     <type>varchar</type>
     <length>3</length>
     <default>NULL</default>
