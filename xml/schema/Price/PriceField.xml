@@ -8,6 +8,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Price Field ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Price Field</comment>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>price_set_id</name>
+    <title>Price Set</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_price_set</comment>
@@ -75,6 +77,7 @@
   </field>
   <field>
     <name>is_enter_qty</name>
+    <title>Price Field Quantity Required?</title>
     <type>boolean</type>
     <default>0</default>
     <comment>Enter a quantity for this field?</comment>
@@ -85,6 +88,7 @@
   </field>
   <field>
     <name>help_pre</name>
+    <title>Price Field Pre Text</title>
     <type>text</type>
     <localizable>true</localizable>
     <comment>Description and/or help text to display before this field.</comment>
@@ -97,6 +101,7 @@
   </field>
   <field>
     <name>help_post</name>
+    <title>Price Field Post Test</title>
     <type>text</type>
     <localizable>true</localizable>
     <comment>Description and/or help text to display after this field.</comment>
@@ -109,6 +114,7 @@
   </field>
   <field>
     <name>weight</name>
+    <title>Price Field Weight</title>
     <type>int</type>
     <default>1</default>
     <comment>Order in which the fields should appear</comment>
@@ -119,6 +125,7 @@
   </field>
   <field>
     <name>is_display_amounts</name>
+    <title>Price Field Show Amounts?</title>
     <type>boolean</type>
     <default>1</default>
     <comment>Should the price be displayed next to the label for each option?</comment>
@@ -128,6 +135,7 @@
   </field>
   <field>
     <name>options_per_line</name>
+    <title>Price Field Options per Row</title>
     <type>int unsigned</type>
     <default>1</default>
     <comment>number of options per line for checkbox and radio</comment>
@@ -138,6 +146,7 @@
   </field>
   <field>
     <name>is_active</name>
+    <title>Price Field Is Active?</title>
     <type>boolean</type>
     <comment>Is this price field active</comment>
     <default>1</default>
@@ -148,6 +157,7 @@
   </field>
   <field>
     <name>is_required</name>
+    <title>Price Field is Required?</title>
     <type>boolean</type>
     <comment>Is this price field required (value must be > 1)</comment>
     <default>1</default>
@@ -158,6 +168,7 @@
   </field>
   <field>
     <name>active_on</name>
+    <title>Price Field Start Date</title>
     <type>datetime</type>
     <default>NULL</default>
     <comment>If non-zero, do not show this field before the date specified</comment>
@@ -168,6 +179,7 @@
   </field>
   <field>
     <name>expire_on</name>
+    <title>Price Field End Date</title>
     <type>datetime</type>
     <default>NULL</default>
     <comment>If non-zero, do not show this field after the date specified</comment>
@@ -178,6 +190,7 @@
   </field>
   <field>
     <name>javascript</name>
+    <title>Price Field Javascript</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Optional scripting attributes for field</comment>
@@ -188,6 +201,7 @@
   </field>
   <field>
     <name>visibility_id</name>
+    <title>Price Field Visibility</title>
     <type>int unsigned</type>
     <default>1</default>
     <comment>Implicit FK to civicrm_option_group with name = \'visibility\'</comment>
