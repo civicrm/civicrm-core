@@ -135,6 +135,7 @@ function _civicrm_api3_constant_get_spec(&$params) {
 
   $params = (array
     ('name' => array(
+      'title' => 'Constant Name',
       'api.required' => 1,
         'options' =>
           'activityStatus',

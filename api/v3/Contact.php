@@ -877,8 +877,11 @@ function civicrm_api3_contact_merge($params) {
  */
 function _civicrm_api3_contact_proximity_spec(&$params) {
   $params['latitude']['api.required'] = 1;
+  $params['latitude']['title'] = 'Latitude';
   $params['longitude']['api.required'] = 1;
+  $params['longitude']['title'] = 'Longitude';
   $params['unit']['api.default'] = 'meter';
+  $params['unit']['title'] = 'Unit of Measurement';
 }
 
 /**
