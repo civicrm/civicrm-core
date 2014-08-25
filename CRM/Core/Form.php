@@ -146,6 +146,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   CONST CB_PREFIX = 'mark_x_', CB_PREFIY = 'mark_y_', CB_PREFIZ = 'mark_z_', CB_PREFIX_LEN = 7;
 
   /**
+   * @internal to keep track of chain-select fields
+   * @var array
+   */
+  private $_chainSelectFields = array();
+
+  /**
    * Constructor for the basic form page
    *
    * We should not use QuickForm directly. This class provides a lot
@@ -255,8 +261,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $attributes = '', $required = FALSE, $extra = NULL
   ) {
     // Normalize this property
-    if ($type == 'select' && is_array($extra) && !empty($extra['multiple'])) {
-      $extra['multiple'] = 'multiple';
+    if ($type == 'select' && is_array($extra)) {
+      if (!empty($extra['multiple'])) {
+        $extra['multiple'] = 'multiple';
+      }
+      else {
+        unset($extra['multiple']);
+      }
     }
     $element = $this->addElement($type, $name, $label, $attributes, $extra);
     if (HTML_QuickForm::isError($element)) {
@@ -382,6 +393,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   function validate() {
     $error = parent::validate();
+
+    $this->validateChainSelectFields();
 
     $hookErrors = CRM_Utils_Hook::validate(
       get_class($this),
@@ -645,6 +658,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @access public
    */
   function toSmarty() {
+    $this->preProcessChainSelectFields();
     $renderer = $this->getRenderer();
     $this->accept($renderer);
     $content = $renderer->toArray();
@@ -1708,6 +1722,93 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case CRM_Core_Action::DELETE:
         CRM_Utils_System::setTitle(ts('Delete %1', array(1 => $entityLabel)));
         break;
+    }
+  }
+
+  /**
+   * Create a chain-select target field. All settings are optional; the defaults usually work.
+   *
+   * @param string $elementName
+   * @param array $settings
+   *
+   * @return HTML_QuickForm_Element
+   */
+  public function addChainSelect($elementName, $settings = array()) {
+    $props = $settings += array(
+      'control_field' => str_replace(array('state_province', 'StateProvince', 'county', 'County'), array('country', 'Country', 'state_province', 'StateProvince'), $elementName),
+      'data-callback' => strpos($elementName, 'rovince') ? 'civicrm/ajax/jqState' : 'civicrm/ajax/jqCounty',
+      'label' => strpos($elementName, 'rovince') ? ts('State / Province') : ts('County'),
+      'data-empty-prompt' => strpos($elementName, 'rovince') ? ts('Choose country first') : ts('Choose state first'),
+      'data-none-prompt' => ts('- N/A -'),
+      'multiple' => FALSE,
+      'required' => FALSE,
+      'placeholder' => empty($settings['required']) ? ts('- none -') : ts('- select -'),
+    );
+    CRM_Utils_Array::remove($props, 'label', 'required', 'control_field');
+    $props['class'] = (empty($props['class']) ? '' : "{$props['class']} ") . 'crm-chain-select-target crm-select2';
+    $props['data-select-prompt'] = $props['placeholder'];
+    $props['data-name'] = $elementName;
+
+    $this->_chainSelectFields[$settings['control_field']] = $elementName;
+
+    return $this->add('select', $elementName, $settings['label'], array(), $settings['required'], $props);
+  }
+
+  /**
+   * Set options and attributes for chain select fields based on the controlling field's value
+   */
+  private function preProcessChainSelectFields() {
+    foreach ($this->_chainSelectFields as $control => $target) {
+      $controlField = $this->getElement($control);
+      $targetField = $this->getElement($target);
+      $controlType = $targetField->getAttribute('data-callback') == 'civicrm/ajax/jqCounty' ? 'stateProvince' : 'country';
+
+      $css = (string) $controlField->getAttribute('class');
+      $controlField->updateAttributes(array(
+        'class' => ($css ? "$css " : 'crm-select2 ') . 'crm-chain-select-control',
+        'data-target' => $target,
+      ));
+      $controlValue = $controlField->getValue();
+      $options = array();
+      if ($controlValue) {
+        $options = CRM_Core_BAO_Location::getChainSelectValues($controlValue, $controlType, TRUE);
+        if (!$options) {
+          $targetField->setAttribute('placeholder', $targetField->getAttribute('data-none-prompt'));
+        }
+      }
+      else {
+        $targetField->setAttribute('placeholder', $targetField->getAttribute('data-empty-prompt'));
+        $targetField->setAttribute('disabled', 'disabled');
+      }
+      if (!$targetField->getAttribute('multiple')) {
+        $options = array('' => $targetField->getAttribute('placeholder')) + $options;
+        $targetField->removeAttribute('placeholder');
+      }
+      $targetField->loadArray($options);
+    }
+  }
+
+  /**
+   * Validate country / state / county match and suppress unwanted "required" errors
+   */
+  private function validateChainSelectFields() {
+    foreach ($this->_chainSelectFields as $control => $target) {
+      $controlValue = (array) $this->getElementValue($control);
+      $targetField = $this->getElement($target);
+      $controlType = $targetField->getAttribute('data-callback') == 'civicrm/ajax/jqCounty' ? 'stateProvince' : 'country';
+      $targetValue = array_filter((array) $targetField->getValue());
+      if ($targetValue || $this->getElementError($target)) {
+        $options = CRM_Core_BAO_Location::getChainSelectValues($controlValue, $controlType, TRUE);
+        if ($targetValue) {
+          if (!array_intersect($targetValue, array_keys($options))) {
+            $this->setElementError($target, $controlType == 'country' ? ts('State/Province does not match the selected Country') : ts('County does not match the selected State/Province'));
+          }
+        }
+        // Suppress "required" error for field if it has no options
+        elseif (!$options) {
+          $this->setElementError($target, NULL);
+        }
+      }
     }
   }
 }

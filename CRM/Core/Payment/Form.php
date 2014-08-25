@@ -106,14 +106,11 @@ class CRM_Core_Payment_Form {
     );
 
     $form->_paymentFields["billing_state_province_id-{$bltID}"] = array(
-      'htmlType' => 'select',
-      'name' => "billing_state_province_id-{$bltID}",
+      'htmlType' => 'chainSelect',
       'title' => ts('State / Province'),
+      'name' => "billing_state_province_id-{$bltID}",
       'cc_field' => TRUE,
-      'attributes' => array(
-        '' => ts('- select -')) +
-      CRM_Core_PseudoConstant::stateProvince(),
-      'is_required' => self::checkRequiredStateProvince($form, "billing_country_id-{$bltID}"),
+      'is_required' => TRUE,
     );
 
     $form->_paymentFields["billing_postal_code-{$bltID}"] = array(
@@ -253,15 +250,18 @@ class CRM_Core_Payment_Form {
     if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM) {
       self::setCreditCardFields($form);
       foreach ($form->_paymentFields as $name => $field) {
-        if (isset($field['cc_field']) &&
-          $field['cc_field']
-        ) {
-          $form->add($field['htmlType'],
-            $field['name'],
-            $field['title'],
-            $field['attributes'],
-            $useRequired ? $field['is_required'] : FALSE
-          );
+        if (!empty($field['cc_field'])) {
+          if ($field['htmlType'] == 'chainSelect') {
+            $form->addChainSelect($field['name'], array('required' => $useRequired && $field['is_required']));
+          }
+          else {
+            $form->add($field['htmlType'],
+              $field['name'],
+              $field['title'],
+              $field['attributes'],
+              $useRequired ? $field['is_required'] : FALSE
+            );
+          }
         }
       }
 
@@ -275,12 +275,6 @@ class CRM_Core_Payment_Form {
         'currentDate', TRUE
       );
 
-      // also take care of state country widget
-      $stateCountryMap = array(
-        1 => array('country' => "billing_country_id-{$form->_bltID}",
-          'state_province' => "billing_state_province_id-{$form->_bltID}",
-        ));
-      CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
     }
 
     if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON) {
@@ -453,48 +447,5 @@ class CRM_Core_Payment_Form {
     return CRM_Utils_Array::value('Y', $src['credit_card_exp_date']);
   }
 
-  /**
-   * function to return state/province is_required = true/false
-   *
-   * @param obj     $form: Form object
-   * @param string  $name: Country index name on $_submitValues array
-   * @param bool    $onBehalf: Is 'On Behalf Of' profile?
-   *
-   * @return bool
-   *   TRUE/FALSE for is_required if country consist/not consist of state/province respectively
-   * @static
-   */
-  static function checkRequiredStateProvince($form, $name, $onBehalf = FALSE) {
-    // If selected country has possible values for state/province mark the
-    // state/province field as required.
-    $config = CRM_Core_Config::singleton();
-    $stateProvince = new CRM_Core_DAO_StateProvince();
-
-    if ($onBehalf) {
-      $stateProvince->country_id = CRM_Utils_Array::value($name, $form->_submitValues['onbehalf']);
-    }
-    else {
-      $stateProvince->country_id = CRM_Utils_Array::value($name, $form->_submitValues);
-    }
-
-    $limitCountryId = $stateProvince->country_id;
-
-    if ($stateProvince->count() > 0) {
-      // check that the state/province data is not excluded by a
-      // limitation in the localisation settings.
-      $countryIsoCodes = CRM_Core_PseudoConstant::countryIsoCode();
-      $limitCodes      = $config->provinceLimit();
-      $limitIds        = array();
-      foreach ($limitCodes as $code) {
-        $limitIds = array_merge($limitIds, array_keys($countryIsoCodes, $code));
-      }
-
-      if ($limitCountryId && in_array($limitCountryId, $limitIds)) {
-        return TRUE;
-      }
-      return FALSE;
-    }
-    return FALSE;
-  }
 }
 
