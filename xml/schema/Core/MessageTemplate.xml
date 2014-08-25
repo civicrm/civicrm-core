@@ -8,6 +8,7 @@
   <add>1.6</add>
   <field>
     <name>id</name>
+    <title>Message Template ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Message Template ID</comment>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>msg_title</name>
+    <title>Message Template Title</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Descriptive title of message</comment>
@@ -26,6 +28,7 @@
   </field>
   <field>
     <name>msg_subject</name>
+    <title>Message Template Subject</title>
     <type>text</type>
     <comment>Subject for email message.</comment>
     <add>1.6</add>
@@ -33,6 +36,7 @@
   </field>
   <field>
     <name>msg_text</name>
+    <title>Message Template Text</title>
     <type>longtext</type>
     <html>
       <type>TextArea</type>
@@ -45,6 +49,7 @@
   </field>
   <field>
     <name>msg_html</name>
+    <title>Message Template HTML</title>
     <type>longtext</type>
     <html>
       <type>RichTextEditor</type>
@@ -64,12 +69,14 @@
   </field>
   <field>
     <name>workflow_id</name>
+    <title>Message Template Workflow</title>
     <type>int unsigned</type>
     <comment>a pseudo-FK to civicrm_option_value</comment>
     <add>3.1</add>
   </field>
   <field>
     <name>is_default</name>
+    <title>Message Template Is Default?</title>
     <type>boolean</type>
     <default>1</default>
     <comment>is this the default message template for the workflow referenced by workflow_id?</comment>
@@ -77,12 +84,14 @@
   </field>
   <field>
     <name>is_reserved</name>
+    <title>Message Template Is Reserved?</title>
     <type>boolean</type>
     <comment>is this the reserved message template which we ship for the workflow referenced by workflow_id?</comment>
     <add>3.1</add>
   </field>
   <field>
     <name>pdf_format_id</name>
+    <title>Message Template Format</title>
     <type>int unsigned</type>
     <comment>a pseudo-FK to civicrm_option_value containing PDF Page Format.</comment>
     <pseudoconstant>

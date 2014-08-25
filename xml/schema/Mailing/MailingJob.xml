@@ -8,6 +8,7 @@
   <archive>true</archive>
   <field>
     <name>id</name>
+    <title>Mailing JOb ID</title>
     <type>int unsigned</type>
     <required>true</required>
   </field>
@@ -17,6 +18,7 @@
   </primaryKey>
   <field>
     <name>mailing_id</name>
+    <title>Mailing</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>The ID of the mailing this Job will send.</comment>
@@ -29,21 +31,25 @@
   </foreignKey>
   <field>
     <name>scheduled_date</name>
+    <title>Mailing Scheduled Date</title>
     <type>datetime</type>
     <comment>date on which this job was scheduled.</comment>
   </field>
   <field>
     <name>start_date</name>
+    <title>Mailing Job Start Date</title>
     <type>datetime</type>
     <comment>date on which this job was started.</comment>
   </field>
   <field>
     <name>end_date</name>
+    <title>Mailing Job End Date</title>
     <type>datetime</type>
     <comment>date on which this job ended.</comment>
   </field>
   <field>
     <name>status</name>
+    <title>Mailing Job Status</title>
     <type>varchar</type>
     <length>12</length>
     <comment>The state of this job</comment>
@@ -56,6 +62,7 @@
   </field>
   <field>
     <name>is_test</name>
+    <title>Mailing Job Is Test?</title>
     <type>boolean</type>
     <default>0</default>
     <comment>Is this job for a test mail?</comment>
@@ -63,6 +70,7 @@
   </field>
   <field>
     <name>job_type</name>
+    <title>Mailing Job Type</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Type of mailling job: null | child </comment>
@@ -70,6 +78,7 @@
   </field>
   <field>
     <name>parent_id</name>
+    <title>Mailing Job Parent</title>
     <type>int unsigned</type>
     <comment>Parent job id</comment>
     <default>NULL</default>
@@ -83,6 +92,7 @@
   </foreignKey>
   <field>
     <name>job_offset</name>
+    <title>Mailing Job Offset</title>
     <type>int</type>
     <comment>Offset of the child job</comment>
     <default>0</default>
@@ -90,6 +100,7 @@
   </field>
   <field>
     <name>job_limit</name>
+    <title>Mailing Job Limit</title>
     <type>int</type>
     <comment>Queue size limit for each child job</comment>
     <default>0</default>
