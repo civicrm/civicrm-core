@@ -124,9 +124,13 @@ function civicrm_api3_mailing_event_bounce($params) {
  */
 function _civicrm_api3_mailing_event_bounce_spec(&$params) {
   $params['job_id']['api.required'] = 1;
+  $params['job_id']['title'] = 'Job ID';
   $params['event_queue_id']['api.required'] = 1;
+  $params['event_queue_id']['title'] = 'Event Queue ID';
   $params['hash']['api.required'] = 1;
+  $params['hash']['title'] = 'Hash';
   $params['body']['api.required'] = 1;
+  $params['body']['title'] = 'Body';
 }
 
 /**
@@ -176,9 +180,13 @@ function civicrm_api3_mailing_event_reply($params) {
  */
 function _civicrm_api3_mailing_event_reply_spec(&$params) {
   $params['job_id']['api.required'] = 1;
+  $params['job_id']['title'] = 'Job ID';
   $params['event_queue_id']['api.required'] = 1;
+  $params['event_queue_id']['title'] = 'Event Queue ID';
   $params['hash']['api.required'] = 1;
+  $params['hash']['title'] = 'Hash';
   $params['replyTo']['api.required'] = 0;
+  $params['replyTo']['title'] = 'Reply To';//doesn't really explain adequately
 }
 
 /**
@@ -213,9 +221,13 @@ function civicrm_api3_mailing_event_forward($params) {
  */
 function _civicrm_api3_mailing_event_forward_spec(&$params) {
   $params['job_id']['api.required'] = 1;
+  $params['job_id']['title'] = 'Job ID';
   $params['event_queue_id']['api.required'] = 1;
+  $params['event_queue_id']['title'] = 'Event Queue ID';
   $params['hash']['api.required'] = 1;
+  $params['hash']['title'] = 'Hash';
   $params['email']['api.required'] = 1;
+  $params['email']['title'] = 'Forwarded to Email';
 }
 
 /**
