@@ -311,6 +311,7 @@
   <field>
     <name>is_archived</name>
     <type>boolean</type>
+    <title>Is Mailing Archived?</title>
     <default>0</default>
     <comment>Is this mailing archived?</comment>
     <html>
@@ -321,6 +322,7 @@
   <field>
     <name>visibility</name>
     <type>varchar</type>
+    <title>Mailing Visibility</title>
     <length>40</length>
     <default>'Public Pages'</default>
     <comment>In what context(s) is the mailing contents visible (online viewing)</comment>
@@ -335,6 +337,7 @@
   <field>
     <name>campaign_id</name>
     <type>int unsigned</type>
+    <title>Mailing Campaign</title>
     <comment>The campaign for which this mailing has been initiated.</comment>
     <pseudoconstant>
       <table>civicrm_campaign</table>
@@ -355,6 +358,7 @@
   <field>
     <name>dedupe_email</name>
     <type>boolean</type>
+    <title>No Duplicate emails?</title>
     <default>0</default>
     <add>4.1</add>
     <comment>Remove duplicate emails?</comment>
