@@ -44,6 +44,7 @@ function civicrm_api3_setting_getfields($params) {
         'type' => CRM_Utils_Type::T_STRING),
       'group' => array('title' => 'name of setting field',
         'api.required' => 0,
+        'title' => 'Setting Group',
         'description' => 'Settings Group. This is required if the setting is not stored in config',
         'type' => CRM_Utils_Type::T_STRING)
       );

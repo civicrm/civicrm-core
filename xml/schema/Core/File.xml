@@ -12,6 +12,7 @@
   <field>
     <name>id</name>
     <type>int unsigned</type>
+    <title>File ID</title>
     <required>true</required>
     <comment>Unique ID</comment>
     <add>1.5</add>
@@ -23,12 +24,14 @@
   <field>
     <name>file_type_id</name>
     <type>int unsigned</type>
+    <title>File Type</title>
     <comment>Type of file (e.g. Transcript, Income Tax Return, etc). FK to civicrm_option_value.</comment>
     <add>1.5</add>
   </field>
   <field>
     <name>mime_type</name>
     <type>varchar</type>
+    <title>Mime Type</title>
     <length>255</length>
     <comment>mime type of the document</comment>
     <add>1.5</add>
@@ -36,6 +39,7 @@
   <field>
     <name>uri</name>
     <type>varchar</type>
+    <title>Path</title>
     <length>255</length>
     <comment>uri of the file on disk</comment>
     <add>1.5</add>
@@ -43,12 +47,14 @@
   <field>
     <name>document</name>
     <type>mediumblob</type>
+    <title>File Contents</title>
     <comment>contents of the document</comment>
     <add>1.5</add>
   </field>
   <field>
     <name>description</name>
     <type>varchar</type>
+    <title>File Description</title>
     <length>255</length>
     <comment>Additional descriptive text regarding this attachment (optional).</comment>
     <add>1.5</add>
@@ -56,6 +62,7 @@
   <field>
     <name>upload_date</name>
     <type>datetime</type>
+    <title>File Upload Date</title>
     <comment>Date and time that this attachment was uploaded or written to server.</comment>
     <add>1.5</add>
   </field>
