@@ -501,11 +501,12 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     $this->customDataFrom();
     $this->groupBy();
 
+    $sql = NULL;
     $rows = array();
 
     // build array of result based on column headers. This method also allows
     // modifying column headers before using it to build result set i.e $rows.
-    $this->buildRows($rows);
+    $this->buildRows($sql, $rows);
 
     // format result set.
     $this->formatDisplay($rows, FALSE);
@@ -529,7 +530,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function buildRows(&$rows) {
+  function buildRows($sql, &$rows) {
     $contactIds = array();
 
     $addWhere = '';

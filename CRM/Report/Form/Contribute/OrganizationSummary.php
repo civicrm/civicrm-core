@@ -351,7 +351,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     //hack filter display for relationship type
     $type = substr($this->_params['relationship_type_id_value'], -3);
     foreach ($statistics['filters'] as $id => $value) {
-      if ($value['title'] == 'Relationship Type') {
+      if ($value['title'] == 'Relationship Type' && !empty($id)) {
         $statistics['filters'][$id]['value'] = 'Is equal to ' . $this->relationTypes[$this->relationshipId . '_' . $type];
       }
     }
@@ -387,7 +387,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     $this->relationTypes = $relationTypes = array();
 
     $params = array('contact_type_b' => 'Organization', 'version' => 3);
-    $typesA = &civicrm_api('relationship_type', 'get', $params);
+    $typesA = civicrm_api('relationship_type', 'get', $params);
 
     if (empty($typesA['is_error'])) {
       foreach ($typesA['values'] as $rel) {
@@ -396,7 +396,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     }
 
     $params = array('contact_type_a' => 'Organization', 'version' => 3);
-    $typesB = &civicrm_api('relationship_type', 'get', $params);
+    $typesB = civicrm_api('relationship_type', 'get', $params);
 
     if (empty($typesB['is_error'])) {
       foreach ($typesB['values'] as $rel) {
