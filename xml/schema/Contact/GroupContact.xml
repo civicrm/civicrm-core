@@ -4,9 +4,7 @@
   <base>CRM/Contact</base>
   <class>GroupContact</class>
   <name>civicrm_group_contact</name>
-  <comment>Join table sets membership for 'static' groups. Also used to store 'opt-out' entries for 'query' type groups
-    (status = 'OUT')
-  </comment>
+  <comment>Join table sets membership for 'static' groups. Also used to store 'opt-out' entries for 'query' type groups (status = 'OUT') </comment>
   <add>1.1</add>
   <log>true</log>
   <field>
