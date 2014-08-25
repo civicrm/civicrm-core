@@ -1831,11 +1831,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     if (substr($fieldName, 0, 14) === 'state_province') {
       $controlField = str_replace('state_province', 'country', $name);
       if (isset($form->_fields[$controlField]) || in_array($controlField, $fieldsProcessed)) {
-        $form->addChainSelect($name, array('label' => $title, 'required' => $required));
+          $form->addChainSelect($name, array('label' => $title, 'required' => $required));
       }
       else {
+        $options = CRM_Core_PseudoConstant::stateProvince();
         $form->add('select', $name, $title,
-          array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvince(), $required);
+          array('' => ts('- select -')) + $options, $required && $options);
       }
       $config = CRM_Core_Config::singleton();
       if (!in_array($mode, array(
@@ -1859,7 +1860,15 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif (substr($fieldName, 0, 6) === 'county') {
       if ($addressOptions['county']) {
-        $form->addChainSelect($name, array('label' => $title, 'required' => $required));
+        $controlField = str_replace('county', 'state_province', $name);
+        if (isset($form->_fields[$controlField]) || in_array($controlField, $fieldsProcessed)) {
+          $form->addChainSelect($name, array('label' => $title, 'required' => $required));
+        }
+        else {
+          $options = CRM_Core_PseudoConstant::county();
+          $form->add('select', $name, $title,
+            array('' => ts('- select -')) + $options, $required && $options);
+        }
       }
     }
     elseif (substr($fieldName, 0, 9) === 'image_URL') {
