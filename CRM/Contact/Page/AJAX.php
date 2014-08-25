@@ -242,8 +242,7 @@ class CRM_Contact_Page_AJAX {
     while ($dao->fetch()) {
       $results[] = array('id' => $dao->id, 'text' => $dao->data);
     }
-    print json_encode($results);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($results);
   }
 
   static function relationship() {
@@ -305,8 +304,7 @@ class CRM_Contact_Page_AJAX {
       }
     }
 
-    echo json_encode($ret);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($ret);
   }
 
   /**
@@ -319,8 +317,7 @@ class CRM_Contact_Page_AJAX {
     $values           = array();
 
     CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $values, $returnProperties);
-    echo json_encode($values);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($values);
   }
 
   static function groupTree() {
@@ -570,8 +567,7 @@ ORDER BY sort_name ";
           CRM_Utils_Hook::enableDisable($recordBAO, $recordID, $isActive);
         }
       }
-      echo json_encode($status);
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output($status);
     }
   }
 
@@ -800,8 +796,7 @@ LIMIT {$offset}, {$rowCount}
 
     $subTypes = CRM_Contact_BAO_ContactType::subTypePairs($contactType, FALSE, NULL);
     asort($subTypes);
-    echo json_encode($subTypes);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($subTypes);
   }
 
   static function buildDedupeRules() {
@@ -823,8 +818,7 @@ LIMIT {$offset}, {$rowCount}
 
     $dedupeRules = CRM_Dedupe_BAO_RuleGroup::getByType($contactType);
 
-    echo json_encode($dedupeRules);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($dedupeRules);
   }
 
   /**
@@ -856,8 +850,7 @@ LIMIT {$offset}, {$rowCount}
         CRM_Utils_System::civiExit();
     }
 
-    echo json_encode($dashlets);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($dashlets);
   }
 
   /**
@@ -876,8 +869,7 @@ LIMIT {$offset}, {$rowCount}
       );
     }
 
-    echo json_encode($signatures);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($signatures);
   }
 
   /**
@@ -910,8 +902,7 @@ LIMIT {$offset}, {$rowCount}
       $status = $exception->delete();
     }
 
-    echo json_encode(array('status' => ($status) ? $oper : $status));
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(array('status' => ($status) ? $oper : $status));
   }
 
   static function getDedupes() {
@@ -973,8 +964,7 @@ LIMIT {$offset}, {$rowCount}
 
     $pdfFormat = CRM_Core_BAO_PdfFormat::getById($formatId);
 
-    echo json_encode($pdfFormat);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($pdfFormat);
   }
 
   /**
@@ -985,8 +975,7 @@ LIMIT {$offset}, {$rowCount}
 
     $paperSize = CRM_Core_BAO_PaperSize::getByName($paperSizeName);
 
-    echo json_encode($paperSize);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($paperSize);
   }
 
   static function selectUnselectContacts() {
@@ -1020,8 +1009,7 @@ LIMIT {$offset}, {$rowCount}
     $countSelectionCids = count($contactIds[$cacheKey]);
 
     $arrRet = array('getCount' => $countSelectionCids);
-    echo json_encode($arrRet);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($arrRet);
   }
 
   /**
@@ -1050,8 +1038,7 @@ LIMIT {$offset}, {$rowCount}
       $addressVal = CRM_Core_BAO_Address::getValues($entityBlock);
     }
 
-    echo json_encode($addressVal);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($addressVal);
   }
 
   /**
