@@ -56,8 +56,8 @@ function civicrm_api3_report_template_create($params) {
  * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_report_template_create_spec(&$params) {
-  require_once 'api/v3/OptionValue.php';
-  _civicrm_api3_option_value_create_spec($params);
+  $fields = civicrm_api3('option_value', 'getfields', array('action' => 'create'));
+  $params = array_merge($params, $fields['values']);
   $params['value']['api.aliases'] = array('report_url');
   $params['name']['api.aliases'] = array('class_name');
   $params['option_group_id']['api.default'] = CRM_Core_DAO::getFieldValue(
