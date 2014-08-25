@@ -450,12 +450,8 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         'first_name' => $rows[$rowID]['first_name'],
         'individual_prefix' => $rows[$rowID]['individual_prefix']
       );
-      $format = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'display_name_format'
-      );
-      $firstNameWithPrefix = CRM_Utils_Address::format($formatted, $format,
-        FALSE, FALSE, TRUE
-      );
+      $format = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'display_name_format');
+      $firstNameWithPrefix = CRM_Utils_Address::format($formatted, $format, FALSE, FALSE, TRUE);
       $firstNameWithPrefix = trim($firstNameWithPrefix);
 
       // fill uniqueAddress array with last/first name tree
