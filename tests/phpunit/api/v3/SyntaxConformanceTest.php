@@ -263,7 +263,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @todo add metadata for ALL these entities
    */
   public static function toBeSkipped_getfields($sequential = FALSE) {
-    $entitiesWithMetadataNotYetFixed = array('ReportTemplate', 'CustomSearch');
+    $entitiesWithMetadataNotYetFixed = array();
     if ($sequential === TRUE) {
       return $entitiesWithMetadataNotYetFixed ;
     }
