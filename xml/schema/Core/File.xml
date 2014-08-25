@@ -4,9 +4,7 @@
   <base>CRM/Core</base>
   <class>File</class>
   <name>civicrm_file</name>
-  <comment>Data store for uploaded (attached) files (pointer to file on disk OR blob). Maybe be joined to entities via
-    custom_value.file_id or entity_file table.
-  </comment>
+  <comment>Data store for uploaded (attached) files (pointer to file on disk OR blob). Maybe be joined to entities via custom_value.file_id or entity_file table.</comment>
   <add>1.5</add>
   <log>true</log>
   <field>

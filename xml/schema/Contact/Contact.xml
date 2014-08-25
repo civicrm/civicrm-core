@@ -172,9 +172,7 @@
     <import>true</import>
     <headerPattern>/external\s?id/i</headerPattern>
     <dataPattern>/^\d{11,}$/</dataPattern>
-    <comment>Unique trusted external ID (generally from a legacy app/datasource). Particularly useful for deduping
-      operations.
-    </comment>
+    <comment>Unique trusted external ID (generally from a legacy app/datasource). Particularly useful for deduping operations.</comment>
     <add>1.1</add>
   </field>
   <index>
@@ -492,9 +490,7 @@
       <optionGroupName>communication_style</optionGroupName>
     </pseudoconstant>
     <export>true</export>
-    <comment>Communication style (e.g. formal vs. familiar) to use with this contact. FK to communication styles in
-      civicrm_option_value.
-    </comment>
+    <comment>Communication style (e.g. formal vs. familiar) to use with this contact. FK to communication styles in civicrm_option_value.</comment>
     <add>4.4</add>
   </field>
   <index>
@@ -699,9 +695,7 @@
     <name>mail_to_household_id</name>
     <title>Mail to Household ID</title>
     <type>int unsigned</type>
-    <comment>OPTIONAL FK to civicrm_contact_household record. If NOT NULL, direct mail communications to household
-      rather than individual location.
-    </comment>
+    <comment>OPTIONAL FK to civicrm_contact_household record. If NOT NULL, direct mail communications to household rather than individual location. </comment>
     <export>true</export>
     <add>1.1</add>
     <drop>3.3</drop>
@@ -792,9 +786,7 @@
     <import>true</import>
     <headerPattern>/^Open\s?ID|u(niq\w*)?\s?ID/i</headerPattern>
     <dataPattern>/^[\w\/\:\.]+$/</dataPattern>
-    <comment>the OpenID (or OpenID-style http://username.domain/) unique identifier for this contact mainly used for
-      logging in to CiviCRM
-    </comment>
+    <comment>the OpenID (or OpenID-style http://username.domain/) unique identifier for this contact mainly used for logging in to CiviCRM</comment>
     <add>2.0</add>
     <html>
       <type>Text</type>
