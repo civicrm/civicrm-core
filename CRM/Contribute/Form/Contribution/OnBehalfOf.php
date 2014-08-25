@@ -169,16 +169,7 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
     foreach ($profileFields as $name => $field) {
       if (in_array($field['field_type'], $fieldTypes)) {
         list($prefixName, $index) = CRM_Utils_System::explode('-', $name, 2);
-        if (in_array($prefixName, array('state_province', 'country', 'county'))) {
-          if (count($form->_submitValues)) {
-            $locationTypeId = $field['location_type_id'];
-            if (!empty($form->_submitValues['onbehalf']["country-{$locationTypeId}"]) &&
-              $prefixName == "state_province") {
-              $field['is_required'] = CRM_Core_Payment_Form::checkRequiredStateProvince($form, "country-{$locationTypeId}", TRUE);
-            }
-          }
-        }
-        elseif (in_array($prefixName, array('organization_name', 'email')) && empty($field['is_required'])) {
+        if (in_array($prefixName, array('organization_name', 'email')) && empty($field['is_required'])) {
           $field['is_required'] = 1;
         }
 

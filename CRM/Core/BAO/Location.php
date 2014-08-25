@@ -409,7 +409,7 @@ WHERE e.id = %1";
     if (!$values) {
       return array();
     }
-    $values = (array) $values;
+    $values = array_filter((array) $values);
     $elements = array();
     $list = &$elements;
     $method = $valueType == 'country' ? 'stateProvinceForCountry' : 'countyForState';
