@@ -4,9 +4,7 @@
   <base>CRM/Core</base>
   <class>Address</class>
   <name>civicrm_address</name>
-  <comment>Stores the physical street / mailing address. This format should be capable of storing ALL international
-    addresses.
-  </comment>
+  <comment>Stores the physical street / mailing address. This format should be capable of storing ALL international addresses.</comment>
   <add>1.1</add>
   <log>true</log>
   <field>
