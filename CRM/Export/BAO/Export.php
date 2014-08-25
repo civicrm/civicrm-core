@@ -78,7 +78,9 @@ class CRM_Export_BAO_Export {
     $headerRows = $returnProperties = array();
     $primary    = $paymentFields    = $selectedPaymentFields = FALSE;
     $origFields = $fields;
-    $relationField = NULL;
+    $queryMode  = $relationField = NULL;
+
+    $allCampaigns = array();
 
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
@@ -602,13 +604,28 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           $addPaymentHeader = TRUE;
         }
       }
-      // If we have selected specific payment fields, leave the payment headers
+      // If we have seleted specific payment fields, leave the payment headers
       // as an empty array; the headers for each selected field will be added
       // elsewhere.
       else {
         $paymentHeaders = array();
       }
       $nullContributionDetails = array_fill_keys(array_keys($paymentHeaders), NULL);
+    }
+
+    // Split campaign into 2 fields for id and title
+    $campaignReturnProperties = array();
+    foreach ($returnProperties as $fld => $true) {
+      $campaignReturnProperties[$fld] = $true;
+      if (substr($fld, -11) == 'campaign_id') {
+        $exportCampaign = TRUE;
+        $campaignReturnProperties[substr($fld, 0, -3)] = 1;
+      }
+    }
+    $returnProperties = $campaignReturnProperties;
+    //get all campaigns.
+    if (isset($exportCampaign)) {
+      $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
     }
 
     $componentDetails = $headerRows = $sqlColumns = array();
@@ -623,17 +640,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     // for CRM-3157 purposes
     $i18n = CRM_Core_I18n::singleton();
-    $outputColumns = array();
-    //@todo - it would be clearer to start defining output columns earlier in this function rather than stick with return properties until this point
-    // as the array is not actually 'returnProperties' after the sql query is formed - making the alterations to it confusing
-    foreach ($returnProperties as $key => $value) {
-      $outputColumns[$key] = 1;
-      if (substr($key, -11) == 'campaign_id') {
-        // the field $dao->x_campaign_id_id holds the id whereas the field $dao->campaign_id
-        // we want to insert it directly after campaign id
-        $outputColumns[$key . '_id'] = 1;
-      }
-    }
+
     while (1) {
       $limitQuery = "{$queryString} LIMIT {$offset}, {$rowCount}";
       $dao = CRM_Core_DAO::executeQuery($limitQuery);
@@ -648,17 +655,17 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         //convert the pseudo constants
         $query->convertToPseudoNames($dao);
 
-        //first loop through output columns so that we return what is required, and in same order.
+        //first loop through returnproperties so that we return what is required, and in same order.
         $relationshipField = 0;
-        foreach ($outputColumns as $field => $value) {
+        foreach ($returnProperties as $field => $value) {
           //we should set header only once
           if ($setHeader) {
             $sqlDone = FALSE;
             // Split campaign into 2 fields for id and title
-            if (substr($field, -11) == 'campaign_id') {
+            if (substr($field, -8) == 'campaign') {
               $headerRows[] = ts('Campaign Title');
             }
-            elseif (substr($field, -14) == 'campaign_id_id') {
+            elseif (substr($field, -11) == 'campaign_id') {
               $headerRows[] = ts('Campaign ID');
             }
             elseif (isset($query->_fields[$field]['title'])) {
@@ -981,7 +988,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
               CRM_Core_OptionGroup::lookupValues($paramsNew, $name, FALSE);
               $row[$field] = $paramsNew[$field];
             }
-
             elseif (in_array($field, array(
               'email_greeting', 'postal_greeting', 'addressee'))) {
               //special case for greeting replacement
@@ -1011,6 +1017,10 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
                   break;
               }
             }
+          }
+          elseif (substr($field, -8) == 'campaign') {
+            $campIdFld = "{$field}_id";
+            $row[$field] = CRM_Utils_Array::value($dao->$campIdFld, $allCampaigns, '');
           }
           elseif ($selectedPaymentFields && array_key_exists($field, self::componentPaymentFields())) {
             $paymentData = CRM_Utils_Array::value($dao->$paymentTableId, $paymentDetails);
@@ -1261,13 +1271,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     // in the DB it is an ID, but in the export, we retrive the display_name of the master record
     if ($fieldName == 'master_id') {
       $sqlColumns[$fieldName] = "$fieldName varchar(128)";
-      return;
-    }
-
-    if (substr($fieldName, -11) == 'campaign_id') {
-      // CRM-14398
-      $sqlColumns[$fieldName] = "$fieldName varchar(128)";
-      $sqlColumns[$fieldName . '_id'] = "{$fieldName}_id varchar(16)";
       return;
     }
 
