@@ -155,6 +155,7 @@
   </field>
   <field>
     <name>is_active</name>
+    <title>Schedule is Active?</title>
     <type>boolean</type>
     <default>1</default>
     <comment>Is this option active?</comment>
@@ -178,18 +179,21 @@
   </field>
   <field>
     <name>body_text</name>
+    <title>Reminder Text</title>
     <type>longtext</type>
     <comment>Body of the mailing in text format.</comment>
     <add>3.4</add>
   </field>
   <field>
     <name>body_html</name>
+    <title>Reminder HTML</title>
     <type>longtext</type>
     <comment>Body of the mailing in html format.</comment>
     <add>3.4</add>
   </field>
   <field>
     <name>subject</name>
+    <title>Reminder Subject</title>
     <type>varchar</type>
     <length>128</length>
     <comment>Subject of mailing</comment>
@@ -197,6 +201,7 @@
   </field>
   <field>
     <name>record_activity</name>
+    <title>Record Activity for Reminder?</title>
     <type>boolean</type>
     <default>NULL</default>
     <comment>Record Activity for this reminder?</comment>
@@ -204,6 +209,7 @@
   </field>
   <field>
     <name>mapping_id</name>
+    <title>Reminder Mapping</title>
     <type>int unsigned</type>
     <comment>FK to mapping which is being used by this reminder</comment>
     <add>3.4</add>
@@ -216,6 +222,7 @@
   </foreignKey>
   <field>
     <name>group_id</name>
+    <title>Reminder Group</title>
     <type>int unsigned</type>
     <comment>FK to Group</comment>
     <pseudoconstant>
@@ -236,6 +243,7 @@
   </foreignKey>
   <field>
     <name>msg_template_id</name>
+    <title>Reminder Template</title>
     <type>int unsigned</type>
     <comment>FK to the message template.</comment>
   </field>
@@ -247,12 +255,14 @@
   </foreignKey>
   <field>
     <name>absolute_date</name>
+    <title>Fixed Date for Reminder</title>
     <type>date</type>
     <comment>Date on which the reminder be sent.</comment>
     <add>4.1</add>
   </field>
   <field>
     <name>from_name</name>
+    <title>Reminder from Name</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Name in "from" field</comment>
@@ -260,6 +270,7 @@
   </field>
   <field>
     <name>from_email</name>
+    <title>Reminder From Email</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Email address in "from" field</comment>
@@ -282,6 +293,7 @@
   </field>
   <field>
     <name>sms_provider_id</name>
+    <title>SMS Provider</title>
     <type>int unsigned</type>
     <add>4.5</add>
     <html>

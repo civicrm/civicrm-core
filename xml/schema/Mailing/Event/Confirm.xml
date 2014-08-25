@@ -8,6 +8,7 @@
   <archive>true</archive>
   <field>
     <name>id</name>
+    <title>Mailing Confirmation ID</title>
     <type>int unsigned</type>
     <required>true</required>
   </field>
@@ -17,6 +18,7 @@
   </primaryKey>
   <field>
     <name>event_subscribe_id</name>
+    <title>Mailing Subscribe ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_mailing_event_subscribe</comment>
@@ -29,6 +31,7 @@
   </foreignKey>
   <field>
     <name>time_stamp</name>
+    <title>Confirm Timestamp</title>
     <type>datetime</type>
     <required>true</required>
     <comment>When this confirmation event occurred.</comment>

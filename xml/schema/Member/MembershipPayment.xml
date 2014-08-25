@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Membership Payment ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <add>1.5</add>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>membership_id</name>
+    <title>Membership</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to Membership table</comment>
@@ -33,6 +35,7 @@
   </foreignKey>
   <field>
     <name>contribution_id</name>
+    <title>Contribution</title>
     <type>int unsigned</type>
     <comment>FK to contribution table.</comment>
     <add>2.0</add>

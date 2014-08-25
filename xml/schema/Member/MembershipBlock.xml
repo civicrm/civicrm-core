@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Membership Block ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Membership Id</comment>
@@ -20,6 +21,7 @@
   </primaryKey>
   <field>
     <name>entity_table</name>
+    <title>Membership Block Entity Table</title>
     <type>varchar</type>
     <length>64</length>
     <comment>Name for Membership Status</comment>
@@ -27,6 +29,7 @@
   </field>
   <field>
     <name>entity_id</name>
+    <title>Membership Block Entity ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_contribution_page.id</comment>
@@ -40,6 +43,7 @@
   </foreignKey>
   <field>
     <name>membership_types</name>
+    <title>Membership Block Membership Types</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Membership types to be exposed by this block</comment>
@@ -47,6 +51,7 @@
   </field>
   <field>
     <name>membership_type_default</name>
+    <title>Membership Block Default Type</title>
     <type>int unsigned</type>
     <comment>Optional foreign key to membership_type</comment>
     <add>1.5</add>
@@ -59,6 +64,7 @@
   </foreignKey>
   <field>
     <name>display_min_fee</name>
+    <title>Membership Block Display Minimum Fee</title>
     <type>boolean</type>
     <default>1</default>
     <comment>Display minimum membership fee</comment>
@@ -66,6 +72,7 @@
   </field>
   <field>
     <name>is_separate_payment</name>
+    <title>Membership Block Is Separate Payment</title>
     <type>boolean</type>
     <default>1</default>
     <comment>Should membership transactions be processed separately</comment>
@@ -73,6 +80,7 @@
   </field>
   <field>
     <name>new_title</name>
+    <title>Membership Block New Title</title>
     <type>varchar</type>
     <length>255</length>
     <localizable>true</localizable>
@@ -81,6 +89,7 @@
   </field>
   <field>
     <name>new_text</name>
+    <title>Membership Block New Text</title>
     <type>text</type>
     <localizable>true</localizable>
     <comment>Text to display below title</comment>
@@ -88,6 +97,7 @@
   </field>
   <field>
     <name>renewal_title</name>
+    <title>Membership Block Renewal Title</title>
     <type>varchar</type>
     <length>255</length>
     <localizable>true</localizable>
@@ -96,6 +106,7 @@
   </field>
   <field>
     <name>renewal_text</name>
+    <title>Membership Block Renewal Text</title>
     <type>text</type>
     <localizable>true</localizable>
     <comment>Text to display for member renewal</comment>

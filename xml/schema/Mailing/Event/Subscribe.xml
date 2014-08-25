@@ -8,6 +8,7 @@
   <archive>true</archive>
   <field>
     <name>id</name>
+    <title>Mailing Subscribe ID</title>
     <type>int unsigned</type>
     <required>true</required>
   </field>
@@ -17,6 +18,7 @@
   </primaryKey>
   <field>
     <name>group_id</name>
+    <title>Mailing Subscribe Group</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to Group</comment>
@@ -37,6 +39,7 @@
   </foreignKey>
   <field>
     <name>contact_id</name>
+    <title>Mailing Subscribe Contact</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to Contact</comment>
@@ -49,6 +52,7 @@
   </foreignKey>
   <field>
     <name>hash</name>
+    <title>Mailing Subscribe Hash</title>
     <type>varchar</type>
     <length>255</length>
     <required>true</required>
@@ -56,6 +60,7 @@
   </field>
   <field>
     <name>time_stamp</name>
+    <title>Mailing Subscribe Timestamp</title>
     <type>datetime</type>
     <required>true</required>
     <comment>When this subscription event occurred.</comment>
