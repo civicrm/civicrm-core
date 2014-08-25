@@ -64,7 +64,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @throws Exception
    */
-  function formatMailPart($part, &$attachments) {
+  public static function formatMailPart($part, &$attachments) {
     if ($part instanceof ezcMail) {
       return self::formatMail($part, $attachments);
     }
@@ -203,7 +203,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @return string
    */
-  function formatMailText($part, &$attachments) {
+  public static function formatMailText($part, &$attachments) {
     $t = "\n{$part->text}\n";
     return $t;
   }
@@ -310,7 +310,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @return array
    */
-  function parseMailingObject(&$mail) {
+  public static function parseMailingObject(&$mail) {
 
     $config = CRM_Core_Config::singleton();
 
@@ -374,7 +374,7 @@ class CRM_Utils_Mail_Incoming {
    * @param $subParam
    * @param $mail
    */
-  function parseAddress(&$address, &$params, &$subParam, &$mail) {
+  public static function parseAddress(&$address, &$params, &$subParam, &$mail) {
     // CRM-9484
     if (empty($address->email)) {
       return;
@@ -398,7 +398,7 @@ class CRM_Utils_Mail_Incoming {
    * @param $params
    * @param $mail
    */
-  function parseAddresses(&$addresses, $token, &$params, &$mail) {
+  public static function parseAddresses(&$addresses, $token, &$params, &$mail) {
     $params[$token] = array();
 
     foreach ($addresses as $address) {
@@ -412,7 +412,7 @@ class CRM_Utils_Mail_Incoming {
    * retrieve a contact ID and if not present
    * create one with this email
    */
-  function getContactID($email, $name = NULL, $create = TRUE, &$mail) {
+  public static function getContactID($email, $name = NULL, $create = TRUE, &$mail) {
     $dao = CRM_Contact_BAO_Contact::matchContactOnEmail($email, 'Individual');
 
     $contactID = NULL;
