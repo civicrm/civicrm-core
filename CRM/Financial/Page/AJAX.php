@@ -90,8 +90,7 @@ class CRM_Financial_Page_AJAX {
         ) + $selectedArray;
       }
     }
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($elements);
   }
 
   /**
@@ -150,8 +149,7 @@ class CRM_Financial_Page_AJAX {
         }
       }
     }
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($elements);
   }
 
   /**
@@ -164,8 +162,7 @@ class CRM_Financial_Page_AJAX {
     }
 
     $elements = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Product', $_GET['_value'], 'financial_type_id');
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($elements);
   }
 
   /**
@@ -257,8 +254,7 @@ class CRM_Financial_Page_AJAX {
         }
       }
     }
-    echo json_encode($response);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($response);
   }
 
   static function getFinancialTransactionsList() {
@@ -490,8 +486,7 @@ class CRM_Financial_Page_AJAX {
     else {
       $status = array('status' => ts("This batch is configured to include only transactions using %1 payment method. If you want to include other transactions, please edit the batch first and modify the Payment Method.", array( 1 => $paymentInstrument)));
     }
-    echo json_encode($status);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($status);
   }
 
   static function getBatchSummary() {
@@ -512,7 +507,6 @@ class CRM_Financial_Page_AJAX {
         'opened_date' => CRM_Utils_Date::customFormat($batchInfo->created_date),
       );
 
-    echo json_encode($batchSummary);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($batchSummary);
   }
 }
