@@ -69,23 +69,18 @@
 </div>
 
 <script type="text/javascript">
-{if $preview}
-{/if}
-
 {literal}
-CRM.$(function($) {
-   $('#start_date_display').change( function( ) { 
-       if ( $(this).val( ) ) {
-          $('#now').prop('checked', false );
-       }
-   });
-   $('#now').change( function( ) { 
-       if ( $('#now').prop('checked', true ) ) {
-          $('#start_date_display').val( '' );
-          $('#start_date').val( '' );
-          $('#start_date_time').val( '' );
-       }
-   });
-});
+  CRM.$(function($) {
+    $('#start_date_display').change(function() {
+      $('#now').prop('checked', !$(this).val());
+    });
+    $('#now').change(function() {
+      if ($(this).prop('checked')) {
+        $('#start_date_display, #start_date, #start_date_time').val('');
+      } else {
+        $('#start_date_display').focus();
+      }
+    });
+  });
 {/literal}
 </script>
