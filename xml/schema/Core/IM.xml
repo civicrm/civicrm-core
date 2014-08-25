@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Instant Messenger ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique IM ID</comment>
@@ -20,6 +21,7 @@
   </primaryKey>
   <field>
     <name>contact_id</name>
+    <title>IM Contact</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
     <add>2.0</add>
@@ -92,6 +94,7 @@
   </index>
   <field>
     <name>is_billing</name>
+    <title>Is IM Billing?</title>
     <type>boolean</type>
     <default>0</default>
     <comment>Is this the billing?</comment>

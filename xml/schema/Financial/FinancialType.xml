@@ -52,6 +52,7 @@
   </field>
   <field>
     <name>is_deductible</name>
+    <title>Is Tax Deductible?</title>
     <type>boolean</type>
     <length>4</length>
     <default>1</default>
@@ -60,6 +61,7 @@
   </field>
   <field>
     <name>is_reserved</name>
+    <title>Financial Type is Reserved?</title>
     <type>boolean</type>
     <length>4</length>
     <comment>Is this a predefined system object?</comment>

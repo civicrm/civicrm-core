@@ -8,6 +8,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Financial Account ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID</comment>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>name</name>
+    <title>Financial Account Name</title>
     <type>varchar</type>
     <length>255</length>
     <required>true</required>

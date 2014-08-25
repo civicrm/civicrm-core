@@ -190,11 +190,13 @@
   </field>
   <field>
     <name>open_tracking</name>
+    <title>Track Mailing?</title>
     <type>boolean</type>
     <comment>Should we track when recipients open/read this mailing?</comment>
   </field>
   <field>
     <name>is_completed</name>
+    <title>Mailing Completed</title>
     <type>boolean</type>
     <comment>Has at least one job associated with this mailing finished?</comment>
     <html>
@@ -203,6 +205,7 @@
   </field>
   <field>
     <name>msg_template_id</name>
+    <title>Mailing Message Template</title>
     <type>int unsigned</type>
     <comment>FK to the message template.</comment>
   </field>
@@ -224,6 +227,7 @@
   </field>
   <field>
     <name>created_id</name>
+    <title>Mailing Creator</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID who first created this mailing</comment>
   </field>
@@ -245,6 +249,7 @@
   </field>
   <field>
     <name>scheduled_id</name>
+    <title>Scheduled By</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID who scheduled this mailing</comment>
   </field>
@@ -263,6 +268,7 @@
   </field>
   <field>
     <name>approver_id</name>
+    <title>Approved By</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID who approved this mailing</comment>
   </field>
