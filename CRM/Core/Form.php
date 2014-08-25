@@ -394,6 +394,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   function validate() {
     $error = parent::validate();
 
+    $this->validateChainSelectFields();
+
     $hookErrors = CRM_Utils_Hook::validate(
       get_class($this),
       $this->_submitValues,
@@ -1759,16 +1761,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     foreach ($this->_chainSelectFields as $control => $target) {
       $controlField = $this->getElement($control);
       $targetField = $this->getElement($target);
+      $controlType = $targetField->getAttribute('data-callback') == 'civicrm/ajax/jqCounty' ? 'stateProvince' : 'country';
 
       $css = (string) $controlField->getAttribute('class');
       $controlField->updateAttributes(array(
         'class' => ($css ? "$css " : 'crm-select2 ') . 'crm-chain-select-control',
         'data-target' => $target,
       ));
-      $selection = $controlField->getValue();
+      $controlValue = $controlField->getValue();
       $options = array();
-      if ($selection) {
-        $options = CRM_Core_BAO_Location::getChainSelectValues($selection, strpos($control, 'rovince') ? 'stateProvince' : 'country', TRUE);
+      if ($controlValue) {
+        $options = CRM_Core_BAO_Location::getChainSelectValues($controlValue, $controlType, TRUE);
         if (!$options) {
           $targetField->setAttribute('placeholder', $targetField->getAttribute('data-none-prompt'));
         }
@@ -1782,6 +1785,30 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $targetField->removeAttribute('placeholder');
       }
       $targetField->loadArray($options);
+    }
+  }
+
+  /**
+   * Validate country / state / county match and suppress unwanted "required" errors
+   */
+  private function validateChainSelectFields() {
+    foreach ($this->_chainSelectFields as $control => $target) {
+      $controlValue = (array) $this->getElementValue($control);
+      $targetField = $this->getElement($target);
+      $controlType = $targetField->getAttribute('data-callback') == 'civicrm/ajax/jqCounty' ? 'stateProvince' : 'country';
+      $targetValue = array_filter((array) $targetField->getValue());
+      if ($targetValue || $this->getElementError($target)) {
+        $options = CRM_Core_BAO_Location::getChainSelectValues($controlValue, $controlType, TRUE);
+        if ($targetValue) {
+          if (!array_intersect($targetValue, array_keys($options))) {
+            $this->setElementError($target, $controlType == 'country' ? ts('State/Province does not match the selected Country') : ts('County does not match the selected State/Province'));
+          }
+        }
+        // Suppress "required" error for field if it has no options
+        elseif (!$options) {
+          $this->setElementError($target, NULL);
+        }
+      }
     }
   }
 }

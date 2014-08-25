@@ -737,28 +737,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             continue;
           }
 
-          list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
-          if ($prefixName == 'state_province' || $prefixName == 'country' || $prefixName == 'county') {
-            if ($prefixName == "state_province") {
-              if ($profileContactType == 'onbehalf') {
-                //CRM-11881: Bypass required-ness check for state/province on Contribution Confirm page
-                //as already done during Contribution registration via onBehalf's quickForm
-                $field['is_required'] = FALSE;
-              }
-              else {
-                if (count($this->_submitValues)) {
-                  $locationTypeId = $field['location_type_id'];
-                  if (array_key_exists("country-{$locationTypeId}", $fields) &&
-                  array_key_exists("state_province-{$locationTypeId}", $fields) &&
-                    !empty($this->_submitValues["country-{$locationTypeId}"])) {
-                    $field['is_required'] =
-                      CRM_Core_Payment_Form::checkRequiredStateProvince($this, "country-{$locationTypeId}");
-                  }
-                }
-              }
-            }
-          }
-
           if ($profileContactType) {
             //Since we are showing honoree name separately so we are removing it from honoree profile just for display
             $honoreeNamefields = array('prefix_id', 'first_name', 'last_name', 'suffix_id', 'organization_name', 'household_name');

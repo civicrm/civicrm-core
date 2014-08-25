@@ -276,7 +276,6 @@ class CRM_Contact_Form_Edit_Address {
       $customDataRequiredFields = explode(',', $self->_addressRequireOmission);
     }
 
-    // check for state/county match if not report error to user.
     if (!empty($fields['address']) && is_array($fields['address'])) {
       foreach ($fields['address'] as $instance => $addressValues) {
 
@@ -304,48 +303,6 @@ class CRM_Contact_Form_Edit_Address {
               // set element error to none
               $self->setElementError($elementName, NULL);
             }
-          }
-        }
-
-        $countryId = CRM_Utils_Array::value('country_id', $addressValues);
-
-        $stateProvinceId = CRM_Utils_Array::value('state_province_id', $addressValues);
-
-        //do check for mismatch countries
-        if ($stateProvinceId && $countryId) {
-          $stateProvinceDAO = new CRM_Core_DAO_StateProvince();
-          $stateProvinceDAO->id = $stateProvinceId;
-          $stateProvinceDAO->find(TRUE);
-          if ($stateProvinceDAO->country_id != $countryId) {
-            // countries mismatch hence display error
-            $stateProvinces = CRM_Core_PseudoConstant::stateProvince();
-            $countries = CRM_Core_PseudoConstant::country();
-            $errors["address[$instance][state_province_id]"] = ts('State/Province %1 is not part of %2. It belongs to %3.',
-              array(
-                1 => $stateProvinces[$stateProvinceId],
-                2 => $countries[$countryId],
-                3 => $countries[$stateProvinceDAO->country_id]
-              )
-            );
-          }
-        }
-
-        $countyId = CRM_Utils_Array::value('county_id', $addressValues);
-
-        //state county validation
-        if ($stateProvinceId && $countyId) {
-          $countyDAO = new CRM_Core_DAO_County();
-          $countyDAO->id = $countyId;
-          $countyDAO->find(TRUE);
-          if ($countyDAO->state_province_id != $stateProvinceId) {
-            $counties = CRM_Core_PseudoConstant::county();
-            $errors["address[$instance][county_id]"] = ts('County %1 is not part of %2. It belongs to %3.',
-              array(
-                1 => $counties[$countyId],
-                2 => $stateProvinces[$stateProvinceId],
-                3 => $stateProvinces[$countyDAO->state_province_id]
-              )
-            );
           }
         }
 
