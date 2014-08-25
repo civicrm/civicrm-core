@@ -8,6 +8,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Location Type ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Location Type ID</comment>
@@ -51,18 +52,21 @@
   </field>
   <field>
     <name>is_reserved</name>
+    <title>Location Type is Reserved?</title>
     <type>boolean</type>
     <comment>Is this location type a predefined system location?</comment>
     <add>1.1</add>
   </field>
   <field>
     <name>is_active</name>
+    <title>Location Type is Active?</title>
     <type>boolean</type>
     <comment>Is this property active?</comment>
     <add>1.1</add>
   </field>
   <field>
     <name>is_default</name>
+    <title>Default Location Type?</title>
     <type>boolean</type>
     <comment>Is this location type the default?</comment>
     <add>1.1</add>

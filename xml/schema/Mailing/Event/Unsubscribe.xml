@@ -8,6 +8,7 @@
   <archive>true</archive>
   <field>
     <name>id</name>
+    <title>Unsubscribe ID</title>
     <type>int unsigned</type>
     <required>true</required>
   </field>
@@ -17,6 +18,7 @@
   </primaryKey>
   <field>
     <name>event_queue_id</name>
+    <title>Mailing Event Queue</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to EventQueue</comment>
@@ -29,12 +31,14 @@
   </foreignKey>
   <field>
     <name>org_unsubscribe</name>
+    <title>Unsubscribe is for Organization?</title>
     <type>boolean</type>
     <required>true</required>
     <comment>Unsubscribe at org- or group-level</comment>
   </field>
   <field>
     <name>time_stamp</name>
+    <title>Unsubscribe Timestamp</title>
     <type>datetime</type>
     <required>true</required>
     <comment>When this delivery event occurred.</comment>

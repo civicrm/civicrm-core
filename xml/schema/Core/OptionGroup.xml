@@ -8,6 +8,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Option Group ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Option Group ID</comment>
@@ -28,6 +29,7 @@
   </field>
   <field>
     <name>title</name>
+    <title>Option Group title</title>
     <type>varchar</type>
     <length>255</length>
     <localizable>true</localizable>
@@ -36,6 +38,7 @@
   </field>
   <field>
     <name>description</name>
+    <title>Option Group Description</title>
     <type>varchar</type>
     <length>255</length>
     <localizable>true</localizable>
@@ -44,6 +47,7 @@
   </field>
   <field>
     <name>is_reserved</name>
+    <title>Option Group Is Reserved?</title>
     <type>boolean</type>
     <default>1</default>
     <comment>Is this a predefined system option group (i.e. it can not be deleted)?</comment>
@@ -51,12 +55,14 @@
   </field>
   <field>
     <name>is_active</name>
+    <title>Option Group Is Active?</title>
     <type>boolean</type>
     <comment>Is this option group active?</comment>
     <add>1.5</add>
   </field>
   <field>
     <name>is_locked</name>
+    <title>Option Group Is Locked</title>
     <type>boolean</type>
     <comment>A lock to remove the ability to add new options via the UI.</comment>
     <add>4.5</add>

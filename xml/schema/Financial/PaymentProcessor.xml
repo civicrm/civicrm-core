@@ -7,6 +7,7 @@
   <add>1.8</add>
   <field>
     <name>id</name>
+    <title>Payment Processor ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Payment Processor ID</comment>
@@ -18,6 +19,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
+    <title>Payment Processor Domain</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -44,6 +46,7 @@
   </field>
   <field>
     <name>description</name>
+    <title>Processor Description</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Payment Processor Description.</comment>
@@ -59,6 +62,7 @@
   </field>
   <field>
     <name>payment_processor_type_id</name>
+    <title>Payment Processor Type ID</title>
     <type>int unsigned</type>
     <length>10</length>
     <add>4.3</add>
@@ -71,18 +75,21 @@
   </foreignKey>
   <field>
     <name>is_active</name>
+    <title>Processor is Active?</title>
     <type>boolean</type>
     <comment>Is this processor active?</comment>
     <add>1.8</add>
   </field>
   <field>
     <name>is_default</name>
+    <title>Processor Is Default?</title>
     <type>boolean</type>
     <comment>Is this processor the default?</comment>
     <add>1.8</add>
   </field>
   <field>
     <name>is_test</name>
+    <title>Is Test Processor?</title>
     <type>boolean</type>
     <comment>Is this processor for a test site?</comment>
     <add>1.8</add>
@@ -159,6 +166,7 @@
   </field>
   <field>
     <name>billing_mode</name>
+    <title>Processor Billing Mode</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Billing Mode</comment>
@@ -166,12 +174,14 @@
   </field>
   <field>
     <name>is_recur</name>
+    <title>Processor Supports Recurring?</title>
     <type>boolean</type>
     <comment>Can process recurring contributions</comment>
     <add>1.8</add>
   </field>
   <field>
     <name>payment_type</name>
+    <title>Payment Type</title>
     <type>int unsigned</type>
     <default>1</default>
     <comment>Payment Type: Credit or Debit</comment>
