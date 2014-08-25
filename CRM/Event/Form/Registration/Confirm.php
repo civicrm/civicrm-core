@@ -359,9 +359,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
 
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
-
     $this->setDefaults($defaults);
     $this->freeze();
 

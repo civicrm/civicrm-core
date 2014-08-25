@@ -403,9 +403,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
       $defaults = array_merge($defaults, $billingDefaults);
 
-      // now fix all state country selectors, set correct state based on country
-      CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
-
       //             // hack to simplify credit card entry for testing
       //             $defaults['credit_card_type']     = 'Visa';
       //             $defaults['credit_card_number']   = '4807731747657838';

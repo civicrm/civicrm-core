@@ -187,9 +187,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
       $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactId);
       $defaults = array_merge($defaults, $billingDefaults);
-
-      // now fix all state country selectors, set correct state based on country
-      CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
     }
 
     if (empty($defaults['trxn_date']) && empty($defaults['trxn_date_time'])) {
