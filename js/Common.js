@@ -155,6 +155,7 @@ function submitOnce(obj, formId, procText) {
   if (obj.value != null) {
     obj.value = procText + " ...";
   }
+  cj(obj).closest('form').attr('data-warn-changes', 'false');
   if (document.getElementById) { // disable submit button for newer browsers
     obj.disabled = true;
     document.getElementById(formId).submit();
