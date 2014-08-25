@@ -86,6 +86,7 @@
   </field>
   <field>
     <name>is_default</name>
+    <title>Option is Default?</title>
     <type>boolean</type>
     <default>0</default>
     <comment>Is this the default option for the group?</comment>
@@ -93,6 +94,7 @@
   </field>
   <field>
     <name>weight</name>
+    <title>Option Weight</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Controls display sort order.</comment>
@@ -100,6 +102,7 @@
   </field>
   <field>
     <name>description</name>
+    <title>Option Description</title>
     <type>text</type>
     <html>
       <type>TextArea</type>
@@ -112,6 +115,7 @@
   </field>
   <field>
     <name>is_optgroup</name>
+    <title>Option is Header?</title>
     <type>boolean</type>
     <default>0</default>
     <comment>Is this row simply a display header? Expected usage is to render these as OPTGROUP tags within a SELECT field list of options?</comment>
@@ -119,6 +123,7 @@
   </field>
   <field>
     <name>is_reserved</name>
+    <title>Option Is Reserved?</title>
     <type>boolean</type>
     <default>0</default>
     <comment>Is this a predefined system object?</comment>
@@ -134,6 +139,7 @@
   </field>
   <field>
     <name>component_id</name>
+    <title>Option Component</title>
     <type>int unsigned</type>
     <comment>Component that this option value belongs/caters to.</comment>
     <add>2.0</add>
@@ -154,6 +160,7 @@
   </foreignKey>
   <field>
     <name>domain_id</name>
+    <title>Option Domain</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -171,6 +178,7 @@
   </foreignKey>
   <field>
     <name>visibility_id</name>
+    <title>Option Visibility</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <add>2.2</add>

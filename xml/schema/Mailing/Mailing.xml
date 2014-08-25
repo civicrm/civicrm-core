@@ -8,6 +8,7 @@
   <archive>true</archive>
   <field>
     <name>id</name>
+    <title>Mailing ID</title>
     <type>int unsigned</type>
     <required>true</required>
   </field>
@@ -17,6 +18,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
+    <title>Mailing Domain</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -35,6 +37,7 @@
   </foreignKey>
   <field>
     <name>header_id</name>
+    <title>Mailing Header</title>
     <type>int unsigned</type>
     <comment>FK to the header component.</comment>
   </field>
@@ -46,6 +49,7 @@
   </foreignKey>
   <field>
     <name>footer_id</name>
+    <title>Mailing Footer</title>
     <type>int unsigned</type>
     <comment>FK to the footer component.</comment>
   </field>
@@ -57,6 +61,7 @@
   </foreignKey>
   <field>
     <name>reply_id</name>
+    <title>Mailing Reply</title>
     <type>int unsigned</type>
     <comment>FK to the auto-responder component.</comment>
   </field>
@@ -68,6 +73,7 @@
   </foreignKey>
   <field>
     <name>unsubscribe_id</name>
+    <title>Mailing Unsubscribe</title>
     <type>int unsigned</type>
     <comment>FK to the unsubscribe component.</comment>
   </field>
@@ -79,6 +85,7 @@
   </foreignKey>
   <field>
     <name>resubscribe_id</name>
+    <title>Mailing Resubscribe</title>
     <type>int unsigned</type>
   </field>
   <foreignKey>
@@ -89,6 +96,7 @@
   </foreignKey>
   <field>
     <name>optout_id</name>
+    <title>Mailing Opt Out</title>
     <type>int unsigned</type>
     <comment>FK to the opt-out component.</comment>
   </field>
@@ -100,6 +108,7 @@
   </foreignKey>
   <field>
     <name>name</name>
+    <title>Mailing Name</title>
     <type>varchar</type>
     <length>128</length>
     <comment>Mailing Name.</comment>
@@ -109,6 +118,7 @@
   </field>
   <field>
     <name>from_name</name>
+    <title>Mailing From Name</title>
     <type>varchar</type>
     <length>128</length>
     <comment>From Header of mailing</comment>
@@ -118,6 +128,7 @@
   </field>
   <field>
     <name>from_email</name>
+    <title>Mailing From Email</title>
     <type>varchar</type>
     <length>128</length>
     <comment>From Email of mailing</comment>
@@ -347,6 +358,7 @@
   </field>
   <field>
     <name>sms_provider_id</name>
+    <title>Mailing SMS Provider</title>
     <type>int unsigned</type>
     <add>4.2</add>
     <html>

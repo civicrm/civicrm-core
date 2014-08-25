@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <length>10</length>
     <required>true</required>

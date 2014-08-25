@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Product ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <add>1.4</add>

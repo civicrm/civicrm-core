@@ -34,6 +34,7 @@
   </foreignKey>
   <field>
     <name>contribution_id</name>
+    <title>Contribution</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to contribution table.</comment>
