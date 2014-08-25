@@ -3165,7 +3165,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       case 'Event':
         $componentBAO     = 'CRM_Event_BAO_Participant';
         $componentBAOName = 'Participant';
-        $componentSubType = array('role_id', 'event_id');
+        $componentSubType = array('role_id', 'event_id', 'event_type_id');
         break;
 
       case 'Activity':
@@ -3180,6 +3180,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
 
     //get the component values.
     CRM_Core_DAO::commonRetrieve($componentBAO, $params, $values);
+    if ($componentBAOName == 'Participant') {
+      $values += array('event_type_id' => CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $values['event_id'], 'event_type_id'));
+    }
 
     $formattedGroupTree = array();
     $dateTimeFields = array('participant_register_date', 'activity_date_time', 'receive_date', 'receipt_date', 'cancel_date', 'thankyou_date', 'membership_start_date', 'membership_end_date', 'join_date');
@@ -3236,18 +3239,20 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
               $skipValue = FALSE;
 
               foreach ($formattedGroupTree as $tree) {
-                if ('CheckBox' == CRM_Utils_Array::value('html_type', $tree['fields'][$customFieldDetails[0]])) {
-                  $skipValue = TRUE;
-                  $defaults['field'][$componentId][$name] = $customValue;
-                  break;
-                }
-                elseif (CRM_Utils_Array::value('data_type', $tree['fields'][$customFieldDetails[0]]) == 'Date') {
-                  $skipValue = TRUE;
+                if (!empty($tree['fields'][$customFieldDetails[0]])) {
+                  if ('CheckBox' == CRM_Utils_Array::value('html_type', $tree['fields'][$customFieldDetails[0]])) {
+                    $skipValue = TRUE;
+                    $defaults['field'][$componentId][$name] = $customValue;
+                    break;
+                  }
+                  elseif (CRM_Utils_Array::value('data_type', $tree['fields'][$customFieldDetails[0]]) == 'Date') {
+                    $skipValue = TRUE;
 
-                  // CRM-6681, $default contains formatted date, time values.
-                  $defaults[$fldName] = $customValue;
-                  if (!empty($defaults[$customKey . '_time'])) {
-                    $defaults['field'][$componentId][$name . '_time'] = $defaults[$customKey . '_time'];
+                    // CRM-6681, $default contains formatted date, time values.
+                    $defaults[$fldName] = $customValue;
+                    if (!empty($defaults[$customKey . '_time'])) {
+                      $defaults['field'][$componentId][$name . '_time'] = $defaults[$customKey . '_time'];
+                    }
                   }
                 }
               }
