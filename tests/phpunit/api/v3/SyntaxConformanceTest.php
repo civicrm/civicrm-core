@@ -263,21 +263,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @todo add metadata for ALL these entities
    */
   public static function toBeSkipped_getfields($sequential = FALSE) {
-    $entitiesWithMetadataNotYetFixed = array('ActionSchedule', 'ActivityType',
-      'ContactType', 'ContributionSoft', 'CustomField', 'CustomGroup', 'CustomValue','CustomSearch',
-      'Domain',
-      'Dashboard', 'DashboardContact', 'Extension', 'File', 'FinancialAccount', 'FinancialType',
-      'GroupOrganization', 'GroupNesting',
-      'Im', 'Job', 'LineItem','LocBlock', 'LocationType',
-      'Mailing', 'MailingComponent', 'MailingEventResubscribe', 'MailingEventSubscribe', 'MailingEventUnsubscribe',
-      'MailingEventConfirm', 'MailingGroup',
-      'MailingRecipients', 'MailingJob', 'MailSettings',
-      'MembershipBlock', 'MembershipPayment', 'MessageTemplate',
-      'MembershipType', 'OptionGroup', 'OptionValue', 'MembershipStatus',
-      'ParticipantPayment', 'ParticipantStatusType',
-      'Premium', 'PaymentProcessorType', 'PaymentProcessor',
-      'PrintLabel', 'Product', 'ReportTemplate',
-      'Setting',);
+    $entitiesWithMetadataNotYetFixed = array('ReportTemplate', 'CustomSearch');
     if ($sequential === TRUE) {
       return $entitiesWithMetadataNotYetFixed ;
     }
@@ -1155,7 +1141,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
     foreach ($fields['values'] as $fieldName => $fieldSpec) {
       $this->assertArrayHasKey('title', $fieldSpec, "no title for $entity - $fieldName");
-      $this->assertNotEmpty($fieldSpec['title']);
+      $this->assertNotEmpty($fieldSpec['title'], "empty title for $entity - $fieldName");
     }
 
     if (!empty($ids)) {
