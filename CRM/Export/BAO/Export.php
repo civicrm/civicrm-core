@@ -627,7 +627,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     //@todo - it would be clearer to start defining output columns earlier in this function rather than stick with return properties until this point
     // as the array is not actually 'returnProperties' after the sql query is formed - making the alterations to it confusing
     foreach ($returnProperties as $key => $value) {
-      $outputColumns[$key] = 1;
+      $outputColumns[$key] = $value;
       if (substr($key, -11) == 'campaign_id') {
         // the field $dao->x_campaign_id_id holds the id whereas the field $dao->campaign_id
         // we want to insert it directly after campaign id
