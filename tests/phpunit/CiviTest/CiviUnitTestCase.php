@@ -2805,6 +2805,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   function setupACL() {
     global $_REQUEST;
     $_REQUEST = $this->_params;
+    
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
     $optionGroupID = $this->callAPISuccessGetValue('option_group', array('return' => 'id', 'name' => 'acl_role'));
     $optionValue = $this->callAPISuccess('option_value', 'create', array('option_group_id' => $optionGroupID,
@@ -2876,7 +2877,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->callAPISuccess('price_field_value', 'create', $priceFieldValue);
     $this->callAPISuccess('price_field_value', 'create', $priceFieldValue);
     $this->callAPISuccess('price_field_value', 'create', array_merge($priceFieldValue, array('price_field_id' => $newPriceField['id'])));
-
   }
 
 /**
