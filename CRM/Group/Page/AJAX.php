@@ -45,8 +45,7 @@ class CRM_Group_Page_AJAX {
       $params['rp']   = 0;
       $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
 
-      echo json_encode($groups);
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output($groups);
     }
     else {
       $sortMapper = array(

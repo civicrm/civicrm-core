@@ -56,8 +56,7 @@ class CRM_Mailing_Page_AJAX {
       'pdf_format_id' => $messageTemplate->pdf_format_id,
     );
 
-    echo json_encode($messages);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($messages);
   }
 
   /**

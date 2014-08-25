@@ -44,8 +44,7 @@ class CRM_Utils_JSON {
    */
   public static function output($input) {
     header('Content-Type: application/json');
-    echo json_encode($input);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($input);
   }
 
   /**
