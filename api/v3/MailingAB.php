@@ -83,7 +83,7 @@ function civicrm_api3_mailing_a_b_get($params) {
  * @return array
  */
 function civicrm_api3_mailing_a_b_recipients_update($params) {
-civicrm_api3_verify_mandatory($params,
+  civicrm_api3_verify_mandatory($params,
     'CRM_Mailing_DAO_MailingAB',
     array('id'),
     FALSE
@@ -99,7 +99,7 @@ civicrm_api3_verify_mandatory($params,
 
   //calulate total number of random recipients for mail C from group_percentage selected
   $totalCount =  civicrm_api3('MailingRecipients', 'getcount', array('mailing_id' => $mailingAB['mailing_id_c']));
-  $totalSelected = round(($totalCount * $mailingAB['group_percentage'])/200);
+  $totalSelected = round(($totalCount * $mailingAB['group_percentage'])/100);
 
   foreach (array('mailing_id_a', 'mailing_id_b') as $columnName) {
     CRM_Mailing_BAO_Recipients::updateRandomRecipients($mailingAB['mailing_id_c'], $mailingAB[$columnName], $totalSelected);
@@ -141,7 +141,7 @@ function civicrm_api3_mailing_a_b_send_mail($params) {
   $mailingAB = civicrm_api3('MailingAB', 'get', array('id' => $params['id']));
   $mailingAB = $mailingAB['values'][$params['id']];
 
- foreach (array('mailing_id_a', 'mailing_id_b') as $columnName) {
+  foreach (array('mailing_id_a', 'mailing_id_b') as $columnName) {
     $params['id'] = $mailingAB[$columnName];
     civicrm_api3('Mailing', 'create', $params);
   }
@@ -156,9 +156,9 @@ function civicrm_api3_mailing_a_b_send_mail($params) {
  * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_mailing_a_b_graph_stats_spec(&$params) {
-   $params['split_count']['api.default'] = 6;
-   $params['split_count_select']['api.required'] = 1;
-  }
+  $params['split_count']['api.default'] = 6;
+  $params['split_count_select']['api.required'] = 1;
+}
 
 /**
  * Send graph detail for A/B tests mail
@@ -167,47 +167,69 @@ function _civicrm_api3_mailing_a_b_graph_stats_spec(&$params) {
  * @return array
  */
 function civicrm_api3_mailing_a_b_graph_stats($params) {
-   civicrm_api3_verify_mandatory($params,
-     'CRM_Mailing_DAO_MailingAB',
-     array('id'),
- FALSE
-   );
+  civicrm_api3_verify_mandatory($params,
+    'CRM_Mailing_DAO_MailingAB',
+    array('id'),
+    FALSE
+  );
 
- $mailingAB = civicrm_api3('MailingAB', 'get', array('id' => $params['id']));
- $mailingAB = $mailingAB['values'][$params['id']];
+  $mailingAB = civicrm_api3('MailingAB', 'get', array('id' => $params['id']));
+  $mailingAB = $mailingAB['values'][$params['id']];
 
- $optionGroupValue = civicrm_api3('OptionValue', 'get', array('option_group_name' => 'mailing_ab_winner_criteria', 'value' => $mailingAB['winner_criteria_id']));
- $winningCriteria = $optionGroupValue['values'][$optionGroupValue['id']]['name'];
+  $optionGroupValue = civicrm_api3('OptionValue', 'get', array('option_group_name' => 'mailing_ab_winner_criteria', 'value' => $mailingAB['winner_criteria_id']));
+  $winningCriteria = $optionGroupValue['values'][$optionGroupValue['id']]['name'];
 
- $graphStats = array();
+  $declareWinnerDate = CRM_Utils_Date::processDate($mailingAB['declare_winning_time']);
+
+  $graphStats = array();
   $ABFormat = array('A' => 'mailing_id_a', 'B' => 'mailing_id_b');
 
- foreach ($ABFormat as $name => $column) {
-     switch ($winningCriteria) {
-     case 'Open':
-         $totalCounts = CRM_Mailing_Event_BAO_Opened::getTotalCount($mailingAB[$column]);
-         $rowCount = round($totalCounts / $params['split_count']);
-         $offset = $rowCount * ($params['split_count_select'] - 1);
-         $graphStats[$name] = CRM_Mailing_Event_BAO_Opened::getRows($mailingAB[$column], NULL, FALSE, $offset, $rowCount, "{$open}.time_stamp ASC");
-         break;
- case 'Total Unique Clicks':
-         $totalCounts = CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($mailingAB[$column]);
-         $rowCount = round($totalCounts / $params['split_count']);
-         $offset = $rowCount * ($params['split_count_select'] - 1);
-         $graphStats[$name] = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows($mailingAB[$column], NULL, FALSE, NULL, $offset, $rowCount, "{$click}.time_stamp ASC");
-         break;
- case 'Total Clicks on a particular link':
-         if (empty($params['url'])) {
-         throw new API_Exception("Provide url to get stats result for '{$winningCriteria}'");
- }
- $url_id = CRM_Mailing_BAO_TrackableURL::getTrackerURLId($mailingAB[$column], $params['url']);
- $totalCounts = CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], NULL, FALSE, $url_id);
- $rowCount = round($totalCounts / $params['split_count']);
- $offset = $rowCount * ($params['split_count_select'] - 1);
- $graphStats[$name] = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows($mailingAB[$column], NULL, FALSE, $url_id, $offset, $rowCount, "{$click}.time_stamp ASC");
- break;
- }
- }
+  foreach ($ABFormat as $name => $column) {
+    switch ($winningCriteria) {
+      case 'Open':
+        $result = CRM_Mailing_Event_BAO_Opened::getRows($mailingAB['mailing_id_a'], NULL, TRUE, 0, 1, "civicrm_mailing_event_opened.time_stamp ASC");        $startDate = CRM_Utils_Date::processDate($result[0]['date']);
+        $dateDuration = round(round(strtotime($declareWinnerDate) - strtotime($startDate))/$params['split_count']);
+        $toDate = strtotime($startDate) + ($dateDuration * $params['split_count_select']);
+        $toDate = date('YmdHis', $toDate);
+        $graphStats[$name] = array(
+          $params['split_count_select'] => array(
+            'count' => CRM_Mailing_Event_BAO_Opened::getTotalCount($mailingAB[$column], NULL, TRUE, $toDate),
+            'time' =>  CRM_Utils_Date::customFormat($toDate)
+          )
+        );
+        break;
+      case 'Total Unique Clicks':
+        $result = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows($mailingAB['mailing_id_a'], NULL, TRUE, 0, 1, "civicrm_mailing_event_trackable_url_open.time_stamp ASC");
+        $startDate = CRM_Utils_Date::processDate($result[0]['date']);
+        $dateDuration = round(abs(strtotime($declareWinnerDate) - strtotime($startDate))/$params['split_count']);
+        $toDate = strtotime($startDate) + ($dateDuration * $params['split_count_select']);
+        $toDate = date('YmdHis', $toDate);
+        $graphStats[$name] = array(
+          $params['split_count_select'] => array(
+            'count' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], NULL, FALSE, NULL, $toDate),
+            'time' =>  CRM_Utils_Date::customFormat($toDate)
+          )
+        );
+        break;
+      case 'Total Clicks on a particular link':
+        if (empty($params['url'])) {
+          throw new API_Exception("Provide url to get stats result for '{$winningCriteria}'");
+        }
+        $url_id = CRM_Mailing_BAO_TrackableURL::getTrackerURLId($mailingAB[$column], $params['url']);
+        $result = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows($mailingAB['mailing_id_a'], NULL, FALSE, $url_id, 0, 1, "civicrm_mailing_event_trackable_url_open.time_stamp ASC");
+        $startDate = CRM_Utils_Date::processDate($result[0]['date']);
+        $dateDuration = round(abs(strtotime($declareWinnerDate) - strtotime($startDate))/$params['split_count']);
+        $toDate = strtotime($startDate) + ($dateDuration * $params['split_count_select']);
+        $toDate = CRM_Utils_Date::processDate($toDate);
+        $graphStats[$name] = array(
+          $params['split_count_select'] => array(
+            'count' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], NULL, FALSE, $url_id, $toDate),
+            'time' =>  CRM_Utils_Date::customFormat($toDate)
+          )
+        );
+        break;
+    }
+  }
 
- return civicrm_api3_create_success($graphStats);
+  return civicrm_api3_create_success($graphStats);
 }
