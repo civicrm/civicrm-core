@@ -49,7 +49,7 @@
         <label for="qa_email">{ts}Email:{/ts}</label>
     </div>
     <div>
-        <input type="text" name="email[1][email]" id="qa_email" class="form-text" maxlength="64" />
+        <input type="email" name="email[1][email]" id="qa_email" class="form-text" maxlength="64" />
     </div>
 
     <input type="hidden" name="email[1][location_type_id]" value="{$primaryLocationType}" />
