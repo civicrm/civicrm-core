@@ -97,7 +97,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     } else {
       $config = CRM_Core_Config::singleton();
       // cleanup only the templates_c directory
-      $config->cleanup(1, FALSE);
+      $config->cleanup(1, TRUE);
     }
     // end of hack
 
