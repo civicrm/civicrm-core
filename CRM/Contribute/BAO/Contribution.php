@@ -2993,19 +2993,12 @@ WHERE  contribution_id = %1 ";
           CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
 
           if ($fieldValues['tax_amount']) {
+            $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+            $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
             $itemParams['amount'] = $diff * $fieldValues['tax_amount'];
-            $itemParams['description'] = ts('VAT');
-            $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
+            $itemParams['description'] = $taxTerm;
             if ($fieldValues['financial_type_id']) {
-              $searchParams = array(
-                'entity_table' => 'civicrm_financial_type',
-                'entity_id' => $fieldValues['financial_type_id'],
-                'account_relationship' => $accountRel,
-              );
-
-              $result = array();
-              CRM_Financial_BAO_FinancialTypeAccount::retrieve( $searchParams, $result );
-              $itemParams['financial_account_id'] = CRM_Utils_Array::value( 'financial_account_id', $result );
+              $itemParams['financial_account_id'] = self::getFinancialAccountId($fieldValues['financial_type_id']);
             }
             CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
           }
@@ -3423,5 +3416,26 @@ WHERE con.id = {$contributionId}
       $info['transaction'] = $rows;
     }
     return $info;
+  }
+
+  /**
+   * Function to get financial account id has 'Sales Tax Account is'
+   * account relationship with financial type
+   *
+   * @param $financialTypeId
+   *
+   * @return FinancialAccountId
+   */
+  static function getFinancialAccountId($financialTypeId) {
+    $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
+    $searchParams = array(
+      'entity_table' => 'civicrm_financial_type',
+      'entity_id' => $financialTypeId,
+      'account_relationship' => $accountRel,
+    );
+    $result = array();
+    CRM_Financial_BAO_FinancialTypeAccount::retrieve( $searchParams, $result );
+
+    return CRM_Utils_Array::value( 'financial_account_id', $result );
   }
 }
