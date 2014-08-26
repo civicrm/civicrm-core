@@ -99,8 +99,6 @@
       $scope.from.email = $scope.currentMailing.from_email;
       $scope.from.total = '"'+ $scope.from.name +'"' + " <" + $scope.from.email + ">";
       $scope.reply.email = $scope.currentMailing.replyto_email;
-      console.log($scope.from.total);
-      console.log($scope.reply.email);
     }
 
     $scope.mailid = [];
@@ -141,7 +139,6 @@
       chck2.push(b);
     }
     $scope.incGroup = chck2;
-    console.log($scope.currentMailing);
 
     $scope.mailingForm = function() {
       if ($scope.mailing_form.$valid) {
@@ -692,15 +689,6 @@
           scope.$evalAsync('_resetSelection()');
           var a = $(element).attr('id');
           if(a=="htgroup"){
-          /*  var msg = document.getElementById("body_html").value;
-            var cursorlen = document.getElementById("body_html").selectionStart;
-            var textlen   = msg.length;
-            document.getElementById("body_html").value = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
-            scope.currentMailing.body_html = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
-            var cursorPos = (cursorlen + e.val.length);
-            document.getElementById("body_html").selectionStart = cursorPos;
-            document.getElementById("body_html").selectionEnd   = cursorPos;
-            document.getElementById("body_html").focus();*/
             if(scope.currentMailing.body_html =="" || scope.currentMailing.body_html == null)
               scope.currentMailing.body_html = e.val;
             else
