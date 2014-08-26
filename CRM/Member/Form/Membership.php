@@ -1655,6 +1655,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     if (!empty($lineItem[$priceSetId])) {
       $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+      $taxAmount = FALSE;
       $totalTaxAmount = 0;
       foreach ($lineItem[$priceSetId] as & $priceFieldOp) {
         if (!empty($priceFieldOp['membership_type_id'])) {
@@ -1666,6 +1667,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $priceFieldOp['start_date'] = $priceFieldOp['end_date'] = 'N/A';
         }
         if ($invoicing && isset($priceFieldOp['tax_amount'])) {
+          $taxAmount = TRUE;
           $totalTaxAmount += $priceFieldOp['tax_amount'];
         }
       }
@@ -1680,7 +1682,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             }
           } 
         }
-        $this->assign('totalTaxAmount', $totalTaxAmount);
+        if ($taxAmount) {
+          $this->assign('totalTaxAmount', $totalTaxAmount);
+          $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
+        }
         $this->assign('dataArray', $dataArray);
       }
     }
