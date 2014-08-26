@@ -307,7 +307,8 @@ input.crm-form-entityref {
 }
 
 /* Style civi form inputs to match select2 */
-.crm-container select.crm-form-select {
+.crm-container select.crm-form-select,
+.crm-container select.crm-form-date {
   border: 1px solid #aaa;
   color: #444;
   height: 2.2em;
@@ -4232,12 +4233,36 @@ span.crm-status-icon {
 #crm-container.crm-public select {
   font-size: 15px;
   padding: 5px;
-  border-radius: 2px;
+  border-radius: 3px;
   vertical-align: middle;
 }
 
 #crm-container.crm-public .label {
   padding-top: 6px;
+}
+
+.crm-container.crm-public .select2-container {
+  font-size: 14px;
+}
+.crm-container.crm-public .select2-container .select2-choice {
+  padding: 5px 5px 5px 8px;
+}
+.crm-container.crm-public .select2-container-multi .select2-choices {
+  padding: 4px;
+}
+.crm-public .select2-container .select2-choice .select2-arrow {
+  width: 20px;
+}
+.crm-public .select2-container .select2-choice .select2-arrow b {
+  position: relative;
+  top: 2px;
+  left: 2px;
+}
+.crm-container.crm-public .select2-container-multi .select2-choices .select2-search-choice {
+  padding: 3px 3px 3px 20px;
+}
+.crm-container.crm-public .select2-container-multi .select2-choices:before {
+  top: 9px;
 }
 
 .crm-public .crm-profile-view .content {
