@@ -127,8 +127,7 @@
   function getActions() {
     if (entity) {
       CRM.api3(entity, 'getactions').done(function(data) {
-        // Ensure 'get' is always an action
-        actions = _.union(['get'], data.values);
+        actions = data.values || ['get'];
         populateActions();
       });
     } else {
@@ -142,9 +141,14 @@
    * @param el
    */
   function populateActions(el) {
+    var val = $('#api-action').val();
     $('#api-action').select2({
       data: _.transform(actions, function(ret, item) {ret.push({text: item, id: item})})
     });
+    // If previously selected action is not available, set it to 'get' if possible
+    if (_.indexOf(actions, val) < 0) {
+      $('#api-action').select2('val', _.indexOf(actions, 'get') < 0 ? actions[0] : 'get', true);
+    }
   }
 
   /**
@@ -362,7 +366,7 @@
       alert(ts('Select an entity.'));
       return;
     }
-    if (action.indexOf('get') < 0) {
+    if (action.indexOf('get') < 0 && action != 'check') {
       var msg = action === 'delete' ? ts('This will delete data from CiviCRM. Are you sure?') : ts('This will write to the database. Continue?');
       CRM.confirm({title: ts('Confirm %1', {1: action}), message: msg}).on('crmConfirm:yes', execute);
     } else {
@@ -393,7 +397,6 @@
       .on('change', '#api-entity, #api-action', function() {
         entity = $('#api-entity').val();
         if ($(this).is('#api-entity')) {
-          $('#api-action').select2('val', 'get');
           getActions();
         }
         action = $('#api-action').val();
