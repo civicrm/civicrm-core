@@ -2,7 +2,8 @@
 (function($, _, undefined) {
   "use strict";
   var selected = 0,
-    form = 'form.crm-search-form';
+    form = 'form.crm-search-form',
+    active = 'a.button, a.action-item, a.crm-popup';
 
   function clearTaskMenu() {
     $('select#task', form).val('').select2('val', '').prop('disabled', true).select2('disable');
@@ -55,6 +56,18 @@
         enableTaskMenu();
       }
     });
+  }
+
+  /**
+   * Refresh the current page
+   */
+  function refresh() {
+    // Clear cached search results using force=1 argument
+    var location = $('#crm-main-content-wrapper').crmSnippet().crmSnippet('option', 'url');
+    if (!(location.match(/[?&]force=1/))) {
+      location += '&force=1';
+    }
+    $('#crm-main-content-wrapper').crmSnippet({url: location}).crmSnippet('refresh');
   }
 
   // Handle user interactions with search results
@@ -111,12 +124,17 @@
         url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=json';
         clearTaskMenu();
         $.post(url, data, function(data) {
-          CRM.loadForm(data.userContext).on('crmFormSuccess', function() {
-            CRM.refreshParent($form);
-          });
+          CRM.loadForm(data.userContext).on('crmFormSuccess', refresh);
           enableTaskMenu();
         }, 'json');
       }
     });
+
+  // Add a specialized version of livepage functionality
+  $('#crm-main-content-wrapper')
+    // Open action links in a popup
+    .off('.crmLivePage')
+    .on('click.crmLivePage', active, CRM.popup)
+    .on('crmPopupFormSuccess.crmLivePage', active, refresh);
 
 })(CRM.$, CRM._);
