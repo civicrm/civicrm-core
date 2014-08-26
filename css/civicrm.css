@@ -3686,7 +3686,9 @@ div.m ul#civicrm-menu,
 }
 /* Style autocomplete results */
 .crm-container .select2-results {
+  font-size: 12px;
   padding: 0;
+  text-align: left;
 }
 .crm-container .select2-results li,
 .crm-container .select2-results .crm-select2-row,
@@ -4241,7 +4243,8 @@ span.crm-status-icon {
   padding-top: 6px;
 }
 
-.crm-container.crm-public .select2-container {
+.crm-container.crm-public .select2-container,
+.crm-container.crm-public .select2-results {
   font-size: 14px;
 }
 .crm-container.crm-public .select2-container .select2-choice {
