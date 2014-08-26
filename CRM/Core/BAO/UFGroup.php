@@ -1728,21 +1728,15 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to build profile form
-   *
-   * @params object  $form       form object
-   * @params array   $field      array field properties
-   * @params int     $mode       profile mode
-   * @params int     $contactID  contact id
-   * @params string  $usedFor    for building up prefixed fieldname for special cases (e.g. onBehalf, Honor)
+   * Function to add profile field to a form
    *
    * @param CRM_Core_Form $form
-   * @param $field
-   * @param $mode
-   * @param null $contactId
+   * @param array $field properties
+   * @param int $mode profile mode
+   * @param int $contactId
    * @param bool $online
-   * @param null $usedFor
-   * @param null $rowNumber
+   * @param string $usedFor for building up prefixed fieldname for special cases (e.g. onBehalf, Honor)
+   * @param int $rowNumber
    * @param string $prefix
    *
    * @return null
@@ -1760,14 +1754,14 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $prefix = ''
   ) {
     $defaultValues = array();
-    $fieldName     = $field['name'];
-    $title         = $field['title'];
-    $attributes    = $field['attributes'];
-    $rule          = $field['rule'];
-    $view          = $field['is_view'];
-    $required      = ($mode == CRM_Profile_Form::MODE_SEARCH) ? FALSE : $field['is_required'];
-    $search        = ($mode == CRM_Profile_Form::MODE_SEARCH) ? TRUE : FALSE;
-    $isShared      = CRM_Utils_Array::value('is_shared', $field, 0);
+    $fieldName = $field['name'];
+    $title = $field['title'];
+    $attributes = $field['attributes'];
+    $rule = $field['rule'];
+    $view = $field['is_view'];
+    $required = ($mode == CRM_Profile_Form::MODE_SEARCH) ? FALSE : $field['is_required'];
+    $search = ($mode == CRM_Profile_Form::MODE_SEARCH) ? TRUE : FALSE;
+    $isShared = CRM_Utils_Array::value('is_shared', $field, 0);
 
     // do not display view fields in drupal registration form
     // CRM-4632
@@ -1793,6 +1787,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     else {
       $name = $fieldName;
     }
+    
+    $selectAttributes = array('class' => 'crm-select2', 'placeholder' => TRUE);
 
     // CRM-15172 - keep track of all the fields we've processed
     // This is hackish but we can't always rely on $form->_fields depending on how this is called
@@ -1835,8 +1831,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
       else {
         $options = CRM_Core_PseudoConstant::stateProvince();
-        $form->add('select', $name, $title,
-          array('' => ts('- select -')) + $options, $required && $options);
+        $form->add('select', $name, $title, $options, $required && $options, $selectAttributes);
       }
       $config = CRM_Core_Config::singleton();
       if (!in_array($mode, array(
@@ -1848,7 +1843,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
     }
     elseif (substr($fieldName, 0, 7) === 'country') {
-      $form->add('select', $name, $title, array('' => ts('- select -')) + CRM_Core_PseudoConstant::country(), $required);
+      $form->add('select', $name, $title, array('' => ts('- select -')) + CRM_Core_PseudoConstant::country(), $required, $selectAttributes);
       $config = CRM_Core_Config::singleton();
       if (!in_array($mode, array(
         CRM_Profile_Form::MODE_EDIT, CRM_Profile_Form::MODE_SEARCH)) &&
@@ -1866,8 +1861,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         }
         else {
           $options = CRM_Core_PseudoConstant::county();
-          $form->add('select', $name, $title,
-            array('' => ts('- select -')) + $options, $required && $options);
+          $form->add('select', $name, $title, $options, $required && $options, $selectAttributes);
         }
       }
     }
@@ -1944,10 +1938,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
     }
     elseif ($fieldName === 'prefix_id' || $fieldName === 'suffix_id') {
-      $form->add('select', $name, $title,
-        array(
-          '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Contact_BAO_Contact', $fieldName), $required
-      );
+      $form->addSelect($name, array(
+        'label' => $title,
+        'entity' => 'contact',
+        'field' => $fieldName,
+        'class' => 'six',
+        'placeholder' => '',
+      ), $required);
     }
     elseif ($fieldName === 'contact_sub_type') {
       $gId = $form->get('gid') ? $form->get('gid') : CRM_Utils_Array::value('group_id', $field);
@@ -2182,10 +2179,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
     }
     elseif ($fieldName == 'world_region') {
-      $form->add('select', $name, $title,
-        array(
-          '' => ts('- select -')) + CRM_Core_PseudoConstant::worldRegion(), $required
-      );
+      $form->add('select', $name, $title, CRM_Core_PseudoConstant::worldRegion(), $required, $selectAttributes);
     }
     elseif ($fieldName == 'signature_html') {
       $form->addWysiwyg($name, $title, CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', $fieldName));
@@ -2200,7 +2194,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         ));
         $form->add('select', $name, $title,
           array(
-            '' => ts('- select -')) + $campaigns, $required, 'class="big"'
+            '' => ts('- select -')) + $campaigns, $required, 'class="crm-select2 big"'
         );
       }
     }

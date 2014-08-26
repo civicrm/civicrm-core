@@ -240,19 +240,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Simple easy to use wrapper around addElement. Deal with
    * simple validation rules
    *
-   * @param $type
-   * @param $name
+   * @param string $type
+   * @param string $name
    * @param string $label
-   * @param string $attributes
+   * @param string|array $attributes (options for select elements)
    * @param bool $required
-   * @param null $extra
-   *
-   * @internal param \type $string of html element to be added
-   * @internal param \name $string of the html element
-   * @internal param \display $string label for the html element
-   * @internal param \attributes $string used for this element.
-   *               These are not default values
-   * @internal param \is $bool this a required field
+   * @param array $extra (attributes for select elements)
    *
    * @return HTML_QuickForm_Element could be an error object
    * @access public
@@ -260,13 +253,22 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   function &add($type, $name, $label = '',
     $attributes = '', $required = FALSE, $extra = NULL
   ) {
-    // Normalize this property
     if ($type == 'select' && is_array($extra)) {
+      // Normalize this property
       if (!empty($extra['multiple'])) {
         $extra['multiple'] = 'multiple';
       }
       else {
         unset($extra['multiple']);
+      }
+      // Add placeholder option for select
+      if (isset($extra['placeholder'])) {
+        if ($extra['placeholder'] === TRUE) {
+          $extra['placeholder'] = $required ? ts('- select -') : ts('- none -');
+        }
+        if (($extra['placeholder'] || $extra['placeholder'] === '') && empty($extra['multiple']) && is_array($attributes) && !isset($attributes[''])) {
+          $attributes = array('' => $extra['placeholder']) + $attributes;
+        }
       }
     }
     $element = $this->addElement($type, $name, $label, $attributes, $extra);
@@ -1039,9 +1041,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $options = $info['values'];
     if (!array_key_exists('placeholder', $props)) {
       $props['placeholder'] = $required ? ts('- select -') : ts('- none -');
-    }
-    if ($props['placeholder'] !== NULL && empty($props['multiple'])) {
-      $options = array('' => '') + $options;
     }
     // Handle custom field
     if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
