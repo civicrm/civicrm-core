@@ -283,11 +283,4 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       watchdog('civicrm', $message, NULL, WATCHDOG_DEBUG);
     }
   }
-
-  /**
-   * Flush css/js caches
-   */
-  function clearResourceCache() {
-    _drupal_flush_css_js();
-  }
 }
