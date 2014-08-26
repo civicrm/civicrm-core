@@ -97,7 +97,7 @@
     if ($scope.currentMailing.from_name != null) {
       $scope.from.name = $scope.currentMailing.from_name;
       $scope.from.email = $scope.currentMailing.from_email;
-      $scope.from.total = $scope.from.name + " <" + $scope.from.email + ">";
+      $scope.from.total = '"'+ $scope.from.name +'"' + " <" + $scope.from.email + ">";
       $scope.reply.email = $scope.currentMailing.replyto_email;
       console.log($scope.from.total);
       console.log($scope.reply.email);
@@ -371,7 +371,7 @@
       if ($scope.from.total != "") {
         var splt = $scope.from.total.split(" ");
         var splta = splt[1].substring(1,(splt[1].length-1));
-        var spltb = splt[0];
+        var spltb = splt[0].substring(1,(splt[0].length-1));
         $scope.currentMailing.from_email = splta;
         $scope.currentMailing.from_name = spltb;
       }
@@ -701,10 +701,10 @@
             document.getElementById("body_html").selectionStart = cursorPos;
             document.getElementById("body_html").selectionEnd   = cursorPos;
             document.getElementById("body_html").focus();*/
-            if(scope.currentMailing.body_html!="")
-            scope.currentMailing.body_html += e.val;
+            if(scope.currentMailing.body_html =="" || scope.currentMailing.body_html == null)
+              scope.currentMailing.body_html = e.val;
             else
-            scope.currentMailing.body_html = e.val;
+              scope.currentMailing.body_html += e.val;
           }
           else if(a=="subgroup"){
             var msg = document.getElementById("sub").value;
