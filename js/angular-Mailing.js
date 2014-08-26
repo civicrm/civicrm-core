@@ -9,6 +9,7 @@
   var chck2= []; // to get id and text in the required format
   var mltokens = [];
   var global = 0;
+  var tabact = 0;
 //-------------------------------------------------------------------------------------------------------
   crmMailing.config(['$routeProvider',
     function($routeProvider) {
@@ -64,6 +65,7 @@
     $scope.currentMailing = selectedMail;
     $scope.currentMailing.created_id = $scope.user_id;
     mltokens = CRM.crmMailing.mailTokens;
+    tabact = 0;
     $scope.pre = false;
     $scope.noOfRecipients = 0;
     $scope.testMailing = {};
@@ -97,6 +99,8 @@
       $scope.from.email = $scope.currentMailing.from_email;
       $scope.from.total = $scope.from.name + " <" + $scope.from.email + ">";
       $scope.reply.email = $scope.currentMailing.replyto_email;
+      console.log($scope.from.total);
+      console.log($scope.reply.email);
     }
 
     $scope.mailid = [];
@@ -137,7 +141,7 @@
       chck2.push(b);
     }
     $scope.incGroup = chck2;
-
+    console.log($scope.currentMailing);
 
     $scope.mailingForm = function() {
       if ($scope.mailing_form.$valid) {
@@ -170,7 +174,6 @@
       }
     };
     //initializing variables we will use for checkboxes, or for purpose of ng-show
-    $scope.acttab=0;
     $scope.composeS="1";
     if($scope.currentMailing.forward_replies==0 && $scope.currentMailing.auto_responder==0){
       $scope.trackreplies="0";
@@ -196,21 +199,21 @@
 
 
     $scope.recclicked = function(){
-      //if($scope.acttab >=0){
-      $scope.acttab =0;
-      //}
+      if(tabact >=0){
+        tabact = 0;
+      }
     };
 
     $scope.conclicked = function(){
-      //	if($scope.acttab >=1){
-      $scope.acttab =1;
-      //}
+     if(tabact >=1){
+      tabact = 1;
+      }
     };
 
     $scope.schedclicked = function(){
-      //if($scope.acttab >=2){
-      $scope.acttab =2;
-      //}
+     if(tabact >=2){
+      tabact = 2;
+      }
     };
 
     //to split the value of selectedMail.scheduled_date into the date and time separately
@@ -577,113 +580,51 @@
 
 
 // Directive to go to the next tab    
-/*  crmMailing.directive('nexttab', function() {
+  crmMailing.directive('nexttab', function() {
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
-        $(element).parent().parent().parent().parent().parent().tabs();
-        console.log($(element).parent().parent().parent().parent().parent());
-       // var myarr = new Array(1,2);
-        //$(element).parent().parent().parent().parent().parent().tabs({disabled:myarr});
+        var tabselector = $(".crmMailingTabs");
+        var myarr = new Array(1,2);
+        tabselector.tabs({disabled:myarr});
         $(element).on("click",function() {
-          scope.acttab=scope.acttab +1;
-        /*  var myArray1 = new Array( );
-          for ( var i = 0; i < 3; i++ ) {
-            if(scope.acttab!=i)
+          tabact = tabact + 1;
+          var myArray1 = new Array( );
+          scope.$apply();
+         for ( var i = 0; i < 3; i++ ) {
+            if(tabact !=i)
               myArray1.push(i);
-          }*/
-          //$(element).parent().parent().parent().parent().parent().tabs( "option", "disabled", myArray1 );
-       /*   $(element).parent().parent().parent().parent().parent().tabs({active:scope.acttab});
-          console.log("sid");
+          }
+
+         tabselector.tabs( "option", "disabled", myArray1 );
+         tabselector.tabs({active:tabact});
+          scope.$apply();
         });
       }
     };
-  });*/
+  });
 
   // Directive to go to the previous tab
-  /*crmMailing.directive('prevtab', function() {
+  crmMailing.directive('prevtab', function() {
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
-        $(element).parent().parent().parent().parent().parent().tabs();
-        //var myarr = new Array(1,2);
-        //$(element).parent().parent().parent().parent().parent().tabs({disabled:myarr});
-        $(element).on("click",function() {
-          scope.acttab=scope.acttab -1;
-        /*  var myArray1 = new Array( );
-          for ( var i = 0; i < 3; i++ ) {
-            if(scope.acttab!=i)
-              myArray1.push(i);
-          }*/
-          //		$(element).parent().parent().parent().parent().parent().tabs( "option", "disabled", myArray1 );
-       /*   $(element).parent().parent().parent().parent().parent().tabs({active:scope.acttab});
-          console.log("sid");
-        });
-      }
-    };
-  });*/
-
-
-   /*crmMailing.directive('prevtab', function () {
-    return {
-// Restrict it to be an attribute in this case
-      restrict: 'A',
-      priority: 500,
-// responsible for registering DOM listeners as well as updating the DOM
-      link: function (scope, element, attrs) {
-        $(element).on("click", function () {
-          var temp = scope.acttab - 1;
-          scope.tab_upd_dec();
-          scope.$apply();
-          if (temp != 3) {
-            $(".crmMailingTabs").tabs("option", "active", temp);
-          }
-          scope.$apply();
-        });
-      }
-    };
-  });*/
-
- /* crmMailing.directive('nexttab', function () {
-    return {
-// Restrict it to be an attribute in this case
-      restrict: 'A',
-      priority: 500,
-// responsible for registering DOM listeners as well as updating the DOM
-      link: function (scope, element, attrs) {
         var tabselector = $(".crmMailingTabs");
-        tabselector.tabs(scope.$eval(attrs.nexttab));
-        var myarr = new Array(1, 2, 3)
-// disable remaining tabs
-        if(scope.sparestuff.isnew == true)
-          tabselector.tabs({disabled: myarr});
-        $(element).on("click", function () {
-          if (scope.tab_val == 0) {
-            scope.create_abtest();
-          }
-          else {
-            if (scope.tab_val == 2) {
-              scope.update_abtest();
-              if (scope.currentABTest.winner_criteria_id == 1) {
-                scope.sparestuff.winnercriteria = "Open";
-                scope.$apply();
-              }
-
-              scope.a_b_update();
-            }
-          }
-          scope.tab_upd();
-          var myArray1 = new Array();
-          for (var i = scope.max_tab + 1; i < 4; i++) {
-            myArray1.push(i);
-          }
-          tabselector.tabs("option", "disabled", myArray1);
-          tabselector.tabs("option", "active", scope.tab_val);
+        tabselector.tabs();
+        $(element).on("click",function() {
+          tabact = tabact - 1;
           scope.$apply();
+          var myArray1 = new Array( );
+          for ( var i = 0; i < 3; i++ ) {
+            if(tabact!=i)
+              myArray1.push(i);
+          }
+          tabselector.tabs( "option", "disabled", myArray1 );
+          tabselector.tabs({active:tabact});
         });
       }
     };
-  });*/
+  });
 
 
   // Select 2 Widget for selecting the included group
@@ -791,6 +732,26 @@
   });
 
 
+  crmMailing.directive('ckedit', function() {
+    return {
+      require: '?ngModel',
+      link: function(scope, elm, attr, ngModel) {
+        var ck = CKEDITOR.replace(elm[0]);
+
+        if (!ngModel) return;
+
+        ck.on('pasteState', function() {
+          scope.$apply(function() {
+            ngModel.$setViewValue(ck.getData());
+          });
+        });
+
+        ngModel.$render = function(value) {
+          ck.setData(ngModel.$viewValue);
+        };
+      }
+    };
+  });
 
   // Used for the select date option. This is used for giving scheduled_date its date value
   crmMailing.directive('chsdate',function(){
@@ -835,7 +796,8 @@
     }
   });
 
-  //This controller is used for creating the mailing list. Simply gets all the mailing data from civiAPI
+
+ //This controller is used for creating the mailing list. Simply gets all the mailing data from civiAPI
   crmMailing.controller('mailingListCtrl', function($scope, crmApi, mailingList, $route) {
     if (global == 0) {
       global = global + 1;
