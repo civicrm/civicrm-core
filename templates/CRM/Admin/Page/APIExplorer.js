@@ -327,6 +327,7 @@
       smarty: "{crmAPI var='result' entity='" + entity + "' action='" + action + "'",
       php: "$result = civicrm_api3('" + entity + "', '" + action + "'",
       json: "CRM.api3('" + entity + "', '" + action + "'",
+      drush: "drush civicrm-api " + entity + '.' + action + ' ',
       rest: CRM.config.resourceBase + "extern/rest.php?entity=" + entity + "&action=" + action + "&json=" + JSON.stringify(params) + "&api_key=yoursitekey&key=yourkey"
     };
     smartyStub = false;
@@ -341,6 +342,7 @@
       q.php += "  '" + key + "' => " + phpFormat(value) + ",\n";
       q.json += "  \"" + key + '": ' + js;
       q.smarty += ' ' + key + '=' + smartyFormat(js, key);
+      q.drush += key + '=' + value + ' ';
     });
     if (i) {
       q.php += ")";
@@ -352,7 +354,7 @@
     if (action.indexOf('get') < 0) {
       q.smarty = '{* Smarty API only works with get actions *}';
     } else if (smartyStub) {
-      q.smarty = "{* Smarty does not have a syntax for array literals; assign complex variables on the server *}\n" + q.smarty;
+      q.smarty = "{* Smarty does not have a syntax for array literals; assign complex variables from php *}\n" + q.smarty;
     }
     $.each(q, function(type, val) {
       $('#api-' + type).removeClass('prettyprinted').text(val);
