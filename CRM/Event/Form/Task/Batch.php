@@ -191,7 +191,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
             );
           }
           $entityColumnValueRole = CRM_Utils_Array::value($roleId, $entityColumnValue);
-          $entityColumnValueEventType = CRM_Utils_Array::value(array_search($eventTypeId, $entityColumnValue), $entityColumnValue);
+          $entityColumnValueEventType = in_array($eventTypeId, $entityColumnValue) ? $eventTypeId : NULL;
           if (($this->_roleCustomDataTypeID == $customValue['extends_entity_column_id']) &&
             ($entityColumnValueRole)
           ) {
