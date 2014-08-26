@@ -9,7 +9,7 @@
   var chck2= []; // to get id and text in the required format
   var mltokens = [];
   var global = 0;
-  var tabact = 0;
+
 //-------------------------------------------------------------------------------------------------------
   crmMailing.config(['$routeProvider',
     function($routeProvider) {
@@ -23,8 +23,6 @@
 
         }
       });    //This route is used for generating the list of mails created.
-
-
 
       $routeProvider.when('/mailing/:id', {
         templateUrl: partialUrl('main.html'),
@@ -65,7 +63,6 @@
     $scope.currentMailing = selectedMail;
     $scope.currentMailing.created_id = $scope.user_id;
     mltokens = CRM.crmMailing.mailTokens;
-    tabact = 0;
     $scope.pre = false;
     $scope.noOfRecipients = 0;
     $scope.testMailing = {};
@@ -139,6 +136,24 @@
       chck2.push(b);
     }
     $scope.incGroup = chck2;
+    $scope.tabact = 0;
+    if($scope.currentMailing.id != null)
+      $scope.maxtab = 3;
+    $scope.maxtab = 0;
+
+    $scope.tabupdate = function(){
+      $scope.tabact = $scope.tabact + 1;
+      $scope.maxtab = Math.max($scope.maxtab,$scope.tabact);
+      console.log($scope.tabact);
+      console.log($scope.maxtab);
+
+    }
+
+    $scope.prevtabupdate = function(){
+      $scope.tabact = $scope.tabact - 1;
+      console.log($scope.tabact);
+      console.log($scope.maxtab);
+    }
 
     $scope.mailingForm = function() {
       if ($scope.mailing_form.$valid) {
@@ -196,21 +211,23 @@
 
 
     $scope.recclicked = function(){
-      if(tabact >=0){
-        tabact = 0;
-      }
+        $scope.tabact = 0;
+
     };
 
     $scope.conclicked = function(){
-     if(tabact >=1){
-      tabact = 1;
-      }
+      if($scope.tabact == 0)
+        $scope.save_next_page1();
+      $scope.tabact = 1;
     };
 
+
     $scope.schedclicked = function(){
-     if(tabact >=2){
-      tabact = 2;
-      }
+      if($scope.tabact == 0)
+        $scope.save_next_page1();
+      else if($scope.tabact == 1)
+        $scope.save_next_page2();
+      $scope.tabact = 2;
     };
 
     //to split the value of selectedMail.scheduled_date into the date and time separately
@@ -583,18 +600,20 @@
       link: function(scope, element, attrs) {
         var tabselector = $(".crmMailingTabs");
         var myarr = new Array(1,2);
-        tabselector.tabs({disabled:myarr});
+        if(scope.currentMailing.id==null){
+          tabselector.tabs({disabled:myarr});
+        }
         $(element).on("click",function() {
-          tabact = tabact + 1;
+          scope.tabupdate();
           var myArray1 = new Array( );
           scope.$apply();
-         for ( var i = 0; i < 3; i++ ) {
-            if(tabact !=i)
+         for ( var i = scope.maxtab + 1; i < 3; i++ ) {
               myArray1.push(i);
           }
 
          tabselector.tabs( "option", "disabled", myArray1 );
-         tabselector.tabs({active:tabact});
+         tabselector.tabs({active:scope.tabact});
+         console.log(scope.tabact);
           scope.$apply();
         });
       }
@@ -609,15 +628,11 @@
         var tabselector = $(".crmMailingTabs");
         tabselector.tabs();
         $(element).on("click",function() {
-          tabact = tabact - 1;
+          scope.prevtabupdate();
           scope.$apply();
           var myArray1 = new Array( );
-          for ( var i = 0; i < 3; i++ ) {
-            if(tabact!=i)
-              myArray1.push(i);
-          }
-          tabselector.tabs( "option", "disabled", myArray1 );
-          tabselector.tabs({active:tabact});
+          tabselector.tabs({active:scope.tabact});
+          console.log(scope.tabact);
         });
       }
     };
