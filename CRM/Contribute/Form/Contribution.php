@@ -1365,7 +1365,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $getTaxDetails = FALSE;
       $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,'contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-      $this->assign('invoicing', $invoicing);
       if ($invoicing) {
         if ($this->_action & CRM_Core_Action::ADD) {
           $line = $lineItem;
@@ -1375,7 +1374,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         }
         foreach ($line as $key => $value) {
           foreach ($value as $v) {
-            if (isset($taxRate[(string) $v['tax_rate']])) {
+            if (isset($taxRate[(string) CRM_Utils_Array::value('tax_rate', $v)])) {
               $taxRate[(string) $v['tax_rate']] = $taxRate[(string) $v['tax_rate']] + CRM_Utils_Array::value('tax_amount', $v);
             }
             else {
@@ -1386,9 +1385,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
             }
           }
         }
-      }
-      else {
-        $taxRate = array($submittedValues['tax_amount']);
       }
        
       if ($invoicing) {
@@ -1407,6 +1403,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
             $this->assign('totalTaxAmount', $submittedValues['tax_amount']);
             $this->assign('getTaxDetails', $getTaxDetails);
             $this->assign('dataArray', $taxRate);
+            $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
           }
           else {
             $this->assign('totalTaxAmount', CRM_Utils_Array::value('tax_amount', $submittedValues));
