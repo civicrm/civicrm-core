@@ -398,7 +398,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // fix the display of the monetary value, CRM-4038
     if (isset($defaults['total_amount'])) {
       if (!empty($defaults['tax_amount'])) {
-        $defaults['total_amount'] = CRM_Utils_Money::format($defaults['total_amount'] - $defaults['tax_amount'], NULL, '%a');
+        $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
+        if (!(CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails))) {
+          $defaults['total_amount'] = CRM_Utils_Money::format($defaults['total_amount'] - $defaults['tax_amount'], NULL, '%a');
+        }
       }
       else {
         $defaults['total_amount'] = CRM_Utils_Money::format($defaults['total_amount'], NULL, '%a');
@@ -932,6 +935,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $this->addFormRule(array('CRM_Contribute_Form_Contribution', 'formRule'), $this);
+
+    // if contribution is related to membership or participant freeze Financial Type, Amount
+    if ($this->_id && isset($this->_values['tax_amount'])) {
+      $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
+      if (CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails)) {
+        $financialType->freeze();
+        $totalAmount->freeze();
+        $this->assign('freezeFinancialType', TRUE);
+      }
+    }
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();

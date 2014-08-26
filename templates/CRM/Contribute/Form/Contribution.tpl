@@ -637,33 +637,37 @@ cj("#currency").on("change",function(){
 CRM.$(function($) {
   $('#total_amount').on("change",function(event) {
     if (event.handled !== true) {
-      var financialType = $('#financial_type_id').val();
-      var taxRates = '{/literal}{$taxRates}{literal}';
-      var taxRates = JSON.parse(taxRates);
-      var currencies = '{/literal}{$currencies}{literal}';
-      var currencies = JSON.parse(currencies);
-      var currencySelect = $('#currency').val();
-      var currencySymbol = currencies[currencySelect];
-      var re= /\((.*?)\)/g;
-      for(m = re.exec(currencySymbol); m; m = re.exec(currencySymbol)){
-        var currencySymbol = m[1];
-      }
-      var taxRate = taxRates[financialType]; 
-      if (!taxRate) {
-        taxRate = 0;
-      }  
-      var totalAmount = $('#total_amount').val();
-      var totalTaxAmount = '{/literal}{$totalTaxAmount}{literal}';
-      var taxAmount = (taxRate/100)*totalAmount.replace(/,/g,'');
-      taxAmount = isNaN (taxAmount) ? 0:taxAmount;
-      if (totalTaxAmount) {
-        var totalTaxAmount = (parseFloat(Number(totalTaxAmount) + Number(totalAmount.replace(/,/g,''))).toFixed(2)).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-      }
-      else {
-      	var totalTaxAmount = (parseFloat(taxAmount + Number(totalAmount.replace(/,/g,''))).toFixed(2)).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-      }
+      var freezeFinancialType = '{/literal}{$freezeFinancialType}{literal}';
+      if (!freezeFinancialType) {
+        var financialType = $('#financial_type_id').val();
+        var taxRates = '{/literal}{$taxRates}{literal}';
+        taxRates = JSON.parse(taxRates);
+        var currencies = '{/literal}{$currencies}{literal}';
+        currencies = JSON.parse(currencies);
+        var currencySelect = $('#currency').val();
+        var currencySymbol = currencies[currencySelect];
+        var re= /\((.*?)\)/g;
+        for(m = re.exec(currencySymbol); m; m = re.exec(currencySymbol)){
+          currencySymbol = m[1];
+        }
+        var taxRate = taxRates[financialType]; 
+        if (!taxRate) {
+          taxRate = 0;
+        }  
+        var totalAmount = $('#total_amount').val();
+        var thousandMarker = '{/literal}{$config->monetaryThousandSeparator}{literal}';
+        var seperator = '{/literal}{$config->monetaryDecimalPoint}{literal}';
+        // replace all thousandMarker and change the seperator to a dot
+	totalAmount = totalAmount.replace(thousandMarker,'').replace(seperator,'.');
 
-      $("#totalTaxAmount" ).html('Amount with tax : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
+      	var totalTaxAmount = '{/literal}{$totalTaxAmount}{literal}';
+      	var taxAmount = (taxRate/100)*totalAmount;
+      	taxAmount = isNaN (taxAmount) ? 0:taxAmount;
+      	var totalTaxAmount = taxAmount + Number(totalAmount);
+	totalTaxAmount = formatMoney( totalTaxAmount, 2, seperator, thousandMarker );
+
+      	$("#totalTaxAmount" ).html('Amount with tax : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
+      }
       event.handled = true;
     }
     return false;
@@ -683,5 +687,15 @@ CRM.$(function($) {
     }
   });
 });
+
+function formatMoney (amount, c, d, t){
+  var n = amount,
+  c = isNaN(c = Math.abs(c)) ? 2 : c,
+  d = d == undefined ? "," : d,
+  t = t == undefined ? "." : t, s = n < 0 ? "-" : "",
+  i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+  j = (j = i.length) > 3 ? j % 3 : 0;
+return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+};
 </script>
 {/literal}
