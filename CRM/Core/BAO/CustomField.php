@@ -759,10 +759,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $widget = 'Text';
     }
 
-    if ($widget == 'Select State/Province' || $widget == 'Select Country') {
-      $qf->_stateCountryMap[$widget == 'Select Country' ? 'country' : 'state_province'][] = $elementName;
-    }
-
     $placeholder = $search ? ts('- any -') : ($useRequired ? ts('- select -') : ts('- none -'));
 
     // FIXME: Why are select state/country separate widget types?

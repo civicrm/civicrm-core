@@ -600,9 +600,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $this->assign('useForMember', $this->get('useForMember'));
 
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
-
     $this->setDefaults($defaults);
 
     $this->freeze();

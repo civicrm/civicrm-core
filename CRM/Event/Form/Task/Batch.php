@@ -163,19 +163,24 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     // get the option value for custom data type
     $this->_roleCustomDataTypeID = CRM_Core_OptionGroup::getValue('custom_data_type', 'ParticipantRole', 'name');
     $this->_eventNameCustomDataTypeID = CRM_Core_OptionGroup::getValue('custom_data_type', 'ParticipantEventName', 'name');
+    $this->_eventTypeCustomDataTypeID = CRM_Core_OptionGroup::getValue('custom_data_type', 'ParticipantEventType', 'name');
 
     // build custom data getFields array
     $customFieldsRole = CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, $this->_roleCustomDataTypeID);
 
     $customFieldsEvent = CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, $this->_eventNameCustomDataTypeID);
+    $customFieldsEventType = CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, $this->_eventTypeCustomDataTypeID);
+
     $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsRole,
       CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, NULL, TRUE)
     );
+    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEventType, $customFields);
     $this->_customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEvent, $customFields);
 
     foreach ($this->_participantIds as $participantId) {
       $roleId = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Participant", $participantId, 'role_id');
       $eventId = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Participant", $participantId, 'event_id');
+      $eventTypeId = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $eventId, 'event_type_id');
       foreach ($this->_fields as $name => $field) {
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
           $customValue = CRM_Utils_Array::value($customFieldID, $this->_customFields);
@@ -186,6 +191,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
             );
           }
           $entityColumnValueRole = CRM_Utils_Array::value($roleId, $entityColumnValue);
+          $entityColumnValueEventType = in_array($eventTypeId, $entityColumnValue) ? $eventTypeId : NULL;
           if (($this->_roleCustomDataTypeID == $customValue['extends_entity_column_id']) &&
             ($entityColumnValueRole)
           ) {
@@ -193,6 +199,11 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
           }
           elseif (($this->_eventNameCustomDataTypeID == $customValue['extends_entity_column_id']) &&
             ($eventId == $entityColumnValueRole)
+          ) {
+            CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $participantId);
+          }
+          elseif ($this->_eventTypeCustomDataTypeID == $customValue['extends_entity_column_id'] &&
+            ($entityColumnValueEventType == $eventTypeId)
           ) {
             CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $participantId);
           }

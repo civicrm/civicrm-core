@@ -80,32 +80,14 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
    */
   function setDefaultValues() {
     $defaults = array();
-    $stateCountryMap = array();
     foreach ($this->_fields as $name => $field) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($field['name'])) {
         CRM_Core_BAO_CustomField::setProfileDefaults($customFieldID, $name, $defaults, NULL, CRM_Profile_Form::MODE_REGISTER);
       }
-
-      //CRM-5403
-      if ((substr($name, 0, 14) === 'state_province') || (substr($name, 0, 7) === 'country') || (substr($name, 0, 6) === 'county')) {
-        list($fieldName, $index) = CRM_Utils_System::explode('-', $name, 2);
-        if (!array_key_exists($index, $stateCountryMap)) {
-          $stateCountryMap[$index] = array();
-        }
-        $stateCountryMap[$index][$fieldName] = $name;
-      }
-    }
-
-    // also take care of state country widget
-    if (!empty($stateCountryMap)) {
-      CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap, $defaults);
     }
 
     //set default for country.
     CRM_Core_BAO_UFGroup::setRegisterDefaults($this->_fields, $defaults);
-
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
 
     return $defaults;
   }

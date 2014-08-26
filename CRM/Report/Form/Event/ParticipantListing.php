@@ -41,6 +41,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
   protected $_lineitemField = FALSE;
   protected $_groupFilter = TRUE;
   protected $_tagFilter = TRUE;
+  protected $activeCampaigns;
 
   protected $_customGroupExtends = array('Participant', 'Contact', 'Individual', 'Event');
 
@@ -747,19 +748,19 @@ GROUP BY  cv.label
       }
 
       // Convert campaign_id to campaign title
-      $this->_initBasicRow($rows, $entryFound, 'civicrm_participant_campaign_id', $this->activeCampaigns, $row, $rowNum);
+      $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_participant_campaign_id', $rowNum, $this->activeCampaigns);
 
       // handle contribution status
-      $this->_initBasicRow($rows, $entryFound, 'civicrm_contribution_contribution_status_id', $contributionStatus, $row, $rowNum);
+      $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_contribution_contribution_status_id', $rowNum, $contributionStatus);
 
       // handle payment instrument
-      $this->_initBasicRow($rows, $entryFound, 'civicrm_contribution_payment_instrument_id', $paymentInstruments, $row, $rowNum);
+      $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_contribution_payment_instrument_id', $rowNum, $paymentInstruments);
 
       // handle financial type
-      $this->_initBasicRow($rows, $entryFound, 'civicrm_contribution_financial_type_id', $financialTypes, $row, $rowNum);
+      $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_contribution_financial_type_id', $rowNum, $financialTypes);
 
       // handle gender id
-      $this->_initBasicRow($rows, $entryFound, 'civicrm_contact_gender_id', $genders, $row, $rowNum);
+      $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_contact_gender_id', $rowNum, $genders);
 
       // display birthday in the configured custom format
       if (array_key_exists('civicrm_contact_birth_date', $row)) {
