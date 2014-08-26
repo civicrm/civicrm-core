@@ -436,8 +436,6 @@ class CRM_Core_Resources {
 
   public function resetCacheCode() {
     $this->setCacheCode(CRM_Utils_String::createRandom(5, CRM_Utils_String::ALPHANUMERIC));
-    // Also flush cms resource cache if needed
-    CRM_Core_Config::singleton()->userSystem->clearResourceCache();
   }
 
   /**
