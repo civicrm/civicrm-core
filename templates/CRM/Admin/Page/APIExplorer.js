@@ -342,7 +342,7 @@
       q.php += "  '" + key + "' => " + phpFormat(value) + ",\n";
       q.json += "  \"" + key + '": ' + js;
       q.smarty += ' ' + key + '=' + smartyFormat(js, key);
-      q.drush += key + '=' + value + ' ';
+      q.drush += key + '=' + js + ' ';
     });
     if (i) {
       q.php += ")";

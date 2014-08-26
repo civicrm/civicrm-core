@@ -129,7 +129,7 @@
       <tr><td>Php</td><td><pre class="prettyprint linenums" id="api-php" title='php syntax'></pre></td></tr>
       <tr><td>Javascript</td><td><pre class="prettyprint linenums" id="api-json" title='javascript syntax'></pre></td></tr>
       {if $config->userSystem->is_drupal}
-        <tr><td>Drush</td><td><pre class="prettyprint linenums" id="api-drush" title='drush syntax'></pre></td></tr>
+        <tr><td>Drush</td><td><pre class="prettyprint" id="api-drush" title='drush syntax'></pre></td></tr>
       {/if}
     </table>
   </div>
