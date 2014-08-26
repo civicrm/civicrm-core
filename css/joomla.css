@@ -359,6 +359,9 @@ ul#civicrm-menu li#crm-qsearch {
   width: auto;
   padding: 2px 4px;
 }
+.crm-container .select2-search input {
+  width: 100%;
+}
 .crm-container textarea,
 .crm-container input {
   height: auto;
@@ -366,3 +369,4 @@ ul#civicrm-menu li#crm-qsearch {
 .crm-container input[type=submit] {
   height: auto;
 }
+
