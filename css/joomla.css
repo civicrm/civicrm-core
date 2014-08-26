@@ -370,3 +370,6 @@ ul#civicrm-menu li#crm-qsearch {
   height: auto;
 }
 
+.crm-container .disabled {
+  font-weight: normal;
+}
