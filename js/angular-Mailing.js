@@ -244,14 +244,6 @@
       }
     }
 
-    // To split the scheduled_date into date and time. The date format is not accepting
-    if(selectedMail.scheduled_date != null){
-      $scope.ans= selectedMail.scheduled_date.split(" ");
-      $scope.scheddate.date=$scope.ans[0];
-      $scope.scheddate.time=$scope.ans[1];
-    }
-
-
     //changing the screen from compose on screen to upload content
     $scope.upldChange= function(composeS){
       if(composeS=="1"){
@@ -384,21 +376,6 @@
         $scope.currentMailing.from_email = splta;
         $scope.currentMailing.from_name = spltb;
       }
-
-      if ($scope.currentMailing.scheduled_date == $scope.currentMailing.approval_date
-        && $scope.currentMailing.scheduled_date != null) {;
-      }
-      else {
-        $scope.currentMailing.scheduled_date= $scope.scheddate.date + " " + $scope.scheddate.time ;
-        if ($scope.currentMailing.scheduled_date!=" ") {
-          $scope.currentMailing.scheduled_id= $scope.user_id;
-        }
-        else {
-          $scope.currentMailing.scheduled_date= null;
-        }
-      }
-
-
     }
 
     $scope.save_next = function() {
@@ -451,8 +428,6 @@
           resubscribe_id: $scope.currentMailing.resubscribe_id,
           body_html: $scope.currentMailing.body_html,
           body_text: $scope.currentMailing.body_text,
-          scheduled_date: $scope.currentMailing.scheduled_date==null ? "" : $scope.currentMailing.scheduled_date,
-          scheduled_id: $scope.currentMailing.scheduled_id==null ? "" : $scope.currentMailing.scheduled_id,
           campaign_id:	$scope.currentMailing.campaign_id==null ? "" : $scope.currentMailing.campaign_id,
           header_id:	$scope.currentMailing.header_id,
           footer_id:	$scope.currentMailing.footer_id,
@@ -463,9 +438,6 @@
             exclude: $scope.excMail
           },
           is_completed: $scope.currentMailing.is_completed,
-          approver_id: $scope.currentMailing.approver_id,
-          approval_status_id: $scope.currentMailing.approval_status_id,
-          approval_date: $scope.currentMailing.approval_date,
           dedupe_email: $scope.currentMailing.dedupe_email
         },
         true);
@@ -480,6 +452,53 @@
 
     $scope.save_next_page2 = function() {
       $scope.save_repeat();
+      var result = crmApi('Mailing', 'create', {
+          id: $scope.currentMailing.id,
+          name: $scope.currentMailing.name,
+          visibility:  $scope.currentMailing.visibility,
+          created_id: $scope.currentMailing.created_id,
+          subject: $scope.currentMailing.subject,
+          msg_template_id: $scope.currentMailing.msg_template_id==null ? "" : $scope.currentMailing.msg_template_id,
+          open_tracking: $scope.currentMailing.open_tracking,
+          url_tracking: $scope.currentMailing.url_tracking,
+          forward_replies: $scope.currentMailing.forward_replies,
+          auto_responder: $scope.currentMailing.auto_responder,
+          from_name: $scope.currentMailing.from_name,
+          from_email: $scope.currentMailing.from_email,
+          replyto_email: $scope.currentMailing.replyto_email,
+          unsubscribe_id: $scope.currentMailing.unsubscribe_id,
+          resubscribe_id: $scope.currentMailing.resubscribe_id,
+          body_html: $scope.currentMailing.body_html,
+          body_text: $scope.currentMailing.body_text,
+          campaign_id:	$scope.currentMailing.campaign_id==null ? "" : $scope.currentMailing.campaign_id,
+          header_id:	$scope.currentMailing.header_id,
+          footer_id:	$scope.currentMailing.footer_id,
+          is_completed: $scope.currentMailing.is_completed,
+          dedupe_email: $scope.currentMailing.dedupe_email
+        },
+        true);
+      //var result = crmApi('Mailing', 'create', $scope.currentMailing, true);
+      result.success(function(data) {
+        if (data.is_error == 0) {
+          $scope.currentMailing.id = data.id;
+        }
+      });
+    };
+
+    $scope.save_next_page3 = function() {
+      $scope.save_repeat();
+      if ($scope.currentMailing.scheduled_date == $scope.currentMailing.approval_date
+        && $scope.currentMailing.scheduled_date != null) {;
+      }
+      else {
+        $scope.currentMailing.scheduled_date= $scope.scheddate.date + " " + $scope.scheddate.time ;
+        if ($scope.currentMailing.scheduled_date!=" ") {
+          $scope.currentMailing.scheduled_id= $scope.user_id;
+        }
+        else {
+          $scope.currentMailing.scheduled_date= null;
+        }
+      }
       var result = crmApi('Mailing', 'create', {
           id: $scope.currentMailing.id,
           name: $scope.currentMailing.name,
@@ -562,7 +581,8 @@
       if($scope.now == 1){
         $scope.currentMailing.scheduled_date = $scope.currentMailing.approval_date;
       }
-      $scope.save();
+      $scope.save_next_page3();
+      $scope.back();
     };
 
     $scope.$watch('pre',function(){
