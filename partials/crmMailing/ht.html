@@ -1,15 +1,17 @@
 
 
 <br>
-<!--&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
-&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
-&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp-->
 <div style = "float:right;">
-<input type="hidden" groupselect id= "htgroup" ng-model="token" ></input>
+<input type="hidden" groupselect id= "htgroup" ng-model="token" />
 </div>
 <br>
+<br>
+<!--<textarea id="body_html" ng-model="currentMailing.body_html" style="width: 600px; height: 300px;"></textarea>-->
+<div ckedit="body" ng-model="currentMailing.body_html" style="width: 600px; height: 300px;"/>
 
-<textarea id="body_html" ng-model="currentMailing.body_html" style="width: 600px; height: 300px;"></textarea>
+<div ng-show="false">
+<textarea id="body_html" ck-editor ng-model="currentMailing.body_html"></textarea>
+</div>
 <br> <br>
 
 
