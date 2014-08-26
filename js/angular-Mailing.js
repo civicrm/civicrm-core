@@ -692,7 +692,7 @@
           scope.$evalAsync('_resetSelection()');
           var a = $(element).attr('id');
           if(a=="htgroup"){
-            var msg = document.getElementById("body_html").value;
+          /*  var msg = document.getElementById("body_html").value;
             var cursorlen = document.getElementById("body_html").selectionStart;
             var textlen   = msg.length;
             document.getElementById("body_html").value = msg.substring(0, cursorlen) + e.val + msg.substring(cursorlen, textlen);
@@ -700,7 +700,11 @@
             var cursorPos = (cursorlen + e.val.length);
             document.getElementById("body_html").selectionStart = cursorPos;
             document.getElementById("body_html").selectionEnd   = cursorPos;
-            document.getElementById("body_html").focus();
+            document.getElementById("body_html").focus();*/
+            if(scope.currentMailing.body_html!="")
+            scope.currentMailing.body_html += e.val;
+            else
+            scope.currentMailing.body_html = e.val;
           }
           else if(a=="subgroup"){
             var msg = document.getElementById("sub").value;
