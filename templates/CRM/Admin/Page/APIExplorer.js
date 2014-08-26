@@ -238,7 +238,7 @@
       });
       return 'array(' + ret + ')';
     }
-    return JSON.stringify(val);
+    return JSON.stringify(val).replace('$', '\\$');
   }
 
   /**
