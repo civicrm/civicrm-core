@@ -74,7 +74,7 @@
 	       {/if}</font> </td> 
 	</tr>
       </table>
-      <table style = "margin-top:75px;padding-right:73px;font-family: Arial, Verdana, sans-serif" width = "590" border = "0"cellpadding = "-5" cellspacing = "19" id = "desc">	
+      <table style = "margin-top:75px;font-family: Arial, Verdana, sans-serif" width = "590" border = "0"cellpadding = "-5" cellspacing = "19" id = "desc">	
 	<tr>
           <td colspan = "2" {$valueStyle}>
             <table> {* FIXME: style this table so that it looks like the text version (justification, etc.) *}
