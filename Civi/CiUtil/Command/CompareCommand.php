@@ -5,11 +5,12 @@ class CompareCommand {
   static function main($argv) {
     if (empty($argv[1])) {
       echo "summary: Compares the output of different test runs\n";
-      echo "usage: phpunit-compare [--phpunit-json|--jenkins-xml] <file1> <file2>...\n";
+      echo "usage: phpunit-compare [--out=txt|csv] [--phpunit-json|--jenkins-xml] <file1> <file2>...\n";
       exit(1);
     }
 
     $parser = array('\Civi\CiUtil\PHPUnitParser', 'parseJsonResults');
+    $printerType = 'txt';
     $suites = array(); // array('file' => string, 'results' => array)
     for ($i = 1; $i < count($argv); $i++) {
       switch ($argv[$i]) {
@@ -18,6 +19,12 @@ class CompareCommand {
           break;
         case '--jenkins-xml':
           $parser = array('\Civi\CiUtil\JenkinsParser', 'parseXmlResults');
+          break;
+        case '--out=txt':
+          $printerType = 'txt';
+          break;
+        case '--out=csv':
+          $printerType = 'csv';
           break;
         default:
           $suites[] = array(
@@ -36,7 +43,11 @@ class CompareCommand {
     }
     sort($tests);
 
-    $printer = new \Civi\CiUtil\ComparisonPrinter(\Civi\CiUtil\Arrays::collect($suites, 'file'));
+    if ($printerType == 'csv') {
+      $printer = new \Civi\CiUtil\CsvPrinter('php://stdout', \Civi\CiUtil\Arrays::collect($suites, 'file'));
+    } else {
+      $printer = new \Civi\CiUtil\ComparisonPrinter(\Civi\CiUtil\Arrays::collect($suites, 'file'));
+    }
     foreach ($tests as $test) {
       $values = array();
       foreach ($suites as $suite) {
