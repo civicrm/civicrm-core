@@ -412,7 +412,8 @@
               $el.data('civiCrmSnippet')._originalUrl = response.userContext;
               $el.crmSnippet('resetUrl').crmSnippet('refresh');
             }
-            else if ($el.data('uiDialog') && settings.autoClose) {
+            // Close if we are on the original url or the action was "delete" (in which case returning to view may be inappropriate)
+            else if ($el.data('uiDialog') && (settings.autoClose || response.action === 8)) {
               $el.dialog('close');
             }
             else if (settings.autoClose === false) {
