@@ -104,8 +104,10 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     );
 
     if ($taxTrxnID) {
+      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
       $params['amount'] = $lineItem->tax_amount;
-      $params['description'] = 'VAT';
+      $params['description'] = $taxTerm;
       $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
     }
     else {
