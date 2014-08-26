@@ -11,9 +11,9 @@
     }
   </style>
   <div id="grph" ></div>
-  <div linegraph></div>
+  <div id="linegraph"></div>
   {{r5}}
-  <table  style ="position: relative;  right :-425px; top:-250px; width :250px;">
+  <table  style ="position: relative;  right :-575px; top:-250px; width :250px;" ng-show= "graphload">
     <tr  >
       <th>Details</th>
       <th style="width :90px;">Version A</th>
@@ -46,7 +46,7 @@
     </tr>
 
   </table>
-  <br><br>
+
    <hr>
 
   <table>
@@ -55,11 +55,13 @@
     <tr >
 
       <td>
-        <input type="radio" name="stop" >  Stop Test and Send Version A
+        <input type="radio"  ng-click = "asure();" name="stop"  >  Stop Test and Send Version A
+        <div ng-show = "aastop" stopa>Are you Sure?</div>
       </td>
 
       <td>
-        <input type="radio" name="stop">  Stop Test and Send Version B
+        <input type="radio" ng-click="bsure(); " name="stop" id="bstop">  Stop Test and Send Version B
+        <div ng-show = "bbstop" stopb>Are you Sure?</div>
       </td>
     </tr>
 
