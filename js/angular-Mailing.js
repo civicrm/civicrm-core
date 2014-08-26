@@ -144,15 +144,10 @@
     $scope.tabupdate = function(){
       $scope.tabact = $scope.tabact + 1;
       $scope.maxtab = Math.max($scope.maxtab,$scope.tabact);
-      console.log($scope.tabact);
-      console.log($scope.maxtab);
-
     }
 
     $scope.prevtabupdate = function(){
       $scope.tabact = $scope.tabact - 1;
-      console.log($scope.tabact);
-      console.log($scope.maxtab);
     }
 
     $scope.mailingForm = function() {
@@ -613,7 +608,6 @@
 
          tabselector.tabs( "option", "disabled", myArray1 );
          tabselector.tabs({active:scope.tabact});
-         console.log(scope.tabact);
           scope.$apply();
         });
       }
@@ -632,7 +626,6 @@
           scope.$apply();
           var myArray1 = new Array( );
           tabselector.tabs({active:scope.tabact});
-          console.log(scope.tabact);
         });
       }
     };
