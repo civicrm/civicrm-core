@@ -136,6 +136,9 @@ div.crm-container fieldset label{
 ** Size input fields in crm-container by class. Classes are assigned by the
 ** module in relation to the data object max size.
 */
+.crm-container .crm-select2 {
+  width: 15em;
+}
 .crm-container .two {
   width: 2em;
 }
@@ -3630,9 +3633,6 @@ div.m ul#civicrm-menu,
 }
 
 /* select2 */
-.crm-select2 {
-  width: 15em;
-}
 .crm-container div.select2-container {
   min-width: 6em;
   font-size: 11px;

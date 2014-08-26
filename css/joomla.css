@@ -60,41 +60,6 @@ td.label {
 }
 
 /*
-** Menu styles
-*/
-#crm-container .menu {
-  padding: 0 0 0 0.5em;
-  margin: 0 0 0 2em;
-}
-#crm-container .menu ul {
-  list-style: none;
-  border: none;
-  text-align:left;
-}
-#crm-container .menu li a {
-  width: 100%;
-  text-decoration: none;
-}
-#crm-container li.expanded {
-  list-style-type: circle;
-  list-style-image: url(menu-expanded.png);
-  padding: 0.2em 0.5em 0 0;
-  margin: 0;
-}
-#crm-container li.collapsed {
-  list-style-type: disc;
-  list-style-image: url(menu-collapsed.png);
-  padding: 0.2em 0.5em 0 0;
-  margin: 0;
-}
-#crm-container li a.active {
-  color: #000;
-}
-#crm-container td.menu-disabled {
-  background: #ccc;
-}
-
-/*
 ** Other common styles
 */
 .breadcrumb {
