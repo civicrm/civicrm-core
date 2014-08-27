@@ -5,24 +5,24 @@
  */
 (function($, CRM, undefined) {
   /**
-   * Almost like {crmURL} but on the client side
-   * eg: var url = CRM.url('civicrm/contact/view', {reset:1,cid:42});
-   * or: $('a.my-link').crmURL();
+   * @param string p - url
+   * @param string|object params
+   * @param string mode - optionally specify "front" or "back"
    */
-  var tplURL = '/civicrm/example?placeholder';
-  var urlInitted = false;
-  CRM.url = function (p, params) {
+  var tplURL;
+  CRM.url = function (p, params, mode) {
     if (p == "init") {
-      tplURL = params;
-      urlInitted = true;
-      return;
+      return tplURL = params;
     }
-    if (!urlInitted) {
+    if (!tplURL) {
       console && console.log && console.log('Warning: CRM.url called before initialization');
+    }
+    if (!mode) {
+      mode = CRM.config.isFrontend ? 'front' : 'back';
     }
     params = params || '';
     var frag = p.split ('?');
-    var url = tplURL.replace("civicrm/example", frag[0]);
+    var url = tplURL[mode].replace("civicrm/example", frag[0]);
 
     if (typeof(params) == 'string') {
       url = url.replace("placeholder", params);
