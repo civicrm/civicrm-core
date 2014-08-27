@@ -728,10 +728,14 @@ HTACCESS;
    * @param string $fileName
    * @return string
    */
-  static function dynamicResourceUrl($fileName) {
+  static function dynamicResourceUrl($fileName, $addCacheCode = TRUE) {
     $config = CRM_Core_Config::singleton();
     // FIXME: Need a better way of getting the url of the baseFilePath
-    return self::addTrailingSlash(str_replace('/persist/contribute', '', $config->imageUploadURL), '/') . 'dynamic/' . $fileName;
+    $url = self::addTrailingSlash(str_replace('/persist/contribute', '', $config->imageUploadURL), '/') . 'dynamic/' . $fileName;
+    if ($addCacheCode) {
+      return $url . '?r=' . CRM_Core_Resources::singleton()->getCacheCode();
+    }
+    return $url;
   }
 
   /**
