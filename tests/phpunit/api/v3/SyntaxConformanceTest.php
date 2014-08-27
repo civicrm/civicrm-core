@@ -684,7 +684,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'check that no limit returns 25',
     );
 
-    $baoString = _civicrm_api3_get_DAO($entityName);
+    $baoString = _civicrm_api3_get_BAO($entityName);
     if (empty($baoString)) {
       $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
       return;
@@ -749,7 +749,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       return;
     }
 
-    $baoString = _civicrm_api3_get_DAO($entityName);
+    $baoString = _civicrm_api3_get_BAO($entityName);
     if (empty($baoString)) {
       $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
       return;
@@ -887,7 +887,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       return;
     }
 
-    $baoString = _civicrm_api3_get_DAO($entityName);
+    $baoString = _civicrm_api3_get_BAO($entityName);
     $this->assertNotEmpty($baoString, $entityName);
     $this->assertNotEmpty($entityName, $entityName);
     $fieldsGet = $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'get'));
@@ -1170,7 +1170,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @return array
    */
   private function getMockableBAOObjects($entityName, $count = 2) {
-    $baoString = _civicrm_api3_get_DAO($entityName);
+    $baoString = _civicrm_api3_get_BAO($entityName);
     if (empty($baoString)) {
       $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
       return;
