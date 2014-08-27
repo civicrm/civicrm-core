@@ -215,6 +215,7 @@ function civicrm_api3_generic_getvalue($apiRequest) {
  */
 function _civicrm_api3_generic_getrefcount_spec(&$params) {
   $params['id']['api.required'] = 1;
+  $params['id']['title'] = 'Entity ID';
 }
 
 /**

@@ -1139,16 +1139,22 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     if (in_array($entity, $entities)) {
       $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, $entity . 'Test.php');
     }
-    $fields = $this->callAPISuccess($entity, 'getfields', array('action' => 'create'));
-    if (!empty($ids)) {
-      $this->assertArrayHasKey('custom_' . $ids['custom_field_id'], $fields['values']);
-    }
+    $actions =  $this->callAPISuccess($entity, 'getactions', array());
+    foreach ($actions['values'] as $action) {
+      if (substr($action, -7) == '_create'  || substr($action, -4) == '_get' || substr($action, -7) == '_delete') {
+        //getactions can't distinguish between contribution_page.create & contribution_page.create
+        continue;
+      }
+      $fields = $this->callAPISuccess($entity, 'getfields', array('action' => $action));
+      if (!empty($ids) && in_array($action, array('create', 'get'))) {
+        $this->assertArrayHasKey('custom_' . $ids['custom_field_id'], $fields['values']);
+      }
 
-    foreach ($fields['values'] as $fieldName => $fieldSpec) {
-      $this->assertArrayHasKey('title', $fieldSpec, "no title for $entity - $fieldName");
-      $this->assertNotEmpty($fieldSpec['title'], "empty title for $entity - $fieldName");
+      foreach ($fields['values'] as $fieldName => $fieldSpec) {
+        $this->assertArrayHasKey('title', $fieldSpec, "no title for $entity - $fieldName on action $action");
+        $this->assertNotEmpty($fieldSpec['title'], "empty title for $entity - $fieldName");
+      }
     }
-
     if (!empty($ids)) {
       $this->customFieldDelete($ids['custom_field_id']);
       $this->customGroupDelete($ids['custom_group_id']);
