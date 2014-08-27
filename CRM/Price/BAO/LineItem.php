@@ -114,7 +114,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @return null|string
    */
   static function getLineTotal($entityId, $entityTable) {
-    $sqlLineItemTotal = "SELECT SUM(li.line_total)
+    $sqlLineItemTotal = "SELECT SUM(li.line_total + COALESCE(li.tax_amount,0))
 FROM civicrm_line_item li
 WHERE li.entity_table = '{$entityTable}'
 AND li.entity_id = {$entityId}
@@ -293,6 +293,7 @@ AND li.entity_id = {$entityId}
         'auto_renew' => CRM_Utils_Array::value('auto_renew', $options[$oid]),
         'html_type' => $fields['html_type'],
         'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $options[$oid]),
+        'tax_amount' => CRM_Utils_Array::value('tax_amount', $options[$oid]),
       );
 
       if ($values[$oid]['membership_type_id'] && empty($values[$oid]['auto_renew'])) {
