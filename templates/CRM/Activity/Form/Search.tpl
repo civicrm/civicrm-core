@@ -88,19 +88,20 @@
 {literal}
   <script type="text/javascript">
     CRM.$(function($) {
-      var roleId = cj('input[name=activity_role]:checked', '#Search').val();
+      var $form = $('form.{/literal}{$form.formClass}{literal}'),
+        roleId = $('input[name=activity_role]:checked', $form).val();
       if (roleId) {
-        cj('.description .option-' + roleId).show();
+        $('.description .option-' + roleId).show();
       }
 
+      $('[name=activity_role]:input').change(function() {
+        $('.description .contact-name-option').hide();
+        if ($(this).is(':checked')) {
+          $('.description .option-' + $(this).val()).show();
+        }
+      }).change();
     });
 
-    cj('[name=activity_role]:input').change(function () {
-      cj('.description .contact-name-option').hide();
-      if (cj(this).is(':checked')) {
-        cj('.description .option-' + cj(this).val()).show();
-      }
-    }).change();
 
   </script>
 {/literal}

@@ -25,183 +25,176 @@
 *}
 {literal}
 <script type="text/javascript">
-CRM.$(function($) {
-// for date sorting see http://wiki.civicrm.org/confluence/display/CRMDOC/Sorting+Date+Fields+in+dataTables+Widget
-var useAjax = {/literal}{if $useAjax}1{else}0{/if}{literal};
-var sortEnabled = true;
-var sourceUrl = '';
-var useClass  = 'display';
+  CRM.$(function($) {
 
-var tcount =1;
-if ( useAjax ) {
- {/literal}{if isset($sourceUrl)}sourceUrl = "{$sourceUrl}";{/if}{literal}
- useClass = 'pagerDisplay';
- tcount =5;
-}
+    function getElementClass(element) {
+      return $(element).attr('class') || '';
+    }
 
-var tableId = '';
-var count   = 1;
+    // fetch the occurrence of element
+    function getRowId(row, str) {
+      var optionId;
+      $.each(row, function(i, n) {
+        if (str === $(n).attr('class')) {
+          optionId = i;
+        }
+      });
+      return optionId;
+    }
+    
+    // for date sorting see http://wiki.civicrm.org/confluence/display/CRMDOC/Sorting+Date+Fields+in+dataTables+Widget
+    var useAjax = {/literal}{if $useAjax}1{else}0{/if}{literal};
+    var sourceUrl = '';
+    var useClass  = 'display';
 
-//rename id of table with sequence
-//and create the object for navigation
-cj('table.' + useClass).each(function(){
-    cj(this).attr('id','option' + tcount + count);
-    tableId += count + ',';
-    count++;
-});
+    var tcount = 1;
+    if ( useAjax ) {
+      {/literal}{if isset($sourceUrl)}sourceUrl = "{$sourceUrl}";{/if}{literal}
+      useClass = 'pagerDisplay';
+      tcount = 5;
+    }
 
-//remove last comma
-tableId = tableId.substring(0, tableId.length - 1 );
-eval('tableId =[' + tableId + ']');
+    var tableId = [], count = 1;
 
-  cj.each(tableId, function(i,n){
-    tabId = '#option' + tcount + n;
-    //get the object of first tr data row.
-    tdObject = cj(tabId + ' tr:nth(1) td');
-    var id = -1; var count = 0; var columns=''; var sortColumn = '';
-    //build columns array for sorting or not sorting
-    cj(tabId + ' th').each( function( ) {
-        var option = cj(this).prop('id').split("_");
+    //rename id of table with sequence
+    //and create the object for navigation
+    $('table.' + useClass).each(function() {
+      $(this).attr('id','option' + tcount + count);
+      tableId.push(count);
+      count++;
+    });
+
+    $.each(tableId, function(i,n){
+      var tabId = '#option' + tcount + n;
+      //get the object of first tr data row.
+      var tdObject = $(tabId + ' tr:nth(1) td');
+      var id = -1; var count = 0; var columns=''; var sortColumn = '';
+      //build columns array for sorting or not sorting
+      $(tabId + ' th').each( function( ) {
+        var option = $(this).prop('id').split("_");
         option  = ( option.length > 1 ) ? option[1] : option[0];
-        stype   = 'numeric';
+        var stype   = 'numeric';
         switch( option ) {
-            case 'sortable':
-                sortColumn += '[' + count + ', "asc" ],';
-                columns += '{"sClass": "'+ getElementClass( this ) +'"},';
+          case 'sortable':
+            sortColumn += '[' + count + ', "asc" ],';
+            columns += '{"sClass": "'+ getElementClass( this ) +'"},';
             break;
-            case 'date':
-                stype = 'date';
-            case 'order':
-                if ( cj(this).attr('class') == 'sortable' ){
-                    sortColumn += '[' + count + ', "asc" ],';
-                }
-                sortId   = getRowId(tdObject, cj(this).attr('id') +' hiddenElement' );
-                sortEnabled = true;
-                columns += '{ "render": function ( data, type, row ) { return "<div style=\'display:none\'>"+ data +"</div>" + row[sortId] ; }, "targets": sortColumn,"bUseRendered": false},';
+          case 'date':
+            stype = 'date';
+          case 'order':
+            if ( $(this).attr('class') == 'sortable' ){
+              sortColumn += '[' + count + ', "asc" ],';
+            }
+            var sortId   = getRowId(tdObject, $(this).attr('id') +' hiddenElement' );
+            columns += '{ "render": function ( data, type, row ) { return "<div style=\'display:none\'>"+ data +"</div>" + row[sortId] ; }, "targets": sortColumn,"bUseRendered": false},';
             break;
-            case 'nosort':
-                columns += '{ "bSortable": false, "sClass": "'+ getElementClass( this ) +'"},';
+          case 'nosort':
+            columns += '{ "bSortable": false, "sClass": "'+ getElementClass( this ) +'"},';
             break;
-            case 'currency':
-                columns += '{ "sType": "currency" },';
+          case 'currency':
+            columns += '{ "sType": "currency" },';
             break;
-            case 'link':
-                columns += '{"sType": "html"},';
+          case 'link':
+            columns += '{"sType": "html"},';
             break;
-            default:
-                if ( cj(this).text() ) {
-                    columns += '{"sClass": "'+ getElementClass( this ) +'"},';
-                } else {
-                    columns += '{ "bSortable": false },';
-                }
+          default:
+            if ( $(this).text() ) {
+              columns += '{"sClass": "'+ getElementClass( this ) +'"},';
+            } else {
+              columns += '{ "bSortable": false },';
+            }
             break;
         }
         count++;
-  });
-  columns    = columns.substring(0, columns.length - 1 );
-  sortColumn = sortColumn.substring(0, sortColumn.length - 1 );
-  eval('sortColumn =[' + sortColumn + ']');
-  eval('columns =[' + columns + ']');
+      });
+      // Fixme: this could be done without eval
+      columns    = columns.substring(0, columns.length - 1 );
+      sortColumn = sortColumn.substring(0, sortColumn.length - 1 );
+      eval('sortColumn =[' + sortColumn + ']');
+      eval('columns =[' + columns + ']');
 
-        var currTable = cj(tabId);
-        if (currTable) {
-            // contains the dataTables master records
-            var s = cj(document).dataTableSettings;
-            if (s != 'undefined') {
-                var len = s.length;
-                for (var i=0; i < len; i++) {
-                    // if already exists, remove from the array
-                    if (s[i].sInstance = tabId) {
-                        s.splice(i,1);
-              }
-              }
+      var currTable = $(tabId);
+      if (currTable) {
+        // contains the dataTables master records
+        var s = $(document).dataTableSettings;
+        if (s != 'undefined') {
+          var len = s.length;
+          for (var i=0; i < len; i++) {
+            // if already exists, remove from the array
+            if (s[i].sInstance = tabId) {
+              s.splice(i,1);
+            }
+          }
         }
-  }
+      }
 
-    var noRecordFoundMsg  = {/literal}'{ts escape="js"}There are no records.{/ts}'{literal};
+      var noRecordFoundMsg  = {/literal}'{ts escape="js"}There are no records.{/ts}'{literal};
 
-    oTable = null;
-    if ( useAjax ) {
-      oTable = cj(tabId).dataTable({
-              "bFilter"    : false,
-              "bAutoWidth" : false,
-              "aaSorting"  : sortColumn,
-              "aoColumns"  : columns,
-              "bProcessing": true,
-              "bJQueryUI"  : true,
-              "asStripClasses" : [ "odd-row", "even-row" ],
-              "sPaginationType": "full_numbers",
-              "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
-              "bServerSide": true,
-              "sAjaxSource": sourceUrl,
-              "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
-              "sZeroRecords" : noRecordFoundMsg },
-
-              {/literal}{if !empty($callBack)}{literal}
-              "fnDrawCallback": function() { checkSelected(); },
-              {/literal}{/if}{literal}
-
-              "fnServerData": function ( sSource, aoData, fnCallback ) {
-                cj.ajax( {
-                  "dataType": 'json',
-                  "type": "POST",
-                  "url": sSource,
-                  "data": aoData,
-                  "success": fnCallback
-                });
-              }
-         });
-    } else {
-      oTable = cj(tabId).dataTable({
-                "aaSorting"    : sortColumn,
-                "bPaginate"    : false,
-                "bLengthChange": true,
-                "bFilter"      : false,
-                "bInfo"        : false,
-                "asStripClasses" : [ "odd-row", "even-row" ],
-                "bAutoWidth"   : false,
-                "aoColumns"   : columns,
-                "bSort" : sortEnabled,
-            "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
-                         "sZeroRecords" : noRecordFoundMsg }
-              });
-    }
-    var object;
-
+      var oTable;
+      if ( useAjax ) {
+        oTable = $(tabId).dataTable({
+          "bFilter": false,
+          "bAutoWidth": false,
+          "aaSorting": sortColumn,
+          "aoColumns": columns,
+          "bProcessing": true,
+          "bJQueryUI": true,
+          "asStripClasses": [ "odd-row", "even-row" ],
+          "sPaginationType": "full_numbers",
+          "sDom": '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
+          "bServerSide": true,
+          "sAjaxSource": sourceUrl,
+          "oLanguage":{
+            "sEmptyTable": noRecordFoundMsg,
+            "sZeroRecords": noRecordFoundMsg
+          },
+          "fnServerData": function ( sSource, aoData, fnCallback ) {
+            $.ajax( {
+              "dataType": 'json',
+              "type": "POST",
+              "url": sSource,
+              "data": aoData,
+              "success": fnCallback
+            });
+          }
+        });
+      } else {
+        oTable = $(tabId).dataTable({
+          "aaSorting": sortColumn,
+          "bPaginate": false,
+          "bLengthChange": true,
+          "bFilter": false,
+          "bInfo": false,
+          "asStripClasses": [ "odd-row", "even-row" ],
+          "bAutoWidth": false,
+          "aoColumns": columns,
+          "bSort": true,
+          "oLanguage":{
+            "sEmptyTable": noRecordFoundMsg,
+            "sZeroRecords": noRecordFoundMsg
+          }
+        });
+      }
     });
-});
+  });
 
-function getElementClass( element ) {
-if( cj(element).attr('class') )   return cj(element).attr('class');
-return '';
-}
+  //plugin to sort on currency
+  cj.fn.dataTableExt.oSort['currency-asc']  = function(a,b) {
+    var symbol = "{/literal}{$config->defaultCurrencySymbol($config->defaultSymbol)}{literal}";
+    var x = (a == "-") ? 0 : a.replace( symbol, "" );
+    var y = (b == "-") ? 0 : b.replace( symbol, "" );
+    x = parseFloat( x );
+    y = parseFloat( y );
+    return ((x < y) ? -1 : ((x > y) ?  1 : 0));
+  };
 
-//function to fetch the occurence of element
-function getRowId(row,str){
- cj.each( row, function(i, n) {
-    if( str === cj(n).attr('class') ) {
-        optionId = i;
-    }
- });
-return optionId;
-}
-
-//plugin to sort on currency
-var symbol = "{/literal}{$config->defaultCurrencySymbol($config->defaultSymbol)}{literal}";
-cj.fn.dataTableExt.oSort['currency-asc']  = function(a,b) {
-  var x = (a == "-") ? 0 : a.replace( symbol, "" );
-  var y = (b == "-") ? 0 : b.replace( symbol, "" );
-  x = parseFloat( x );
-  y = parseFloat( y );
-  return ((x < y) ? -1 : ((x > y) ?  1 : 0));
-};
-
-cj.fn.dataTableExt.oSort['currency-desc'] = function(a,b) {
-  var x = (a == "-") ? 0 : a.replace( symbol, "" );
-  var y = (b == "-") ? 0 : b.replace( symbol, "" );
-  x = parseFloat( x );
-  y = parseFloat( y );
-  return ((x < y) ?  1 : ((x > y) ? -1 : 0));
-};
+  cj.fn.dataTableExt.oSort['currency-desc'] = function(a,b) {
+    var symbol = "{/literal}{$config->defaultCurrencySymbol($config->defaultSymbol)}{literal}";
+    var x = (a == "-") ? 0 : a.replace( symbol, "" );
+    var y = (b == "-") ? 0 : b.replace( symbol, "" );
+    x = parseFloat( x );
+    y = parseFloat( y );
+    return ((x < y) ?  1 : ((x > y) ? -1 : 0));
+  };
 </script>
 {/literal}

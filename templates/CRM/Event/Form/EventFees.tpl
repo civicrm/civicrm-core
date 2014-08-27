@@ -205,7 +205,7 @@
 <script type="text/javascript">
 {literal}
 CRM.$(function($) {
-    cj("#contact_id").change( function( ) {
+    $("#contact_id").change( function( ) {
         checkEmail( );
     } );
     checkEmail( );

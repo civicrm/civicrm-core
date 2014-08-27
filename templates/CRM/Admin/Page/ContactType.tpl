@@ -23,14 +23,13 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="help">
-    {ts}CiviCRM comes with 3 basic (built-in) contact types: Individual, Household, and Organization. You can create additional contact types based on these types to further differentiate contacts (for example you might create Student, Parent, Staff, and /or Volunteer types from the basic Individual type...).{/ts} {help id="id-contactSubtype-intro"}
-</div>
-
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Admin/Form/ContactType.tpl"}
 {else}
 
+  <div id="help">
+    {ts}CiviCRM comes with 3 basic (built-in) contact types: Individual, Household, and Organization. You can create additional contact types based on these types to further differentiate contacts (for example you might create Student, Parent, Staff, and /or Volunteer types from the basic Individual type...).{/ts} {help id="id-contactSubtype-intro"}
+  </div>
 {if $rows}
 <div>
     {strip}
@@ -57,17 +56,14 @@
     {/foreach}
     </table>
     {/strip}
-    {if $action ne 1 and $action ne 2}
-    <div class="action-link">
-  <a href="{crmURL q="action=add&reset=1"}" class="button"><span><div class="icon add-icon"></div>{ts}Add Contact Type{/ts}</span></a>
-    </div>
-    {/if}
-</div>
-{else}
+  </div>
+  {else}
     <div class="messages status no-popup">
-          <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
-        {capture assign=crmURL}{crmURL p='civicrm/admin/ContactType' q="action=add&reset=1"}{/capture}
-        {ts 1=$crmURL}There are currently no Contact Types entered. You can <a href='%1'>add one</a>.{/ts}
+      <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+      {ts}None found.{/ts}
     </div>
-{/if}
+  {/if}
+  <div class="action-link">
+    <a href="{crmURL q="action=add&reset=1"}" class="button"><span><div class="icon add-icon"></div>{ts}Add Contact Type{/ts}</span></a>
+  </div>
 {/if}

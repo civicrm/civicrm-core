@@ -421,6 +421,100 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('participant', 'delete', array('id' => $participant['id']));
   }
+
+  /**
+    * Test the line items for participant fee with multiple price field values.
+    */
+  function testCreateParticipantLineItems() {
+    // Create a price set for this event.
+
+    $priceset = $this->callAPISuccess('PriceSet', 'create', array(
+      'name' => 'my_price_set',
+      'title' => 'My Price Set',
+      'is_active' => 1,
+      'extends' => 1,
+      'financial_type_id' => 4,
+      // 'entity' => array('civicrm_event' => array($this->_eventID)),
+    ));
+
+    // Add the price set to the event with another API call.
+    // I tried to do this at once, but it did not work.
+
+    $priceset = $this->callAPISuccess('PriceSet', 'create', array(
+      'entity_table' => 'civicrm_event',
+      'entity_id' => $this->_eventID,
+      'id' => $priceset['id'],
+    ));
+
+    $pricefield = $this->callAPISuccess('PriceField', 'create', array(
+      'price_set_id' => $priceset['id'],
+      'name' => 'mypricefield',
+      'label' => 'My Price Field',
+      'html_type' => 'Text',
+      'is_enter_qty' => 1,
+      'is_display_amounts' => 1,
+      'is_active' => 1,
+    ));
+
+    $pfv1 = $this->callAPISuccess('PriceFieldValue', 'create', array(
+      'price_field_id' => $pricefield['id'],
+      'name' => 'pricefieldvalue1',
+      'label' => 'pricefieldvalue1',
+      'amount' => 20,
+      'is_active' => 1,
+      'financial_type_id' => 4,
+    ));
+
+    $pfv2 = $this->callAPISuccess('PriceFieldValue', 'create', array(
+      'price_field_id' => $pricefield['id'],
+      'name' => 'pricefieldvalue2',
+      'label' => 'pricefieldvalue2',
+      'amount' => 5,
+      'is_active' => 1,
+      'financial_type_id' => 4,
+    ));
+
+    // pay 2 times price field value 1, and 2 times price field value 2.
+    $myParams = $this->_params + array('participant_fee_level' => CRM_Core_DAO::VALUE_SEPARATOR . "pricefieldvalue1 - 2" . CRM_Core_DAO::VALUE_SEPARATOR . "pricefieldvalue2 - 2" . CRM_Core_DAO::VALUE_SEPARATOR);
+    $participant = $this->callAPISuccess('participant', 'create', $myParams);
+
+    // expect 2 line items.
+    $lineItems = $this->callAPISuccess('LineItem', 'get', array(
+      'entity_id' => $participant['id'],
+      'entity_table' => 'civicrm_participant',
+    ));
+
+    $this->assertEquals(2, $lineItems['count']);
+
+    // Check quantity, label and unit price of lines.
+    // TODO: These assertions depend on the order of the line items, which is 
+    // technically incorrect.
+
+    $lineItem = array_pop($lineItems['values']);
+    $this->assertEquals(2, $lineItem['qty']);
+    $this->assertEquals(5, $lineItem['unit_price']);
+    $this->assertEquals('pricefieldvalue2', $lineItem['label']);
+
+    $lineItem = array_pop($lineItems['values']);
+    $this->assertEquals(2, $lineItem['qty']);
+    $this->assertEquals(20, $lineItem['unit_price']);
+    $this->assertEquals('pricefieldvalue1', $lineItem['label']);
+
+    // Cleanup
+    $this->callAPISuccess('participant', 'delete', array('id' => $participant['id']));
+
+    // TODO: I think the price set should be removed, but I don't know how
+    // to decouple it properly from the event. For the moment, I'll just comment
+    // out the lines below.
+
+    /*
+    $this->callAPISuccess('PriceFieldValue', 'delete', array('id' => $pfv1['id']));
+    $this->callAPISuccess('PriceFieldValue', 'delete', array('id' => $pfv2['id']));
+    $this->callAPISuccess('PriceField', 'delete', array('id' => $pricefield['id']));
+    $this->callAPISuccess('PriceSet', 'delete', array('id' => $priceset['id']));
+    */
+  }
+
   /**
    * check with complete array
    */

@@ -48,11 +48,11 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+    $this->setPageTitle(ts('Financial Type'));
 
     $this->_id = CRM_Utils_Request::retrieve('id' , 'Positive', $this);
     if ($this->_id) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_id, 'name');
-      CRM_Utils_System::setTitle($this->_title . ' - ' . ts( 'Financial Type'));
     }
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -129,4 +129,5 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
       $session->replaceUserContext($url);
     }
   }
+
 }

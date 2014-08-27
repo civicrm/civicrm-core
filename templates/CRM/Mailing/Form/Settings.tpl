@@ -29,18 +29,18 @@
 
 CRM.$(function($) {
   // hide all the selects that contains only one option
-  cj('.crm-message-select select').each(function (){
-    if (cj(this).find('option').size() == 1) {
-      cj(this).parent().parent().hide();
+  $('.crm-message-select select').each(function (){
+    if ($(this).find('option').size() == 1) {
+      $(this).parent().parent().hide();
     }
   });
-  if (!cj('#override_verp').prop('checked')){
-    cj('.crm-mailing-settings-form-block-forward_replies,.crm-mailing-settings-form-block-auto_responder').hide();
+  if (!$('#override_verp').prop('checked')){
+    $('.crm-mailing-settings-form-block-forward_replies,.crm-mailing-settings-form-block-auto_responder').hide();
   }
-  cj('#override_verp').click(function(){
-      cj('.crm-mailing-settings-form-block-forward_replies,.crm-mailing-settings-form-block-auto_responder').toggle();
-       if (!cj('#override_verp').prop('checked')) {
-             cj('#forward_replies, #auto_responder').prop('checked', false);
+  $('#override_verp').click(function(){
+      $('.crm-mailing-settings-form-block-forward_replies,.crm-mailing-settings-form-block-auto_responder').toggle();
+       if (!$('#override_verp').prop('checked')) {
+             $('#forward_replies, #auto_responder').prop('checked', false);
            }
     });
 

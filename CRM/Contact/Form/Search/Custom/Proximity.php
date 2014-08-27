@@ -136,16 +136,16 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     else {
       $stateProvince = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvince();
     }
-    $form->addElement('select', 'state_province_id', ts('State/Province'), $stateProvince);
+    $form->add('select', 'state_province_id', ts('State/Province'), $stateProvince, FALSE, array('class' => 'crm-select2 huge'));
 
     $country = array('' => ts('- select -')) + CRM_Core_PseudoConstant::country();
-    $form->add('select', 'country_id', ts('Country'), $country, TRUE);
+    $form->add('select', 'country_id', ts('Country'), $country, TRUE, array('class' => 'crm-select2 huge'));
 
-    $group = array('' => ts('- any group -')) + CRM_Core_PseudoConstant::group();
-    $form->addElement('select', 'group', ts('Group'), $group);
+    $group = array('' => ts('- any group -')) + CRM_Core_PseudoConstant::nestedGroup();
+    $form->addElement('select', 'group', ts('Group'), $group, array('class' => 'crm-select2 huge'));
 
     $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
-    $form->addElement('select', 'tag', ts('Tag'), $tag);
+    $form->addElement('select', 'tag', ts('Tag'), $tag, array('class' => 'crm-select2 huge'));
 
 
     // state country js, CRM-5233

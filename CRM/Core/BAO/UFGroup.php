@@ -1854,8 +1854,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     elseif (substr($fieldName, 0, 6) === 'county') {
       if ($addressOptions['county']) {
         $form->add('select', $name, $title,
-          array(
-            '' => ts('(choose state first)')), $required
+          array('' => ts('Choose state first')), $required
         );
       }
     }
@@ -2317,6 +2316,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                 $defaults[$fldName . "[$item]"] = 1;
               }
             }
+          }
+          elseif ($name == 'contact_sub_type') {
+            $defaults[$fldName] = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($details[$name], CRM_Core_DAO::VALUE_SEPARATOR));
           }
           elseif ($name == 'world_region') {
             $defaults[$fldName] = $details['worldregion_id'];

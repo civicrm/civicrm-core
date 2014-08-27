@@ -54,7 +54,6 @@
             if you want to cancel the automatic renewal option.{/ts}</p>
       </div>
     {/if}
-    <h3>{ts}Renew Membership{/ts}</h3>
   {/if}
   <div class="crm-block crm-form-block crm-member-membershiprenew-form-block">
     <div id="help" class="description">
@@ -304,8 +303,8 @@
 {literal}
   <script type="text/javascript">
     CRM.$(function($) {
-      cj('#membershipOrgType').hide();
-      cj('#changeNumTerms').hide();
+      $('#membershipOrgType').hide();
+      $('#changeNumTerms').hide();
       {/literal}
       CRM.buildCustomData('{$customDataType}');
       {if $customDataSubType}

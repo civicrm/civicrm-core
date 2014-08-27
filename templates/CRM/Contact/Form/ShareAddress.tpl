@@ -51,35 +51,35 @@
 
 {literal}
 <script type="text/javascript">
-  function showHideSharedAddress( blockNo, showSelect ) {
-    // based on checkbox, show or hide
-    if ( cj( '#address\\[' + blockNo + '\\]\\[use_shared_address\\]' ).prop('checked') ) {
-      if ( showSelect && cj( '#shared-address-display-' + blockNo ).length == 0 ) {
-        cj( '#shared-address-' + blockNo ).show( );
-      }
-      cj( 'table#address_table_' + blockNo ).hide( );
-      cj( '#shared-address-display-' + blockNo ).show( );
-      cj( '#shared-address-display-name-' + blockNo ).show( );
-      cj( '#shared-address-display-cancel-' + blockNo ).hide( );
-      cj( '.crm-address-custom-set-block-' + blockNo).hide( );
-    } else {
-      cj( '#shared-address-' + blockNo ).hide( );
-      cj( 'table#address_table_' + blockNo ).show( );
-      cj( '#shared-address-display-' + blockNo ).hide( );
-      cj( '#shared-address-display-name-' + blockNo ).hide( );
-      cj( '#shared-address-display-cancel-' + blockNo ).hide( );
-      cj( '.crm-address-custom-set-block-' + blockNo).show( );
-    }
-  }
+  CRM.$(function($) {
 
-CRM.$(function($) {
+    function showHideSharedAddress( blockNo, showSelect ) {
+      // based on checkbox, show or hide
+      if ( $( '#address\\[' + blockNo + '\\]\\[use_shared_address\\]' ).prop('checked') ) {
+        if ( showSelect && $( '#shared-address-display-' + blockNo ).length == 0 ) {
+          $( '#shared-address-' + blockNo ).show( );
+        }
+        $( 'table#address_table_' + blockNo ).hide( );
+        $( '#shared-address-display-' + blockNo ).show( );
+        $( '#shared-address-display-name-' + blockNo ).show( );
+        $( '#shared-address-display-cancel-' + blockNo ).hide( );
+        $( '.crm-address-custom-set-block-' + blockNo).hide( );
+      } else {
+        $( '#shared-address-' + blockNo ).hide( );
+        $( 'table#address_table_' + blockNo ).show( );
+        $( '#shared-address-display-' + blockNo ).hide( );
+        $( '#shared-address-display-name-' + blockNo ).hide( );
+        $( '#shared-address-display-cancel-' + blockNo ).hide( );
+        $( '.crm-address-custom-set-block-' + blockNo).show( );
+      }
+    }
     var blockNo = {/literal}{$blockId}{literal};
 
     // call this when form loads
     showHideSharedAddress( blockNo, true );
 
     // handle check / uncheck of checkbox
-    cj( '#address\\[' + blockNo + '\\]\\[use_shared_address\\]' ).click( function( ) {
+    $( '#address\\[' + blockNo + '\\]\\[use_shared_address\\]' ).click( function( ) {
       showHideSharedAddress( blockNo, true );
     });
 
@@ -87,8 +87,8 @@ CRM.$(function($) {
     var contactHiddenElement = 'input[name="address[' + blockNo +'][master_contact_id]"]';
 
     // observe changes
-    cj( contactHiddenElement ).change(function( ) {
-      var sharedContactId = cj( this ).val( );
+    $( contactHiddenElement ).change(function( ) {
+      var sharedContactId = $( this ).val( );
       if ( !sharedContactId || isNaN( sharedContactId ) ) {
         return;
       }
@@ -96,23 +96,23 @@ CRM.$(function($) {
       var addressHTML = '';
       var postUrl = {/literal}"{crmURL p='civicrm/ajax/inline' h=0}"{literal};
 
-      cj.post( postUrl, {
-        'contact_id': sharedContactId,
-        'type': 'method',
-        'async': false,
-        'class_name': 'CRM_Contact_Page_AJAX',
-        'fn_name': 'getAddressDisplay'
+      $.post( postUrl, {
+          'contact_id': sharedContactId,
+          'type': 'method',
+          'async': false,
+          'class_name': 'CRM_Contact_Page_AJAX',
+          'fn_name': 'getAddressDisplay'
         },
         function( response ) {
           if ( response ) {
             var selected = 'checked';
             var addressExists = false;
 
-            cj.each( response, function( i, val ) {
+            $.each( response, function( i, val ) {
               if ( i > 1 ) {
                 selected = '';
               } else {
-                cj( 'input[name="address[' + blockNo + '][master_id]"]' ).val( val.id );
+                $( 'input[name="address[' + blockNo + '][master_id]"]' ).val( val.id );
               }
 
               addressHTML = addressHTML + '<input type="radio" name="selected_shared_address-'+ blockNo +'" value=' + val.id + ' ' + selected +'>' + val.display_text + '<br/>';
@@ -121,23 +121,23 @@ CRM.$(function($) {
             });
 
             if ( addressExists  ) {
-              cj( '#shared-address-' + blockNo + ' .shared-address-list' ).remove( );
-              cj( '#shared-address-' + blockNo ).append( '<tr class="shared-address-list"><td></td><td>' + addressHTML + '</td></tr>');
-              cj( 'input[name^=selected_shared_address-]' ).click( function( ) {
+              $( '#shared-address-' + blockNo + ' .shared-address-list' ).remove( );
+              $( '#shared-address-' + blockNo ).append( '<tr class="shared-address-list"><td></td><td>' + addressHTML + '</td></tr>');
+              $( 'input[name^=selected_shared_address-]' ).click( function( ) {
 
-              // get the block id
-              var elemId = cj(this).attr( 'name' ).split('-');
-              cj( 'input[name="address[' + elemId[1] + '][master_id]"]' ).val( cj(this).val( ) );
+                // get the block id
+                var elemId = $(this).attr( 'name' ).split('-');
+                $( 'input[name="address[' + elemId[1] + '][master_id]"]' ).val( $(this).val( ) );
               });
             } else {
               var helpText = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit that contact to add an address, or select a different contact.{/ts}"{literal};
-              cj( '#shared-address-' + blockNo + ' .shared-address-list' ).remove( );
-              cj( '#shared-address-' + blockNo ).append( '<tr class="shared-address-list"><td></td><td>' + helpText + '</td></tr>');
+              $( '#shared-address-' + blockNo + ' .shared-address-list' ).remove( );
+              $( '#shared-address-' + blockNo ).append( '<tr class="shared-address-list"><td></td><td>' + helpText + '</td></tr>');
             }
           }
         },'json');
     });
-});
+  });
 </script>
 {/literal}
 

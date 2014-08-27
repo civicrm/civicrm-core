@@ -176,22 +176,6 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           ),
         ),
       ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_GroupContact',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-          ),
-        ),
-      ),
     );
 
     // If we have a campaign, build out the relevant elements
@@ -206,6 +190,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
       );
     }
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
   }

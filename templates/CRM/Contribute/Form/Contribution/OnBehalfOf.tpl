@@ -296,9 +296,9 @@ function selectCreateOrg( orgOption, reset ) {
 {if $membershipContactID}
 {literal}
   CRM.$(function($) {
-    cj('#organization_id').val("{/literal}{$membershipContactName}{literal}");
-    cj('#organization_name').val("{/literal}{$membershipContactName}{literal}");
-    cj('#onbehalfof_id').val("{/literal}{$membershipContactID}{literal}");
+    $('#organization_id').val("{/literal}{$membershipContactName}{literal}");
+    $('#organization_name').val("{/literal}{$membershipContactName}{literal}");
+    $('#onbehalfof_id').val("{/literal}{$membershipContactID}{literal}");
     setLocationDetails( "{/literal}{$membershipContactID}{literal}" );
   });
 {/literal}

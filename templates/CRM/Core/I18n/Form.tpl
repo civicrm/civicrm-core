@@ -41,11 +41,12 @@
 <script type="text/javascript">
 var fieldName = "{/literal}{$field}{literal}";
 var tsLocale = "{/literal}{$tsLocale}{literal}";
-cj('#Form').submit(function() {
+var $form = $('form.{/literal}{$form.formClass}{literal}');
+cj($form).submit(function() {
       cj(this).ajaxSubmit({
                             beforeSubmit: function (formData, jqForm, options) {
                                                     var queryString = cj.param(formData);
-                                                    var postUrl     = cj('#Form').attr('action');
+                                                    var postUrl     = cj($form).attr('action');
                                                     cj.ajax({
                                                              type   : "POST",
                                                              url    : postUrl,

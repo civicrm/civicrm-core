@@ -164,7 +164,7 @@ function loadPetitionList( )
      noRecordFoundMsg += '<div class="qill">';
 
      var count = 0;
-     var searchQill = new Array( );
+     var searchQill = [];
      for ( param in searchParams ) {
        if ( val = CRM.$( '#' + param ).val( ) ) {
          if ( param == 'petition_campaign_id' ) val = campaigns[val];
@@ -216,7 +216,7 @@ function loadPetitionList( )
       var dataLength = aoData.length;
 
       var count = 1;
-      var searchCriteria = new Array( );
+      var searchCriteria = [];
 
       //get the search criteria.
                         var searchParams = {/literal}{$searchParams}{literal};

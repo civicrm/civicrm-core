@@ -91,7 +91,9 @@ function civicrm_api3_activity_type_create($params) {
  */
 function _civicrm_api3_activity_type_create_spec(&$params) {
   $params['label']['api.required'] = 1;
+  $params['label']['title'] = 'Label';
   $params['weight']['api.required'] = 1;
+  $params['weight']['title'] = 'Weight';
 }
 
 /**
