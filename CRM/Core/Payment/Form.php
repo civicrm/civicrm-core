@@ -107,7 +107,7 @@ class CRM_Core_Payment_Form {
 
     $form->_paymentFields["billing_state_province_id-{$bltID}"] = array(
       'htmlType' => 'chainSelect',
-      'title' => ts('State / Province'),
+      'title' => ts('State/Province'),
       'name' => "billing_state_province_id-{$bltID}",
       'cc_field' => TRUE,
       'is_required' => TRUE,

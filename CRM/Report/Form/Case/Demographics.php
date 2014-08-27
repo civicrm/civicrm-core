@@ -136,7 +136,7 @@ class CRM_Report_Form_Case_Demographics extends CRM_Report_Form {
                                         'options' => CRM_Core_PseudoConstant::country( ),
                                         ),
                                  'state_province_id' =>
-                                 array( 'title'   => ts( 'State / Province' ),
+                                 array( 'title'   => ts( 'State/Province' ),
                                         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
                                         'options' => CRM_Core_PseudoConstant::stateProvince( ), ),
                                  ),

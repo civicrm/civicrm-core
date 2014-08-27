@@ -1736,7 +1736,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $props = $settings += array(
       'control_field' => str_replace(array('state_province', 'StateProvince', 'county', 'County'), array('country', 'Country', 'state_province', 'StateProvince'), $elementName),
       'data-callback' => strpos($elementName, 'rovince') ? 'civicrm/ajax/jqState' : 'civicrm/ajax/jqCounty',
-      'label' => strpos($elementName, 'rovince') ? ts('State / Province') : ts('County'),
+      'label' => strpos($elementName, 'rovince') ? ts('State/Province') : ts('County'),
       'data-empty-prompt' => strpos($elementName, 'rovince') ? ts('Choose country first') : ts('Choose state first'),
       'data-none-prompt' => ts('- N/A -'),
       'multiple' => FALSE,

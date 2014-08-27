@@ -1405,7 +1405,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
                     continue;
                   }
                   else {
-                    self::addToErrorMsg(ts('State / Province'), $errorMessage);
+                    self::addToErrorMsg(ts('State/Province'), $errorMessage);
                   }
                 }
               }
