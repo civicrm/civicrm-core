@@ -4034,7 +4034,7 @@ WHERE  id IN ( $groupIDs )
     $relStatus = $this->getWhereValues('relation_status', $grouping);
     $relPermission = $this->getWhereValues('relation_permission', $grouping);
     $targetGroup = $this->getWhereValues('relation_target_group', $grouping);
-    
+
     $nameClause = $name = NULL;
     if ($targetName) {
       $name = trim($targetName[2]);
