@@ -740,6 +740,7 @@ HTACCESS;
 
   /**
    * Delete all files from the dynamic resource directory
+   * Change the cache code to force browsers to reload new resources
    */
   static function flushDynamicResources() {
     $files = glob(self::dynamicResourcePath('*'));
@@ -748,6 +749,7 @@ HTACCESS;
         unlink($file);
       }
     }
+    CRM_Core_Resources::singleton()->resetCacheCode();
   }
 }
 
