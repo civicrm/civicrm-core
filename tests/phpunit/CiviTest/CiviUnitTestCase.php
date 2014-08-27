@@ -39,11 +39,6 @@ require_once CIVICRM_SETTINGS_PATH;
 /**
  *  Include class definitions
  */
-require_once 'PHPUnit/Extensions/Database/TestCase.php';
-require_once 'PHPUnit/Framework/TestResult.php';
-require_once 'PHPUnit/Extensions/Database/DataSet/FlatXmlDataSet.php';
-require_once 'PHPUnit/Extensions/Database/DataSet/XmlDataSet.php';
-require_once 'PHPUnit/Extensions/Database/DataSet/QueryDataSet.php';
 require_once 'tests/phpunit/Utils.php';
 require_once 'api/api.php';
 require_once 'CRM/Financial/BAO/FinancialType.php';
@@ -391,7 +386,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $xmlFiles = glob($fixturesDir . '/*.xml');
     foreach ($xmlFiles as $xmlFixture) {
       $op = new PHPUnit_Extensions_Database_Operation_Insert();
-      $dataset = new PHPUnit_Extensions_Database_DataSet_XMLDataSet($xmlFixture);
+      $dataset = $this->createXMLDataSet($xmlFixture);
       $this->_tablesToTruncate = array_merge($this->_tablesToTruncate, $dataset->getTableNames());
       $op->execute($this->_dbconn, $dataset);
     }
@@ -438,6 +433,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   protected function tearDown() {
     error_reporting(E_ALL & ~E_NOTICE);
+    $session = CRM_Core_Session::singleton();
+    $session->set('userID', NULL);
     $tablesToTruncate = array('civicrm_contact');
     $this->quickCleanup($tablesToTruncate);
     $this->cleanTempDirs();
@@ -1054,7 +1051,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       $params[$key] = $values[$seq % sizeof($values)];
     }
     if ($contact_type == 'Individual' ) {
-        $employer = $this->sampleContact('Organization', $seq);
         $params['email'] = strtolower(
           $params['first_name'] . '_' . $params['last_name'] . '@civicrm.org'
         );
@@ -2809,6 +2805,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   function setupACL() {
     global $_REQUEST;
     $_REQUEST = $this->_params;
+    
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
     $optionGroupID = $this->callAPISuccessGetValue('option_group', array('return' => 'id', 'name' => 'acl_role'));
     $optionValue = $this->callAPISuccess('option_value', 'create', array('option_group_id' => $optionGroupID,
@@ -2880,7 +2877,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->callAPISuccess('price_field_value', 'create', $priceFieldValue);
     $this->callAPISuccess('price_field_value', 'create', $priceFieldValue);
     $this->callAPISuccess('price_field_value', 'create', array_merge($priceFieldValue, array('price_field_id' => $newPriceField['id'])));
-
   }
 
 /**

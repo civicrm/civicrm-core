@@ -234,7 +234,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       foreach ($field as $fieldName => $fieldValue) {
         if ($fieldName == 'external_identifier') {
           if (in_array($fieldValue, $externalIdentifiers)) {
-            $errors["field[$componentId][external_identifier]"] = ts('Duplicate value for External Identifier.');
+            $errors["field[$componentId][external_identifier]"] = ts('Duplicate value for External ID.');
           }
           else {
             $externalIdentifiers[$componentId] = $fieldValue;

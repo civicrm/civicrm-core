@@ -69,7 +69,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
     $op = new PHPUnit_Extensions_Database_Operation_Insert;
     $op->execute(
       $this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(dirname(__FILE__) . '/dataset/im_test.xml')
+      $this->createFlatXMLDataSet(dirname(__FILE__) . '/dataset/im_test.xml')
     );
 
     $contactId = 69;

@@ -47,6 +47,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+    $this->setPageTitle(ts('Mail Account'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -182,5 +183,6 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
       CRM_Core_Session::setStatus("", ts('Changes Not Saved.'), "info");
     }
   }
+
 }
 

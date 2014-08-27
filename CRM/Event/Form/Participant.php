@@ -218,8 +218,10 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     if ($this->_contactId) {
       $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
       $this->assign('displayName', $displayName);
-      // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-      CRM_Utils_System::setTitle(ts('Event Registration for') .  ' ' . $displayName);
+      $this->setPageTitle(ts('Event Registration for %1', array(1 => $displayName)));
+    }
+    else {
+      $this->setPageTitle(ts('Event Registration'));
     }
 
     // check the current path, if search based, then dont get participantID

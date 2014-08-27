@@ -26,7 +26,6 @@
 <div class="view-content">
 {if $action eq 4}{* when action is view  *}
     {if $notes}
-        <h3>{ts}View Note{/ts}</h3>
         <div class="crm-block crm-content-block crm-note-view-block">
           <table class="crm-info-panel">
             <tr><td class="label">{ts}Subject{/ts}</td><td>{$note.subject}</td></tr>
@@ -38,7 +37,9 @@
                {include file="CRM/Form/attachment.tpl"}
             {/if}
           </table>
-          <div class="crm-submit-buttons"><input type="submit" class='cancel form-submit' value="{ts}Done{/ts}"/></div>
+          <div class="crm-submit-buttons">
+            <a class="button cancel" href="{crmURL p='civicrm/contact/view' q="selectedChild=note&reset=1&cid=`$contactId`"}">{ts}Done{/ts}</a>
+          </div>
 
         {if $comments}
         <fieldset>
@@ -57,13 +58,6 @@
         </div>
         {/if}
 {elseif $action eq 1 or $action eq 2} {* action is add or update *}
-    <h3>
-        {if $parentId}
-            {if $action eq 1}{ts}New Comment{/ts}{else}{ts}Edit Comment{/ts}{/if}
-        {else}
-            {if $action eq 1}{ts}New Note{/ts}{else}{ts}Edit Note{/ts}{/if}
-        {/if}
-    </h3>
   <div class="crm-block crm-form-block crm-note-form-block">
     <div class="content crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout">
@@ -99,10 +93,8 @@
     </div>
 {/if}
 {if ($action eq 8)}
-<fieldset><legend>{ts}Delete Note{/ts}</legend>
 <div class=status>{ts 1=$notes.$id.note}Are you sure you want to delete the note '%1'?{/ts}</div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
-</fieldset>
 
 {/if}
 
@@ -214,18 +206,18 @@
 
     <script type="text/javascript">
     {literal}
-        cj(document).ready( function() {
-            var tabId = cj.fn.dataTableSettings[0].sInstance;
+      CRM.$(function($) {
+        var tabId = $.fn.dataTableSettings[0].sInstance;
 
-            cj('table#'+ tabId).dataTable().fnSettings().aoDrawCallback.push( {
-                    "fn": function () {
-                        cj('#'+ tabId +' tr').each( function() {
-                            drawCommentRows(this.id)
-                        });
-                    },
-                    "sName": "user"
-            } );
-        });
+        $('table#'+ tabId).dataTable().fnSettings().aoDrawCallback.push( {
+          "fn": function () {
+            $('#'+ tabId +' tr').each( function() {
+              drawCommentRows(this.id)
+            });
+          },
+          "sName": "user"
+        } );
+      });
 
     {/literal}
     </script>
@@ -262,7 +254,7 @@
                 {* Include '(more)' link to view entire note if it has been truncated *}
                 {assign var="noteSize" value=$note.note|count_characters:true}
                 {if $noteSize GT 80}
-            <a href="{crmURL p='civicrm/contact/view/note' q="action=view&selectedChild=note&reset=1&cid=`$contactId`&id=`$note.id`"}">{ts}(more){/ts}</a>
+                  <a class="crm-popup" href="{crmURL p='civicrm/contact/view/note' q="action=view&selectedChild=note&reset=1&cid=`$contactId`&id=`$note.id`"}">{ts}(more){/ts}</a>
                 {/if}
             </td>
             <td class="crm-note-subject">{$note.subject}</td>

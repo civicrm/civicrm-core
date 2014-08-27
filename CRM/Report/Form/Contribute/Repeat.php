@@ -243,24 +243,9 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
         ),
         'group_bys' => array('contribution_source' => NULL),
       ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_GroupContact',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-          ),
-        ),
-      ),
     );
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
     parent::__construct();

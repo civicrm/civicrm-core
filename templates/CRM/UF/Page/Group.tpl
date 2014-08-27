@@ -157,9 +157,9 @@
   <script type='text/javascript'>
       CRM.$(function($) {ldelim}
         var selectedTab = '{if $selectedChild}{$selectedChild}{else}user-profiles{/if}';
-        var tabIndex = cj('#tab_' + selectedTab).prevAll().length;
+        var tabIndex = $('#tab_' + selectedTab).prevAll().length;
         {literal}
-        cj("#mainTabContainer").tabs( {active: tabIndex} );
+        $("#mainTabContainer").tabs( {active: tabIndex} );
       });
     {/literal}
   </script>

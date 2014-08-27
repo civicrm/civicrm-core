@@ -90,6 +90,8 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
     }
 
+    $this->setPageTitle(ts('Grant'));
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
@@ -123,7 +125,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
 
-    $defaults = array();
     $defaults = parent::setDefaultValues();
 
     if ($this->_action & CRM_Core_Action::DELETE) {

@@ -41,7 +41,7 @@
 
         $el.load(CRM.url('civicrm/case/changeactivitystatus'), data, function() {
           $el.unblock().trigger('crmLoad');
-          cj("#activity_change_status").val(current_status_id);
+          $("#activity_change_status").val(current_status_id);
         });
 
         CRM.confirm({

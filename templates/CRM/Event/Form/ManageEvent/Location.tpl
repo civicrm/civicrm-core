@@ -108,7 +108,7 @@ if ( {/literal}"{$locUsed}"{literal} ) {
    displayMessage( true );
 }
 
-cj(document).ready(function() {
+CRM.$(function($) {
   //FIX ME: by default load 2 blocks and hide add and delete links
   //we should make additional block function more flexible to set max block limit
   buildBlocks('Email');
@@ -116,7 +116,7 @@ cj(document).ready(function() {
 
   // build blocks only if it is not built
   function buildBlocks(element) {
-    if (!cj('[id='+ element +'_Block_2]').length) {
+    if (!$('[id='+ element +'_Block_2]').length) {
       buildAdditionalBlocks(element, 'CRM_Event_Form_ManageEvent_Location');
     }
   }
@@ -124,18 +124,18 @@ cj(document).ready(function() {
   hideAddDeleteLinks('Email');
   hideAddDeleteLinks('Phone');
   function hideAddDeleteLinks(element) {
-    cj('#add'+ element).hide();
-    cj('[id='+ element +'_Block_2] a:last').hide();
+    $('#add'+ element).hide();
+    $('[id='+ element +'_Block_2] a:last').hide();
   }
 
-  cj('#loc_event_id').change(function() {
-    cj.ajax({
+  $('#loc_event_id').change(function() {
+    $.ajax({
       url: CRM.url('civicrm/ajax/locBlock', 'reset=1'),
       type: 'POST',
-      data: {'lbid': cj(this).val()},
+      data: {'lbid': $(this).val()},
       dataType: 'json',
       success: function(data) {
-        var selectLocBlockId = cj('#loc_event_id').val();
+        var selectLocBlockId = $('#loc_event_id').val();
         for(i in data) {
           if ( i == 'count_loc_used' ) {
             if ( ((selectLocBlockId == locBlockId) && data['count_loc_used'] > 1) ||
@@ -146,10 +146,10 @@ cj(document).ready(function() {
             }
           } else {
             if (i == 'phone_1_phone_type_id' || i == 'phone_2_phone_type_id') {
-              cj('#'+i).select2('val', data[i]);
+              $('#'+i).select2('val', data[i]);
             }
             else {
-              cj('#'+i).val(data[i]);
+              $('#'+i).val(data[i]);
             }
           }
         }
@@ -160,11 +160,11 @@ cj(document).ready(function() {
 });
 
 function displayMessage( set ) {
-   cj(document).ready(function() {
+   CRM.$(function($) {
      if ( set ) {
-       cj('#locUsedMsg').html( locUsedMsgTxt ).addClass('status');
+       $('#locUsedMsg').html( locUsedMsgTxt ).addClass('status');
      } else {
-       cj('#locUsedMsg').html( ' ' ).removeClass('status');
+       $('#locUsedMsg').html( ' ' ).removeClass('status');
      }
    });
 }

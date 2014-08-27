@@ -54,12 +54,12 @@
         </thead>
         <tbody>
         {foreach from=$rows item=row}
-      <tr id="acl_role-{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-acl_entity_role crm-entity {if NOT $row.is_active} disabled{/if}">
-          <td class="crm-acl_entity_role-acl_role">{$row.acl_role}</td>
-          <td class="crm-acl_entity_role-entity">{$row.entity}</td>
-          <td class="crm-acl_entity_role-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
-            </tr>
+          <tr id="acl_role-{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-acl_entity_role crm-entity {if NOT $row.is_active} disabled{/if}">
+            <td class="crm-acl_entity_role-acl_role">{$row.acl_role}</td>
+            <td class="crm-acl_entity_role-entity">{$row.entity}</td>
+            <td class="crm-acl_entity_role-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+            <td>{$row.action|replace:'xx':$row.id}</td>
+          </tr>
         {/foreach}
         </tbody>
     </table>

@@ -265,7 +265,7 @@ invert              = 0
 {literal}
 <script type="text/javascript">
 
-cj(document).ready(function(){
+CRM.$(function($) {
   cj('#selector tr:even').addClass('odd-row ');
   cj('#selector tr:odd ').addClass('even-row');
 });

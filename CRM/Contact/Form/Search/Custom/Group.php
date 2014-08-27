@@ -51,7 +51,7 @@ class CRM_Contact_Form_Search_Custom_Group
   function __construct(&$formValues) {
     $this->_formValues = $formValues;
     $this->_columns = array(
-      ts('Contact Id') => 'contact_id',
+      ts('Contact ID') => 'contact_id',
       ts('Contact Type') => 'contact_type',
       ts('Name') => 'sort_name',
       ts('Group Name') => 'gname',
@@ -97,7 +97,7 @@ class CRM_Contact_Form_Search_Custom_Group
 
     $this->setTitle(ts('Include / Exclude Search'));
 
-    $groups = CRM_Core_PseudoConstant::group();
+    $groups = CRM_Core_PseudoConstant::nestedGroup();
 
     $tags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
     if (count($groups) == 0 || count($tags) == 0) {

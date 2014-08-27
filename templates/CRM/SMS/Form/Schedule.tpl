@@ -74,16 +74,16 @@
 
 {literal}
 CRM.$(function($) {
-   cj('#start_date_display').change( function( ) { 
-       if ( cj(this).val( ) ) {
-          cj('#now').prop('checked', false );
+   $('#start_date_display').change( function( ) { 
+       if ( $(this).val( ) ) {
+          $('#now').prop('checked', false );
        }
    });
-   cj('#now').change( function( ) { 
-       if ( cj('#now').prop('checked', true ) ) {
-          cj('#start_date_display').val( '' );
-          cj('#start_date').val( '' );
-          cj('#start_date_time').val( '' );
+   $('#now').change( function( ) { 
+       if ( $('#now').prop('checked', true ) ) {
+          $('#start_date_display').val( '' );
+          $('#start_date').val( '' );
+          $('#start_date_time').val( '' );
        }
    });
 });

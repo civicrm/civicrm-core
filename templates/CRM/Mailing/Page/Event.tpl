@@ -72,7 +72,7 @@
   <script type="text/javascript">
     var totalPages = {/literal}{$pager->_totalPages}{literal};
     CRM.$(function($) {
-      cj("#crm-container .crm-pager input.form-submit").click(function () {
+      $("#crm-container .crm-pager input.crm-form-submit").click(function () {
         submitPagerData(this);
       });
     });

@@ -8,6 +8,7 @@
   <add>4.4</add>
   <field>
     <name>id</name>
+    <title>Print Label ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <add>4.4</add>
@@ -40,6 +41,7 @@
   </field>
   <field>
     <name>label_format_name</name>
+    <title>Label Format</title>
     <type>varchar</type>
     <length>255</length>
     <pseudoconstant>
@@ -53,6 +55,7 @@
   </field>
   <field>
     <name>label_type_id</name>
+    <title>Label Type</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <optionGroupName>label_type</optionGroupName>
@@ -71,6 +74,7 @@
   </field>
   <field>
     <name>is_default</name>
+    <title>Label is Default?</title>
     <type>boolean</type>
     <default>1</default>
     <comment>Is this default?</comment>
@@ -78,6 +82,7 @@
   </field>
   <field>
     <name>is_active</name>
+    <title>Label Is Active?</title>
     <type>boolean</type>
     <default>1</default>
     <comment>Is this option active?</comment>
@@ -85,6 +90,7 @@
   </field>
   <field>
     <name>is_reserved</name>
+    <title>Is Label Reserved?</title>
     <type>boolean</type>
     <default>1</default>
     <comment>Is this reserved label?</comment>
@@ -92,6 +98,7 @@
   </field>
   <field>
     <name>created_id</name>
+    <title>Label Created By</title>
     <type>int unsigned</type>
     <title>Created By Contact ID</title>
     <comment>FK to civicrm_contact, who created this label layout</comment>

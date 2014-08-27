@@ -198,9 +198,6 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     // check logged in url permission
     CRM_Contact_Page_View::checkUserPermission($this);
 
-    // set page title
-    CRM_Contact_Page_View::setTitle($this->_contactId);
-
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->assign('action', $this->_action);
   }

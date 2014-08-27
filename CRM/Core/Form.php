@@ -170,6 +170,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->_name = $name;
     }
     else {
+      // CRM-15153 - FIXME this name translates to a DOM id and is not always unique!
       $this->_name = CRM_Utils_String::getClassName(CRM_Utils_System::getClassName($this));
     }
 
@@ -187,11 +188,22 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!isset(self::$_template)) {
       self::$_template = CRM_Core_Smarty::singleton();
     }
+    // Workaround for CRM-15153 - give each form a reasonably unique css class
+    $this->addClass(CRM_Utils_System::getClassName($this));
 
     $this->assign('snippet', CRM_Utils_Array::value('snippet', $_GET));
   }
 
   static function generateID() {
+  }
+
+  /**
+   * Add one or more css classes to the form
+   * @param $className
+   */
+  public function addClass($className) {
+    $classes = $this->getAttribute('class');
+    $this->setAttribute('class', ($classes ? "$classes " : '') . $className);
   }
 
   /**
@@ -471,10 +483,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $js = CRM_Utils_Array::value('js', $button);
       $isDefault = CRM_Utils_Array::value('isDefault', $button, FALSE);
       if ($isDefault) {
-        $attrs = array('class' => 'form-submit default');
+        $attrs = array('class' => 'crm-form-submit default');
       }
       else {
-        $attrs = array('class' => 'form-submit');
+        $attrs = array('class' => 'crm-form-submit');
       }
 
       if ($js) {
@@ -637,6 +649,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->accept($renderer);
     $content = $renderer->toArray();
     $content['formName'] = $this->getName();
+    // CRM-15153
+    $content['formClass'] = CRM_Utils_System::getClassName($this);
     return $content;
   }
 
@@ -1673,6 +1687,28 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   function allowAjaxSubmit() {
     $this->removeAttribute('data-no-ajax-submit');
+  }
+
+  /**
+   * Sets page title based on entity and action
+   * @param string $entityLabel
+   */
+  function setPageTitle($entityLabel) {
+    switch ($this->_action) {
+      case CRM_Core_Action::ADD:
+        CRM_Utils_System::setTitle(ts('New %1', array(1 => $entityLabel)));
+        break;
+      case CRM_Core_Action::UPDATE:
+        CRM_Utils_System::setTitle(ts('Edit %1', array(1 => $entityLabel)));
+        break;
+      case CRM_Core_Action::VIEW:
+      case CRM_Core_Action::PREVIEW:
+        CRM_Utils_System::setTitle(ts('View %1', array(1 => $entityLabel)));
+        break;
+      case CRM_Core_Action::DELETE:
+        CRM_Utils_System::setTitle(ts('Delete %1', array(1 => $entityLabel)));
+        break;
+    }
   }
 }
 

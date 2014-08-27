@@ -366,9 +366,9 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
     $form->add('select', 'contact_type', ts('Contact Type(s)'), $contactTypes, FALSE,
       array('id' => 'contact_type', 'multiple' => 'multiple', 'class' => 'crm-select2')
     );
-    $groups = CRM_Core_PseudoConstant::group();
+    $groups = CRM_Core_PseudoConstant::nestedGroup();
     $form->add('select', 'group', ts('Groups'), $groups, FALSE,
-      array('id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2')
+      array('multiple' => 'multiple', 'class' => 'crm-select2')
     );
 
     $showInterviewer = FALSE;

@@ -156,7 +156,7 @@
   {include file="CRM/common/customData.tpl"}
   {literal}
     <script type="text/javascript">
-      cj(document).ready(function() {
+      CRM.$(function($) {
         {/literal}
         {if $customDataSubType}
           CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
@@ -178,7 +178,8 @@
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
-    $('#template_id', '#EventInfo').change(function() {
+    var $form = $('form.{/literal}{$form.formClass}{literal}');
+    $('#template_id', $form).change(function() {
       $('#crm-main-content-wrapper')
         .crmSnippet({url: CRM.url('civicrm/event/add', {action: 'add', reset: 1, template_id: $(this).val()})})
         .crmSnippet('refresh');

@@ -197,6 +197,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
+
+    CRM_Utils_System::setTitle(ts('Renew Membership'));
+
     parent::preProcess();
   }
 
@@ -786,14 +789,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $formValues['contact_id'] = $this->_contactID;
 
       CRM_Member_BAO_Membership::recordMembershipContribution(array_merge($formValues, array('membership_id' => $renewMembership->id)));
-    }
-
-    if (!empty($formValues['send_receipt'])) {
-      CRM_Core_DAO::setFieldValue('CRM_Member_DAO_MembershipType',
-        $formValues['membership_type_id'][1],
-        'receipt_text_renewal',
-        $formValues['receipt_text_renewal']
-      );
     }
 
     $receiptSend = FALSE;

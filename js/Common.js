@@ -207,7 +207,7 @@ CRM.strings = CRM.strings || {};
 
   // Workaround for https://github.com/ivaynberg/select2/issues/1246
   $.ui.dialog.prototype._allowInteraction = function(e) {
-    return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop').length;
+    return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .cke_dialog').length;
   };
 
   /**
@@ -249,38 +249,6 @@ CRM.strings = CRM.strings || {};
       }
     });
     return isDirty;
-  };
-
-   /**
-   * Wrapper for toggle function which is deprecated in from jQuery 1.8;
-   * @param fn1,fn2 handlers
-   */
-
-  $.fn.toggleClick = function( fn1, fn2 ) {
-    // Don't mess with animation or css toggles
-    if ( !$.isFunction( fn1 ) || !$.isFunction( fn2 ) ) {
-      return;
-    }
-    // migrateWarn("jQuery.fn.toggle(handler, handler...) is deprecated");
-    // Save reference to arguments for access in closure
-    var args = arguments,
-    guid = fn1.guid || $.guid++,
-    i = 0,
-    toggler = function( event ) {
-      // Figure out which function to execute
-      var lastToggle = ( $._data( this, "lastToggle" + fn1.guid ) || 0 ) % i;
-      $._data( this, "lastToggle" + fn1.guid, lastToggle + 1 );
-      // Make sure that clicks stop
-      event.preventDefault();
-      // and execute the function
-      return args[ lastToggle ].apply( this, arguments ) || false;
-    };
-    // link all the functions, so any of them can unbind this click handler
-    toggler.guid = guid;
-    while ( i < args.length ) {
-      args[ i++ ].guid = guid;
-    }
-    return this.click( toggler );
   };
 
   /**
@@ -516,6 +484,9 @@ CRM.strings = CRM.strings || {};
           }
         })
         .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
+      if ($("input:radio[name=radio_ts]").size() == 1) {
+        $("input:radio[name=radio_ts]").prop("checked", true);
+      }
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
       $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
       // Cache Form Input initial values
@@ -773,7 +744,7 @@ CRM.strings = CRM.strings || {};
    */
   CRM.confirm = function (options) {
     var dialog, settings = {
-      title: ts('Confirm Action'),
+      title: ts('Confirm'),
       message: ts('Are you sure you want to continue?'),
       width: 'auto',
       modal: true,

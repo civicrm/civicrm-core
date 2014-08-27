@@ -3191,7 +3191,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    *
    * @param  int     $contactId   contact id.
    *
-   * @return true if present else false.
+   * @return bool true if present else false.
    * @access public
    * @static
    */

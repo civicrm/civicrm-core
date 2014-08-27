@@ -66,12 +66,14 @@
   </tr>
 </table>
 </div>
-<br/>
+<div class="css_right">
+  <a class="crm-hover-button action-item" href="{crmURL q="reset=1&update_smart_groups=1"}">{ts}Update Smart Group Counts{/ts}</a> {help id="update_smart_groups"}
+</div>
 <table class="crm-group-selector">
   <thead>
     <tr>
       <th class='crm-group-name'>{ts}Name{/ts}</th>
-      <th class='crm-group-group_id'>{ts}ID{/ts}</th>
+      <th class='crm-group-count'>{ts}Count{/ts}</th>
       <th class='crm-group-created_by'>{ts}Created By{/ts}</th>
       <th class='crm-group-description'>{ts}Description{/ts}</th>
       <th class='crm-group-group_type'>{ts}Group Type{/ts}</th>
@@ -105,8 +107,8 @@ CRM.$(function($) {
     .on('click', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', CRM.popup)
     .on('crmPopupFormSuccess', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', function() {
         // Refresh datatable when form completes
-	var $context = $('#crm-main-content-wrapper');
-        $('table.crm-group-selector',$context ).dataTable().fnDraw();
+      	var $context = $('#crm-main-content-wrapper');
+        $('table.crm-group-selector', $context).dataTable().fnDraw();
     });
 
   function buildGroupSelector( filterSearch, parentsOnlyArg ) {
@@ -137,7 +139,7 @@ CRM.$(function($) {
         "aaSorting"  : [],
         "aoColumns"  : [
                         {sClass:'crm-group-name'},
-                        {sClass:'crm-group-group_id'},
+                        {sClass:'crm-group-count'},
                         {sClass:'crm-group-created_by'},
                         {sClass:'crm-group-description', bSortable:false},
                         {sClass:'crm-group-group_type'},
@@ -171,14 +173,20 @@ CRM.$(function($) {
                         }
                     },
         "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-          var id = $('td:eq(1)', nRow).text();
-          $(nRow).addClass('crm-entity').attr('data-entity', 'group').attr('data-id', id);
-          $('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-name" />');
+          var id = $('td:last', nRow).text().split(',')[0];
+          var cl = $('td:last', nRow).text().split(',')[1];
+          $(nRow).addClass(cl).attr({id: 'row_' + id, 'data-id': id, 'data-entity': 'group'});
+          $('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-title" />');
+          $('td:eq(1)', nRow).addClass('right');
           $('td:eq(3)', nRow).wrapInner('<span class="crm-editable crmf-description" data-type="textarea" />');
+          if (parentsOnly) {
+            if ($(nRow).hasClass('crm-group-parent')) {
+              $(nRow).find('td:first').prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}');
+            }
+          }
           return nRow;
         },
         "fnDrawCallback": function() {
-          setSelectorClass( parentsOnly, showOrgInfo );
           $('.crm-editable').crmEditable();
         },
         "fnServerData": function ( sSource, aoData, fnCallback ) {
@@ -230,20 +238,6 @@ CRM.$(function($) {
     });
   }
 
-  function setSelectorClass( parentsOnly, showOrgInfo ) {
-    var $context = $('#crm-main-content-wrapper');
-    $('table.crm-group-selector tr', $context).each( function( ) {
-      var className = $(this).find('td:last-child').text();
-      $(this).addClass( className );
-      var rowID = $(this).find('td:nth-child(2)').text();
-      $(this).prop( 'id', 'row_' + rowID );
-      if (parentsOnly) {
-        if ( $(this).hasClass('crm-group-parent') ) {
-          $(this).find('td:first').prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}');
-        }
-      }
-    });
-  }
   // show hide children
   var $context = $('#crm-main-content-wrapper');
   $('table.crm-group-selector', $context).on( 'click', 'span.show-children', function(){
@@ -292,21 +286,21 @@ CRM.$(function($) {
           "success": function(response){
             var appendHTML = '';
             $.each( response, function( i, val ) {
-              appendHTML += '<tr id="row_'+ val.group_id +'_'+parent_id+'" data-entity="group" data-id="'+ val.group_id +'" class="crm-entity parent_is_' + parent_id + ' crm-row-child ' + val.class + '">';
+              appendHTML += '<tr id="row_'+ val.group_id +'_'+parent_id+'" data-entity="group" data-id="'+ val.group_id +'" class="parent_is_' + parent_id + ' crm-row-child ' + val.class.split(',')[1] + '">';
               if ( val.is_parent ) {
-                appendHTML += '<td class="crm-group-name ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}<span class="crm-editable crmf-name">' + val.group_name + '</span></td>';
+                appendHTML += '<td class="crm-group-name ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}<span class="crm-editable crmf-title">' + val.group_name + '</span></td>';
               }
               else {
-                appendHTML += '<td class="crm-group-name ' + levelClass + '"><span class="crm-no-children"></span><span class="crm-editable crmf-name">' + val.group_name + '</span></td>';
+                appendHTML += '<td class="crm-group-name ' + levelClass + '"><span class="crm-no-children"></span><span class="crm-editable crmf-title">' + val.group_name + '</span></td>';
               }
-              appendHTML += "<td>" + val.group_id + "</td>";
+              appendHTML += '<td class="right">' + val.count + "</td>";
               appendHTML += "<td>" + val.created_by + "</td>";
               appendHTML += '<td><span class="crm-editable crmf-description" data-type="textarea">' + (val.group_description || '') + "</span></td>";
               appendHTML += "<td>" + val.group_type + "</td>";
               appendHTML += "<td>" + val.visibility + "</td>";
-	      if (showOrgInfo) {
-	        appendHTML += "<td>" + val.org_info + "</td>";
-	      }
+              if (showOrgInfo) {
+                appendHTML += "<td>" + val.org_info + "</td>";
+              }
               appendHTML += "<td>" + val.links + "</td>";
               appendHTML += "</tr>";
             });

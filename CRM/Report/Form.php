@@ -921,13 +921,12 @@ class CRM_Report_Form extends CRM_Core_Form {
               if (count($operations) <= 1) {
                 $element->freeze();
               }
-              $select = $this->addElement('select', "{$fieldName}_value", NULL,
-                        $field['options'], array(
-                          'size' => 4,
-                          'style' => 'min-width:250px',
-                        )
-              );
-              $select->setMultiple(TRUE);
+              $this->addElement('select', "{$fieldName}_value", NULL, $field['options'], array(
+                'style' => 'min-width:250px',
+                'class' => 'crm-select2',
+                'multiple' => TRUE,
+                'placeholder' => ts('- select -'),
+              ));
             }
             break;
 
@@ -1108,13 +1107,13 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     if (CRM_Core_Permission::check('administer Reports') && $this->_add2groupSupported) {
       $this->addElement('select', 'groups', ts('Group'),
-        array('' => ts('- select group -')) + CRM_Core_PseudoConstant::staticGroup()
+        array('' => ts('Add Contacts to Group')) + CRM_Core_PseudoConstant::nestedGroup(),
+        array('class' => 'crm-select2 crm-action-menu action-icon-plus huge')
       );
       $this->assign('group', TRUE);
     }
 
-    $label = ts('Add These Contacts to Group');
-    $this->addElement('submit', $this->_groupButtonName, $label, array('onclick' => 'return checkGroup();'));
+    $this->addElement('submit', $this->_groupButtonName, '', array('style' => 'display: none;'));
 
     $this->addChartOptions();
     $this->addButtons(array(
@@ -1283,7 +1282,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         'title' => ts('Group'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'group' => TRUE,
-        'options' => CRM_Core_PseudoConstant::group(),
+        'options' => CRM_Core_PseudoConstant::nestedGroup(),
       ),
     );
     if (empty($this->_columns['civicrm_group']['dao'])) {
@@ -3484,18 +3483,18 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
           array('title' => ts('Postal Code Suffix'),
             'default' => CRM_Utils_Array::value('postal_code_suffix', $defaults, FALSE),
           ),
-          'county_id' =>
-          array('title' => ts('County'),
-            'default' => CRM_Utils_Array::value('county_id', $defaults, FALSE),
-          ),
+          'country_id' =>
+            array('title' => ts('Country'),
+              'default' => CRM_Utils_Array::value('country_id', $defaults, FALSE),
+            ),
           'state_province_id' =>
           array('title' => ts('State/Province'),
             'default' => CRM_Utils_Array::value('state_province_id', $defaults, FALSE),
           ),
-          'country_id' =>
-          array('title' => ts('Country'),
-            'default' => CRM_Utils_Array::value('country_id', $defaults, FALSE),
-          ),
+          'county_id' =>
+            array('title' => ts('County'),
+              'default' => CRM_Utils_Array::value('county_id', $defaults, FALSE),
+            ),
         ),
         'grouping' => 'location-fields',
       ),
@@ -3519,6 +3518,24 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
                 'operator' => 'like',
                 'name' => 'city',
         ),
+        'country_id' => array(
+          'name' => 'country_id',
+          'title' => ts('Country'),
+          'type' => CRM_Utils_Type::T_INT,
+          'operatorType' =>
+            CRM_Report_Form::OP_MULTISELECT,
+          'options' =>
+            CRM_Core_PseudoConstant::country(),
+        ),
+        'state_province_id' => array(
+          'name' => 'state_province_id',
+          'title' => ts('State/Province'),
+          'type' => CRM_Utils_Type::T_INT,
+          'operatorType' =>
+            CRM_Report_Form::OP_MULTISELECT,
+          'options' =>
+            CRM_Core_PseudoConstant::stateProvince(),
+        ),
         'county_id' => array(
           'name' => 'county_id',
           'title' => ts('County'),
@@ -3527,24 +3544,6 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
           CRM_Report_Form::OP_MULTISELECT,
           'options' =>
           CRM_Core_PseudoConstant::county(),
-        ),
-        'state_province_id' => array(
-          'name' => 'state_province_id',
-          'title' => ts('State/Province'),
-          'type' => CRM_Utils_Type::T_INT,
-          'operatorType' =>
-          CRM_Report_Form::OP_MULTISELECT,
-          'options' =>
-          CRM_Core_PseudoConstant::stateProvince(),
-        ),
-        'country_id' => array(
-          'name' => 'country_id',
-          'title' => ts('Country'),
-          'type' => CRM_Utils_Type::T_INT,
-          'operatorType' =>
-          CRM_Report_Form::OP_MULTISELECT,
-          'options' =>
-          CRM_Core_PseudoConstant::country(),
         ),
       );
     }

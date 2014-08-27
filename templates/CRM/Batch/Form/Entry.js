@@ -1,24 +1,24 @@
 //@todo functions partially moved from tpl but still need an enclosure / cleanup
 // jslinting etc
 CRM.$(function($) {
-  cj('.selector-rows').change(function () {
+  $('.selector-rows').change(function () {
     var options = {
       'url': CRM.url('civicrm/ajax/batch')
     };
 
-    cj("#Entry").ajaxSubmit(options);
+    $("#Entry").ajaxSubmit(options);
 
     // validate rows
-    checkColumns(cj(this));
+    checkColumns($(this));
   });
 
-  cj('input[name^="soft_credit_contact["]').change(function(){
-    var rowNum = cj(this).attr('id').replace('soft_credit_contact_','');
-    var totalAmount = cj('#field_'+rowNum+'_total_amount').val();
+  $('input[name^="soft_credit_contact["]').change(function(){
+    var rowNum = $(this).attr('id').replace('soft_credit_contact_','');
+    var totalAmount = $('#field_'+rowNum+'_total_amount').val();
     //assign total amount as default soft credit amount
-    cj('#soft_credit_amount_'+ rowNum).val(totalAmount);
+    $('#soft_credit_amount_'+ rowNum).val(totalAmount);
     //assign soft credit type default value if any
-    cj('#field_'+rowNum+'_soft_credit_type').val(cj('#sct_default_id').val());
+    $('#field_'+rowNum+'_soft_credit_type').val($('#sct_default_id').val());
   });
 
   // validate rows
@@ -27,7 +27,7 @@ CRM.$(function($) {
   //calculate the actual total for the batch
   calculateActualTotal();
 
-  cj('input[id*="_total_amount"]').bind('keyup change', function () {
+  $('input[id*="_total_amount"]').bind('keyup change', function () {
     calculateActualTotal();
   });
 
@@ -36,35 +36,35 @@ CRM.$(function($) {
     hideSendReceipt();
 
     // hide the receipt date if send receipt is checked
-    cj('input[id*="][send_receipt]"]').change(function () {
-      showHideReceipt(cj(this));
+    $('input[id*="][send_receipt]"]').change(function () {
+      showHideReceipt($(this));
     });
 
   }
   else{
-    cj('select[id^="member_option_"]').each(function () {
-      if (cj(this).val() == 1) {
-        cj(this).prop('disabled', true);
+    $('select[id^="member_option_"]').each(function () {
+      if ($(this).val() == 1) {
+        $(this).prop('disabled', true);
       }
     });
 
   // set payment info accord to membership type
-  cj('select[id*="_membership_type_0"]').change(function () {
-    setPaymentBlock(cj(this), null);
+  $('select[id*="_membership_type_0"]').change(function () {
+    setPaymentBlock($(this), null);
   });
 
-  cj('select[id*="_membership_type_1"]').change(function () {
-    setPaymentBlock(cj(this), cj(this).val());
+  $('select[id*="_membership_type_1"]').change(function () {
+    setPaymentBlock($(this), $(this).val());
   });
 
   }
 
   // line breaks between radio buttons and checkboxes
-  cj('input.form-radio').next().after('<br />');
-  cj('input.form-checkbox').next().after('<br />');
+  $('input.form-radio').next().after('<br />');
+  $('input.form-checkbox').next().after('<br />');
 
   //set the focus on first element
-  cj('#primary_contact_1').focus();
+  $('#primary_contact_1').focus();
 
 });
 

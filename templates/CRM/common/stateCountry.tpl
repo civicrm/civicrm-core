@@ -27,54 +27,66 @@
 <script type="text/javascript">
   {literal}
   CRM.$(function($) {
+    var $form = $('form.{/literal}{$form.formClass}{literal}');
     function chainSelect(e) {
       var info = $(this).data('chainSelect');
       var val = info.target.val();
       var multiple = info.target.attr('multiple');
       var placeholder = $(this).val() ? "{/literal}{ts escape='js'}Loading{/ts}{literal}..." : info.placeholder;
-      !multiple && info.target.html('<option value="">' + placeholder + '</option>');
+      if (multiple) {
+        info.target.html('').prop('disabled', true).crmSelect2({placeholder: placeholder});
+      }
+      else {
+        info.target.html('<option value="">' + placeholder + '</option>').prop('disabled', true).crmSelect2();
+      }
       if ($(this).val()) {
-        if (multiple) {
+        $.getJSON(info.callback, {_value: $(this).val()}, function(data) {
           var options = '';
-          $.each($(this).val(), function(index, value) {
-            $.getJSON(info.callback, {_value: value}, function(data) {
-              $.each(data, function() {
-                if (this.value) {
-                  options += '<option value="' + this.value + '">' + this.name + '</option>';
-                }
-              });
-              info.target.html(options).val(val).trigger('change');
-            });
-          });
-        }
-        else {
-          $.getJSON(info.callback, {_value: $(this).val()}, function(data) {
-            var options = '';
+          function buildOptions(data) {
             $.each(data, function() {
-              if (this.name) {
+              if (this.children) {
+                options += '<optgroup label="' + this.name + '">';
+                buildOptions(this.children);
+                options += '</optgroup>';
+              }
+              else if (this.value || !multiple) {
                 options += '<option value="' + this.value + '">' + this.name + '</option>';
               }
+              else {
+                info.target.crmSelect2({placeholder: this.name});
+              }
             });
-            info.target.html(options).val(val).trigger('change');
-          });
-        }
+          }
+          buildOptions(data);
+          info.target.html(options).val(val).prop('disabled', false).trigger('change');
+        });
       }
+      else {
+        info.target.trigger('change');
+      }
+    }
+    function initField(selector, removePlaceholder) {
+      var $el = $(selector, $form);
+      if (removePlaceholder !== false) {
+        $el.removeAttr('placeholder');
+      }
+      return $el.css('min-width', '20em').crmSelect2();
     }
     {/literal}
     {foreach from=$config->stateCountryMap item=stateCountryMap}
-      {if $stateCountryMap.country && $stateCountryMap.state_province}
-        $('select[name="{$stateCountryMap.country}"], #{$stateCountryMap.country}').data('chainSelect', {ldelim}
-          callback: CRM.url('civicrm/ajax/jqState'),
-          target: $('select[name="{$stateCountryMap.state_province}"], #{$stateCountryMap.state_province}'),
-          placeholder: "{ts escape='js'}(choose country first){/ts}"
-          {rdelim}).on('change', chainSelect);
-      {/if}
       {if $stateCountryMap.state_province && $stateCountryMap.county}
-        $('select[name="{$stateCountryMap.state_province}"], #{$stateCountryMap.state_province}').data('chainSelect', {ldelim}
+        $('select[name="{$stateCountryMap.state_province}"], select#{$stateCountryMap.state_province}', $form).data('chainSelect', {ldelim}
           callback: CRM.url('civicrm/ajax/jqCounty'),
-          target: $('select[name="{$stateCountryMap.county}"], #{$stateCountryMap.county}'),
-          placeholder: "{ts escape='js'}(choose state first){/ts}"
+          target: initField('select[name="{$stateCountryMap.county}"], #{$stateCountryMap.county}'),
+          placeholder: "{ts escape='js'}Choose state first{/ts}"
         {rdelim}).on('change',  chainSelect);
+      {/if}
+      {if $stateCountryMap.country && $stateCountryMap.state_province}
+        initField('select[name="{$stateCountryMap.country}"], select#{$stateCountryMap.country}', false).data('chainSelect', {ldelim}
+          callback: CRM.url('civicrm/ajax/jqState'),
+          target: initField('select[name="{$stateCountryMap.state_province}"], #{$stateCountryMap.state_province}'),
+          placeholder: "{ts escape='js'}Choose country first{/ts}"
+        {rdelim}).on('change', chainSelect).change();
       {/if}
     {/foreach}
     {literal}

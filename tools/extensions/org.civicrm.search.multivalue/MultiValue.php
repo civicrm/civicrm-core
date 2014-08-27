@@ -56,7 +56,7 @@ class org_civicrm_search_multivalue extends CRM_Contact_Form_Search_Custom_Basei
       NULL, -1
     );
 
-    $this->_columns = array(ts('Contact Id') => 'contact_id',
+    $this->_columns = array(ts('Contact ID') => 'contact_id',
       ts('Contact Type') => 'contact_type',
       ts('Name') => 'sort_name',
     );
