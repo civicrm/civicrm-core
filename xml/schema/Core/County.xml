@@ -39,7 +39,7 @@
     <name>state_province_id</name>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>ID of State / Province that County belongs</comment>
+    <comment>ID of State/Province that County belongs</comment>
     <add>1.1</add>
   </field>
   <foreignKey>
