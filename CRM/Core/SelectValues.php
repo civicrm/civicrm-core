@@ -554,9 +554,7 @@ class CRM_Core_SelectValues {
         'is_deceased', 'deceased_date', 'legal_identifier', 'contact_sub_type', 'user_unique_id',
       );
 
-      $customFields = CRM_Core_BAO_CustomField::getFields('Individual');
-      $customFieldsAddress = CRM_Core_BAO_CustomField::getFields('Address');
-      $customFields = $customFields + $customFieldsAddress;
+      $customFields = CRM_Core_BAO_CustomField::getFields(array('Individual', 'Address'));
       $legacyTokenNames = array_flip(CRM_Utils_Token::legacyContactTokens());
 
       foreach ($values as $val) {
@@ -564,8 +562,12 @@ class CRM_Core_SelectValues {
           continue;
         }
         //keys for $tokens should be constant. $token Values are changed for Custom Fields. CRM-3734
-        if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($val)) {
-          $tokens["{contact.$val}"] = !empty($customFields[$customFieldId]) ? $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'] : '';
+        $customFieldId = CRM_Core_BAO_CustomField::getKeyID($val);
+        if ($customFieldId) {
+          // CRM-15191 - if key is not in $customFields then the field is disabled and should be ignored
+          if (!empty($customFields[$customFieldId])) {
+            $tokens["{contact.$val}"] = $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'];
+          }
         }
         else {
           // Support legacy token names

@@ -411,11 +411,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       }
     }
 
-    if ($customDataSubType && !is_array($customDataSubType)) {
-      $customDataSubType = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        trim($customDataSubType, CRM_Core_DAO::VALUE_SEPARATOR)
-      );
-    }
+    $customDataSubType = CRM_Utils_Array::explodePadded($customDataSubType);
 
     if (is_array($customDataType)) {
       $cacheKey = implode('_', $customDataType);
@@ -684,8 +680,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         );
       }
     }
-    return $all ? array(
-      NULL, NULL) : NULL;
+    return $all ? array(NULL, NULL) : NULL;
   }
 
   /**
