@@ -88,6 +88,15 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     return $caseTypeDAO->save();
   }
 
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName  == 'definition') {
+      $this->{$fieldName} = "<CaseType><name>TestCaseType{$counter}</name></CaseType>";
+    } else {
+      parent::assignTestValue($fieldName, $fieldDef, $counter);
+    }
+  }
+
+
   /**
    * Function to format / convert submitted array to xml for case type definition
    *

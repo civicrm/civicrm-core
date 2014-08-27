@@ -423,6 +423,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'entity_table',
         )
       ),
+      'CaseType' => array(
+        'cant_update' => array(
+          'definition',
+        )
+      ),
       'Pledge' => array(
         'cant_update' => array(
           'pledge_original_installment_amount',
