@@ -114,7 +114,7 @@ class CRM_Contact_Form_Edit_Address {
       'postal_code' => array(ts('Zip / Postal Code'), array_merge($attributes['postal_code'], array('class' => 'crm_postal_code')), NULL),
       'postal_code_suffix' => array(ts('Postal Code Suffix'), array('size' => 4, 'maxlength' => 12, 'class' => 'crm_postal_code_suffix'), NULL),
       'country_id' => array(ts('Country'), $attributes['country_id'], 'country'),
-      'state_province_id' => array(ts('State / Province'), $attributes['state_province_id'], NULL),
+      'state_province_id' => array(ts('State/Province'), $attributes['state_province_id'], NULL),
       'county_id' => array(ts('County'), $attributes['county_id'], NULL),
       'geo_code_1' => array(ts('Latitude'), array('size' => 9, 'maxlength' => 11), NULL),
       'geo_code_2' => array(ts('Longitude'), array('size' => 9, 'maxlength' => 11), NULL),

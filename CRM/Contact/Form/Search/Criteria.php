@@ -296,7 +296,7 @@ class CRM_Contact_Form_Search_Criteria {
       'city' => array(ts('City'), $attributes['city'], NULL, NULL),
       'postal_code' => array(ts('Zip / Postal Code'), $attributes['postal_code'], NULL, NULL),
       'country' => array(ts('Country'), $attributes['country_id'], 'country', FALSE),
-      'state_province' => array(ts('State / Province'), $attributes['state_province_id'], 'stateProvince', TRUE),
+      'state_province' => array(ts('State/Province'), $attributes['state_province_id'], 'stateProvince', TRUE),
       'county' => array(ts('County'), $attributes['county_id'], 'county', TRUE),
       'address_name' => array(ts('Address Name'), $attributes['address_name'], NULL, NULL),
       'street_number' => array(ts('Street Number'), $attributes['street_number'], NULL, NULL),
