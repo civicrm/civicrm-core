@@ -94,14 +94,14 @@
 CRM.$(function($) {
     //if price set is set we use below below code to show for showing auto renew
     var autoRenewOption =  {/literal}'{$autoRenewOption}'{literal};
-    cj('#allow_auto_renew').hide();
+    $('#allow_auto_renew').hide();
     if ( autoRenewOption == 1 ) {
-        cj('#allow_auto_renew').show();
+        $('#allow_auto_renew').show();
     } else if ( autoRenewOption == 2 ) {
-        var autoRenew = cj("#auto_renew");
+        var autoRenew = $("#auto_renew");
         autoRenew.prop('checked',  true );
         autoRenew.attr( 'readonly', true );
-        cj('#allow_auto_renew').show();
+        $('#allow_auto_renew').show();
     }
 });
 </script>

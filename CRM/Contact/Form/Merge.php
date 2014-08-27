@@ -71,6 +71,11 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->_gid     = $gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE);
     $this->_mergeId = CRM_Utils_Request::retrieve('mergeId', 'Positive', $this, FALSE);
 
+    // Sanity check
+    if ($cid == $oid) {
+      CRM_Core_Error::statusBounce(ts('Cannot merge a contact with itself.'));
+    }
+
     if (!CRM_Dedupe_BAO_Rule::validateContacts($cid, $oid)) {
       CRM_Core_Error::statusBounce(ts('The selected pair of contacts are marked as non duplicates. If these records should be merged, you can remove this exception on the <a href=\'%1\'>Dedupe Exceptions</a> page.', array(1 => CRM_Utils_System::url('civicrm/dedupe/exception', 'reset=1'))));
     }
@@ -334,7 +339,10 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     CRM_Dedupe_Merger::moveAllBelongings($this->_cid, $this->_oid, $formValues);
 
-    CRM_Core_Session::setStatus(ts('Contact id %1 has been updated and contact id %2 has been deleted.', array(1 => $this->_cid, 2 => $this->_oid)), ts('Contacts Merged'), 'success');
+    $name = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_cid, 'display_name');
+    $message = '<ul><li>' . ts('%1 has been updated.', array(1 => $name)) . '</li><li>' . ts('Contact ID %1 has been deleted.', array(1 => $this->_oid)) . '</li></ul>';
+    CRM_Core_Session::setStatus($message, ts('Contacts Merged'), 'success');
+
     $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->_cid}");
     if (!empty($formValues['_qf_Merge_submit'])) {
       $listParamsURL = "reset=1&action=update&rgid={$this->_rgid}";

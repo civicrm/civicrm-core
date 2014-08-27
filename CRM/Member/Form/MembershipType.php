@@ -53,6 +53,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/admin/member/membershipType', 'reset=1');
     $session->pushUserContext($url);
+
+    $this->setPageTitle(ts('Membership Type'));
   }
 
   /**

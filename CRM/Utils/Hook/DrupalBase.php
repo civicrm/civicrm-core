@@ -97,7 +97,25 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
         $this->requireCiviModules($this->civiModules);
       }
 
-      $this->allModules = array_merge((array)$this->drupalModules, (array)$this->civiModules);
+      // CRM-12370
+      // we should add civicrm's module's just after main civicrm drupal module
+      // Note: Assume that drupalModules and civiModules may each be array() or NULL
+      if ($this->drupalModules !== NULL) {
+        foreach ($this->drupalModules as $moduleName) {
+          $this->allModules[$moduleName] = $moduleName;
+          if ($moduleName == 'civicrm') {
+            if (!empty($this->civiModules)) {
+              foreach ($this->civiModules as $civiModuleName) {
+                $this->allModules[$civiModuleName] = $civiModuleName;
+              }
+            }
+          }
+        }
+      }
+      else {
+        $this->allModules = (array) $this->civiModules;
+      }
+
       if ($this->drupalModules !== NULL && $this->civiModules !== NULL) {
         // both CRM and CMS have bootstrapped, so this is the final list
         $this->isBuilt = TRUE;

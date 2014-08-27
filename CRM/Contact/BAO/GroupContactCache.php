@@ -191,6 +191,15 @@ AND    g.refresh_date IS NULL
   }
 
   /**
+   * FIXME: This function should not be needed, because the cache table should not be getting truncated
+   */
+  static function fillIfEmpty() {
+    if (!CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_group_contact_cache")) {
+      self::loadAll();
+    }
+  }
+
+  /**
    * @param $groupID
    */
   static function add($groupID) {

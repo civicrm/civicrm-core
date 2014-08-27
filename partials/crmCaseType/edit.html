@@ -15,18 +15,19 @@ Required vars: caseType
 
   <div ng-include="partialUrl('caseTypeDetails.html')"></div>
 
-  <h2>Roles</h2>
+  <h2 ng-show="isForkable()">Roles</h2>
 
-  <div ng-include="partialUrl('rolesTable.html')"></div>
+  <div ng-show="isForkable()" ng-include="partialUrl('rolesTable.html')"></div>
 
-  <h2>Activities</h2>
+  <h2 ng-show="isForkable()">Activities</h2>
 
-  <div class="crmCaseType-acttab" ui-jq="tabs" ui-options="{show: true, hide: true}">
+  <div ng-show="isForkable()" class="crmCaseType-acttab" ui-jq="tabs" ui-options="{show: true, hide: true}">
     <ul>
       <li><a href="#acttab-actType">Activity Types</a></li>
       <li ng-repeat="activitySet in caseType.definition.activitySets">
         <a href="#acttab-{{$index}}">{{ activitySet.label }}</a>
         <span class="ui-icon ui-icon-trash" title="Remove"
+          ng-hide="activitySet.name == 'standard_timeline'"
           ng-click="removeItem(caseType.definition.activitySets, activitySet)">Remove</span>
         <!-- Weird spacing:
         <a class="crm-hover-button" ng-click="removeItem(caseType.definition.activitySets, activitySet)">

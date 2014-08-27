@@ -318,7 +318,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->click("CIVICRM_QFID_0_is_monetary");
 
     $this->clickLink("_qf_Fee_upload-bottom", "_qf_Fee_upload-bottom", FALSE);
-    $this->waitForElementPresent("xpath=//div[@id='event-fees'][@style='display: none;']");
+    sleep(2);
     //check if pay later option is disabled
     $this->click('CIVICRM_QFID_1_is_monetary');
     $this->waitForElementPresent('is_pay_later');

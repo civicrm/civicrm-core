@@ -48,8 +48,8 @@
     {* Controller for 'Rows Per Page' *}
     {if $location eq 'bottom' and $pager->_totalItems > 25}
      <div class="form-item float-right">
-       <label for="{$form.formName}-rows-per-page-select">{ts}Rows per page:{/ts}</label> &nbsp;
-       <input class="crm-rows-per-page-select" id="{$form.formName}-rows-per-page-select" type="text" size="3" value="{$pager->_perPage}"/>
+       <label for="{$form.formClass}-rows-per-page-select">{ts}Rows per page:{/ts}</label> &nbsp;
+       <input class="crm-rows-per-page-select" id="{$form.formClass}-rows-per-page-select" type="text" size="3" value="{$pager->_perPage}"/>
      </div>
      <div class="clear"></div>
     {/if}
@@ -60,7 +60,7 @@
         CRM.$(function($) {
           {/literal}
           var
-            $form = $('#{$form.formName}'),
+            $form = $('form.{$form.formClass}'),
             numPages = {$pager->_response.numPages},
             currentPage = {$pager->_response.currentPage},
             perPageCount = {$pager->_perPage},
@@ -127,9 +127,10 @@
                 }
               }, 200);
             })
-            .on('click', 'a.crm-pager-link, #alpha-filter a', function() {
+            // Handle sorting, paging and alpha filtering links
+            .on('click', 'a.crm-pager-link, #alpha-filter a, th a.sorting, th a.sorting_desc, th a.sorting_asc', function(e) {
               refresh($(this).attr('href'));
-              return false;
+              e.preventDefault();
             });
         });
         {/literal}

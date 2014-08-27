@@ -101,7 +101,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     // echo "testCount\n";
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/dataset.xml'
       )
     );
@@ -132,7 +132,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     // echo "testAll\n";
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/dataset.xml'
       )
     );
@@ -163,7 +163,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     // echo "testContactIDs\n";
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/dataset.xml'
       )
     );

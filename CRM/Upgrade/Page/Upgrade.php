@@ -142,7 +142,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     }
     // end of hack
 
-    $postUpgradeMessage = ts('CiviCRM upgrade was successful.');
+    $postUpgradeMessage = ts('Congratulations! Your upgrade was successful! (... wasn\'t that easy!)');
 
     // lets drop all the triggers here
     CRM_Core_DAO::dropTriggers();

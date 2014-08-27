@@ -268,13 +268,13 @@
             }
         }
 
-    cj(document).ready(function(){
-      cj('.crm-report-criteria-groupby input:checkbox').click(function() {
-        cj('#fields_' + this.id.substr(10)).prop('checked', this.checked);
+    CRM.$(function($) {
+      $('.crm-report-criteria-groupby input:checkbox').click(function() {
+        $('#fields_' + this.id.substr(10)).prop('checked', this.checked);
       });
       {/literal}{if $displayToggleGroupByFields}{literal}
-      cj('.crm-report-criteria-field input:checkbox').click(function() {
-        cj('#group_bys_' + this.id.substr(7)).prop('checked', this.checked);
+      $('.crm-report-criteria-field input:checkbox').click(function() {
+        $('#group_bys_' + this.id.substr(7)).prop('checked', this.checked);
       });
       {/literal}{/if}{literal}
     });

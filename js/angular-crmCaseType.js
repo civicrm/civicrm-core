@@ -14,7 +14,11 @@
     weight: "1",
     definition: {
       activityTypes: [
-        {name: 'Open Case', max_instances: 1 }
+        {name: 'Open Case', max_instances: 1},
+        {name: 'Email'},
+        {name: 'Follow up'},
+        {name: 'Meeting'},
+        {name: 'Phone Call'}
       ],
       activitySets: [
         {
@@ -129,7 +133,7 @@
     $scope.activityTypes = apiCalls.actTypes.values;
     $scope.activityTypeNames = _.pluck(apiCalls.actTypes.values, 'name');
     $scope.relationshipTypeNames = _.pluck(apiCalls.relTypes.values, CRM.crmCaseType.REL_TYPE_CNAME); // CRM_Case_XMLProcessor::REL_TYPE_CNAME
-    $scope.locks = {caseTypeName: true};
+    $scope.locks = {caseTypeName: true, activitySetName: true};
 
     $scope.workflows = {
       'timeline': 'Timeline',
@@ -216,6 +220,10 @@
       }
     };
 
+    $scope.isForkable = function() {
+      return !$scope.caseType.id || $scope.caseType.is_forkable
+    };
+
     $scope.isNewActivitySetAllowed = function(workflow) {
       switch (workflow) {
         case 'timeline':
@@ -226,6 +234,18 @@
           if (console && console.log) console.log('Denied access to unrecognized workflow: (' + workflow + ')');
           return false;
       }
+    };
+
+    $scope.isActivityRemovable = function(activitySet, activity) {
+      if (activitySet.name == 'standard_timeline' && activity.name == 'Open Case') {
+        return false;
+      } else {
+        return true;
+      }
+    };
+
+    $scope.isValidName = function(name) {
+      return !name || name.match(/^[a-zA-Z0-9_]+$/);
     };
 
     $scope.getWorkflowName = function(activitySet) {
@@ -280,6 +300,10 @@
     };
     $scope.$watch('locks.caseTypeName', updateCaseTypeName);
     $scope.$watch('caseType.title', updateCaseTypeName);
+
+    if (!$scope.isForkable()) {
+      CRM.alert(ts('The CiviCase XML file for this case-type prohibits editing the definition.'));
+    }
   });
 
   crmCaseType.controller('CaseTypeListCtrl', function($scope, crmApi, caseTypes) {
@@ -303,6 +327,17 @@
         .then(function (data) {
           if (!data.is_error) {
             delete caseTypes.values[caseType.id];
+            $scope.$digest();
+          }
+        });
+    };
+    $scope.revertCaseType = function (caseType) {
+      caseType.definition = 'null';
+      caseType.is_forked = '0';
+      crmApi('CaseType', 'create', caseType, true)
+        .then(function (data) {
+          if (data.is_error) {
+            caseType.is_forked = '1'; // restore
             $scope.$digest();
           }
         });

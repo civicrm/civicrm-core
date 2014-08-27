@@ -72,39 +72,33 @@
 {/if} {* $action ne view *}
 </div>
 
-<script language="JavaScript" type="text/javascript">
-{literal}
-function getFinancialType()
-{
-{/literal}
-   productID         = "#product_id";
-   financialTypeID    = "#financial_type_id"
-   callbackURL        = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancialType'}"
+<script type="text/javascript">
 {literal}
 
-          var check          = cj(productID).val();
-          callbackURL = callbackURL+"&_value="+check;
-                cj.ajax({
-                         url: callbackURL,
-                         context: document.body,
-                         success: function( data, textStatus ){
-       data = eval(data);//get json array
-                              if ( data != null ) {
-             cj(financialTypeID).val(data);
+  CRM.$(function($) {
 
-           }
-
-      }
-           });
-
-  }
-
-cj(document).ready(function(){
+    function getFinancialType() {
+      var callbackURL = CRM.url('civicrm/ajax/rest', {
+        className: 'CRM_Financial_Page_AJAX',
+        fnName: 'jqFinancialType',
+        _value: $("#product_id").val()
+      });
+      $.ajax({
+        url: callbackURL,
+        success: function( data, textStatus ){
+          data = eval(data);//get json array
+          if ( data != null ) {
+            $("#financial_type_id").val(data);
+  
+          }
+  
+        }
+      });
+  
+    }
     getFinancialType();
 
-    cj("#product_id").change( function(){
-         getFinancialType();
-    });
+    $("#product_id").change(getFinancialType);
 });
 {/literal}
 </script>

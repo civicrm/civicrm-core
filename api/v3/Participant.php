@@ -81,31 +81,58 @@ function civicrm_api3_participant_create($params) {
  * Create a default participant line item
  */
 function _civicrm_api3_participant_createlineitem(&$params, $participant){
-  $sql = "
-SELECT      ps.id AS setID, pf.id AS priceFieldID, pfv.id AS priceFieldValueID
-FROM  civicrm_price_set_entity cpse
-LEFT JOIN civicrm_price_set ps ON cpse.price_set_id = ps.id AND cpse.entity_id = {$params['event_id']} AND cpse.entity_table = 'civicrm_event'
-LEFT JOIN   civicrm_price_field pf ON pf.`price_set_id` = ps.id
-LEFT JOIN   civicrm_price_field_value pfv ON pfv.price_field_id = pf.id and pfv.label = '{$params['fee_level']}'
-where ps.id is not null
-";
+  // it is possible that a fee level contains information about multiple
+  // price field values.
 
-  $dao = CRM_Core_DAO::executeQuery($sql);
-  if ($dao->fetch()) {
-    $amount = CRM_Utils_Array::value('fee_amount', $params, 0);
-    $lineItemparams = array(
-      'price_field_id' => $dao->priceFieldID,
-      'price_field_value_id' => $dao->priceFieldValueID,
-      'entity_table' => 'civicrm_participant',
-      'entity_id' => $participant->id,
-      'label' => $params['fee_level'],
-      'qty' => 1,
-      'participant_count' => 0,
-      'unit_price' => $amount,
-      'line_total' => $amount,
-      'version' => 3,
+  $priceFieldValueDetails = CRM_Utils_Array::explodePadded(
+    $params["fee_level"]);
+
+  foreach($priceFieldValueDetails as $detail) {
+    if (preg_match('/- ([0-9]+)$/', $detail, $matches)) {
+      // it is possible that a price field value is payd for multiple times.
+      // (FIXME: if the price field value ends in minus followed by whitespace
+      // and a number, things will go wrong.)
+
+      $qty = $matches[1];
+      preg_match('/^(.*) - [0-9]+$/', $detail, $matches);
+      $label = $matches[1];
+    }
+    else {
+      $label = $detail;
+      $qty = 1;
+    }
+
+    $sql = "
+      SELECT      ps.id AS setID, pf.id AS priceFieldID, pfv.id AS priceFieldValueID, pfv.amount AS amount
+      FROM  civicrm_price_set_entity cpse
+      LEFT JOIN civicrm_price_set ps ON cpse.price_set_id = ps.id AND cpse.entity_id = %1 AND cpse.entity_table = 'civicrm_event'
+      LEFT JOIN   civicrm_price_field pf ON pf.`price_set_id` = ps.id
+      LEFT JOIN   civicrm_price_field_value pfv ON pfv.price_field_id = pf.id
+      where ps.id is not null and pfv.label = %2
+    ";
+
+    $qParams = array(
+      1 => array($params['event_id'], 'Integer'),
+      2 => array($label, 'String'),
     );
-    civicrm_api('line_item', 'create', $lineItemparams);
+
+    $dao = CRM_Core_DAO::executeQuery($sql, $qParams);
+    if ($dao->fetch()) {
+      $lineItemparams = array(
+        'price_field_id' => $dao->priceFieldID,
+        'price_field_value_id' => $dao->priceFieldValueID,
+        'entity_table' => 'civicrm_participant',
+        'entity_id' => $participant->id,
+        'label' => $label,
+        'qty' => $qty,
+        'participant_count' => 0,
+        'unit_price' => $dao->amount,
+        'line_total' => $qty*$dao->amount,
+        'version' => 3,
+      );
+      civicrm_api('line_item', 'create', $lineItemparams);
+    }
+
   }
 }
 

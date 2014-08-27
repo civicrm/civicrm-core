@@ -83,11 +83,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     if ($this->_id && CRM_Core_BAO_Note::getNotePrivacyHidden($this->_id)) {
       CRM_Core_Error::statusBounce(ts('You do not have access to this note.'));
     }
-
-    // set title to "Note - " + Contact Name
-    $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_entityId, 'display_name');
-    $pageTitle = 'Note - ' . $displayName;
-    $this->assign('pageTitle', $pageTitle);
+    $this->setPageTitle($this->_parentId ? ts('Comment') : ts('Note'));
   }
 
   /**

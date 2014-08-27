@@ -38,7 +38,12 @@
     <div class="messages help">{$cd_edit.help_post}</div>
   {/if}
   {if $cd_edit.is_multiple and ( ( $cd_edit.max_multiple eq '' )  or ( $cd_edit.max_multiple > 0 and $cd_edit.max_multiple > $cgCount ) ) }
-    <div id="add-more-link-{$cgCount}" class="add-more-link-{$group_id}-{$cgCount}"><a href="#" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">{ts 1=$cd_edit.title}Add another %1 record{/ts}</a></div>
+    <div id="add-more-link-{$cgCount}" class="add-more-link-{$group_id} add-more-link-{$group_id}-{$cgCount}">
+      <a href="#" class="crm-hover-button" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">
+        <span class="icon ui-icon-circle-plus"></span>
+        {ts 1=$cd_edit.title}Another %1 record{/ts}
+      </a>
+    </div>
   {/if}
 {else}
   {foreach from=$groupTree item=cd_edit key=group_id name=custom_sets}
@@ -61,7 +66,7 @@
      <div class="custom-group custom-group-{$cd_edit.name} crm-accordion-wrapper {if $cd_edit.collapse_display and !$skipTitle}collapsed{/if}">
       {if !$skipTitle}
       <div class="crm-accordion-header">
-        {$cd_edit.title}
+        {$cd_edit.title} {$cgCount}
        </div><!-- /.crm-accordion-header -->
       {/if}
       <div class="crm-accordion-body">
@@ -86,7 +91,12 @@
           <em>{ts 1=$cd_edit.title}Click "Edit Contact" to add more %1 records{/ts}</em>
         </div>
       {else}
-        <div id="add-more-link-{$cgCount}"><a href="#" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">{ts 1=$cd_edit.title}Add another %1 record{/ts}</a></div>       
+        <div id="add-more-link-{$cgCount}">
+          <a href="#" class="crm-hover-button" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">
+            <span class="icon ui-icon-circle-plus"></span>
+            {ts 1=$cd_edit.title}Another %1 record{/ts}
+          </a>
+        </div>
       {/if}
     {/if}
     {/if}

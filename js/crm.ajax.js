@@ -301,24 +301,39 @@
         settings.dialog.height = parseInt($(window).height() * (parseFloat(settings.dialog.height)/100), 10);
       }
       $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
-      $(settings.target).on('dialogclose', function() {
-        if ($(this).attr('data-unsaved-changes') !== 'true') {
-          $(this).crmSnippet('destroy').dialog('destroy').remove();
-        }
-      });
-    }
-    if (settings.dialog && !settings.dialog.title) {
-      $(settings.target).on('crmLoad', function(e, data) {
-        if (e.target === $(settings.target)[0] && data && data.title) {
-          $(this).dialog('option', 'title', data.title);
-        }
-      });
+      $(settings.target)
+        .on('dialogclose', function() {
+          if ($(this).attr('data-unsaved-changes') !== 'true') {
+            $(this).crmSnippet('destroy').dialog('destroy').remove();
+          }
+        })
+        .on('crmLoad', function(e, data) {
+          // Set title
+          if (e.target === $(settings.target)[0] && data && !settings.dialog.title && data.title) {
+            $(this).dialog('option', 'title', data.title);
+          }
+          // Adjust height to fit content (small delay to allow elements to render)
+          window.setTimeout(function() {
+            var currentHeight = $(settings.target).parent().height(),
+              padding = currentHeight - $(settings.target).height(),
+              newHeight = $(settings.target).prop('scrollHeight') + padding,
+              menuHeight = $('#civicrm-menu').height(),
+              maxHeight = $(window).height() - menuHeight;
+            newHeight = newHeight > maxHeight ? maxHeight : newHeight;
+            if (newHeight > (currentHeight + 15)) {
+              $(settings.target).dialog('option', {
+                position: {my: 'center', at: 'center center+' + (menuHeight / 2), of: window},
+                height: newHeight
+              });
+            }
+          }, 500);
+        });
     }
     $(settings.target).crmSnippet(settings).crmSnippet('refresh');
     return $(settings.target);
   };
   CRM.loadForm = function(url, options) {
-    var settings = {
+    var formErrors = [], settings = {
       crmForm: {
         ajaxForm: {},
         autoClose: true,
@@ -408,9 +423,10 @@
             response.url = data.url;
             $el.html(response.content).trigger('crmLoad', response).trigger('crmFormLoad', response);
             if (response.status === 'form_error') {
+              formErrors = [];
               $el.trigger('crmFormError', response);
               $.each(response.errors || [], function(formElement, msg) {
-                $('[name="'+formElement+'"]', $el).crmError(msg);
+                formErrors.push($('[name="'+formElement+'"]', $el).crmError(msg));
               });
             }
           }
@@ -423,6 +439,9 @@
           }
         },
         beforeSubmit: function(submission) {
+          $.each(formErrors, function() {
+            this && this.close && this.close();
+          });
           $el.crmSnippet('option', 'block') && $el.block();
           $el.trigger('crmFormSubmit', submission);
         }
@@ -434,7 +453,7 @@
           return false;
         });
       }
-      // Alow a button to prevent ajax submit
+      // Allow a button to prevent ajax submit
       $('input[data-no-ajax-submit=true]').click(function() {
         $(this).closest('form').ajaxFormUnbind();
       });
@@ -444,7 +463,7 @@
     return widget;
   };
   /**
-   * Handler for jQuery click event e.g. $('a').click(CRM.popup)
+   * Handler for jQuery click event e.g. $('a').click(CRM.popup);
    */
   CRM.popup = function(e) {
     var $el = $(this).first(),
@@ -484,14 +503,14 @@
   };
   /**
    * An event callback for CRM.popup or a standalone function to refresh the content around a given element
-   * @param e event|selector
+   * @param e {event|selector}
    */
   CRM.refreshParent = function(e) {
     // Use e.target if input smells like an event, otherwise assume it's a jQuery selector
     var $el = (e.stopPropagation && e.target) ? $(e.target) : $(e),
       $table = $el.closest('.dataTable');
     // Call native refresh method on ajax datatables
-    if ($table && $.fn.DataTable.fnIsDataTable($table[0]) && $table.dataTable().fnSettings().sAjaxSource) {
+    if ($table.length && $.fn.DataTable.fnIsDataTable($table[0]) && $table.dataTable().fnSettings().sAjaxSource) {
       // Refresh ALL datatables - needed for contact relationship tab
       $.each($.fn.dataTable.fnTables(), function() {
         $(this).dataTable().fnSettings().sAjaxSource && $(this).unblock().dataTable().fnDraw();

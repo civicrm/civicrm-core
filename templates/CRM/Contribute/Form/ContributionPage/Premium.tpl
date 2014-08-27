@@ -143,13 +143,13 @@
   CRM.$(function($) {
 
     // bind click event to premiums_active checkbox
-    cj('#premiums_active').click(function () {
+    $('#premiums_active').click(function () {
       premiumBlock();
     });
 
     // hide premium setting if premium block is not enabled
-    if (!cj('#premiums_active').prop('checked')) {
-      cj('#premiumSettings').hide();
+    if (!$('#premiums_active').prop('checked')) {
+      $('#premiumSettings').hide();
     }
   });
 

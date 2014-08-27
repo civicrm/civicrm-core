@@ -346,7 +346,7 @@ WHERE      t.table_name = 'Activity' AND
    */
   function &columns() {
     $this->_columns = array(
-      ts('Contact Id') => 'contact_id',
+      ts('Contact ID') => 'contact_id',
       ts('Name') => 'sort_name',
     );
 

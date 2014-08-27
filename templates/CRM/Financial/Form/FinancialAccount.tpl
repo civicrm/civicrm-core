@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting financial type  *}
-<h3>{if $action eq 1}{ts}New Financial Account{/ts}{elseif $action eq 2}{ts}Edit Financial Account{/ts}{else}{ts}Delete Financial Account{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-contribution_type-form-block crm-financial_type-form-block">
 {if $action eq 8}
   <div class="messages status no-popup">
@@ -50,7 +49,7 @@
     </tr>
     <tr class="crm-contribution-form-block-financial_account_type_id">
       <td class="label">{$form.financial_account_type_id.label}</td>
-      <td class="html-adjust">{$form.financial_account_type_id.html|crmReplace:class:twenty}</td>
+      <td class="html-adjust">{$form.financial_account_type_id.html}</td>
     </tr>
     <tr class="crm-contribution-form-block-accounting_code">
       <td class="label">{$form.accounting_code.label}</td>

@@ -558,6 +558,92 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
      $this->_testOrganization($pageId, $cid, $pageTitle);
   }
 
+  function testWithContactSubtypeDupe() {
+    $this->webtestLogin();
+
+    //create organisation
+    $orgName = "Org WebAccess ". substr(sha1(rand()), 0, 7);
+    $orgEmail = "org". substr(sha1(rand()), 0, 7) . "@web.com";
+    $contactSubType = 'Sponsor';
+    $this->webtestAddOrganization($orgName, $orgEmail, $contactSubType);
+
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $cid = $this->urlArg('cid');
+
+    $pageTitle = substr(sha1(rand()), 0, 7);
+    $rand = 100;
+    $hash = substr(sha1(rand()), 0, 7);
+    $amountSection = TRUE;
+    $payLater = TRUE;
+    $onBehalf = TRUE;
+    $pledges = FALSE;
+    $recurring = FALSE;
+    $memberships = FALSE;
+    $memPriceSetId = NULL;
+    $friend = FALSE;
+    $profilePreId = NULL;
+    $profilePostId = NULL;
+    $premiums = FALSE;
+    $widget = FALSE;
+    $pcp = FALSE;
+    $honoreeSection = FALSE;
+    $isAddPaymentProcessor = FALSE;
+    $isPcpApprovalNeeded = FALSE;
+    $isSeparatePayment = FALSE;
+
+    // create a new online contribution page
+    // create contribution page with randomized title and default params
+    $pageId = $this->webtestAddContributionPage($hash,
+      $rand,
+      $pageTitle,
+      null,
+      $amountSection,
+      $payLater,
+      $onBehalf,
+      $pledges,
+      $recurring,
+      $memberships,
+      $memPriceSetId,
+      $friend,
+      $profilePreId,
+      $profilePostId,
+      $premiums,
+      $widget,
+      $pcp,
+      $isAddPaymentProcessor,
+      $isPcpApprovalNeeded,
+      $isSeparatePayment,
+      $honoreeSection
+    );
+
+     //Open Live Contribution Page
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
+    $this->waitForElementPresent("onbehalf_state_province-3");
+
+    $this->type("onbehalf_organization_name", $orgName);
+    $this->waitForElementPresent("onbehalf_phone-3-1");
+    $this->type("onbehalf_phone-3-1", 9999999999);
+    $this->waitForElementPresent("onbehalf_email-3");
+    $this->type("onbehalf_email-3", "org@example.com");
+    $this->type("onbehalf_street_address-3", "Test Street Address");
+    $this->type("onbehalf_city-3", "Test City");
+    $this->type("onbehalf_postal_code-3", substr(sha1(rand()), 0, 6));
+    $this->click("onbehalf_country-3");
+    $this->select("onbehalf_country-3", "label=United States");
+    $this->click("onbehalf_state_province-3");
+    $this->select("onbehalf_state_province-3", "label=Alabama");
+
+    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
+
+    $this->click("_qf_Confirm_next-bottom");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    $this->openCiviPage("contact/view", "reset=1&cid=$cid", "xpath=//div[@class='crm-content crm-contact_type_label']");
+
+    $this->verifyText("xpath=//div[@class='crm-content crm-contact_type_label']", $contactSubType);
+  }
+
   /**
    * @param $pageId
    * @param $cid

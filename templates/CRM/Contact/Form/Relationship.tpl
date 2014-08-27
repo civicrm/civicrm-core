@@ -145,7 +145,7 @@
       {literal}
       CRM.$(function($) {
         var
-          $form = $("form#{/literal}{$form.formName}{literal}"),
+          $form = $("form.{/literal}{$form.formClass}{literal}"),
           relationshipData = {/literal}{$relationshipData|@json_encode}{literal};
         $('[name=relationship_type_id]', $form).change(function() {
           var

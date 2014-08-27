@@ -165,7 +165,8 @@ class CRM_Utils_VersionCheck {
    */
   public function newerVersion() {
     if ($this->latestVersion) {
-      if (version_compare($this->localVersion, $this->latestVersion) < 0) {
+      if ((version_compare($this->localVersion, $this->latestVersion) < 0)
+        && CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'versionAlert', NULL, TRUE)) {
         return $this->latestVersion;
       }
     }

@@ -75,7 +75,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * This function sets the default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
@@ -112,7 +112,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
-    if ($this->_action & CRM_Core_Action::VIEW) {
+    if ($this->_action & CRM_Core_Action::VIEW || $this->_action & CRM_Core_Action::PREVIEW) {
       $this->addButtons(array(
           array(
             'type' => 'cancel',

@@ -199,8 +199,9 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
 
     $this->addEntityRef('recipient_manual_id', ts('Manual Recipients'), array('multiple' => true));
 
+    $groups = CRM_Contact_BAO_Group::getGroupsHierarchy(CRM_Core_PseudoConstant::staticGroup(), NULL, '&nbsp;&nbsp;', TRUE);
     $this->add('select', 'group_id', ts('Group'),
-      CRM_Core_PseudoConstant::staticGroup(), FALSE, array('class' => 'crm-select2 huge')
+      $groups, FALSE, array('class' => 'crm-select2 huge')
     );
 
     CRM_Mailing_BAO_Mailing::commonCompose($this);

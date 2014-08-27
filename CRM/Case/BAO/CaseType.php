@@ -70,13 +70,17 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     if (!$nameParam && empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
-    if (!empty($params['name']) && !CRM_Case_BAO_CaseType::isValidName($params['name'])) {
-      throw new CRM_Core_Exception("Cannot create caseType with malformed name [{$params['name']}]");
+
+    // Old case-types (pre-4.5) may keep their ucky names, but new case-types must satisfy isValidName()
+    if (empty($params['id']) && !empty($params['name']) && !CRM_Case_BAO_CaseType::isValidName($params['name'])) {
+      throw new CRM_Core_Exception("Cannot create new case-type with malformed name [{$params['name']}]");
     }
+
+    $caseTypeName = (isset($params['name'])) ? $params['name'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $params['id'], 'name', 'id', TRUE);
 
     // function to format definition column
     if (isset($params['definition']) && is_array($params['definition'])) {
-      $params['definition'] = self::convertDefinitionToXML($params['name'], $params['definition']);
+      $params['definition'] = self::convertDefinitionToXML($caseTypeName, $params['definition']);
       CRM_Core_ManagedEntities::scheduleReconcilation();
     }
 
@@ -96,6 +100,10 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   static function convertDefinitionToXML($name, $definition) {
     $xmlFile = '<?xml version="1.0" encoding="iso-8859-1" ?>' . "\n\n<CaseType>\n";
     $xmlFile .= "<name>{$name}</name>\n";
+
+    if (array_key_exists('forkable', $definition)) {
+      $xmlFile .= "<forkable>" . ((int) $definition['forkable']) . "</forkable>\n";
+    }
 
     if (isset($definition['activityTypes'])) {
       $xmlFile .= "<ActivityTypes>\n";
@@ -172,6 +180,10 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   static function convertXmlToDefinition($xml) {
     // build PHP array based on definition
     $definition = array();
+
+    if (isset($xml->forkable)) {
+      $definition['forkable'] = (int) $xml->forkable;
+    }
 
     // set activity types
     if (isset($xml->ActivityTypes)) {
@@ -329,5 +341,39 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    */
   static function isValidName($caseType) {
     return preg_match('/^[a-zA-Z0-9_]+$/',  $caseType);
+  }
+
+  /**
+   * Determine if the case-type has *both* DB and file-based definitions.
+   *
+   * @param int $caseTypeId
+   * @return bool|null TRUE if there are *both* DB and file-based definitions
+   */
+  static function isForked($caseTypeId) {
+    $caseTypeName = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'name', 'id', TRUE);
+    if ($caseTypeName) {
+      $dbDefinition = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'definition', 'id', TRUE);
+      $fileDefinition = CRM_Case_XMLRepository::singleton()->retrieveFile($caseTypeName);
+      return $fileDefinition && $dbDefinition;
+    }
+    return NULL;
+  }
+
+  /**
+   * Determine if modifications are allowed on the case-type
+   *
+   * @param int $caseTypeId
+   * @return bool TRUE if the definition can be modified
+   */
+  static function isForkable($caseTypeId) {
+    $caseTypeName = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'name', 'id', TRUE);
+    if ($caseTypeName) {
+      // if file-based definition explicitly disables "forkable" option, then don't allow changes to definition
+      $fileDefinition = CRM_Case_XMLRepository::singleton()->retrieveFile($caseTypeName);
+      if ($fileDefinition && isset($fileDefinition->forkable)) {
+        return CRM_Utils_String::strtobool((string)$fileDefinition->forkable);
+      }
+    }
+    return TRUE;
   }
 }

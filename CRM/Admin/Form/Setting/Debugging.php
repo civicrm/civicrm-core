@@ -40,10 +40,10 @@
 class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
 
   protected $_settings = array(
-    'debug_enabled' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
-    'backtrace' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
-    'fatalErrorTemplate' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
-    'fatalErrorHandler' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
+    'debug_enabled' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
+    'backtrace' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
+    'fatalErrorTemplate' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
+    'fatalErrorHandler' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
   );
   /**
    * Function to build the form
@@ -54,7 +54,7 @@ class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts(' Settings - Debugging and Error Handling '));
     if (CRM_Core_Config::singleton()->userSystem->supports_UF_Logging == '1') {
-      $this->_settings['userFrameworkLogging'] = CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME;
+      $this->_settings['userFrameworkLogging'] = CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME;
     }
 
     parent::buildQuickForm();

@@ -247,10 +247,10 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     // Justification for this instance: FIXME
     sleep(3);
     $this->click("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr/td[3]/span/a[text()='Edit']");
-    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']/form/div[2]//div[@id='crm-profile-block']//div[@class='crm-submit-buttons']/span/input[@class='validate form-submit default crm-form-submit']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']/form/div[2]//div[@id='crm-profile-block']//div[@class='crm-submit-buttons']/span/input[@class='validate crm-form-submit default crm-form-submit']");
     $this->verifyText("//div[@id='custom--table-wrapper']/div/div/table/thead/tr/th[1]", preg_quote($params['textFieldLabel']));
     $this->type("//div[@id='crm-profile-block']/div/div[2]/input[@class='crm-form-text required']", $recordNew['text'].'edit');
-    $this->click("xpath=//div[@class='ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']/form/div[2]//div[@id='crm-profile-block']//div[@class='crm-submit-buttons']/span/input[@class='validate form-submit default crm-form-submit']");
+    $this->click("xpath=//div[@class='ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']/form/div[2]//div[@id='crm-profile-block']//div[@class='crm-submit-buttons']/span/input[@class='validate crm-form-submit default crm-form-submit']");
     $this->waitForText("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[1]/td[1]", $recordNew['text'].'edit');
     $editalertText = $this->getAlert();
     $this->assertEquals("Thank you. Your information has been saved.", $editalertText);
@@ -399,12 +399,12 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $this->type('email-Primary', $params['email']);
       $this->waitForElementPresent("//div[@id='crm-profile-block']//div/div[2]/select");
       $this->select("//div[@id='crm-profile-block']//div/div[2]/select",'value=1');
-      $this->click("xpath=//div[@id='crm-profile-block']//div[@class='crm-submit-buttons']/span/input[@class='validate form-submit default crm-form-submit']");
+      $this->click("xpath=//div[@id='crm-profile-block']//div[@class='crm-submit-buttons']/span/input[@class='validate crm-form-submit default crm-form-submit']");
     }
     else {
       $this->waitForElementPresent("//div[@id='crm-profile-block']//div/div[2]/select");
       $this->select("//div[@id='crm-profile-block']//div/div[2]/select",'value=1');
-      $this->click("xpath=//div[@class='ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']/form/div[2]//div[@id='crm-profile-block']//div[@class='crm-submit-buttons']/span/input[@class='validate form-submit default crm-form-submit']");
+      $this->click("xpath=//div[@class='ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']/form/div[2]//div[@id='crm-profile-block']//div[@class='crm-submit-buttons']/span/input[@class='validate crm-form-submit default crm-form-submit']");
     }
     return $params;
   }

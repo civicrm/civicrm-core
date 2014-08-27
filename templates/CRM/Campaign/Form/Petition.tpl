@@ -129,13 +129,13 @@
     //show edit profile field links
     CRM.$(function($) {
       // show edit for both contact and activity profile
-      cj('select[id$="profile_id"]').change(function () {
-        buildLinks(cj(this), cj(this).val());
+      $('select[id$="profile_id"]').change(function () {
+        buildLinks($(this), $(this).val());
       });
 
       // make sure we set edit links for both profiles when form loads
-      cj('select[id$="profile_id"]').each(function (e) {
-        buildLinks(cj(this), cj(this).val());
+      $('select[id$="profile_id"]').each(function (e) {
+        buildLinks($(this), $(this).val());
       });
     });
   </script>
