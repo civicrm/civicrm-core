@@ -44,6 +44,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   protected function tearDown() {
     parent::tearDown();
     $this->quickCleanup($this->tablesToTruncate, TRUE);
+    CRM_Core_BAO_ConfigSetting::disableComponent('CiviCase');
   }
 
   function testAddCaseToContact() {
