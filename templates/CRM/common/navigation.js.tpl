@@ -33,7 +33,7 @@
             <input type="text" id="sort_contact_id" style="display: none" />
             <input type="hidden" name="hidden_location" value="1" />
             <input type="hidden" name="qfKey" value="{crmKey name='CRM_Contact_Controller_Search' addSequence=1}" />
-            <div style="height:1px; overflow:hidden;"><input type="submit" value="{ts}Go{/ts}" name="_qf_Advanced_refresh" class="form-submit default" /></div>
+            <div style="height:1px; overflow:hidden;"><input type="submit" value="{ts}Go{/ts}" name="_qf_Advanced_refresh" class="crm-form-submit default" /></div>
           </div>
         </form>
         <ul>

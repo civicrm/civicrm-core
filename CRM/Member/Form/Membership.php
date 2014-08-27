@@ -121,7 +121,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     $this->_processors = array();
-    CRM_Core_Resources::singleton()->addSetting(array('ids' => array('contact' => $this->_contactID)));
+    $this->assign('contactID', $this->_contactID);
 
     // check for edit permission
     if (!CRM_Core_Permission::checkActionPermission('CiviMember', $this->_action)) {
@@ -269,18 +269,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->assign('onlinePendingContributionId', $this->_onlinePendingContributionId);
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
 
-    // Set title
-    if ($this->_contactID) {
-      $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactID);
+    $this->setPageTitle(ts('Membership'));
 
-      // Check if this is default domain contact CRM-10482
-      if (CRM_Contact_BAO_Contact::checkDomainContact($this->_contactID)) {
-        $displayName .= ' (' . ts('default organization') . ')';
-      }
-
-      // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-      CRM_Utils_System::setTitle(ts('Membership for') . ' ' . $displayName);
-    }
     parent::preProcess();
   }
 

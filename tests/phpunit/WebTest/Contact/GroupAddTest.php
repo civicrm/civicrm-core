@@ -237,4 +237,51 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->click("edit-submit");
     $this->waitForTextPresent("The role has been deleted.");
   }
+
+   /**
+   * Webtest for add contact to group (CRM-15108)
+   */
+  function testAddContactToGroup() {
+    $this->webtestLogin();
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
+    $this->waitForElementPresent('_qf_Contact_upload_view-bottom');
+
+    //Create contact.
+    $group = "Advisory Board";
+    $firstName = "Adams".substr(sha1(rand()), 0, 4);
+    $lastName = substr(sha1(rand()), 0, 4);
+    $email = "{$lastName}.{$firstName}@example.org";
+    $this->type('first_name', $firstName);
+    $this->type('last_name', $lastName);
+    $this->type('email_1_email', "{$firstName}.{$lastName}@example.com");
+    $this->click('_qf_Contact_upload_view-bottom');
+    $this->waitForText('crm-notification-container', "Contact Saved");
+
+    $this->openCiviPage('group', 'reset=1');
+    $this->waitForElementPresent("xpath=//a/span[text()='Add Group']");
+    $this->waitForElementPresent("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[1]/span[contains(text(), '{$group}')]");
+    $this->click("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[1]/span[text()='{$group}']/../../td[7]/span[1]/a[1]");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//form[@id='Basic']/div[2]/a/span");
+    $this->waitForElementPresent("_qf_Basic_refresh");
+    $this->type('sort_name', $firstName);
+    $this->click('_qf_Basic_refresh');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("_qf_Basic_next_action");
+
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[3]/a[text()='{$lastName}, {$firstName}']"));
+    $this->click("xpath=//table/tbody//tr/td[1]/input[@type='checkbox']");
+    $this->click('_qf_Basic_next_action');
+    $this->waitForElementPresent("_qf_AddToGroup_back-bottom");
+    $this->click('_qf_AddToGroup_next-bottom');
+    $this->waitForText('crm-notification-container', "1 contact added to group");
+
+    $this->openCiviPage('contact/search', 'reset=1');
+    $this->waitForElementPresent("_qf_Basic_refresh");
+    $this->type('sort_name', $firstName);
+    $this->select('group',"Advisory Board");
+    $this->click('_qf_Basic_refresh');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[3]/a[text()='{$lastName}, {$firstName}']"));
+  }
 }

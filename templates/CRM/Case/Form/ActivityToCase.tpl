@@ -65,11 +65,6 @@
             return {results: response};
           }
         }
-      }).change(function() {
-        if ($(this).val()) {
-          selectedCaseId = $(this).val();
-          contactId = $(this).select2('data').extra.contact_id;
-        }
       });
     });
 
@@ -110,6 +105,8 @@
           },
           buttons: {
             "{/literal}{ts escape='js'}Save{/ts}{literal}": function() {
+              var selectedCaseId = cj('input[name=file_on_case_unclosed_case_id]', '#fileOnCaseDialog').val();
+              var contactId = cj('input[name=file_on_case_unclosed_case_id]', '#fileOnCaseDialog').select2('data').extra.contact_id;
               var subject         = cj("#file_on_case_activity_subject").val( );
               var targetContactId = cj("#file_on_case_target_contact_id").val( );
 

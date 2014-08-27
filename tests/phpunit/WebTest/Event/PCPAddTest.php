@@ -25,7 +25,6 @@
  */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
-require_once 'WebTest/Event/AddEventTest.php';
 
 /**
  * Class WebTest_Event_PCPAddTest

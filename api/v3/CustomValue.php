@@ -121,6 +121,7 @@ function civicrm_api3_custom_value_create($params) {
  */
 function _civicrm_api3_custom_value_create_spec(&$params) {
   $params['entity_id']['api.required'] = 1;
+  $params['entity_id']['title'] = 'Entity ID';
 }
 
 /**

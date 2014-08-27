@@ -7,29 +7,29 @@
   <comment>Table to cache items for civicrm components.</comment>
   <add>2.1</add>
   <field>
-      <name>id</name>
-      <type>int unsigned</type>
-      <required>true</required>
-      <add>2.1</add>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>2.1</add>
   </field>
   <primaryKey>
-       <name>id</name>
-       <autoincrement>true</autoincrement>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
   </primaryKey>
   <field>
-       <name>group_name</name>
-       <type>varchar</type>
-       <length>32</length>
-       <required>true</required>
-       <comment>group name for cache element, useful in cleaning cache elements</comment>
-       <add>2.1</add>
+    <name>group_name</name>
+    <type>varchar</type>
+    <length>32</length>
+    <required>true</required>
+    <comment>group name for cache element, useful in cleaning cache elements</comment>
+    <add>2.1</add>
   </field>
   <field>
-       <name>path</name>
-       <type>varchar</type>
-       <length>255</length>
-       <comment>Unique path name for cache element</comment>
-       <add>2.1</add>
+    <name>path</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Unique path name for cache element</comment>
+    <add>2.1</add>
   </field>
   <index>
     <name>UI_group_path</name>
@@ -68,10 +68,10 @@
     </html>
   </field>
   <foreignKey>
-       <name>component_id</name>
-       <table>civicrm_component</table>
-       <key>id</key>
-       <add>2.1</add>
+    <name>component_id</name>
+    <table>civicrm_component</table>
+    <key>id</key>
+    <add>2.1</add>
   </foreignKey>
   <field>
     <name>created_date</name>

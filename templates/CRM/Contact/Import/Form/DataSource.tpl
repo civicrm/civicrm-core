@@ -105,7 +105,7 @@
 
   {literal}
     <script type="text/javascript">
-      cj(document).ready(function() {
+      CRM.$(function($) {
          //build data source form block
          buildDataSourceFormBlock();
          buildSubTypes();

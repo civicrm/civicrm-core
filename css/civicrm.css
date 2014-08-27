@@ -5,6 +5,10 @@
  * Other civi blocks outside the main container also have the class crm-container (but not the id)
  * All styles should start with .crm-container unless they are specific to the main div only
  */
+.crm-container input,
+#civicrm-menu input {
+  box-sizing: content-box;
+}
 
 div.crm-container label {
   font-weight: normal;
@@ -47,6 +51,10 @@ div.crm-container fieldset label{
   border-collapse: collapse;
   width: 100%;
   font-size: 13px;
+}
+
+.crm-container tr {
+  background: none transparent;
 }
 
 .crm-container table.criteria-group {
@@ -105,11 +113,6 @@ div.crm-container fieldset label{
   border-top: none;
 }
 
-.crm-container tr {
-  font-size: .95em;
-  background: none !important;
-}
-
 .crm-container td {
   padding: 4px;
   vertical-align: top;
@@ -122,25 +125,11 @@ div.crm-container fieldset label{
   border-collapse: collapse;
 }
 
-.crm-container .crm-row-selected {
-  margin: 0px;
-  padding: 3px 0px 3px 0px;
-  clear: none;
-  background-color: #FFFFCC !important;
-}
-
 .crm-container .crm-row-child {
   margin: 0px;
   padding: 3px 0px 3px 0px;
   clear: none;
-  background-color: #F1F8EB !important;
-}
-
-.crm-container .row-highlighted {
-  margin: 0px;
-  padding: 3px 0px 3px 0px;
-  clear: none;
-  background-color: #FFFFCC;
+  background-color: #F1F8EB;
 }
 
 /*
@@ -346,11 +335,19 @@ input.crm-form-entityref {
   background-image: linear-gradient(top, #eee 1%, #fff 15%);
 }
 
-.crm-container .form-submit {
+.crm-container input.crm-form-text[disabled],
+.crm-container input.crm-form-text[readonly] {
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #ddd), color-stop(15%, #f2f2f2));
+  background-image: -webkit-linear-gradient(top, #ddd 1%, #f2f2f2 15%);
+  background-image: -moz-linear-gradient(top, #ddd 1%, #f2f2f2 15%);
+  background-image: linear-gradient(top, #ddd 1%, #f2f2f2 15%);
+}
+
+.crm-container .crm-form-submit {
   margin: .25em 0.5em 0.25em 0;
 }
 
-.crm-container .form-submit-inline {
+.crm-container .crm-form-submit-inline {
   margin: 0em 0.5em 0.25em 0em;
 }
 
@@ -421,6 +418,7 @@ input.crm-form-entityref {
 }
 
 .crm-container .crm-section,
+.crm-container div.crm-field-wrapper,
 .crm-container-snippet .crm-section {
   margin-bottom: 1em;
 }
@@ -1342,11 +1340,11 @@ input.crm-form-entityref {
 
 #crm-container input.submit-link {
   color: #285286;
-  background-color: transparent;
+  background: none transparent;
   border: none;
   cursor: pointer;
-  cursor: hand;
   margin: 0em -0.5em 0em -0.5em;
+  text-shadow: none;
 }
 
 .crm-container .underline-effect {
@@ -1642,10 +1640,6 @@ editor specific classes
   cursor: pointer;
 }
 
-#crm-container table.nestedActivitySelector tr a {
-  color: #0066CC;
-}
-
 #crm-container #activities-selector tr:hover td,
 #crm-container #activities-selector tr:hover td.sorted,
 #crm-container #activities-selector tr.trOver td.sorted,
@@ -1724,8 +1718,9 @@ editor specific classes
   display: inline-block;
   white-space: nowrap;
   border: 1px solid transparent;
+  border-radius: 4px;
   text-decoration: none;
-  font-size: .8em;
+  font-size: .9em;
   color: #000;
   padding: 1px 2px 1px 0;
   opacity: .7;
@@ -1735,6 +1730,7 @@ editor specific classes
   font-size: .95em;
   padding: 3px 5px;
   opacity: 1;
+  color: #2786c2;
 }
 .crm-container .btn-slide .action-item {
   white-space: normal;
@@ -1753,7 +1749,6 @@ editor specific classes
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#cccccc', endColorstr = '#eeeeee', GradientType = 0);
   background-image: linear-gradient(top, #eee 0%, #ccc 100%);
   border: 1px solid #AAAAAA;
-  border-radius: 4px;
   opacity: 1;
   color: #2786C2;
 }
@@ -1776,11 +1771,7 @@ editor specific classes
   background-color: #2F2F2E;
 }
 
-.crm-container .panel li a {
-  color: #DFDFDF;
-}
-
-.crm-container .panel li a:hover,
+.crm-container .btn-slide .panel li a:hover,
 .crm-container .crm-participant-list-inner li a:hover,
 .crm-container .crm-event-links-list-inner li a:hover,
 .crm-container .crm-contribpage-links-list-inner li a:hover {
@@ -1845,11 +1836,12 @@ editor specific classes
   z-index: 1;
 }
 
-.crm-container .panel li a {
+.crm-container .btn-slide .panel li a {
   text-decoration: none;
   padding: 4px;
   display: block;
   cursor: pointer;
+  color: #DFDFDF;
 }
 
 /*class for CMS user name check used in profile*/
@@ -2128,11 +2120,6 @@ div.grippie {
   padding-top: 5px;
 }
 
-#crm-container a.crm-link-action {
-  cursor: pointer;
-  cursor: hand;
-}
-
 #crm-container span.crm-custom-greeting {
   font-size: 9px;
 }
@@ -2379,27 +2366,27 @@ div.grippie {
 .crm-container a.crm-invoiceButton:visited,
 .crm-container a.button:link,
 .crm-container a.button:visited,
-.crm-container input.form-submit,
+.crm-container input.crm-form-submit,
 .crm-container .crm-button,
 #crm-container input[type=button],
-#crm-container input.form-submit-inline,
+#crm-container input.crm-form-submit-inline,
 #crm-container .crm-button {
   text-shadow: 0 1px 0 black;
   background: #70716B url(../i/crm-button-bg.gif) repeat-x top left;
   color: #FFF;
   font-size: 13px;
   font-weight: normal;
-  margin-right: 6px;
+  margin: 0 6px 0 0;
   padding: 2px 6px;
   text-decoration: none;
   cursor: pointer;
   border: 1px solid #3e3e3e;
 }
 
-.crm-container input.form-submit[disabled],
+.crm-container input.crm-form-submit[disabled],
 .crm-container .crm-button[disabled],
 #crm-container input[type=button][disabled],
-#crm-container input.form-submit-inline[disabled],
+#crm-container input.crm-form-submit-inline[disabled],
 #crm-container .crm-button[disabled] {
     color: #999;
 }
@@ -2409,18 +2396,18 @@ div.grippie {
   padding: 1px;
 }
 
-.crm-container input.form-submit,
+.crm-container input.crm-form-submit,
 #crm-container input[type=button],
-#crm-container input.form-submit-inline {
+#crm-container input.crm-form-submit-inline {
   padding: 2px 6px;
 }
 
 .crm-container .crm-button input[type=button],
-.crm-container .crm-button input.form-submit,
-.crm-container .crm-button input.form-submit-inline,
+.crm-container .crm-button input.crm-form-submit,
+.crm-container .crm-button input.crm-form-submit-inline,
 #crm-container .crm-button input[type=button],
-#crm-container .crm-button input.form-submit,
-#crm-container .crm-button input.form-submit-inline {
+#crm-container .crm-button input.crm-form-submit,
+#crm-container .crm-button input.crm-form-submit-inline {
   padding: 2px 4px;
   margin: 0px;
   background: none;
@@ -2966,6 +2953,7 @@ div.grippie {
   opacity: .7;
   position: relative;
   top: 2px;
+  padding: 0;
 }
 
 div.crm-accordion-header a.helpicon {
@@ -3020,8 +3008,10 @@ div a.helpicon:focus {
 }
 #crm-container .crm-tooltip table,
 #crm-container .crm-tooltip table tr td {
+  background-color: #2f2f2e;
   border: none;
   color: #FFF;
+  word-wrap: break-word;
 }
 .crm-container .crm-tooltip .crm-summary-group {
   width: 700px;
@@ -3058,6 +3048,16 @@ div a.helpicon:focus {
   margin-left: 41%;
 }
 
+#crm-container .crm-tooltip table .crm-summary-col-1,
+.crm-container .crm-tooltip table .crm-summary-col-1 {
+  width: 350px;
+}
+
+#crm-container .crm-tooltip table .crm-summary-col-1 div,
+.crm-container .crm-tooltip table .crm-summary-col-1 div {
+  width: auto;
+}
+
 /* Class for tokens and helpicon */
 .crm-container .helpIcon {
   float: right;
@@ -3066,7 +3066,6 @@ div a.helpicon:focus {
   margin-right: 45px;
 }
 
-#crm-container ul.token-input-list-facebook, ul.token-input-list-facebook li.leaf,
 #crm-container ul li {
   list-style-image: none;
 }
@@ -3089,7 +3088,7 @@ div a.helpicon:focus {
 }
 
 /* Override Drupal .2em margin-bottom on forms (we don't want to give up that space) */
-div#crm-container form {
+div.crm-container form {
   margin-bottom: 0em;
 }
 
@@ -3258,51 +3257,7 @@ div#crm-container form {
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * DataTables row classes
- */
-.crm-container table.display tr.odd.gradeA {
-  background-color: #ddffdd;
-}
-
-.crm-container table.display tr.even.gradeA {
-  background-color: #eeffee;
-}
-
-.crm-container table.display tr.odd.gradeC {
-  background-color: #ddddff;
-}
-
-.crm-container table.display tr.even.gradeC {
-  background-color: #eeeeff;
-}
-
-.crm-container table.display tr.odd.gradeX {
-  background-color: #ffdddd;
-}
-
-.crm-container table.display tr.even.gradeX {
-  background-color: #ffeeee;
-}
-
-.crm-container table.display tr.odd.gradeU {
-  background-color: #ddd;
-}
-
-.crm-container table.display tr.even.gradeU {
-  background-color: #eee;
-}
-
-
-.crm-container tr.odd {
-  background-color: #E2E4FF;
-}
-
-.crm-container tr.even {
-  background-color: white;
-}
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Misc
+ * Datatables misc
  */
 .crm-container .dataTables_scroll {
   clear: both;
@@ -3331,73 +3286,6 @@ div#crm-container form {
   margin: 0.5em 0;
   width: 100%;
   color: #444;
-}
-
-.crm-container tfoot input.search_init {
-  color: #999;
-}
-
-.crm-container td.group {
-  background-color: #d1cfd0;
-  border-bottom: 2px solid #A19B9E;
-  border-top: 2px solid #A19B9E;
-}
-
-.crm-container td.details {
-  background-color: #d1cfd0;
-  border: 2px solid #A19B9E;
-}
-
-
-.crm-container .example_alt_pagination div.dataTables_info {
-  width: 40%;
-}
-
-.crm-container .paging_full_numbers {
-  width: 400px;
-  height: 22px;
-  line-height: 22px;
-}
-
-.crm-container .paging_full_numbers a:active {
-  outline: none
-}
-
-.crm-container .paging_full_numbers a:hover {
-  text-decoration: none;
-}
-
-.crm-container .paging_full_numbers a.paginate_button,
-.crm-container .paging_full_numbers a.paginate_active {
-  border: 1px solid #aaa;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  padding: 2px 5px;
-  margin: 0 3px;
-  cursor: pointer;
-  *cursor: hand;
-  color: #333 !important;
-}
-
-.crm-container .paging_full_numbers a.paginate_button {
-  background-color: #ddd;
-}
-
-.crm-container .paging_full_numbers a.paginate_button:hover {
-  background-color: #ccc;
-  text-decoration: none !important;
-}
-
-.crm-container .paging_full_numbers a.paginate_active {
-  background-color: #99B3FF;
-}
-
-.crm-container table.display tr.even.row_selected td {
-  background-color: #B0BED9;
-}
-
-.crm-container table.display tr.odd.row_selected td {
-  background-color: #9FAFD1;
 }
 
 /*  DataTables fixes */
@@ -3567,22 +3455,22 @@ tbody.scrollContent tr.alternateRow {
   text-decoration: none !important;
 }
 
-#crm-container table.selector td {
+.crm-container table.selector td {
   border-right: 1px dotted #DDDDDD;
 }
-#crm-container #customFields div.contact_panel td {
+.crm-container #customFields div.contact_panel td {
   border-bottom: 1px solid #FFFFFF;
   padding: 4px;
   vertical-align: top;
 }
 
-#crm-container div.contact_panel td,
+.crm-container div.contact_panel td,
 .crm-container table.crm-info-panel td {
   background-color: #f4f4ed;
 }
 
-#crm-container div.contact_panel td.label,
-#crm-container #customFields div.contact_panel td.label,
+.crm-container div.contact_panel td.label,
+.crm-container #customFields div.contact_panel td.label,
 .crm-container table.crm-info-panel td.label {
   background-color: #fafafa;
   width: 120px;
@@ -3593,21 +3481,21 @@ tbody.scrollContent tr.alternateRow {
   width: 150px;
 }
 
-#crm-container .form-layout td.label,
-#crm-container .form-layout-compressed td.label {
+.crm-container .form-layout td.label,
+.crm-container .form-layout-compressed td.label {
   width: 150px;
   text-align: right;
   color: #7a7a60;
 }
 
-#crm-container .form-layout td.label,
-#crm-container form table.report .label,
-#crm-container form table label,
-#crm-container form table.report label {
+.crm-container .form-layout td.label,
+.crm-container form table.report .label,
+.crm-container form table label,
+.crm-container form table.report label {
   color: #3e3e3e;
 }
 
-#crm-container div.contact_panel td.grouplabel {
+.crm-container div.contact_panel td.grouplabel {
   border-bottom: 2px solid #D7D7D0 !important;
 }
 
@@ -3655,9 +3543,9 @@ tbody.scrollContent tr.alternateRow {
 .crm-container a.crm-invoiceButton,
 .crm-container a.crm-invoiceButton:link,
 .crm-container a.button:link,
-.crm-container input.form-submit,
+.crm-container input.crm-form-submit,
 .crm-container input[type=button],
-.crm-container input.form-submit-inline {
+.crm-container input.crm-form-submit-inline {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
   -khtml-border-radius: 3px;
@@ -3755,8 +3643,8 @@ div.m ul#civicrm-menu,
 .crm-select2 {
   width: 15em;
 }
-.crm-container .select2-container {
-  min-width: 6em !important;
+.crm-container div.select2-container {
+  min-width: 6em;
   font-size: 11px;
 }
 /* Add arrow icon to multi-selects */
@@ -3868,6 +3756,10 @@ div.m ul#civicrm-menu,
 .crm-container .crm-action-menu.action-icon-clipboard .select2-default span.select2-chosen:before {
   background-position: -160px -128px;
 }
+/* Restore this property otherwise our css overrides it */
+.select2-search input {
+  box-sizing: border-box;
+}
 
 /* Special styling for specific form buttons */
 #crm-container span.crm-button_qf_Main_upload input,
@@ -3877,7 +3769,7 @@ div.m ul#civicrm-menu,
 }
 
 /* Match font size on 'Continue' button on event participant form (no specific class) */
-#crm-container .crm-event-additionalparticipant-form-block span.crm-button input.form-submit.default {
+#crm-container .crm-event-additionalparticipant-form-block span.crm-button input.crm-form-submit.default {
   font-size: 1.2em;
 }
 
@@ -3947,9 +3839,17 @@ div.m ul#civicrm-menu,
 }
 
 /* table row highlightng */
-.crm-container table.row-highlight tr:hover {
-  background-color: #FFFFCC !important;
+.crm-container table.row-highlight tr:hover,
+.crm-container .crm-row-selected {
+  background-color: #FFFFCC;
 }
+.crm-container table.row-highlight tr.even-row:hover,
+.crm-container table.row-highlight tr.even:hover,
+.crm-container .even-row.crm-row-selected,
+.crm-container .even.crm-row-selected {
+  background-color: #fffdb2;
+}
+
 #crm-container .civicrm-drupal-wysiwyg .collapsed {
   background: transparent;
   padding-left: 0px;
@@ -3996,31 +3896,22 @@ div.m ul#civicrm-menu,
 }
 
 /* classes related to batch entry operation */
-.crm-container span.batch-edit {
+.crm-container span.batch-edit,
+.crm-container span.batch-valid,
+.crm-container span.batch-invalid {
   padding: 2px 9px 2px 3px;
   margin: 2px 2px 3px 2px;
   cursor: pointer;
-  cursor: hand;
   background-position: -66px -114px;
   background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
 }
 
 .crm-container span.batch-valid {
-  padding: 2px 9px 2px 3px;
-  margin: 2px 2px 3px 2px;
-  cursor: pointer;
-  cursor: hand;
   background-position: -322px -143px;
-  background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
 }
 
 .crm-container span.batch-invalid {
-  padding: 2px 9px 2px 3px;
-  margin: 2px 2px 3px 2px;
-  cursor: pointer;
-  cursor: hand;
   background-position: -258px -143px;
-  background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
 }
 
 .crm-container #Entry ul#errorList {

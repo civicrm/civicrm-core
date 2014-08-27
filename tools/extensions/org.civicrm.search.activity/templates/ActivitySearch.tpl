@@ -140,10 +140,3 @@
 {/if}
 </div>
 {/if}
-{literal}
-<script type="text/javascript">
-CRM.$(function($) {
-   cj().crmaccordions(); 
-});
-</script>
-{/literal}

@@ -322,9 +322,9 @@
     {literal}
     <script type="text/javascript">
       CRM.$(function($) {
-        cj('.crm-with-contact').click(function(){
-          cj('#with-contacts-widget').toggle();
-          cj('#with-clients').toggle();
+        $('.crm-with-contact').click(function() {
+          $('#with-contacts-widget').toggle();
+          $('#with-clients').toggle();
           return false;
         });
       });

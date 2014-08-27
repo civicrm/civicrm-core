@@ -270,7 +270,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
           break;
       }
     }
-    $this->click("css=#$block input.form-submit");
+    $this->click("css=#$block input.crm-form-submit");
     if ($valid !== 'error') {
       // Verify the form saved
       $this->waitForElementPresent("css=#$block > .crm-inline-block-content");

@@ -29,14 +29,6 @@
   {include file="CRM/Custom/Form/CustomData.tpl"}
 {else}
 
-{if $action eq 1 and $context ne 'standalone'}
-   <h3>{ts}New Grant{/ts}</h3>
-{elseif $action eq 2}
-   <h3>{ts}Edit Grant{/ts}</h3>
-{elseif $action eq 8}
-   <h3>{ts}Delete Grant{/ts}</h3>
-{/if}
-
 <div class="crm-block crm-form-block crm-grant-form-block">
   {if $action eq 8}
      <div class="messages status">
