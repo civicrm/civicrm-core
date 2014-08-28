@@ -304,6 +304,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // Rebuild triggers
     civicrm_api('system', 'flush', array('version' => 3, 'triggers' => 1));
 
+    CRM_Core_BAO_ConfigSetting::setEnabledComponents(array(
+      'CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'
+    ));
+
     return TRUE;
   }
 
