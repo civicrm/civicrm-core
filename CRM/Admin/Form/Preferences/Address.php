@@ -206,13 +206,9 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
           !empty($this->_params['address_options'][$key])
         ) {
           // print a status message to the user if county table seems small
-          $sql = "
-SELECT count(*)
-FROM   civicrm_county
-";
-          $countyCount = CRM_Core_DAO::singleValueQuery($sql);
+          $countyCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_county");
           if ($countyCount < 10) {
-            CRM_Core_Session::setStatus(ts('You have enabled the County option. Please ensure you populate the county table in your CiviCRM Database. You can find extensions to populate counties in the ') . CRM_Utils_System::href(ts('CiviCRM Extensions Directory'), 'civicrm/admin/extensions', array('reset' => 1), TRUE, 'extensions-addnew'),
+            CRM_Core_Session::setStatus(ts('You have enabled the County option. Please ensure you populate the county table in your CiviCRM Database. You can find extensions to populate counties in the <a %1>CiviCRM Extensions Directory</a>.', array(1 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', array('reset' => 1), TRUE, 'extensions-addnew') . '"')),
               ts('Populate counties'),
               "info"
             );
