@@ -2104,10 +2104,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->clickAt("//*[@class='select2-results']/li[1]/div");
     }
     else {
-      if ($xpath)
-	$this->clickAt($fieldName);
-      else
-	$this->clickAt("//*[@id='$fieldName']/../div/a");
+      if ($xpath) {
+        $this->clickAt($fieldName);
+      }
+      else {
+        $this->clickAt("//*[@id='$fieldName']/../div/a");
+      }
       $this->waitForElementPresent("//*[@id='select2-drop']/div/input");
       $this->keyDown("//*[@id='select2-drop']/div/input", " ");
       $this->type("//*[@id='select2-drop']/div/input", $label);
@@ -2125,7 +2127,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
       $this->waitForElementPresent("xpath=//ul[@class='select2-results']");
       $this->clickAt("xpath=//ul[@class='select2-results']//li/div[text()='$value']");
-      $this->waitForText("xpath=//*[@id='$fieldid']/../div", $value);
+      $this->assertElementContainsText("xpath=//*[@id='$fieldid']/preceding-sibling::div[1]/", $value);
     }
   }
 }

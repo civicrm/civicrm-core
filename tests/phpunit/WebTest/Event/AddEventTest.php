@@ -317,8 +317,8 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->assertChecked('is_pay_later');
     $this->click("CIVICRM_QFID_0_is_monetary");
 
-    $this->clickLink("_qf_Fee_upload-bottom", "_qf_Fee_upload-bottom", FALSE);
-    sleep(2);
+    $this->clickLink("_qf_Fee_upload-bottom", "_qf_Fee_upload-bottom");
+
     //check if pay later option is disabled
     $this->click('CIVICRM_QFID_1_is_monetary');
     $this->waitForElementPresent('is_pay_later');
@@ -419,6 +419,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->type("address_1_street_address", $streetAddress);
     $this->type("address_1_city", "San Francisco");
     $this->type("address_1_postal_code", "94117");
+    $this->select('address_1_country_id', 'United States');
     $this->select("address_1_state_province_id", "value=1004");
     $this->type("email_1_email", "info@civicrm.org");
 
@@ -786,7 +787,6 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
       $this->assertTrue(
         $this->isElementPresent("xpath=//tr[@class='crm-participant-form-block-registered-by']/td[2]/a[contains(text(),
          '$primaryDisplayName')]"), 'Registered By info is wrong on additional participant edit form');
-      $this->assertElementContainsText("xpath=//form[@id='Participant']/h3", 'Edit Event Registration');
       $this->assertTrue(
         $this->isElementPresent(
           "xpath=//table/tbody/tr[@class='crm-participant-form-block-displayName']/td[2][contains(text(),
