@@ -428,6 +428,13 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'definition',
         )
       ),
+      'MembershipBlock' => array(
+        'cant_update' => array(
+          // The fake/auto-generated values leave us unable to properly cleanup fake data
+          'entity_type',
+          'entity_id',
+        )
+      ),
       'Pledge' => array(
         'cant_update' => array(
           'pledge_original_installment_amount',
