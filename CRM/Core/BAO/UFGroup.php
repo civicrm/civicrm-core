@@ -3292,7 +3292,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           $links[] = array(
             'label' => $profile['title'],
             'url' => CRM_Utils_System::url('civicrm/profile/create', "reset=1&context=dialog&gid=$id",
-              NULL, NULL, FALSE, NULL, FALSE) ,
+              NULL, NULL, FALSE, FALSE, TRUE) ,
             'type' => ucfirst(str_replace('new_', '', $profile['name'])),
           );
         }
