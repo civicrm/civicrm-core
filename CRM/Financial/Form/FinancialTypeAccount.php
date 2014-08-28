@@ -128,7 +128,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->setPageTitle(ts('Financial Type Account')););
+    $this->setPageTitle(ts('Financial Type Account'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;

@@ -64,7 +64,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     // go to tag tab and add to new tag
     $this->click("css=li#tab_tag a");
     $this->waitForElementPresent("css=div#tagtree");
-    $this->click("xpath=//ul/li/label[text()=\"$tagName\"]");
+    $this->click("xpath=//ul/li/span/label[text()=\"$tagName\"]");
     $this->waitForElementPresent("css=.success");
 
     // is status message correct?
@@ -217,7 +217,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
 
         //go to next page
         $this->click("xpath=//div[@class='crm-search-results']/div[@class='crm-pager']/span[@class='crm-pager-nav']/a[@title='next page']");
-        $this->waitForElementPresent("Go");
+        $this->waitForElementPresent("task");
         $j = $j + $subTotal;
       }
 
@@ -276,7 +276,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $stateBeforeSort = $this->getText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]");
     $this->click("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(),'State')]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(),'State')]");
     $this->assertElementNotContainsText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]", $stateBeforeSort);
     $this->click("xpath=//form[@id='Advanced']//div//div[contains(text(),'Edit Search Criteria')]/../div");
     $this->waitForElementPresent('group');
@@ -294,7 +294,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $stateBeforeSort = $this->getText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]");
     $this->click("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(),'State')]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(),'State')]");
     $this->assertElementNotContainsText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]", $stateBeforeSort);
   }
 
@@ -331,8 +331,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
    */
   function addAddressSearchDetail($firstName) {
     // select location type (home and main)
-    $this->click("xpath=//div[@id='location']/table/tbody/tr[1]/td[1]//label[text()='Home']");
-    $this->click("xpath=//div[@id='location']/table/tbody/tr[1]/td[1]//label[text()='Main']");
+    $this->multiselect2('location_type', array('Home', 'Main'));
     // fill street address
     $this->type("street_address", "street 1 $firstName");
     // fill city
@@ -343,6 +342,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     // select country
     $this->select("country", "United States");
     // select state-province
+    $this->waitForElementPresent('state_province');
     $this->select("state_province", "Alaska");
   }
 
