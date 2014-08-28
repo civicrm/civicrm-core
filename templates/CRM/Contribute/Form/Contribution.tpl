@@ -482,19 +482,20 @@
       showHideCancelInfo(cj('#contribution_status_id'));
 
       cj('#contribution_status_id').change(function() {
-       showHideCancelInfo(this);
+       showHideCancelInfo(cj('#contribution_status_id'));
       }
        );
      });
 
      function showHideCancelInfo(obj) {
-       contributionStatus = cj(obj).val();
-       if (contributionStatus == 3 || contributionStatus == 7) {
+       if (obj.find(":selected").text() == 'Refunded' || obj.find(":selected").text() == 'Cancelled') {
          cj('#cancelInfo').show( );
+         cj('#total_amount').attr('readonly', true);
        }
        else {
-          status();
+         status();
          cj('#cancelInfo').hide( );
+         cj("#total_amount").removeAttr('readonly');
        }
      }
 
