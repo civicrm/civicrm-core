@@ -87,9 +87,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
     if ($this->_action & CRM_Core_Action::DELETE) {
       $errors = CRM_Financial_BAO_FinancialType::del($this->_id);
       if (!empty($errors)) {
-        $message = ts('This item cannot be deleted.') . $errors['error_message'];
-        CRM_Core_Session::setStatus($message);
-        return CRM_Utils_System::redirect(CRM_Utils_System::url( 'civicrm/admin/financial/financialType', "reset=1&action=browse"));
+        CRM_Core_Error::statusBounce($errors['error_message'], CRM_Utils_System::url('civicrm/admin/financial/financialType', "reset=1&action=browse"), ts('Cannot Delete'));
       }
       CRM_Core_Session::setStatus(ts('Selected financial type has been deleted.'));
     }
