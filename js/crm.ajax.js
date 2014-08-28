@@ -314,10 +314,10 @@
           }
           // Adjust height to fit content (small delay to allow elements to render)
           window.setTimeout(function() {
-            var currentHeight = $(settings.target).parent().height(),
+            var currentHeight = $(settings.target).parent().outerHeight(),
               padding = currentHeight - $(settings.target).height(),
               newHeight = $(settings.target).prop('scrollHeight') + padding,
-              menuHeight = $('#civicrm-menu').height(),
+              menuHeight = $('#civicrm-menu').outerHeight(),
               maxHeight = $(window).height() - menuHeight;
             newHeight = newHeight > maxHeight ? maxHeight : newHeight;
             if (newHeight > (currentHeight + 15)) {
