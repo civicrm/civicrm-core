@@ -2093,7 +2093,8 @@ SELECT civicrm_contact.id as casemanager_id,
             {$limitClause}
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
-    $statuses = CRM_Case_PseudoConstant::caseStatus();
+    $statuses = CRM_Case_BAO_Case::buildOptions('status_id', 'create');
+
     $unclosedCases = array();
     while ($dao->fetch()) {
       if ($doFilterCases && !array_key_exists($dao->id, $filterCases)) {
