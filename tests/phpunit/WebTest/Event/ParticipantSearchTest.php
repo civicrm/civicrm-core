@@ -182,7 +182,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     // visit event search page
     $this->openCiviPage("event/search", "reset=1");
 
-    $this->click("xpath=//div[@id='Food_Preference']/div[2]/table/tbody/tr/td[2]//label[contains(text(),'Chicken Combo')]");
+    $this->select("xpath=//div[@id='Food_Preference']/div[2]/table/tbody/tr/td[2]//select", 'Chicken Combo');
 
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -194,7 +194,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
 
     $this->_checkStrings($stringsToCheck);
 
-    $this->click("xpath=//div[@id='Food_Preference']/div[2]/table/tbody/tr/td[2]//label[contains(text(),'Salmon Stew')]");
+    $this->select("xpath=//div[@id='Food_Preference']/div[2]/table/tbody/tr/td[2]//select", 'Salmon Stew');
     $this->click("_qf_Search_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -216,12 +216,10 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("xpath=id('participantSearch')/table/tbody/tr/td[11]/span/a[text()='View']");
     $this->click("xpath=id('participantSearch')/table/tbody/tr/td[11]/span/a[text()='View']");
-    $this->waitForElementPresent("_qf_ParticipantView_cancel-bottom");
+    $this->waitForTextPresent("View Event Registration");
 
     // ensure we get to particpant view
     $stringsToCheck = array(
-      "View Participant",
-      "Event Registration",
       "Name",
       "Event",
       "Participant Role",
@@ -243,11 +241,10 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("xpath=id('participantSearch')/table/tbody/tr/td[11]/span/a[text()='Edit']");
     $this->click("xpath=id('participantSearch')/table/tbody/tr/td[11]/span/a[text()='Edit']");
-    $this->waitForElementPresent("_qf_Participant_cancel-bottom");
+    $this->waitForTextPresent("Edit Event Registration");
 
     // ensure we get to particpant view
     $stringsToCheck = array(
-      "Edit Event Registration",
       "Participant",
       "Event",
       "Participant Role",
