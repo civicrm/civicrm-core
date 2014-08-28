@@ -168,12 +168,12 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
         'grouping' => 'event-fields',
         'filters' =>
         array(
-          'event_id' =>
-          array(
+          'event_id' => array(
             'name' => 'event_id',
             'title' => ts('Event'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $this->getEventFilterOptions(),
+            'operatorType' => CRM_Report_Form::OP_ENTITYREF,
+            'type' => CRM_Utils_Type::T_INT,
+            'attributes' => array('entity' => 'event', 'select' => array('minimumInputLength' => 0)),
           ),
           'sid' =>
           array(
