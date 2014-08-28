@@ -50,16 +50,14 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
   function __construct() {
 
     $this->_columns = array(
-      'civicrm_event' =>
-      array(
+      'civicrm_event' => array(
         'dao' => 'CRM_Event_DAO_Event',
-        'filters' =>
-        array(
-          'id' =>
-          array('title' => ts('Event Title'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+        'filters' => array(
+          'id' => array(
+            'title' => ts('Event'),
+            'operatorType' => CRM_Report_Form::OP_ENTITYREF,
             'type' => CRM_Utils_Type::T_INT,
-            'options' => $this->getEventFilterOptions(),
+            'attributes' => array('select' => array('minimumInputLength' => 0)),
           ),
         ),
       ),
@@ -321,7 +319,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     $this->_setVariable = TRUE;
 
     $noSelection = FALSE;
-    if (empty($this->_params['id_value'][0])) {
+    if (empty($this->_params['id_value'])) {
       $this->_params['id_value'] = array();
       $this->_setVariable = FALSE;
 
@@ -335,6 +333,9 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
         $this->_params['id_value'][] = $key;
       }
       $noSelection = TRUE;
+    }
+    else {
+      $this->_params['id_value'] = explode(',', $this->_params['id_value']);
     }
 
     $this->_rowsFound = count($this->_params['id_value']);
