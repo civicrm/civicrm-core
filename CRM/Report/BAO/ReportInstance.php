@@ -216,7 +216,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
         $section = 1;
         $chart   = "&charts=" . $params['charts'];
       }
-
+      $dashletParams['name'] = "report/{$instance->id}";
       $dashletParams['url'] = "civicrm/report/instance/{$instance->id}&reset=1&section={$section}&snippet=5{$chart}&context=dashlet";
       $dashletParams['fullscreen_url'] = "civicrm/report/instance/{$instance->id}&reset=1&section={$section}&snippet=5{$chart}&context=dashletFullscreen";
       $dashletParams['instanceURL'] = "civicrm/report/instance/{$instance->id}";
