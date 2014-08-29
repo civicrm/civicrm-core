@@ -213,16 +213,15 @@ CRM.strings = CRM.strings || {};
 
   /**
    * Populate a select list, overwriting the existing options except for the placeholder.
-   * @param $el jquery collection - 1 or more select elements
+   * @param select jquery selector - 1 or more select elements
    * @param options array in format returned by api.getoptions
    * @param placeholder string
    */
-  CRM.utils.setOptions = function($el, options, placeholder) {
-    $el.each(function() {
+  CRM.utils.setOptions = function(select, options, placeholder) {
+    $(select).each(function() {
       var
         $elect = $(this),
         val = $elect.val() || [],
-        multiple = $el.is('[multiple]'),
         opts = placeholder || placeholder === '' ? '' : '[value!=""]',
         newOptions = '',
         theme = function(options) {
@@ -243,8 +242,8 @@ CRM.strings = CRM.strings || {};
       $elect.find('option' + opts).remove();
       theme(options);
       if (typeof placeholder === 'string') {
-        if (multiple) {
-          $el.attr('placeholder', placeholder);
+        if ($elect.is('[multiple]')) {
+          select.attr('placeholder', placeholder);
         } else {
           newOptions = '<option value="">' + placeholder + '</option>' + newOptions;
         }
