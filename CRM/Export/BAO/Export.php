@@ -646,7 +646,17 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $row = array();
 
         //convert the pseudo constants
-        $query->convertToPseudoNames($dao);
+        // CRM-14398 there is problem in this architecture that is not easily solved. For now we are using the cloned
+        // temporary iterationDAO object to get around it.
+        // the issue is that the convertToPseudoNames function is adding additional properties (e.g for campaign) to the DAO object
+        // these additional properties are NOT reset when the $dao cycles through the while loop
+        // nor are they overwritten as they are not in the loop
+        // the convertToPseudoNames will not adequately over-write them either as it doesn't 'kick-in' unless the
+        // relevant property is set.
+        // It may be that a long-term fix could be introduced there - however, it's probably necessary to figure out how to test the
+        // export class before tackling a better architectural fix
+        $iterationDAO = clone $dao;
+        $query->convertToPseudoNames($iterationDAO);
 
         //first loop through output columns so that we return what is required, and in same order.
         $relationshipField = 0;
@@ -772,14 +782,14 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           }
 
           // add im_provider to $dao object
-          if ($field == 'im_provider' && property_exists($dao, 'provider_id')) {
-            $dao->im_provider = $dao->provider_id;
+          if ($field == 'im_provider' && property_exists($iterationDAO, 'provider_id')) {
+            $iterationDAO->im_provider = $iterationDAO->provider_id;
           }
 
           //build row values (data)
           $fieldValue = NULL;
-          if (property_exists($dao, $field)) {
-            $fieldValue = $dao->$field;
+          if (property_exists($iterationDAO, $field)) {
+            $fieldValue = $iterationDAO->$field;
             // to get phone type from phone type id
             if ($field == 'phone_type_id' && isset($phoneTypes[$fieldValue])) {
               $fieldValue = $phoneTypes[$fieldValue];
@@ -789,36 +799,36 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             }
             elseif ($field == 'participant_role_id') {
               $participantRoles = CRM_Event_PseudoConstant::participantRole();
-              $sep              = CRM_Core_DAO::VALUE_SEPARATOR;
-              $viewRoles        = array();
-              foreach (explode($sep, $dao->$field) as $k => $v) {
+              $sep = CRM_Core_DAO::VALUE_SEPARATOR;
+              $viewRoles = array();
+              foreach (explode($sep, $iterationDAO->$field) as $k => $v) {
                 $viewRoles[] = $participantRoles[$v];
               }
               $fieldValue = implode(',', $viewRoles);
             }
             elseif ($field == 'master_id') {
               $masterAddressId = NULL;
-              if (isset($dao->master_id)) {
-                $masterAddressId = $dao->master_id;
+              if (isset($iterationDAO->master_id)) {
+                $masterAddressId = $iterationDAO->master_id;
               }
               // get display name of contact that address is shared.
-              $fieldValue = CRM_Contact_BAO_Contact::getMasterDisplayName($masterAddressId, $dao->contact_id);
+              $fieldValue = CRM_Contact_BAO_Contact::getMasterDisplayName($masterAddressId, $iterationDAO->contact_id);
             }
           }
 
           if ($field == 'id') {
-            $row[$field] = $dao->contact_id;
+            $row[$field] = $iterationDAO->contact_id;
             // special case for calculated field
           }
           elseif ($field == 'source_contact_id') {
-            $row[$field] = $dao->contact_id;
+            $row[$field] = $iterationDAO->contact_id;
           }
           elseif ($field == 'pledge_balance_amount') {
-            $row[$field] = $dao->pledge_amount - $dao->pledge_total_paid;
+            $row[$field] = $iterationDAO->pledge_amount - $iterationDAO->pledge_total_paid;
             // special case for calculated field
           }
           elseif ($field == 'pledge_next_pay_amount') {
-            $row[$field] = $dao->pledge_next_pay_amount + $dao->pledge_outstanding_amount;
+            $row[$field] = $iterationDAO->pledge_next_pay_amount + $iterationDAO->pledge_outstanding_amount;
           }
           elseif (is_array($value) && $field == 'location') {
             // fix header for location type case
@@ -839,27 +849,27 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
                 switch ($fld) {
                   case 'country':
                   case 'world_region':
-                    $row[$fldValue] = $i18n->crm_translate($dao->$daoField, array('context' => 'country'));
+                    $row[$fldValue] = $i18n->crm_translate($iterationDAO->$daoField, array('context' => 'country'));
                     break;
 
                   case 'state_province':
-                    $row[$fldValue] = $i18n->crm_translate($dao->$daoField, array('context' => 'province'));
+                    $row[$fldValue] = $i18n->crm_translate($iterationDAO->$daoField, array('context' => 'province'));
                     break;
 
                   case 'im_provider':
                     $imFieldvalue = $daoField . "-provider_id";
-                    $row[$fldValue] = CRM_Utils_Array::value($dao->$imFieldvalue, $imProviders);
+                    $row[$fldValue] = CRM_Utils_Array::value($iterationDAO->$imFieldvalue, $imProviders);
                     break;
 
                   default:
-                    $row[$fldValue] = $dao->$daoField;
+                    $row[$fldValue] = $iterationDAO->$daoField;
                     break;
                 }
               }
             }
           }
           elseif (array_key_exists($field, $contactRelationshipTypes)) {
-            $relDAO = CRM_Utils_Array::value($dao->contact_id, $allRelContactArray[$field]);
+            $relDAO = CRM_Utils_Array::value($iterationDAO->contact_id, $allRelContactArray[$field]);
             foreach ($value as $relationField => $relationValue) {
               if (is_object($relDAO) && property_exists($relDAO, $relationField)) {
                 $fieldValue = $relDAO->$relationField;
@@ -986,7 +996,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
               'email_greeting', 'postal_greeting', 'addressee'))) {
               //special case for greeting replacement
               $fldValue = "{$field}_display";
-              $row[$field] = $dao->$fldValue;
+              $row[$field] = $iterationDAO->$fldValue;
             }
             else {
               //normal fields with a touch of CRM-3157
@@ -1013,7 +1023,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             }
           }
           elseif ($selectedPaymentFields && array_key_exists($field, self::componentPaymentFields())) {
-            $paymentData = CRM_Utils_Array::value($dao->$paymentTableId, $paymentDetails);
+            $paymentData = CRM_Utils_Array::value($iterationDAO->$paymentTableId, $paymentDetails);
             $payFieldMapper = array(
               'componentPaymentField_total_amount'        => 'total_amount',
               'componentPaymentField_contribution_status' => 'contribution_status',
