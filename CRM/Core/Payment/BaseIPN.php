@@ -195,6 +195,19 @@ class CRM_Core_Payment_BaseIPN {
     $contribution->contribution_status_id = array_search('Failed', $contributionStatus);
     $contribution->save();
 
+    //add a MembershipPayment record for recurring payments on memberships
+    if ( CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id && !empty( $memberships ) ) {
+      foreach ($memberships as $membership) {
+        if ( $membership ) {
+          $params = array(
+            'membership_id' => $membership->id,
+            'contribution_id' => $contribution->id
+          );
+          $membershipPayment = CRM_Member_BAO_MembershipPayment::create($params);
+        }
+      }
+    }
+
     //add lineitems for recurring payments
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
       $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id, CRM_Core_DAO::$_nullArray);
