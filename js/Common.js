@@ -80,14 +80,6 @@ function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
  * @param  invert               Boolean - if true, we HIDE target on value match; if false, we SHOW target on value match
  */
 function showHideByValue(trigger_field_id, trigger_value, target_element_id, target_element_type, field_type, invert) {
-  if (target_element_type == null) {
-    var target_element_type = 'block';
-  }
-  else {
-    if (target_element_type == 'table-row') {
-      var target_element_type = '';
-    }
-  }
 
   if (field_type == 'select') {
     var trigger = trigger_value.split("|");

@@ -340,33 +340,5 @@ LIMIT $limit";
     CRM_Utils_JSON::output($result);
   }
 
-  function recipient() {
-    if (empty($_GET['recipient'])) {
-      CRM_Utils_JSON::output(array('status' => 'error', 'error_msg' => 'required params missing.'));
-    }
-
-    switch ($_GET['recipient']) {
-      case 'Participant Status':
-        $values = CRM_Event_PseudoConstant::participantStatus();
-        break;
-
-      case 'participant_role':
-        $values = CRM_Event_PseudoConstant::participantRole();
-        break;
-
-      default:
-        exit;
-    }
-
-    $elements = array();
-    foreach ($values as $id => $name) {
-      $elements[] = array(
-        'value' => $name,
-        'key' => $id,
-      );
-    }
-
-    CRM_Utils_JSON::output($elements);
-  }
 }
 

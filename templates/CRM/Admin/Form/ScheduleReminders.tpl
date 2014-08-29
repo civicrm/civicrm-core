@@ -200,11 +200,10 @@
         var recipient = $("#recipient", $form).val();
 
         if (recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role') {
-          $.getJSON(CRM.url('civicrm/ajax/populateRecipient'), {recipient: recipientMapping[recipient]},
-            function (result) {
-              CRM.utils.setOptions($('#recipient_listing', $form), result);
-            }
-          );
+          CRM.api3('participant', 'getoptions', {field: recipientMapping[recipient] == 'participant_role' ? 'role_id' : 'status_id', sequential: 1})
+            .done(function(result) {
+              CRM.utils.setOptions($('#recipient_listing', $form), result.values);
+            });
           $("#recipientList", $form).show();
           $('#is_recipient_listing', $form).val(1);
         } else {
