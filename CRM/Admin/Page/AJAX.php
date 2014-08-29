@@ -296,52 +296,27 @@ LIMIT $limit";
   }
 
   function mappingList() {
-    $params = array('mappingID');
-    foreach ($params as $param) {
-      $$param = CRM_Utils_Array::value($param, $_POST);
+    if (empty($_GET['mappingID'])) {
+      CRM_Utils_JSON::output(array('status' => 'error', 'error_msg' => 'required params missing.'));
     }
 
-    if (!$mappingID) {
-      CRM_Utils_JSON::output(array('error_msg' => 'required params missing.'));
+    $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection1($_GET['mappingID']);
+
+    $output = array(
+      'sel4' => array(),
+      'sel5' => array(),
+      'recipientMapping' => $selectionOptions['recipientMapping'],
+    );
+    foreach (array(4, 5) as $sel) {
+      foreach ($selectionOptions["sel$sel"] as $id => $name) {
+        $output["sel$sel"][] = array(
+          'value' => $name,
+          'key' => $id,
+        );
+      }
     }
 
-    $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection1($mappingID);
-    extract($selectionOptions);
-
-    $elements = array();
-    foreach ($sel4 as $id => $name) {
-      $elements[] = array(
-        'name' => $name,
-        'value' => $id,
-      );
-    }
-
-    CRM_Utils_JSON::output($elements);
-  }
-
-  function mappingList1() {
-    $params = array('mappingID');
-    foreach ($params as $param) {
-      $$param = CRM_Utils_Array::value($param, $_POST);
-    }
-
-    if (!$mappingID) {
-      CRM_Utils_JSON::output(array('error_msg' => 'required params missing.'));
-    }
-
-    $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection1($mappingID);
-    extract($selectionOptions);
-
-    $elements = array();
-    foreach ($sel5 as $id => $name) {
-      $elements['sel5'][] = array(
-        'name' => $name,
-        'value' => $id,
-      );
-    }
-    $elements['recipientMapping'] = $recipientMapping;
-
-    CRM_Utils_JSON::output($elements);
+    CRM_Utils_JSON::output($output);
   }
 
   static function mergeTags() {
@@ -365,38 +340,5 @@ LIMIT $limit";
     CRM_Utils_JSON::output($result);
   }
 
-  function recipient() {
-    $params = array('recipient');
-    foreach ($params as $param) {
-      $$param = CRM_Utils_Array::value($param, $_POST);
-    }
-
-    if (!$recipient) {
-      CRM_Utils_JSON::output(array('error_msg' => 'required params missing.'));
-    }
-
-    switch ($recipient) {
-      case 'Participant Status':
-        $values = CRM_Event_PseudoConstant::participantStatus();
-        break;
-
-      case 'participant_role':
-        $values = CRM_Event_PseudoConstant::participantRole();
-        break;
-
-      default:
-        exit;
-    }
-
-    $elements = array();
-    foreach ($values as $id => $name) {
-      $elements[] = array(
-        'name' => $name,
-        'value' => $id,
-      );
-    }
-
-    CRM_Utils_JSON::output($elements);
-  }
 }
 

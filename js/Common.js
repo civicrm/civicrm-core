@@ -80,14 +80,6 @@ function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
  * @param  invert               Boolean - if true, we HIDE target on value match; if false, we SHOW target on value match
  */
 function showHideByValue(trigger_field_id, trigger_value, target_element_id, target_element_type, field_type, invert) {
-  if (target_element_type == null) {
-    var target_element_type = 'block';
-  }
-  else {
-    if (target_element_type == 'table-row') {
-      var target_element_type = '';
-    }
-  }
 
   if (field_type == 'select') {
     var trigger = trigger_value.split("|");
@@ -213,16 +205,15 @@ CRM.strings = CRM.strings || {};
 
   /**
    * Populate a select list, overwriting the existing options except for the placeholder.
-   * @param $el jquery collection - 1 or more select elements
+   * @param select jquery selector - 1 or more select elements
    * @param options array in format returned by api.getoptions
    * @param placeholder string
    */
-  CRM.utils.setOptions = function($el, options, placeholder) {
-    $el.each(function() {
+  CRM.utils.setOptions = function(select, options, placeholder) {
+    $(select).each(function() {
       var
         $elect = $(this),
         val = $elect.val() || [],
-        multiple = $el.is('[multiple]'),
         opts = placeholder || placeholder === '' ? '' : '[value!=""]',
         newOptions = '',
         theme = function(options) {
@@ -243,8 +234,8 @@ CRM.strings = CRM.strings || {};
       $elect.find('option' + opts).remove();
       theme(options);
       if (typeof placeholder === 'string') {
-        if (multiple) {
-          $el.attr('placeholder', placeholder);
+        if ($elect.is('[multiple]')) {
+          select.attr('placeholder', placeholder);
         } else {
           newOptions = '<option value="">' + placeholder + '</option>' + newOptions;
         }
