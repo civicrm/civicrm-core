@@ -101,6 +101,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->clickLink("xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", '_qf_Contribution_cancel-bottom', FALSE);
    $this->select("contribution_status_id", "label=Completed");
    $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", FALSE);
+   $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
    //Assertions
    $search = array('id' => $contId);
@@ -325,6 +326,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $contId = explode('&', $contId[1]);
    $contId = $contId[0];
    $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", FALSE);
+   $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
    //Assertions
    $search = array('id' => $contId);
@@ -360,6 +362,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $contId = explode('&', $contId[1]);
    $contId = $contId[0];
    $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='Edit']", FALSE);
+   $this->waitForText('crm-notification-container', "The contribution record has been saved.");
 
    //Assertions
    $search = array( 'id' => $contId );
@@ -519,4 +522,3 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
    $this->click("_qf_ContributionView_cancel-bottom");
  }
 }
-
