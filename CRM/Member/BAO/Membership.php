@@ -1273,7 +1273,20 @@ AND civicrm_membership.is_test = %2";
     $result      = $membershipContribution = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = array();
-
+    
+    $membershipLineItem = array();
+    if (is_array($membershipTypeID)) {
+      foreach ($form->_lineItem[$form->_priceSetId] as $key => $line) {
+        if (!empty($line['membership_type_id'])) {
+          $membershipLineItem[$line['membership_type_id']] = $line;
+          unset($form->_lineItem[$form->_priceSetId][$key]);
+        }        
+      }      
+      if (empty($form->_lineItem[$form->_priceSetId])) {
+        $membershipParams['skipLineItem'] = TRUE;
+      }
+    }
+    
     if ($isPaidMembership) {
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
         $premiumParams, $contactID,
@@ -1318,6 +1331,10 @@ AND civicrm_membership.is_test = %2";
       foreach ($membershipTypeID as $memType) {
         $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
         $createdMemberships[$memType] = self::createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, $form);
+        if (CRM_Utils_Array::value($memType, $membershipLineItem)) {
+          CRM_Price_BAO_LineItem::processPriceSet($createdMemberships[$memType]->id, array($form->_priceSetId => array($membershipLineItem[$memType])), $membershipContribution);
+          $form->_lineItem[$form->_priceSetId][] = $membershipLineItem[$memType];
+        }
       }
       if ($form->_priceSetId && !empty($form->_useForMember) && !empty($form->_lineItem)) {
         foreach ($form->_lineItem[$form->_priceSetId] as & $priceFieldOp) {
