@@ -50,7 +50,7 @@ class CRM_Core_CodeGen_Util_Template {
   }
 
   function __destruct() {
-    CRM_Core_CodeGen_Util_File::removeDir($this->compileDir);
+    CRM_Core_CodeGen_Util_File::cleanTempDir($this->compileDir);
   }
 
   /**
