@@ -1276,15 +1276,20 @@ AND civicrm_membership.is_test = %2";
     
     $membershipLineItem = array();
     if (is_array($membershipTypeID)) {
-      foreach ($form->_lineItem[$form->_priceSetId] as $key => $line) {
+      $lineItems = $form->_lineItem;
+      if ($isProcessSeparateMembershipTransaction) {
+        $lineItems[$form->_priceSetId] =  array_merge($lineItems[$form->_priceSetId], $membershipLineItems[$form->_priceSetId]);
+      }
+      foreach ($lineItems[$form->_priceSetId] as $key => $line) {
         if (!empty($line['membership_type_id'])) {
           $membershipLineItem[$line['membership_type_id']] = $line;
-          unset($form->_lineItem[$form->_priceSetId][$key]);
+          unset($lineItems[$form->_priceSetId][$key]);
         }        
       }      
-      if (empty($form->_lineItem[$form->_priceSetId])) {
+      if (empty($lineItems[$form->_priceSetId])) {
         $membershipParams['skipLineItem'] = TRUE;
       }
+      $form->_lineItem = $lineItems;
     }
     
     if ($isPaidMembership) {
@@ -1307,7 +1312,7 @@ AND civicrm_membership.is_test = %2";
 
     if ($isProcessSeparateMembershipTransaction) {
       try {
-        $lineItems = $form->_lineItem = $membershipLineItems;
+        $membershipParams['skipLineItem'] = TRUE;
         $membershipContribution = self::processSecondaryFinancialTransaction($contactID, $form, $membershipParams, $isTest, $membershipLineItems, CRM_Utils_Array::value('minimum_fee', $membershipDetails, 0), CRM_Utils_Array::value('financial_type_id', $membershipDetails));
       }
       catch (CRM_Core_Exception $e) {
