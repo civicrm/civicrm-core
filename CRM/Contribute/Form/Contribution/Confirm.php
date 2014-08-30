@@ -118,7 +118,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'address_id' => $addressID,
       //setting to make available to hook - although seems wrong to set on form for BAO hook availability
       'soft_credit_to' => $softCreditToID,
-      'line_item' => $lineItems
+      'line_item' => $lineItems,
+      'skipLineItem' => CRM_Utils_Array::value('skipLineItem', $params, 0)
     );
     if (!$online && isset($params['thankyou_date'])) {
       $contributionParam['thankyou_date'] = $params['thankyou_date'];
