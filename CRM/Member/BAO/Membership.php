@@ -318,7 +318,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     }
     
     $params['skipLineItem'] = TRUE;
-    $params['contribution'] = NULL;
     
     //record contribution for this membership
     if (!empty($params['contribution_status_id']) && empty($params['relate_contribution_id'])) {
@@ -327,7 +326,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     }
     
     if (CRM_Utils_Array::value('lineItems', $params) && empty($params['contributionId'])) {
-      CRM_Price_BAO_LineItem::processPriceSet($membership->id, $params['lineItems'], $params['contribution']);
+      CRM_Price_BAO_LineItem::processPriceSet($membership->id, $params['lineItems'], CRM_Utils_Array::value('contribution', $params));
     }
 
     //insert payment record for this membership
