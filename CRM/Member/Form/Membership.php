@@ -1245,12 +1245,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     $membershipType = implode(', ', $membershipTypes);
     
-    //do cleanup line  items if membership edit the Membership Fee.
-    $params['contributionId'] = CRM_Utils_Array::value('contribution_id', $this->_defaultValues);
-    if (empty($params['contributionId']) && $this->_id) {
-      CRM_Price_BAO_LineItem::deleteLineItems($this->_id, 'civicrm_membership');
-    }
-
     // Retrieve the name and email of the current user - this will be the FROM for the receipt email
     list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($ids['userId']);
 

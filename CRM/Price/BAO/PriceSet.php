@@ -121,7 +121,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
     }
 
     $sql = "
-SELECT      ps.id AS setID, pfv.price_field_id AS priceFieldID, pfv.id AS priceFieldValueID, pfv.name, pfv.label
+SELECT      ps.id AS setID, pfv.price_field_id AS priceFieldID, pfv.id AS priceFieldValueID, pfv.name, pfv.label, pfv.membership_type_id, pfv.amount, pfv.financial_type_id
 FROM        civicrm_price_set ps
 LEFT JOIN   civicrm_price_field pf ON pf.`price_set_id` = ps.id
 LEFT JOIN   civicrm_price_field_value pfv ON pfv.price_field_id = pf.id
@@ -136,6 +136,9 @@ WHERE       ps.name = '{$entityName}'
       $defaultPriceSet[$dao->priceFieldValueID]['name'] = $dao->name;
       $defaultPriceSet[$dao->priceFieldValueID]['label'] = $dao->label;
       $defaultPriceSet[$dao->priceFieldValueID]['priceFieldValueID'] = $dao->priceFieldValueID;
+      $defaultPriceSet[$dao->priceFieldValueID]['membership_type_id'] = $dao->membership_type_id;
+      $defaultPriceSet[$dao->priceFieldValueID]['amount'] = $dao->amount;
+      $defaultPriceSet[$dao->priceFieldValueID]['financial_type_id'] = $dao->financial_type_id;
     }
 
     return $defaultPriceSet;

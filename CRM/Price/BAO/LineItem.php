@@ -432,17 +432,30 @@ AND li.entity_id = {$entityId}
   static function getLineItemArray(&$params, $entityId = NULL, $entityTable = 'contribution', $isRelatedID = FALSE) {
 
     if (!$entityId) {
-      $priceSetDetails = CRM_Price_BAO_PriceSet::getDefaultPriceSet();
+      $priceSetDetails = CRM_Price_BAO_PriceSet::getDefaultPriceSet($entityTable);
+      $totalAmount = CRM_Utils_Array::value('total_amount', $params);
+      $financialType = CRM_Utils_Array::value('financial_type_id', $params);
       foreach ($priceSetDetails as $values) {
+        if ($entityTable == 'membership') { 
+          if ($isRelatedID != $values['membership_type_id']) {
+            continue;
+          }
+          if (!$totalAmount) {
+            $totalAmount = $values['amount'];
+          }
+          $financialType = $values['financial_type_id'];
+        }
         $params['line_item'][$values['setID']][$values['priceFieldID']] = array(
           'price_field_id' => $values['priceFieldID'],
           'price_field_value_id' => $values['priceFieldValueID'],
           'label' => $values['label'],
           'qty' => 1,
-          'unit_price' => $params['total_amount'],
-          'line_total' => $params['total_amount'],
-          'financial_type_id' => $params['financial_type_id']
+          'unit_price' => $totalAmount,
+          'line_total' => $totalAmount,
+          'financial_type_id' => $financialType,
+          'membership_type_id' => $values['membership_type_id']
         );
+        break;
       }
     }
     else {
