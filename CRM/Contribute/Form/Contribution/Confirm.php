@@ -1707,7 +1707,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->assign('membership_name', CRM_Utils_Array::value('name', $membershipType));
 
       $isPaidMembership = FALSE;
-      if($this->_amount > 0.0 && $membershipParams['amount']) {
+      if($this->_amount >= 0.0 && isset($membershipParams['amount'])) {
         //amount must be greater than zero for
         //adding contribution record  to contribution table.
         //this condition arises when separate membership payment is
