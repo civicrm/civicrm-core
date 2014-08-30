@@ -39,6 +39,15 @@
  */
 class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
 
+  
+  /**
+   * static field for default price set details
+   *
+   * @var array
+   * @static
+   */
+  static $_defaultPriceSet = NULL;
+
   /**
    * class constructor
    */
@@ -114,7 +123,9 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    *
    */
   public static function getDefaultPriceSet($entity = 'contribution') {
-
+    if (!empty(self::$_defaultPriceSet[$entity])) {
+      return self::$_defaultPriceSet[$entity];
+    }
     $entityName = 'default_contribution_amount';
     if ($entity == 'membership') {
       $entityName = 'default_membership_type_amount';
@@ -129,19 +140,21 @@ WHERE       ps.name = '{$entityName}'
 ";
 
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $defaultPriceSet = array();
+    self::$_defaultPriceSet[$entity] = array();
     while ($dao->fetch()) {
-      $defaultPriceSet[$dao->priceFieldValueID]['setID'] = $dao->setID;
-      $defaultPriceSet[$dao->priceFieldValueID]['priceFieldID'] = $dao->priceFieldID;
-      $defaultPriceSet[$dao->priceFieldValueID]['name'] = $dao->name;
-      $defaultPriceSet[$dao->priceFieldValueID]['label'] = $dao->label;
-      $defaultPriceSet[$dao->priceFieldValueID]['priceFieldValueID'] = $dao->priceFieldValueID;
-      $defaultPriceSet[$dao->priceFieldValueID]['membership_type_id'] = $dao->membership_type_id;
-      $defaultPriceSet[$dao->priceFieldValueID]['amount'] = $dao->amount;
-      $defaultPriceSet[$dao->priceFieldValueID]['financial_type_id'] = $dao->financial_type_id;
+      self::$_defaultPriceSet[$entity][$dao->priceFieldValueID] = array(
+       'setID' => $dao->setID,
+       'priceFieldID' => $dao->priceFieldID,
+       'name' => $dao->name,
+       'label' => $dao->label,
+       'priceFieldValueID' => $dao->priceFieldValueID,
+       'membership_type_id' => $dao->membership_type_id,
+       'amount' => $dao->amount,
+       'financial_type_id' => $dao->financial_type_id,
+      );
     }
 
-    return $defaultPriceSet;
+    return self::$_defaultPriceSet[$entity];
   }
 
   /**
