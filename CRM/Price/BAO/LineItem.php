@@ -341,17 +341,15 @@ AND li.entity_id = {$entityId}
         $line['entity_table'] = $entityTable;
         $line['entity_id'] = $entityId;
         if(!empty($line['membership_type_id'])) {
-          $entityTable == 'civicrm_membership';
+          $line['entity_table'] = 'civicrm_membership';
+        }
+        if (!empty($contributionDetails->id)) {
           $line['contribution_id'] = $contributionDetails->id;
-        }
-        if ($entityTable == 'civicrm_contribution') {
-          $line['contribution_id'] = $entityId;
-        }
-        else {
-          if (!empty($contributionDetails->id)) {
-            $line['contribution_id'] = $contributionDetails->id;
+          if ($line['entity_table'] == 'civicrm_contribution') {
+            $line['entity_id'] = $contributionDetails->id;
           }
         }
+        
         // if financial type is not set and if price field value is NOT NULL
         // get financial type id of price field value
         if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
@@ -431,7 +429,7 @@ AND li.entity_id = {$entityId}
    * @return void
    * @static
    */
-  static function getLineItemArray(&$params, $entityId = NULL, $entityTable = 'contribution') {
+  static function getLineItemArray(&$params, $entityId = NULL, $entityTable = 'contribution', $isRelatedID = FALSE) {
 
     if (!$entityId) {
       $priceSetDetails = CRM_Price_BAO_PriceSet::getDefaultPriceSet();
@@ -451,7 +449,7 @@ AND li.entity_id = {$entityId}
       $setID = NULL;
       $totalEntityId = count($entityId);
       foreach ($entityId as $id) {
-        $lineItems = CRM_Price_BAO_LineItem::getLineItems($id, $entityTable);
+        $lineItems = CRM_Price_BAO_LineItem::getLineItems($id, $entityTable, NULL, TRUE, $isRelatedID);
         foreach ($lineItems as $key => $values) {
           if (!$setID && $values['price_field_id']) {
             $setID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $values['price_field_id'], 'price_set_id');
