@@ -545,7 +545,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->fireEvent($fieldName, 'focus');
     if ($editor == 'CKEditor') {
       if ($compressed) {
-        $this->click("{$fieldName}-plain");        
+        $this->click("{$fieldName}-plain");
       }
       $this->waitForElementPresent("xpath=//div[@id='cke_{$fieldName}']//iframe");
       $this->runScript("CKEDITOR.instances['{$fieldName}'].setData('<p>{$text}</p>');");
@@ -2007,7 +2007,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $return = $this->addCustomGroupField($customSets);
 
     $this->openCiviPage($pageUrl['url'], $pageUrl['args']);
-
     foreach($return as $values) {
       foreach ($values as $entityType => $customData) {
         //initiate necessary variables
@@ -2037,7 +2036,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
             $this->select2($elementName, $entityData);
           }
         }
-
         //checking for proper custom data which is loading through ajax
         $this->waitForElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]",
           "The on the fly custom group has not been rendered for entity : {$entity} => {$entityData}");
@@ -2073,16 +2071,17 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
       // Save
       $this->click('_qf_Group_next-bottom');
-      $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
       //Is custom group created?
       $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added.");
+      $this->click('css=a#newCustomField');
+
       $gid = $this->urlArg('gid');
+      $this->waitForTextPresent("{$customGroupTitle} - New Field");
 
       $fieldLabel = "custom_field_for_{$customSet['entity']}_{$customSet['subEntity']}" . substr(sha1(rand()), 0, 4);
       $this->type('label', $fieldLabel);
       $this->click('_qf_Field_next_new-bottom');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
       $customGroupTitle = preg_replace('/\s/', '_', trim($customGroupTitle));
 
       $return[] = array(
