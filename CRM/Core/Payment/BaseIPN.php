@@ -601,6 +601,10 @@ LIMIT 1;";
         $input['participant_id'] = $contribution->_relatedObjects['participant']->id;
         $input['skipLineItem'] = 1;
       }
+      elseif (!empty($contribution->_relatedObjects['membership'])) {
+        $input['skipLineItem'] = TRUE;
+        $input['contribution_mode'] = 'membership';
+      }
       //@todo writing a unit test I was unable to create a scenario where this line did not fatal on second
       // and subsequent payments. In this case the line items are created at $this->addrecurLineItems
       // and since the contribution is saved prior to this line there is always a contribution-id,
