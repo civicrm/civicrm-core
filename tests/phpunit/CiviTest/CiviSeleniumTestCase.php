@@ -2129,4 +2129,23 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->assertElementContainsText("xpath=//*[@id='$fieldid']/preceding-sibling::div[1]/", $value);
     }
   }
+  
+  /**
+   * function to enable or disable Pop-ups via Display Preferences
+   */
+  function enableDisablePopups($enabled = TRUE) {
+    $this->openCiviPage('admin/setting/preferences/display', 'reset=1');
+    $isChecked = $this->isChecked('ajaxPopupsEnabled');
+    if (($isChecked && !$enabled) || (!$isChecked && $enabled)) {
+        $this->click('ajaxPopupsEnabled');
+    }
+    if ($enabled) {
+      $this->assertChecked('ajaxPopupsEnabled');      
+    }
+    else {
+      $this->assertNotChecked('ajaxPopupsEnabled');
+    }
+    $this->click("_qf_Display_next-bottom");
+    $this->waitForPageToLoad($this->getTimeoutMsec());    
+  }
 }
