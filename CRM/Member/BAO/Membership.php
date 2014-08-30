@@ -325,8 +325,17 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       $params['contribution'] = self::recordMembershipContribution($memInfo, $ids);
     }
     
-    if (CRM_Utils_Array::value('lineItems', $params) && empty($params['contributionId'])) {
-      CRM_Price_BAO_LineItem::processPriceSet($membership->id, $params['lineItems'], CRM_Utils_Array::value('contribution', $params));
+    if (!empty($params['lineItems'])) {
+      $params['line_item'] = $params['lineItems'];
+    }
+
+    //do cleanup line  items if membership edit the Membership type.
+    if (empty($ids['contribution']) && !empty($ids['membership'])) {
+      CRM_Price_BAO_LineItem::deleteLineItems($ids['membership'], 'civicrm_membership');
+    }
+    
+    if (!empty($params['line_item']) && empty($ids['contribution'])) {
+      CRM_Price_BAO_LineItem::processPriceSet($membership->id, $params['line_item'], CRM_Utils_Array::value('contribution', $params));
     }
 
     //insert payment record for this membership
