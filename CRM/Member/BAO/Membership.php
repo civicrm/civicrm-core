@@ -316,11 +316,18 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         'membership_id'
       );
     }
-
+    
+    $params['skipLineItem'] = TRUE;
+    $params['contribution'] = NULL;
+    
     //record contribution for this membership
     if (!empty($params['contribution_status_id']) && empty($params['relate_contribution_id'])) {
       $memInfo = array_merge($params, array('membership_id' => $membership->id));
       $params['contribution'] = self::recordMembershipContribution($memInfo, $ids);
+    }
+    
+    if (CRM_Utils_Array::value('lineItems', $params) && empty($params['contributionId'])) {
+      CRM_Price_BAO_LineItem::processPriceSet($membership->id, $params['lineItems'], $params['contribution']);
     }
 
     //insert payment record for this membership
@@ -2804,7 +2811,7 @@ WHERE      civicrm_membership.is_test = 0";
       'contact_id', 'total_amount', 'receive_date', 'financial_type_id',
       'payment_instrument_id', 'trxn_id', 'invoice_id', 'is_test',
       'contribution_status_id', 'check_number', 'campaign_id', 'is_pay_later',
-      'membership_id',
+      'membership_id', 'skipLineItem'
     );
     foreach ($recordContribution as $f) {
       $contributionParams[$f] = CRM_Utils_Array::value($f, $params);
