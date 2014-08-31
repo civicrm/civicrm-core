@@ -17,11 +17,16 @@ class CRM_Core_CodeGen_Util_File {
   /**
    * @param $dir
    */
-  static function removeDir($dir) {
+  static function cleanTempDir($dir) {
     foreach (glob("$dir/*") as $tempFile) {
       unlink($tempFile);
     }
     rmdir($dir);
+    if (preg_match(':^(.*)\.d$:', $dir, $matches)) {
+      if (file_exists($matches[1])) {
+        unlink($matches[1]);
+      }
+    }
   }
 
   /**
@@ -30,18 +35,7 @@ class CRM_Core_CodeGen_Util_File {
    * @return string
    */
   static function createTempDir($prefix) {
-    if (isset($_SERVER['TMPDIR'])) {
-      $tempDir = $_SERVER['TMPDIR'];
-    }
-    else {
-      $tempDir = '/tmp';
-    }
-
-    $newTempDir = $tempDir . '/' . $prefix . rand(1, 10000);
-    if (function_exists('posix_geteuid')) {
-      $newTempDir .= '_' . posix_geteuid();
-    }
-
+    $newTempDir = tempnam(sys_get_temp_dir(), $prefix) . '.d';
     if (file_exists($newTempDir)) {
       self::removeDir($newTempDir);
     }
