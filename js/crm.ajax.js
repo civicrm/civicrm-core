@@ -9,15 +9,12 @@
    * @param string|object params
    * @param string mode - optionally specify "front" or "back"
    */
-  var tplURL = '/civicrm/example?placeholder';
-  var urlInitted = false;
+  var tplURL;
   CRM.url = function (p, params, mode) {
     if (p == "init") {
-      tplURL = params;
-      urlInitted = true;
-      return;
+      return tplURL = params;
     }
-    if (!urlInitted) {
+    if (!tplURL) {
       console && console.log && console.log('Warning: CRM.url called before initialization');
     }
     if (!mode) {
@@ -25,7 +22,7 @@
     }
     params = params || '';
     var frag = p.split ('?');
-    var url = tplURL.replace("civicrm/example", frag[0]);
+    var url = tplURL[mode].replace("civicrm/example", frag[0]);
 
     if (typeof(params) == 'string') {
       url = url.replace("placeholder", params);
