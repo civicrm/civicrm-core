@@ -5,37 +5,33 @@
  */
 (function($, CRM, undefined) {
   /**
-   * @param string p - url
-   * @param string|object params
+   * @param string path
+   * @param string|object query
    * @param string mode - optionally specify "front" or "back"
    */
   var tplURL;
-  CRM.url = function (p, params, mode) {
-    if (p == "init") {
-      return tplURL = params;
+  CRM.url = function (path, query, mode) {
+    if (typeof path === 'object') {
+      return tplURL = path;
     }
     if (!tplURL) {
       console && console.log && console.log('Warning: CRM.url called before initialization');
     }
     if (!mode) {
-      mode = CRM.config.isFrontend ? 'front' : 'back';
+      mode = CRM.config && CRM.config.isFrontend ? 'front' : 'back';
     }
-    params = params || '';
-    var frag = p.split ('?');
-    var url = tplURL[mode].replace("civicrm/example", frag[0]);
+    query = query || '';
+    var frag = path.split ('?');
+    var url = tplURL[mode].replace("*path*", frag[0]);
 
-    if (typeof(params) == 'string') {
-      url = url.replace("placeholder", params);
+    if (!query) {
+      url = url.replace(/[?&]\*query\*/, '');
     }
     else {
-      url = url.replace("placeholder", $.param(params));
+      url = url.replace("*query*", typeof query === 'string' ? query : $.param(query));
     }
     if (frag[1]) {
-      url += (url.indexOf('?') === (url.length - 1) ? '' : '&') + frag[1];
-    }
-    // remove trailing "?"
-    if (url.indexOf('?') === (url.length - 1)) {
-      url = url.slice(0, (url.length - 1));
+      url += (url.indexOf('?') < 0 ? '?' : '&') + frag[1];
     }
     return url;
   };
