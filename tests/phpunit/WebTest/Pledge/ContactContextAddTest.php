@@ -108,8 +108,10 @@ class WebTest_Pledge_ContactContextAddTest extends CiviSeleniumTestCase {
     }
 
     $this->clickLink("_qf_PledgeView_next-bottom", "xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span[1]/a[text()='View']", FALSE);
+    
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody//tr//td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody//tr//td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment']");
   }
 }
 
