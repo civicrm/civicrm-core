@@ -144,21 +144,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
         $defaults['address'][1]['state_province_id'] = $config->defaultContactStateProvince;
       }
 
-      if (!empty($defaults['address'])) {
-        foreach ($defaults['address'] as $key => $value) {
-          CRM_Contact_Form_Edit_Address::fixStateSelect($this,
-            "address[$key][country_id]",
-            "address[$key][state_province_id]",
-            "address[$key][county_id]",
-            CRM_Utils_Array::value('country_id', $value,
-              $config->defaultContactCountry
-            ),
-            CRM_Utils_Array::value('state_province_id', $value,
-              $config->defaultContactStateProvince
-            )
-          );
-        }
-      }
     }
     $defaults = array_merge($defaults, $domainDefaults);
     return $defaults;

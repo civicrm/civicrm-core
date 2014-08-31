@@ -575,8 +575,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @access public
    */
   function buildCustom($id, $name, $viewOnly = FALSE) {
-    $stateCountryMap = $fields = array();
-
     if ($id) {
       $button    = substr($this->controller->getButtonName(), -4);
       $cid       = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -656,19 +654,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             $addCaptcha = TRUE;
           }
           list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
-          if ($prefixName == 'state_province' || $prefixName == 'country' || $prefixName == 'county') {
-            if (!array_key_exists($index, $stateCountryMap)) {
-              $stateCountryMap[$index] = array();
-            }
-            $stateCountryMap[$index][$prefixName] = $key;
-          }
           CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE, $contactID, TRUE);
 
           $this->_fields[$key] = $field;
         }
       }
-
-      CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
 
       if ($addCaptcha && !$viewOnly) {
         $captcha = CRM_Utils_ReCAPTCHA::singleton();

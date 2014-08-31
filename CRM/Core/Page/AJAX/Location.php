@@ -195,74 +195,15 @@ class CRM_Core_Page_AJAX_Location {
         }
       }
 
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($elements);
   }
 
   static function jqState() {
-    if (empty($_GET['_value'])) {
-      CRM_Utils_System::civiExit();
-    }
-    $countries = (array) $_GET['_value'];
-    $elements = array();
-    $list = &$elements;
-    foreach ($countries as $val) {
-      $result = CRM_Core_PseudoConstant::stateProvinceForCountry($val);
-
-      // Option-groups for multiple countries
-      if ($result && count($countries) > 1) {
-        $elements[] = array(
-          'name' => CRM_Core_PseudoConstant::country($val, FALSE),
-          'children' => array(),
-        );
-        $list = &$elements[count($elements)-1]['children'];
-      }
-      foreach ($result as $id => $name) {
-        $list[] = array(
-          'name' => $name,
-          'value' => $id,
-        );
-      }
-    }
-    $placeholder = array(array('value' => '', 'name' => $elements ? ts('- select -') : ts('- N/A -')));
-    echo json_encode(array_merge($placeholder, $elements));
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(CRM_Core_BAO_Location::getChainSelectValues($_GET['_value'], 'country'));
   }
 
   static function jqCounty() {
-    $elements = array();
-    if (!isset($_GET['_value']) || CRM_Utils_System::isNull($_GET['_value'])) {
-      $elements = array(
-        array('name' => ts('Choose state first'), 'value' => '')
-      );
-    }
-    else {
-      $states = (array) $_GET['_value'];
-      $list = &$elements;
-      foreach ($states as $val) {
-        $result = CRM_Core_PseudoConstant::countyForState($val);
-
-        // Option-groups for multiple countries
-        if ($result && count($states) > 1) {
-          $elements[] = array(
-            'name' => CRM_Core_PseudoConstant::stateProvince($val, FALSE),
-            'children' => array(),
-          );
-          $list = &$elements[count($elements)-1]['children'];
-        }
-        foreach ($result as $id => $name) {
-          $list[] = array(
-            'name' => $name,
-            'value' => $id,
-          );
-        }
-      }
-      $placeholder = array(array('value' => '', 'name' => $elements ? ts('- select -') : ts('- N/A -')));
-      $elements = array_merge($placeholder, $elements);
-    }
-
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(CRM_Core_BAO_Location::getChainSelectValues($_GET['_value'], 'stateProvince'));
   }
 
   static function getLocBlock() {
@@ -317,7 +258,6 @@ class CRM_Core_Page_AJAX_Location {
     // set the message if loc block is being used by more than one event.
     $result['count_loc_used'] = CRM_Event_BAO_Event::countEventsUsingLocBlockId($_POST['lbid']);
 
-    echo json_encode($result);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($result);
   }
 }

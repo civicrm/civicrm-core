@@ -143,7 +143,9 @@ function civicrm_api3_profile_get($params) {
  */
 function _civicrm_api3_profile_get_spec(&$params) {
   $params['profile_id']['api.required'] = TRUE;
+  $params['profile_id']['title'] = 'Profile ID';
   $params['contact_id']['description'] = 'If no contact is specified an array of defaults will be returned';
+  $params['contact_id']['title'] = 'Contact ID';
 }
 
 /**
@@ -320,6 +322,7 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
     _civicrm_api3_buildprofile_submitfields(FALSE, FALSE, True);
   }
   $params['profile_id']['api.required'] = TRUE;
+  $params['profile_id']['title'] = 'Profile ID';
 }
 
 /**

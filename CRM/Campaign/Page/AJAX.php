@@ -92,8 +92,7 @@ class CRM_Campaign_Page_AJAX {
     $errors = CRM_Core_BAO_CustomField::validateCustomData($params);
     if (is_array($errors) && !empty($errors)) {
       $result['errors'] = $errors;
-      echo json_encode($result);
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output($result);
     }
 
     //process the response/interview data.
@@ -102,9 +101,7 @@ class CRM_Campaign_Page_AJAX {
       $result['status'] = 'success';
     }
 
-    echo json_encode($result);
-
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($result);
   }
 
   static function loadOptionGroupDetails() {
@@ -144,8 +141,7 @@ class CRM_Campaign_Page_AJAX {
       'result' => $opValues,
     );
 
-    echo json_encode($result);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($result);
   }
 
   function voterList() {
@@ -480,8 +476,7 @@ class CRM_Campaign_Page_AJAX {
       }
     }
 
-    echo json_encode(array('status' => $status));
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(array('status' => $status));
   }
 
   function allActiveCampaigns() {
@@ -512,9 +507,7 @@ class CRM_Campaign_Page_AJAX {
       'campaigns' => $options,
     );
 
-    echo json_encode($results);
-
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($results);
   }
 
   function campaignGroups() {
@@ -549,9 +542,7 @@ class CRM_Campaign_Page_AJAX {
       'groups' => $groups,
     );
 
-    echo json_encode($results);
-
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($results);
   }
 
   /**

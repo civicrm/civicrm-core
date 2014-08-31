@@ -423,6 +423,18 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'entity_table',
         )
       ),
+      'CaseType' => array(
+        'cant_update' => array(
+          'definition',
+        )
+      ),
+      'MembershipBlock' => array(
+        'cant_update' => array(
+          // The fake/auto-generated values leave us unable to properly cleanup fake data
+          'entity_type',
+          'entity_id',
+        )
+      ),
       'Pledge' => array(
         'cant_update' => array(
           'pledge_original_installment_amount',
@@ -684,7 +696,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'check that no limit returns 25',
     );
 
-    $baoString = _civicrm_api3_get_DAO($entityName);
+    $baoString = _civicrm_api3_get_BAO($entityName);
     if (empty($baoString)) {
       $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
       return;
@@ -749,7 +761,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       return;
     }
 
-    $baoString = _civicrm_api3_get_DAO($entityName);
+    $baoString = _civicrm_api3_get_BAO($entityName);
     if (empty($baoString)) {
       $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
       return;
@@ -887,7 +899,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       return;
     }
 
-    $baoString = _civicrm_api3_get_DAO($entityName);
+    $baoString = _civicrm_api3_get_BAO($entityName);
     $this->assertNotEmpty($baoString, $entityName);
     $this->assertNotEmpty($entityName, $entityName);
     $fieldsGet = $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'get'));
@@ -1134,16 +1146,22 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     if (in_array($entity, $entities)) {
       $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, $entity . 'Test.php');
     }
-    $fields = $this->callAPISuccess($entity, 'getfields', array('action' => 'create'));
-    if (!empty($ids)) {
-      $this->assertArrayHasKey('custom_' . $ids['custom_field_id'], $fields['values']);
-    }
+    $actions =  $this->callAPISuccess($entity, 'getactions', array());
+    foreach ($actions['values'] as $action) {
+      if (substr($action, -7) == '_create'  || substr($action, -4) == '_get' || substr($action, -7) == '_delete') {
+        //getactions can't distinguish between contribution_page.create & contribution_page.create
+        continue;
+      }
+      $fields = $this->callAPISuccess($entity, 'getfields', array('action' => $action));
+      if (!empty($ids) && in_array($action, array('create', 'get'))) {
+        $this->assertArrayHasKey('custom_' . $ids['custom_field_id'], $fields['values']);
+      }
 
-    foreach ($fields['values'] as $fieldName => $fieldSpec) {
-      $this->assertArrayHasKey('title', $fieldSpec, "no title for $entity - $fieldName");
-      $this->assertNotEmpty($fieldSpec['title'], "empty title for $entity - $fieldName");
+      foreach ($fields['values'] as $fieldName => $fieldSpec) {
+        $this->assertArrayHasKey('title', $fieldSpec, "no title for $entity - $fieldName on action $action");
+        $this->assertNotEmpty($fieldSpec['title'], "empty title for $entity - $fieldName");
+      }
     }
-
     if (!empty($ids)) {
       $this->customFieldDelete($ids['custom_field_id']);
       $this->customGroupDelete($ids['custom_group_id']);
@@ -1170,7 +1188,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @return array
    */
   private function getMockableBAOObjects($entityName, $count = 2) {
-    $baoString = _civicrm_api3_get_DAO($entityName);
+    $baoString = _civicrm_api3_get_BAO($entityName);
     if (empty($baoString)) {
       $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
       return;

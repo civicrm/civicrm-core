@@ -545,7 +545,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->fireEvent($fieldName, 'focus');
     if ($editor == 'CKEditor') {
       if ($compressed) {
-        $this->click("{$fieldName}-plain");        
+        $this->click("{$fieldName}-plain");
       }
       $this->waitForElementPresent("xpath=//div[@id='cke_{$fieldName}']//iframe");
       $this->runScript("CKEDITOR.instances['{$fieldName}'].setData('<p>{$text}</p>');");
@@ -2007,7 +2007,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $return = $this->addCustomGroupField($customSets);
 
     $this->openCiviPage($pageUrl['url'], $pageUrl['args']);
-
     foreach($return as $values) {
       foreach ($values as $entityType => $customData) {
         //initiate necessary variables
@@ -2037,7 +2036,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
             $this->select2($elementName, $entityData);
           }
         }
-
         //checking for proper custom data which is loading through ajax
         $this->waitForElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]",
           "The on the fly custom group has not been rendered for entity : {$entity} => {$entityData}");
@@ -2073,16 +2071,17 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
       // Save
       $this->click('_qf_Group_next-bottom');
-      $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
       //Is custom group created?
       $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added.");
+      $this->click('css=a#newCustomField');
+
       $gid = $this->urlArg('gid');
+      $this->waitForTextPresent("{$customGroupTitle} - New Field");
 
       $fieldLabel = "custom_field_for_{$customSet['entity']}_{$customSet['subEntity']}" . substr(sha1(rand()), 0, 4);
       $this->type('label', $fieldLabel);
       $this->click('_qf_Field_next_new-bottom');
-      $this->waitForPageToLoad($this->getTimeoutMsec());
       $customGroupTitle = preg_replace('/\s/', '_', trim($customGroupTitle));
 
       $return[] = array(
@@ -2104,10 +2103,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->clickAt("//*[@class='select2-results']/li[1]/div");
     }
     else {
-      if ($xpath)
-	$this->clickAt($fieldName);
-      else
-	$this->clickAt("//*[@id='$fieldName']/../div/a");
+      if ($xpath) {
+        $this->clickAt($fieldName);
+      }
+      else {
+        $this->clickAt("//*[@id='$fieldName']/../div/a");
+      }
       $this->waitForElementPresent("//*[@id='select2-drop']/div/input");
       $this->keyDown("//*[@id='select2-drop']/div/input", " ");
       $this->type("//*[@id='select2-drop']/div/input", $label);
@@ -2125,7 +2126,26 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
       $this->waitForElementPresent("xpath=//ul[@class='select2-results']");
       $this->clickAt("xpath=//ul[@class='select2-results']//li/div[text()='$value']");
-      $this->waitForText("xpath=//*[@id='$fieldid']/../div", $value);
+      $this->assertElementContainsText("xpath=//*[@id='$fieldid']/preceding-sibling::div[1]/", $value);
     }
+  }
+  
+  /**
+   * function to enable or disable Pop-ups via Display Preferences
+   */
+  function enableDisablePopups($enabled = TRUE) {
+    $this->openCiviPage('admin/setting/preferences/display', 'reset=1');
+    $isChecked = $this->isChecked('ajaxPopupsEnabled');
+    if (($isChecked && !$enabled) || (!$isChecked && $enabled)) {
+        $this->click('ajaxPopupsEnabled');
+    }
+    if ($enabled) {
+      $this->assertChecked('ajaxPopupsEnabled');      
+    }
+    else {
+      $this->assertNotChecked('ajaxPopupsEnabled');
+    }
+    $this->click("_qf_Display_next-bottom");
+    $this->waitForPageToLoad($this->getTimeoutMsec());    
   }
 }

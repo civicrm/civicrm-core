@@ -47,7 +47,8 @@ class CRM_Report_Form extends CRM_Core_Form {
     OP_SELECT = 64,
     OP_MULTISELECT = 65,
     OP_MULTISELECT_SEPARATOR = 66,
-    OP_MONTH = 128;
+    OP_MONTH = 128,
+    OP_ENTITYREF = 256;
 
   /**
    * The id of the report instance
@@ -698,6 +699,9 @@ class CRM_Report_Form extends CRM_Core_Form {
           if (CRM_Utils_Array::value('operatorType', $field) == CRM_Report_Form::OP_MULTISELECT) {
             $this->_defaults["{$fieldName}_op"] = 'in';
           }
+          if (CRM_Utils_Array::value('operatorType', $field) == CRM_Report_Form::OP_ENTITYREF) {
+            $this->_defaults["{$fieldName}_op"] = 'in';
+          }
           elseif (CRM_Utils_Array::value('operatorType', $field) == CRM_Report_Form::OP_MULTISELECT_SEPARATOR) {
             $this->_defaults["{$fieldName}_op"] = 'mhas';
           }
@@ -878,7 +882,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   function addFilters() {
-    $options = $filters = array();
+    $filters = array();
     $count = 1;
     foreach ($this->_filters as $table => $attributes) {
       foreach ($attributes as $fieldName => $field) {
@@ -916,17 +920,22 @@ class CRM_Report_Form extends CRM_Core_Form {
           case CRM_Report_Form::OP_MULTISELECT:
           case CRM_Report_Form::OP_MULTISELECT_SEPARATOR:
             // assume a multi-select field
-            if (!empty($field['options'])) {
+            if (!empty($field['options']) || $fieldName == 'state_province_id' || $fieldName == 'county_id') {
               $element = $this->addElement('select', "{$fieldName}_op", ts('Operator:'), $operations);
               if (count($operations) <= 1) {
                 $element->freeze();
               }
-              $this->addElement('select', "{$fieldName}_value", NULL, $field['options'], array(
-                'style' => 'min-width:250px',
-                'class' => 'crm-select2',
-                'multiple' => TRUE,
-                'placeholder' => ts('- select -'),
-              ));
+              if ($fieldName == 'state_province_id' || $fieldName == 'county_id') {
+                $this->addChainSelect($fieldName . '_value', array('multiple' => TRUE, 'label' => NULL));
+              }
+              else {
+                $this->addElement('select', "{$fieldName}_value", NULL, $field['options'], array(
+                  'style' => 'min-width:250px',
+                  'class' => 'crm-select2 huge',
+                  'multiple' => TRUE,
+                  'placeholder' => ts('- select -'),
+                ));
+              }
             }
             break;
 
@@ -935,6 +944,12 @@ class CRM_Report_Form extends CRM_Core_Form {
             $this->addElement('select', "{$fieldName}_op", ts('Operator:'), $operations);
             if (!empty($field['options']))
               $this->addElement('select', "{$fieldName}_value", NULL, $field['options']);
+            break;
+
+          case CRM_Report_Form::OP_ENTITYREF:
+            $this->addElement('select', "{$fieldName}_op", ts('Operator:'), $operations);
+            $this->setEntityRefDefaults($field, $table);
+            $this->addEntityRef("{$fieldName}_value", NULL, $field['attributes']);
             break;
 
           case CRM_Report_Form::OP_DATE:
@@ -961,19 +976,11 @@ class CRM_Report_Form extends CRM_Core_Form {
               array('onchange' => "return showHideMaxMinVal( '$fieldName', this.value );")
             );
             // we need text box for value input
-            $this->add('text', "{$fieldName}_value", NULL);
+            $this->add('text', "{$fieldName}_value", NULL, array('class' => 'huge'));
             break;
         }
       }
     }
-
-    $stateCountryMap[] = array(
-      'country' => 'country_id_value',
-      'state_province' => 'state_province_id_value',
-      'county' => 'county_id_value'
-    );
-    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
-
     $this->assign('filters', $filters);
   }
 
@@ -1215,6 +1222,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
       case CRM_Report_Form::OP_MONTH:
       case CRM_Report_Form::OP_MULTISELECT:
+      case CRM_Report_Form::OP_ENTITYREF:
         return array(
           'in' => ts('Is one of'),
           'notin' => ts('Is not one of'),
@@ -1410,6 +1418,9 @@ class CRM_Report_Form extends CRM_Core_Form {
 
       case 'in':
       case 'notin':
+        if (is_string($value) && strlen($value)) {
+          $value = explode(',', $value);
+        }
         if ($value !== NULL && is_array($value) && count($value) > 0) {
           $sqlOP = $this->getSQLOperator($op);
           if (CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_STRING) {
@@ -2640,9 +2651,17 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
               $min = CRM_Utils_Array::value("{$fieldName}_min", $this->_params);
               $max = CRM_Utils_Array::value("{$fieldName}_max", $this->_params);
               $val = CRM_Utils_Array::value("{$fieldName}_value", $this->_params);
-              if (in_array($op, array(
-                    'bw', 'nbw')) && ($min || $max)) {
-                $value = "{$pair[$op]} " . $min . ' and ' . $max;
+              if (in_array($op, array('bw', 'nbw')) && ($min || $max)) {
+                $value = "{$pair[$op]} $min " . ts('and') . " $max";
+              }
+              elseif ($val && CRM_Utils_Array::value('operatorType', $field) & self::OP_ENTITYREF) {
+                $this->setEntityRefDefaults($field, $tableName);
+                $result = civicrm_api3($field['attributes']['entity'], 'getlist', array('id' => $val) + CRM_Utils_Array::value('api', $field['attributes'], array()));
+                $values = array();
+                foreach ($result['values'] as $v) {
+                  $values[] = $v['label'];
+                }
+                $value = "{$pair[$op]} " . implode(', ', $values);
               }
               elseif ($op == 'nll' || $op == 'nnll') {
                 $value = $pair[$op];
@@ -3426,8 +3445,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *
    * @return array address fields for construct clause
    */
-  function addAddressFields($groupBy = TRUE, $orderBy = FALSE, $filters = TRUE, $defaults = array(
-      'country_id' => TRUE)) {
+  function addAddressFields($groupBy = TRUE, $orderBy = FALSE, $filters = TRUE, $defaults = array('country_id' => TRUE)) {
     $addressFields = array(
       'civicrm_address' =>
       array(
@@ -3524,26 +3542,21 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
           'type' => CRM_Utils_Type::T_INT,
           'operatorType' =>
             CRM_Report_Form::OP_MULTISELECT,
-          'options' =>
-            CRM_Core_PseudoConstant::country(),
+          'options' => CRM_Core_PseudoConstant::country(),
         ),
         'state_province_id' => array(
           'name' => 'state_province_id',
           'title' => ts('State/Province'),
           'type' => CRM_Utils_Type::T_INT,
-          'operatorType' =>
-            CRM_Report_Form::OP_MULTISELECT,
-          'options' =>
-            CRM_Core_PseudoConstant::stateProvince(),
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'options' => array(),
         ),
         'county_id' => array(
           'name' => 'county_id',
           'title' => ts('County'),
           'type' => CRM_Utils_Type::T_INT,
-          'operatorType' =>
-          CRM_Report_Form::OP_MULTISELECT,
-          'options' =>
-          CRM_Core_PseudoConstant::county(),
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'options' => array(),
         ),
       );
     }
@@ -3729,24 +3742,21 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *  - prefix_label Label to give columns from this address table instance
    * @return array address columns definition
    */
-  function getAddressColumns($options = array()){
-    $defaultOptions = array(
+  function getAddressColumns($options = array()) {
+    $options += array(
       'prefix' => '',
       'prefix_label' => '',
       'group_by' => TRUE,
       'order_by' => TRUE,
       'filters' => TRUE,
-      'defaults' => array(
-       ),
+      'defaults' => array(),
     );
-    $options = array_merge($defaultOptions,$options);
     return $this->addAddressFields(
       $options['group_by'],
       $options['order_by'],
       $options['filters'],
       $options['defaults']
     );
-
   }
 
   /**
@@ -3806,5 +3816,19 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       fclose($jfh);
       CRM_Utils_System::civiExit();
     }
+  }
+
+  /**
+   * Apply common settings to entityRef fields
+   * @param array $field
+   * @param string $table
+   */
+  private function setEntityRefDefaults(&$field, $table) {
+    $field['attributes'] = $field['attributes'] ? $field['attributes'] : array();
+    $field['attributes'] += array(
+      'entity' => CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($table)),
+      'multiple' => TRUE,
+      'placeholder' => ts('- select -'),
+    );
   }
 }

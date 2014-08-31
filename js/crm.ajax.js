@@ -5,13 +5,13 @@
  */
 (function($, CRM, undefined) {
   /**
-   * Almost like {crmURL} but on the client side
-   * eg: var url = CRM.url('civicrm/contact/view', {reset:1,cid:42});
-   * or: $('a.my-link').crmURL();
+   * @param string p - url
+   * @param string|object params
+   * @param string mode - optionally specify "front" or "back"
    */
   var tplURL = '/civicrm/example?placeholder';
   var urlInitted = false;
-  CRM.url = function (p, params) {
+  CRM.url = function (p, params, mode) {
     if (p == "init") {
       tplURL = params;
       urlInitted = true;
@@ -19,6 +19,9 @@
     }
     if (!urlInitted) {
       console && console.log && console.log('Warning: CRM.url called before initialization');
+    }
+    if (!mode) {
+      mode = CRM.config.isFrontend ? 'front' : 'back';
     }
     params = params || '';
     var frag = p.split ('?');
@@ -314,10 +317,10 @@
           }
           // Adjust height to fit content (small delay to allow elements to render)
           window.setTimeout(function() {
-            var currentHeight = $(settings.target).parent().height(),
+            var currentHeight = $(settings.target).parent().outerHeight(),
               padding = currentHeight - $(settings.target).height(),
               newHeight = $(settings.target).prop('scrollHeight') + padding,
-              menuHeight = $('#civicrm-menu').height(),
+              menuHeight = $('#civicrm-menu').outerHeight(),
               maxHeight = $(window).height() - menuHeight;
             newHeight = newHeight > maxHeight ? maxHeight : newHeight;
             if (newHeight > (currentHeight + 15)) {
@@ -412,7 +415,8 @@
               $el.data('civiCrmSnippet')._originalUrl = response.userContext;
               $el.crmSnippet('resetUrl').crmSnippet('refresh');
             }
-            else if ($el.data('uiDialog') && settings.autoClose) {
+            // Close if we are on the original url or the action was "delete" (in which case returning to view may be inappropriate)
+            else if ($el.data('uiDialog') && (settings.autoClose || response.action === 8)) {
               $el.dialog('close');
             }
             else if (settings.autoClose === false) {
