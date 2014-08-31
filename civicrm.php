@@ -653,6 +653,9 @@ class CiviCRM_For_WordPress {
         return;
       }
 
+      $config = CRM_Core_Config::singleton();
+      $config->userFrameworkFrontend = TRUE;
+
       // add CiviCRM core resources
       CRM_Core_Resources::singleton()->addCoreResources();
 
@@ -698,12 +701,12 @@ class CiviCRM_For_WordPress {
     // kick out if not CiviCRM
     if ( ! $this->initialize() ) { return; }
 
-    // add CiviCRM core resources
-    CRM_Core_Resources::singleton()->addCoreResources();
-
     // set the frontend part for civicrm code
     $config = CRM_Core_Config::singleton();
     $config->userFrameworkFrontend = TRUE;
+
+    // add CiviCRM core resources
+    CRM_Core_Resources::singleton()->addCoreResources();
 
     $argString = NULL;
     $args = array();
