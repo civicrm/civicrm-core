@@ -80,14 +80,6 @@ function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
  * @param  invert               Boolean - if true, we HIDE target on value match; if false, we SHOW target on value match
  */
 function showHideByValue(trigger_field_id, trigger_value, target_element_id, target_element_type, field_type, invert) {
-  if (target_element_type == null) {
-    var target_element_type = 'block';
-  }
-  else {
-    if (target_element_type == 'table-row') {
-      var target_element_type = '';
-    }
-  }
 
   if (field_type == 'select') {
     var trigger = trigger_value.split("|");
@@ -155,6 +147,7 @@ function submitOnce(obj, formId, procText) {
   if (obj.value != null) {
     obj.value = procText + " ...";
   }
+  cj(obj).closest('form').attr('data-warn-changes', 'false');
   if (document.getElementById) { // disable submit button for newer browsers
     obj.disabled = true;
     document.getElementById(formId).submit();
@@ -212,27 +205,65 @@ CRM.strings = CRM.strings || {};
 
   /**
    * Populate a select list, overwriting the existing options except for the placeholder.
-   * @param $el jquery collection - 1 or more select elements
+   * @param select jquery selector - 1 or more select elements
    * @param options array in format returned by api.getoptions
-   * @param removePlaceholder bool
+   * @param placeholder string
    */
-  CRM.utils.setOptions = function($el, options, removePlaceholder) {
-    $el.each(function() {
+  CRM.utils.setOptions = function(select, options, placeholder) {
+    $(select).each(function() {
       var
         $elect = $(this),
         val = $elect.val() || [],
-        opts = removePlaceholder ? '' : '[value!=""]';
+        opts = placeholder || placeholder === '' ? '' : '[value!=""]',
+        newOptions = '',
+        theme = function(options) {
+          _.each(options, function(option) {
+            if (option.children) {
+              newOptions += '<optgroup label="' + option.value + '">';
+              theme(option.children);
+              newOptions += '</optgroup>';
+            } else {
+              var selected = ($.inArray('' + option.key, val) > -1) ? 'selected="selected"' : '';
+              newOptions += '<option value="' + option.key + '"' + selected + '>' + option.value + '</option>';
+            }
+          });
+        };
       if (!$.isArray(val)) {
         val = [val];
       }
       $elect.find('option' + opts).remove();
-      _.each(options, function(option) {
-        var selected = ($.inArray(''+option.key, val) > -1) ? 'selected="selected"' : '';
-        $elect.append('<option value="' + option.key + '"' + selected + '>' + option.value + '</option>');
-      });
+      theme(options);
+      if (typeof placeholder === 'string') {
+        if ($elect.is('[multiple]')) {
+          select.attr('placeholder', placeholder);
+        } else {
+          newOptions = '<option value="">' + placeholder + '</option>' + newOptions;
+        }
+      }
+      $elect.append(newOptions);
       $elect.trigger('crmOptionsUpdated', $.extend({}, options)).trigger('change');
     });
   };
+
+  function chainSelect() {
+    var $form = $(this).closest('form'),
+      $target = $('select[data-name="' + $(this).data('target') + '"]', $form),
+      data = $target.data(),
+      val = $(this).val();
+    $target.prop('disabled', true);
+    if ($target.is('select.crm-chain-select-control')) {
+      $('select[data-name="' + $target.data('target') + '"]', $form).prop('disabled', true).blur();
+    }
+    if (!(val && val.length)) {
+      CRM.utils.setOptions($target.blur(), [], data.emptyPrompt);
+    } else {
+      $target.addClass('loading');
+      $.getJSON(CRM.url(data.callback), {_value: val}, function(vals) {
+        $target.prop('disabled', false).removeClass('loading');
+        CRM.utils.setOptions($target, vals || [], (vals && vals.length ? data.selectPrompt : data.nonePrompt));
+      });
+    }
+  }
 
 /**
  * Compare Form Input values against cached initial value.
@@ -345,7 +376,7 @@ CRM.strings = CRM.strings || {};
       if ($el.data('create-links') && entity.toLowerCase() === 'contact') {
         selectParams.formatInputTooShort = function() {
           var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
-          if ($el.data('create-links') && CRM.profileCreate) {
+          if ($el.data('create-links') && CRM.profileCreate && CRM.profileCreate.length) {
             txt += ' ' + ts('or') + '<br />' + formatSelect2CreateLinks($el);
           }
           return txt;
@@ -489,6 +520,7 @@ CRM.strings = CRM.strings || {};
       }
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
       $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
+      $('select.crm-chain-select-control', e.target).off('.chainSelect').on('change.chainSelect', chainSelect);
       // Cache Form Input initial values
       $('form[data-warn-changes] :input', e.target).each(function() {
         $(this).data('crm-initial-value', $(this).val());
@@ -510,12 +542,12 @@ CRM.strings = CRM.strings || {};
             $el.dialog('option', $el.data('origSize'));
             $el.data('origSize', null);
           } else {
+            var menuHeight = $('#civicrm-menu').outerHeight();
             $el.data('origSize', {
-              position: {my: 'center', at: 'center', of: window},
+              position: {my: 'center', at: 'center center+' + (menuHeight / 2), of: window},
               width: $el.dialog('option', 'width'),
               height: $el.dialog('option', 'height')
             });
-            var menuHeight = $('#civicrm-menu').height();
             $el.dialog('option', {width: '100%', height: ($(window).height() - menuHeight), position: {my: "top", at: "top+"+menuHeight, of: window}});
           }
           e.preventDefault();
@@ -883,6 +915,10 @@ CRM.strings = CRM.strings || {};
 
   $(function () {
     $.blockUI.defaults.message = null;
+
+    if ($('#crm-container').hasClass('crm-public')) {
+      $.fn.select2.defaults.dropdownCssClass = $.ui.dialog.prototype.options.dialogClass = 'crm-container crm-public';
+    }
 
     // Trigger crmLoad on initial content for consistency. It will also be triggered for ajax-loaded content.
     $('.crm-container').trigger('crmLoad');

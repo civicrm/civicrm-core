@@ -54,6 +54,9 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
         $url = CRM_Utils_System::url('civicrm/admin/tag', "reset=1");
         CRM_Core_Error::statusBounce(ts("This tag cannot be deleted. You must delete all its child tags ('%1', etc) prior to deleting this tag.", array(1 => $tag)), $url);
       }
+      if ($this->_values['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved tags')) {
+        CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to delete this reserved tag."));
+      }
     }
     else {
       $this->_isTagSet = CRM_Utils_Request::retrieve('tagset', 'Positive', $this);

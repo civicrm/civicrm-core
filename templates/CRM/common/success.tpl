@@ -49,7 +49,7 @@
 
 {else}
     <div class="crm-container" style="margin-top: 2em; padding: 1em; background-color: #EEFFEE; border: 1px #070 solid; color: black;">
-      <div style="padding: 1em; background-color: rgba(255, 255, 255, 0.76);">
+      <div class="bold" style="padding: 1em; background-color: rgba(255, 255, 255, 0.76);">
         <p>
           <img style="display:block; float:left; width:40px; margin-right:10px;" src="{$config->resourceBase}i/logo_lg.png">
           {ts 1='https://civicrm.org/membership'}If you feel that CiviCRM is valuable to your organization, consider that thousands of organizations worldwide also feel the same way. Protect your investment, and theirs, by <a href="%1" target="_blank">ensuring that CiviCRM remains stable, sustainable and consistently improving through membership</a>. ~Donald Lobo {/ts}
@@ -58,7 +58,7 @@
           {ts 1='https://civicrm.org/register-site'}Not ready for a membership yet? You can still help us learn how to improve CiviCRM by <a href="%1" target="_blank">registering your site</a>.{/ts}
         </p>
       </div>
-      <p><span class="crm-status-icon success"> </span><strong>{$message}</strong></p>
+      <p><span class="crm-status-icon success"> </span>{$message}</p>
       {if $afterUpgradeMessage}
         <h3>{ts}Important Notes{/ts}</h3>
         <p>{$afterUpgradeMessage}</p>

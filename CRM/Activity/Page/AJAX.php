@@ -296,14 +296,12 @@ class CRM_Activity_Page_AJAX {
 
   static function convertToCaseActivity() {
     $params = array('caseID', 'activityID', 'contactID', 'newSubject', 'targetContactIds', 'mode');
+    $vals = array();
     foreach ($params as $param) {
       $vals[$param] = CRM_Utils_Array::value($param, $_POST);
     }
 
-    $retval = self::_convertToCaseActivity($vals);
-
-    echo json_encode($retval);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(self::_convertToCaseActivity($vals));
   }
 
   /**

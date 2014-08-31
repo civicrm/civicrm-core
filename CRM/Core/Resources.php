@@ -436,6 +436,8 @@ class CRM_Core_Resources {
 
   public function resetCacheCode() {
     $this->setCacheCode(CRM_Utils_String::createRandom(5, CRM_Utils_String::ALPHANUMERIC));
+    // Also flush cms resource cache if needed
+    CRM_Core_Config::singleton()->userSystem->clearResourceCache();
   }
 
   /**
@@ -473,6 +475,7 @@ class CRM_Core_Resources {
       // Add global settings
       $settings = array('config' => array(
         'ajaxPopupsEnabled' => $this->ajaxPopupsEnabled,
+        'isFrontend' => $config->userFrameworkFrontend,
       ));
       // Disable profile creation if user lacks permission
       if (!CRM_Core_Permission::check('edit all contacts') && !CRM_Core_Permission::check('add contacts')) {

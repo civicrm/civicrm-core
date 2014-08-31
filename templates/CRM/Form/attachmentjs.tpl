@@ -1,7 +1,7 @@
 <script type="text/javascript">
 {literal}
   CRM.$(function($) {
-    $('a.delete-attachment').click(function(e) {
+    $('a.delete-attachment').off('.crmAttachments').on('click.crmAttachments', function(e) {
       var $el = $(this),
         $row = $el.closest('.crm-attachment-wrapper'),
         msg = '{/literal}{ts escape="js" 1="%1"}This will immediately delete the file %1. This action cannot be undone.{/ts}{literal}';

@@ -9,7 +9,7 @@
     <name>id</name>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>State / Province ID</comment>
+    <comment>State/Province ID</comment>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -24,7 +24,7 @@
     <import>true</import>
     <headerPattern>/state|prov(ince)?/i</headerPattern>
     <dataPattern>/[A-Z]{2}/</dataPattern>
-    <comment>Name of State / Province</comment>
+    <comment>Name of State/Province</comment>
     <add>1.1</add>
   </field>
   <field>
@@ -32,14 +32,14 @@
     <title>State Abbreviation</title>
     <type>varchar</type>
     <length>4</length>
-    <comment>2-4 Character Abbreviation of State / Province</comment>
+    <comment>2-4 Character Abbreviation of State/Province</comment>
     <add>1.1</add>
   </field>
   <field>
     <name>country_id</name>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>ID of Country that State / Province belong</comment>
+    <comment>ID of Country that State/Province belong</comment>
     <add>1.1</add>
   </field>
   <foreignKey>

@@ -97,7 +97,7 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   function buildForm(&$form) {
 
@@ -123,34 +123,21 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
       'postal_code',
       ts('Postal Code')
     );
-    $stateCountryMap = array();
-    $stateCountryMap[] = array(
-      'state_province' => 'state_province_id',
-      'country' => 'country_id',
-    );
+
     $defaults = array();
     if ($countryDefault) {
-      $stateProvince = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvinceForCountry($countryDefault);
       $defaults['country_id'] = $countryDefault;
     }
-    else {
-      $stateProvince = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvince();
-    }
-    $form->add('select', 'state_province_id', ts('State/Province'), $stateProvince, FALSE, array('class' => 'crm-select2 huge'));
+    $form->addChainSelect('state_province_id');
 
     $country = array('' => ts('- select -')) + CRM_Core_PseudoConstant::country();
-    $form->add('select', 'country_id', ts('Country'), $country, TRUE, array('class' => 'crm-select2 huge'));
+    $form->add('select', 'country_id', ts('Country'), $country, TRUE, array('class' => 'crm-select2'));
 
     $group = array('' => ts('- any group -')) + CRM_Core_PseudoConstant::nestedGroup();
     $form->addElement('select', 'group', ts('Group'), $group, array('class' => 'crm-select2 huge'));
 
     $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
     $form->addElement('select', 'tag', ts('Tag'), $tag, array('class' => 'crm-select2 huge'));
-
-
-    // state country js, CRM-5233
-    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
-    CRM_Core_BAO_Address::fixAllStateSelects($form, $defaults);
 
     /**
      * You can define a custom title for the search form

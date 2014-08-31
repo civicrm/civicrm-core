@@ -342,13 +342,13 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone&mode=test&eid=3");
 
-    $this->assertTrue($this->isTextPresent("Register New Participant"), "Page title 'Register New Participant' missing");
+    $this->assertTrue($this->isTextPresent("New Event Registration"), "Page title 'New Event Registration' missing");
     $this->assertTrue($this->isTextPresent("A TEST transaction will be submitted"), "test mode status 'A TEST transaction will be submitted' missing");
     $this->_fillParticipantDetails($firstName, $lastName, $processorId);
     $this->click('_qf_Participant_upload_new-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("Register New Participant"), "Page title 'Register New Participant' missing");
+    $this->assertTrue($this->isTextPresent("New Event Registration"), "Page title 'New Event Registration' missing");
     $this->assertTrue($this->isTextPresent("A TEST transaction will be submitted"), "test mode status 'A TEST transaction will be submitted' missing");
     $this->_fillParticipantDetails($firstName, $lastName2, $processorId);
     $this->click('_qf_Participant_upload_new-bottom');
