@@ -92,7 +92,7 @@
 {crmRegion name="contribution-confirm-recur-membership"}
                     <br />
                     <strong>{ts 1=$frequency_interval 2=$frequency_unit}I want this membership to be renewed automatically every %1 %2(s).{/ts}</strong></p>
-                    <div class="description crm-auto-renew-cancel-info">({ts}Your initial membership fee will be processed once you complete the confirmation step. You will be able to cancel the auto-renwal option by visiting the web page link that will be included in your receipt.{/ts})</div>
+                    <div class="description crm-auto-renew-cancel-info">({ts}Your initial membership fee will be processed once you complete the confirmation step. You will be able to cancel the auto-renewal option by visiting the web page link that will be included in your receipt.{/ts})</div>
 {/crmRegion}
                 {else}
 {crmRegion name="contribution-confirm-recur"}
