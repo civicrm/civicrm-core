@@ -96,9 +96,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->type("description", "This is a test campaign");
 
     // include groups for the campaign
-    $this->addSelection("includeGroups-f", "label=$groupName");
-    $this->click("//option[@value=4]");
-    $this->click("add");
+    $this->multiselect2("includeGroups", array("$groupName", "Advisory Board"));
 
     // fill the end date for campaign
     $this->webtestFillDate("end_date", "+1 year");
@@ -112,8 +110,8 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
     $this->waitForText('crm-notification-container', "Campaign $title");
 
-    $this->waitForElementPresent("xpath=//div[@id='campaignList']/div[@id='campaigns_wrapper']/table[@id='campaigns']/tbody//tr/td[text()='$campaignTitle']");
-    $url = explode('id=', $this->getAttribute("xpath=//div[@id='campaignList']/div[@id='campaigns_wrapper']/table[@id='campaigns']/tbody//tr/td[text()='$campaignTitle']/../td[13]/span/a[text()='Edit']@href"));
+    $this->waitForElementPresent("xpath=//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[text()='$campaignTitle']");
+    $url = explode('id=', $this->getAttribute("xpath=//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[text()='$campaignTitle']/../td[13]/span/a[text()='Edit']@href"));
     $campaignId = $url[1];
 
     $this->offlineContributionTest($campaignTitle, $campaignId);
@@ -254,9 +252,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->type("description", "This is a test for past campaign");
 
     // include groups for the campaign
-    $this->addSelection("includeGroups-f", "label=$groupName");
-    $this->click("//option[@value=4]");
-    $this->click("add");
+    $this->multiselect2("includeGroups", array("$groupName", "Advisory Board"));
 
     // fill the start date for campaign
     $this->webtestFillDate("start_date", "1 January 2011");
@@ -278,8 +274,8 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->type("campaign_title", $pastCampaignTitle);
     $this->click("xpath=//div[@class='crm-accordion-body']/table/tbody/tr[4]/td/a[text()='Search']");
 
-    $this->waitForElementPresent("xpath=//div[@id='campaignList']/div[@id='campaigns_wrapper']/table[@id='campaigns']/tbody//tr/td[text()='$pastCampaignTitle']");
-    $url = explode('id=', $this->getAttribute("xpath=//div[@id='campaignList']/div[@id='campaigns_wrapper']/table[@id='campaigns']/tbody//tr/td[text()='$pastCampaignTitle']/../td[13]/span/a[text()='Edit']@href"));
+    $this->waitForElementPresent("xpath=//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[text()='$pastCampaignTitle']");
+    $url = explode('id=', $this->getAttribute("xpath=//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[text()='$pastCampaignTitle']/../td[13]/span/a[text()='Edit']@href"));
     $campaignId = $url[1];
 
     $this->offlineContributionTest($pastCampaignTitle, $campaignId, TRUE);
