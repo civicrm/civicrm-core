@@ -1185,7 +1185,7 @@ SELECT is_primary,
             $props['country_id'] = $config->defaultContactCountry;
           }
         }
-        if (!empty($props['country_id'])) {
+        if (!empty($props['country_id']) && $context !== 'validate') {
           $params['condition'] = 'country_id IN (' . implode(',', (array) $props['country_id']) . ')';
         }
         break;
