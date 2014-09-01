@@ -7,8 +7,8 @@
   var crmMailing = angular.module('crmMailing', ['ngRoute', 'ui.utils','ngSanitize']);
   var chck = []; //to fill the group variable $scope.incGroup
   var chck2= []; // to get id and text in the required format
-  var mltokens = [];
-  var global = 0;
+  var mltokens = []; //we store list of the tokens in this
+  var global = 0; //use this to reload mailingList page once
 
 //-------------------------------------------------------------------------------------------------------
   crmMailing.config(['$routeProvider',
@@ -33,7 +33,7 @@
               return crmApi('Mailing', 'getsingle', {id: $route.current.params.id});
             }
             else {
-              //created_id has been set to my id. Does not save without created_id. Needs to made generic based on the user
+              //selected mail in case of a new mailing. some default values are set
               return {visibility: "Public Pages", url_tracking:"1",dedupe_email:"1", forward_replies:"0", auto_responder:"0", open_tracking:"1"
               };
             }
@@ -49,7 +49,6 @@
   crmMailing.controller('mailingCtrl', function($scope, crmApi, selectedMail, $location,$route, $sce, $window) {
 
     //setting variables to the values we have got to the api
-    $scope.submitted = false;
     $scope.partialUrl = partialUrl;
     $scope.campaignList =  CRM.crmMailing.campNames;
     $scope.mailList = CRM.crmMailing.civiMails;
@@ -60,28 +59,37 @@
     $scope.tmpList = CRM.crmMailing.mesTemplate;
     $scope.mailingGrp = CRM.crmMailing.mailGrp;
     $scope.user_id = CRM.crmMailing.contactid;
+    mltokens = CRM.crmMailing.mailTokens;
+    //set currentMailing to selectedMail
     $scope.currentMailing = selectedMail;
     $scope.currentMailing.created_id = $scope.user_id;
-    mltokens = CRM.crmMailing.mailTokens;
+    //when pre is true, preview mailing is opened
     $scope.pre = false;
+    //counts number of recipients
     $scope.noOfRecipients = 0;
+    //object testMailing for testMailing.name and testMailing.group
     $scope.testMailing = {};
     $scope.testMailing.name = "";
     $scope.testMailing.group = "";
     window.ct = $scope.currentMailing;
+    //previewbody_html stores value of HTML in editor, similar functionality of text and subject based on name
     $scope.previewbody_html = "";
     $scope.previewbody_text = "";
     $scope.preview_subject = "";
-    $scope.param = {};
+    //object for tokens
     $scope.token = "";
+    //chck and chck2 are used for mailing groups
     chck = [];
     chck2 = [];
+    //from.name stores name of the sender, email stores the mail address of the sender, total stores the concatenation of the two
+    //reply.email stores the reply to email address
     $scope.from = {};
     $scope.from.name = "";
     $scope.from.email = "";
     $scope.from.total = "";
     $scope.reply ={};
     $scope.reply.email = "";
+    //replyaddress is the array used to save the set of fromemailAddress of the person
     $scope.replyaddress = [];
     for(var a in $scope.fromAddress){
       var b = {};
@@ -90,7 +98,7 @@
       b.email = splt;
       $scope.replyaddress.push(b);
     }
-
+    //from.total retrieves the from.name + from.email value so it can be read by the select2 widget
     if ($scope.currentMailing.from_name != null) {
       $scope.from.name = $scope.currentMailing.from_name;
       $scope.from.email = $scope.currentMailing.from_email;
@@ -99,7 +107,7 @@
     }
 
     $scope.mailid = [];
-
+    //putting all the ids of mails corresponding to the current mailing in mailid.
     for (var a in $scope.mailingGrp) {
       if ($scope.mailingGrp[a].mailing_id==$scope.currentMailing.id) {
         var b = $scope.mailingGrp[a].entity_id + " " + $scope.mailingGrp[a].entity_table +" " + $scope.mailingGrp[a].group_type;
@@ -109,13 +117,15 @@
       }
     }
 
+    //used to put the Template id in tst so it can be used
+
     if ($scope.currentMailing.msg_template_id!=null) {
       $scope.tst=$scope.currentMailing.msg_template_id;
     }
-    //Making the object for data
+    //Making the object for data in the mailing group related directive
 
     for (var a in chck) {
-      var b ={}
+      var b ={};
       b.id = chck[a];
       var splt = chck[a].split(" ");
 
@@ -136,34 +146,50 @@
       chck2.push(b);
     }
     $scope.incGroup = chck2;
+    //tabact is set to 0. stores value of active tab
     $scope.tabact = 0;
+    //all tabs with tab index greater than maxtab will be disabled. if not a new mail, no tab will be disabled
+    //otherwise all except first tab disabled
     if($scope.currentMailing.id != null)
       $scope.maxtab = 3;
     $scope.maxtab = 0;
 
+    //increments active tab value and maxtab when next is clicked
     $scope.tabupdate = function(){
       $scope.tabact = $scope.tabact + 1;
       $scope.maxtab = Math.max($scope.maxtab,$scope.tabact);
     }
-
+    //decrements active tab value
     $scope.prevtabupdate = function(){
       $scope.tabact = $scope.tabact - 1;
     }
+    //set active tab to 0 when recipient is clicked
+    $scope.recclicked = function(){
+      $scope.tabact = 0;
 
-    $scope.mailingForm = function() {
-      if ($scope.mailing_form.$valid) {
-        // Submit as normal
-      }
-      else {
-        $scope.mailing_form.submitted = true;
-      }
     };
-
+    //set active tab to 1 when content is clicked
+    //also call appropriate save function if clicked from recipient tab
+    $scope.conclicked = function(){
+      if($scope.tabact == 0)
+        $scope.save_next_page1();
+      $scope.tabact = 1;
+    };
+    //set active tab to 2 when schedule and send is clicked
+    //also call appropriate save functions if clicked from recipient or content tab
+    $scope.schedclicked = function(){
+      if($scope.tabact == 0)
+        $scope.save_next_page1();
+      else if($scope.tabact == 1)
+        $scope.save_next_page2();
+      $scope.tabact = 2;
+    };
+    //goes to the mailing list page
     $scope.back = function (){
       $window.location.href = "#/mailing" ;
       $route.reload();
     };
-
+    //on changing the selected template, updates subject and body_html of currentMailing
     $scope.tmp = function (tst){
       $scope.currentMailing.msg_template_id=tst;
       if($scope.currentMailing.msg_template_id == null){
@@ -204,33 +230,11 @@
       }
     }
 
-
-    $scope.recclicked = function(){
-        $scope.tabact = 0;
-
-    };
-
-    $scope.conclicked = function(){
-      if($scope.tabact == 0)
-        $scope.save_next_page1();
-      $scope.tabact = 1;
-    };
-
-
-    $scope.schedclicked = function(){
-      if($scope.tabact == 0)
-        $scope.save_next_page1();
-      else if($scope.tabact == 1)
-        $scope.save_next_page2();
-      $scope.tabact = 2;
-    };
-
-    //to split the value of selectedMail.scheduled_date into the date and time separately
+    //joining scheddate.date and scheddate.time gives us scheduled date of current mailing
     $scope.scheddate={};
     $scope.scheddate.date = "";
     $scope.scheddate.time = "";
-    $scope.ans="";
-
+    //checkNow decides whether we see the date picker or not. Depends on send immediately being on or off
     $scope.checkNow = function(){
       if($scope.now == 1 ){
         $scope.now = 0;
@@ -242,8 +246,7 @@
         $scope.scheddate.date = "";
         $scope.scheddate.time = "";
       }
-    }
-
+    };
     //changing the screen from compose on screen to upload content
     $scope.upldChange= function(composeS){
       if(composeS=="1"){
@@ -276,16 +279,15 @@
       else
         return false;
     }
-
+    //we should only see groups with appropriate mailing visibility
     $scope.isGrp= function(grp){
       return grp.visibility == "Public Pages";
     };
-
+    //only completed mails are shown in the groupings
     $scope.isCompMail= function(ml){
       return ml.is_completed == 1;
     };
-
-
+    //This is used to open the update the values in preview mailing
     $scope.preview_update = function(){
       var resulta =crmApi('Mailing','preview',{id:$scope.currentMailing.id});
       resulta.success(function(data) {
@@ -299,14 +301,14 @@
         }
       });
     };
-
+    //checks if body_text is empty or not
     $scope.isBody_text = function(){
       if($scope.currentMailing.body_text == null || $scope.currentMailing.body_text == "" )
         return false;
       else
         return true;
     };
-
+    //parses html
     $scope.deliberatelyTrustDangerousSnippet = function() {
       return $sce.trustAsHtml($scope.previewbody_html);
     };
@@ -318,7 +320,7 @@
     $scope.deliberatelyTrustDangerousSnippet3 = function() {
       return $sce.trustAsHtml($scope.preview_subject);
     };
-
+    //gets number of mailing recipients
     $scope.mailing_recipients= function() {
       var resulta =crmApi('MailingRecipients', 'get', {mailing_id: $scope.currentMailing.id,  options: {limit:1000}});
       resulta.success(function(data) {
@@ -329,7 +331,7 @@
         }
       });
     }
-
+    //gets mailing groups associated with current mailing id. formats it in the required way
     $scope.mailingGroup = function() {
       var resulta =crmApi('MailingGroup', 'get', {mailing_id: $scope.currentMailing.id,  options: {limit:1000}})
       resulta.success(function(data) {
@@ -367,7 +369,7 @@
         $scope.mailing_recipients();
       });
     }
-
+    //save repeat is a function that is repeated in all versions of save
     $scope.save_repeat = function(){
       if ($scope.from.total != "") {
         var splt = $scope.from.total.split(" ");
@@ -377,9 +379,10 @@
         $scope.currentMailing.from_name = spltb;
       }
     }
-
+    //save_next is used in recipient page. stores mailing groups
     $scope.save_next = function() {
       $scope.save_repeat();
+      //splits the groups based on include exclude mailing and groups
       $scope.incGrp=[];
       $scope.excGrp=[];
       $scope.incMail=[];
@@ -401,7 +404,7 @@
           $scope.excGrp.push($scope.answer[0]);
         }
       }
-
+      //deletes existing mailing groups of that id
       if ($scope.mailid != null) {
         for (var a in $scope.mailid) {
           var result_2= crmApi('MailingGroup', 'delete', {
@@ -449,7 +452,7 @@
         }
       });
     };
-
+    //in second page save neither groups or schedule date information.
     $scope.save_next_page2 = function() {
       $scope.save_repeat();
       var result = crmApi('Mailing', 'create', {
@@ -484,7 +487,7 @@
         }
       });
     };
-
+    //save scheduling information and not groups
     $scope.save_next_page3 = function() {
       $scope.save_repeat();
       if ($scope.currentMailing.scheduled_date == $scope.currentMailing.approval_date
@@ -537,17 +540,17 @@
       });
     };
 
-
+    //call save of page2 and go to listing page
     $scope.save = function() {
       $scope.save_next_page2();
       $scope.back();
     };
-
+    //call save of page1 and go to listing page
     $scope.save_page1 = function() {
       $scope.save_next_page1();
       $scope.back();
     };
-
+    //if we save on page one, subject isnt defined. so we equate it to mailing name for now so we can save
     $scope.save_next_page1 = function() {
       if($scope.currentMailing.id == null){
         $scope.currentMailing.subject = $scope.currentMailing.name;
@@ -558,7 +561,8 @@
       }
 
     };
-
+    //set approval date to current time, also schedule date based on send immediately or not. then call 3rd page save
+    //go back to listing page
     $scope.submitButton= function(){
       $scope.currentMailing.approval_status_id = "1";
       $scope.currentMailing.approver_id = $scope.user_id;
@@ -584,7 +588,7 @@
       $scope.save_next_page3();
       $scope.back();
     };
-
+    //we use this to open the preview modal based on value of pre
     $scope.$watch('pre',function(){
       if($scope.pre==true){
         $('#prevmail').dialog({
@@ -600,7 +604,7 @@
         });
       }
     },true);
-
+    //send test api called to send the test
     $scope.sendTest = function(){
       var resulta =crmApi('Mailing','send_test',{test_email:$scope.testMailing.name, test_group:$scope.testMailing.group,
         mailing_id:$scope.currentMailing.id});
@@ -706,7 +710,7 @@
       }
     };
   });
-
+  //used for tokens select2 widget
   crmMailing.directive('groupselect',function(){
     return {
       restrict : 'AE',
@@ -751,7 +755,7 @@
     };
   });
 
-
+  //ckeditor directive
   crmMailing.directive('ckedit', function() {
     return {
       require: '?ngModel',
@@ -789,7 +793,7 @@
       }
     };
   });
-
+  //used for file upload
   crmMailing.directive('file', function(){
     return {
       scope: {
@@ -805,8 +809,7 @@
       }
     };
   });
-
-
+  //used to insert the time entry
   crmMailing.directive('checktimeentry',function(){
     return {
       restrict :'AE',
