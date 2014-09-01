@@ -21,7 +21,7 @@
       mode = CRM.config && CRM.config.isFrontend ? 'front' : 'back';
     }
     query = query || '';
-    var frag = path.split ('?');
+    var frag = path.split('?');
     var url = tplURL[mode].replace("*path*", frag[0]);
 
     if (!query) {
