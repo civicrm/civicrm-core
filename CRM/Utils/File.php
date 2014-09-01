@@ -716,7 +716,7 @@ HTACCESS;
     // FIXME: Use self::baseFilePath once url issue has been resolved
     // Windows PHP accepts any mix of "/" or "\"; simpler if we only deal with one of those
     $imageUploadDir = str_replace('\\', '/', $config->imageUploadDir);
-    $path = self::addTrailingSlash(str_replace('/persist/contribute', '', $imageUploadDir)) . 'dynamic';
+    $path = self::addTrailingSlash(str_replace('/persist/contribute', '', $imageUploadDir), '/') . 'dynamic';
     if ($fileName !== NULL) {
       $path .= "/$fileName";
     }
