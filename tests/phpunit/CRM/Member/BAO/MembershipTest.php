@@ -549,8 +549,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'membership_id',
       'Database checked on membershiplog record.'
     );
-    $this->assertEquals($MembershipRenew->membership_type_id, $this->_membershipTypeID, 'Verify membership type is changed during renewal.');
-    $this->assertEquals($MembershipRenew->end_date, $endDate, 'Verify correct end date is calculated after membership renewal');
+    $this->assertEquals($this->_membershipTypeID, $MembershipRenew->membership_type_id, 'Verify membership type is changed during renewal.');
+    $this->assertEquals($endDate, $MembershipRenew->end_date, 'Verify correct end date is calculated after membership renewal');
 
     $this->membershipDelete($membershipId);
     Contact::delete($contactId);
