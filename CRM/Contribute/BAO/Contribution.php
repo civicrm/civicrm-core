@@ -2718,9 +2718,15 @@ WHERE  contribution_id = %1 ";
         $params['trxnParams']['net_amount'] = $params['prevContribution']->net_amount;
         $params['trxnParams']['trxn_id'] = $params['prevContribution']->trxn_id;
         $params['trxnParams']['status_id'] = $params['prevContribution']->contribution_status_id;
-        $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
-        $params['trxnParams']['check_number'] = $params['prevContribution']->check_number;
 
+
+        if (!(($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses)
+          || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatuses))
+          && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatuses))) {
+          $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
+          $params['trxnParams']['check_number'] = $params['prevContribution']->check_number;
+        }
+                
         //if financial type is changed
         if (!empty($params['financial_type_id']) &&
           $params['contribution']->financial_type_id != $params['prevContribution']->financial_type_id) {
