@@ -14,3 +14,14 @@ INSERT INTO civicrm_navigation
 ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
 ( {$domainID}, 'civicrm/admin/options/grant_status?reset=1', '{ts escape="sql" skip="true"}Grant Status{/ts}', 'Grant Status', 'access CiviGrant,administer CiviCRM', 'AND', @parent_id, '1', NULL, 2 );
+
+-- CRM-14853
+UPDATE civicrm_financial_trxn cft
+INNER JOIN ( SELECT max(cft.id) trxn_id, ceft.entity_id contribution_id
+FROM civicrm_financial_trxn cft
+LEFT JOIN civicrm_entity_financial_trxn ceft ON ceft.financial_trxn_id = cft.id
+WHERE ceft.entity_table = 'civicrm_contribution'
+GROUP BY ceft.entity_id ) as temp ON temp.trxn_id = cft.id
+INNER JOIN civicrm_contribution cc ON cc.id = temp.contribution_id
+AND cc.payment_instrument_id <> cft.payment_instrument_id
+SET cft.payment_instrument_id = cc.payment_instrument_id;
