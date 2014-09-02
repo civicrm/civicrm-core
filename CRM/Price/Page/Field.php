@@ -170,7 +170,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
 
       // need to translate html types from the db
       $htmlTypes = CRM_Price_BAO_PriceField::htmlTypes();
-      $priceField[$priceFieldBAO->id]['html_type'] = $htmlTypes[$priceField[$priceFieldBAO->id]['html_type']];
+      $priceField[$priceFieldBAO->id]['html_type_display'] = $htmlTypes[$priceField[$priceFieldBAO->id]['html_type']];
       $priceField[$priceFieldBAO->id]['order'] = $priceField[$priceFieldBAO->id]['weight'];
       $priceField[$priceFieldBAO->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
         array(
