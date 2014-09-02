@@ -128,33 +128,35 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->select('extends[0]', "value=Address");
     $this->click("//option[@value='Address']");
     $this->click('_qf_Group_next-bottom');
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
+    $this->waitForElementPresent('newCustomField');
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
     $gid = $this->urlArg('gid');
+    $this->click('newCustomField');
+    $this->waitForElementPresent('_qf_Field_cancel-bottom');
 
     // create custom field "alphanumeric text"
     $customField = 'Custom field ' . substr(sha1(rand()), 0, 4);
     $this->type('label', $customField);
 
     // clicking save
-    $this->click('_qf_Field_next-bottom');
-    $this->waitForElementPresent('newCustomField');
+    $this->click('_qf_Field_done-bottom');
 
     $this->waitForText('crm-notification-container',"Custom field '{$customField}' has been saved.");
+    $this->waitForElementPresent("xpath=//span[text()='$customField']");
     $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField']/../../td[8]/span/a@href"));
     $customFieldId = $customFieldId[1];
 
     // create custom field - Integer
     $this->click("newCustomField");
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField1 = 'Customfield_int ' . substr(sha1(rand()), 0, 4);
     $this->type('label', $customField1);
     $this->select("data_type[0]","value=1");
 
     // clicking save
-    $this->click('_qf_Field_next-bottom');
+    $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Custom field '{$customField1}' has been saved.");
     $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField1']");
@@ -163,13 +165,13 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
 
     // create custom field - Number
     $this->click("newCustomField");
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField2 = 'Customfield_Number ' . substr(sha1(rand()), 0, 4);
     $this->type('label', $customField2);
     $this->select("data_type[0]","value=2");
 
     // clicking save
-    $this->click('_qf_Field_next-bottom');
+    $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Custom field '{$customField2}' has been saved.");
     $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField2']");
@@ -178,49 +180,49 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
 
     // create custom field - "alphanumeric select"
     $this->click("newCustomField");
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField3 = 'Customfield_alp_select' . substr(sha1(rand()), 0, 4);
     $customFieldId3 = $this->_createMultipleValueCustomField($customField3,'Select');
 
     // create custom field - "alphanumeric radio"
     $this->click("newCustomField");
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField4 = 'Customfield_alp_radio' . substr(sha1(rand()), 0, 4);
     $customFieldId4 = $this->_createMultipleValueCustomField($customField4,'Radio');
 
     // create custom field - "alphanumeric checkbox"
     $this->click("newCustomField");
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField5 = 'Customfield_alp_checkbox' . substr(sha1(rand()), 0, 4);
     $customFieldId5 = $this->_createMultipleValueCustomField($customField5,'CheckBox');
 
     // create custom field - "alphanumeric multiselect"
     $this->click("newCustomField");
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField6 = 'Customfield_alp_multiselect' . substr(sha1(rand()), 0, 4);
     $customFieldId6 = $this->_createMultipleValueCustomField($customField6,'Multi-Select');
 
      // create custom field - "alphanumeric advmultiselect"
     $this->click("newCustomField");
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField7 = 'Customfield_alp_advmultiselect' . substr(sha1(rand()), 0, 4);
     $customFieldId7 = $this->_createMultipleValueCustomField($customField7,'AdvMulti-Select');
 
     // create custom field - "alphanumeric autocompleteselect"
     $this->click("newCustomField");
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField8 = 'Customfield_alp_autocompleteselect' . substr(sha1(rand()), 0, 4);
     $customFieldId8 = $this->_createMultipleValueCustomField($customField8,'Autocomplete-Select');
 
     // create custom field - Money
     $this->click("newCustomField");
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField9 = 'Customfield_Money' . substr(sha1(rand()), 0, 4);
     $this->type('label', $customField9);
     $this->select("data_type[0]","value=3");
 
     // clicking save
-    $this->click('_qf_Field_next-bottom');
+    $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Custom field '{$customField9}' has been saved.");
     $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField9']");
@@ -229,14 +231,14 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
 
     // create custom field - Date
     $this->click("newCustomField");
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField10 = 'Customfield_Date' . substr(sha1(rand()), 0, 4);
     $this->type('label', $customField10);
     $this->select("data_type[0]","value=5");
     $this->select("date_format","value=yy-mm-dd");
 
     // clicking save
-    $this->click('_qf_Field_next-bottom');
+    $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Custom field '{$customField10}' has been saved.");
     $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField10']");
@@ -303,7 +305,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->type("option_value_2","label2");
 
     // clicking save
-    $this->click('_qf_Field_next-bottom');
+    $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Custom field '{$customFieldName}' has been saved.");
     $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customFieldName']");

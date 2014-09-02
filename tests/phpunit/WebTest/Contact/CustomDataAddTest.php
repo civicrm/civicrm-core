@@ -50,10 +50,12 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->select("extends[0]", "value=Contact");
     $this->click("//option[@value='Contact']");
     $this->click("_qf_Group_next-bottom");
-    $this->waitForElementPresent("_qf_Field_cancel-bottom");
+    $this->waitForElementPresent('newCustomField');
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
+    $this->click('newCustomField');
+    $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //add custom field - alphanumeric checkbox
     $checkboxFieldLabel = 'custom_field' . substr(sha1(rand()), 0, 4);
@@ -86,14 +88,14 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("is_searchable");
 
     //clicking save
-    $this->click("_qf_Field_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("_qf_Field_done");
 
     //Is custom field created?
     $this->waitForText('crm-notification-container', "Custom field '$checkboxFieldLabel' has been saved.");
+    $this->waitForElementPresent('newCustomField');
 
     //create another custom field - Integer Radio
-    $this->clickLink("//a[@id='newCustomField']/span", '_qf_Field_cancel', FALSE);
+    $this->clickLink("newCustomField", '_qf_Field_cancel', FALSE);
     $this->click("data_type[0]");
     $this->select("data_type[0]", "value=1");
     $this->click("//option[@value='1']");
@@ -127,7 +129,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("is_searchable");
 
     //clicking save
-    $this->click("_qf_Field_next");
+    $this->click("_qf_Field_done");
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$radioFieldLabel' has been saved.");
@@ -172,10 +174,12 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->select("extends[0]", "value=Contact");
     $this->click("//option[@value='Contact']");
     $this->click("_qf_Group_next-bottom");
-    $this->waitForElementPresent("_qf_Field_cancel-bottom");
+    $this->waitForElementPresent('newCustomField');
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
+    $this->click('newCustomField');
+    $this->waitForElementPresent("_qf_Field_cancel-bottom");
 
     //add custom field - money text
     $moneyTextFieldLabel = 'money' . substr(sha1(rand()), 0, 4);
@@ -198,8 +202,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("is_searchable");
 
     //clicking save
-    $this->click("_qf_Field_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("_qf_Field_done");
 
     //Is custom field created?
     $this->waitForText('crm-notification-container', "Custom field '$moneyTextFieldLabel' has been saved.");
@@ -257,15 +260,16 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->select("id=extends_0", "label=Individual");
     $this->click("id=collapse_display");
     $this->click("id=_qf_Group_next-bottom");
-    $this->waitForElementPresent('_qf_Field_next-bottom');
+    $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Your custom field set '$customFieldSet' has been added.");
+    $this->click('newCustomField');
+    $this->waitForElementPresent('_qf_Field_done-bottom');
 
     // Add field to fieldset
     $customField = 'CustomField' . rand();
     $this->type("id=label", $customField);
     $this->select("id=data_type_0", "value=0");
-    $this->click("id=_qf_Field_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("id=_qf_Field_done-bottom");
     $this->waitForText('crm-notification-container', "Custom field '$customField' has been saved.");
 
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
