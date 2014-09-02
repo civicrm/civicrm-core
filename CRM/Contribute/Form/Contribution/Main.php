@@ -842,13 +842,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               $priceFieldIDS[] = $fields['price_' . $priceId];
             }
 
-            if (CRM_Utils_Array::value('options', $value)  && (
-                ($fields['price_' . $priceId] == $val['id']) ||
-                (isset($fields['price_' . $priceId]) && !empty($fields['price_' . $priceId][$val['id']]))
-              )
-            ) {
+            if (CRM_Utils_Array::value('options', $value)) {
               foreach ($value['options'] as $val) {
-                if (CRM_Utils_Array::value('membership_type_id', $val)) {
+                if (CRM_Utils_Array::value('membership_type_id', $val)  && (
+                    ($fields['price_' . $priceId] == $val['id']) ||
+                    (isset($fields['price_' . $priceId]) && !empty($fields['price_' . $priceId][$val['id']]))
+                  )
+                ) {
                   $priceFieldMemTypes[] = $val['membership_type_id'];
                 }
               }
