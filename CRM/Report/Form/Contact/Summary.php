@@ -65,6 +65,9 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
           'first_name' => array(
             'title' => ts('First Name'),
           ),
+          'middle_name' => array(
+            'title' => ts('Middle Name'),
+          ),
           'last_name' => array(
             'title' => ts('Last Name'),
           ),
@@ -81,9 +84,16 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
           array(
             'title' => ts('Contact SubType'),
           ),
+          'gender_id' =>
+          array('title' => ts('Gender'),
+          ),
           'birth_date' =>
           array(
             'title' => ts('Birth Date'),
+          ),
+          'age' => array(
+            'title'   => ts('Age'),
+            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
           ),
         ),
         'filters' =>
@@ -98,6 +108,11 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
           array('title' => ts('Contact ID'),
             'no_display' => TRUE,
           ),
+          'gender_id' =>
+          array('title' => ts('Gender'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+          ),
           'birth_date' =>
           array(
             'title' => ts('Birth Date'),
@@ -110,6 +125,16 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
           'sort_name' =>
           array(
             'title' => ts('Last Name, First Name'), 'default' => '1', 'default_weight' => '0', 'default_order' => 'ASC',
+          ),
+          'gender_id' =>
+          array(
+            'name' => 'gender_id',
+            'title' => ts('Gender'),
+          ),
+          'birth_date' =>
+          array(
+            'name' => 'birth_date',
+            'title' => ts('Birth Date'),
           ),
         ),
       ),
@@ -246,9 +271,24 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
   /**
    * @param $rows
    */
+  private function _initBasicRow(&$rows, &$entryFound, $row, $rowId, $rowNum, $types){
+    if (!array_key_exists($rowId, $row)) {
+      return FALSE;
+    }
+
+    $value = $row[$rowId];
+    if ($value) {
+      $rows[$rowNum][$rowId] = $types[$value];
+    }
+    $entryFound = TRUE;
+  }
+
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
+
+    $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id', array('localize' => TRUE));
+
     foreach ($rows as $rowNum => $row) {
       // make count columns point to detail report
       // convert sort name to links
@@ -271,6 +311,17 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
+      // handle gender id
+      $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_contact_gender_id', $rowNum, $genders);
+
+      // display birthday in the configured custom format
+      if (array_key_exists('civicrm_contact_birth_date', $row)) {
+        $birthDate = $row['civicrm_contact_birth_date'];
+        if ($birthDate) {
+          $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
+        }
+        $entryFound = TRUE;
+      }
 
       // skip looking further in rows, if first row itself doesn't
       // have the column we need
