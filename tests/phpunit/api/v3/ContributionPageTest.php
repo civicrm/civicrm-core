@@ -189,6 +189,35 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test submit with a membership block in place
+   */
+  public function testSubmitMembershipBlockTwoTypesIsSeparatePayment() {
+    $this->_ids['membership_type'] = array($this->membershipTypeCreate(array('minimum_fee' => 6)));
+    $this->_ids['membership_type'][] = $this->membershipTypeCreate(array('name' => 'Student', 'minimum_fee' => 50));
+    $this->setUpMembershipContributionPage(TRUE);
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => $this->_ids['price_field_value'][1],
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'selectMembership' => $this->_ids['membership_type'][1],
+    );
+
+    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
+    $contributions = $this->callAPISuccess('contribution', 'get', array('contribution_page_id' => $this->_ids['contribution_page'],));
+    $this->assertCount(2, $contributions['values']);
+    $ids = array_keys($contributions['values']);
+    $this->assertEquals('10.00', $contributions['values'][$ids[0]]['total_amount']);
+    $this->assertEquals('50.00', $contributions['values'][$ids[1]]['total_amount']);
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
+    $this->assertArrayHasKey($membershipPayment['contribution_id'], $contributions['values']);
+    $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
+    $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
+  }
+
+  /**
    * set up membership contribution page
    * @param bool $isSeparatePayment
    */
