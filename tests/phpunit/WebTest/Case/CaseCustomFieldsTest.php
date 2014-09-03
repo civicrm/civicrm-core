@@ -280,7 +280,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
       $this->type("label", $field3);
       $this->check("is_searchable");
-      $this->click("_qf_Field_next-bottom");
+      $this->click("_qf_Field_done-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
 
       // get id of custom fields
@@ -440,9 +440,9 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
     $cusId_1 = 'custom_' . $customId[0] . '_1';
     $cusId_2 = 'custom_' . $customId[1] . '_1';
-    $this->clickLink("css=#{$customGrp1} a.button");
+    $this->clickLink("css=#{$customGrp1} a.button", '_qf_CustomData_cancel-bottom', FALSE);
 
-    $this->assertElementContainsText("page-title", "Edit $customGrp1");
+    $this->assertElementContainsText("xpath=//span[@class='ui-dialog-title']", "Edit $customGrp1");
 
     $custFname = "Miky" . substr(sha1(rand()), 0, 7);
     $custLname = "Kristy" . substr(sha1(rand()), 0, 7);
