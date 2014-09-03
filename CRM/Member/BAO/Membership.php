@@ -316,23 +316,31 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         'membership_id'
       );
     }
-
+    
+    $params['skipLineItem'] = TRUE;
+    
     //record contribution for this membership
     if (!empty($params['contribution_status_id']) && empty($params['relate_contribution_id'])) {
       $memInfo = array_merge($params, array('membership_id' => $membership->id));
       $params['contribution'] = self::recordMembershipContribution($memInfo, $ids);
     }
+    
+    if (!empty($params['lineItems'])) {
+      $params['line_item'] = $params['lineItems'];
+    }
+
+    //do cleanup line  items if membership edit the Membership type.
+    if (empty($ids['contribution']) && !empty($ids['membership'])) {
+      CRM_Price_BAO_LineItem::deleteLineItems($ids['membership'], 'civicrm_membership');
+    }
+    
+    if (!empty($params['line_item']) && empty($ids['contribution'])) {
+      CRM_Price_BAO_LineItem::processPriceSet($membership->id, $params['line_item'], CRM_Utils_Array::value('contribution', $params));
+    }
 
     //insert payment record for this membership
     if (!empty($params['relate_contribution_id'])) {
-      $mpDAO = new CRM_Member_DAO_MembershipPayment();
-      $mpDAO->membership_id = $membership->id;
-      $mpDAO->contribution_id = $params['relate_contribution_id'];
-      if (!($mpDAO->find(TRUE))) {
-        CRM_Utils_Hook::pre('create', 'MembershipPayment', NULL, $mpDAO);
-        $mpDAO->save();
-        CRM_Utils_Hook::post('create', 'MembershipPayment', $mpDAO->id, $mpDAO);
-      }
+      CRM_Member_BAO_MembershipPayment::create(array('membership_id' => $membership->id, 'contribution_id' => $params['relate_contribution_id']));
     }
 
     // add activity record only during create mode and renew mode
@@ -1267,7 +1275,7 @@ AND civicrm_membership.is_test = %2";
     $result      = $membershipContribution = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = array();
-
+        
     if ($isPaidMembership) {
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
         $premiumParams, $contactID,
@@ -2804,7 +2812,7 @@ WHERE      civicrm_membership.is_test = 0";
       'contact_id', 'total_amount', 'receive_date', 'financial_type_id',
       'payment_instrument_id', 'trxn_id', 'invoice_id', 'is_test',
       'contribution_status_id', 'check_number', 'campaign_id', 'is_pay_later',
-      'membership_id',
+      'membership_id', 'skipLineItem'
     );
     foreach ($recordContribution as $f) {
       $contributionParams[$f] = CRM_Utils_Array::value($f, $params);
@@ -2842,16 +2850,7 @@ WHERE      civicrm_membership.is_test = 0";
 
     //insert payment record for this membership
     if (empty($ids['contribution']) || !empty($params['is_recur'])) {
-      $mpDAO = new CRM_Member_DAO_MembershipPayment();
-      $mpDAO->membership_id = $membershipId;
-      $mpDAO->contribution_id = $contribution->id;
-      if (!empty($params['is_recur'])) {
-        $mpDAO->find();
-      }
-
-      CRM_Utils_Hook::pre('create', 'MembershipPayment', NULL, $mpDAO);
-      $mpDAO->save();
-      CRM_Utils_Hook::post('create', 'MembershipPayment', $mpDAO->id, $mpDAO);
+      CRM_Member_BAO_MembershipPayment::create(array('membership_id' => $membershipId, 'contribution_id' => $contribution->id));
     }
     return $contribution;
   }

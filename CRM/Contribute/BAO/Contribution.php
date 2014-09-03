@@ -2583,7 +2583,7 @@ WHERE  contribution_id = %1 ";
    * @static
    */
   static function recordFinancialAccounts(&$params, $financialTrxnValues = NULL) {
-    $skipRecords = $update = $return = FALSE;
+    $skipRecords = $update = $return = $isRelatedId = FALSE;
 
     $additionalParticipantId = array();
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -2604,6 +2604,10 @@ WHERE  contribution_id = %1 ";
       $entityTable = 'civicrm_contribution';
     }
 
+    if (CRM_Utils_Array::value('contribution_mode', $params) == 'membership') {
+      $isRelatedId = TRUE;
+    }
+    
     $entityID[] = $entityId;
     if (!empty($additionalParticipantId)) {
       $entityID += $additionalParticipantId;
@@ -2654,7 +2658,7 @@ WHERE  contribution_id = %1 ";
 
     // build line item array if its not set in $params
     if (empty($params['line_item']) || $additionalParticipantId) {
-      CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable));
+      CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable), $isRelatedId);
     }
 
     if (CRM_Utils_Array::value('contribution_status_id', $params) != array_search('Failed', $contributionStatuses) &&
