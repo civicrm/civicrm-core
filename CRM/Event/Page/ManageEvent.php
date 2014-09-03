@@ -92,6 +92,11 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
           'title' => ts('Copy Event'),
         ),
+        'repeat' => array(
+          'title' => ts('Repeat Event'),
+          'url' => 'civicrm/event/manage/repeat',
+          'field' => 'is_pcp_enabled',
+        )
       );
     }
     return self::$_actionLinks;
@@ -311,6 +316,15 @@ ORDER BY start_date desc
     while ($dao->fetch()) {
       if (in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])) {
         $manageEvent[$dao->id] = array();
+        $isRepeatingEvent = CRM_Core_BAO_RecurringEntity::getParentFor($dao->id, 'civicrm_event');
+        $manageEvent[$dao->id]['repeat'] = '';
+        if($isRepeatingEvent){
+          if($dao->id == $isRepeatingEvent){
+            $manageEvent[$dao->id]['repeat'] = 'Repeating Event - (Parent)';
+          }else{
+            $manageEvent[$dao->id]['repeat'] = 'Repeating Event - (Child)';
+          }
+        }
         CRM_Core_DAO::storeValues($dao, $manageEvent[$dao->id]);
 
         // form all action links

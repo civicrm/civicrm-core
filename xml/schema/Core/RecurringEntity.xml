@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>RecurringEntity</class>
+  <name>civicrm_recurring_entity</name>
+  <add>1.7</add>
+  <log>true</log>
+  <field>
+      <name>id</name>
+      <title>ID</title>
+      <type>int unsigned</type>
+      <required>true</required>      
+      <add>1.7</add>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+      <name>parent_id</name>
+      <type>int unsigned</type>
+      <title>Parent ID</title>
+      <required>true</required>
+      <add>1.7</add>
+  </field>
+  <field>
+      <name>entity_id</name>
+      <type>int unsigned</type>
+      <title>Entity ID</title>
+      <add>1.7</add>
+  </field>
+  <field>
+      <name>entity_table</name>
+      <type>varchar</type>
+      <title>Entity Table</title>
+      <required>true</required>
+      <add>1.7</add>
+  </field>
+</table>

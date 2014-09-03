@@ -216,6 +216,14 @@
      <weight>950</weight>
   </item>
   <item>
+     <path>civicrm/event/manage/repeat</path>
+     <title>Repeat Event</title>
+     <page_callback>CRM_Event_Form_ManageEvent_Repeat</page_callback>
+     <access_arguments>access CiviEvent</access_arguments>
+     <is_ssl>true</is_ssl>
+     <weight>960</weight>
+  </item>
+  <item>
      <path>civicrm/event/manage/conference</path>
      <title>Conference Slots</title>
      <page_callback>CRM_Event_Form_ManageEvent_Conference</page_callback>
@@ -317,5 +325,15 @@
     <title>Change Registration Selections</title>
     <page_callback>CRM_Event_Form_ParticipantFeeSelection</page_callback>
     <access_arguments>access CiviEvent</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/ajax/recurringEntity/update_cascade_type</path>
+     <page_callback>CRM_Core_Page_Ajax_RecurringEntity::updateCascadeType</page_callback>
+     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/ajax/recurringEntity/generate_preview</path>
+     <page_callback>CRM_Core_Page_Ajax_RecurringEntity::generatePreview</page_callback>
+     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
   </item>
 </menu>

@@ -367,20 +367,19 @@ FROM civicrm_action_schedule cas
 LEFT JOIN civicrm_action_mapping cam ON (cam.id = cas.mapping_id)
 ";
     $params = CRM_Core_DAO::$_nullArray;
-
+    $where = " WHERE 1 ";
     if ($entityValue and $id) {
-      $where = "
-WHERE   cas.entity_value = $id AND
+      $where .= "
+AND   cas.entity_value = $id AND
         cam.entity_value = '$entityValue'";
-
-      $query .= $where;
 
       $params = array(
         1 => array($id, 'Integer'),
         2 => array($entityValue, 'String'),
       );
     }
-
+    $where .= " AND cas.used_for IS NULL";
+    $query .= $where;
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $list[$dao->id]['id'] = $dao->id;
