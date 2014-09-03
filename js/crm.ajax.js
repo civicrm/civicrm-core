@@ -245,8 +245,9 @@
       if (this._originalContent === null) {
         this._originalContent = this.element.contents().detach();
       }
-      this.options.block && $('.blockOverlay', this.element).length < 1 && this.element.block();
+      this.options.block && this.element.block();
       $.getJSON(url, function(data) {
+        that.options.block && that.element.unblock();
         if (!$.isPlainObject(data)) {
           that._onFailure(data);
           return;
