@@ -53,8 +53,8 @@
         conf.html(response.content);
         if (!response.illegal) {
           conf.dialog('option', 'buttons', [
-            {text: {/literal}'{ts escape="js"}Yes{/ts}'{literal}, click: save},
-            {text: {/literal}'{ts escape="js"}No{/ts}'{literal}, click: function() {$(this).dialog('close');}}
+            {text: {/literal}'{ts escape="js"}Yes{/ts}'{literal}, click: save, icons: {primary: 'ui-icon-check'}},
+            {text: {/literal}'{ts escape="js"}No{/ts}'{literal}, click: function() {$(this).dialog('close');}, icons: {primary: 'ui-icon-close'}}
           ]);
         }
       });
