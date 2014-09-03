@@ -1699,10 +1699,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public function processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems) {
     try {
-      $membershipTypeID = (array) $membershipParams['selectMembership'];
-
-      $membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this);
-
+      $membershipTypeIDs = (array) $membershipParams['selectMembership'];
+      $membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIDs);
       $membershipType = empty($membershipTypes) ? array() : reset($membershipTypes);
       $this->assign('membership_name', CRM_Utils_Array::value('name', $membershipType));
 
@@ -1724,7 +1722,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
 
       CRM_Member_BAO_Membership::postProcessMembership($membershipParams, $contactID,
-        $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipType,  $membershipTypeID, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction, $contributionTypeId,
+        $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipType,  $membershipTypeIDs, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction, $contributionTypeId,
         $membershipLineItems
       );
       $this->assign('membership_assign', TRUE);
