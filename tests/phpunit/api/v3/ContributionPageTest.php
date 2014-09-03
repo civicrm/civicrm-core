@@ -217,7 +217,34 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
   }
 
+  /**
+   * Test submit with a membership block in place
+   */
+  public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessor() {
+    $this->setUpMembershipContributionPage(TRUE);
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'selectMembership' => $this->_ids['membership_type'],
+      'payment_processor' => 1,
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040 ),
+      'cvv2' => 123,
+    );
 
+    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
+    $contributions = $this->callAPISuccess('contribution', 'get', array('contribution_page_id' => $this->_ids['contribution_page'], 'contribution_status_id' => 1));
+    $this->assertCount(2, $contributions['values']);
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
+    $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
+    $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
+    $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
+  }
   /**
    * set up membership contribution page
    * @param bool $isSeparatePayment
