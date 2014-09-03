@@ -137,7 +137,7 @@ class CRM_Core_Payment_Form {
   /**
    * create all fields needed for a credit card transaction
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    * @access public
@@ -185,6 +185,27 @@ class CRM_Core_Payment_Form {
       'attributes' => $creditCardType,
       'is_required' => FALSE,
     );
+  }
+
+  /**
+   * @param CRM_Core_Form $form
+   */
+  static function addCommonFields(&$form, $useRequired) {
+    foreach ($form->_paymentFields as $name => $field) {
+      if (!empty($field['cc_field'])) {
+        if ($field['htmlType'] == 'chainSelect') {
+          $form->addChainSelect($field['name'], array('required' => $useRequired && $field['is_required']));
+        }
+        else {
+          $form->add($field['htmlType'],
+            $field['name'],
+            $field['title'],
+            $field['attributes'],
+            $useRequired ? $field['is_required'] : FALSE
+          );
+        }
+      }
+    }
   }
 
   /**
@@ -249,21 +270,7 @@ class CRM_Core_Payment_Form {
   static function buildCreditCard(&$form, $useRequired = FALSE) {
     if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM) {
       self::setCreditCardFields($form);
-      foreach ($form->_paymentFields as $name => $field) {
-        if (!empty($field['cc_field'])) {
-          if ($field['htmlType'] == 'chainSelect') {
-            $form->addChainSelect($field['name'], array('required' => $useRequired && $field['is_required']));
-          }
-          else {
-            $form->add($field['htmlType'],
-              $field['name'],
-              $field['title'],
-              $field['attributes'],
-              $useRequired ? $field['is_required'] : FALSE
-            );
-          }
-        }
-      }
+      self::addCommonFields($form, $useRequired);
 
       $form->addRule('cvv2',
         ts('Please enter a valid value for your card security code. This is usually the last 3-4 digits on the card\'s signature panel.'),
@@ -317,18 +324,7 @@ class CRM_Core_Payment_Form {
   static function buildDirectDebit(&$form, $useRequired = FALSE) {
     if ($form->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM) {
       self::setDirectDebitFields($form);
-      foreach ($form->_paymentFields as $name => $field) {
-        if (isset($field['cc_field']) &&
-          $field['cc_field']
-        ) {
-          $form->add($field['htmlType'],
-            $field['name'],
-            $field['title'],
-            $field['attributes'],
-            $useRequired ? $field['is_required'] : FALSE
-          );
-        }
-      }
+      self::addCommonFields($form, $useRequired);
 
       $form->addRule('bank_identification_number',
         ts('Please enter a valid Bank Identification Number (value must not contain punctuation characters).'),
