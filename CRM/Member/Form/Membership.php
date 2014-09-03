@@ -271,6 +271,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $this->setPageTitle(ts('Membership'));
 
+
     parent::preProcess();
   }
 
@@ -1243,7 +1244,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
     $membershipType = implode(', ', $membershipTypes);
-
+    
     // Retrieve the name and email of the current user - this will be the FROM for the receipt email
     list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($ids['userId']);
 
@@ -1296,7 +1297,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $formValues['financial_type_id']
       );
     }
-
+    
     // process line items, until no previous line items.
     if (!empty($lineItem)) {
       $params['lineItems'] = $lineItem;
@@ -1523,7 +1524,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
         $membershipParams = array_merge($membershipTypeValues[$memType], $params);
         $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
-
+        $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
+        unset($params['lineItems']);
         $this->_membershipIDs[] = $membership->id;
         $createdMemberships[$memType] = $membership;
         $count++;
@@ -1622,8 +1624,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           if (!empty($softParams)) {
             $membershipParams['soft_credit'] = $softParams;
           }
-
+          
           $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
+          $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
+          unset($params['lineItems']);
 
           $this->_membershipIDs[] = $membership->id;
           $createdMemberships[$memType] = $membership;
@@ -1636,6 +1640,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       foreach ($lineItem[$priceSetId] as & $priceFieldOp) {
         if (!empty($priceFieldOp['membership_type_id'])) {
           $priceFieldOp['start_date'] = $membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'] ? CRM_Utils_Date::customFormat($membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'], '%d%f %b, %Y') : '-';
+
 
           $priceFieldOp['end_date'] = $membershipTypeValues[$priceFieldOp['membership_type_id']]['end_date'] ? CRM_Utils_Date::customFormat($membershipTypeValues[$priceFieldOp['membership_type_id']]['end_date'], '%d%f %b, %Y') : '-';
         }
