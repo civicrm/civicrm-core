@@ -116,6 +116,115 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
   }
 
   /**
+   * @param $rev
+   *
+   * @return bool
+   */
+  function upgrade_4_5_beta9($rev) {
+    $this->addTask(ts('Upgrade DB to 4.5.beta9: SQL'), 'task_4_5_x_runSql', $rev);
+    
+    list($minParticipantId, $maxParticipantId) = CRM_Core_DAO::executeQuery('SELECT coalesce(min(id),0), coalesce(max(id),0)
+      FROM civicrm_participant_payment')->getDatabaseResult()->fetchRow();
+    for ($startId = $minParticipantId; $startId <= $maxParticipantId; $startId += self::BATCH_SIZE) {
+      $endId = $startId + self::BATCH_SIZE - 1;
+      $title = ts('Upgrade DB to 4.5.beta9: Fix line items for Participant (%1 => %2)', array(1 => $startId, 2 => $endId));
+      $this->addTask($title, 'task_4_5_0_fixLineItem', $startId, $endId, 'participant');
+    }
+
+    list($minContributionId, $maxContributionId) = CRM_Core_DAO::executeQuery('SELECT coalesce(min(id),0), coalesce(max(id),0) 
+      FROM civicrm_contribution')->getDatabaseResult()->fetchRow();
+    for ($startId = $minContributionId; $startId <= $maxContributionId; $startId += self::BATCH_SIZE) {
+      $endId = $startId + self::BATCH_SIZE - 1;
+      $title = ts('Upgrade DB to 4.5.beta9: Fix line items for Contibution (%1 => %2)', array(1 => $startId, 2 => $endId));
+      $this->addTask($title, 'task_4_5_0_fixLineItem', $startId, $endId, 'contribution');
+    }
+    
+    list($maxMembershipId, $minMembershipId) = CRM_Core_DAO::executeQuery('SELECT coalesce(max(id),0), coalesce(min(id),0) 
+      FROM civicrm_membership')->getDatabaseResult()->fetchRow();
+    for ($startId = $minMembershipId; $startId <= $maxMembershipId; $startId += self::BATCH_SIZE) {
+      $endId = $startId + self::BATCH_SIZE - 1;
+      $title = ts('Upgrade DB to 4.5.beta9: Fix line items for Membership (%1 => %2)', array(1 => $startId, 2 => $endId));
+      $this->addTask($title, 'task_4_5_0_fixLineItem', $startId, $endId, 'membership');
+    }
+    
+    return TRUE;
+  }
+
+  /**
+   * (Queue Task Callback)
+   *
+   * Function to update the line items
+   * 
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param $startId int, the first/lowest entity ID to convert
+   * @param $endId int, the last/highest entity ID to convert
+   * @param 
+   *
+   * @return bool
+   */
+  static function task_4_5_0_fixLineItem(CRM_Queue_TaskContext $ctx, $startId, $endId, $entityTable) {
+    
+    $sqlParams = array(
+      1 => array($startId, 'Integer'),
+      2 => array($endId, 'Integer'),
+    );
+    switch ($entityTable) {
+      case 'contribution':  
+        // update all the line item entity_table and entity_id with contribution due to bug CRM-15055
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item cln
+          INNER JOIN civicrm_contribution cc ON cc.id = cln.contribution_id
+          SET entity_id = cln.contribution_id, entity_table = 'civicrm_contribution'
+          WHERE cln.contribution_id IS NOT NULL AND cln.entity_table <> 'civicrm_participant' AND (cc.id BETWEEN %1 AND %2)", $sqlParams);
+        
+        // update the civicrm_line_item.contribution_id
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item cln
+          INNER JOIN civicrm_contribution cc ON cc.id = cln.entity_id 
+          SET contribution_id = entity_id
+          WHERE cln.contribution_id IS NULL AND cln.entity_table = 'civicrm_contribution' AND (cc.id BETWEEN %1 AND %2)", $sqlParams); 
+        break;
+        
+      case 'participant':
+        // update the civicrm_line_item.contribution_id
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item li 
+          INNER JOIN civicrm_participant_payment pp ON pp.participant_id = li.entity_id
+          SET li.contribution_id = pp.contribution_id
+          WHERE li.entity_table = 'civicrm_participant' AND cli.contribution_id IS NULL AND (pp.id BETWEEN %1 AND %2)", $sqlParams);
+        break;
+        
+      case 'membership':
+        $upgrade = new CRM_Upgrade_Form();
+        // update the line item of  membership
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item li
+          INNER JOIN civicrm_membership_payment mp ON mp.contribution_id = li.contribution_id
+          INNER JOIN civicrm_membership cm ON mp.membership_id = cm.id
+          INNER JOIN civicrm_price_field_value pv ON pv.id = li.price_field_value_id
+          SET li.entity_table = 'civicrm_membership', li.entity_id = mp.membership_id
+          WHERE li.entity_table = 'civicrm_contribution'
+          AND pv.membership_type_id IS NOT NULL AND cm.membership_type_id = pv.membership_type_id AND (cm.id BETWEEN %1 AND %2)");
+        
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item li
+          INNER JOIN civicrm_membership_payment mp ON mp.contribution_id = li.contribution_id
+          INNER JOIN civicrm_price_field_value pv ON pv.id = li.price_field_value_id
+          SET li.entity_table = 'civicrm_membership', li.entity_id = mp.membership_id
+          WHERE li.entity_table = 'civicrm_contribution'
+          AND pv.membership_type_id IS NOT NULL AND (cmp.membership_id BETWEEN %1 AND %2)", $sqlParams);
+        
+        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_line_item (entity_table, entity_id, price_field_id, label, 
+          qty, unit_price, line_total, price_field_value_id, financial_type_id)
+          SELECT 'civicrm_membership', cm.id, cpf.id price_field_id, cpfv.label, 1 as qty, cpfv.amount, cpfv.amount line_total, 
+          cpfv.id price_field_value_id, cpfv.financial_type_id FROM civicrm_membership cm
+          LEFT JOIN civicrm_membership_payment cmp ON cmp.membership_id = cm.id
+          LEFT JOIN civicrm_price_field_value cpfv ON cpfv.membership_type_id = cm.membership_type_id
+          LEFT JOIN civicrm_price_field cpf ON cpf.id = cpfv.price_field_id
+          LEFT JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id
+          WHERE cmp.contribution_id IS NULL AND cps.name = 'default_membership_type_amount' AND (cm.id BETWEEN %1 AND %2)", $sqlParams);
+        break;
+    } 
+    return TRUE;
+  }
+
+  /**
    * Add defaults for the newly introduced name fields configuration in 'contact_edit_options' setting
    *
    * @param CRM_Queue_TaskContext $ctx
