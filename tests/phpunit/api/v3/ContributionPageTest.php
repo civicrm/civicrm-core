@@ -217,6 +217,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
   }
 
+
   /**
    * set up membership contribution page
    * @param bool $isSeparatePayment
