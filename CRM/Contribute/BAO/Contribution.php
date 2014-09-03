@@ -3402,7 +3402,7 @@ WHERE con.id = {$contributionId}
       // conditioned WHERE clause
       if ($isBalance) {
         // if balance trxn exists don't include details of it in transaction info
-        $sql .= " AND ft.id != {$baseTrxnId} ";
+        $sql .= " AND ft.id != {$baseTrxnId} AND ft.from_financial_account_id IS NULL";
       }
       $resultDAO = CRM_Core_DAO::executeQuery($sql);
 
