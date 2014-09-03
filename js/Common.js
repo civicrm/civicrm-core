@@ -796,6 +796,7 @@ CRM.strings = CRM.strings || {};
       $.each(settings.options, function(key, label) {
         settings.buttons.push({
           text: label,
+          icons: {primary: key === 'no' ? 'ui-icon-close' : 'ui-icon-check'},
           click: function() {
             var event = $.Event('crmConfirm:' + key);
             $(this).trigger(event);
