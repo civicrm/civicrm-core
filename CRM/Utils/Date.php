@@ -1070,6 +1070,7 @@ class CRM_Utils_Date {
             $difference = 2;
             $quarter    = ceil($now['mon'] / 3);
             $quarter    = $quarter - $difference;
+            $subtractYear = 0;  
             if ($quarter <= 0) {
               $subtractYear = 1;
               $quarter += 4;
@@ -1120,6 +1121,7 @@ class CRM_Utils_Date {
 
           case 'earlier':
             $quarter = ceil($now['mon'] / 3) - 1;
+            $subtractYear = 0;  
             if ($quarter <= 0) {
               $subtractYear = 1;
               $quarter += 4;
