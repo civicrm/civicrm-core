@@ -898,6 +898,25 @@ CRM.strings = CRM.strings || {};
     });
   }
 
+  var originalBlock = $.fn.block,
+    originalUnblock = $.fn.unblock;
+
+  $.fn.block = function(opts) {
+    if ($(this).is('.ui-dialog-content')) {
+      originalBlock.call($(this).parents('.ui-dialog'), opts);
+      return $(this);
+    }
+    return originalBlock.call(this, opts);
+  }
+
+  $.fn.unblock = function(opts) {
+    if ($(this).is('.ui-dialog-content')) {
+      originalUnblock.call($(this).parents('.ui-dialog'), opts);
+      return $(this);
+    }
+    return originalUnblock.call(this, opts);
+  }
+
   // Preprocess all cj ajax calls to display messages
   $(document).ajaxSuccess(function(event, xhr, settings) {
     try {
@@ -916,6 +935,7 @@ CRM.strings = CRM.strings || {};
 
   $(function () {
     $.blockUI.defaults.message = null;
+    $.blockUI.defaults.ignoreIfBlocked = true;
 
     if ($('#crm-container').hasClass('crm-public')) {
       $.fn.select2.defaults.dropdownCssClass = $.ui.dialog.prototype.options.dialogClass = 'crm-container crm-public';
