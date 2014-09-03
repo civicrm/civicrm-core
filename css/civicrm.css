@@ -4516,5 +4516,5 @@ span.crm-status-icon {
 
 /* block-ui */
 .crm-container .blockUI.blockOverlay {
-  background: url("../i/loading-overlay.gif") center center no-repeat black;
+  background: url("../i/loading-overlay.gif") center center no-repeat white !important;
 }
