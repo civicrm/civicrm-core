@@ -1327,8 +1327,8 @@ AND civicrm_membership.is_test = %2";
             isset($createdMemberships[$priceFieldOp['membership_type_id']])
           ) {
             $membershipOb = $createdMemberships[$priceFieldOp['membership_type_id']];
-            $priceFieldOp['start_date'] = $membershipOb->start_date ? CRM_Utils_Date::customFormat($membershipOb->start_date, '%d%f %b, %Y') : '-';
-            $priceFieldOp['end_date'] = $membershipOb->end_date ? CRM_Utils_Date::customFormat($membershipOb->end_date, '%d%f %b, %Y') : '-';
+            $priceFieldOp['start_date'] = $membershipOb->start_date ? CRM_Utils_Date::customFormat($membershipOb->start_date, '%B %E%f, %Y') : '-';
+            $priceFieldOp['end_date'] = $membershipOb->end_date ? CRM_Utils_Date::customFormat($membershipOb->end_date, '%B %E%f, %Y') : '-';
           }
           else {
             $priceFieldOp['start_date'] = $priceFieldOp['end_date'] = 'N/A';
