@@ -1750,6 +1750,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $this->_chainSelectFields[$settings['control_field']] = $elementName;
 
+    // Passing NULL instead of an array of options
+    // CRM-15225 - normally QF will reject any selected values that are not part of the field's options, but due to a
+    // quirk in our patched version of HTML_QuickForm_select, this doesn't happen if the options are NULL
+    // which seems a bit dirty but it allows our dynamically-popuplated select element to function as expected.
     return $this->add('select', $elementName, $settings['label'], NULL, $settings['required'], $props);
   }
 
