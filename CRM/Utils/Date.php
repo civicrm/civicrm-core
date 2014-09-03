@@ -1001,6 +1001,13 @@ class CRM_Utils_Date {
             unset($to);
             break;
 
+          case 'greater_previous':
+            $from['d'] = 31;
+            $from['M'] = 12;
+            $from['Y'] = $now['year'] - 1;
+            unset($to);
+            break;
+
           case 'ending':
             $to['d'] = $now['mday'];
             $to['M'] = $now['mon'];
@@ -1170,6 +1177,19 @@ class CRM_Utils_Date {
             $from['Y'] = $now['year'];
             unset($to);
             break;
+ 
+          case 'greater_previous':
+            $quarter = ceil($now['mon'] / 3) - 1;
+            $subtractYear    = 0;            
+            if ($quarter <= 0) {
+              $subtractYear = 1;
+              $quarter += 4;
+            }
+            $from['M'] = 3 * $quarter;
+            $from['Y'] = $from['Y'] = $now['year'] - $subtractYear;
+            $from['d'] = date('t', mktime(0, 0, 0, $from['M'], 1, $from['Y']));
+            unset($to);
+            break;
 
           case 'ending':
             $to['d'] = $now['mday'];
@@ -1275,6 +1295,21 @@ class CRM_Utils_Date {
             unset($to);
             break;
 
+          case 'greater_previous':
+            //from end of past month
+            if ($now['mon'] == 1) {
+              $from['M'] = 12;
+              $from['Y'] = $now['year'] - 1;
+            }
+            else {
+              $from['M'] = $now['mon'] - 1;
+              $from['Y'] = $now['year'];
+            }
+
+            $from['d'] = date('t', mktime(0, 0, 0, $from['M'], 1, $from['Y']));
+            unset($to);
+            break;
+
           case 'ending':
             $to['d'] = $now['mday'];
             $to['M'] = $now['mon'];
@@ -1345,6 +1380,14 @@ class CRM_Utils_Date {
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
             $from      = self::intervalAdd('day', -1 * ($now['wday']), $from);
+            unset($to);
+            break;
+
+          case 'greater_previous':
+            $from['d'] = $now['mday'];
+            $from['M'] = $now['mon'];
+            $from['Y'] = $now['year'];
+            $from     = self::intervalAdd('day', -1 * ($now['wday']) - 1, $from);
             unset($to);
             break;
 
