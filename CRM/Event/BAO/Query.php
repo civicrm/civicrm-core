@@ -206,6 +206,7 @@ class CRM_Event_BAO_Query {
       }
     }
   }
+  
 
   /**
    * @param $query
@@ -248,14 +249,46 @@ class CRM_Event_BAO_Query {
           'civicrm_event', 'event_end_date', 'end_date', 'End Date'
         );
         return;
-
+        
       case 'event_id':
         $query->_where[$grouping][] = "civicrm_event.id $op {$value}";
         $eventTitle = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $value, 'title');
         $query->_qill[$grouping][] = ts('Event') . " $op {$eventTitle}";
         $query->_tables['civicrm_event'] = $query->_whereTables['civicrm_event'] = 1;
         return;
-
+        
+      case 'event_include_repeating_events':
+        /**
+         * Include Repeating Events
+         */
+        //Get parent of this event
+        $exEventId = '';
+        if($query->_where[$grouping]){
+          foreach($query->_where[$grouping] as $key => $val){
+            if (strstr($val, 'civicrm_event.id =')) {
+              $exEventId = $val;
+              $extractEventId = explode(" ", $val);
+              $value = $extractEventId[2];
+              unset($query->_where[$grouping][$key]);
+            }
+          }
+          $extractEventId = explode(" ", $exEventId);
+          $value = $extractEventId[2];
+          unset($query->_where[$grouping][$key]);
+        }
+        $thisEventHasParent = CRM_Core_BAO_RecurringEntity::getParentFor($value, 'civicrm_event');
+        if($thisEventHasParent){
+          $getAllConnections = CRM_Core_Form_RecurringEntity::getAllConnectedEvents($thisEventHasParent);
+          if($getAllConnections->entity_id){
+            $op = "IN";
+            $value = "($getAllConnections->entity_id)";
+          }
+        }
+        $query->_where[$grouping][] = "civicrm_event.id $op {$value}";
+        $query->_qill[$grouping][] = ts('Include Repeating Events (If Any) ') . " = TRUE";
+        $query->_tables['civicrm_event'] = $query->_whereTables['civicrm_event'] = 1;
+        return;
+       
       case 'event_type_id':
 
         $eventTypes = CRM_Core_OptionGroup::values("event_type");
@@ -263,7 +296,7 @@ class CRM_Event_BAO_Query {
         $query->_qill[$grouping][] = ts('Event Type - %1', array(1 => $eventTypes[$value]));
         $query->_tables['civicrm_event'] = $query->_whereTables['civicrm_event'] = 1;
         return;
-
+        
       case 'participant_test':
         // We dont want to include all tests for sql OR CRM-7827
         if (!$value || $query->getOperator() != 'OR') {
@@ -602,6 +635,7 @@ class CRM_Event_BAO_Query {
     $form->add('text', 'participant_fee_id', ts('Fee Level'), array('class' => 'big crm-ajax-select'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
+    $eventIncludeRepeatingEvents = &$form->addElement('checkbox', "event_include_repeating_events", NULL, ts(' Include Repeating Events (If Any) ? '));
 
     $status = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     foreach ($status as $id => $Name) {
@@ -638,7 +672,7 @@ class CRM_Event_BAO_Query {
     }
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($form, 'participant_campaign_id');
-
+    
     $form->assign('validCiviEvent', TRUE);
     $form->setDefaults(array('participant_test' => 0));
   }
