@@ -400,7 +400,6 @@
         dataType: 'json',
         success: function(response) {
           if (response.content === undefined) {
-            $el.crmSnippet('option', 'block') && $el.unblock();
             $el.trigger('crmFormSuccess', response);
             // Reset form for e.g. "save and new"
             if (response.userContext && (response.status === 'redirect' || (settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0))) {
@@ -417,6 +416,7 @@
             }
           }
           else {
+            $el.crmSnippet('option', 'block') && $el.unblock();
             response.url = data.url;
             $el.html(response.content).trigger('crmLoad', response).trigger('crmFormLoad', response);
             if (response.status === 'form_error') {
