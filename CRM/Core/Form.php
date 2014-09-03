@@ -1750,7 +1750,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $this->_chainSelectFields[$settings['control_field']] = $elementName;
 
-    return $this->add('select', $elementName, $settings['label'], array(), $settings['required'], $props);
+    return $this->add('select', $elementName, $settings['label'], NULL, $settings['required'], $props);
   }
 
   /**
@@ -1783,6 +1783,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $options = array('' => $targetField->getAttribute('placeholder')) + $options;
         $targetField->removeAttribute('placeholder');
       }
+      $targetField->_options = array();
       $targetField->loadArray($options);
     }
   }
