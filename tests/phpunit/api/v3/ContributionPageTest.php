@@ -149,7 +149,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   public function testSubmitMembershipBlockNotSeparatePayment() {
     $this->setUpMembershipContributionPage();
     $submitParams = array(
-      'price_' . $this->_ids['price_field'] => reset($this->_ids['price_field_value']),
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
       'amount' => 10,
       'billing_first_name' => 'Billy',
@@ -170,7 +170,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   public function testSubmitMembershipBlockIsSeparatePayment() {
     $this->setUpMembershipContributionPage(TRUE);
     $submitParams = array(
-      'price_' . $this->_ids['price_field'] => reset($this->_ids['price_field_value']),
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
       'amount' => 10,
       'billing_first_name' => 'Billy',
@@ -188,6 +188,63 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
   }
 
+  /**
+   * Test submit with a membership block in place
+   */
+  public function testSubmitMembershipBlockTwoTypesIsSeparatePayment() {
+    $this->_ids['membership_type'] = array($this->membershipTypeCreate(array('minimum_fee' => 6)));
+    $this->_ids['membership_type'][] = $this->membershipTypeCreate(array('name' => 'Student', 'minimum_fee' => 50));
+    $this->setUpMembershipContributionPage(TRUE);
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => $this->_ids['price_field_value'][1],
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'selectMembership' => $this->_ids['membership_type'][1],
+    );
+
+    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
+    $contributions = $this->callAPISuccess('contribution', 'get', array('contribution_page_id' => $this->_ids['contribution_page'],));
+    $this->assertCount(2, $contributions['values']);
+    $ids = array_keys($contributions['values']);
+    $this->assertEquals('10.00', $contributions['values'][$ids[0]]['total_amount']);
+    $this->assertEquals('50.00', $contributions['values'][$ids[1]]['total_amount']);
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
+    $this->assertArrayHasKey($membershipPayment['contribution_id'], $contributions['values']);
+    $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
+    $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
+  }
+
+  /**
+   * Test submit with a membership block in place
+   */
+  public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessor() {
+    $this->setUpMembershipContributionPage(TRUE);
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'selectMembership' => $this->_ids['membership_type'],
+      'payment_processor' => 1,
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040 ),
+      'cvv2' => 123,
+    );
+
+    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL, 'Submit');
+    $contributions = $this->callAPISuccess('contribution', 'get', array('contribution_page_id' => $this->_ids['contribution_page'], 'contribution_status_id' => 1));
+    $this->assertCount(2, $contributions['values']);
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
+    $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
+    $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
+    $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
+  }
   /**
    * set up membership contribution page
    * @param bool $isSeparatePayment
@@ -214,39 +271,30 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   function setUpMembershipBlockPriceSet() {
     $this->_ids['price_set'][] = $this->callAPISuccess('price_set', 'getvalue', array('name' => 'default_membership_type_amount', 'return' => 'id'));
     if (empty($this->_ids['membership_type'])) {
-      $this->_ids['membership_type'] = $this->membershipTypeCreate(array('minimum_fee' => 1));
+      $this->_ids['membership_type'] = array($this->membershipTypeCreate(array('minimum_fee' => 2)));
     }
-    try {
-      $this->_ids['price_field'] = $this->callAPISuccessGetValue('price_field', array(
-          'return' => 'id',
-          'name' => 'membership_amount',
-          'price_set_id' => reset($this->_ids['price_set']),
-          'options' => array('limit' => 1))
-      );
-      $this->_ids['price_field_value'] =  array($this->callAPISuccessGetValue('price_field_value', array('weight' => 1, 'return' => 'id', 'name' => 'membership_amount', 'price_field_id' => $this->_ids['price_field'])));
-      $this->callAPISuccess('price_field_value', 'create', array('id' => $this->_ids['price_field_value'][0],  'membership_type_id' => $this->_ids['membership_type'],));
-    }
-    catch (Exception $e) {
-      //default price set likely not set up correctly :-(
-      $priceField = $this->callAPISuccess('price_field', 'create', array(
-        'price_set_id' => reset($this->_ids['price_set']),
+    $priceField = $this->callAPISuccess('price_field', 'create', array(
+      'price_set_id' => reset($this->_ids['price_set']),
+      'name' => 'membership_amount',
+      'label' => 'Membership Amount',
+      'html_type' => 'Radio',
+      'sequential' => 1,
+    ));
+    $this->_ids['price_field'][] = $priceField['id'];
+    foreach ($this->_ids['membership_type'] as $membershipTypeID) {
+      $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
         'name' => 'membership_amount',
         'label' => 'Membership Amount',
-        'html_type' => 'Radio',
-        'sequential' => 1,
-        'api.price_field_value.create' => array(
-          'name' => 'membership_amount',
-          'label' => 'Membership Amount',
-          'amount' => 1,
-          'financial_type_id' => 1,
-          'format.only_id' => TRUE,
-          'membership_type_id' => $this->_ids['membership_type']
-        )
+        'amount' => 1,
+        'financial_type_id' => 1,
+        'format.only_id' => TRUE,
+        'membership_type_id' => $membershipTypeID,
+        'price_field_id' => $priceField['id'],
       ));
-      $this->_ids['price_field'] = $priceField['id'];
-      $this->_ids['price_field_value'] = array($priceField['values'][0]['api.price_field_value.create']);
+      $this->_ids['price_field_value'][] = $priceFieldValue['id'];
     }
   }
+
   /**
    * help function to set up contribution page with some defaults
    */
