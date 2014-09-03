@@ -375,9 +375,8 @@
     });
 
     widget.on('crmFormLoad.crmForm', function(event, data) {
-      var $el = $(this)
-        .attr('data-unsaved-changes', 'false');
-      var settings = $el.crmSnippet('option', 'crmForm');
+      var $el = $(this).attr('data-unsaved-changes', 'false'),
+        settings = $el.crmSnippet('option', 'crmForm');
       settings.cancelButton && $(settings.cancelButton, this).click(function(e) {
         e.preventDefault();
         var returnVal = settings.onCancel.call($el, e);
@@ -449,6 +448,32 @@
           $el.crmSnippet('option', 'url', $(this).attr('href')).crmSnippet('refresh');
           return false;
         });
+      }
+      // Show form buttons as part of the dialog
+      if ($el.data('uiDialog')) {
+        var buttons = [], added = [];
+        $('input.crm-form-submit, a.button', $el).each(function() {
+          var $el = $(this),
+            label = $el.is('input') ? $el.attr('value') : $el.text(),
+            identifier = $el.attr('name') || $el.attr('href');
+          if (!identifier || identifier === '#' || $.inArray(identifier, added) < 0) {
+            var button = {text: label, click: function () {
+              $el.click();
+            }};
+            if ($el.find('.icon').length) {
+              button.icons = {primary: $el.find('.icon').attr('class')};
+            } else {
+              button.icons = {primary: $el.hasClass('cancel') ? 'ui-icon-close' : 'ui-icon-check'};
+              if (identifier.substr(identifier.length-4) === '_new') {
+                button.icons.secondary = 'ui-icon-plus';
+              }
+            }
+            buttons.push(button);
+            added.push(identifier);
+          }
+          $el.hide().parents('.crm-button, .crm-submit-buttons, .action-link').hide();
+        });
+        $el.dialog('option', 'buttons', buttons);
       }
       // Allow a button to prevent ajax submit
       $('input[data-no-ajax-submit=true]').click(function() {
