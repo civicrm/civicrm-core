@@ -1255,10 +1255,10 @@ AND civicrm_membership.is_test = %2";
    *
    * @param array $membershipDetails
    *
-   * @param array $membershipTypeID
+   * @param array $membershipTypeIDs
    *
    * @param bool $isPaidMembership
-   * @param integer $membershipID
+   * @param array $membershipID
    *
    * @param $isProcessSeparateMembershipTransaction
    *
@@ -1270,7 +1270,7 @@ AND civicrm_membership.is_test = %2";
    * @access public
    */
   public static function postProcessMembership($membershipParams, $contactID, &$form, $premiumParams,
-    $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeID, $isPaidMembership, $membershipID,
+    $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
     $isProcessSeparateMembershipTransaction, $defaultContributionTypeID, $membershipLineItems) {
     $result      = $membershipContribution = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
@@ -1315,9 +1315,9 @@ AND civicrm_membership.is_test = %2";
       $form->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
     }
     //@todo it should no longer be possible for it to get to this point & membership to not be an array
-    if (is_array($membershipTypeID)) {
+    if (is_array($membershipTypeIDs)) {
       $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
-      foreach ($membershipTypeID as $memType) {
+      foreach ($membershipTypeIDs as $memType) {
         $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
         $createdMemberships[$memType] = self::createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, $form);
       }
@@ -2096,11 +2096,16 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @param $contactID
    * @param CRM_Contribute_Form_Contribution_Confirm $form
-   * @param $membershipDetails
    * @param $tempParams
    * @param $isTest
    *
+   * @param $lineItems
+   * @param $minimumFee
+   * @param $financialTypeID
+   *
    * @throws CRM_Core_Exception
+   * @throws Exception
+   * @internal param $membershipDetails
    * @return CRM_Contribute_BAO_Contribution
    */
   public static function processSecondaryFinancialTransaction($contactID, &$form, $tempParams, $isTest, $lineItems, $minimumFee, $financialTypeID) {
