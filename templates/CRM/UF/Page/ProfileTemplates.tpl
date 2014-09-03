@@ -3,7 +3,7 @@
  *}
 <script type="text/template" id="designer_template">
   <div class="crm-designer-toolbar full-height">
-    <div class="crm-designer-buttonset-region">
+    <div class="crm-designer-buttonset-region ui-dialog-buttonset">
     </div>
     <hr />
     <div class="crm-designer-palette-region full-height">

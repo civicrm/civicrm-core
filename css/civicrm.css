@@ -2369,6 +2369,7 @@ div.grippie {
 .crm-container a.button:visited,
 .crm-container input.crm-form-submit,
 .crm-container .crm-button,
+.crm-container .ui-dialog-buttonset .ui-button,
 #crm-container input[type=button],
 #crm-container input.crm-form-submit-inline,
 #crm-container .crm-button {
@@ -2444,9 +2445,23 @@ div.grippie {
 .crm-container .crm-button:focus,
 .crm-container input[type=submit]:hover,
 .crm-container input[type=button]:hover,
+.crm-container .ui-dialog-buttonset .ui-button:hover,
+.crm-container .ui-dialog-buttonset .ui-button:focus,
 .crm-container a.button:hover,
 .crm-container a.button:focus {
   background-position: 0px -25px;
+}
+
+.crm-container .ui-dialog-buttonpane {
+  background: linear-gradient(to bottom, #f2f2f2 0%,#ffffff 35%);
+}
+
+.crm-container .ui-dialog-buttonset .ui-button {
+  padding: 0;
+}
+.crm-container .ui-dialog-buttonset .ui-button .ui-icon,
+#crm-contact-actions-list .icon {
+  background-image: url("../i/icons/jquery-ui-FFFFFF.png");
 }
 
 /* No button styling for PayPal Express buttons */
@@ -2484,9 +2499,6 @@ div.grippie {
 
 #crm-create-new-list {
   width: 160px;
-}
-#crm-contact-actions-list .icon {
-  background-image: url("../i/icons/jquery-ui-FFFFFF.png");
 }
 
 #crm-contact-actions-list .crm-contact_activities-list select {
@@ -4504,5 +4516,5 @@ span.crm-status-icon {
 
 /* block-ui */
 .crm-container .blockUI.blockOverlay {
-  background: url("../i/loading-overlay.gif") center center no-repeat black;
+  background: url("../i/loading-overlay.gif") center center no-repeat white !important;
 }
