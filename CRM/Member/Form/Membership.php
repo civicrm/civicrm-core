@@ -1297,13 +1297,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $formValues['financial_type_id']
       );
     }
-    $membershipLineItems = array();
-    foreach ($lineItem[$this->_priceSetId] as $key => $value) {
-      if (!empty($value['membership_type_id'])) {
-        $membershipLineItems[$value['membership_type_id']] = $value;
-        unset($lineItem[$this->_priceSetId][$key]);
-      }
-    }
+    
     // process line items, until no previous line items.
     if (!empty($lineItem)) {
       $params['lineItems'] = $lineItem;
@@ -1529,7 +1523,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         }
 
         $membershipParams = array_merge($membershipTypeValues[$memType], $params);
-        $membershipParams['lineItems'][$this->_priceSetId][] = $membershipLineItems[$memType];
         $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
         $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
         unset($params['lineItems']);
@@ -1632,7 +1625,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             $membershipParams['soft_credit'] = $softParams;
           }
           
-          $membershipParams['lineItems'][$this->_priceSetId][] = $membershipLineItems[$memType];
           $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
           $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
           unset($params['lineItems']);

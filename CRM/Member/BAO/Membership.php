@@ -340,14 +340,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     //insert payment record for this membership
     if (!empty($params['relate_contribution_id'])) {
-      $mpDAO = new CRM_Member_DAO_MembershipPayment();
-      $mpDAO->membership_id = $membership->id;
-      $mpDAO->contribution_id = $params['relate_contribution_id'];
-      if (!($mpDAO->find(TRUE))) {
-        CRM_Utils_Hook::pre('create', 'MembershipPayment', NULL, $mpDAO);
-        $mpDAO->save();
-        CRM_Utils_Hook::post('create', 'MembershipPayment', $mpDAO->id, $mpDAO);
-      }
+      CRM_Member_BAO_MembershipPayment::create(array('membership_id' => $membership->id, 'contribution_id' => $params['relate_contribution_id']));
     }
 
     // add activity record only during create mode and renew mode
@@ -1282,25 +1275,7 @@ AND civicrm_membership.is_test = %2";
     $result      = $membershipContribution = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = array();
-    
-    $membershipLineItem = array();
-    if (is_array($membershipTypeID)) {
-      $lineItems = $form->_lineItem;
-      if ($isProcessSeparateMembershipTransaction) {
-        $lineItems[$form->_priceSetId] =  array_merge($lineItems[$form->_priceSetId], $membershipLineItems[$form->_priceSetId]);
-      }
-      foreach ($lineItems[$form->_priceSetId] as $key => $line) {
-        if (!empty($line['membership_type_id'])) {
-          $membershipLineItem[$line['membership_type_id']] = $line;
-          unset($lineItems[$form->_priceSetId][$key]);
-        }        
-      }      
-      if (empty($lineItems[$form->_priceSetId])) {
-        $membershipParams['skipLineItem'] = TRUE;
-      }
-      $form->_lineItem = $lineItems;
-    }
-    
+        
     if ($isPaidMembership) {
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
         $premiumParams, $contactID,
@@ -1321,7 +1296,7 @@ AND civicrm_membership.is_test = %2";
 
     if ($isProcessSeparateMembershipTransaction) {
       try {
-        $membershipParams['skipLineItem'] = TRUE;
+        $lineItems = $form->_lineItem = $membershipLineItems;
         $membershipContribution = self::processSecondaryFinancialTransaction($contactID, $form, $membershipParams, $isTest, $membershipLineItems, CRM_Utils_Array::value('minimum_fee', $membershipDetails, 0), CRM_Utils_Array::value('financial_type_id', $membershipDetails));
       }
       catch (CRM_Core_Exception $e) {
@@ -1345,10 +1320,6 @@ AND civicrm_membership.is_test = %2";
       foreach ($membershipTypeID as $memType) {
         $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
         $createdMemberships[$memType] = self::createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, $form);
-        if (CRM_Utils_Array::value($memType, $membershipLineItem)) {
-          CRM_Price_BAO_LineItem::processPriceSet($createdMemberships[$memType]->id, array($form->_priceSetId => array($membershipLineItem[$memType])), $membershipContribution);
-          $form->_lineItem[$form->_priceSetId][] = $membershipLineItem[$memType];
-        }
       }
       if ($form->_priceSetId && !empty($form->_useForMember) && !empty($form->_lineItem)) {
         foreach ($form->_lineItem[$form->_priceSetId] as & $priceFieldOp) {
@@ -2879,16 +2850,7 @@ WHERE      civicrm_membership.is_test = 0";
 
     //insert payment record for this membership
     if (empty($ids['contribution']) || !empty($params['is_recur'])) {
-      $mpDAO = new CRM_Member_DAO_MembershipPayment();
-      $mpDAO->membership_id = $membershipId;
-      $mpDAO->contribution_id = $contribution->id;
-      if (!empty($params['is_recur'])) {
-        $mpDAO->find();
-      }
-
-      CRM_Utils_Hook::pre('create', 'MembershipPayment', NULL, $mpDAO);
-      $mpDAO->save();
-      CRM_Utils_Hook::post('create', 'MembershipPayment', $mpDAO->id, $mpDAO);
+      CRM_Member_BAO_MembershipPayment::create(array('membership_id' => $membershipId, 'contribution_id' => $contribution->id));
     }
     return $contribution;
   }
