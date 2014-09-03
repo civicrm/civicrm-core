@@ -559,7 +559,7 @@ class CiviCRM_For_WordPress {
         'CiviCRM',
         array( $this, 'invoke' ),
         $civilogo,
-        1
+        59.1
       );
 
     } else {
