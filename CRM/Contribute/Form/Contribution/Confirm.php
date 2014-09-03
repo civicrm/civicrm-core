@@ -1831,13 +1831,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $paramsProcessedForForm = $form->_params = self::getFormParams($params['id'], $params);
     $form->_amount = $params['amount'];
 
-
     $priceSetID = $form->_params['priceSetId'] = $paramsProcessedForForm['price_set_id'];
     $priceFields = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
     $priceSetFields = reset($priceFields);
     $form->_values['fee'] = $priceSetFields['fields'];
     $form->_priceSetId = $priceSetID;
     $form->setFormAmountFields($priceSetID);
+    if (!empty($params['payment_processor'])) {
+      $form->_paymentProcessor = civicrm_api3('payment_processor', 'getsingle', array('id' => $params['payment_processor']));
+    }
     $priceFields = $priceFields[$priceSetID]['fields'];
     CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution');
     $form->_lineItem = array($priceSetID => $lineItems);
@@ -1854,7 +1856,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   static function getFormParams($id, array $params) {
     if(!isset($params['is_pay_later'])) {
-      $params['is_pay_later'] = civicrm_api3('contribution_page', 'getvalue', array('id' => $id, 'return' => 'is_pay_later'));
+      if (!empty($params['payment_processor'])) {
+        $params['is_pay_later'] = 0;
+      }
+      else {
+        $params['is_pay_later'] = civicrm_api3('contribution_page', 'getvalue', array(
+            'id' => $id,
+            'return' => 'is_pay_later'
+          ));
+      }
     }
     if(empty($params['price_set_id'])) {
       $params['price_set_id'] = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $params['id']);
