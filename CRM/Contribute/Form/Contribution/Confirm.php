@@ -1533,7 +1533,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isCurrentEmployer = FALSE;
     $dupeIDs = array();
     $orgID = NULL;
-    if (!empty($behalfOrganization['organization_id']) && !empty($behalfOrganization['org_option'])) {
+    if (!empty($behalfOrganization['organization_id']) && empty($behalfOrganization['org_option'])) {
       $orgID = $behalfOrganization['organization_id'];
       unset($behalfOrganization['organization_id']);
       $isCurrentEmployer = TRUE;
