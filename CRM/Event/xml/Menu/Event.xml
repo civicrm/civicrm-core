@@ -328,12 +328,12 @@
   </item>
   <item>
      <path>civicrm/ajax/recurringEntity/update_cascade_type</path>
-     <page_callback>CRM_Core_Page_Ajax_RecurringEntity::updateCascadeType</page_callback>
+     <page_callback>CRM_Core_Page_AJAX_RecurringEntity::updateCascadeType</page_callback>
      <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
   </item>
   <item>
      <path>civicrm/ajax/recurringEntity/generate_preview</path>
-     <page_callback>CRM_Core_Page_Ajax_RecurringEntity::generatePreview</page_callback>
+     <page_callback>CRM_Core_Page_AJAX_RecurringEntity::generatePreview</page_callback>
      <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
   </item>
 </menu>

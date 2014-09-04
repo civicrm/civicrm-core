@@ -12,7 +12,7 @@
  * @author Priyanka
  */
 
-class CRM_Core_Page_Ajax_RecurringEntity {
+class CRM_Core_Page_AJAX_RecurringEntity {
   
   public static function updateCascadeType(){
     if(CRM_Utils_Array::value('cascadeType', $_REQUEST) && CRM_Utils_Array::value('entityId', $_REQUEST)){
