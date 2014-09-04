@@ -16,3 +16,12 @@ INSERT INTO
 `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
 VALUES
 (@option_group_id_cro, {localize}'{ts escape="sql"}Postal Code{/ts}'{/localize}, @option_val_id_cro_val+1, 'postal_code', NULL, 0, NULL, @option_val_id_cro_wt+1, 0, 1, 1, NULL, NULL);
+
+-- CRM-15086 Fix the names of option values for Batch Status.
+SELECT @option_group_id_batch_status := id FROM civicrm_option_group WHERE name = 'batch_status';
+
+UPDATE civicrm_option_value SET name = 'Open' WHERE value = 1 AND option_group_id = @option_group_id_batch_status;
+UPDATE civicrm_option_value SET name = 'Closed' WHERE value = 2 AND option_group_id = @option_group_id_batch_status;
+UPDATE civicrm_option_value SET name = 'Data Entry' WHERE value = 3 AND option_group_id = @option_group_id_batch_status;
+UPDATE civicrm_option_value SET name = 'Reopened' WHERE value = 4 AND option_group_id = @option_group_id_batch_status;
+UPDATE civicrm_option_value SET name = 'Exported' WHERE value = 5 AND option_group_id = @option_group_id_batch_status;
