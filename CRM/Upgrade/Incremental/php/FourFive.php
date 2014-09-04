@@ -123,30 +123,21 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
   function upgrade_4_5_beta9($rev) {
     $this->addTask(ts('Upgrade DB to 4.5.beta9: SQL'), 'task_4_5_x_runSql', $rev);
     
-    list($minParticipantId, $maxParticipantId) = CRM_Core_DAO::executeQuery('SELECT coalesce(min(id),0), coalesce(max(id),0)
-      FROM civicrm_participant_payment')->getDatabaseResult()->fetchRow();
-    for ($startId = $minParticipantId; $startId <= $maxParticipantId; $startId += self::BATCH_SIZE) {
-      $endId = $startId + self::BATCH_SIZE - 1;
-      $title = ts('Upgrade DB to 4.5.beta9: Fix line items for Participant (%1 => %2)', array(1 => $startId, 2 => $endId));
-      $this->addTask($title, 'task_4_5_0_fixLineItem', $startId, $endId, 'participant');
-    }
-
-    list($minContributionId, $maxContributionId) = CRM_Core_DAO::executeQuery('SELECT coalesce(min(id),0), coalesce(max(id),0) 
-      FROM civicrm_contribution')->getDatabaseResult()->fetchRow();
-    for ($startId = $minContributionId; $startId <= $maxContributionId; $startId += self::BATCH_SIZE) {
-      $endId = $startId + self::BATCH_SIZE - 1;
-      $title = ts('Upgrade DB to 4.5.beta9: Fix line items for Contibution (%1 => %2)', array(1 => $startId, 2 => $endId));
-      $this->addTask($title, 'task_4_5_0_fixLineItem', $startId, $endId, 'contribution');
-    }
+    $entityTable = array(
+      'Participant' => 'civicrm_participant_payment',
+      'Contibution' => 'civicrm_contribution',
+      'Membership' => 'civicrm_membership',
+    );
     
-    list($maxMembershipId, $minMembershipId) = CRM_Core_DAO::executeQuery('SELECT coalesce(max(id),0), coalesce(min(id),0) 
-      FROM civicrm_membership')->getDatabaseResult()->fetchRow();
-    for ($startId = $minMembershipId; $startId <= $maxMembershipId; $startId += self::BATCH_SIZE) {
-      $endId = $startId + self::BATCH_SIZE - 1;
-      $title = ts('Upgrade DB to 4.5.beta9: Fix line items for Membership (%1 => %2)', array(1 => $startId, 2 => $endId));
-      $this->addTask($title, 'task_4_5_0_fixLineItem', $startId, $endId, 'membership');
-    }
-    
+    foreach ($entityTable as $label => $tableName) {
+      list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
+        FROM {$tableName}")->getDatabaseResult()->fetchRow();
+      for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
+        $endId = $startId + self::BATCH_SIZE - 1;
+        $title = ts("Upgrade DB to 4.5.beta9: Fix line items for {$label} (%1 => %2)", array(1 => $startId, 2 => $endId));
+        $this->addTask($title, 'task_4_5_0_fixLineItem', $startId, $endId, $label);
+      }      
+    }    
     return TRUE;
   }
 
@@ -170,7 +161,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
       2 => array($endId, 'Integer'),
     );
     switch ($entityTable) {
-      case 'contribution':  
+      case 'Contribution':  
         // update all the line item entity_table and entity_id with contribution due to bug CRM-15055
         CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item cln
           INNER JOIN civicrm_contribution cc ON cc.id = cln.contribution_id
@@ -184,7 +175,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
           WHERE cln.contribution_id IS NULL AND cln.entity_table = 'civicrm_contribution' AND (cc.id BETWEEN %1 AND %2)", $sqlParams); 
         break;
         
-      case 'participant':
+      case 'Participant':
         // update the civicrm_line_item.contribution_id
         CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item li 
           INNER JOIN civicrm_participant_payment pp ON pp.participant_id = li.entity_id
@@ -192,7 +183,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
           WHERE li.entity_table = 'civicrm_participant' AND cli.contribution_id IS NULL AND (pp.id BETWEEN %1 AND %2)", $sqlParams);
         break;
         
-      case 'membership':
+      case 'Membership':
         $upgrade = new CRM_Upgrade_Form();
         // update the line item of  membership
         CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item li
