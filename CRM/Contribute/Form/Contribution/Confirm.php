@@ -1812,6 +1812,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // contribution amount same as membership amount.
       //@todo - merge with section above
       if ($this->_membershipBlock['is_separate_payment']
+        && !empty($this->_values['fee'][$priceField->id])
         && CRM_Utils_Array::value('name', $this->_values['fee'][$priceField->id]) == 'contribution_amount'
         && CRM_Utils_Array::value("price_{$priceField->id}", $this->_params) == '-1'
       ) {
