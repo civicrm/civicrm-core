@@ -1868,12 +1868,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     $this->click('_qf_FinancialType_next');
     if ($option == 'new') {
-      $text = "Your Financial '{$financialType['name']}' Type has been created, along with a corresponding income account '{$financialType['name']}'. That income account, along with standard financial accounts 'Accounts Receivable', 'Banking Fees' and 'Premiums' have been linked to the financial type. You may edit or replace those relationships here.";
+      $text = "Your Financial \"{$financialType['name']}\" Type has been created, along with a corresponding income account \"{$financialType['name']}\". That income account, along with standard financial accounts \"Accounts Receivable\", \"Banking Fees\" and \"Premiums\" have been linked to the financial type. You may edit or replace those relationships here.";
     }
     else {
       $text = "The financial type '{$financialType['name']}' has been saved.";
     }
-    $this->waitForText('crm-notification-container', $text);
+    $this->waitForText("xpath=//div[@class='notify-content']", $text);
   }
 
   /**
