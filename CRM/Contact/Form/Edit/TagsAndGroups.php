@@ -142,30 +142,82 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     }
 
     if ($type & self::TAG) {
-      $fName = 'tag';
-      if ($fieldName) {
-        $fName = $fieldName;
-      }
-      $form->_tagGroup[$fName] = 1;
-      $elements = array();
-      $tag = CRM_Core_BAO_Tag::getTags();
+		CRM_Core_Resources::singleton()->addScriptUrl('http://10.0.0.2/crm/sites/all/modules/civicrm/packages/jquery/plugins/jstree/jquery.jstree.js?napuqq', 10, 'html-header');
+		// get categories for the contact id
+		//$entityTag = CRM_Core_BAO_EntityTag::getTag($this->_entityID, $this->_entityTable);
+		//$this->assign('tagged', $entityTag);
 
-      foreach ($tag as $id => $name) {
-        $elements[] = $form->createElement('checkbox', $id, NULL, $name);
-      }
-      if (!empty($elements)) {
-        $form->addGroup($elements, $fName, $tagName, '<br />');
-        $form->assign('tagCount', count($elements));
-      }
+		// get the list of all the categories
+		$allTag = CRM_Core_BAO_Tag::getTagsUsedFor();
 
-      if ($isRequired) {
-        $form->addRule($fName, ts('%1 is a required field.', array(1 => $tagName)), 'required');
-      }
+		// need to append the array with the " checked " if contact is tagged with the tag
+		$tagChk = array();
+		foreach ($allTag as $tagID => $varValue) {
+			$tagAttribute = array(
+		  'onclick' => "return changeRowColor(\"rowidtag_$tagID\")",
+		  'id' => "tag_{$tagID}",
+			);
 
-      // build tag widget
-      $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
+			$tagChk[$tagID] = $form->createElement('checkbox', $tagID, '', '', $tagAttribute);
+		}
 
-      CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', $contactId, FALSE, TRUE);
+		$form->addGroup($tagChk, 'tagList', NULL, NULL, TRUE);
+
+		$tags = new CRM_Core_BAO_Tag();
+		$tree = $tags->getTree('civicrm_contact', TRUE);
+		$form->assign('tree', $tree);
+		$form->assign('tag', $allTag);
+			
+		$form->assign('entityID', $contactId);
+		$form->assign('entityTable', 'civicrm_contact');
+
+		if ($isRequired) {
+		 $form->addRule($fName, ts('%1 is a required field.', array(1 => $tagName)), 'required');
+		}
+
+		// build tag widget
+		$parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
+		CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', $contactId, TRUE, TRUE);
+
+
+		/*$this->addButtons(array(
+		 array(
+		 'type' => 'next',
+		 'name' => ts('Update Tags'),
+		 'isDefault' => TRUE,
+		 ),
+		 array(
+		 'type' => 'cancel',
+		 'name' => ts('Cancel'),
+		 ),
+		 ));*/
+
+
+
+		/*$fName = 'tag';
+		 if ($fieldName) {
+		 $fName = $fieldName;
+		 }
+		 $form->_tagGroup[$fName] = 1;
+		 $elements = array();
+		 $tag = CRM_Core_BAO_Tag::getTags();
+
+		 foreach ($tag as $id => $name) {
+		 $elements[] = $form->createElement('checkbox', $id, NULL, $name);
+		 }
+		 if (!empty($elements)) {
+		 $form->addGroup($elements, $fName, $tagName, '<br />');
+		 $form->assign('tagCount', count($elements));
+		 }
+
+		 if ($isRequired) {
+		 $form->addRule($fName, ts('%1 is a required field.', array(1 => $tagName)), 'required');
+		 }
+
+		 // build tag widget
+		 $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
+
+		 CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', $contactId, TRUE, TRUE);*/
     }
     $form->assign('tagGroup', $form->_tagGroup);
   }
