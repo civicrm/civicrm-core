@@ -30,12 +30,19 @@
               <div style="width:30%;float:left;">
                   <button class="dialog-button only-this-event">Only this Event</button>
               </div>
-              <div style="width:70%;float:left;">All other events in the series will remain same</div></div>
+              <div style="width:70%;float:left;">All other events in the series will remain same</div>
+          </div>
           <div style="display:inline-block;width:100%;">
               <div style="width:30%;float:left;">
                   <button class="dialog-button this-and-all-following-event">This and Following Events</button>
               </div>
               <div style="width:70%;float:left;">This and all the following events will be changed</div>
+          </div>
+          <div style="display:inline-block;width:100%;">
+              <div style="width:30%;float:left;">
+                  <button class="dialog-button all-events">All the Events</button>
+              </div>
+              <div style="width:70%;float:left;">All the related events will be changed</div>
           </div>
       </div>
   </div>
@@ -62,7 +69,8 @@
     {literal}
         <script type="text/javascript">
         cj(document).ready(function() {
-            var saveButtonID = '';
+           var saveButtonID = '';
+           var eventID ={/literal}{$id}{literal};
            cj("#dialog").dialog({ autoOpen: false });
             cj('div.crm-submit-buttons span.crm-button input[value="Save"], div.crm-submit-buttons span.crm-button input[value="Save and Done"]').click( function () {
                 saveButtonID = this.id;
@@ -81,10 +89,26 @@
                 return false;
             });
             cj(".this-and-all-following-event").click(function(){
-                var eventID ={/literal}{$id}{literal};
                 if(eventID != ""){
                     var ajaxurl = CRM.url("civicrm/ajax/recurringEntity/update_cascade_type");
                     var data    = {cascadeType: 2, entityId: eventID};
+                    cj.ajax({
+                      dataType: "json",
+                      data: data,
+                      url:  ajaxurl,
+                      success: function (result) {
+                          cj("#dialog").dialog('close');
+                          if(saveButtonID != ""){
+                            cj('#'+saveButtonID).closest('form').submit();
+                          }
+                      }
+                    });
+                }
+            });
+            cj(".all-events").click(function(){
+                if(eventID != ""){
+                    var ajaxurl = CRM.url("civicrm/ajax/recurringEntity/update_cascade_type");
+                    var data    = {cascadeType: 3, entityId: eventID};
                     cj.ajax({
                       dataType: "json",
                       data: data,
