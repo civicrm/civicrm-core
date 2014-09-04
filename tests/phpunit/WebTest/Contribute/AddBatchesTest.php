@@ -242,8 +242,9 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
    * @param $type
    */
   function _verifyData($data, $type) {
-    $this->waitForElementPresent("xpath=//div[@id='crm-batch-selector_wrapper']//table//tbody/tr[1]/td[7]/span/a[text()='Enter records']");
-    $this->clickLink("xpath=//div[@id='crm-batch-selector_wrapper']//table//tbody/tr[1]/td[7]/span/a[text()='Enter records']", "_qf_Entry_upload");
+    $this->waitForElementPresent("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[7]/span/a[1][text()='Enter records']");
+    $this->click("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[7]/span/a[1][text()='Enter records']");
+    $this->waitForElementPresent('_qf_Entry_upload');
     $this->click("_qf_Entry_upload");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     foreach ($data as $value) {
