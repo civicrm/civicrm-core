@@ -285,7 +285,13 @@ class CRM_Core_Menu {
             ',' => '_', '/' => '_',
           )
         ),
-        'url' => CRM_Utils_System::url($path, $query, FALSE),
+        'url' => CRM_Utils_System::url($path, $query, 
+            FALSE, // absolute
+            NULL, // fragment
+            TRUE, // htmlize
+            FALSE, // frontend
+            TRUE // forceBackend; CRM-14439 work-around; acceptable for now because we don't display breadcrumbs on frontend
+        ),
         'icon' => CRM_Utils_Array::value('icon', $item),
         'extra' => CRM_Utils_Array::value('extra', $item),
       );

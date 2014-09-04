@@ -269,7 +269,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     if (!$id) {
       $id = CRM_Utils_Array::value('contact_id', $params);
     }
-    if (CRM_Utils_Array::value('note', $params) || CRM_Utils_Array::value('id', CRM_Utils_Array::value('note',$ids))) {
+    if (!empty($params['note']) || CRM_Utils_Array::value('id', CRM_Utils_Array::value('note', $ids))) {
       $noteParams = array(
         'entity_table' => 'civicrm_grant',
         'note' => $params['note'] = $params['note'] ? $params['note'] : "null",
@@ -278,7 +278,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
         'modified_date' => date('Ymd'),
       );
 
-      CRM_Core_BAO_Note::add($noteParams, $ids['note']);
+      CRM_Core_BAO_Note::add($noteParams, (array) CRM_Utils_Array::value('note', $ids));
     }
     // Log the information on successful add/edit of Grant
     $logParams = array(

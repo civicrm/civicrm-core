@@ -1244,12 +1244,16 @@ class CRM_Contact_BAO_Query {
    * @param boolean $count
    * @param boolean $sortByChar
    * @param boolean $groupContacts
+   * @param boolean $onlyDeleted
    *
    * @return the sql string for that query (this will most likely
    * change soon)
    * @access public
    */
-  function query($count = FALSE, $sortByChar = FALSE, $groupContacts = FALSE) {
+  function query($count = FALSE, $sortByChar = FALSE, $groupContacts = FALSE, $onlyDeleted = FALSE) {
+    // build permission clause
+    $this->generatePermissionClause($onlyDeleted, $count);
+
     if ($count) {
       if (isset($this->_distinctComponentClause)) {
         // we add distinct to get the right count for components
@@ -1322,6 +1326,15 @@ class CRM_Contact_BAO_Query {
     $where = '';
     if (!empty($this->_whereClause)) {
       $where = "WHERE {$this->_whereClause}";
+    }
+
+    if (!empty($this->_permissionWhereClause)) {
+      if (empty($where)) {
+        $where = "WHERE $this->_permissionWhereClause";
+      }
+      else {
+        $where = "$where AND $this->_permissionWhereClause";
+      }
     }
 
     $having = '';
@@ -4304,7 +4317,6 @@ civicrm_relationship.is_permission_a_b = 0
         break;
       }
     }
-    $this->generatePermissionClause($onlyDeleted, $count);
 
     // building the query string
     $groupBy = NULL;
@@ -4403,16 +4415,7 @@ civicrm_relationship.is_permission_a_b = 0
     // note : this modifies _fromClause and _simpleFromClause
     $this->includePseudoFieldsJoin($sort);
 
-    list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts);
-
-    if(!empty($this->_permissionWhereClause)){
-      if (empty($where)) {
-        $where = "WHERE $this->_permissionWhereClause";
-      }
-      else {
-        $where = "$where AND $this->_permissionWhereClause";
-      }
-    }
+    list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
 
     if ($additionalWhereClause) {
       $where = $where . ' AND ' . $additionalWhereClause;
