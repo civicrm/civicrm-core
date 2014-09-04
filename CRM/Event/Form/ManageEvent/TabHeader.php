@@ -104,12 +104,13 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     if ($eventID) {
       // disable tabs based on their configuration status
       $sql = "
-SELECT     e.loc_block_id as is_location, e.is_online_registration, e.is_monetary, taf.is_active, pcp.is_active as is_pcp, sch.id as is_reminder
+SELECT     e.loc_block_id as is_location, e.is_online_registration, e.is_monetary, taf.is_active, pcp.is_active as is_pcp, sch.id as is_reminder, re.id as is_repeating_event
 FROM       civicrm_event e
 LEFT JOIN  civicrm_tell_friend taf ON ( taf.entity_table = 'civicrm_event' AND taf.entity_id = e.id )
 LEFT JOIN  civicrm_pcp_block pcp   ON ( pcp.entity_table = 'civicrm_event' AND pcp.entity_id = e.id )
 LEFT JOIN  civicrm_action_mapping  map ON ( map.entity_value = 'civicrm_event' )
 LEFT JOIN  civicrm_action_schedule sch ON ( sch.mapping_id = map.id AND sch.entity_value = %1 )
+LEFT JOIN  civicrm_recurring_entity re ON ( e.id = re.entity_id AND re.entity_table = 'civicrm_event' )
 WHERE      e.id = %1
 ";
       //Check if repeat is configured
@@ -137,7 +138,7 @@ WHERE      e.id = %1
       if (!$dao->is_reminder) {
         $tabs['reminder']['valid'] = FALSE;
       }
-      if(!$eventHasParent){
+      if(!$dao->is_repeating_event){
         $tabs['repeat']['valid'] = FALSE;
       }
     }
