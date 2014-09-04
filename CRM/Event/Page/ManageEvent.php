@@ -91,11 +91,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'qs' => 'reset=1&action=copy&id=%%id%%',
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
           'title' => ts('Copy Event'),
-        ),
-        'repeat' => array(
-          'title' => ts('Repeat Event'),
-          'url' => 'civicrm/event/manage/repeat',
-          'field' => 'is_pcp_enabled',
         )
       );
     }
@@ -165,6 +160,12 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'title' => ts('Personal Campaign Pages'),
           'url' => 'civicrm/event/manage/pcp',
           'field' => 'is_pcp_enabled',
+        );
+      self::$_tabLinks[$cacheKey]['repeat'] =
+        array(
+          'title' => ts('Repeat'),
+          'url' => 'civicrm/event/manage/repeat',
+          'field' => 'is_recurring_event',
         );
 
     }

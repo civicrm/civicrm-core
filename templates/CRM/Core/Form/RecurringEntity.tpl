@@ -268,7 +268,7 @@
     //Dialog for preview repeat Configuration dates
     cj('#preview-dialog').dialog({ autoOpen: false });
     cj('#_qf_Repeat_submit-top, #_qf_Repeat_submit-bottom').click( function (){
-        cj('#generated_dates').html('').html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Just a moment, generating dates{/ts}{literal}...<img src="{/literal}{$config->resourceBase}{literal}i/loading.gif" /></span></div>');
+        cj('#generated_dates').html('').html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Just a moment, generating dates{/ts}{literal}...</span></div>');
         cj('#preview-dialog').dialog('open');
         cj('#preview-dialog').dialog({
             title: 'Confirm event dates',
