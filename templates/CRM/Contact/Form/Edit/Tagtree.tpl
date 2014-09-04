@@ -26,8 +26,8 @@
 {* This tpl runs recursively to build each level of the tag tree *}
 <ul class="tree-level-{$level}">
   {foreach from=$tree item="node" key="id"}
-    <li id="tag_{$id}">
-      <input name="tag[{$id}]" id="tag_{$id}" class="form-checkbox" type="checkbox" value="1" />
+    <li id="tagli_{$id}">
+      <input name="tag[{$id}]" id="tag_{$id}" class="form-checkbox" type="checkbox" value="1" {if $node['is_selectable'] EQ 0}disabled=""{/if}/>
       <span>
         <label for="tag_{$id}" id="tagLabel_{$id}">{$node.name}</label>
         {if $node.description}{help id=$id title=$node.name file="CRM/Tag/Form/Tagtree"}{/if}
