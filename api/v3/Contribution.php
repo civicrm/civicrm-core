@@ -372,6 +372,9 @@ function civicrm_api3_contribution_completetransaction(&$params) {
   if(!$contribution->id == $params['id']){
     throw new API_Exception('A valid contribution ID is required', 'invalid_data');
   }
+  elseif ($contribution->contribution_status_id == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
+    throw new API_Exception(ts('Contribution already completed'));
+  }
   try {
     if(!$contribution->loadRelatedObjects($input, $ids, FALSE, TRUE)){
       throw new API_Exception('failed to load related objects');

@@ -42,7 +42,7 @@ class CRM_Group_Page_AJAX {
     if ( isset($params['parent_id']) ) {
       // requesting child groups for a given parent
       $params['page'] = 1;
-      $params['rp']   = 25;
+      $params['rp']   = 0;
       $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
 
       echo json_encode($groups);

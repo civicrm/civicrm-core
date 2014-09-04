@@ -140,7 +140,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     // contribution status is missing, choose Completed as default status
     // do this for create mode only
-    if (!CRM_Utils_Array::value('contribution', $ids) && !CRM_Utils_Array::value('contribution_status_id', $params)) {
+    if (!$contributionID && !CRM_Utils_Array::value('contribution_status_id', $params)) {
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     }
 
@@ -173,7 +173,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     //add Account details
     $params['contribution'] = $contribution;
-    self::recordFinancialAccounts($params, $ids);
+    self::recordFinancialAccounts($params);
 
     // reset the group contact cache for this group
     CRM_Contact_BAO_GroupContactCache::remove();
@@ -216,6 +216,31 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       return $contribution;
     }
     return NULL;
+  }
+
+  /**
+   * Get the number of terms for this contribution for a given membership type
+   * based on querying the line item table and relevant price field values
+   * Note that any one contribution should only be able to have one line item relating to a particular membership
+   * type
+   * @param int $membershipTypeID
+   *
+   * @return int
+   */
+  public function getNumTermsByContributionAndMembershipType($membershipTypeID) {
+    if (!is_numeric($membershipTypeID)) {
+      //precautionary measure - this is being introduced to a mature release hence adding extra checks that
+      // might be removed later
+      return 1;
+    }
+    $numTerms = CRM_Core_DAO::singleValueQuery("
+      SELECT membership_num_terms FROM civicrm_line_item li
+      LEFT JOIN civicrm_price_field_value v ON li.price_field_value_id = v.id
+      WHERE entity_id = %1 AND entity_table = 'civicrm_contribution' AND membership_type_id = %2",
+      array(1 => array($this->id, 'Integer') , 2 => array($membershipTypeID, 'Integer'))
+    );
+    // default of 1 is precautionary
+    return empty($numTerms) ? 1 : $numTerms;
   }
 
   /**
@@ -1546,7 +1571,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
               $dates['end_date'],
               $dates['join_date'],
               'today',
-              TRUE
+              TRUE,
+              $membership->membership_type_id,
+              (array) $membership
             );
 
             $formattedParams = array(

@@ -1835,6 +1835,7 @@ SELECT  display_name
       ),
       'subject' => $subject,
       'activity_date_time' => $date,
+      'details' => $activity->details,
       'is_test' => $activity->is_test,
       'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
         'Completed',
