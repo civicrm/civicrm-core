@@ -91,6 +91,9 @@
                       url:  ajaxurl,
                       success: function (result) {
                           cj("#dialog").dialog('close');
+                          if(saveButtonID != ""){
+                            cj('#'+saveButtonID).closest('form').submit();
+                          }
                       }
                     });
                 }
