@@ -77,22 +77,46 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return self::add($params);
   }
 
-  static public function getEntitiesForParent($parentId, $entityTable, $includeParent = TRUE) {
+  // MODE = 3 (ALL)
+  static public function getEntitiesForParent($parentId, $entityTable, $includeParent = TRUE, $mode = 3, $initiatorId = NULL) {
     $entities = array();
+
+    if (!$initiatorId) {
+      $initiatorId = $parentId;
+    } 
+
+    $queryParams = array(
+      1 => array($parentId,    'Integer'),
+      2 => array($entityTable, 'String'),
+      3 => array($initiatorId, 'Integer'),
+    );
+
+    if (!$mode) {
+      $mode = CRM_Core_DAO::singleValueQuery("SELECT cascade_type FROM civicrm_recurring_entity WHERE entity_id = %3 AND entity_table = %2", $queryParams);
+    }
 
     $query = "SELECT *
       FROM civicrm_recurring_entity
       WHERE parent_id = %1 AND entity_table = %2";
     if (!$includeParent) {
-      $query .= " AND entity_id != %1";
+      $query .= " AND entity_id != " . ($initiatorId ? "%3" : "%1");
     }
-    $dao = CRM_Core_DAO::executeQuery($query, 
-      array(
-        1 => array($parentId, 'Integer'),
-        2 => array($entityTable, 'String'),
-      )
-    );
 
+    if ($mode == '1') { // MODE = SINGLE
+      $query .= " AND entity_id = %3";
+    } else if ($mode == '2') { // MODE = FUTURE
+      $recurringEntityID = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_recurring_entity WHERE entity_id = %3 AND entity_table = %2", $queryParams);
+      if ($recurringEntityID) {
+        $query .= $includeParent ? " AND id >= %4" : " AND id > %4";
+        $query .= " ORDER BY id ASC"; // FIXME: change to order by dates  
+        $queryParams[4] = array($recurringEntityID, 'Integer');
+      } else {
+        // something wrong, return empty
+        return array();
+      }
+    }
+
+    $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
     while ($dao->fetch()) {
       $entities["{$dao->entity_table}_{$dao->entity_id}"]['table'] = $dao->entity_table;
       $entities["{$dao->entity_table}_{$dao->entity_id}"]['id'] = $dao->entity_id;
@@ -100,10 +124,10 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return $entities;
   }
 
-  static public function getEntitiesFor($entityId, $entityTable, $includeParent = TRUE) {
+  static public function getEntitiesFor($entityId, $entityTable, $includeParent = TRUE, $mode = 3) {
     $parentId = self::getParentFor($entityId, $entityTable);
     if ($parentId) {
-      return self::getEntitiesForParent($parentId, $entityTable, $includeParent);
+      return self::getEntitiesForParent($parentId, $entityTable, $includeParent, $mode, $entityId);
     }
     return array();
   }
@@ -156,15 +180,18 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
 
     // get related entities
-    $repeatingEntities = self::getEntitiesFor($obj->id, $obj->__table, FALSE);
+    $repeatingEntities = self::getEntitiesFor($obj->id, $obj->__table, FALSE, NULL);
     if (empty($repeatingEntities)) {
       // return if its not a recurring entity parent
       return NULL;
     }
-    // mark processed
+    // mark being processed
     $processedEntities[$key] = 1;
 
-    foreach ($repeatingEntities as $key => $val) {
+    // to make sure we not copying to source itself
+    unset($repeatingEntities[$key]);
+
+    foreach($repeatingEntities as $key => $val) {
       $entityID = $val['id'];
       $entityTable = $val['table'];
 
@@ -173,14 +200,13 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       if (array_key_exists($entityTable, self::$_tableDAOMapper)) {
         $daoName = self::$_tableDAOMapper[$entityTable];
 
-        $fromId  = self::getParentFor($entityID, $entityTable);
-
         // FIXME: generalize me
         $skipData = array('start_date' => NULL, 
           'end_date' => NULL,
         );
 
-        $updateDAO = CRM_Core_DAO::cascadeUpdate($daoName, $fromId, $entityID, $skipData);
+        $updateDAO = CRM_Core_DAO::cascadeUpdate($daoName, $obj->id, $entityID, $skipData);
+        CRM_Core_DAO::freeResult();
       }
     }
     // done with processing. lets unset static var.

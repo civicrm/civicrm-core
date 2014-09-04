@@ -314,6 +314,9 @@ class CRM_Core_Form_RecurringEntity {
         $parent_event_id = $currEntityID;
       }
 
+      // add first entry just for parent
+      CRM_Core_BAO_RecurringEntity::quickAdd($parent_event_id, $parent_event_id, 'civicrm_event');
+
       foreach ($recursionResult as $key => $value) {
         $newEventObj = CRM_Core_BAO_RecurringEntity::copyCreateEntity('civicrm_event', 
         array('id' => $parent_event_id), 
@@ -361,7 +364,6 @@ class CRM_Core_Form_RecurringEntity {
           )
         );
       }
-      CRM_Core_BAO_RecurringEntity::quickAdd($parent_event_id, $parent_event_id, 'civicrm_event');
     }
   }
   
