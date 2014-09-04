@@ -125,7 +125,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
     
     $entityTable = array(
       'Participant' => 'civicrm_participant_payment',
-      'Contibution' => 'civicrm_contribution',
+      'Contribution' => 'civicrm_contribution',
       'Membership' => 'civicrm_membership',
     );
     
@@ -163,16 +163,16 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
     switch ($entityTable) {
       case 'Contribution':  
         // update all the line item entity_table and entity_id with contribution due to bug CRM-15055
-        CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item cln
-          INNER JOIN civicrm_contribution cc ON cc.id = cln.contribution_id
-          SET entity_id = cln.contribution_id, entity_table = 'civicrm_contribution'
-          WHERE cln.contribution_id IS NOT NULL AND cln.entity_table <> 'civicrm_participant' AND (cc.id BETWEEN %1 AND %2)", $sqlParams);
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item li
+          INNER JOIN civicrm_contribution cc ON cc.id = li.contribution_id
+          SET entity_id = li.contribution_id, entity_table = 'civicrm_contribution'
+          WHERE li.contribution_id IS NOT NULL AND li.entity_table <> 'civicrm_participant' AND (cc.id BETWEEN %1 AND %2)", $sqlParams);
         
         // update the civicrm_line_item.contribution_id
-        CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item cln
-          INNER JOIN civicrm_contribution cc ON cc.id = cln.entity_id 
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item li
+          INNER JOIN civicrm_contribution cc ON cc.id = li.entity_id 
           SET contribution_id = entity_id
-          WHERE cln.contribution_id IS NULL AND cln.entity_table = 'civicrm_contribution' AND (cc.id BETWEEN %1 AND %2)", $sqlParams); 
+          WHERE li.contribution_id IS NULL AND li.entity_table = 'civicrm_contribution' AND (cc.id BETWEEN %1 AND %2)", $sqlParams); 
         break;
         
       case 'Participant':
@@ -180,7 +180,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
         CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item li 
           INNER JOIN civicrm_participant_payment pp ON pp.participant_id = li.entity_id
           SET li.contribution_id = pp.contribution_id
-          WHERE li.entity_table = 'civicrm_participant' AND cli.contribution_id IS NULL AND (pp.id BETWEEN %1 AND %2)", $sqlParams);
+          WHERE li.entity_table = 'civicrm_participant' AND li.contribution_id IS NULL AND (pp.id BETWEEN %1 AND %2)", $sqlParams);
         break;
         
       case 'Membership':
@@ -192,23 +192,23 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
           INNER JOIN civicrm_price_field_value pv ON pv.id = li.price_field_value_id
           SET li.entity_table = 'civicrm_membership', li.entity_id = mp.membership_id
           WHERE li.entity_table = 'civicrm_contribution'
-          AND pv.membership_type_id IS NOT NULL AND cm.membership_type_id = pv.membership_type_id AND (cm.id BETWEEN %1 AND %2)");
+          AND pv.membership_type_id IS NOT NULL AND cm.membership_type_id = pv.membership_type_id AND (cm.id BETWEEN %1 AND %2)", $sqlParams);
         
         CRM_Core_DAO::executeQuery("UPDATE civicrm_line_item li
           INNER JOIN civicrm_membership_payment mp ON mp.contribution_id = li.contribution_id
           INNER JOIN civicrm_price_field_value pv ON pv.id = li.price_field_value_id
           SET li.entity_table = 'civicrm_membership', li.entity_id = mp.membership_id
           WHERE li.entity_table = 'civicrm_contribution'
-          AND pv.membership_type_id IS NOT NULL AND (cmp.membership_id BETWEEN %1 AND %2)", $sqlParams);
+          AND pv.membership_type_id IS NOT NULL AND (mp.membership_id BETWEEN %1 AND %2)", $sqlParams);
         
-        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_line_item (entity_table, entity_id, price_field_id, label, 
+        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_line_item (entity_table, entity_id, price_field_id, label,
           qty, unit_price, line_total, price_field_value_id, financial_type_id)
           SELECT 'civicrm_membership', cm.id, cpf.id price_field_id, cpfv.label, 1 as qty, cpfv.amount, cpfv.amount line_total, 
           cpfv.id price_field_value_id, cpfv.financial_type_id FROM civicrm_membership cm
           LEFT JOIN civicrm_membership_payment cmp ON cmp.membership_id = cm.id
-          LEFT JOIN civicrm_price_field_value cpfv ON cpfv.membership_type_id = cm.membership_type_id
-          LEFT JOIN civicrm_price_field cpf ON cpf.id = cpfv.price_field_id
-          LEFT JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id
+          INNER JOIN civicrm_price_field_value cpfv ON cpfv.membership_type_id = cm.membership_type_id
+          INNER JOIN civicrm_price_field cpf ON cpf.id = cpfv.price_field_id
+          INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id
           WHERE cmp.contribution_id IS NULL AND cps.name = 'default_membership_type_amount' AND (cm.id BETWEEN %1 AND %2)", $sqlParams);
         break;
     } 
