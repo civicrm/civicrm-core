@@ -4,14 +4,15 @@
   <base>CRM/Core</base>
   <class>RecurringEntity</class>
   <name>civicrm_recurring_entity</name>
-  <add>1.7</add>
+  <add>4.6</add>
   <log>true</log>
   <field>
       <name>id</name>
       <title>ID</title>
       <type>int unsigned</type>
+      <length>10</length>
       <required>true</required>      
-      <add>1.7</add>
+      <add>4.6</add>
   </field>
   <primaryKey>
        <name>id</name>
@@ -20,21 +21,32 @@
   <field>
       <name>parent_id</name>
       <type>int unsigned</type>
+      <length>10</length>
       <title>Parent ID</title>
       <required>true</required>
-      <add>1.7</add>
+      <add>4.6</add>
   </field>
   <field>
       <name>entity_id</name>
       <type>int unsigned</type>
+      <length>10</length>
       <title>Entity ID</title>
-      <add>1.7</add>
+      <add>4.6</add>
   </field>
   <field>
       <name>entity_table</name>
       <type>varchar</type>
+      <length>64</length>
       <title>Entity Table</title>
       <required>true</required>
-      <add>1.7</add>
+      <add>4.6</add>
+  </field>
+  <field>
+      <name>cascade_type</name>
+      <type>tinyint unsigned</type>
+      <length>4</length>
+      <title>Cascade Type</title>
+      <required>true</required>
+      <add>4.6</add>
   </field>
 </table>
