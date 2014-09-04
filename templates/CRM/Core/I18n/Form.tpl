@@ -41,7 +41,7 @@
 <script type="text/javascript">
 var fieldName = "{/literal}{$field}{literal}";
 var tsLocale = "{/literal}{$tsLocale}{literal}";
-var $form = $('form.{/literal}{$form.formClass}{literal}');
+var $form = cj('form.{/literal}{$form.formClass}{literal}');
 cj($form).submit(function() {
       cj(this).ajaxSubmit({
                             beforeSubmit: function (formData, jqForm, options) {
