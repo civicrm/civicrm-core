@@ -331,6 +331,6 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Maintained for recurring entity</comment>
-    <add>4.4</add>
+    <add>4.6</add>
   </field>
 </table>
