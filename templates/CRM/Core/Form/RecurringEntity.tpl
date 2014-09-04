@@ -278,7 +278,7 @@
             buttons: {
                 Ok: function() {
                     cj(this).dialog( "close" );
-                    cj('form').submit();
+                    cj('form#Repeat').submit();
                 },
                 Cancel: function() { //cancel
                     cj(this).dialog( "close" );
