@@ -1244,14 +1244,16 @@ class CRM_Contact_BAO_Query {
    * @param boolean $count
    * @param boolean $sortByChar
    * @param boolean $groupContacts
+   * @param boolean $onlyDeleted
    *
    * @return the sql string for that query (this will most likely
    * change soon)
    * @access public
    */
-  function query($count = FALSE, $sortByChar = FALSE, $groupContacts = FALSE) {
-    //@todo - this next line should probably be called from initialize - adding it here as a more conservative approach to patching a stable release
-    $this->generatePermissionClause(FALSE, $count);
+  function query($count = FALSE, $sortByChar = FALSE, $groupContacts = FALSE, $onlyDeleted = FALSE) {
+    // build permission clause
+    $this->generatePermissionClause($onlyDeleted, $count);
+
     if ($count) {
       if (isset($this->_distinctComponentClause)) {
         // we add distinct to get the right count for components
@@ -1321,7 +1323,19 @@ class CRM_Contact_BAO_Query {
       $from = $this->_fromClause;
     }
 
-    $where = $this->composeWhereClause();
+    $where = '';
+    if (!empty($this->_whereClause)) {
+      $where = "WHERE {$this->_whereClause}";
+    }
+
+    if (!empty($this->_permissionWhereClause)) {
+      if (empty($where)) {
+        $where = "WHERE $this->_permissionWhereClause";
+      }
+      else {
+        $where = "$where AND $this->_permissionWhereClause";
+      }
+    }
 
     $having = '';
     if (!empty($this->_having)) {
@@ -1340,25 +1354,6 @@ class CRM_Contact_BAO_Query {
     }
 
     return array($select, $from, $where, $having);
-  }
-
-  /**
-   * Combine whereClause & where condition clause into a complete where clause if they are set
-   *
-   * @return string
-   */
-  function composeWhereClause() {
-    if (empty($this->_whereClause)  AND empty($this->_permissionWhereClause)) {
-      return '';
-    }
-    $where = ' WHERE 1 ';
-    if (!empty($this->_whereClause)) {
-      $where .= " AND {$this->_whereClause} ";
-    }
-    if (!empty($this->_permissionWhereClause)) {
-      $where .= " AND {$this->_permissionWhereClause}";
-    }
-    return $where;
   }
 
   function &getWhereValues($name, $grouping) {
@@ -4322,7 +4317,6 @@ civicrm_relationship.is_permission_a_b = 0
         break;
       }
     }
-    $this->generatePermissionClause($onlyDeleted, $count);
 
     // building the query string
     $groupBy = NULL;
@@ -4421,16 +4415,7 @@ civicrm_relationship.is_permission_a_b = 0
     // note : this modifies _fromClause and _simpleFromClause
     $this->includePseudoFieldsJoin($sort);
 
-    list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts);
-
-    if(!empty($this->_permissionWhereClause)){
-      if (empty($where)) {
-        $where = "WHERE $this->_permissionWhereClause";
-      }
-      else {
-        $where = "$where AND $this->_permissionWhereClause";
-      }
-    }
+    list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
 
     if ($additionalWhereClause) {
       $where = $where . ' AND ' . $additionalWhereClause;
