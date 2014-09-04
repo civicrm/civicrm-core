@@ -142,15 +142,20 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     }
 
     if ($type & self::TAG) {
-		CRM_Core_Resources::singleton()->addScriptUrl('http://10.0.0.2/crm/sites/all/modules/civicrm/packages/jquery/plugins/jstree/jquery.jstree.js?napuqq', 10, 'html-header');
-		// get categories for the contact id
-		//$entityTag = CRM_Core_BAO_EntityTag::getTag($this->_entityID, $this->_entityTable);
-		//$this->assign('tagged', $entityTag);
+    	// CODE FROM CRM/Tag/Form/Tag.php //
+		CRM_Core_Resources::singleton()
+			->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
+      		->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
 
+      	$fName = 'tag';
+      	if ($fieldName) {
+        	$fName = $fieldName;
+      	}
+      	$form->_tagGroup[$fName] = 1;
+      		
 		// get the list of all the categories
-		$allTag = CRM_Core_BAO_Tag::getTagsUsedFor();
+    	$allTag = CRM_Core_BAO_Tag::getTagsUsedFor('civicrm_contact');
 
-		// need to append the array with the " checked " if contact is tagged with the tag
 		$tagChk = array();
 		foreach ($allTag as $tagID => $varValue) {
 			$tagAttribute = array(
@@ -161,7 +166,8 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
 			$tagChk[$tagID] = $form->createElement('checkbox', $tagID, '', '', $tagAttribute);
 		}
 
-		$form->addGroup($tagChk, 'tagList', NULL, NULL, TRUE);
+        $form->addGroup($tagChk, $fName, $tagName, '<br />');
+        $form->assign('tagCount', count($elements));
 
 		$tags = new CRM_Core_BAO_Tag();
 		$tree = $tags->getTree('civicrm_contact', TRUE);
@@ -171,14 +177,9 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
 		$form->assign('entityID', $contactId);
 		$form->assign('entityTable', 'civicrm_contact');
 
-		if ($isRequired) {
-		 $form->addRule($fName, ts('%1 is a required field.', array(1 => $tagName)), 'required');
-		}
-
 		// build tag widget
 		$parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
-		CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', $contactId, TRUE, TRUE);
-
+		CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', $contactId, FALSE, TRUE);
 
 		/*$this->addButtons(array(
 		 array(

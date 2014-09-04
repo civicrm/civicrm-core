@@ -23,35 +23,52 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{literal}
 <style>
-  .hit {ldelim}padding-left:10px;{rdelim}
-  .tree li {ldelim}padding-left:10px;{rdelim}
-  #Tag .tree .collapsable .hit {ldelim}background:url('{$config->resourceBase}i/menu-expanded.png') no-repeat left 8px;padding-left: 9px;cursor:pointer{rdelim}
-  #Tag .tree .expandable .hit {ldelim}background:url('{$config->resourceBase}i/menu-collapsed.png') no-repeat left 6px;padding-left: 9px;cursor:pointer{rdelim}
-  #Tag #tagtree .highlighted {ldelim}background-color:lightgrey;{rdelim}
+  #tagtree .highlighted > span {
+    background-color: #fefca6;
+  }
+  #tagtree .helpicon ins {
+    display: none;
+  }
+  #tagtree ins.jstree-icon {
+    cursor: pointer;
+  }
 </style>
-{*crmScript ext=civicrm.jquery.plugins.jstree file=jquery.jstree.js*}
 <script type="text/javascript">
-  (function($){ldelim}
-    var entityID={$entityID};
-    var entityTable='{$entityTable}';
+  (function($, _){{/literal}
+    var entityID={$entityID},
+      entityTable='{$entityTable}',
+      $form = $('form.{$form.formClass}');
     {literal}
-    $(function() {
-      $("#tagtree input").removeAttr("disabled");
-      //unobsctructive elements are there to provide the function to those not having javascript, no need for the others
-      $(".unobstructive").hide();
 
-      $("#tagtree ul input:checked").each(function(){
-        $(this).parents("li").children(".jstree-icon").addClass('highlighted');
+    $(function() {
+      function highlightSelected() {
+        $("ul input:not(:checked)", '#tagtree').each(function () {
+          $(this).closest("li").removeClass('highlighted');
+        });
+        $("ul input:checked", '#tagtree').each(function () {
+          $(this).parents("li[id^=tag]").addClass('highlighted');
+        });
+      }
+      highlightSelected();
+
+      $("#tagtree input").change(function(){
+        highlightSelected();
       });
 
       //load js tree.
       $("#tagtree").jstree({
-        "plugins" : ["themes", "html_data"],
-        "themes": {"url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/default/style.css'}
+        plugins : ["themes", "html_data"],
+        themes: {
+          "theme": 'classic',
+          "dots": false,
+          "icons": false,
+          "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
+        }
       });
     });
-  })(cj);
+  })(CRM.$, CRM._);
   {/literal}
 </script>
 
@@ -70,7 +87,7 @@
       
 	  <td width="70%"><span class="label">{if $title}{$form.$key.label}{/if}</span>
 		<div id="tagtree">
-			{include file="CRM/Tag/Form/Tagtree.tpl" level=1}
+			{include file="CRM/Contact/Form/Edit/Tagtree.tpl" level=1}
 		</div>
 	  </td>
     </tr>
