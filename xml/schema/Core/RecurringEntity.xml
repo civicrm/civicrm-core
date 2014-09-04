@@ -44,6 +44,7 @@
   <field>
       <name>cascade_type</name>
       <type>tinyint unsigned</type>
+      <default>1</default>
       <length>4</length>
       <title>Cascade Type</title>
       <required>true</required>
