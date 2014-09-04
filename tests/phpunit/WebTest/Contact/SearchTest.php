@@ -54,10 +54,10 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->typeKeys("css=input#sort_name_navigation", $sortName);
 
     // wait for result list
-    $this->waitForElementPresent("xpath=//*[@id='ui-id-1']/li");
+    $this->waitForElementPresent("xpath=//li[contains(text(), '$sortName :: $firstName.anderson@example.org')]");
 
     // visit contact summary page
-    $this->click("xpath=//*[@id='ui-id-1']/li");
+    $this->click("xpath=//li[contains(text(), '$sortName :: $firstName.anderson@example.org')]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is contact present?
@@ -125,7 +125,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("css=div#tagtree");
 
     // select tag
-    $this->click("xpath=//ul/li/label[text()=\"$tagName\"]");
+    $this->click("xpath=//ul/li/span/label[text()=\"$tagName\"]");
     $this->waitForElementPresent("css=.success");
 
     // visit contact search page
@@ -249,7 +249,6 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     // Select the task action to export
     $this->click("task");
     $this->select("task", "label=Export Contacts");
-    $this->click("Go");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->click("_qf_Select_next-bottom");
