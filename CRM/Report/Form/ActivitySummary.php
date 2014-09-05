@@ -193,8 +193,8 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       if (array_key_exists('group_bys', $table)) {
         foreach ($table['group_bys'] as $fieldName => $field) {
           if (!empty($this->_params['group_bys'][$fieldName])) {
-
-            switch (CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])) {
+            if (isset($this->_params['group_bys_freq']) && !empty($this->_params['group_bys_freq'][$fieldName])) {
+            switch ($this->_params['group_bys_freq'][$fieldName]) {
               case 'YEARWEEK':
                 $select[] = "DATE_SUB({$field['dbAlias']}, INTERVAL WEEKDAY({$field['dbAlias']}) DAY) AS {$tableName}_{$fieldName}_start";
 
@@ -224,7 +224,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
                 $field['title'] = 'Quarter';
                 break;
             }
-            if (!empty($this->_params['group_bys_freq'][$fieldName])) {
               $this->_interval = $field['title'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['title'] = $field['title'] . ' Beginning';
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['type'] = $field['type'];
