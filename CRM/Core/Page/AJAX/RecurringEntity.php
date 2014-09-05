@@ -55,7 +55,7 @@ class CRM_Core_Page_AJAX_RecurringEntity {
             $params['parent_event_start_date'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['parent_event_id'], 'start_date');
             $params['parent_event_end_date'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['parent_event_id'], 'end_date');
           }
-          $recurResult = CRM_Core_Form_RecurringEntity::generateRecursions($recursionObject, $params); 
+          $recurResult = CRM_Core_BAO_RecurringEntity::generateRecursions($recursionObject, $params); 
           $count = 1;
           foreach ($recurResult as $key => $value) {
             $recurDates[$count]['start_date'] = date('M d, Y h:i:s A \o\n l', strtotime($value['start_date']));
