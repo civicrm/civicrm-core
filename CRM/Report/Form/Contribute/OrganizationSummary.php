@@ -363,6 +363,9 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
+  /**
+   * Set variables to be accessed by API and form layer in processing
+   */
   function beginPostProcessCommon() {
     $getRelationship = $this->_params['relationship_type_id_value'];
     $type = substr($getRelationship, -3);

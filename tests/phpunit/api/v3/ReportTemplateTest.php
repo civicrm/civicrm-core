@@ -173,7 +173,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
                       also, type should be added to state province & others? & potentially getAddressColumns fn should be
                       used per other reports',
         'contribute/repeat' => 'Reports with important functionality in postProcess are not callable via the api. For variable setting recommend beginPostProcessCommon, for temp table creation recommend From fn',
-        'contribute/householdSummary' => '(see contribute/repeat) Undefined property: CRM_Report_Form_Contribute_HouseholdSummary::$householdContact LINE 260, property should be declared on class, for api accessibility should be set in beginPreProcess common',
         'contribute/topDonor' => 'construction of query in postProcess makes inaccessible ',
         'contribute/sybunt' => 'e notice - (ui gives fatal error at civicrm/report/contribute/sybunt&reset=1&force=1
                                 e-notice is on yid_valueContribute/Sybunt.php(214) because at the force url "yid_relative" not "yid_value" is defined',
