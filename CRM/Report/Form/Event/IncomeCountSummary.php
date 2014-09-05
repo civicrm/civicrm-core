@@ -67,6 +67,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
             'required' => TRUE,
           ),
           'id' => array(
+            'title' => 'Event ID',
             'no_display' => TRUE,
             'required' => TRUE,
           ),
@@ -268,6 +269,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     if ($dao->fetch()) {
+      $avg = 0;
       if ($dao->count && $dao->amount) {
         $avg = $dao->amount / $dao->count;
       }
@@ -281,7 +283,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
         'title' => 'Total Income',
         'type' => CRM_Utils_Type::T_MONEY,
       );
-      $statistics['counts']['avg   '] = array(
+      $statistics['counts']['avg'] = array(
         'value' => $avg,
         'title' => 'Average',
         'type' => CRM_Utils_Type::T_MONEY,
