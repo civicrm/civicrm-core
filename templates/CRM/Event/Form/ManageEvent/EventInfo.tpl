@@ -152,7 +152,6 @@
   <div id="customData"></div>
   {include file="CRM/Form/validate.tpl"}
   {*include custom data js file*}
-  {include file="CRM/Event/Form/ConfirmSubmit.tpl"}
   {literal}
     <script type="text/javascript">
       CRM.$(function($) {
