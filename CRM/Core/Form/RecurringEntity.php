@@ -366,18 +366,6 @@ class CRM_Core_Form_RecurringEntity {
       }
     }
   }
-    
-  static public function getAllConnectedEvents($parentId=''){
-    if(!empty($parentId)){
-      $query = "
-        SELECT GROUP_CONCAT(entity_id) as entity_id
-        FROM civicrm_recurring_entity
-        WHERE parent_id = ".$parentId;
-      $dao = CRM_Core_DAO::executeQuery($query);
-      $dao->fetch();
-    }
-    return $dao;
-  }
   
   static function getListOfCurrentAndFutureEvents($ids=''){
     if(isset($ids) and !empty($ids)){

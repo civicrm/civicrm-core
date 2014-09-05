@@ -62,27 +62,31 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
      * Get connected event information list
      */
       //Get all connected event ids
-      $allEventIds = CRM_Core_Form_RecurringEntity::getAllConnectedEvents($checkParentExistsForThisId);
-      if($allEventIds->entity_id){
-        //echo "<pre>"; print_r($eventIds);
-        //list($offset, $rowCount) = $this->_pager->getOffsetAndRowCount();
-        $params = array();
-        $query = "
-          SELECT *
-          FROM civicrm_event
-          WHERE id IN (".$allEventIds->entity_id.")
-          ORDER BY start_date asc
-           ";
-
-        $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Event_DAO_Event');
-        //$permissions = CRM_Event_BAO_Event::checkPermission();
-        while($dao->fetch()){
-//          if(in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])){
-          if($dao->id){
-            $manageEvent[$dao->id] = array();
-            CRM_Core_DAO::storeValues($dao, $manageEvent[$dao->id]);
-          }
+      //$allEventIds = CRM_Core_Form_RecurringEntity::getAllConnectedEvents($checkParentExistsForThisId);
+      $allEventIdsArray = CRM_Core_BAo_RecurringEntity::getEntitiesForParent($checkParentExistsForThisId, 'civicrm_event');
+      $allEventIds = array();
+      if(!empty($allEventIdsArray)){
+        foreach($allEventIdsArray as $key => $val){
+          $allEventIds[] = $val['id'];
         }
+        if(!empty($allEventIds)){
+          $params = array();
+          $query = "
+            SELECT *
+            FROM civicrm_event
+            WHERE id IN (".implode(",", $allEventIds).")
+            ORDER BY start_date asc
+             ";
+
+          $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Event_DAO_Event');
+          $permissions = CRM_Event_BAO_Event::checkPermission();
+          while($dao->fetch()){
+            if(in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])){
+              $manageEvent[$dao->id] = array();
+              CRM_Core_DAO::storeValues($dao, $manageEvent[$dao->id]);
+            }
+          }
+        }  
         $this->assign('rows', $manageEvent);
       }
     }else{
