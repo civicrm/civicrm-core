@@ -297,20 +297,32 @@
           data: formData,
           url:  ajaxurl,
           success: function (result) {
+             var errors = [];
              var html = 'Based on your repeat configuration here is the list of event dates, Do you wish to proceed creating events for these dates?<br/><table id="options" class="display"><thead><tr><th>Sr No</th><th>Start date</th><th id="th-end-date">End date</th></tr><thead>';
              var count = 1;
              for(var i in result) {
-                var start_date = result[i].start_date;
-                var end_date = result[i].end_date;
-                
-                var end_date_text = '';
-                if(end_date !== undefined){
-                   end_date_text = '<td>'+end_date+'</td>';
+                if(i != 'errors'){
+                    var start_date = result[i].start_date;
+                    var end_date = result[i].end_date;
+
+                    var end_date_text = '';
+                    if(end_date !== undefined){
+                       end_date_text = '<td>'+end_date+'</td>';
+                    }
+                    html += '<tr><td>'+count+'</td><td>'+start_date+'</td>'+end_date_text+'</tr>';
+                    count = count + 1;
+                }else{
+                    errors = result.errors;
                 }
-                html += '<tr><td>'+count+'</td><td>'+start_date+'</td>'+end_date_text+'</tr>';
-                count = count + 1;
             }
             html += '</table>';
+            if(errors.length > 0){
+                alert('hey');
+                html = '';
+                for (var j = 0; j < errors.length; j++) {
+                    html += '<span style="color: #8A1F11;">*&nbsp;' + errors[j] + '</span><br/>';
+                }
+            }
             cj('#generated_dates').html(html);
             if(end_date_text == ""){
                 cj('#th-end-date').hide();

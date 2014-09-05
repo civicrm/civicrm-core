@@ -39,37 +39,31 @@ class CRM_Core_Page_AJAX_RecurringEntity {
     $params = $formValues = $recurDates = array();
     $formValues = $_REQUEST;
     if(!empty($formValues)){
-      //Check for mandatory fields
-//      if(!CRM_Utils_Array::value('repetition_frequency_unit', $formValues)){
-//        $recurDates['errors']['repetition_frequency_unit'] = 'Repeats is a required field';
-//      }
-//      if(!CRM_Utils_Array::value('repetition_frequency_interval', $formValues)){
-//        $recurDates['errors']['repetition_frequency_interval'] = 'Repeats every is a required field';
-//      }
-//      if(!CRM_Utils_Array::value('start_action_offset', $formValues) && !CRM_Utils_Array::value('repeat_absolute_date', $formValues)){
-//        $recurDates['errors']['start_action_offset'] = 'Ends is a required field';
-//      }
-      
       $dbParams = CRM_Core_BAO_RecurringEntity::mapFormValuesToDB($formValues);
       if(!empty($dbParams)){
         $recursionObject = CRM_Core_BAO_RecurringEntity::getRecursionFromReminderByDBParams($dbParams);
-        if(CRM_Utils_Array::value('event_id', $formValues)){
-          $parent_event_id = CRM_Core_BAO_RecurringEntity::getParentFor($formValues['event_id'], 'civicrm_event');
-          if(!$parent_event_id){
-            $parent_event_id = $formValues['event_id'];
+        // Check if there were any errors
+        if($recursionObject->errors){
+          $recurDates['errors'] = $recursionObject->errors;
+        }else{
+          if(CRM_Utils_Array::value('event_id', $formValues)){
+            $parent_event_id = CRM_Core_BAO_RecurringEntity::getParentFor($formValues['event_id'], 'civicrm_event');
+            if(!$parent_event_id){
+              $parent_event_id = $formValues['event_id'];
+            }
+            $params['parent_event_id'] = $parent_event_id;
+            $params['parent_event_start_date'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['parent_event_id'], 'start_date');
+            $params['parent_event_end_date'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['parent_event_id'], 'end_date');
           }
-          $params['parent_event_id'] = $parent_event_id;
-          $params['parent_event_start_date'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['parent_event_id'], 'start_date');
-          $params['parent_event_end_date'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['parent_event_id'], 'end_date');
-        }
-        $recurResult = CRM_Core_Form_RecurringEntity::generateRecursions($recursionObject, $params); 
-        $count = 1;
-        foreach ($recurResult as $key => $value) {
-          $recurDates[$count]['start_date'] = date('M d, Y h:i:s A \o\n l', strtotime($value['start_date']));
-          if($value['end_date']){
-            $recurDates[$count]['end_date'] = date('M d, Y h:i:s A \o\n l', strtotime($value['end_date']));
+          $recurResult = CRM_Core_Form_RecurringEntity::generateRecursions($recursionObject, $params); 
+          $count = 1;
+          foreach ($recurResult as $key => $value) {
+            $recurDates[$count]['start_date'] = date('M d, Y h:i:s A \o\n l', strtotime($value['start_date']));
+            if($value['end_date']){
+              $recurDates[$count]['end_date'] = date('M d, Y h:i:s A \o\n l', strtotime($value['end_date']));
+            }
+            $count++;
           }
-          $count++;
         }
       }
     }
