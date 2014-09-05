@@ -1,7 +1,7 @@
 <?php
 /**
  * Test Generated example of using group getfields API
- * demonstrate use of getfields to interogate api *
+ * demonstrate use of getfields to interrogate api *
  */
 function group_getfields_example(){
 $params = array(
