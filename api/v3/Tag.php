@@ -55,6 +55,8 @@ function civicrm_api3_tag_create($params) {
 /**
  * Specify Meta data for create. Note that this data is retrievable via the getfields function
  * and is used for pre-filling defaults and ensuring mandatory requirements are met.
+ *
+ * @param array $params
  */
 function _civicrm_api3_tag_create_spec(&$params) {
   $params['used_for']['api.default'] = 'civicrm_contact';
