@@ -44,6 +44,18 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
   protected $_summary = NULL;
 
   /**
+   * Organisation contact ie. 'contact_id_b' or 'contact_id_a'
+   * @var string
+   */
+  protected $orgContact;
+
+  /**
+   * Related Contact ie. 'contact_id_b' or 'contact_id_a'
+   * @var string
+   */
+  protected $otherContact;
+
+  /**
    *
    */
   /**
@@ -97,7 +109,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => $this->relationTypes,
-            'default' => array(1),
+            'default' => key($this->relationTypes),
           ),
         ),
         'grouping' => 'organization-fields',
@@ -341,8 +353,17 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
   }
 
   function postProcess() {
-
     $this->beginPostProcess();
+    $this->buildACLClause(array($this->_aliases['civicrm_contact'], $this->_aliases['civicrm_contact_organization']));
+    $sql = $this->buildQuery(TRUE);
+    $rows = array();
+    $this->buildRows($sql, $rows);
+    $this->formatDisplay($rows);
+    $this->doTemplateAssignment($rows);
+    $this->endPostProcess($rows);
+  }
+
+  function beginPostProcessCommon() {
     $getRelationship = $this->_params['relationship_type_id_value'];
     $type = substr($getRelationship, -3);
     $this->relationshipId = intval((substr($getRelationship, 0, strpos($getRelationship, '_'))));
@@ -354,17 +375,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
       $this->orgContact = 'contact_id_a';
       $this->otherContact = 'contact_id_b';
     }
-
-    $this->buildACLClause(array($this->_aliases['civicrm_contact'], $this->_aliases['civicrm_contact_organization']));
-    $sql = $this->buildQuery(TRUE);
-    $rows = array();
-
-    $this->buildRows($sql, $rows);
-    $this->formatDisplay($rows);
-    $this->doTemplateAssignment($rows);
-    $this->endPostProcess($rows);
   }
-
   function validRelationships() {
     $this->relationTypes = $relationTypes = array();
 
