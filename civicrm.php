@@ -559,7 +559,7 @@ class CiviCRM_For_WordPress {
         'CiviCRM',
         array( $this, 'invoke' ),
         $civilogo,
-        59.1
+        apply_filters( 'civicrm_menu_item_position', '3.904981' ) // 3.9 + random digits to reduce risk of conflict
       );
 
     } else {
