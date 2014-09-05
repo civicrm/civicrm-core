@@ -25,3 +25,12 @@ GROUP BY ceft.entity_id ) as temp ON temp.trxn_id = cft.id
 INNER JOIN civicrm_contribution cc ON cc.id = temp.contribution_id
 AND cc.payment_instrument_id <> cft.payment_instrument_id
 SET cft.payment_instrument_id = cc.payment_instrument_id;
+
+--CRM-15086
+SELECT @option_group_id_batch_status := id FROM civicrm_option_group WHERE name = 'batch_status';
+
+UPDATE civicrm_option_value SET name = 'Open' WHERE value = 1 AND option_group_id = @option_group_id_batch_status;
+UPDATE civicrm_option_value SET name = 'Closed' WHERE value = 2 AND option_group_id = @option_group_id_batch_status;
+UPDATE civicrm_option_value SET name = 'Data Entry' WHERE value = 3 AND option_group_id = @option_group_id_batch_status;
+UPDATE civicrm_option_value SET name = 'Reopened' WHERE value = 4 AND option_group_id = @option_group_id_batch_status;
+UPDATE civicrm_option_value SET name = 'Exported' WHERE value = 5 AND option_group_id = @option_group_id_batch_status;
