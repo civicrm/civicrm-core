@@ -312,6 +312,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
         if($scheduleReminderDetails['repetition_frequency_interval']){
           $r->interval($scheduleReminderDetails['repetition_frequency_interval']);
+        }else{
+          $r->errors[] = 'Repeats every: is a required field';
         }
 
         //week
@@ -369,11 +371,34 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         }
 
         if(!$scheduleReminderDetails['start_action_offset'] && !$scheduleReminderDetails['absolute_date']){
-          CRM_Core_Error::fatal("Could not find end limit for repeat configuration");
+          $r->errors[] = 'Ends: is a required field';
         }
+     }else{
+       $r->errors[] = 'Repeats: is a required field';
      }
       return $r;
     }
     
+  /*
+   * Get Reminder id based on event id
+   */
+  static public function getReminderDetailsByEventId($eventId, $used_for){
+    if($eventId){
+      $query = "
+        SELECT *
+        FROM   civicrm_action_schedule 
+        WHERE  entity_value = %1";
+      if($used_for){
+        $query .= " AND used_for = %2";
+      }
+      $params = array(
+                  1 => array($eventId, 'Integer'),
+                  2 => array($used_for, 'String')
+                );
+      $dao = CRM_Core_DAO::executeQuery($query, $params);
+      $dao->fetch();
+    }
+    return $dao;
+  }   
     
-  }
+}

@@ -55,7 +55,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
     $checkParentExistsForThisId;
     //If this ID has parent, send parent id
     if($checkParentExistsForThisId){
-      $this->_scheduleReminderDetails = CRM_Core_Form_RecurringEntity::getReminderDetailsByEventId($checkParentExistsForThisId);
+      $this->_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEventId($checkParentExistsForThisId, 'event');
       $this->_parentEventId = $checkParentExistsForThisId;
       
       /**
@@ -87,7 +87,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       }
     }else{
       //ELse send this id as parent
-      $this->_scheduleReminderDetails = CRM_Core_Form_RecurringEntity::getReminderDetailsByEventId($this->_id);
+      $this->_scheduleReminderDetails = CRM_Core_BAO_RecurringEntity::getReminderDetailsByEventId($this->_id, 'event');
       $this->_parentEventId = $this->_id;
     }
     //Assign this to hide summary
@@ -184,10 +184,6 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       $url = 'civicrm/event/manage/repeat';
       $urlParams = "action=update&reset=1&id={$this->_id}";
       
-      //Check if isChangeInRepeatConfiguration is set in params
-//      if($params['isChangeInRepeatConfiguration'] == 1){
-//        CRM_Core_Form_RecurringEntity::updateRecurCriterias($this->_id);
-//      }
       CRM_Core_Form_RecurringEntity::postProcess($params, 'event');
       CRM_Utils_System::redirect(CRM_Utils_System::url($url, $urlParams));
       //CRM_Core_Error::debug_var('Event Recursion');

@@ -366,35 +366,7 @@ class CRM_Core_Form_RecurringEntity {
       }
     }
   }
-  
-  /*
-   * Get Reminder id based on event id
-   */
-  static public function getReminderDetailsByEventId($eventId=''){
-    if(!empty($eventId)){
-      $query = "
-        SELECT *
-        FROM   civicrm_action_schedule 
-        WHERE  entity_value = '".$eventId."'";
-      $dao = CRM_Core_DAO::executeQuery($query);
-      $dao->fetch();
-    }
-    return $dao;
-  }
-  
-  //It is a repeating event if, there exists a parent for an event
-  static public function checkParentExistsForThisId($currentEventId){
-    if(!empty($currentEventId)){
-      $query = "
-        SELECT parent_id 
-        FROM civicrm_recurring_entity
-        WHERE entity_id = ".$currentEventId;
-      $dao = CRM_Core_DAO::executeQuery($query);
-      $dao->fetch();
-    }
-    return $dao;
-  }
-  
+    
   static public function getAllConnectedEvents($parentId=''){
     if(!empty($parentId)){
       $query = "
