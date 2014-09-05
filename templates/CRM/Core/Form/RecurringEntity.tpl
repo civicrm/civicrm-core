@@ -64,7 +64,7 @@
           </tr>*}
           <tr class="crm-core-form-recurringentity-block-ends">
             <td class="label">{$form.ends.label}</td>
-            <td>{$form.ends.1.html}&nbsp;{$form.start_action_offset.html}&nbsp;occurrences{help id="id-ends-after"}</td>
+            <td>{$form.ends.1.html}&nbsp;{$form.start_action_offset.html}&nbsp;occurrences&nbsp;{help id="id-ends-after"}</td>
           </tr>
           <tr class="crm-core-form-recurringentity-block-absolute_date">
               <td class="label"></td>
@@ -88,9 +88,9 @@
       </div>
     </div>
 </div>
-<div id="dialog" style="display:none">
+<!--<div id="dialog" style="display:none">
     Changing Repeat configuration may affect all other connected repeating events, Are you sure?
-</div>
+</div>-->
 <div id="preview-dialog" style="display:none;height:auto;">
     <div style="display:block;" id="generated_dates"></div>
     
@@ -317,7 +317,6 @@
             }
             html += '</table>';
             if(errors.length > 0){
-                alert('hey');
                 html = '';
                 for (var j = 0; j < errors.length; j++) {
                     html += '<span style="color: #8A1F11;">*&nbsp;' + errors[j] + '</span><br/>';
