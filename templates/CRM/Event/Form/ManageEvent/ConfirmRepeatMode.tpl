@@ -25,25 +25,25 @@
 *}
 
 <div id="repeat-mode-dailog" style="display:none;">
-    Would you like to change this event only, or this and following events in series?<br/><br/>
+    How would you like this change to affect other events in the repetition set?<br/><br/>
     <div style="display: inline-block">
         <div style="display:inline-block;width:100%;">
             <div style="width:30%;float:left;">
                 <button class="repeat-mode-dailog-button only-this-event">Only this Event</button>
             </div>
-            <div style="width:70%;float:left;">All other events in the series will remain same</div>
+            <div style="width:70%;float:left;">All other events in the series will remain same.</div>
         </div>
         <div style="display:inline-block;width:100%;">
             <div style="width:30%;float:left;">
                 <button class="repeat-mode-dailog-button this-and-all-following-event">This and Following Events</button>
             </div>
-            <div style="width:70%;float:left;">This and all the following events will be changed</div>
+            <div style="width:70%;float:left;">Change applies to this and all the following events.</div>
         </div>
         <div style="display:inline-block;width:100%;">
             <div style="width:30%;float:left;">
                 <button class="repeat-mode-dailog-button all-events">All the Events</button>
             </div>
-            <div style="width:70%;float:left;">All the related events will be changed</div>
+            <div style="width:70%;float:left;">Change applies to all the events in the series.</div>
         </div>
     </div>
 </div>
@@ -70,10 +70,9 @@
   CRM.$(function($) {
     $('#crm-main-content-wrapper').on('click', 'div.crm-submit-buttons span.crm-button input[value="Save"], div.crm-submit-buttons span.crm-button input[value="Save and Done"]', function() {
       $("#repeat-mode-dailog").dialog({
-        title: 'Save recurring event',
+        title: 'How does this change affect other repeating events in the set?',
+        modal: true,
         width: '650',
-        position: 'center',
-        //draggable: false,
         buttons: {
           Cancel: function() { //cancel
             $( this ).dialog( "close" );
