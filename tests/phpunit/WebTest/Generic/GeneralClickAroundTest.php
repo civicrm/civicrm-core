@@ -112,12 +112,10 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     // Contributions → Dashboard
     $this->click("css=ul#civicrm-menu li.crm-Contributions");
     $this->click("css=ul#civicrm-menu li.crm-Contributions li.crm-Dashboard a");
-    $this->waitForElementPresent('chart_type');
-
+    $this->waitForElementPresent("xpath=//*[@id='chart_view']/a");
+    $this->waitForElementPresent("xpath=//*[@id='ContributionCharts']/div[4]/div[3]");
     $this->assertTextPresent("Contribution Summary");
-    $this->assertTextPresent("Select Year (for monthly breakdown)");
     $this->assertTextPresent("Recent Contributions");
-    $this->assertTextPresent("Find more contributions...");
   }
 
   function testEventDashboard() {
@@ -205,8 +203,8 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
 
     $this->assertTextPresent("New Mailing");
     $this->assertElementPresent("name");
-    $this->assertElementPresent("includeGroups-f");
-    $this->assertElementPresent("excludeGroups-t");
+    $this->assertElementPresent("includeGroups");
+    $this->assertElementPresent("excludeGroups");
   }
 
   function testConstituentReportSummary() {
@@ -272,7 +270,9 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
 
     $this->assertTextPresent("CiviCRM Profile");
     // Verify Reserved Profiles
-    $this->click("ui-id-3");
+
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[2]/a");
+    $this->waitForElementPresent("newCiviCRMProfile-bottom");
     $this->assertTextPresent("New Household");
     $this->assertTextPresent("New Individual");
     $this->assertTextPresent("New Organization");
@@ -281,7 +281,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Summary Overlay");
 
     // Verify profiles that are not reserved
-    $this->click("ui-id-2");
+    $this->click("xpath=//div[@id='mainTabContainer']/ul/li[1]/a");
     $this->assertTextPresent("Name and Address");
     $this->assertTextPresent("Supporter Profile");
 
