@@ -3438,4 +3438,78 @@ WHERE con.id = {$contributionId}
 
     return CRM_Utils_Array::value( 'financial_account_id', $result );
   }
+
+  function checkTaxAmount($params, $isLineItem = FALSE) {
+    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+
+    // Update contribution
+    if (!empty($params['id'])) {
+      $id = $params['id'];
+      $values = $ids = array();
+      $contrbutionParams = array('id' => $id);
+      $prevContributionValue = CRM_Contribute_BAO_Contribution::getValues($contrbutionParams, $values, $ids);
+
+      // To assign pervious finantial type on update of contribution
+     if (!isset($params['financial_type_id'])) {
+        $params['financial_type_id'] = $prevContributionValue->financial_type_id;
+      }
+      else if (isset($params['financial_type_id']) && !array_key_exists($params['financial_type_id'], $taxRates)) {
+        // Assisn tax Amount on update of contrbution
+        if (!empty($prevContributionValue->tax_amount)) {
+          $params['tax_amount'] = 'null';
+          CRM_Price_BAO_LineItem::getLineItemArray($params, array($params['id']));
+          foreach ($params['line_item'] as $setID => $priceField) {
+            foreach ($priceField as $priceFieldID => $priceFieldValue) {
+              $params['line_item'][$setID][$priceFieldID]['tax_amount'] = $params['tax_amount'];
+            }
+          }
+        }
+      }
+    }
+
+    // New Contrbution and update of contribution with tax rate financial type
+    if (isset($params['financial_type_id']) && array_key_exists($params['financial_type_id'], $taxRates) && 
+      empty($params['skipLineItem']) && !$isLineItem)
+      {
+        $taxRateParams = $taxRates[$params['financial_type_id']];
+        $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($params['total_amount'], $taxRateParams);
+        $params['tax_amount'] = round($taxAmount['tax_amount'], 2);
+
+        // Get Line Item on update of contribution
+        if (isset($params['id'])) {
+          CRM_Price_BAO_LineItem::getLineItemArray($params, array($params['id']));
+        }
+        else {
+          CRM_Price_BAO_LineItem::getLineItemArray($params);
+        }
+        foreach ($params['line_item'] as $setID => $priceField) {
+          foreach ($priceField as $priceFieldID => $priceFieldValue) {
+           $params['line_item'][$setID][$priceFieldID]['tax_amount'] = $params['tax_amount'];
+          }
+        }
+        $params['total_amount'] = $params['total_amount'] + $params['tax_amount'];
+      } 
+    else if (isset($params['api.line_item.create'])) {
+      // Update total amount of contribution using lineItem 
+      $taxAmountArray = array();
+      foreach ($params['api.line_item.create'] as $key => $value) {
+        if (isset($value['financial_type_id']) && array_key_exists($value['financial_type_id'], $taxRates)) {
+         $taxRate = $taxRates[$value['financial_type_id']];
+          $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($value['line_total'], $taxRate);                   
+          $taxAmountArray[] = round($taxAmount['tax_amount'], 2);
+        }
+      }
+      $params['tax_amount'] = array_sum($taxAmountArray);
+      $params['total_amount'] = $params['total_amount'] + $params['tax_amount'];  
+    }
+    else {
+      // update line item of contrbution
+      if (isset($params['financial_type_id']) && array_key_exists($params['financial_type_id'], $taxRates) && $isLineItem) {
+        $taxRate = $taxRates[$params['financial_type_id']];
+        $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($params['line_total'], $taxRate);
+        $params['tax_amount'] = round($taxAmount['tax_amount'], 2);
+      }
+    }
+    return $params;
+  }
 }
