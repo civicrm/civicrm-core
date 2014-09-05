@@ -361,6 +361,9 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
         //Ends
         if($scheduleReminderDetails['start_action_offset']){
+          if($scheduleReminderDetails['start_action_offset'] > 30){
+            $r->errors[] = 'Occurrences should be less than or equal to 30';
+          }
           $r->count($scheduleReminderDetails['start_action_offset']);
         }
 
