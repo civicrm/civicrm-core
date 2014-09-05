@@ -376,7 +376,6 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
       $this->otherContact = 'contact_id_b';
     }
   }
-
   function validRelationships() {
     $this->relationTypes = $relationTypes = array();
 
