@@ -209,12 +209,6 @@
     //Select all options in selectbox before submitting
     cj(this).submit(function() {
         cj('#exclude_date_list option').attr('selected',true);
-        var dateTxt=[];
-        cj('#exclude_date_list option:selected').each(function(){
-            dateTxt.push(cj(this).text());
-        });
-        var completeDateText = dateTxt.join(',');
-        cj('#copyExcludeDates').val(completeDateText);
         
         //Check form for values submitted
         if(cj('input[name=ends]:checked').val() == 1){
@@ -238,36 +232,19 @@
         }
         
     });
-    
-    
-    //Dialog for changes in repeat configuration
-/*    cj('#dialog').dialog({ autoOpen: false });
-    cj('#_qf_Repeat_submit-top, #_qf_Repeat_submit-bottom').click(
-        function () {
-            cj('#dialog').dialog('open');
-            cj('#dialog').dialog({
-                title: 'Save recurring event',
-                width: '600',
-                position: 'center',
-                //draggable: false,
-                buttons: {
-                    Yes: function() {
-                        cj(this).dialog( "close" );
-                        cj('#isChangeInRepeatConfiguration').val('1');
-                        cj('form').submit();
-                    },
-                    No: function() { //cancel
-                        cj(this).dialog( "close" );
-                    }
-                }
-            });
-            return false;
-        }
-    );*/
-    
+        
     //Dialog for preview repeat Configuration dates
     cj('#preview-dialog').dialog({ autoOpen: false });
     cj('#_qf_Repeat_submit-top, #_qf_Repeat_submit-bottom').click( function (){
+        cj('#exclude_date_list option').attr('selected',true);
+        //Copy exclude dates
+        var dateTxt=[];
+        cj('#exclude_date_list option:selected').each(function(){
+            dateTxt.push(cj(this).text());
+        });
+        var completeDateText = dateTxt.join(',');
+        cj('#copyExcludeDates').val(completeDateText);
+        
         cj('#generated_dates').html('').html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Just a moment, generating dates{/ts}{literal}...</span></div>');
         cj('#preview-dialog').dialog('open');
         cj('#preview-dialog').dialog({
