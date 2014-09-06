@@ -25,9 +25,9 @@
     return this.each(function() {
       // Hide the existing <SELECT> and instead construct a ProfileSelector view.
       // Keep them synchronized.
-      var select = this;
+      var matchingUfGroups,
+        $select = $(this).hide().addClass('rendered');
 
-      var matchingUfGroups;
       if (options.groupTypeFilter) {
         matchingUfGroups = ufGroupCollection.subcollection({
           filter: function(ufGroupModel) {
@@ -39,15 +39,15 @@
       }
 
       var view = new CRM.ProfileSelector.View({
-        ufGroupId: $(select).val(),
+        ufGroupId: $select.val(),
         ufGroupCollection: matchingUfGroups,
         ufEntities: options.entities
       });
       view.on('change:ufGroupId', function() {
-        $(select).val(view.getUfGroupId()).change();
+        $select.val(view.getUfGroupId()).change();
       });
       view.render();
-      $(select).after(view.el);
+      $select.after(view.el);
       setTimeout(function() {
         view.doPreview();
       }, 100);
@@ -55,9 +55,9 @@
   };
 
   $('#crm-container').on('crmLoad', function() {
-    $('.crm-profile-selector:not(.rendered)', this).addClass('rendered').each(function() {
+    $('.crm-profile-selector:not(.rendered)', this).each(function() {
       $(this).crmProfileSelector({
-        groupTypeFilter: $(this).attr('data-group-type'),
+        groupTypeFilter: $(this).data('groupType'),
         entities: $(this).data('entities')
       });
     });
