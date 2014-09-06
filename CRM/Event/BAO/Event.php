@@ -403,13 +403,15 @@ SELECT     civicrm_event.id as id, civicrm_event.title as event_title, civicrm_e
            civicrm_event.end_date as end_date, civicrm_event.is_online_registration, civicrm_event.is_monetary, civicrm_event.is_show_location,civicrm_event.is_map as is_map, civicrm_option_value.label as event_type, civicrm_tell_friend.is_active as is_friend_active,
            civicrm_event.slot_label_id,
            civicrm_event.summary as summary,
-           civicrm_pcp_block.id as is_pcp_enabled
+           civicrm_pcp_block.id as is_pcp_enabled,
+           civicrm_recurring_entity.id as is_repeating_event
 FROM       civicrm_event
 LEFT JOIN  civicrm_option_value ON (
            civicrm_event.event_type_id = civicrm_option_value.value AND
            civicrm_option_value.option_group_id = %1 )
 LEFT JOIN  civicrm_tell_friend ON ( civicrm_tell_friend.entity_id = civicrm_event.id  AND civicrm_tell_friend.entity_table = 'civicrm_event' )
 LEFT JOIN  civicrm_pcp_block ON ( civicrm_pcp_block.entity_id = civicrm_event.id AND civicrm_pcp_block.entity_table = 'civicrm_event')
+LEFT JOIN  civicrm_recurring_entity ON ( civicrm_event.id = civicrm_recurring_entity.entity_id AND civicrm_recurring_entity.entity_table = 'civicrm_event' )
 WHERE      civicrm_event.is_active = 1 AND
            ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0) AND
            civicrm_event.start_date >= DATE_SUB( NOW(), INTERVAL 7 day )
@@ -541,6 +543,7 @@ $event_summary_limit
       $eventSummary['events'][$dao->id]['is_subevent'] = $dao->slot_label_id;
       $eventSummary['events'][$dao->id]['is_pcp_enabled'] = $dao->is_pcp_enabled;
       $eventSummary['events'][$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mappingID);
+      $eventSummary['events'][$dao->id]['is_repeating_event'] = $dao->is_repeating_event;
 
       $statusTypes = CRM_Event_PseudoConstant::participantStatus();
       foreach ($statusValues as $statusId => $statusValue) {

@@ -165,7 +165,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
         array(
           'title' => ts('Repeat'),
           'url' => 'civicrm/event/manage/repeat',
-          'field' => 'is_recurring_event',
+          'field' => 'is_repeating_event',
         );
 
     }
