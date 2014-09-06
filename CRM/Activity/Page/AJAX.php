@@ -266,20 +266,22 @@ class CRM_Activity_Page_AJAX {
       // edit links
       $row['actions'] = '';
       if ($hasAccessToAllCases) {
-        switch($row['source']){
+        $contactType = empty($row['relation_type']) ? '' : (string) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $row['relation_type'], 'contact_type_b');
+        $contactType = $contactType == 'Contact' ? '' : $contactType;
+        switch($row['source']) {
         case 'caseRel':
           $row['actions'] =
-            '<a href="#editCaseRoleDialog" title="'. ts('Reassign %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-rel_type="'. $row['relation_type'] .'" data-rel_id="'. $row['rel_id'] .'"data-key="'. CRM_Core_Key::get('civicrm/ajax/relation') .'">'.
+            '<a href="#editCaseRoleDialog" title="'. ts('Reassign %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="'. $row['relation_type'] .'" data-rel_id="'. $row['rel_id'] .'"data-key="'. CRM_Core_Key::get('civicrm/ajax/relation') .'">'.
               '<span class="icon edit-icon"></span>'.
             '</a>'.
-            '<a href="#deleteCaseRoleDialog" title="'. ts('Remove %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-rel_type="'.$row['relation_type'].'" data-key="'. CRM_Core_Key::get('civicrm/ajax/delcaserole') .'">'.
+            '<a href="#deleteCaseRoleDialog" title="'. ts('Remove %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="'.$row['relation_type'].'" data-key="'. CRM_Core_Key::get('civicrm/ajax/delcaserole') .'">'.
               '<span class="icon delete-icon"></span>'.
             '</a>';
           break;
 
         case 'caseRoles':
           $row['actions'] =
-            '<a href="#editCaseRoleDialog" title="'. ts('Assign %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-rel_type="'. $row['relation_type'] .'" data-key="'. CRM_Core_Key::get('civicrm/ajax/relation') .'">'.
+            '<a href="#editCaseRoleDialog" title="'. ts('Assign %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="'. $row['relation_type'] .'" data-key="'. CRM_Core_Key::get('civicrm/ajax/relation') .'">'.
               '<span class="icon edit-icon"></span>'.
             '</a>';
           break;
