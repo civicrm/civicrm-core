@@ -150,8 +150,8 @@
     </tr>
   </table>
   <div id="customData"></div>
-  {include file="CRM/Form/validate.tpl"}
   {*include custom data js file*}
+  {include file="CRM/common/customData.tpl"}
   {literal}
     <script type="text/javascript">
       CRM.$(function($) {
