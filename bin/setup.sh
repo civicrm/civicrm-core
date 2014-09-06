@@ -19,7 +19,7 @@ fi
 source "$CALLEDPATH/setup.conf"
 
 if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
-  echo; echo Usage: setup.sh [schema file] [database data file] [database name] [database user] [database password] [additional args]; echo
+  echo; echo Usage: setup.sh [schema file] [database data file] [database name] [database user] [database password] [database host] [database port] [additional args]; echo
   exit 0
 fi
 
@@ -30,6 +30,8 @@ if [ ! -z "$2" ] ; then DBLOAD="$2"; fi
 if [ ! -z "$3" ] ; then DBNAME="$3"; fi
 if [ ! -z "$4" ] ; then DBUSER="$4"; fi
 if [ ! -z "$5" ] ; then DBPASS="$5"; fi
+if [ ! -z "$6" ] ; then DBHOST="$6"; fi
+if [ ! -z "$7" ] ; then DBPORT="$7"; fi
 
 # verify if we have at least DBNAME given
 if [ -z $DBNAME ] ; then
@@ -60,10 +62,20 @@ else
   PASSWDSECTION="-p$DBPASS"
 fi
 
+HOSTSECTTION=""
+if [ ! -z "$DBHOST" ]; then
+  HOSTSECTION="-h $DBHOST"
+fi
+
+PORTSECTION=""
+if [ ! -z "$DBPORT" ]; then
+  PORTSECTION="-P $DBPORT"
+fi
+
 cd "$CALLEDPATH/../sql"
 echo; echo "Dropping civicrm_* tables from database $DBNAME"
 # mysqladmin -f -u $DBUSER $PASSWDSECTION $DBARGS drop $DBNAME
-MYSQLCMD="mysql -u$DBUSER $PASSWDSECTION $DBARGS $DBNAME"
+MYSQLCMD="mysql -u$DBUSER $PASSWDSECTION $HOSTSECTION $PORTSECTION $DBARGS $DBNAME"
 echo "SELECT table_name FROM information_schema.TABLES  WHERE TABLE_SCHEMA='${DBNAME}' AND TABLE_TYPE = 'VIEW'" \
   | $MYSQLCMD \
   | grep '^\(civicrm_\|log_civicrm_\)' \
@@ -77,23 +89,23 @@ echo "SELECT table_name FROM information_schema.TABLES  WHERE TABLE_SCHEMA='${DB
 
 
 echo; echo Creating database structure
-mysql -u $DBUSER $PASSWDSECTION $DBARGS $DBNAME < civicrm.mysql
+$MYSQLCMD < civicrm.mysql
 
 # load civicrm_generated.mysql sample data unless special DBLOAD is passed
 if [ -z $DBLOAD ]; then
     echo; echo Populating database with example data - civicrm_generated.mysql
-    mysql -u $DBUSER $PASSWDSECTION $DBARGS $DBNAME < civicrm_generated.mysql
+    $MYSQLCMD < civicrm_generated.mysql
 else
     echo; echo Populating database with required data - civicrm_data.mysql
-    mysql -u $DBUSER $PASSWDSECTION $DBARGS $DBNAME < civicrm_data.mysql
+    $MYSQLCMD < civicrm_data.mysql
     echo; echo Populating database with $DBLOAD data
-    mysql -u $DBUSER $PASSWDSECTION $DBARGS $DBNAME < $DBLOAD
+    $MYSQLCMD < $DBLOAD
 fi
 
 # load additional script if DBADD defined
 if [ ! -z $DBADD ]; then
     echo; echo Loading $DBADD
-    mysql -u $DBUSER $PASSWDSECTION $DBARGS $DBNAME < $DBADD
+    $MYSQLCMD < $DBADD
 fi
 
 # run the cli script to build the menu and the triggers
@@ -102,7 +114,7 @@ cd "$CALLEDPATH/.."
 
 # reset config_backend and userFrameworkResourceURL which gets set
 # when config object is initialized
-mysql -u$DBUSER $PASSWDSECTION $DBARGS $DBNAME -e "UPDATE civicrm_domain SET config_backend = NULL; UPDATE civicrm_setting SET value = NULL WHERE name = 'userFrameworkResourceURL';"
+$MYSQLCMD -e "UPDATE civicrm_domain SET config_backend = NULL; UPDATE civicrm_setting SET value = NULL WHERE name = 'userFrameworkResourceURL';"
 
 echo; echo "Setup Complete. Logout from your CMS to avoid session conflicts."
 
