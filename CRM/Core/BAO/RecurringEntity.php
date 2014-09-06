@@ -488,5 +488,17 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       }
     }
   }
+  
+  static public function delEntityRelations($entityId, $entityTable){
+    if(!$entityId && !$entityTable){
+      return FALSE;
+    }
+    $parentID = self::getParentFor($entityId, $entityTable);
+    if($parentID){
+      $dao = new CRM_Core_DAO_RecurringEntity();
+      $dao->parent_id = $parentID;
+      return $dao->delete();
+    }
+  }
     
 }
