@@ -36,6 +36,13 @@
  * This class contains all contact related functions that are called using AJAX (jQuery)
  */
 class CRM_Contact_Page_AJAX {
+  /**
+   * When a user chooses a username, CHECK_USERNAME_TTL
+   * is the time window in which they can check usernames
+   * (without reloading the overall form).
+   */
+  const CHECK_USERNAME_TTL = 10800; // 3hr; 3*60*60
+
   static function getContactList() {
     // if context is 'customfield'
     if (CRM_Utils_Array::value('context', $_GET) == 'customfield') {
@@ -615,6 +622,17 @@ WHERE sort_name LIKE '%$name%'";
      *
     */
   static public function checkUserName() {
+    $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), array('for', 'ts'));
+    if (
+      CRM_Utils_Time::getTimeRaw() > $_REQUEST['ts'] + self::CHECK_USERNAME_TTL
+      || $_REQUEST['for'] != 'civicrm/ajax/cmsuser'
+      || !$signer->validate($_REQUEST['sig'], $_REQUEST)
+    ) {
+      $user = array('name' => 'error');
+      echo json_encode($user);
+      CRM_Utils_System::civiExit();
+    }
+
     $config = CRM_Core_Config::singleton();
     $username = trim($_REQUEST['cms_name']);
 
