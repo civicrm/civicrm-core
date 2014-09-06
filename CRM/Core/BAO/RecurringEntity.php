@@ -406,7 +406,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   static public function generateRecursions($recursionObj, $params=array()){ 
     $newParams = $recursionResult = array();
     if($recursionObj && !empty($params)){ 
-      //Proceed only if these keys are found in array
       if(CRM_Utils_Array::value('parent_event_start_date', $params) && CRM_Utils_Array::value('parent_event_id', $params)){
         $count = 1;
         while($result = $recursionObj->next()){

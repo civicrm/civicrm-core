@@ -259,9 +259,13 @@ class CRM_Core_Form_RecurringEntity {
       }
     }
     
+    //Delete relations if any from recurring entity tables before inserting new relations for this entity id
+    if($params['parent_event_id']){
+      CRM_Core_BAO_RecurringEntity::delEntityRelations($params['parent_event_id'], 'civicrm_event');
+    }
     //Give call to create recursions
     $recurResult = CRM_Core_BAO_RecurringEntity::generateRecursions($recursionObject, $params);
-    if(!empty($recurResult)){
+    if(!empty($recurResult) && $params['parent_event_id']){
       CRM_Core_BAO_RecurringEntity::addEntityThroughRecursion($recurResult, $params['parent_event_id']);
     }
     $status = ts('Repeat Configuration has been saved');
