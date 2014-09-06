@@ -642,6 +642,9 @@ WHERE sort_name LIKE '%$name%'";
   static function getContactEmail() {
     if (CRM_Utils_Array::value('contact_id', $_REQUEST)) {
       $contactID = CRM_Utils_Type::escape($_REQUEST['contact_id'], 'Positive');
+      if (!CRM_Contact_BAO_Contact_Permission::allow($contactID, CRM_Core_Permission::EDIT)) {
+        return;
+      }
       list($displayName,
         $userEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
