@@ -43,6 +43,8 @@ class CRM_Contact_Page_AJAX {
    */
   const CHECK_USERNAME_TTL = 10800; // 3hr; 3*60*60
 
+  const AUTOCOMPLETE_TTL = 21600; // 6hr; 6*60*60
+
   static function getContactList() {
     // if context is 'customfield'
     if (CRM_Utils_Array::value('context', $_GET) == 'customfield') {
@@ -259,6 +261,13 @@ class CRM_Contact_Page_AJAX {
    * Function to fetch the values
    */
   static function autocomplete() {
+    $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), array('cfid', 'ogid', 'sigts'));
+    if (CRM_Utils_Time::getTimeRaw() > $_REQUEST['sigts'] + self::AUTOCOMPLETE_TTL
+      || !$signer->validate($_REQUEST['sig'], $_REQUEST)
+    ) {
+      CRM_Utils_System::civiExit();
+    }
+
     $fieldID       = CRM_Utils_Type::escape($_GET['cfid'], 'Integer');
     $optionGroupID = CRM_Utils_Type::escape($_GET['ogid'], 'Integer');
     $label         = CRM_Utils_Type::escape($_GET['s'], 'String');

@@ -983,10 +983,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $qf->addRule($elementName, ts('Select a valid contact for %1.', array(1 => $label)), 'validContact', $actualElementValue);
         }
         else {
-          $customUrls[$elementName] = CRM_Utils_System::url('civicrm/ajax/auto',
-            "reset=1&ogid={$field->option_group_id}&cfid={$field->id}",
-            FALSE, NULL, FALSE
+          $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), array('cfid','ogid','sigts'));
+          $signParams = array(
+            'reset' => 1,
+            'sigts' => CRM_Utils_Time::getTimeRaw(),
+            'ogid' => $field->option_group_id,
+            'cfid' => $field->id,
           );
+          $signParams['sig'] = $signer->sign($signParams);
+          $customUrls[$elementName] = CRM_Utils_System::url('civicrm/ajax/auto', $signParams, FALSE, NULL, FALSE);
           $qf->addRule($elementName, ts('Select a valid value for %1.', array(1 => $label)),
             'autocomplete', array(
               'fieldID' => $field->id,
