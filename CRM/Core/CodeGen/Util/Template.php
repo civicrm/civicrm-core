@@ -21,7 +21,6 @@ class CRM_Core_CodeGen_Util_Template {
 
     $this->smarty = CRM_Core_CodeGen_Util_Smarty::singleton()->getSmarty();
     $this->smarty->template_dir = $this->config->xmlTemplatePath;
-    $this->smarty->plugins_dir = self::$smartyPluginDirs;
     $this->smarty->compile_dir = $this->compileDir;
     $this->smarty->clear_all_cache();
 
