@@ -285,7 +285,6 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     // click through to the Activity view screen
     $this->waitForElementPresent("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[1]/td[8]");
     $this->click("xpath=//div[@id='contact-activity-selector-activity_wrapper']//table/tbody/tr[2]/td[8]/span[2]/ul/li/a[text()='File On Case']");
-    $this->waitForElementPresent("css=div#fileOnCaseDialog");
     $this->waitForElementPresent('file_on_case_activity_subject');
 
     // file activity on case

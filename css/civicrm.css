@@ -3789,7 +3789,7 @@ div.m ul#civicrm-menu,
 .crm-container.ui-dialog {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
 }
-.crm-container.ui-dialog.ui-draggable:before {
+.crm-container.ui-dialog.ui-resizable:before {
   display:block;
   content: " ";
   width: 16px;

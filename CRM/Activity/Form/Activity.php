@@ -278,6 +278,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->_activityTypeId = CRM_Utils_Request::retrieve('atype', 'Positive', $this);
     $this->assign('atype', $this->_activityTypeId);
 
+    $this->assign('activityId', $this->_activityId);
+
     //check for required permissions, CRM-6264
     if ($this->_activityId &&
       in_array($this->_action, array(
@@ -740,24 +742,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       if (isset($this->_groupTree)) {
         CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $this->_groupTree);
       }
-      $buttons = array();
-      // do check for permissions
-      if (CRM_Case_BAO_Case::checkPermission($this->_activityId, 'File On Case', $this->_activityTypeId)) {
-        $buttons[] = array(
-          'type' => 'cancel',
-          'name' => ts('File on case'),
-          'subName' => 'file_on_case',
-          'js' => array('onClick' => "javascript:fileOnCase( \"file\", $this->_activityId ); return false;")
-        );
-      }
       // form should be frozen for view mode
       $this->freeze();
 
+      $buttons = array();
       $buttons[] = array(
         'type' => 'cancel',
         'name' => ts('Done')
       );
-
       $this->addButtons($buttons);
     }
     else {
