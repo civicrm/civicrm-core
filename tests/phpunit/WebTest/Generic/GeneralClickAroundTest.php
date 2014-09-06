@@ -228,7 +228,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Contact Name");
     $this->assertTextPresent("Contact Source");
     $this->assertTextPresent("Country");
-    $this->assertTextPresent("State / Province");
+    $this->assertTextPresent("State/Province");
     $this->assertTextPresent("Group");
     $this->assertTextPresent("Tag");
     $this->click("_qf_Summary_submit");

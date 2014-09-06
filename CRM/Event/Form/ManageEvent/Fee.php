@@ -386,7 +386,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     }
     $_showHide->addToTemplate();
     $this->addElement('submit', $this->getButtonName('submit'), ts('Add Discount Set to Fee Table'),
-      array('class' => 'form-submit cancel')
+      array('class' => 'crm-form-submit cancel')
     );
 
     $this->buildAmountLabel();

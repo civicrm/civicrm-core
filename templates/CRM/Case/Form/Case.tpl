@@ -133,8 +133,8 @@
     {include file="CRM/common/customData.tpl"}
     {literal}
       <script type="text/javascript">
-      cj(document).ready(function() {
-           var customDataSubType = cj('#case_type_id').val();
+      CRM.$(function($) {
+           var customDataSubType = $('#case_type_id').val();
            if ( customDataSubType ) {
               CRM.buildCustomData( {/literal}'{$customDataType}'{literal}, customDataSubType );
            } else {

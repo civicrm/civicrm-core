@@ -531,7 +531,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->add('image',
         $this->_checkoutButtonName,
         $this->_paymentProcessor['url_button'],
-        array('class' => 'form-submit')
+        array('class' => 'crm-form-submit')
       );
 
       $this->addButtons(array(
@@ -599,9 +599,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     $this->assign('useForMember', $this->get('useForMember'));
-
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
 
     $this->setDefaults($defaults);
 
@@ -1559,7 +1556,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       // CRM-6243 says to pick the first org even if more than one match
       if (count($dupeIDs) >= 1) {
-        $behalfOrganization['contact_id'] = $dupeIDs[0];
+        $behalfOrganization['contact_id'] = $orgID = $dupeIDs[0];
         // don't allow name edit
         unset($behalfOrganization['organization_name']);
       }

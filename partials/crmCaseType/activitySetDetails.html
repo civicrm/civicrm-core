@@ -13,7 +13,9 @@ Required vars: activitySet
   <tr>
     <td class="label">Name</td>
     <td>
-      <input type="text" name="name" ng-model="activitySet.name"/><!-- FIXME lock -->
+      <input type="text" name="name" ng-model="activitySet.name" ng-disabled="locks.activitySetName" />
+      <a crm-ui-lock binding="locks.activitySetName"></a>
+
     </td>
   </tr>
   <tr>

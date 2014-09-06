@@ -106,7 +106,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     if ($this->_gid) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'title');
-      CRM_Utils_System::setTitle($this->_title . ' - ' . ts('CiviCRM Profile Fields'));
+
+      $this->setPageTitle(ts('Profile Field'));
 
       $url = CRM_Utils_System::url('civicrm/admin/uf/group/field',
         "reset=1&action=browse&gid={$this->_gid}"

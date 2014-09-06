@@ -76,6 +76,10 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     );
 
     $fields = array_merge($fields, array(
+      'source_contact_id' => array(
+        'title' => ts('Source Contact'),
+        'headerPattern' => '/Source.Contact?/i',
+      ),
       'activity_label' => array(
         'title' => ts('Activity Type Label'),
         'headerPattern' => '/(activity.)?type label?/i',

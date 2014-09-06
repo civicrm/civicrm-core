@@ -243,24 +243,9 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
         ),
         'group_bys' => array('contribution_source' => NULL),
       ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_GroupContact',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-          ),
-        ),
-      ),
     );
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
     parent::__construct();
@@ -479,7 +464,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
    *
    * @return array
    */
-  function formRule($fields, $files, $self) {
+  static function formRule($fields, $files, $self) {
 
     $errors = $checkDate = $errorCount = array();
 
@@ -507,6 +492,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
 
     $idMapping = array(
       'id' => ts('Contact'),
+      'exposed_id' => ts('Contact'),
       'country_id' => ts('Country'),
       'state_province_id' => ts('State/Province'),
       'contribution_source' => ts('Contribution Source'),

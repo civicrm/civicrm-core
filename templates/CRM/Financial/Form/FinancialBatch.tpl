@@ -24,14 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting financial batch  *}
-<h3>{if $action eq 8}
-  {ts}Delete Batch{/ts} - {$batchTitle}
-  {elseif $action eq 1}
-  {ts}Add New Batch{/ts}
-  {elseif $action eq 2}
-  {ts}Edit Batch{/ts} - {$batchTitle}
-  {/if}
-</h3>
 <div class="crm-block crm-form-block crm-financial_type-form-block">
 {if $action eq 8}
   <div class="messages status">

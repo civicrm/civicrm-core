@@ -35,7 +35,7 @@
 </div>
 
 <div class="action-link">
-       <a id='notDuplicate' href="#" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid}, {$other_cid}, 'dupe-nondupe', 'merge-contact', '{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=$rgid"}' );return false;">&raquo; {ts}Mark this pair as not a duplicate.{/ts}</a>
+       <a id='notDuplicate' href="#" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid}, {$other_cid}, 'dupe-nondupe', 'merge-contact', '{if $rgid}{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=$rgid"}{/if}' );return false;">&raquo; {ts}Mark this pair as not a duplicate.{/ts}</a>
 </div>
 
 <table class="row-highlight">
@@ -143,10 +143,10 @@ You will need to manually delete that user (click on the link to open Drupal Use
 {literal}
 <script type="text/javascript">
 
-cj(document).ready(function(){
-    cj('table td input.form-checkbox').each(function() {
+  CRM.$(function($) {
+    $('table td input.form-checkbox').each(function() {
        var ele = null;
-       var element = cj(this).attr('id').split('_',3);
+       var element = $(this).attr('id').split('_',3);
 
        switch ( element['1'] ) {
            case 'addressee':
@@ -160,13 +160,13 @@ cj(document).ready(function(){
        }
 
        if( ele ) {
-          cj(this).on('click', function() {
-            var val = cj(this).prop('checked');
-            cj('input' + ele + ', input' + ele + '_custom').prop('checked', val);
+          $(this).on('click', function() {
+            var val = $(this).prop('checked');
+            $('input' + ele + ', input' + ele + '_custom').prop('checked', val);
           });
        }
     });
-});
+  });
 
 </script>
 {/literal}

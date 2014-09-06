@@ -165,7 +165,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
       // build tag widget
       $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
 
-      CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', $contactId, TRUE, TRUE);
+      CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', $contactId, FALSE, TRUE);
     }
     $form->assign('tagGroup', $form->_tagGroup);
   }

@@ -1,11 +1,3 @@
-INSERT INTO `civicrm_dashboard`
-	(`domain_id`, `name`, {localize field='label'}`label`{/localize}, `url`, `permission`, `permission_operator`, `column_no`, `is_minimized`, `fullscreen_url`, `is_fullscreen`, `is_active`, `is_reserved`, `weight`)
-	VALUES
-	({$domainID},'report/6', {localize}'Donor Summary'{/localize},'civicrm/report/instance/6?reset=1&section=1&snippet=5&charts=barChart','access CiviContribute','AND',0,0,'civicrm/report/instance/6?reset=1&section=1&snippet=5&charts=barChart&context=dashletFullscreen',1,1,0,4),
-	({$domainID},'report/13', {localize}'Top Donors'{/localize},'civicrm/report/instance/13?reset=1&section=2&snippet=5','access CiviContribute','AND',0,0,'civicrm/report/instance/13?reset=1&section=2&snippet=5&context=dashletFullscreen',1,1,0,5),
-	({$domainID},'report/25', {localize}'Event Income Summary'{/localize}, 'civicrm/report/instance/25?reset=1&section=1&snippet=5&charts=pieChart','access CiviEvent','AND',0,0,'civicrm/report/instance/25?reset=1&section=1&snippet=5&charts=pieChart&context=dashletFullscreen',1,1,0,6),
-	({$domainID},'report/20', {localize}'Membership Summary'{/localize},'civicrm/report/instance/20?reset=1&section=2&snippet=5','access CiviMember','AND',0,0,'civicrm/report/instance/20?reset=1&section=2&snippet=5&context=dashletFullscreen',1,1,0,7);
-
 UPDATE civicrm_dashboard
 	SET civicrm_dashboard.url = CONCAT(SUBSTRING(url FROM 1 FOR LOCATE('&', url) - 1), '?', SUBSTRING(url FROM LOCATE('&', url) + 1))
 	WHERE civicrm_dashboard.url LIKE "%&%" AND civicrm_dashboard.url NOT LIKE "%?%";

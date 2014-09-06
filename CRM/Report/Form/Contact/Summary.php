@@ -49,9 +49,6 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
   /**
    *
    */
-  /**
-   *
-   */
   function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
     $this->_columns = array(
@@ -134,55 +131,6 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
           ),
         ),
       ),
-      'civicrm_address' =>
-      array(
-        'dao' => 'CRM_Core_DAO_Address',
-        'grouping' => 'contact-fields',
-        'fields' =>
-        array(
-          'street_address' =>
-          array('default' => TRUE),
-          'city' =>
-          array('default' => TRUE),
-          'postal_code' => NULL,
-          'state_province_id' =>
-          array('title' => ts('State/Province'),
-          ),
-        ),
-        'filters' =>
-        array(
-          'country_id' =>
-          array('title' => ts('Country'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::country(),
-          ),
-          'state_province_id' =>
-          array('title' => ts('State / Province'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::stateProvince(),
-          ),
-        ),
-        'order_bys' =>
-        array('state_province_id' => array('title' => 'State/Province'),
-          'city' => array('title' => 'City'),
-          'postal_code' => array('title' => 'Postal Code'),
-        ),
-      ),
-      'civicrm_country' =>
-      array(
-        'dao' => 'CRM_Core_DAO_Country',
-        'fields' =>
-        array(
-          'name' =>
-          array('title' => 'Country', 'default' => TRUE),
-        ),
-        'order_bys' =>
-        array(
-          'name' =>
-          array('title' => 'Country'),
-        ),
-        'grouping' => 'contact-fields',
-      ),
       'civicrm_phone' =>
       array(
         'dao' => 'CRM_Core_DAO_Phone',
@@ -196,24 +144,9 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
         ),
         'grouping' => 'contact-fields',
       ),
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_Group',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-          ),
-        ),
-      ),
-    );
+    ) + $this->getAddressColumns(array('group_by' => FALSE));
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
   }

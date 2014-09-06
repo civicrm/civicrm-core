@@ -47,12 +47,15 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
    * @access public
    */
   public function buildQuickForm() {
+    $this->setPageTitle($this->_isTagSet ? ts('Tag Set') : ts('Tag'));
+
     if ($this->_action == CRM_Core_Action::DELETE) {
       if ($this->_id && $tag = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'name', 'parent_id')) {
-        CRM_Core_Session::setStatus(ts("This tag cannot be deleted. You must delete all its child tags ('%1', etc) prior to deleting this tag.", array(1 => $tag)), ts('Sorry'), 'error');
         $url = CRM_Utils_System::url('civicrm/admin/tag', "reset=1");
-        CRM_Utils_System::redirect($url);
-        return TRUE;
+        CRM_Core_Error::statusBounce(ts("This tag cannot be deleted. You must delete all its child tags ('%1', etc) prior to deleting this tag.", array(1 => $tag)), $url);
+      }
+      if ($this->_values['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved tags')) {
+        CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to delete this reserved tag."));
       }
     }
     else {
@@ -65,7 +68,7 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
         $this->_isTagSet = TRUE;
       }
 
-      $allTag = array('' => '- ' . ts('select') . ' -') + CRM_Core_BAO_Tag::getTagsNotInTagset();
+      $allTag = array('' => ts('- select -')) + CRM_Core_BAO_Tag::getTagsNotInTagset();
 
       if ($this->_id) {
         unset($allTag[$this->_id]);
@@ -89,7 +92,7 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
       );
 
       //@lobo haven't a clue why the checkbox isn't displayed (it should be checked by default
-      $this->add('checkbox', 'is_selectable', ts("If it's a tag or a category"));
+      $this->add('checkbox', 'is_selectable');
 
       $isReserved = $this->add('checkbox', 'is_reserved', ts('Reserved?'));
 
@@ -159,6 +162,6 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
       CRM_Core_Session::setStatus(ts('The tag \'%1\' has been saved.', array(1 => $tag->name)), ts('Saved'), 'success');
     }
   }
-  //end of function
+
 }
 

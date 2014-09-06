@@ -26,11 +26,8 @@
 
 {literal}
 <script type="text/javascript">
-  cj(document).ready(function(){
-    cj('#birth_date_from').attr('startOffset',200);
-    cj('#birth_date_from').attr('endoffset',0);
-    cj('#birth_date_to').attr('startOffset',200);
-    cj('#birth_date_to').attr('endoffset',0);
+  CRM.$(function($) {
+    $('#birth_date_from, #birth_date_to').attr({startOffset: '200', endoffset: '0'});
   });
 </script>
 {/literal}

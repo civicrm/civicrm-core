@@ -139,7 +139,7 @@ class CRM_Utils_Sort {
       $this->_currentSortDirection = $this->_vars[$this->_currentSortID]['direction'];
     }
     $this->_urlVar = self::SORT_ID;
-    $this->_link = CRM_Utils_System::makeURL($this->_urlVar);
+    $this->_link = CRM_Utils_System::makeURL($this->_urlVar, TRUE);
 
     $this->initialize($defaultSortOrder);
   }

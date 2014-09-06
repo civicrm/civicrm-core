@@ -231,23 +231,6 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
           ),
         ),
       ),
-    ) + array(
-      'civicrm_group' =>
-      array(
-        'dao' => 'CRM_Contact_DAO_GroupContact',
-        'alias' => 'cgroup',
-        'filters' =>
-        array(
-          'gid' =>
-          array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'group' => TRUE,
-            'options' => CRM_Core_PseudoConstant::group(),
-          ),
-        ),
-      ),
     );
 
     $this->_columns['civicrm_contribution']['fields']['civicrm_upto_' . $this->_yearStatisticsFrom] = array('title' => ts('Up To %1 Donation', array(1 => $this->_yearStatisticsFrom)),
@@ -272,6 +255,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
       'is_statistics' => TRUE,
     );
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
   }
@@ -517,11 +501,12 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     $this->customDataFrom();
     $this->groupBy();
 
+    $sql = NULL;
     $rows = array();
 
     // build array of result based on column headers. This method also allows
     // modifying column headers before using it to build result set i.e $rows.
-    $this->buildRows($rows);
+    $this->buildRows($sql, $rows);
 
     // format result set.
     $this->formatDisplay($rows, FALSE);
@@ -545,7 +530,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function buildRows(&$rows) {
+  function buildRows($sql, &$rows) {
     $contactIds = array();
 
     $addWhere = '';

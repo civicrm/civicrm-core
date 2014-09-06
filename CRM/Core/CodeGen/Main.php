@@ -43,10 +43,11 @@ class CRM_Core_CodeGen_Main {
     $this->schemaPath = CRM_Utils_Path::join($this->civicrm_root_path, 'xml', 'schema', 'Schema.xml');
     $this->schemaPath = CRM_Utils_Array::value('schema-path', $options, $this->schemaPath);
     define('CIVICRM_UF', $this->cms);
-    CRM_Core_CodeGen_Util_Template::$smartyPluginDirs = array(
+    $smartyPluginDirs = array(
       CRM_Utils_Path::join($this->civicrm_root_path, 'packages', 'Smarty', 'plugins'),
       CRM_Utils_Path::join($this->civicrm_root_path, 'CRM', 'Core', 'Smarty', 'plugins'),
     );
+    CRM_Core_CodeGen_Util_Smarty::singleton()->setPluginDirs($smartyPluginDirs);
     if (array_key_exists('civi-version', $options)) {
       $this->db_version = $options['civi-version'];
     } else {

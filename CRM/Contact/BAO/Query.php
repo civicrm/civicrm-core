@@ -563,6 +563,13 @@ class CRM_Contact_BAO_Query {
         if (!array_key_exists($cfID, $this->_cfIDs)) {
           $this->_cfIDs[$cfID] = array();
         }
+        // Set wildcard value based on "and/or" selection
+        foreach ($this->_params as $key => $param) {
+          if ($param[0] == $value[0] . '_operator') {
+            $value[4] = $param[2] == 'or';
+            break;
+          }
+        }
         $this->_cfIDs[$cfID][] = $value;
       }
 
@@ -652,7 +659,7 @@ class CRM_Contact_BAO_Query {
         }
       }
 
-      if (in_array($name, array('prefix_id', 'suffix_id', 'gender_id'))) {
+      if (in_array($name, array('prefix_id', 'suffix_id', 'gender_id', 'communication_style_id'))) {
         if (CRM_Utils_Array::value($field['pseudoconstant']['optionGroupName'], $this->_returnProperties)) {
           $makeException = TRUE;
         }
@@ -1812,7 +1819,7 @@ class CRM_Contact_BAO_Query {
             //why on earth do they put ' in the middle & not on the outside? We have to assume it's
             //to support 'something' so lets add them conditionally to support the api (which is a tested flow
             // so if you are looking to alter this check api test results
-            if(strpos(trim($idList), "'") > 0) {
+            if (strpos(trim($idList), "'") > 0) {
               $idList = "'" . $idList . "'";
             }
 
@@ -2129,7 +2136,7 @@ class CRM_Contact_BAO_Query {
         // per CRM-14743 we are adding modified_date & created_date operator support
         $operations = array_keys($value);
         foreach ($operations as $operator) {
-          if(!in_array($operator, CRM_Core_DAO::acceptedSQLOperators())) {
+          if (!in_array($operator, CRM_Core_DAO::acceptedSQLOperators())) {
             // we don't know when this might happen
             CRM_Core_Error::fatal();
           }
@@ -2524,7 +2531,7 @@ class CRM_Contact_BAO_Query {
 
         case 'civicrm_relationship':
           if (self::$_relType == 'reciprocal') {
-            if(self::$_relationshipTempTable) {
+            if (self::$_relationshipTempTable) {
               // we have a temptable to join on
               $tbl = self::$_relationshipTempTable;
               $from .= " INNER JOIN {$tbl} civicrm_relationship ON civicrm_relationship.contact_id = contact_a.id";
@@ -2572,7 +2579,7 @@ class CRM_Contact_BAO_Query {
           elseif (strpos($name, '-email') != 0) {
             $locationTypeName = 'email';
           }
-          if($locationTypeName) {
+          if ($locationTypeName) {
             //we have a join on an location table - possibly in conjunction with search builder - CRM-14263
             $parts = explode('-', $name);
             $locationID = array_search($parts[0], CRM_Core_BAO_Address::buildOptions('location_type_id', 'get', array('name' => $parts[0])));
@@ -3555,13 +3562,13 @@ WHERE  id IN ( $groupIDs )
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     if (is_array($value)) {
-      $this->_where[$grouping][] = 'civicrm_address.location_type_id IN (' . implode(',', array_keys($value)) . ')';
+      $this->_where[$grouping][] = 'civicrm_address.location_type_id IN (' . implode(',', $value) . ')';
       $this->_tables['civicrm_address'] = 1;
       $this->_whereTables['civicrm_address'] = 1;
 
       $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       $names = array();
-      foreach (array_keys($value) as $id) {
+      foreach ($value as $id) {
         $names[] = $locationType[$id];
       }
 
@@ -3790,9 +3797,8 @@ WHERE  id IN ( $groupIDs )
       }
       $stateClause = "civicrm_address.state_province_id $op (" . implode(',', $value) . ')';
 
-      $stateProvince = CRM_Core_PseudoConstant::stateProvince();
       foreach ($value as $id) {
-        $names[] = CRM_Utils_Array::value($id, $stateProvince);
+        $names[] = CRM_Core_PseudoConstant::stateProvince($id, FALSE);
       }
     }
     else {
@@ -3936,24 +3942,24 @@ WHERE  id IN ( $groupIDs )
     }
 
     $toggleValues = $this->getWhereValues('privacy_toggle', $grouping);
-    $compareOP = '!=';
+    $compareOP = '!';
     if ($toggleValues &&
       $toggleValues[2] == 2
     ) {
-      $compareOP = '=';
+      $compareOP = '';
     }
 
     $clauses = array();
     $qill = array();
     foreach ($value as $dontCare => $pOption) {
-      $clauses[] = " ( contact_a.{$pOption} $compareOP 1 ) ";
+      $clauses[] = " ( contact_a.{$pOption} = 1 ) ";
       $field = CRM_Utils_Array::value($pOption, $this->_fields);
       $title = $field ? $field['title'] : $pOption;
-      $qill[] = " $title $compareOP 1 ";
+      $qill[] = " $title = 1 ";
     }
 
-    $this->_where[$grouping][] = '( ' . implode($operator, $clauses) . ' )';
-    $this->_qill[$grouping][] = implode($operator, $qill);
+    $this->_where[$grouping][] = $compareOP . '( ' . implode($operator, $clauses) . ' )';
+    $this->_qill[$grouping][] = $compareOP . '( ' . implode($operator, $qill) . ' )';
   }
 
   /**
@@ -4018,11 +4024,12 @@ WHERE  id IN ( $groupIDs )
    */
   function relationship(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
-    if($this->_relationshipValuesAdded){
+    if ($this->_relationshipValuesAdded){
        return;
     }
     // also get values array for relation_target_name
     // for relatinship search we always do wildcard
+    $relationType = $this->getWhereValues('relation_type_id', $grouping);    
     $targetName = $this->getWhereValues('relation_target_name', $grouping);
     $relStatus = $this->getWhereValues('relation_status', $grouping);
     $relPermission = $this->getWhereValues('relation_permission', $grouping);
@@ -4044,25 +4051,26 @@ WHERE  id IN ( $groupIDs )
       }
     }
 
-    $rel = explode('_', $value);
-
-    self::$_relType = $rel[1];
-    $params = array('id' => $rel[0]);
     $rTypeValues = array();
-    $rType = CRM_Contact_BAO_RelationshipType::retrieve($params, $rTypeValues);
-    if ($rTypeValues['name_a_b'] == $rTypeValues['name_b_a']) {
+    if (!empty($relationType) ) {
+      $rel = explode('_', $relationType[2]);
+      self::$_relType = $rel[1];
+      $params = array('id' => $rel[0]);
+      $rType = CRM_Contact_BAO_RelationshipType::retrieve($params, $rTypeValues);
+    }
+    if ( empty($rTypeValues) ) {    
       // if we don't know which end of the relationship we are dealing with we'll create a temp table
       //@todo unless we are dealing with a target group
       self::$_relType = 'reciprocal';
     }
     // if we are creating a temp table we build our own where for the relationship table
     $relationshipTempTable = NULL;
-    if(self::$_relType == 'reciprocal' && empty($targetGroup)) {
+    if (self::$_relType == 'reciprocal' && empty($targetGroup)) {
       $where = array();
       self::$_relationshipTempTable =
         $relationshipTempTable =
         CRM_Core_DAO::createTempTableName( 'civicrm_rel');
-      if($nameClause) {
+      if ($nameClause) {
         $where[$grouping][] = " sort_name $nameClause ";
       }
     }
@@ -4082,7 +4090,11 @@ WHERE  id IN ( $groupIDs )
     $allRelationshipType = array_merge($allRelationshipType, $relTypeHou);
 
     if ($nameClause || !$targetGroup) {
-      $this->_qill[$grouping][] = "$allRelationshipType[$value]  $name";
+      if (!empty($relationType) ) {
+        $this->_qill[$grouping][] = $allRelationshipType[$relationType[2]] ." $name";
+      } else {
+        $this->_qill[$grouping][] = $name;
+      }
     }
 
 
@@ -4113,7 +4125,11 @@ WHERE  id IN ( $groupIDs )
           $qillNames[] = $groupNames[$groupId];
         }
       }
-      $this->_qill[$grouping][] = "$allRelationshipType[$value]  ( " . implode(", ", $qillNames) . " )";
+      if ( !empty($relationType) ) {
+        $this->_qill[$grouping][] = $allRelationshipType[$relationType[2]] ." ( " . implode(", ", $qillNames) . " )";
+      } else {
+        $this->_qill[$grouping][] = implode(", ", $qillNames);
+      }
     }
 
     // Note we do not currently set mySql to handle timezones, so doing this the old-fashioned way
@@ -4138,20 +4154,20 @@ civicrm_relationship.start_date > {$today}
 
     //check for permissioned, non-permissioned and all permissioned relations
     if ($relPermission[2] == 1) {
-      $this->_where[$grouping][] = "(
+      $where[$grouping][] = "(
 civicrm_relationship.is_permission_a_b = 1
 )";
       $this->_qill[$grouping][] = ts('Relationship - Permissioned');
     } elseif ($relPermission[2] == 2) {
       //non-allowed permission relationship.
-      $this->_where[$grouping][] = "(
+      $where[$grouping][] = "(
 civicrm_relationship.is_permission_a_b = 0
 )";
       $this->_qill[$grouping][] = ts('Relationship - Non-permissioned');
     }
 
     $this->addRelationshipDateClauses($grouping, $where);
-    if(!empty($rType) && isset($rType->id)){
+    if (!empty($relationType) && !empty($rType) && isset($rType->id)){
       $where[$grouping][] = 'civicrm_relationship.relationship_type_id = ' . $rType->id;
     }
     $this->_tables['civicrm_relationship'] = $this->_whereTables['civicrm_relationship'] = 1;
@@ -4162,8 +4178,11 @@ civicrm_relationship.is_permission_a_b = 0
     // @todo creating a temp table could be expanded to group filter
     // as even creating a temp table of all relationships is much much more efficient than
     // an OR in the join
-    if($relationshipTempTable) {
-      $whereClause = ' WHERE ' . implode(' AND ', $where[$grouping]);
+    if ($relationshipTempTable) {
+      $whereClause = '';
+      if ( ! empty( $where[$grouping] ) ) {
+        $whereClause = ' WHERE ' . implode(' AND ', $where[$grouping]);
+      }
       $sql = "
         CREATE TEMPORARY TABLE {$relationshipTempTable}
           (SELECT contact_id_b as contact_id, civicrm_relationship.id
@@ -4196,12 +4215,12 @@ civicrm_relationship.is_permission_a_b = 0
     foreach ($dateTypes as $dateField){
       $dateValueLow = $this->getWhereValues('relation_'. $dateField .'_low', $grouping);
       $dateValueHigh= $this->getWhereValues('relation_'. $dateField .'_high', $grouping);
-      if(!empty($dateValueLow)){
+      if (!empty($dateValueLow)){
         $date = date('Ymd', strtotime($dateValueLow[2]));
         $where[$grouping][] = "civicrm_relationship.$dateField >= $date";
         $this->_qill[$grouping][] = ($dateField == 'end_date' ? ts('Relationship Ended on or After') : ts('Relationship Recorded Start Date On or Before')) . " " . CRM_Utils_Date::customFormat($date);
       }
-      if(!empty($dateValueHigh)){
+      if (!empty($dateValueHigh)){
         $date = date('Ymd', strtotime($dateValueHigh[2]));
         $where[$grouping][] = "civicrm_relationship.$dateField <= $date";
         $this->_qill[$grouping][] = ( $dateField == 'end_date' ? ts('Relationship Ended on or Before') : ts('Relationship Recorded Start Date On or After')) . " " . CRM_Utils_Date::customFormat($date);
@@ -4379,7 +4398,7 @@ civicrm_relationship.is_permission_a_b = 0
     list($select, $from, $where, $having) = $query->query($count);
 
     $options = $query->_options;
-    if(!empty($query->_permissionWhereClause)){
+    if (!empty($query->_permissionWhereClause)){
       if (empty($where)) {
         $where = "WHERE $query->_permissionWhereClause";
       }
@@ -4721,7 +4740,7 @@ SELECT COUNT( conts.total_amount ) as total_count,
        SUM(   conts.total_amount ) as total_amount,
        AVG(   conts.total_amount ) as total_avg,
        conts.currency              as currency";
-    if($this->_permissionWhereClause) {
+    if ($this->_permissionWhereClause) {
       $where .= " AND " . $this->_permissionWhereClause;
     }
     if ($context == 'search') {

@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
@@ -23,63 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
- */
-
-/**
- * This class generates form components generic to all the contact types.
- *
- * It delegates the work to lower level subclasses and integrates the changes
- * back in. It also uses a lot of functionality with the CRM API's, so any change
- * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
- */
-class CRM_Contact_Form_Test extends CRM_Core_Form {
-  function preProcess() {}
-
-  /**
-   * This function sets the default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return void
-   */
-  function setDefaultValues() {
-    $defaults = array();
-    $params = array();
-  }
-
-  /**
-   * Function to actually build the form
-   *
-   * @return void
-   * @access public
-   */
-  public function buildQuickForm() {
-
-    $this->addElement('text', "state", ts('State / Province'), 'onkeyup="getState(this,event, false);"  onblur="getState(this,event, false);" autocomplete="off"');
-
-    $this->addElement('text', "state_id", ts('State / Province Id'));
-    //$this->addElement('text', "country", ts('Country'));
-    // $this->addElement('text', "country_id", ts('Country  Id'));
-    $this->addElement('select', "country", ts('Country'), array('' => ts('- select -')), 'onblur="getState(this,event, true);"');
-  }
-
-  /**
-   * Form submission of new/edit contact is processed.
-   *
-   * @access public
-   *
-   * @return void
-   */
-  public function postProcess() {}
-}
-
+*}
+{* This tpl runs recursively to build each level of the tag tree *}
+<ul class="tree-level-{$level}">
+  {foreach from=$tree item="node" key="id"}
+    <li id="tag_{$id}">
+      <input name="tagList[{$id}]" id="check_{$id}" type="checkbox" {if $tagged[$id]}checked="checked"{/if}/>
+      <span>
+        <label for="check_{$id}" id="tagLabel_{$id}">{$node.name}</label>
+        {if $node.description}{help id=$id title=$node.name file="CRM/Tag/Form/Tagtree"}{/if}
+      </span>
+      {if $node.children}
+        {* Recurse... *}
+        {include file="CRM/Tag/Form/Tagtree.tpl" tree=$node.children level=$level+1}
+      {/if}
+    </li>
+  {/foreach}
+</ul>

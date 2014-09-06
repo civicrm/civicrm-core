@@ -128,7 +128,7 @@ class CRM_Contact_Form_Edit_Individual {
       $form->assign('checkSimilar', $checkSimilar);
 
       //External Identifier Element
-      $form->add('text', 'external_identifier', ts('External Id'),
+      $form->add('text', 'external_identifier', ts('External ID'),
         CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'external_identifier'), FALSE
       );
 

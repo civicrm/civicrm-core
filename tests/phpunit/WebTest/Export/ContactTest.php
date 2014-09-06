@@ -101,7 +101,6 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Select the task action to export.
     $this->click("task");
     $this->select("task", "label=Export Contacts");
-    $this->click("Go");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $csvFile = $this->downloadCSV("_qf_Select_next-bottom");
@@ -222,7 +221,6 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Select the task action to export.
     $this->click("task");
     $this->select("task", "label=Export Contacts");
-    $this->click("Go");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $csvFile = $this->downloadCSV("_qf_Select_next-bottom");
@@ -376,7 +374,6 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Select the task action to export.
     $this->click("task");
     $this->select("task", "label=Export Contacts");
-    $this->click("Go");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->click("CIVICRM_QFID_2_10");

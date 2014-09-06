@@ -152,45 +152,66 @@
 
 {literal}
 <script type='text/javascript'>
-    var entityMapping = eval({/literal}{$entityMapping}{literal});
-    var recipientMapping = eval({/literal}{$recipientMapping}{literal});
-
-    cj('#absolute_date_display').change( function() {
-        if(cj('#absolute_date_display').val()) {
-            cj('#relativeDate').hide();
-            cj('#relativeDateRepeat').hide();
-            cj('#repeatFields').hide();
-        } else {
-            cj('#relativeDate').show();
-            cj('#relativeDateRepeat').show();
-        }
-    });
-
     CRM.$(function($) {
-        if (cj('#absolute_date_display').val()) {
-            cj('#relativeDate').hide();
-            cj('#relativeDateRepeat').hide();
-            cj('#repeatFields').hide();
-         }
+      var $form = $('form.{/literal}{$form.formClass}{literal}'),
+        recipientMapping = eval({/literal}{$recipientMapping}{literal});
 
-         cj('#entity_0').change( function( ) {
-              buildSelect("start_action_date");
-        buildSelect("end_date");
-        buildSelect1("recipient");
-         });
-     });
+      $('#absolute_date_display', $form).change(function() {
+        if($(this).val()) {
+          $('#relativeDate, #relativeDateRepeat, #repeatFields', $form).hide();
+        } else {
+          $('#relativeDate, #relativeDateRepeat', $form).show();
+        }
+      });
+      
+      if ($('#absolute_date_display', $form).val()) {
+        $('#relativeDate, #relativeDateRepeat, #repeatFields', $form).hide();
+      }
 
-  CRM.$(function($) {
-    loadMsgBox();
-    cj('#mode').change(function () {
+      $('#entity_0', $form).change(buildSelects);
+
       loadMsgBox();
-    });
+      $('#mode', $form).change(loadMsgBox);
 
-    showHideLimitTo();
-    cj('#entity_0').change(function () {
       showHideLimitTo();
+
+      $('#recipient', $form).change(populateRecipient);
+
+      var entity = $('#entity_0', $form).val();
+      if (!(entity === '2' || entity === '3') || $('#recipient', $form).val() !== '1') {
+        $('#recipientList', $form).hide();
+      }
+
+      function buildSelects() {
+        var mappingID = $('#entity_0', $form).val();
+
+        $('#is_recipient_listing').val('');
+        $.getJSON(CRM.url('civicrm/ajax/mapping'), {mappingID: mappingID},
+          function (result) {
+            CRM.utils.setOptions($('#start_action_date', $form), result.sel4);
+            CRM.utils.setOptions($('#end_date', $form), result.sel4);
+            CRM.utils.setOptions($('#recipient', $form), result.sel5);
+            recipientMapping = result.recipientMapping;
+            populateRecipient();
+          }
+        );
+      }
+      function populateRecipient() {
+        var recipient = $("#recipient", $form).val();
+
+        if (recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role') {
+          CRM.api3('participant', 'getoptions', {field: recipientMapping[recipient] == 'participant_role' ? 'role_id' : 'status_id', sequential: 1})
+            .done(function(result) {
+              CRM.utils.setOptions($('#recipient_listing', $form), result.values);
+            });
+          $("#recipientList", $form).show();
+          $('#is_recipient_listing', $form).val(1);
+        } else {
+          $("#recipientList", $form).hide();
+          $('#is_recipient_listing', $form).val('');
+        }
+      }
     });
-  });
 
   function loadMsgBox() {
     if (cj('#mode').val() == 'Email' || cj('#mode').val() == 0){
@@ -217,76 +238,6 @@
     else {
       cj('#limit_to').show();
     }
-  }
-
-  CRM.$(function($) {
-    if (cj('#is_recipient_listing').val()) {
-      cj('#recipientList').show();
-    }
-    else {
-      cj('#recipientList').hide();
-    }
-    cj('#recipient').change(function () {
-      populateRecipient();
-    });
-  });
-
-  function populateRecipient( ) {
-    var recipient = cj("#recipient option:selected").val();
-    var entity = cj("#entity_0 option:selected").val();
-    var postUrl = "{/literal}{crmURL p='civicrm/ajax/populateRecipient' h=0}{literal}";
-
-    if (recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role') {
-      var elementID = '#recipient_listing';
-      cj( elementID ).html('');
-      cj.post(postUrl, {recipient: recipientMapping[recipient]},
-      function ( response ) {
-        response = eval( response );
-        for (i = 0; i < response.length; i++) {
-          cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
-        }
-      });
-      cj("#recipientList").show();
-      cj('#is_recipient_listing').val(1);
-    } else {
-      cj("#recipientList").hide();
-      cj('#is_recipient_listing').val('');
-    }
-  }
-  
-  function buildSelect( selectID ) {
-    var elementID = '#' +  selectID;
-    cj( elementID ).html('');
-    var mappingID = cj('#entity_0').val();
-    var postUrl = "{/literal}{crmURL p='civicrm/ajax/mapping' h=0}{literal}";
-    cj.post( postUrl, { mappingID: mappingID},
-    function ( response ) {
-      response = eval( response );
-      for (i = 0; i < response.length; i++) {
-        cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
-      }
-    }
-    );
-  }
-
-  function buildSelect1( selectID ) {
-    var elementID = '#' +  selectID;
-    cj( elementID ).html('');
-    var mappingID = cj('#entity_0').val();
-    var postUrl1 = "{/literal}{crmURL p='civicrm/ajax/mapping1' h=0}{literal}";
-
-    cj('#is_recipient_listing').val('');
-    cj.post( postUrl1, { mappingID: mappingID},
-    function ( result ) {
-      var responseResult = cj.parseJSON(result);
-      var response       = eval(responseResult.sel5);
-      recipientMapping   = eval(responseResult.recipientMapping);
-      for (i = 0; i < response.length; i++) {
-        cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
-      }
-      populateRecipient();
-    }
-    );
   }
 
  </script>

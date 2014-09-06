@@ -128,9 +128,12 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
         'style'
       );
 
-      if ($displayStyle === 'Tab with table' && $this->_multiRecordDisplay != 'single') {
+      if ($this->_multiRecordDisplay != 'single') {
         $id = "custom_{$this->_groupId}";
         $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $groupTree[$this->_groupId]['table_name']);
+      }
+
+      if ($displayStyle === 'Tab with table' && $this->_multiRecordDisplay != 'single') {
         $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
           $this->_contactId,
           'contact_type'

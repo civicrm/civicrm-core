@@ -127,23 +127,12 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    * @access public
    */
   public function buildQuickForm() {
+    parent::buildQuickForm();
+    $this->setPageTitle(ts('Financial Type Account'));
+
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Delete Financial Account Type'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'))
-        )
-      );
       return;
     }
-
-    parent::buildQuickForm();
 
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
@@ -351,6 +340,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
         "reset=1&action=browse&aid={$this->_aid}"));
     }
   }
+
 }
 
 

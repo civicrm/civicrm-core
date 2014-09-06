@@ -379,14 +379,14 @@ class CRM_Utils_Weight {
       $nextID = $ids[$i + 1];
 
       $links = array();
-      $url = "{$baseURL}&src=$id";
+      $url = "{$baseURL}&amp;src=$id";
 
       if ($prevID != 0) {
         $alt = ts('Move to top');
-        $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&dst={$firstID}&dir=first\"><img src=\"{$imageURL}/first.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
+        $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&amp;dst={$firstID}&amp;dir=first\"><img src=\"{$imageURL}/first.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
 
         $alt = ts('Move up one row');
-        $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&dst={$prevID}&dir=swap\"><img src=\"{$imageURL}/up.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
+        $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&amp;dst={$prevID}&amp;dir=swap\"><img src=\"{$imageURL}/up.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
       }
       else {
         $links[] = "<img src=\"{$imageURL}/spacer.gif\" class=\"order-icon\">";
@@ -395,10 +395,10 @@ class CRM_Utils_Weight {
 
       if ($nextID != 0) {
         $alt = ts('Move down one row');
-        $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&dst={$nextID}&dir=swap\"><img src=\"{$imageURL}/down.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
+        $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&amp;dst={$nextID}&amp;dir=swap\"><img src=\"{$imageURL}/down.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
 
         $alt = ts('Move to bottom');
-        $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&dst={$lastID}&dir=last\"><img src=\"{$imageURL}/last.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
+        $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&amp;dst={$lastID}&amp;dir=last\"><img src=\"{$imageURL}/last.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
       }
       else {
         $links[] = "<img src=\"{$imageURL}/spacer.gif\" class=\"order-icon\">";

@@ -33,12 +33,6 @@
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 
-  {if $contributionMode}
-  <h3>{if $ppID}{ts}Credit Card Pledge Payment{/ts}{else}{ts}Credit Card Contribution{/ts}{/if}</h3>
-    {elseif $context NEQ 'standalone'}
-  <h3>{if $action eq 1 or $action eq 1024}{if $ppID}{ts}Pledge Payment{/ts}{else}{ts}New Contribution{/ts}{/if}{elseif $action eq 8}{ts}Delete Contribution{/ts}{else}{ts}Edit Contribution{/ts}{/if}</h3>
-  {/if}
-
   <div class="crm-block crm-form-block crm-contribution-form-block">
 
   {if $contributionMode == 'test' }
@@ -75,7 +69,7 @@
       {else}
         {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
       {/if}
-      <span class="action-link crm-link-credit-card-mode">&nbsp;<a class="open-inline crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card contribution{/ts}</a></span>
+      <span class="action-link crm-link-credit-card-mode">&nbsp;<a class="open-inline crm-hover-button action-item" href="{$ccModeLink}">&raquo; {ts}submit credit card contribution{/ts}</a></span>
     {/if}
   </div>
   {if $isOnline}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}
@@ -85,9 +79,6 @@
       <td class="font-size12pt label"><strong><strong>{ts}Contributor{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
     </tr>
     {else}
-      {if !$contributionMode and !$email and $outBound_option != 2}
-        {assign var='profileCreateCallback' value=1 }
-      {/if}
       <td class="label">{$form.contact_id.label}</td>
       <td>{$form.contact_id.html}</td>
     {/if}
@@ -213,7 +204,7 @@
             </tr>
             <tr id="cancelReason">
               <td class="label" style="vertical-align: top;">{$form.cancel_reason.label}</td>
-              <td>{$form.cancel_reason.html|crmReplace:class:huge}</td>
+              <td>{$form.cancel_reason.html}</td>
             </tr>
           </table>
         </fieldset>
@@ -307,12 +298,12 @@
           {if $showCheckNumber || !$isOnline}
             <tr id="checkNumber" class="crm-contribution-form-block-check_number">
               <td class="label">{$form.check_number.label}</td>
-              <td>{$form.check_number.html|crmReplace:class:six}</td>
+              <td>{$form.check_number.html}</td>
             </tr>
           {/if}
           <tr class="crm-contribution-form-block-trxn_id">
             <td class="label">{$form.trxn_id.label}</td>
-            <td {$valueStyle}>{$form.trxn_id.html|crmReplace:class:twelve} {help id="id-trans_id"}</td>
+            <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
           </tr>
           {if $email and $outBound_option != 2}
             <tr class="crm-contribution-form-block-is_email_receipt">
@@ -399,38 +390,26 @@
     {if $context eq 'standalone' and $outBound_option != 2 }
       {literal}
       CRM.$(function($) {
-        cj("#contact_id").change( function( ) {
-          checkEmail( );
-        });
+
+        var $form = $("form.{/literal}{$form.formClass}{literal}");
+        $("#contact_id", $form).change(checkEmail);
         checkEmail( );
+
+        function checkEmail( ) {
+          var data = $("#contact_id", $form).select2('data');
+          if (data && data.extra && data.extra.email && data.extra.email.length) {
+            $("#email-receipt", $form).show();
+            $("#email-address", $form).html(data.extra.email);
+          }
+          else {
+            $("#email-receipt", $form).hide();
+          }
+        }
+
         showHideByValue( 'is_email_receipt', '', 'receiptDate', 'table-row', 'radio', true);
         showHideByValue( 'is_email_receipt', '', 'fromEmail', 'table-row', 'radio', false );
       });
 
-      function checkEmail( ) {
-        var contactID = cj("#contact_id").val();
-        if (contactID) {
-          var postUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' h=0}{literal}";
-          cj.post( postUrl, {contact_id: contactID},
-            function (response) {
-              if (response) {
-                cj("#email-receipt").show( );
-                cj("#email-address").html(response);
-              }
-              else {
-                cj("#email-receipt").hide( );
-              }
-            }
-          );
-        }
-        else {
-          cj("#email-receipt").hide( );
-        }
-      }
-
-      function profileCreateCallback( blockNo ) {
-        checkEmail( );
-      }
     {/literal}
     {/if}
   </script>
@@ -503,19 +482,20 @@
       showHideCancelInfo(cj('#contribution_status_id'));
 
       cj('#contribution_status_id').change(function() {
-       showHideCancelInfo(this);
+       showHideCancelInfo(cj('#contribution_status_id'));
       }
        );
      });
 
      function showHideCancelInfo(obj) {
-       contributionStatus = cj(obj).val();
-       if (contributionStatus == 3 || contributionStatus == 7) {
+       if (obj.find(":selected").text() == 'Refunded' || obj.find(":selected").text() == 'Cancelled') {
          cj('#cancelInfo').show( );
+         cj('#total_amount').attr('readonly', true);
        }
        else {
-          status();
+         status();
          cj('#cancelInfo').hide( );
+         cj("#total_amount").removeAttr('readonly');
        }
      }
 

@@ -29,7 +29,7 @@ require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 /**
  * Class WebTest_Import_SavedMapping
  */
-class WebTest_Import_SavedMapping extends ImportCiviSeleniumTestCase {
+class WebTest_Import_SavedMappingTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
@@ -56,8 +56,8 @@ class WebTest_Import_SavedMapping extends ImportCiviSeleniumTestCase {
 
     // Map Fields
     $fieldMapper = array(
-      'mapper[0][0]' => 'individual_prefix',
-      'mapper[4][0]' => 'individual_suffix',
+      'mapper[0][0]' => 'prefix_id',
+      'mapper[4][0]' => 'suffix_id',
       'mapper[6][0]' => 'phone',
       'mapper[6][1]' => '5',
       'mapper[7][0]' => 'supplemental_address_1',

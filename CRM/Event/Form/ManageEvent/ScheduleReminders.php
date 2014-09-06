@@ -92,6 +92,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
       // Update tab "disabled" css class
       $this->ajaxResponse['tabValid'] = !empty($reminderList) && is_array($reminderList);
     }
+    $this->setPageTitle(ts('Scheduled Reminder'));
   }
 
   /**
@@ -192,15 +193,14 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     $this->add('select', 'recipient', ts('Recipients'), $sel5[$recipient],
       FALSE, array('onchange' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);")
     );
-    $recipientListing = $this->add('select', 'recipient_listing', ts('Recipient Listing'),
-      $sel3[$this->_mappingID][0], FALSE, array('class' => 'crm-select2 huge')
+    $recipientListing = $this->add('select', 'recipient_listing', ts('Recipient Roles'),
+      $sel3[$this->_mappingID][0], FALSE, array('multiple' => TRUE, 'class' => 'crm-select2 huge', 'placeholder' => TRUE)
     );
-    $recipientListing->setMultiple(TRUE);
 
     $this->addEntityRef('recipient_manual_id', ts('Manual Recipients'), array('multiple' => true));
 
     $this->add('select', 'group_id', ts('Group'),
-      CRM_Core_PseudoConstant::staticGroup(), FALSE, array('class' => 'crm-select2 huge')
+      CRM_Core_PseudoConstant::nestedGroup(), FALSE, array('class' => 'crm-select2 huge')
     );
 
     CRM_Mailing_BAO_Mailing::commonCompose($this);

@@ -52,25 +52,23 @@
 {literal}
   <script type="text/javascript">
     CRM.$(function($) {
-      updateChangeLogLabels();
-    });
-
-    cj('[name=log_date]:input').change(function () {
-      updateChangeLogLabels();
-    });
-
-    function updateChangeLogLabels() {
-      var changeType = cj('input[name=log_date]:checked').val();
-      if (changeType == 2) {
-        cj('.addedBy').hide();
-        cj('.modifiedBy').show();
-      }
-      else {
-        if (changeType == 1) {
-          cj('.addedBy').show();
-          cj('.modifiedBy').hide();
+      function updateChangeLogLabels() {
+        var changeType = $('input[name=log_date]:checked').val();
+        if (changeType == 2) {
+          $('.addedBy').hide();
+          $('.modifiedBy').show();
+        }
+        else {
+          if (changeType == 1) {
+            $('.addedBy').show();
+            $('.modifiedBy').hide();
+          }
         }
       }
-    }
+      $('[name=log_date]:input').change(updateChangeLogLabels);
+      updateChangeLogLabels();
+    });
+
+
   </script>
 {/literal}

@@ -172,11 +172,13 @@
         <td class="label">{$form.wysiwyg_input_format.label}</td>
         <td>
           {$form.wysiwyg_input_format.html}{literal}
-            <script type="text/javascript">cj(document).ready(function () {
-                if (cj('#editor_id').val() == 4) {
-                  cj('#crm-preferences-display-form-block-wysiwyg_input_format').show();
+            <script type="text/javascript">
+              CRM.$(function($) {
+                if ($('#editor_id').val() == 4) {
+                  $('#crm-preferences-display-form-block-wysiwyg_input_format').show();
                 }
-              });</script>
+              });
+            </script>
           {/literal}
           <br/>
           <span class="description">
@@ -228,36 +230,32 @@
   {literal}
     <script type="text/javascript">
       CRM.$(function($) {
-        cj("#contactEditBlocks").sortable({
-          placeholder: 'ui-state-highlight',
-          update: getSorting
-        });
-        cj("#contactEditOptions").sortable({
+        function getSorting(e, ui) {
+          var params = [];
+          var y = 0;
+          var items = $("#contactEditBlocks li");
+          if (items.length > 0) {
+            for (var y = 0; y < items.length; y++) {
+              var idState = items[y].id.split('-');
+              params[y + 1] = idState[1];
+            }
+          }
+
+          items = $("#contactEditOptions li");
+          if (items.length > 0) {
+            for (var x = 0; x < items.length; x++) {
+              var idState = items[x].id.split('-');
+              params[x + y + 1] = idState[1];
+            }
+          }
+          $('#contact_edit_preferences').val(params.toString());
+        }
+        
+        $("#contactEditBlocks, #contactEditOptions").sortable({
           placeholder: 'ui-state-highlight',
           update: getSorting
         });
       });
-
-      function getSorting(e, ui) {
-        var params = new Array();
-        var y = 0;
-        var items = cj("#contactEditBlocks li");
-        if (items.length > 0) {
-          for (var y = 0; y < items.length; y++) {
-            var idState = items[y].id.split('-');
-            params[y + 1] = idState[1];
-          }
-        }
-
-        items = cj("#contactEditOptions li");
-        if (items.length > 0) {
-          for (var x = 0; x < items.length; x++) {
-            var idState = items[x].id.split('-');
-            params[x + y + 1] = idState[1];
-          }
-        }
-        cj('#contact_edit_preferences').val(params.toString());
-      }
     </script>
   {/literal}
 {/if}

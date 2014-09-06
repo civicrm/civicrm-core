@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Membership Type ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Membership Id</comment>
@@ -20,6 +21,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
+    <title>Membership Type Domain</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -49,6 +51,7 @@
   </field>
   <field>
     <name>description</name>
+    <title>Membership Type Description</title>
     <type>varchar</type>
     <html>
       <type>TextArea</type>
@@ -62,6 +65,7 @@
   </field>
   <field>
     <name>member_of_contact_id</name>
+    <title>Membership Type Organization</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Owner organization for this membership type. FK to Contact ID</comment>
@@ -91,6 +95,7 @@
   </foreignKey>
   <field>
     <name>financial_type_id</name>
+    <title>Membership Financial Type</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -109,6 +114,7 @@
   </foreignKey>
   <field>
     <name>minimum_fee</name>
+    <title>membership Type Minimum Fee</title>
     <type>decimal</type>
     <comment>Minimum fee for this membership (0 for free/complimentary memberships).</comment>
     <default>0</default>
@@ -116,6 +122,7 @@
   </field>
   <field>
     <name>duration_unit</name>
+    <title>Membership Type Duration Unit</title>
     <type>varchar</type>
     <length>8</length>
     <comment>Unit in which membership period is expressed.</comment>
@@ -129,12 +136,14 @@
   </field>
   <field>
     <name>duration_interval</name>
+    <title>Membership Type Duration Interval</title>
     <type>int</type>
     <comment>Number of duration units in membership period (e.g. 1 year, 12 months).</comment>
     <add>1.5</add>
   </field>
   <field>
     <name>period_type</name>
+    <title>Membership Type Plan</title>
     <type>varchar</type>
     <length>8</length>
     <comment>Rolling membership period starts on signup date. Fixed membership periods start on fixed_period_start_day.</comment>
@@ -145,18 +154,21 @@
   </field>
   <field>
     <name>fixed_period_start_day</name>
+    <title>Fixed Period Start Day</title>
     <type>int</type>
     <comment>For fixed period memberships, month and day (mmdd) on which subscription/membership will start. Period start is back-dated unless after rollover day.</comment>
     <add>1.5</add>
   </field>
   <field>
     <name>fixed_period_rollover_day</name>
+    <title>Fixed Period Rollover Day</title>
     <type>int</type>
     <comment>For fixed period memberships, signups after this day (mmdd) rollover to next period.</comment>
     <add>1.5</add>
   </field>
   <field>
     <name>relationship_type_id</name>
+    <title>Membership Type Relationship</title>
     <type>varchar</type>
     <length>64</length>
     <comment>FK to Relationship Type ID</comment>
@@ -182,6 +194,7 @@
   </field>
   <field>
     <name>max_related</name>
+    <title>Max Related Members for Type</title>
     <type>int</type>
     <comment>Maximum number of related memberships.</comment>
     <add>4.3</add>
@@ -207,6 +220,7 @@
   </field>
   <field>
     <name>receipt_text_signup</name>
+    <title>Membership Type Receipt Text</title>
     <type>varchar</type>
     <html>
       <type>TextArea</type>
@@ -219,6 +233,7 @@
   </field>
   <field>
     <name>receipt_text_renewal</name>
+    <title>Membership Type Renewal Text</title>
     <type>varchar</type>
     <html>
       <type>TextArea</type>

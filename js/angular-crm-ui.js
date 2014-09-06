@@ -127,7 +127,7 @@
         }
       };
     })
-    // Example: <button crm-confirm="{message: ts('Frobincation is a footastical operation')}" on-yes="frobnicate(123)">Frobincate</button>
+    // Example: <button crm-confirm="{message: ts('Are you sure you want to continue?')}" on-yes="frobnicate(123)">Frobincate</button>
     // Example: <button crm-confirm="{type: 'disable', obj: myObject}" on-yes="myObject.is_active=0; myObject.save()">Disable</button>
     .directive('crmConfirm', function () {
       // Helpers to calculate default options for CRM.confirm()
@@ -138,6 +138,16 @@
             options: {no: ts('Cancel'), yes: ts('Disable')},
             width: 300,
             title: ts('Disable %1?', {
+              1: options.obj.title || options.obj.label || options.obj.name || ts('the record')
+            })
+          };
+        },
+        'revert': function (options) {
+          return {
+            message: ts('Are you sure you want to revert this?'),
+            options: {no: ts('Cancel'), yes: ts('Revert')},
+            width: 300,
+            title: ts('Revert %1?', {
               1: options.obj.title || options.obj.label || options.obj.name || ts('the record')
             })
           };

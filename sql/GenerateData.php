@@ -1857,7 +1857,7 @@ WHERE cefa.account_relationship = 1";
         'status_id' => 1,
         'trxn_id' => $result->trxn_id,
         'contribution_id' => $result->contribution_id,
-        'to_financial_account_id' => $result->payment_instrument_id ? $financialAccountId[$result->payment_instrument_id] : $defaultFinancialAccount,
+        'to_financial_account_id' => empty($financialAccountId[$result->payment_instrument_id]) ? $defaultFinancialAccount : $financialAccountId[$result->payment_instrument_id],
         'payment_instrument_id' => $result->payment_instrument_id,
         'check_number' => $result->check_number
       );

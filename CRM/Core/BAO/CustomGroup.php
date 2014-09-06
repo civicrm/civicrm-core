@@ -1037,6 +1037,7 @@ ORDER BY civicrm_custom_group.weight,
       $group['query']      = "reset=1&gid={$customGroupDAO->id}&cid={$cidToken}";
       $group['extra']      = array('gid' => $customGroupDAO->id);
       $group['table_name'] = $customGroupDAO->table_name;
+      $group['is_multiple'] = $customGroupDAO->is_multiple;
       $groups[]            = $group;
     }
 
@@ -1238,7 +1239,6 @@ ORDER BY civicrm_custom_group.weight,
       if (!isset($group['fields'])) {
         continue;
       }
-      $groupId = CRM_Utils_Array::value('id', $group);
       foreach ($group['fields'] as $field) {
         if (CRM_Utils_Array::value('element_value', $field) !== NULL) {
           $value = $field['element_value'];
@@ -1255,7 +1255,6 @@ ORDER BY civicrm_custom_group.weight,
           continue;
         }
 
-        $fieldId = $field['id'];
         if (!empty($field['element_name'])) {
           $elementName = $field['element_name'];
         }
@@ -1522,13 +1521,6 @@ ORDER BY civicrm_custom_group.weight,
         $elementName = $field['element_name'];
         CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, $inactiveNeeded, $required);
       }
-    }
-    if (!empty($form->_stateCountryMap['state_province']) && !empty($form->_stateCountryMap['country'])) {
-      foreach ($form->_stateCountryMap['state_province'] as $key => $value) {
-        $stateCountryMap[$key]['state_province'] = $value;
-        $stateCountryMap[$key]['country'] = $form->_stateCountryMap['country'][$key];
-      }
-      CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
     }
   }
 

@@ -88,7 +88,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom', 'newPriceField');
   }
 
   /**
@@ -97,6 +97,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
    * @param bool $dateSpecificFields
    */
   function _testAddPriceFields(&$fields, &$validateStrings, $dateSpecificFields = FALSE) {
+    $this->clickLink('newPriceField', '_qf_Field_cancel-bottom', FALSE);
     foreach ($fields as $label => $type) {
       $validateStrings[] = $label;
 
@@ -148,7 +149,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
             ),
           );
           $this->addMultipleChoiceOptions($options, $validateStrings);
-          $this->check('is_required');
+          $this->click('is_required');
           if ($dateSpecificFields == TRUE) {
             $this->webtestFillDateTime('active_on', '-1 week');
           }
@@ -175,7 +176,8 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         default:
           break;
       }
-      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom');
+      $this->clickLink('_qf_Field_next_new-bottom', '_qf_Field_next-bottom', FALSE);
+      $this->waitForText('crm-notification-container', "Price Field '".$label."' has been saved.");
     }
   }
 
@@ -721,13 +723,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
     //check the delete for price field
     $this->openCiviPage("admin/price/field", "reset=1&action=browse&sid={$sid}");
-    $this->click("xpath=//table[@id='option11']/tbody/tr/td[9]/span[2]/ul/li[2]/a");
-    // Check confirmation alert.
-    $this->assertTrue((bool)preg_match("/^Are you sure you want to delete this price field?/",
-      $this->getConfirmation()
-    ));
-    $this->chooseOkOnNextConfirmation();
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("xpath=//table[@id='options']/tbody/tr/td[9]/span[2]/ul/li[2]/a");
     //assert the message
     $this->waitForText('price_set_used_by',
       "it is currently in use by one or more active events or contribution pages or contributions or event templates.");

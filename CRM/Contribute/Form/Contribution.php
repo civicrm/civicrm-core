@@ -331,16 +331,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('lineItem', empty($this->_lineItems) ? FALSE : $this->_lineItems);
 
     // Set title
-    if ($this->_contactID) {
-      $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactID);
-
-      // Check if this is default domain contact CRM-10482
-      if (CRM_Contact_BAO_Contact::checkDomainContact($this->_contactID)) {
-        $displayName .= ' (' . ts('default organization') . ')';
-      }
-
-      // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-      CRM_Utils_System::setTitle(ts('Contribution from') . ' ' . $displayName);
+    if ($this->_mode) {
+      $this->setPageTitle($this->_ppID ? ts('Credit Card Pledge Payment') : ts('Credit Card Contribution'));
+    }
+    else {
+      $this->setPageTitle($this->_ppID ? ts('Pledge Payment') : ts('Contribution'));
     }
 
     if ($this->_id) {
@@ -383,9 +378,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
       $defaults = array_merge($defaults, $billingDefaults);
-
-      // now fix all state country selectors, set correct state based on country
-      CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
     }
 
     if ($this->_id) {
@@ -667,7 +659,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('entityID', $this->_id);
 
     if ($this->_context == 'standalone') {
-      $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE), TRUE);
+      $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE, 'api' => array('extra' => array('email'))), TRUE);
     }
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
@@ -687,7 +679,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
     }
 
-    $trxnId = $this->add('text', 'trxn_id', ts('Transaction ID'), $attributes['trxn_id']);
+    $trxnId = $this->add('text', 'trxn_id', ts('Transaction ID'), array('class' => 'twelve') + $attributes['trxn_id']);
 
     //add receipt for offline contribution
     $this->addElement('checkbox', 'is_email_receipt', ts('Send Receipt?'));
@@ -952,24 +944,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $softErrors = CRM_Contribute_Form_SoftCredit::formRule($fields, $errors, $self);
-   
-    // If we have a net amount or fee amount that is NOT set to 0.00, then ensure
-    // that the net_amount + the fee_amount is equal to the total amount.
-    $total_amount = NULL;
-    if(!empty($fields['total_amount']) && $fields['total_amount'] != '0.00') {
-      $total_amount = $fields['total_amount'];
-    }
-    $fee_amount = NULL;
-    if(!empty($fields['fee_amount']) && $fields['fee_amount'] != '0.00') {
-      $fee_amount = $fields['fee_amount'];
-    }
-    $net_amount = NULL;
-    if(!empty($fields['net_amount']) && $fields['net_amount'] != '0.00') {
-      $net_amount = $fields['net_amount'];
-    }
-    if ($total_amount && ($net_amount || $fee_amount)) {
-      $sum = CRM_Utils_Rule::cleanMoney($net_amount) + CRM_Utils_Rule::cleanMoney($fee_amount);
-      if (CRM_Utils_Rule::cleanMoney($total_amount) != $sum) {
+
+    if (!empty($fields['total_amount']) && (!empty($fields['net_amount']) || !empty($fields['fee_amount']))) {
+      $sum = CRM_Utils_Rule::cleanMoney($fields['net_amount']) + CRM_Utils_Rule::cleanMoney($fields['fee_amount']);
+      if (CRM_Utils_Rule::cleanMoney($fields['total_amount']) != $sum) {
         $errors['total_amount'] = ts('The sum of fee amount and net amount must be equal to total amount');
       }
     }
@@ -1217,8 +1195,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
 
       // Set is_pay_later flag for back-office offline Pending status contributions CRM-8996
+      // else if contribution_status is changed to Completed is_pay_later flag is changed to 0, CRM-15041
       if ($params['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name')) {
         $params['is_pay_later'] = 1;
+      }
+      elseif ($params['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
+        $params['is_pay_later'] = 0;
       }
 
       $ids['contribution'] = $params['id'] = $this->_id;
@@ -1715,4 +1697,3 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
   }
 }
-

@@ -149,7 +149,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     // contribution status is missing, choose Completed as default status
     // do this for create mode only
-    if (empty($ids['contribution']) && empty($params['contribution_status_id'])) {
+    if (!$contributionID && empty($params['contribution_status_id'])) {
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     }
     $setPrevContribution = TRUE;
@@ -3139,7 +3139,17 @@ WHERE  contribution_id = %1 ";
       $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($contributionDAO->financial_type_id, $relationTypeId);
 
       $trxnId = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId, $contributionDAO->financial_type_id);
-      $trxnId = $trxnId['trxn_id'];
+      if (!empty($trxnId)) {
+        $trxnId = $trxnId['trxn_id'];
+      }
+      elseif (!empty($contributionDAO->payment_instrument_id)) {
+        $trxnId = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($contributionDAO->payment_instrument_id);
+      }
+      else {
+        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
+        $queryParams = array(1 => array($relationTypeId, 'Integer'));
+        $trxnId = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = %1", $queryParams);
+      }
 
       // update statuses
       // criteria for updates contribution total_amount == financial_trxns of partial_payments
@@ -3156,15 +3166,21 @@ WHERE eft.entity_table = 'civicrm_contribution'
 
       // update statuses
       if ($contributionDAO->total_amount == $sumOfPayments) {
-        // update contribution status
-        $contributionUpdate['id'] = $contributionId;
-        $contributionUpdate['contribution_status_id'] = $statusId;
-        $contributionUpdate['skipLineItem'] = TRUE;
+        // update contribution status and
+        // clean cancel info (if any) if prev. contribution was updated in case of 'Refunded' => 'Completed'
+        $contributionDAO->contribution_status_id = $statusId;
+        $contributionDAO->cancel_date = 'null';
+        $contributionDAO->cancel_reason = NULL;
+        $contributionDAO->save();
+
+        //Change status of financial record too
+        $financialTrxn->status_id = $statusId;
+        $financialTrxn->save();
+
         // note : not using the self::add method,
         // the reason because it performs 'status change' related code execution for financial records
         // which in 'Partial Paid' => 'Completed' is not useful, instead specific financial record updates
         // are coded below i.e. just updating financial_item status to 'Paid'
-        $contributionDetails = CRM_Core_DAO::setFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'contribution_status_id', $statusId);
 
         if ($participantId) {
           // update participant status

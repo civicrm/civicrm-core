@@ -176,7 +176,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->addElement('checkbox', 'record_activity', $recordActivity);
 
     $this->addElement('checkbox', 'is_repeat', ts('Repeat'),
-      NULL, array('onclick' => "return showHideByValue('is_repeat',true,'repeatFields','table-row','radio',false);")
+      NULL, array('onchange' => "return showHideByValue('is_repeat',true,'repeatFields','table-row','radio',false);")
     );
 
     $this->add('select', 'repetition_frequency_unit', ts('every'), $freqUnitsDisplay);
@@ -203,7 +203,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->add('select', 'limit_to', ts('Limit Options'), $limitOptions);
 
     $this->add('select', 'recipient', ts('Recipients'), $sel5[$recipient],
-      FALSE, array('onClick' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);")
+      FALSE, array('onchange' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);")
     );
 
     if (!empty($_POST['is_recipient_listing'])) {
@@ -212,18 +212,14 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     elseif (!empty($this->_values['recipient_listing'])) {
       $recipientListingOptions = CRM_Core_BAO_ActionSchedule::getRecipientListing($this->_values['mapping_id'], $this->_values['recipient']);
     }
-    $recipientListing = $this->add('select', 'recipient_listing', ts('Recipient Listing'), $recipientListingOptions);
-    $recipientListing->setMultiple(TRUE);
-    $this->add('hidden', 'is_recipient_listing', empty($recipientListingOptions) ? FALSE : TRUE, array('id' => 'is_recipient_listing'));
+    $this->add('select', 'recipient_listing', ts('Recipient Roles'), $recipientListingOptions, FALSE,
+      array('multiple' => TRUE, 'class' => 'crm-select2 huge', 'placeholder' => TRUE));
+    $this->add('hidden', 'is_recipient_listing', (int) !empty($recipientListingOptions));
 
     $this->addEntityRef('recipient_manual_id', ts('Manual Recipients'), array('multiple' => TRUE, 'create' => TRUE));
 
-    $this->addElement(
-      'select',
-      'group_id',
-      ts('Group'),
-      // CRM-13577
-      CRM_Core_PseudoConstant::group()
+    $this->add('select', 'group_id', ts('Group'),
+      CRM_Core_PseudoConstant::nestedGroup(), FALSE, array('class' => 'crm-select2 huge')
     );
 
     CRM_Mailing_BAO_Mailing::commonCompose($this);
@@ -235,6 +231,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->add('checkbox', 'is_active', $isActive);
 
     $this->addFormRule(array('CRM_Admin_Form_ScheduleReminders', 'formRule'));
+
+    $this->setPageTitle(ts('Scheduled Reminder'));
   }
   /**
    * global form rule

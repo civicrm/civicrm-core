@@ -337,7 +337,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    */
   function buildQuickForm() {
     parent::buildQuickForm();
-    $this->setAttribute('class', 'crm-search-form crm-ajax-selection-form');
+    $this->addClass('crm-ajax-selection-form');
     CRM_Core_Resources::singleton()
       // jsTree is needed for tags popup
       ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
@@ -446,10 +446,14 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->assign_by_ref('group', $groupValues);
       $this->add('submit', $this->_actionButtonName, ts('Add Contacts to %1', array(1 => $this->_group[$this->_amtgID])),
         array(
-          'class' => 'form-submit',
+          'class' => 'crm-form-submit',
         )
       );
       $this->add('hidden', 'task', CRM_Contact_Task::GROUP_CONTACTS);
+      $selectedRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
+      $allRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all');
+      $this->assign('ts_sel_id', $selectedRowsRadio->_attributes['id']);
+      $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
     }
     else {
       $this->addTaskMenu($tasks);

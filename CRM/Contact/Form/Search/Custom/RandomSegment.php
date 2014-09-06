@@ -43,7 +43,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     parent::__construct($formValues);
 
     $this->_columns = array(
-      ts('Contact Id') => 'contact_id',
+      ts('Contact ID') => 'contact_id',
       ts('Contact Type') => 'contact_type',
       ts('Name') => 'sort_name',
       ts('Email') => 'email',
@@ -83,7 +83,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
       TRUE
     );
 
-    $groups = CRM_Core_PseudoConstant::group();
+    $groups = CRM_Core_PseudoConstant::nestedGroup();
 
     $select2style = array(
       'multiple' => TRUE,

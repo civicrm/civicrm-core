@@ -1,10 +1,10 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
+require_once 'CiviTest/CiviCaseTestCase.php';
 
 /**
  * Class CRM_Case_PseudoConstantTest
  */
-class CRM_Case_PseudoConstantTest extends CiviUnitTestCase {
+class CRM_Case_PseudoConstantTest extends CiviCaseTestCase {
   /**
    * @return array
    */
@@ -16,19 +16,12 @@ class CRM_Case_PseudoConstantTest extends CiviUnitTestCase {
     );
   }
 
-  function setUp() {
-    parent::setUp();
-
-    $this->loadAllFixtures();
-
-    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-  }
-
   function testCaseType() {
     CRM_Core_PseudoConstant::flush();
     $caseTypes = CRM_Case_PseudoConstant::caseType();
     $expectedTypes = array(
-        1 => 'Housing Support',
+      1 => 'Housing Support',
+      2 => 'Adult Day Care Referral',
     );
     $this->assertEquals($expectedTypes, $caseTypes);
   }

@@ -19,9 +19,31 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   function setUp() {
     parent::setUp();
 
+    $this->tablesToTruncate = array(
+      'civicrm_activity',
+      'civicrm_contact',
+      'civicrm_custom_group',
+      'civicrm_custom_field',
+      'civicrm_case',
+      'civicrm_case_contact',
+      'civicrm_case_activity',
+      'civicrm_case_type',
+      'civicrm_activity_contact',
+      'civicrm_managed',
+      'civicrm_relationship',
+      'civicrm_relationship_type',
+    );
+
+    $this->quickCleanup($this->tablesToTruncate);
+
     $this->loadAllFixtures();
 
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+  }
+
+  protected function tearDown() {
+    parent::tearDown();
+    $this->quickCleanup($this->tablesToTruncate, TRUE);
   }
 
   function testAddCaseToContact() {

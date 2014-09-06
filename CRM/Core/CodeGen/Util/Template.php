@@ -10,9 +10,6 @@ class CRM_Core_CodeGen_Util_Template {
   protected $smarty;
   protected $beautifier;
 
-  // FIXME: Set by Main...
-  static public $smartyPluginDirs = array();
-
   /**
    * @param string $filetype
    */
@@ -22,9 +19,7 @@ class CRM_Core_CodeGen_Util_Template {
 
     $this->filetype = $filetype;
 
-    // TODO use Core Smarty
-    require_once 'Smarty/Smarty.class.php';
-    $this->smarty = new Smarty();
+    $this->smarty = CRM_Core_CodeGen_Util_Smarty::singleton()->getSmarty();
     $this->smarty->template_dir = $this->config->xmlTemplatePath;
     $this->smarty->plugins_dir = self::$smartyPluginDirs;
     $this->smarty->compile_dir = $this->compileDir;
@@ -49,10 +44,6 @@ class CRM_Core_CodeGen_Util_Template {
       $this->beautifier->setIndentNumber(2);
       $this->beautifier->setNewLine("\n");
     }
-  }
-
-  function __destruct() {
-    CRM_Core_CodeGen_Util_File::removeDir($this->compileDir);
   }
 
   /**

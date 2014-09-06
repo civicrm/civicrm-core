@@ -539,8 +539,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       }
 
       // Fixme: why are we getting the wrong keys from upstream?
-      $defaults['target_contact_id'] = $defaults['target_contact'];
-      $defaults['assignee_contact_id'] = $defaults['assignee_contact'];
+      $defaults['target_contact_id'] = CRM_Utils_Array::value('target_contact', $defaults);
+      $defaults['assignee_contact_id'] = CRM_Utils_Array::value('assignee_contact', $defaults);
 
       // set default tags if exists
       $defaults['tag'] = CRM_Core_BAO_EntityTag::getTag($this->_activityId, 'civicrm_activity');

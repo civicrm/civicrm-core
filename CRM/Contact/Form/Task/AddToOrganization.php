@@ -93,8 +93,8 @@ class CRM_Contact_Form_Task_AddToOrganization extends CRM_Contact_Form_Task {
     $this->assign('searchCount', $searchCount);
     $this->assign('searchDone', $this->get('searchDone'));
     $this->assign('contact_type_display', ts('Organization'));
-    $this->addElement('submit', $this->getButtonName('refresh'), ts('Search'), array('class' => 'form-submit'));
-    $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), array('class' => 'form-submit'));
+    $this->addElement('submit', $this->getButtonName('refresh'), ts('Search'), array('class' => 'crm-form-submit'));
+    $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), array('class' => 'crm-form-submit'));
 
 
     $this->addButtons(array(

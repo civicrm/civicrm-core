@@ -48,7 +48,14 @@
         {if $privacy.do_not_email}<span class="icon privacy-flag do-not-email" title="{ts}Privacy flag: Do Not Email{/ts}"></span>{elseif $item.on_hold}<span class="icon privacy-flag email-hold" title="{ts}Email on hold - generally due to bouncing.{/ts}"></span>{/if}
       </div>
       <div class="crm-content crm-contact_email {if $item.is_primary eq 1}primary{/if}">
-        <a href="mailto:{$item.email}">{$item.email}</a>{if $item.on_hold == 2}&nbsp;({ts}On Hold - Opt Out{/ts}){elseif $item.on_hold}&nbsp;({ts}On Hold{/ts}){/if}{if $item.is_bulkmail}&nbsp;({ts}Bulk{/ts}){/if}
+        {if !$item.on_hold and !$privacy.do_not_email}
+          <a href="{crmURL p="civicrm/activity/email/add" q="action=add&reset=1&email_id=`$item.id`"}" class="crm-popup" title="{ts 1=$item.email}Send email to %1{/ts}">
+            {$item.email}
+          </a>
+        {else}
+          {$item.email}
+        {/if}
+        {if $item.on_hold == 2}&nbsp;({ts}On Hold - Opt Out{/ts}){elseif $item.on_hold}&nbsp;({ts}On Hold{/ts}){/if}{if $item.is_bulkmail}&nbsp;({ts}Bulk{/ts}){/if}
         {if $item.signature_text OR $item.signature_html}
         <span class="signature-link description">
           <a href="#" title="{ts}Signature{/ts}" onClick="showHideSignature( '{$blockId}' ); return false;">{ts}(signature){/ts}</a>

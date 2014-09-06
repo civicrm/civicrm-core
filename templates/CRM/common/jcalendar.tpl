@@ -77,15 +77,15 @@
       var element_time  = "#{$elementId}_time";
       {if $timeElement}
           element_time  = "#{$timeElement}";
-          var time_format   = cj( element_time ).attr('timeFormat');
+          var time_format   = $( element_time ).attr('timeFormat');
           {literal}
-              cj(element_time).timeEntry({ show24Hours : time_format, spinnerImage: '' });
+              $(element_time).timeEntry({ show24Hours : time_format, spinnerImage: '' });
           {/literal}
       {/if}
       var currentYear = new Date().getFullYear();
       var alt_field   = '#{$elementId}';
-      cj( alt_field ).hide();
-      var date_format = cj( alt_field ).attr('format');
+      $( alt_field ).hide();
+      var date_format = $( alt_field ).attr('format');
 
       var altDateFormat = 'mm/dd/yy';
       {literal}
@@ -97,22 +97,22 @@
       }
 
       if ( !( ( date_format == 'M yy' ) || ( date_format == 'yy' ) || ( date_format == 'yy-mm' ) ) ) {
-          cj( element_date ).addClass( 'dpDate' );
+          $( element_date ).addClass( 'dpDate' );
       }
 
       {/literal}
-      var yearRange   = currentYear - parseInt( cj( alt_field ).attr('startOffset') );
+      var yearRange   = currentYear - parseInt( $( alt_field ).attr('startOffset') );
           yearRange  += ':';
-          yearRange  += currentYear + parseInt( cj( alt_field ).attr('endOffset'  ) );
+          yearRange  += currentYear + parseInt( $( alt_field ).attr('endOffset'  ) );
       {literal}
 
-      var startRangeYr = currentYear - parseInt( cj( alt_field ).attr('startOffset') );
-      var endRangeYr = currentYear + parseInt( cj( alt_field ).attr('endOffset'  ) );
+      var startRangeYr = currentYear - parseInt( $( alt_field ).attr('startOffset') );
+      var endRangeYr = currentYear + parseInt( $( alt_field ).attr('endOffset'  ) );
 
       var lcMessage = {/literal}"{$config->lcMessages}"{literal};
       var localisation = lcMessage.split('_');
-      var dateValue = cj(alt_field).val( );
-      cj(element_date).datepicker({
+      var dateValue = $(alt_field).val( );
+      $(element_date).datepicker({
                                     closeAtTop        : true,
                                     dateFormat        : date_format,
                                     changeMonth       : true,
@@ -128,31 +128,31 @@
       // set default value to display field, setDefault param for datepicker
       // is not working hence using below logic
       // parse the date
-      var displayDateValue = cj.datepicker.parseDate( altDateFormat, dateValue );
+      var displayDateValue = $.datepicker.parseDate( altDateFormat, dateValue );
 
       // format date according to display field
-      displayDateValue = cj.datepicker.formatDate( date_format, displayDateValue );
-      cj( element_date).val( displayDateValue );
+      displayDateValue = $.datepicker.formatDate( date_format, displayDateValue );
+      $( element_date).val( displayDateValue );
       //support unsaved-changes warning: CRM-14353
-      cj( element_date).data('crm-initial-value', displayDateValue);
+      $( element_date).data('crm-initial-value', displayDateValue);
 
-      cj(element_date).click( function( ) {
+      $(element_date).click( function( ) {
           hideYear( this );
       });
-      cj('.ui-datepicker-trigger').click( function( ) {
-          hideYear( cj(this).prev() );
+      $('.ui-datepicker-trigger').click( function( ) {
+          hideYear( $(this).prev() );
       });
       function hideYear( element ) {
-        var format = cj( element ).attr('format');
+        var format = $( element ).attr('format');
         if ( format == 'dd-mm' || format == 'mm/dd' ) {
-          cj(".ui-datepicker-year").css('display', 'none');
+          $(".ui-datepicker-year").css('display', 'none');
         }
       }
-      cj(alt_field + ',' + element_date + ',' + element_time).on('blur change', function() {
-        var vis = cj(alt_field).val() || cj(element_time).val() ? '' : 'hidden';
-        cj(this).siblings('.crm-clear-link').css('visibility', vis);
+      $(alt_field + ',' + element_date + ',' + element_time).on('blur change', function() {
+        var vis = $(alt_field).val() || $(element_time).val() ? '' : 'hidden';
+        $(this).siblings('.crm-clear-link').css('visibility', vis);
       });
-      cj(alt_field).change();
+      $(alt_field).change();
     });
 
     {/literal}

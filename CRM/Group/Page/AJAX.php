@@ -42,15 +42,14 @@ class CRM_Group_Page_AJAX {
     if (isset($params['parent_id'])) {
       // requesting child groups for a given parent
       $params['page'] = 1;
-      $params['rp']   = 25;
+      $params['rp']   = 0;
       $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
 
-      echo json_encode($groups);
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output($groups);
     }
     else {
       $sortMapper = array(
-        0 => 'groups.title', 1 => 'groups.id', 2 => 'createdBy.sort_name', 3 => '',
+        0 => 'groups.title', 1 => 'count', 2 => 'createdBy.sort_name', 3 => '',
         4 => 'groups.group_type', 5 => 'groups.visibility',
       );
 
@@ -84,7 +83,7 @@ class CRM_Group_Page_AJAX {
 
       $iFilteredTotal = $iTotal = $params['total'];
       $selectorElements = array(
-        'group_name', 'group_id', 'created_by', 'group_description',
+        'group_name', 'count', 'created_by', 'group_description',
         'group_type', 'visibility', 'org_info', 'links', 'class',
       );
 

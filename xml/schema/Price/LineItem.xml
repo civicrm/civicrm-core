@@ -8,6 +8,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Line Item ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Line Item</comment>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>entity_table</name>
+    <title>Line Item Entity Type</title>
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
@@ -27,6 +29,7 @@
   </field>
   <field>
     <name>entity_id</name>
+    <title>Line Item Entity</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>entry in table</comment>
@@ -39,6 +42,7 @@
   </dynamicForeignKey>
   <field>
     <name>contribution_id</name>
+    <title>Line Item Contribution</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contribution</comment>
     <add>4.5</add>
@@ -51,6 +55,7 @@
   </foreignKey>
   <field>
     <name>price_field_id</name>
+    <title>Line Item Price Field</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_price_field</comment>
     <!-- changed to not required in 4.3 in order to change ON DELETE CASCADE FK constraint to SET NULL -->
@@ -64,6 +69,7 @@
   </foreignKey>
   <field>
     <name>option_group_id</name>
+    <title>Line Item Option Group</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to option group</comment>
@@ -72,6 +78,7 @@
   </field>
   <field>
     <name>label</name>
+    <title>Line Item Label</title>
     <type>varchar</type>
     <length>255</length>
     <default>NULL</default>
@@ -84,6 +91,7 @@
   </field>
   <field>
     <name>qty</name>
+    <title>Line Item Quantity</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>How many items ordered</comment>
@@ -104,6 +112,7 @@
   </field>
   <field>
     <name>line_total</name>
+    <title>Line Item Total</title>
     <type>decimal</type>
     <required>true</required>
     <comment>qty * unit_price</comment>
@@ -111,12 +120,13 @@
   </field>
   <field>
     <name>participant_count</name>
+    <title>Line Item Participant Count</title>
     <type>int unsigned</type>
     <default>NULL</default>
-    <comment>Participant count for fiel
-    <html>
-      <type>Text</type>
-    </html>d</comment>
+    <comment>Participant count for field</comment>
+      <html>
+        <type>Text</type>
+      </html>
     <add>3.2</add>
 
   </field>
@@ -140,6 +150,7 @@
   </index>
   <field>
     <name>price_field_value_id</name>
+    <title>Line Item Option</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to civicrm_price_field_value</comment>

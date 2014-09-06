@@ -34,12 +34,14 @@ The original form used table layout; don't know if we have an alternative, CSS-b
         name="caseTypeName"
         ng-model="caseType.name"
         ng-disabled="locks.caseTypeName"
-        ng-pattern="/^[a-zA-Z0-9_]+$/"
         required
         class="big crm-form-text"/>
 
       <a crm-ui-lock binding="locks.caseTypeName"></a>
 
+      <div ng-show="!isValidName(caseType.name)">
+        <em>WARNING: The case type name includes deprecated characters.</em>
+      </div>
       <div ng-show="caseType.id && !locks.caseTypeName">
         <em>WARNING: If any external files or programs reference the old "Name", then they must be updated manually.</em>
       </div>

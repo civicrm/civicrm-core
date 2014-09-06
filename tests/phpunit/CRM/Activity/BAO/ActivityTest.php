@@ -285,7 +285,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   function testGetActivitiesCountforAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
@@ -314,7 +314,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   function testGetActivitiesCountforNonAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
@@ -344,7 +344,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   function testGetActivitiesCountforContactSummary() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
@@ -373,7 +373,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   function testGetActivitiesCountforContactSummaryWithNoActivities() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
@@ -401,7 +401,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   function testGetActivitiesforAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
@@ -436,7 +436,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   function testGetActivitiesforNonAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
@@ -479,7 +479,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   function testGetActivitiesforContactSummary() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
@@ -534,7 +534,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   function testGetActivitiesforContactSummaryWithNoActivities() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );

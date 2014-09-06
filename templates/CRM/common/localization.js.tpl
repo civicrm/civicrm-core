@@ -37,7 +37,7 @@
   {rdelim}
   
   // Initialize CRM.url and CRM.formatMoney
-  CRM.url('init', '{crmURL p="civicrm/example" q="placeholder" h=0}');
+  CRM.url({ldelim}back: '{crmURL p="*path*" q="*query*" h=0 fb=1}', front: '{crmURL p="*path*" q="*query*" h=0 fe=1}'{rdelim});
   CRM.formatMoney('init', {$moneyFormat});
 
   // Localize select2
