@@ -92,7 +92,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     );
 
     if (!$mode) {
-      $mode = CRM_Core_DAO::singleValueQuery("SELECT cascade_type FROM civicrm_recurring_entity WHERE entity_id = %3 AND entity_table = %2", $queryParams);
+      $mode = CRM_Core_DAO::singleValueQuery("SELECT mode FROM civicrm_recurring_entity WHERE entity_id = %3 AND entity_table = %2", $queryParams);
     }
 
     $query = "SELECT *
@@ -168,6 +168,15 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   static public function triggerUpdate($obj) {
+    // if DB version is earlier than 4.6 skip any processing
+    static $currentVer = NULL;
+    if (!$currentVer) {
+      $currentVer = CRM_Core_BAO_Domain::version();
+    }
+    if (version_compare($currentVer, '4.6.alpha1') < 0) {
+      return;
+    }
+
     static $processedEntities = array();
     if (empty($obj->id) || empty($obj->__table)) {
       return FALSE;

@@ -262,7 +262,7 @@
                 }
             }
         });
-        var ajaxurl = CRM.url("civicrm/ajax/recurringEntity/generate_preview");
+        var ajaxurl = CRM.url("civicrm/ajax/recurringentity/generate-preview");
         var eventID = {/literal}{$currentEntityId}{literal};
         if(eventID != ""){
             ajaxurl += "?event_id="+eventID;

@@ -14,20 +14,20 @@
 
 class CRM_Core_Page_AJAX_RecurringEntity {
   
-  public static function updateCascadeType(){
-    if(CRM_Utils_Array::value('cascadeType', $_REQUEST) && CRM_Utils_Array::value('entityId', $_REQUEST)){
+  public static function updateMode() {
+    if(CRM_Utils_Array::value('mode', $_REQUEST) && CRM_Utils_Array::value('entityId', $_REQUEST)){
       $finalResult = array();
-      $cascadeType = CRM_Utils_Type::escape($_REQUEST['cascadeType'], 'Integer');
+      $mode = CRM_Utils_Type::escape($_REQUEST['mode'], 'Integer');
       $entityId = CRM_Utils_Type::escape($_REQUEST['entityId'], 'Integer');
-      
+
       $sql = "UPDATE
-          civicrm_recurring_entity
-          SET cascade_type = (%1)
-          WHERE entity_id = (%2) AND entity_table = 'civicrm_event'";
+        civicrm_recurring_entity
+        SET mode = %1
+        WHERE entity_id = %2 AND entity_table = 'civicrm_event'";
       $params = array(
-                  1 => array($cascadeType, 'Integer'),          
-                  2 => array($entityId, 'Integer')
-                );
+        1 => array($mode, 'Integer'),          
+        2 => array($entityId, 'Integer')
+      );
       CRM_Core_DAO::executeQuery($sql, $params);
       $finalResult['status'] = 'Done';
     }

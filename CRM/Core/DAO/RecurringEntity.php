@@ -109,6 +109,11 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO
    */
   public $entity_table;
   /**
+   *
+   * @var boolean
+   */
+  public $mode;
+  /**
    * class constructor
    *
    * @access public
@@ -151,7 +156,15 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO
           'type' => CRM_Utils_Type::T_STRING,
           'title' => ts('Entity Table') ,
           'required' => true,
-          'size' => CRM_Utils_Type::TWO,
+          'maxlength' => 64,
+          'size' => CRM_Utils_Type::BIG,
+        ) ,
+        'mode' => array(
+          'name' => 'mode',
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Cascade Type') ,
+          'required' => true,
+          'default' => '1',
         ) ,
       );
     }
@@ -172,6 +185,7 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO
         'parent_id' => 'parent_id',
         'entity_id' => 'entity_id',
         'entity_table' => 'entity_table',
+        'mode' => 'mode',
       );
     }
     return self::$_fieldKeys;
