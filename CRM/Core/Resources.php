@@ -634,6 +634,11 @@ class CRM_Core_Resources {
       $items[] = "js/jquery/jquery.crmeditable.js";
     }
 
+    // JS for multilingual installations
+    if (!empty($config->languageLimit) && count($config->languageLimit) > 1 && CRM_Core_Permission::check('translate CiviCRM')) {
+      $items[] = "js/crm.multilingual.js";
+    }
+
     // Enable administrators to edit option lists in a dialog
     if (CRM_Core_Permission::check('administer CiviCRM') && $this->ajaxPopupsEnabled) {
       $items[] = "js/crm.optionEdit.js";
