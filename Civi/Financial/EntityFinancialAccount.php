@@ -258,4 +258,10 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
      }
     return self::$_fields;
   }
+
+  static function getDynamicReferenceColumns($tableName) {
+    $dynamic_reference_columns = array();
+    $dynamic_reference_columns[] = new \CRM_Core_Reference_Dynamic($tableName, 'entity_id', NULL, 'id', 'entity_table');
+    return $dynamic_reference_columns;
+  }
 }

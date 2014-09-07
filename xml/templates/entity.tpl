@@ -199,4 +199,14 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
      {rdelim}
     return self::$_fields;
   {rdelim}
+
+  static function getDynamicReferenceColumns($tableName) {ldelim}
+    $dynamic_reference_columns = array();
+{if $table.dynamicForeignKey}
+{foreach from=$table.dynamicForeignKey item=dynamic_foreign_key}
+    $dynamic_reference_columns[] = new \CRM_Core_Reference_Dynamic($tableName, '{$dynamic_foreign_key.idColumn}', NULL, '{$dynamic_foreign_key.key|default:'id'}', '{$dynamic_foreign_key.typeColumn}');
+{/foreach}
+{/if}
+    return $dynamic_reference_columns;
+  {rdelim}
 {rdelim}

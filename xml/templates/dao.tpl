@@ -137,10 +137,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {foreach from=$table.foreignKey item=foreign}
         self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName(), '{$foreign.name}', '{$foreign.table}', '{$foreign.key}');
 {/foreach}
-
-{foreach from=$table.dynamicForeignKey item=foreign}
-        self::$_links[] = new CRM_Core_Reference_Dynamic(self::getTableName(), '{$foreign.idColumn}', NULL, '{$foreign.key|default:'id'}', '{$foreign.typeColumn}');
-{/foreach}
+        self::$_links = array_merge(self::$_links, {$table.entity_class_name}::getDynamicReferenceColumns(self::getTableName()));
       {rdelim}
       return self::$_links;
     {rdelim}

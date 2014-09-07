@@ -350,4 +350,9 @@ class LocationType extends \Civi\Core\Entity {
      }
     return self::$_fields;
   }
+
+  static function getDynamicReferenceColumns($tableName) {
+    $dynamic_reference_columns = array();
+    return $dynamic_reference_columns;
+  }
 }

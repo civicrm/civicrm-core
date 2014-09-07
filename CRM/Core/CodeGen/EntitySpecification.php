@@ -82,6 +82,9 @@ class CRM_Core_CodeGen_EntitySpecification {
     $tables = array();
     foreach ($dbXML->tables as $tablesXML) {
       foreach ($tablesXML->table as $tableXML) {
+        if ($this->value('drop', $tableXML, 10000) <= $this->buildVersion) {
+          continue;
+        }
         if ($this->value('add', $tableXML, 0) <= $this->buildVersion) {
           $this->getTable($tableXML, $database, $tables);
         }
