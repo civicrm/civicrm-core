@@ -128,9 +128,7 @@
       width: '600',
       resizable: true,
       options: {yes: "{/literal}{ts escape='js'}Save{/ts}{literal}", no: "{/literal}{ts escape='js'}Cancel{/ts}{literal}"},
-      open: function() {
-        CRM.loadPage(dataUrl, {target: this});
-      }
+      url: dataUrl
     }).on('crmConfirm:yes', save);
     
   }
