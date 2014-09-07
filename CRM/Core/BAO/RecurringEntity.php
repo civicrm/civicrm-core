@@ -230,165 +230,175 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 	
     if(CRM_Utils_Array::value('parent_event_id', $formParams)){
         $dbParams['entity_value'] = $formParams['parent_event_id'];
-      }
+    }
+    
+    if(CRM_Utils_Array::value('repetition_start_date', $formParams)){
+      $repetition_start_date = new DateTime($formParams['repetition_start_date']);
+      $repetition_start_date->modify('+1 day');
+      $dbParams['entity_status'] = CRM_Utils_Date::processDate($repetition_start_date->format('Y-m-d H:i:s'));
+    }
 
     if(CRM_Utils_Array::value('repetition_frequency_unit', $formParams)){
-        $dbParams['repetition_frequency_unit'] = $formParams['repetition_frequency_unit'];
-      }
+      $dbParams['repetition_frequency_unit'] = $formParams['repetition_frequency_unit'];
+    }
 
     if(CRM_Utils_Array::value('repetition_frequency_interval', $formParams)){
-        $dbParams['repetition_frequency_interval'] = $formParams['repetition_frequency_interval'];
-      }
+      $dbParams['repetition_frequency_interval'] = $formParams['repetition_frequency_interval'];
+    }
 
     //For Repeats on:(weekly case)
-      if($formParams['repetition_frequency_unit'] == 'week'){
-        if(CRM_Utils_Array::value('start_action_condition', $formParams)){
-          $repeats_on = CRM_Utils_Array::value('start_action_condition', $formParams);
-          $dbParams['start_action_condition'] = implode(",", array_keys($repeats_on));
-        }
+    if($formParams['repetition_frequency_unit'] == 'week'){
+      if(CRM_Utils_Array::value('start_action_condition', $formParams)){
+        $repeats_on = CRM_Utils_Array::value('start_action_condition', $formParams);
+        $dbParams['start_action_condition'] = implode(",", array_keys($repeats_on));
       }
+    }
 
     //For Repeats By:(monthly case)
-      if($formParams['repetition_frequency_unit'] == 'month'){
-        if($formParams['repeats_by'] == 1){
-          if(CRM_Utils_Array::value('limit_to', $formParams)){
-            $dbParams['limit_to'] = $formParams['limit_to'];
-          }
-        }
-        if($formParams['repeats_by'] == 2){
-          if(CRM_Utils_Array::value('start_action_date_1', $formParams) && CRM_Utils_Array::value('start_action_date_2', $formParams)){
-            $dbParams['start_action_date'] = $formParams['start_action_date_1']." ".$formParams['start_action_date_2'];
-          }
+    if($formParams['repetition_frequency_unit'] == 'month'){
+      if($formParams['repeats_by'] == 1){
+        if(CRM_Utils_Array::value('limit_to', $formParams)){
+          $dbParams['limit_to'] = $formParams['limit_to'];
         }
       }
+      if($formParams['repeats_by'] == 2){
+        if(CRM_Utils_Array::value('start_action_date_1', $formParams) && CRM_Utils_Array::value('start_action_date_2', $formParams)){
+          $dbParams['start_action_date'] = $formParams['start_action_date_1']." ".$formParams['start_action_date_2'];
+        }
+      }
+    }
 
     //For "Ends" - After: 
-      if($formParams['ends'] == 1){
-        if(CRM_Utils_Array::value('start_action_offset', $formParams)){
-          $dbParams['start_action_offset'] = $formParams['start_action_offset'];
-        }
+    if($formParams['ends'] == 1){
+      if(CRM_Utils_Array::value('start_action_offset', $formParams)){
+        $dbParams['start_action_offset'] = $formParams['start_action_offset'];
       }
-
-      //For "Ends" - On: 
-      if($formParams['ends'] == 2){
-        if(CRM_Utils_Array::value('repeat_absolute_date', $formParams)){
-          $dbParams['absolute_date'] = CRM_Utils_Date::processDate($formParams['repeat_absolute_date']);
-        }
-      }
-      return $dbParams;
     }
 
-    static public function getScheduleReminderDetailsById($scheduleReminderId){
-      $query = "SELECT *
-                FROM civicrm_action_schedule WHERE 1";
-      if($scheduleReminderId){
-        $query .= "
-        AND id = %1";
+    //For "Ends" - On: 
+    if($formParams['ends'] == 2){
+      if(CRM_Utils_Array::value('repeat_absolute_date', $formParams)){
+        $dbParams['absolute_date'] = CRM_Utils_Date::processDate($formParams['repeat_absolute_date']);
       }
-      $dao = CRM_Core_DAO::executeQuery($query,
-            array(
-              1 => array($scheduleReminderId, 'Integer')
-            )
-          );
-      $dao->fetch();
-      return $dao;
     }
-    
-    static function getRecursionFromReminder($scheduleReminderId){
-      if($scheduleReminderId){
-        //Get all the details from schedule reminder table
-        $scheduleReminderDetails = self::getScheduleReminderDetailsById($scheduleReminderId);
-        $scheduleReminderDetails = (array) $scheduleReminderDetails;
-        $recursionDetails = self::getRecursionFromReminderByDBParams($scheduleReminderDetails);
-      }
-      return $recursionDetails;
+    return $dbParams;
+  }
+
+  static public function getScheduleReminderDetailsById($scheduleReminderId){
+    $query = "SELECT *
+              FROM civicrm_action_schedule WHERE 1";
+    if($scheduleReminderId){
+      $query .= "
+      AND id = %1";
     }
+    $dao = CRM_Core_DAO::executeQuery($query,
+          array(
+            1 => array($scheduleReminderId, 'Integer')
+          )
+        );
+    $dao->fetch();
+    return $dao;
+  }
     
-    static function getRecursionFromReminderByDBParams($scheduleReminderDetails = array()){
-      $r = new When();
-      //If there is some data for this id
-      if($scheduleReminderDetails['repetition_frequency_unit']){
+  static function getRecursionFromReminder($scheduleReminderId){
+    if($scheduleReminderId){
+      //Get all the details from schedule reminder table
+      $scheduleReminderDetails = self::getScheduleReminderDetailsById($scheduleReminderId);
+      $scheduleReminderDetails = (array) $scheduleReminderDetails;
+      $recursionDetails = self::getRecursionFromReminderByDBParams($scheduleReminderDetails);
+    }
+    return $recursionDetails;
+  }
+    
+  static function getRecursionFromReminderByDBParams($scheduleReminderDetails = array()){
+    $r = new When();
+    //If there is some data for this id
+    if($scheduleReminderDetails['repetition_frequency_unit']){
+      if($scheduleReminderDetails['entity_status']){
+        $currDate = date('Y-m-d H:i:s', strtotime($scheduleReminderDetails['entity_status']));
+      }else{
         $currDate = date("Y-m-d H:i:s");
-        $start = new DateTime($currDate);
-        if($scheduleReminderDetails['repetition_frequency_unit']){
-          $repetition_frequency_unit = $scheduleReminderDetails['repetition_frequency_unit'];
-          if($repetition_frequency_unit == "day"){
-            $repetition_frequency_unit = "dai";
+      }
+      $start = new DateTime($currDate);
+      if($scheduleReminderDetails['repetition_frequency_unit']){
+        $repetition_frequency_unit = $scheduleReminderDetails['repetition_frequency_unit'];
+        if($repetition_frequency_unit == "day"){
+          $repetition_frequency_unit = "dai";
+        }
+        $repetition_frequency_unit = $repetition_frequency_unit.'ly';
+        $r->recur($start, $repetition_frequency_unit);
+      }
+
+      if($scheduleReminderDetails['repetition_frequency_interval']){
+        $r->interval($scheduleReminderDetails['repetition_frequency_interval']);
+      }else{
+        $r->errors[] = 'Repeats every: is a required field';
+      }
+
+      //week
+      if($scheduleReminderDetails['repetition_frequency_unit'] == 'week'){
+        if($scheduleReminderDetails['start_action_condition']){
+          $startActionCondition = $scheduleReminderDetails['start_action_condition'];
+          $explodeStartActionCondition = explode(',', $startActionCondition);
+          $buildRuleArray = array();
+          foreach($explodeStartActionCondition as $key => $val){
+            $buildRuleArray[] = strtoupper(substr($val, 0, 2));
           }
-          $repetition_frequency_unit = $repetition_frequency_unit.'ly';
-          $r->recur($start, $repetition_frequency_unit);
+          $r->wkst('MO')->byday($buildRuleArray);
         }
+      }
 
-        if($scheduleReminderDetails['repetition_frequency_interval']){
-          $r->interval($scheduleReminderDetails['repetition_frequency_interval']);
-        }else{
-          $r->errors[] = 'Repeats every: is a required field';
+      //month 
+      if($scheduleReminderDetails['repetition_frequency_unit'] == 'month'){
+        if($scheduleReminderDetails['limit_to']){
+          $r->bymonthday(array($scheduleReminderDetails['limit_to']));
         }
-
-        //week
-        if($scheduleReminderDetails['repetition_frequency_unit'] == 'week'){
-          if($scheduleReminderDetails['start_action_condition']){
-            $startActionCondition = $scheduleReminderDetails['start_action_condition'];
-            $explodeStartActionCondition = explode(',', $startActionCondition);
-            $buildRuleArray = array();
-            foreach($explodeStartActionCondition as $key => $val){
-              $buildRuleArray[] = strtoupper(substr($val, 0, 2));
-            }
-            $r->wkst('MO')->byday($buildRuleArray);
+        if($scheduleReminderDetails['start_action_date']){
+          $startActionDate = explode(" ", $scheduleReminderDetails['start_action_date']);
+          switch ($startActionDate[0]) {
+            case 'first':
+                $startActionDate1 = 1;
+                break;
+            case 'second':
+                $startActionDate1 = 2;
+                break;
+            case 'third':
+                $startActionDate1 = 3;
+                break;
+            case 'fourth':
+                $startActionDate1 = 4;
+                break;
+            case 'last':
+                $startActionDate1 = -1;
+                break;
           }
+          $concatStartActionDateBits = $startActionDate1.strtoupper(substr($startActionDate[1], 0, 2));
+          $r->byday(array($concatStartActionDateBits));
         }
+      }
 
-        //month 
-        if($scheduleReminderDetails['repetition_frequency_unit'] == 'month'){
-          if($scheduleReminderDetails['limit_to']){
-            $r->bymonthday(array($scheduleReminderDetails['limit_to']));
-          }
-          if($scheduleReminderDetails['start_action_date']){
-            $startActionDate = explode(" ", $scheduleReminderDetails['start_action_date']);
-            switch ($startActionDate[0]) {
-              case 'first':
-                  $startActionDate1 = 1;
-                  break;
-              case 'second':
-                  $startActionDate1 = 2;
-                  break;
-              case 'third':
-                  $startActionDate1 = 3;
-                  break;
-              case 'fourth':
-                  $startActionDate1 = 4;
-                  break;
-              case 'last':
-                  $startActionDate1 = -1;
-                  break;
-            }
-            $concatStartActionDateBits = $startActionDate1.strtoupper(substr($startActionDate[1], 0, 2));
-            $r->byday(array($concatStartActionDateBits));
-          }
+      //Ends
+      if($scheduleReminderDetails['start_action_offset']){
+        if($scheduleReminderDetails['start_action_offset'] > 30){
+          $r->errors[] = 'Occurrences should be less than or equal to 30';
         }
+        $r->count($scheduleReminderDetails['start_action_offset']);
+      }
 
-        //Ends
-        if($scheduleReminderDetails['start_action_offset']){
-          if($scheduleReminderDetails['start_action_offset'] > 30){
-            $r->errors[] = 'Occurrences should be less than or equal to 30';
-          }
-          $r->count($scheduleReminderDetails['start_action_offset']);
-        }
+      if($scheduleReminderDetails['absolute_date']){
+        $absoluteDate = CRM_Utils_Date::setDateDefaults($scheduleReminderDetails['absolute_date']);
+        $endDate = new DateTime($absoluteDate[0].' '.$absoluteDate[1]);
+        $r->until($endDate);
+      }
 
-        if($scheduleReminderDetails['absolute_date']){
-          $absoluteDate = CRM_Utils_Date::setDateDefaults($scheduleReminderDetails['absolute_date']);
-          $endDate = new DateTime($absoluteDate[0].' '.$absoluteDate[1]);
-          $r->until($endDate);
-        }
-
-        if(!$scheduleReminderDetails['start_action_offset'] && !$scheduleReminderDetails['absolute_date']){
-          $r->errors[] = 'Ends: is a required field';
-        }
-     }else{
-       $r->errors[] = 'Repeats: is a required field';
-     }
-      return $r;
-    }
+      if(!$scheduleReminderDetails['start_action_offset'] && !$scheduleReminderDetails['absolute_date']){
+        $r->errors[] = 'Ends: is a required field';
+      }
+   }else{
+     $r->errors[] = 'Repeats: is a required field';
+   }
+    return $r;
+  }
     
   /*
    * Get Reminder id based on event id
