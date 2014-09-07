@@ -508,9 +508,6 @@
     else if ($el.hasClass('medium-popup')) {
       settings.dialog.width = settings.dialog.height = '50%';
     }
-    else if ($el.hasClass('huge-popup')) {
-      settings.dialog.height = '90%';
-    }
     var dialog = popup(url, settings);
     // Trigger events from the dialog on the original link element
     $el.trigger('crmPopupOpen', [dialog]);
