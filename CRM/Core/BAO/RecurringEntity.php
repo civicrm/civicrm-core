@@ -403,14 +403,16 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return $dao;
   }  
   
-  static public function generateRecursions($recursionObj, $params=array()){ 
+  static public function generateRecursions($recursionObj, $params = array(), $excludeDates = array()) { 
     $newParams = $recursionResult = array();
-    if($recursionObj && !empty($params)){ 
+    if ($recursionObj && !empty($params)) { 
+      $initialCount = CRM_Utils_Array::value('start_action_offset', $params);
       if(CRM_Utils_Array::value('parent_event_start_date', $params) && CRM_Utils_Array::value('parent_event_id', $params)){
         $count = 1;
-        while($result = $recursionObj->next()){
+        while ($result = $recursionObj->next()) {
           $newParams['start_date'] = CRM_Utils_Date::processDate($result->format('Y-m-d H:i:s'));
           $parentStartDate = new DateTime($params['parent_event_start_date']);
+
           //If events with end date
           if(CRM_Utils_Array::value('parent_event_end_date', $params)){
             $parentEndDate = new DateTime($params['parent_event_end_date']);
@@ -421,6 +423,27 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
             $recursionResult[$count]['end_date'] = $newParams['end_date'];
           }
           $recursionResult[$count]['start_date'] = $newParams['start_date'];
+
+          $skip = FALSE;
+          foreach ($excludeDates as $date) {
+            $date = CRM_Utils_Date::processDate($date, NULL, FALSE, 'Ymd');
+            if (($date == $result->format('Ymd')) || 
+              ($end_date && ($date > $result->format('Ymd')) && ($date <= $end_date->format('Ymd')))
+            ) {
+                $skip = TRUE;
+                break;
+            }
+          }
+
+          if ($skip) {
+            unset($recursionResult[$count]);
+            if ($initialCount && ($initialCount > 0)) {
+              // lets increase the counter, so we get correct number of occurrences
+              $initialCount++;
+              $recursionObj->count($initialCount);
+            }
+            continue;
+          }
           $count++;
         }
       }

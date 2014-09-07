@@ -218,6 +218,7 @@ class CRM_Core_Form_RecurringEntity {
     
     
     //TO DO - Exclude date functionality
+    $excludeDateList = array();
     if(CRM_Utils_Array::value('copyExcludeDates', $params) && CRM_Utils_Array::value('parent_event_id', $params)){   
       //Since we get comma separated values lets get them in array
       $exclude_date_list = array();
@@ -254,6 +255,7 @@ class CRM_Core_Form_RecurringEntity {
                 'weight'          =>  CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_OptionValue', $oldWeight, CRM_Utils_Array::value('weight', $params), $fieldValues),
                 'is_active'       =>  1
               );
+          $excludeDateList[] = $optionGroupValue['value'];
           CRM_Core_BAO_OptionValue::add($optionGroupValue);
         }
       }
@@ -264,8 +266,8 @@ class CRM_Core_Form_RecurringEntity {
       CRM_Core_BAO_RecurringEntity::delEntityRelations($params['parent_event_id'], 'civicrm_event');
     }
     //Give call to create recursions
-    $recurResult = CRM_Core_BAO_RecurringEntity::generateRecursions($recursionObject, $params);
-    if(!empty($recurResult) && $params['parent_event_id']){
+    $recurResult = CRM_Core_BAO_RecurringEntity::generateRecursions($recursionObject, $params, $excludeDateList);
+    if(!empty($recurResult) && $params['parent_event_id']) {
       CRM_Core_BAO_RecurringEntity::addEntityThroughRecursion($recurResult, $params['parent_event_id']);
     }
     $status = ts('Repeat Configuration has been saved');
