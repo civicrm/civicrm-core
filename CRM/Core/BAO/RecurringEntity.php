@@ -231,8 +231,9 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         $dbParams['entity_value'] = $formParams['parent_event_id'];
     }
     
-    if(CRM_Utils_Array::value('repetition_start_date', $formParams)){
-      $repetition_start_date = new DateTime($formParams['repetition_start_date']);
+    if(CRM_Utils_Array::value('repetition_start_date', $formParams) &&
+        CRM_Utils_Array::value('repetition_start_date_time', $formParams)){
+      $repetition_start_date = new DateTime($formParams['repetition_start_date']." ".$formParams['repetition_start_date_time']);
       $repetition_start_date->modify('+1 day');
       $dbParams['entity_status'] = CRM_Utils_Date::processDate($repetition_start_date->format('Y-m-d H:i:s'));
     }
