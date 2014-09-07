@@ -42,10 +42,9 @@
       <add>4.6</add>
   </field>
   <field>
-      <name>cascade_type</name>
-      <type>tinyint unsigned</type>
+      <name>mode</name>
+      <type>boolean</type>
       <default>1</default>
-      <length>4</length>
       <title>Cascade Type</title>
       <required>true</required>
       <add>4.6</add>

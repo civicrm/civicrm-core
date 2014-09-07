@@ -97,8 +97,8 @@
     function updateMode(mode) {
       var eventID = {/literal}{$id}{literal};
       if (eventID != "" && mode) {
-        var ajaxurl = CRM.url("civicrm/ajax/recurringEntity/update_cascade_type");
-        var data    = {cascadeType: mode, entityId: eventID};
+        var ajaxurl = CRM.url("civicrm/ajax/recurringentity/update-mode");
+        var data    = {mode: mode, entityId: eventID};
         $.ajax({
           dataType: "json",
           data: data,
