@@ -424,9 +424,9 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     static public function getInterval($startDate, $endDate) { 
       if ($startDate && $endDate) {
         $startDate = new DateTime($startDate);
+        $endDate   = new DateTime($endDate);
 
-        $endDate = new DateTime($endDate);
-        return $parentStartDate->diff($parentEndDate);
+        return $startDate->diff($endDate);
       }
     }
   
